@@ -1,21 +1,20 @@
-use std::fmt::{self, Write as _};
-
-use rowan::TextSize;
-use salsa::Database as Db;
-use squawk_syntax::ast::{self, AstNode};
-
-use crate::arena::IdxRange;
-use crate::db::{parse, semantic_index};
-use crate::file::{FilePosition, FileRange, InFile};
-use crate::hover_literal::{LiteralHover, hover_literal};
-use crate::interner::Name;
-use crate::ir::{
+use squawk_sema::arena::IdxRange;
+use squawk_sema::file::{FilePosition, FileRange, InFile};
+use squawk_sema::interner::Name;
+use squawk_sema::ir::{
     Column, ColumnId, ColumnOwner, ConstraintOwner, FunctionId, FunctionKind, GraphElementKind,
     Item, Operand, ParamId, ParamMode, SourceId, SourceKind, StarId, TableId, TableKind, TypeId,
     TypeKind,
 };
+use squawk_sema::semantic_index::SemanticIndex;
+use std::fmt::{self, Write as _};
+
+use rowan::TextSize;
+use squawk_syntax::ast::{self, AstNode};
+
+use crate::db::{Db, parse, semantic_index};
+use crate::hover_literal::{LiteralHover, hover_literal};
 use crate::offsets::{TokenAt, item_at_token};
-use crate::semantic_index::SemanticIndex;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Hover {

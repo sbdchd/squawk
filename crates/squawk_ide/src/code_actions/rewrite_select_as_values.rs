@@ -1,13 +1,14 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
+use squawk_sema::file::InFile;
 use squawk_syntax::{
     SyntaxToken,
     ast::{self, AstNode},
 };
 use std::iter;
 
-use crate::{code_actions::name::Name, file::InFile, offsets::token_from_offset};
+use crate::db::Db;
+use crate::{code_actions::name::Name, offsets::token_from_offset};
 
 use super::{ActionKind, CodeAction};
 

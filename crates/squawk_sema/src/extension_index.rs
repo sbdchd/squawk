@@ -5,7 +5,7 @@ use crate::interner::Name;
 use crate::ir::{Extension, ExtensionId};
 
 #[derive(Debug, Default)]
-pub(crate) struct ExtensionIndex {
+pub struct ExtensionIndex {
     arena: LayeredArena<Extension>,
     by_name: LayeredMultimap<Name, ExtensionId>,
     by_schema: LayeredMultimap<Name, ExtensionId>,

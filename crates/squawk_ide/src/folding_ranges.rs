@@ -30,13 +30,14 @@
 use rustc_hash::FxHashSet;
 
 use rowan::{NodeOrToken, SyntaxText, TextRange};
-use salsa::Database as Db;
 use squawk_line_index::find_newline;
 use squawk_syntax::SyntaxKind;
 use squawk_syntax::ast::{self, AstNode, AstToken};
 
-use crate::comments::line_comment_group;
-use crate::db::{File, parse};
+use squawk_sema::comments::line_comment_group;
+use squawk_sema::file::FileId;
+
+use crate::db::{Db, File, original_file, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FoldKind {
@@ -58,9 +59,13 @@ pub struct Fold {
     pub kind: FoldKind,
 }
 
+pub fn folding_ranges(db: &dyn Db, file_id: FileId) -> Vec<Fold> {
+    file_folding_ranges(db, original_file(db, file_id))
+}
+
 #[salsa::tracked]
-pub fn folding_ranges(db: &dyn Db, file: File) -> Vec<Fold> {
-    let parse = parse(db, file);
+fn file_folding_ranges(db: &dyn Db, file: File) -> Vec<Fold> {
+    let parse = parse(db, file.file_id(db));
 
     let mut folds = vec![];
     let mut visited_comments = FxHashSet::default();
@@ -237,7 +242,7 @@ mod tests {
     use insta::assert_snapshot;
     use std::fmt::Write as _;
 
-    use crate::db::{Database, File};
+    use crate::db::Database;
 
     use super::*;
 
@@ -258,9 +263,9 @@ mod tests {
 
     #[must_use]
     fn check(sql: &str) -> String {
-        let db = Database::default();
-        let file = File::new(&db, sql.to_string().into());
-        let folds = folding_ranges(&db, file);
+        let mut db = Database::default();
+        let file = db.add_file(sql.into());
+        let folds = folding_ranges(&db, file.into());
 
         if folds.is_empty() {
             return sql.to_string();

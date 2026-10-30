@@ -1,1 +1,1 @@
-../../crates/squawk_ide/src/generated/builtins.sql
+../../crates/squawk_sema/src/generated/builtins.sql

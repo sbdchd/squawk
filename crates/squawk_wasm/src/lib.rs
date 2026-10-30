@@ -3,14 +3,13 @@ use std::fmt::Write as _;
 
 use log::info;
 use rowan::{TextRange, TextSize};
-use salsa::Setter;
 use serde::{Deserialize, Serialize};
 use squawk_ide::builtins::builtins_file;
-use squawk_ide::db::{self, Database, File};
-use squawk_ide::file::InFile;
+use squawk_ide::db::{self, Database, File, original_file};
 use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
 use squawk_ide::semantic_tokens::{SemanticTokenType, semantic_tokens};
 use squawk_line_index::{LineIndex, find_newline};
+use squawk_sema::file::{FileId, FileIndex, InFile};
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
 use web_sys::js_sys::Error;
@@ -141,9 +140,9 @@ impl SemanticTokenEncoder {
     }
 }
 
-fn encode_semantic_tokens(db: &Database, file: File) -> Vec<u32> {
+fn encode_semantic_tokens(db: &Database, file: FileId) -> Vec<u32> {
     let line_index = db::line_index(db, file);
-    let content = file.content(db);
+    let content = original_file(db, file).content(db);
     let tokens = semantic_tokens(db, file, None);
 
     let mut encoder = SemanticTokenEncoder::with_capacity(tokens.len());
@@ -199,8 +198,8 @@ pub fn run() {
 #[wasm_bindgen]
 pub struct SquawkDatabase {
     db: Database,
-    file: Option<File>,
-    formatted_file: Option<File>,
+    file: Option<FileIndex>,
+    formatted_file: Option<FileIndex>,
 }
 
 #[wasm_bindgen]
@@ -216,18 +215,19 @@ impl SquawkDatabase {
     }
 
     pub fn open_file(&mut self, content: String) {
-        let file = File::new(&self.db, content.into());
+        let file = self.db.add_file(content.into());
         self.file = Some(file);
     }
 
     pub fn update_file(&mut self, content: String) {
         if let Some(file) = self.file {
-            file.set_content(&mut self.db).to(content.into());
+            self.db.set_file_content(file, content.into());
         }
     }
 
-    fn file(&self) -> Result<File, Error> {
+    fn file(&self) -> Result<FileId, Error> {
         self.file
+            .map(FileId::from)
             .ok_or_else(|| Error::new("No file open. Call open_file first."))
     }
 
@@ -239,7 +239,7 @@ impl SquawkDatabase {
 
     pub fn dump_tokens(&self) -> Result<String, Error> {
         let file = self.file()?;
-        let content = file.content(&self.db);
+        let content = original_file(&self.db, file).content(&self.db);
         let tokens = squawk_lexer::tokenize(content);
         let mut start = 0;
         let mut out = String::new();
@@ -254,7 +254,7 @@ impl SquawkDatabase {
 
     pub fn format(&self) -> Result<String, Error> {
         let file = self.file()?;
-        let content = file.content(&self.db);
+        let content = original_file(&self.db, file).content(&self.db);
         let line_ending = find_newline(content)
             .map(|(_, ending)| ending)
             .unwrap_or_default();
@@ -272,7 +272,7 @@ impl SquawkDatabase {
 
     pub fn lint(&self) -> Result<JsValue, Error> {
         let file = self.file()?;
-        let content = file.content(&self.db);
+        let content = original_file(&self.db, file).content(&self.db);
         let mut linter = squawk_linter::Linter::with_default_rules();
         let parse = db::parse(&self.db, file);
         let parse_errors = parse.errors();
@@ -612,16 +612,16 @@ impl SquawkDatabase {
     pub fn formatted_semantic_tokens(&mut self, content: String) -> Vec<u32> {
         let file = match self.formatted_file {
             Some(file) => {
-                file.set_content(&mut self.db).to(content.into());
+                self.db.set_file_content(file, content.into());
                 file
             }
             None => {
-                let file = File::new(&self.db, content.into());
+                let file = self.db.add_file(content.into());
                 self.formatted_file = Some(file);
                 file
             }
         };
-        encode_semantic_tokens(&self.db, file)
+        encode_semantic_tokens(&self.db, file.into())
     }
 
     pub fn semantic_tokens_legend() -> Result<JsValue, Error> {
@@ -685,8 +685,8 @@ fn into_error<E: std::fmt::Display>(err: E) -> Error {
 }
 
 fn location_range(db: &Database, loc: InFile<TextRange>) -> LocationRange {
-    let file = loc.file_id.original_file(db);
-    let line_index = db::line_index(db, file);
+    let file = original_file(db, loc.file_id);
+    let line_index = db::line_index(db, loc.file_id);
     let start = line_index.line_col(loc.value.start());
     let end = line_index.line_col(loc.value.end());
     let start_wide = line_index
@@ -707,7 +707,7 @@ fn location_range(db: &Database, loc: InFile<TextRange>) -> LocationRange {
 
 fn position_to_offset(
     db: &Database,
-    file: File,
+    file: FileId,
     line: u32,
     col: u32,
 ) -> Result<InFile<rowan::TextSize>, Error> {

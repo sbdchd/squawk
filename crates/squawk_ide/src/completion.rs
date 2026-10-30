@@ -1,20 +1,20 @@
+use squawk_sema::file::FileId;
+use squawk_sema::file::{FileRange, InFile, InIrFile, IrFileId};
+use squawk_sema::interner::Name;
+use squawk_sema::ir::{ColumnId, FunctionId, FunctionKind, Item, ParamMode, ScopeId, SourceId, Ty};
+use squawk_sema::semantic_index::SemanticIndex;
 use std::fmt::Write;
 use std::iter;
 
 use rowan::TextSize;
 use rustc_hash::FxHashSet;
-use salsa::Database as Db;
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode},
 };
 
-use crate::db::{CompletionFile, FileId, parse, semantic_index};
-use crate::file::{FileRange, InFile, InIrFile, IrFileId};
+use crate::db::{Db, parse, semantic_index};
 use crate::hover::function_signature;
-use crate::interner::Name;
-use crate::ir::{ColumnId, FunctionId, FunctionKind, Item, ParamMode, ScopeId, SourceId, Ty};
-use crate::semantic_index::SemanticIndex;
 
 pub(crate) const COMPLETION_MARKER: &str = "squawkCompletionMarker";
 
@@ -36,8 +36,13 @@ const SELECT_CLAUSES: &[&str] = &[
 const DELETE_CLAUSES: &[&str] = &["returning", "using", "where"];
 
 pub fn completion(db: &dyn Db, position: InFile<TextSize>) -> Vec<CompletionItem> {
-    let file = position.file_id.original_file(db);
-    let file_id = FileId::Completion(CompletionFile::new(db, file, position.value));
+    let FileId::File(file) = position.file_id else {
+        return vec![];
+    };
+    let file_id = FileId::Completion {
+        file,
+        offset: position.value,
+    };
     let tree = parse(db, file_id).tree();
     let Some(token) = tree
         .syntax()

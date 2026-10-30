@@ -2,15 +2,15 @@ use std::ops::Range;
 
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
 use insta::assert_snapshot;
-use squawk_syntax::SourceFile;
-
-use crate::{
+use squawk_sema::{
     builtins::BUILTINS_SQL,
     extensions::BundledExtension,
     file::{FileId, InFile},
-    inlay_hints::inlay_hints_with_index as inlay_hints,
     semantic_index_builder::SemanticIndexBuilder,
 };
+use squawk_syntax::SourceFile;
+
+use crate::inlay_hints::inlay_hints_with_index as inlay_hints;
 
 #[must_use]
 #[track_caller]
@@ -18,8 +18,8 @@ fn check_inlay_hints(sql: &str) -> String {
     let parse = SourceFile::parse(sql);
     assert_eq!(parse.errors(), vec![]);
     let tree = parse.tree();
-    let db = crate::db::Database::default();
-    let file = InFile::new(crate::db::File::new(&db, sql.into()), &tree);
+    let mut db = crate::db::Database::default();
+    let file = InFile::new(db.add_file(sql.into()), &tree);
     let mut builder = SemanticIndexBuilder::new();
     builder.add_file(file);
     let index = builder.build();

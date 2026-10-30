@@ -1,5 +1,6 @@
 use gen_lsp_types::{LspRequestMethod, MessageDirection, Request};
 use log::info;
+use squawk_ide::db::original_file;
 
 use crate::global_state::Snapshot;
 
@@ -25,7 +26,7 @@ pub(crate) fn handle_tokens(snapshot: &Snapshot, params: TokensParams) -> String
 
     let db = snapshot.db();
     let file = snapshot.file(&uri).unwrap();
-    let content = file.content(db);
+    let content = original_file(db, file).content(db);
 
     // TODO: move this to a tracked function
     let tokens = squawk_lexer::tokenize(content);

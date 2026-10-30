@@ -12,7 +12,7 @@ use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 
 #[derive(Debug)]
-pub(crate) struct LayeredArena<T: 'static> {
+pub struct LayeredArena<T: 'static> {
     base: &'static [T],
     local: Vec<T>,
 }
@@ -99,7 +99,7 @@ impl<T> LayeredArena<T> {
             .chain(self.iter_local())
     }
 
-    pub(crate) fn iter_local(&self) -> impl DoubleEndedIterator<Item = (Idx<T>, &T)> {
+    pub fn iter_local(&self) -> impl DoubleEndedIterator<Item = (Idx<T>, &T)> {
         let offset = self.base.len();
         self.local
             .iter()
@@ -198,7 +198,7 @@ fn idx<T>(i: usize) -> Idx<T> {
     Idx::from_raw(RawIdx::from_u32(u32::try_from(i).unwrap()))
 }
 
-pub(crate) struct IdxRange<T> {
+pub struct IdxRange<T> {
     // using std::Range is copy vs the crates.io version
     range: Range<u32>,
     _ty: PhantomData<fn() -> T>,
@@ -220,19 +220,19 @@ impl<T> IdxRange<T> {
         }
     }
 
-    pub(crate) fn start(self) -> Idx<T> {
+    pub fn start(self) -> Idx<T> {
         Idx::from_raw(RawIdx::from_u32(self.range.start))
     }
 
-    pub(crate) fn len(self) -> usize {
+    pub fn len(self) -> usize {
         (self.range.end - self.range.start) as usize
     }
 
-    pub(crate) fn is_empty(self) -> bool {
+    pub fn is_empty(self) -> bool {
         self.range.is_empty()
     }
 
-    pub(crate) fn iter(self) -> <Self as IntoIterator>::IntoIter {
+    pub fn iter(self) -> <Self as IntoIterator>::IntoIter {
         self.into_iter()
     }
 }

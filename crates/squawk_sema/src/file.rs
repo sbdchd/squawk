@@ -26,10 +26,37 @@
 
 use std::cmp::Ordering;
 
-pub use crate::db::FileId;
+use crate::extensions::BundledExtension;
 use crate::ir::BodyId;
 use rowan::{TextRange, TextSize};
 use squawk_syntax::{AstPtr, SyntaxNodePtr, ast::AstNode};
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub struct FileIndex(u32);
+
+impl FileIndex {
+    pub fn from_raw(raw: u32) -> FileIndex {
+        FileIndex(raw)
+    }
+
+    pub fn index(self) -> usize {
+        self.0 as usize
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum FileId {
+    File(FileIndex),
+    Completion { file: FileIndex, offset: TextSize },
+    Builtins,
+    Extension(BundledExtension),
+}
+
+impl From<FileIndex> for FileId {
+    fn from(file: FileIndex) -> Self {
+        FileId::File(file)
+    }
+}
 
 /// `InFile<T>` stores a value of `T` inside a particular file/syntax tree.
 ///
@@ -90,7 +117,7 @@ impl PartialOrd for FileRange {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub(crate) enum IrFileId {
+pub enum IrFileId {
     File(FileId),
     Body(BodyId),
 }
@@ -101,8 +128,8 @@ impl From<FileId> for IrFileId {
     }
 }
 
-pub(crate) type InIrFile<T> = InFileWrapper<IrFileId, T>;
-pub(crate) type IrFileRange = InIrFile<TextRange>;
+pub type InIrFile<T> = InFileWrapper<IrFileId, T>;
+pub type IrFileRange = InIrFile<TextRange>;
 
 impl<FileKind: Copy> InFileWrapper<FileKind, SyntaxNodePtr> {
     pub fn file_range(&self) -> InFileWrapper<FileKind, TextRange> {

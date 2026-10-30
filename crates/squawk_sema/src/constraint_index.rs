@@ -5,7 +5,7 @@ use crate::interner::Name;
 use crate::ir::{Constraint, ConstraintId, ConstraintKind, ConstraintOwner, IndexId};
 
 #[derive(Debug, Default)]
-pub(crate) struct ConstraintIndex {
+pub struct ConstraintIndex {
     arena: LayeredArena<Constraint>,
     by_name: LayeredMultimap<Name, ConstraintId>,
     by_owner: LayeredMultimap<ConstraintOwner, ConstraintId>,

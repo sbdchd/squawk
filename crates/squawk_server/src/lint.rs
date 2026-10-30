@@ -1,12 +1,12 @@
 use gen_lsp_types::{
     Code, CodeDescription, Diagnostic, DiagnosticSeverity, Message, Position, Range, TextEdit,
 };
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
-use squawk_ide::db::{File, line_index as file_line_index, parse};
+use squawk_ide::db::{Db, File, line_index as file_line_index, original_file, parse};
 use squawk_ide::diagnostics::{Suggestion, diagnostics as semantic_diagnostics};
 use squawk_line_index::{LineIndex, TextRange, find_newline};
 use squawk_linter::Linter;
+use squawk_sema::file::FileId;
 use url::Url;
 
 use crate::{
@@ -41,14 +41,19 @@ fn diagnostic_range(line_index: &LineIndex, range: TextRange) -> Range {
     )
 }
 
+pub(crate) fn lint(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
+    file_lint(db, original_file(db, file_id))
+}
+
 #[salsa::tracked]
-pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
-    let parse = parse(db, file);
+fn file_lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
+    let file_id = file.file_id(db);
+    let parse = parse(db, file_id);
     let content = file.content(db);
     let parse_errors = parse.errors();
     let mut linter = Linter::with_default_rules();
     let violations = linter.lint(&parse, content);
-    let line_index = file_line_index(db, file);
+    let line_index = file_line_index(db, file_id);
     let line_ending = find_newline(content)
         .map(|(_, ending)| ending)
         .unwrap_or_default();
@@ -74,7 +79,7 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
         diagnostics.push(diagnostic);
     }
 
-    for error in semantic_diagnostics(db, file) {
+    for error in semantic_diagnostics(db, file_id) {
         let message = match error.hint {
             Some(hint) => format!("{}\nhint: {hint}", error.message),
             None => error.message.into_owned(),
@@ -163,15 +168,15 @@ pub(crate) fn lint(db: &dyn Db, file: File) -> Vec<Diagnostic> {
 mod test {
     use gen_lsp_types::{Code, Message};
     use insta::assert_snapshot;
-    use squawk_ide::db::{Database, File};
+    use squawk_ide::db::Database;
 
     use super::lint;
     use crate::diagnostic::AssociatedDiagnosticData;
 
     fn check(sql: &str) -> String {
-        let db = Database::default();
-        let file = File::new(&db, sql.into());
-        lint(&db, file)
+        let mut db = Database::default();
+        let file = db.add_file(sql.into());
+        lint(&db, file.into())
             .into_iter()
             .map(|d| {
                 let code = match d.code {

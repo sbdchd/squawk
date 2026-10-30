@@ -10,7 +10,7 @@ use crate::ir::{Column, ColumnTypeRef, Columns, Subscript, Ty, Type, TypeCategor
 type NamePtr = InIrFile<AstPtr<ast::PathSegment>>;
 
 #[derive(Debug, Default)]
-pub(crate) struct TypeIndex {
+pub struct TypeIndex {
     arena: LayeredArena<Type>,
     by_name: LayeredMultimap<QualifiedName, TypeId>,
     by_schema: LayeredMultimap<Name, TypeId>,

@@ -36,12 +36,18 @@ pub(crate) fn builtins() -> &'static SemanticIndex {
     &BUILTINS
 }
 
-pub(crate) struct SemanticIndexBuilder {
+pub struct SemanticIndexBuilder {
     lowerer: Lowerer,
 }
 
+impl Default for SemanticIndexBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl SemanticIndexBuilder {
-    pub(crate) fn new() -> SemanticIndexBuilder {
+    pub fn new() -> SemanticIndexBuilder {
         SemanticIndexBuilder::with_index(IndexData::on_top_of(builtins()))
     }
 
@@ -51,12 +57,12 @@ impl SemanticIndexBuilder {
         }
     }
 
-    pub(crate) fn add_file(&mut self, file: InFile<&ast::SourceFile>) -> &mut SemanticIndexBuilder {
+    pub fn add_file(&mut self, file: InFile<&ast::SourceFile>) -> &mut SemanticIndexBuilder {
         self.lowerer.lower_file(file);
         self
     }
 
-    pub(crate) fn build(self) -> SemanticIndex {
+    pub fn build(self) -> SemanticIndex {
         let mut index = self.lowerer.finish();
         index
             .items

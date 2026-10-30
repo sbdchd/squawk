@@ -9,7 +9,7 @@ use crate::ir::{
     OperatorId, Statistics, TextSearch, Ty,
 };
 
-pub(crate) trait Qualified {
+pub trait Qualified {
     fn name(&self) -> Name;
 
     fn schema(&self) -> Name;
@@ -18,7 +18,7 @@ pub(crate) trait Qualified {
 }
 
 #[derive(Debug)]
-pub(crate) struct QualifiedIndex<T: 'static> {
+pub struct QualifiedIndex<T: 'static> {
     arena: LayeredArena<T>,
     by_name: LayeredMultimap<QualifiedName, Idx<T>>,
     by_schema: LayeredMultimap<Name, Idx<T>>,
@@ -52,11 +52,11 @@ impl<T: Qualified> QualifiedIndex<T> {
         id
     }
 
-    pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = Idx<T>> + '_ {
+    pub fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = Idx<T>> + '_ {
         self.by_name.get(QualifiedName { schema, name })
     }
 
-    pub(crate) fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = Idx<T>> + '_ {
+    pub fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = Idx<T>> + '_ {
         self.by_schema.get(schema)
     }
 

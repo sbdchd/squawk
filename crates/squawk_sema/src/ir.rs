@@ -9,15 +9,15 @@ use crate::file::{InIrFile, IrFileId, IrFileRange};
 use crate::interner::Name;
 
 pub(crate) type QueryId = Idx<Query>;
-pub(crate) type ScopeId = Idx<Scope>;
+pub type ScopeId = Idx<Scope>;
 pub(crate) type CteId = Idx<Cte>;
-pub(crate) type SourceId = Idx<Source>;
-pub(crate) type ColumnId = Idx<Column>;
-pub(crate) type TableId = Idx<Table>;
+pub type SourceId = Idx<Source>;
+pub type ColumnId = Idx<Column>;
+pub type TableId = Idx<Table>;
 pub(crate) type RefId = Idx<Reference>;
-pub(crate) type FunctionId = Idx<Function>;
-pub(crate) type ParamId = Idx<Param>;
-pub(crate) type TypeId = Idx<Type>;
+pub type FunctionId = Idx<Function>;
+pub type ParamId = Idx<Param>;
+pub type TypeId = Idx<Type>;
 pub(crate) type MergeId = Idx<Merge>;
 pub(crate) type BodyId = Idx<Body>;
 pub(crate) type WindowId = Idx<Window>;
@@ -60,10 +60,10 @@ pub(crate) type PreparedTransactionId = Idx<PreparedTransaction>;
 pub(crate) type PreparedStatementId = Idx<PreparedStatement>;
 pub(crate) type ChannelId = Idx<Channel>;
 pub(crate) type CaseId = Idx<Case>;
-pub(crate) type StarId = Idx<Star>;
+pub type StarId = Idx<Star>;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum TableKind {
+pub enum TableKind {
     Table,
     ForeignTable,
     View,
@@ -73,7 +73,7 @@ pub(crate) enum TableKind {
 }
 
 impl TableKind {
-    pub(crate) fn label(self) -> &'static str {
+    pub fn label(self) -> &'static str {
         match self {
             TableKind::Table => "table",
             TableKind::ForeignTable => "foreign table",
@@ -86,13 +86,13 @@ impl TableKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct Table {
-    pub(crate) kind: TableKind,
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
+pub struct Table {
+    pub kind: TableKind,
+    pub schema: Name,
+    pub name: Name,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) columns: Columns,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
+    pub columns: Columns,
     pub(crate) constraints_complete: bool,
     pub(crate) sequence_owner: Option<SequenceOwner>,
     pub(crate) of_type: Option<TypeId>,
@@ -106,16 +106,16 @@ pub(crate) struct SequenceOwner {
 }
 
 #[derive(Debug)]
-pub(crate) struct Index {
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
-    pub(crate) table: Option<TableId>,
+pub struct Index {
+    pub schema: Name,
+    pub name: Name,
+    pub table: Option<TableId>,
     pub(crate) key: Option<IdxRange<Name>>,
     pub(crate) unique: bool,
     pub(crate) partial: bool,
     pub(crate) deferrable: bool,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -130,29 +130,29 @@ pub(crate) enum ConstraintKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum ConstraintOwner {
+pub enum ConstraintOwner {
     Table(TableId),
     Domain(TypeId),
 }
 
 #[derive(Debug)]
-pub(crate) struct Constraint {
+pub struct Constraint {
     pub(crate) kind: ConstraintKind,
-    pub(crate) name: Name,
-    pub(crate) owner: ConstraintOwner,
+    pub name: Name,
+    pub owner: ConstraintOwner,
     pub(crate) index: Option<IndexId>,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Trigger {
-    pub(crate) name: Name,
-    pub(crate) table: TableId,
-    pub(crate) constraint: bool,
+pub struct Trigger {
+    pub name: Name,
+    pub table: TableId,
+    pub constraint: bool,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -164,28 +164,28 @@ pub(crate) enum RuleEvent {
 }
 
 #[derive(Debug)]
-pub(crate) struct Rule {
-    pub(crate) name: Name,
-    pub(crate) table: TableId,
+pub struct Rule {
+    pub name: Name,
+    pub table: TableId,
     pub(crate) event: RuleEvent,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Collation {
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
+pub struct Collation {
+    pub schema: Name,
+    pub name: Name,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
+    pub name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Schema {
-    pub(crate) name: Name,
+pub struct Schema {
+    pub name: Name,
     pub(crate) ptr: InIrFile<AstPtr<ast::CreateSchema>>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -195,71 +195,71 @@ pub(crate) enum AccessMethodKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct AccessMethod {
-    pub(crate) name: Name,
+pub struct AccessMethod {
+    pub name: Name,
     pub(crate) kind: AccessMethodKind,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct EventTrigger {
-    pub(crate) name: Name,
+pub struct EventTrigger {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Language {
-    pub(crate) name: Name,
+pub struct Language {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct ForeignDataWrapper {
-    pub(crate) name: Name,
+pub struct ForeignDataWrapper {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Server {
-    pub(crate) name: Name,
+pub struct Server {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Conversion {
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
+pub struct Conversion {
+    pub schema: Name,
+    pub name: Name,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct OperatorFamily {
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
-    pub(crate) access_method: Option<AccessMethodId>,
+pub struct OperatorFamily {
+    pub schema: Name,
+    pub name: Name,
+    pub access_method: Option<AccessMethodId>,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum MemberOwner {
+pub enum MemberOwner {
     Class(OperatorClassId),
     Family(OperatorFamilyId),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum MemberKind {
+pub enum MemberKind {
     Operator,
     Function,
 }
@@ -271,34 +271,34 @@ pub(crate) struct Operands {
 }
 
 #[derive(Debug)]
-pub(crate) struct OperatorFamilyMember {
+pub struct OperatorFamilyMember {
     pub(crate) owner: MemberOwner,
-    pub(crate) kind: MemberKind,
+    pub kind: MemberKind,
     pub(crate) number: Option<u16>,
     pub(crate) operands: Operands,
-    pub(crate) ptr: InIrFile<SyntaxNodePtr>,
+    pub ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct OperatorClass {
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
-    pub(crate) access_method: Option<AccessMethodId>,
+pub struct OperatorClass {
+    pub schema: Name,
+    pub name: Name,
+    pub access_method: Option<AccessMethodId>,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Statistics {
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
-    pub(crate) table: Option<TableId>,
+pub struct Statistics {
+    pub schema: Name,
+    pub name: Name,
+    pub table: Option<TableId>,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum TextSearchKind {
+pub enum TextSearchKind {
     Parser,
     Template,
     Dictionary,
@@ -306,7 +306,7 @@ pub(crate) enum TextSearchKind {
 }
 
 impl TextSearchKind {
-    pub(crate) fn label(self) -> &'static str {
+    pub fn label(self) -> &'static str {
         match self {
             TextSearchKind::Parser => "text search parser",
             TextSearchKind::Template => "text search template",
@@ -317,110 +317,110 @@ impl TextSearchKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct TextSearch {
-    pub(crate) kind: TextSearchKind,
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
+pub struct TextSearch {
+    pub kind: TextSearchKind,
+    pub schema: Name,
+    pub name: Name,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Publication {
-    pub(crate) name: Name,
+pub struct Publication {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Subscription {
-    pub(crate) name: Name,
+pub struct Subscription {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum GraphElementKind {
+pub enum GraphElementKind {
     Vertex,
     Edge,
 }
 
 #[derive(Debug)]
-pub(crate) struct GraphElement {
-    pub(crate) graph: TableId,
-    pub(crate) kind: GraphElementKind,
-    pub(crate) alias: Name,
+pub struct GraphElement {
+    pub graph: TableId,
+    pub kind: GraphElementKind,
+    pub alias: Name,
     pub(crate) table: Option<TableId>,
     pub(crate) source: Option<GraphElementId>,
     pub(crate) destination: Option<GraphElementId>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct EnumLabel {
-    pub(crate) ty: TypeId,
-    pub(crate) name: Name,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+pub struct EnumLabel {
+    pub ty: TypeId,
+    pub name: Name,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct GraphLabel {
+pub struct GraphLabel {
     pub(crate) element: GraphElementId,
-    pub(crate) name: Name,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name: Name,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct GraphProperty {
+pub struct GraphProperty {
     pub(crate) label: GraphLabelId,
-    pub(crate) name: Name,
-    pub(crate) column: ColumnId,
+    pub name: Name,
+    pub column: ColumnId,
 }
 
 #[derive(Debug)]
-pub(crate) struct Policy {
-    pub(crate) name: Name,
-    pub(crate) table: TableId,
+pub struct Policy {
+    pub name: Name,
+    pub table: TableId,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Role {
-    pub(crate) name: Name,
+pub struct Role {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Tablespace {
-    pub(crate) name: Name,
+pub struct Tablespace {
+    pub name: Name,
     pub(crate) ptr: InIrFile<AstPtr<ast::CreateTablespace>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Tablespace>>,
+    pub name_ptr: InIrFile<AstPtr<ast::Tablespace>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Database {
-    pub(crate) name: Name,
+pub struct Database {
+    pub name: Name,
     pub(crate) ptr: InIrFile<AstPtr<ast::CreateDatabase>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Database>>,
+    pub name_ptr: InIrFile<AstPtr<ast::Database>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Extension {
+pub struct Extension {
     pub(crate) schema: Name,
-    pub(crate) name: Name,
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::CreateExtension>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Extension>>,
+    pub name_ptr: InIrFile<AstPtr<ast::Extension>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Operand {
+pub enum Operand {
     None,
     Unknown,
     Ty(Ty),
@@ -440,14 +440,14 @@ impl Operand {
 }
 
 #[derive(Debug)]
-pub(crate) struct Operator {
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
-    pub(crate) left: Operand,
-    pub(crate) right: Operand,
-    pub(crate) function: Option<FunctionId>,
+pub struct Operator {
+    pub schema: Name,
+    pub name: Name,
+    pub left: Operand,
+    pub right: Operand,
+    pub function: Option<FunctionId>,
     pub(crate) ptr: InIrFile<AstPtr<ast::CreateOperator>>,
-    pub(crate) name_range: IrFileRange,
+    pub name_range: IrFileRange,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -486,7 +486,7 @@ pub(crate) struct Cast {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum TypeKind {
+pub enum TypeKind {
     Shell,
     Type,
     Domain,
@@ -547,7 +547,7 @@ impl TypeCategory {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Ty {
+pub enum Ty {
     Type(TypeId),
     Table(TableId),
     Cte(CteId),
@@ -555,7 +555,7 @@ pub(crate) enum Ty {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum ElementTy {
+pub enum ElementTy {
     Type(TypeId),
     Table(TableId),
     Cte(CteId),
@@ -618,17 +618,17 @@ impl From<ElementTy> for Ty {
 }
 
 #[derive(Debug)]
-pub(crate) struct Type {
-    pub(crate) kind: TypeKind,
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
+pub struct Type {
+    pub kind: TypeKind,
+    pub schema: Name,
+    pub name: Name,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
-    pub(crate) shell_name_ptr: Option<InIrFile<AstPtr<ast::PathSegment>>>,
-    pub(crate) columns: Option<Columns>,
-    pub(crate) base: Option<Ty>,
+    pub name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
+    pub shell_name_ptr: Option<InIrFile<AstPtr<ast::PathSegment>>>,
+    pub columns: Option<Columns>,
+    pub base: Option<Ty>,
     pub(crate) element: Option<Ty>,
-    pub(crate) subtype: Option<Ty>,
+    pub subtype: Option<Ty>,
     pub(crate) range: Option<TypeId>,
     pub(crate) subscript: Option<Subscript>,
     pub(crate) subscript_result: Option<Ty>,
@@ -638,7 +638,7 @@ pub(crate) struct Type {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum FunctionKind {
+pub enum FunctionKind {
     Function,
     Aggregate,
     Procedure,
@@ -664,21 +664,21 @@ impl RoutineKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct Function {
-    pub(crate) kind: FunctionKind,
+pub struct Function {
+    pub kind: FunctionKind,
     pub(crate) window: bool,
-    pub(crate) schema: Name,
-    pub(crate) name: Name,
-    pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
-    pub(crate) params: IdxRange<Param>,
-    pub(crate) direct_args: Option<usize>,
-    pub(crate) ret: Option<Ty>,
-    pub(crate) columns: Option<Columns>,
+    pub schema: Name,
+    pub name: Name,
+    pub ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
+    pub params: IdxRange<Param>,
+    pub direct_args: Option<usize>,
+    pub ret: Option<Ty>,
+    pub columns: Option<Columns>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ParamMode {
+pub enum ParamMode {
     In,
     Out,
     InOut,
@@ -686,37 +686,37 @@ pub(crate) enum ParamMode {
 }
 
 #[derive(Debug)]
-pub(crate) struct Param {
-    pub(crate) name: Option<Name>,
-    pub(crate) mode: ParamMode,
-    pub(crate) ty: Option<Ty>,
-    pub(crate) has_default: bool,
-    pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) name_ptr: Option<InIrFile<AstPtr<ast::ParamName>>>,
+pub struct Param {
+    pub name: Option<Name>,
+    pub mode: ParamMode,
+    pub ty: Option<Ty>,
+    pub has_default: bool,
+    pub ptr: InIrFile<SyntaxNodePtr>,
+    pub name_ptr: Option<InIrFile<AstPtr<ast::ParamName>>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Body {
-    pub(crate) parent: IrFileId,
-    pub(crate) sql: SqlBody,
+pub struct Body {
+    pub parent: IrFileId,
+    pub sql: SqlBody,
 }
 
 #[derive(Debug)]
-pub(crate) struct Cte {
-    pub(crate) name: Name,
+pub struct Cte {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::WithTable>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::CteName>>,
+    pub name_ptr: InIrFile<AstPtr<ast::CteName>>,
     pub(crate) query: Option<QueryId>,
-    pub(crate) columns: Columns,
+    pub columns: Columns,
 }
 
 #[derive(Debug)]
-pub(crate) struct Window {
-    pub(crate) name: Name,
+pub struct Window {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::WindowDef>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Window>>,
+    pub name_ptr: InIrFile<AstPtr<ast::Window>>,
     pub(crate) clauses: WindowClauses,
 }
 
@@ -728,83 +728,83 @@ pub(crate) struct WindowClauses {
 }
 
 #[derive(Debug)]
-pub(crate) struct JsonPath {
-    pub(crate) name: Name,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::JsonPathName>>,
+pub struct JsonPath {
+    pub name: Name,
+    pub name_ptr: InIrFile<AstPtr<ast::JsonPathName>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Savepoint {
-    pub(crate) name: Name,
+pub struct Savepoint {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::SavepointCreate>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Savepoint>>,
+    pub name_ptr: InIrFile<AstPtr<ast::Savepoint>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Cursor {
-    pub(crate) name: Name,
-    pub(crate) hold: bool,
+pub struct Cursor {
+    pub name: Name,
+    pub hold: bool,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::Declare>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Cursor>>,
+    pub name_ptr: InIrFile<AstPtr<ast::Cursor>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Transaction {
-    pub(crate) begin: InIrFile<AstPtr<ast::Begin>>,
-    pub(crate) end: Option<InIrFile<SyntaxNodePtr>>,
+pub struct Transaction {
+    pub begin: InIrFile<AstPtr<ast::Begin>>,
+    pub end: Option<InIrFile<SyntaxNodePtr>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct PreparedTransaction {
-    pub(crate) name: Name,
+pub struct PreparedTransaction {
+    pub name: Name,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::PrepareTransaction>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Literal>>,
+    pub name_ptr: InIrFile<AstPtr<ast::Literal>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct PreparedStatement {
-    pub(crate) name: Name,
-    pub(crate) columns: Columns,
+pub struct PreparedStatement {
+    pub name: Name,
+    pub columns: Columns,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::Prepare>>,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::PreparedStatement>>,
+    pub name_ptr: InIrFile<AstPtr<ast::PreparedStatement>>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Case {
-    pub(crate) case_range: IrFileRange,
+pub struct Case {
+    pub case_range: IrFileRange,
 }
 
 #[derive(Debug)]
-pub(crate) struct Star {
-    pub(crate) columns: IdxRange<ColumnId>,
+pub struct Star {
+    pub columns: IdxRange<ColumnId>,
 }
 
 #[derive(Debug)]
-pub(crate) struct Channel {
-    pub(crate) name: Name,
-    pub(crate) name_ptr: InIrFile<AstPtr<ast::Channel>>,
+pub struct Channel {
+    pub name: Name,
+    pub name_ptr: InIrFile<AstPtr<ast::Channel>>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct Columns {
-    pub(crate) range: IdxRange<Column>,
+pub struct Columns {
+    pub range: IdxRange<Column>,
     pub(crate) complete: bool,
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct Column {
-    pub(crate) name: Option<Name>,
-    pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) ty: Option<Ty>,
+pub struct Column {
+    pub name: Option<Name>,
+    pub ptr: InIrFile<SyntaxNodePtr>,
+    pub ty: Option<Ty>,
     pub(crate) merge: Option<MergeId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ColumnOwner {
+pub enum ColumnOwner {
     Table(TableId),
     Type(TypeId),
     Cte(CteId),
@@ -842,19 +842,19 @@ pub(crate) enum QueryKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct Query {
+pub struct Query {
     #[expect(dead_code)]
     pub(crate) kind: QueryKind,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     #[expect(dead_code)]
     pub(crate) parent: Option<QueryId>,
-    pub(crate) sources: Vec<SourceId>,
+    pub sources: Vec<SourceId>,
     pub(crate) columns: Columns,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum SourceKind {
+pub enum SourceKind {
     Cte(CteId),
     Table(TableId),
     External,
@@ -870,7 +870,7 @@ pub(crate) enum SourceKind {
 }
 
 impl SourceKind {
-    pub(crate) fn is_qualified_only(self) -> bool {
+    pub fn is_qualified_only(self) -> bool {
         matches!(
             self,
             SourceKind::UsingAlias
@@ -882,15 +882,15 @@ impl SourceKind {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct Scope {
-    pub(crate) query: QueryId,
-    pub(crate) parent: Option<ScopeId>,
+pub struct Scope {
+    pub query: QueryId,
+    pub parent: Option<ScopeId>,
     pub(crate) visible: Range<usize>,
     pub(crate) hidden: Vec<Range<usize>>,
 }
 
 impl Scope {
-    pub(crate) fn visible_indices(&self) -> impl Iterator<Item = usize> + '_ {
+    pub fn visible_indices(&self) -> impl Iterator<Item = usize> + '_ {
         self.visible
             .into_iter()
             .filter(|index| !self.hidden.iter().any(|range| range.contains(index)))
@@ -904,16 +904,16 @@ impl Scope {
 }
 
 #[derive(Debug, Clone, Copy)]
-pub(crate) struct Source {
-    pub(crate) name: Option<Name>,
-    pub(crate) kind: SourceKind,
-    pub(crate) ptr: InIrFile<SyntaxNodePtr>,
-    pub(crate) alias_ptr: Option<InIrFile<AstPtr<ast::TableAlias>>>,
-    pub(crate) columns: Columns,
+pub struct Source {
+    pub name: Option<Name>,
+    pub kind: SourceKind,
+    pub ptr: InIrFile<SyntaxNodePtr>,
+    pub alias_ptr: Option<InIrFile<AstPtr<ast::TableAlias>>>,
+    pub columns: Columns,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum Resolution {
+pub enum Resolution {
     Column {
         source: Option<SourceId>,
         column: ColumnId,
@@ -965,7 +965,7 @@ pub(crate) enum Resolution {
 }
 
 impl Resolution {
-    pub(crate) fn item(self) -> Option<Item> {
+    pub fn item(self) -> Option<Item> {
         Some(match self {
             Resolution::Column { column, .. } => Item::Column(column),
             Resolution::Source(source) => Item::Source(source),
@@ -1060,16 +1060,16 @@ pub(crate) enum ReferenceKind {
 }
 
 #[derive(Debug)]
-pub(crate) struct Reference {
+pub struct Reference {
     pub(crate) name: Name,
     pub(crate) kind: ReferenceKind,
     pub(crate) range: IrFileRange,
-    pub(crate) resolution: Resolution,
-    pub(crate) scope: Option<ScopeId>,
+    pub resolution: Resolution,
+    pub scope: Option<ScopeId>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) enum Item {
+pub enum Item {
     Reference(RefId),
     Cte(CteId),
     Column(ColumnId),
@@ -1120,9 +1120,9 @@ pub(crate) enum Item {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) struct ItemRange {
-    pub(crate) range: TextRange,
-    pub(crate) item: Item,
+pub struct ItemRange {
+    pub range: TextRange,
+    pub item: Item,
 }
 
 #[derive(Debug, Clone)]

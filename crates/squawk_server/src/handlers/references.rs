@@ -1,4 +1,5 @@
 use gen_lsp_types::{Location, ReferenceParams};
+use squawk_ide::db::original_file;
 use squawk_ide::find_references::find_references;
 
 use crate::global_state::Snapshot;
@@ -21,7 +22,9 @@ pub(crate) fn handle_references(snapshot: &Snapshot, params: ReferenceParams) ->
             if include_declaration {
                 return true;
             }
-            if loc.file_id.original_file(db) == file && !loc.value.contains(position.value) {
+            if original_file(db, loc.file_id) == original_file(db, file)
+                && !loc.value.contains(position.value)
+            {
                 return true;
             }
             false

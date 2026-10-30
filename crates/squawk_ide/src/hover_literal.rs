@@ -3,7 +3,7 @@ use std::fmt::{self, Write as _};
 use rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode, LitKind};
 
-use crate::lower::literal_type_name;
+use squawk_sema::lower::literal_type_name;
 
 pub(crate) struct LiteralHover {
     pub(crate) snippet: &'static str,

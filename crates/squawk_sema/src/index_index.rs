@@ -7,7 +7,7 @@ use crate::interner::{Name, QualifiedName};
 use crate::ir::{Index, IndexId, TableId};
 
 #[derive(Debug, Default)]
-pub(crate) struct IndexIndex {
+pub struct IndexIndex {
     arena: LayeredArena<Index>,
     keys: LayeredArena<Name>,
     by_name: LayeredMultimap<QualifiedName, IndexId>,

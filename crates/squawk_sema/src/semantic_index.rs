@@ -184,7 +184,7 @@ impl Errors {
     }
 }
 
-pub(crate) struct TypeName<'a> {
+pub struct TypeName<'a> {
     index: &'a IndexData,
     ty: Ty,
 }
@@ -198,7 +198,7 @@ impl std::fmt::Display for TypeName<'_> {
 }
 
 #[derive(Debug)]
-pub(crate) struct SemanticIndex {
+pub struct SemanticIndex {
     // Wrap IndexData so we don't expose a mutable version of the SemanticIndex.
     // All mutation of it happens during lowering.
     data: IndexData,
@@ -219,63 +219,63 @@ impl Deref for SemanticIndex {
 }
 
 #[derive(Debug)]
-pub(crate) struct IndexData {
-    pub(crate) names: Interner,
-    pub(crate) tables: TableIndex,
-    pub(crate) types: TypeIndex,
-    pub(crate) functions: FunctionIndex,
-    pub(crate) params: LayeredArena<Param>,
-    pub(crate) ctes: LayeredArena<Cte>,
-    pub(crate) queries: LayeredArena<Query>,
-    pub(crate) scopes: LayeredArena<Scope>,
-    pub(crate) sources: LayeredArena<Source>,
-    pub(crate) columns: LayeredArena<Column>,
+pub struct IndexData {
+    pub names: Interner,
+    pub tables: TableIndex,
+    pub types: TypeIndex,
+    pub functions: FunctionIndex,
+    pub params: LayeredArena<Param>,
+    pub ctes: LayeredArena<Cte>,
+    pub queries: LayeredArena<Query>,
+    pub scopes: LayeredArena<Scope>,
+    pub sources: LayeredArena<Source>,
+    pub columns: LayeredArena<Column>,
     pub(crate) column_owners: FxHashMap<ColumnId, ColumnOwner>,
     pub(crate) merges: LayeredArena<Merge>,
-    pub(crate) references: LayeredArena<Reference>,
-    pub(crate) bodies: LayeredArena<Body>,
-    pub(crate) windows: LayeredArena<Window>,
-    pub(crate) json_paths: LayeredArena<JsonPath>,
-    pub(crate) indexes: IndexIndex,
-    pub(crate) constraints: ConstraintIndex,
-    pub(crate) triggers: TriggerIndex,
-    pub(crate) rules: RuleIndex,
-    pub(crate) roles: RoleIndex,
-    pub(crate) policies: PolicyIndex,
-    pub(crate) access_methods: AccessMethodIndex,
-    pub(crate) event_triggers: EventTriggerIndex,
-    pub(crate) languages: LanguageIndex,
-    pub(crate) foreign_data_wrappers: ForeignDataWrapperIndex,
-    pub(crate) servers: ServerIndex,
-    pub(crate) conversions: ConversionIndex,
-    pub(crate) operator_families: OperatorFamilyIndex,
-    pub(crate) operator_family_members: OperatorFamilyMemberIndex,
-    pub(crate) operator_classes: OperatorClassIndex,
-    pub(crate) statistics: StatisticsIndex,
-    pub(crate) text_search: TextSearchIndex,
-    pub(crate) publications: PublicationIndex,
-    pub(crate) subscriptions: SubscriptionIndex,
-    pub(crate) graph_elements: GraphElementIndex,
-    pub(crate) graph_labels: GraphLabelIndex,
-    pub(crate) enum_labels: LayeredArena<EnumLabel>,
-    pub(crate) graph_properties: GraphPropertyIndex,
-    pub(crate) collations: CollationIndex,
-    pub(crate) schemas: SchemaIndex,
-    pub(crate) tablespaces: TablespaceIndex,
-    pub(crate) databases: DatabaseIndex,
-    pub(crate) extensions: ExtensionIndex,
-    pub(crate) operators: OperatorIndex,
+    pub references: LayeredArena<Reference>,
+    pub bodies: LayeredArena<Body>,
+    pub windows: LayeredArena<Window>,
+    pub json_paths: LayeredArena<JsonPath>,
+    pub indexes: IndexIndex,
+    pub constraints: ConstraintIndex,
+    pub triggers: TriggerIndex,
+    pub rules: RuleIndex,
+    pub roles: RoleIndex,
+    pub policies: PolicyIndex,
+    pub access_methods: AccessMethodIndex,
+    pub event_triggers: EventTriggerIndex,
+    pub languages: LanguageIndex,
+    pub foreign_data_wrappers: ForeignDataWrapperIndex,
+    pub servers: ServerIndex,
+    pub conversions: ConversionIndex,
+    pub operator_families: OperatorFamilyIndex,
+    pub operator_family_members: OperatorFamilyMemberIndex,
+    pub operator_classes: OperatorClassIndex,
+    pub statistics: StatisticsIndex,
+    pub text_search: TextSearchIndex,
+    pub publications: PublicationIndex,
+    pub subscriptions: SubscriptionIndex,
+    pub graph_elements: GraphElementIndex,
+    pub graph_labels: GraphLabelIndex,
+    pub enum_labels: LayeredArena<EnumLabel>,
+    pub graph_properties: GraphPropertyIndex,
+    pub collations: CollationIndex,
+    pub schemas: SchemaIndex,
+    pub tablespaces: TablespaceIndex,
+    pub databases: DatabaseIndex,
+    pub extensions: ExtensionIndex,
+    pub operators: OperatorIndex,
     pub(crate) casts: CastIndex,
     pub(crate) transforms: LayeredArena<Transform>,
-    pub(crate) savepoints: LayeredArena<Savepoint>,
-    pub(crate) cursors: LayeredArena<Cursor>,
-    pub(crate) transactions: LayeredArena<Transaction>,
-    pub(crate) prepared_transactions: LayeredArena<PreparedTransaction>,
-    pub(crate) prepared_statements: LayeredArena<PreparedStatement>,
-    pub(crate) channels: LayeredArena<Channel>,
-    pub(crate) cases: LayeredArena<Case>,
-    pub(crate) stars: LayeredArena<Star>,
-    pub(crate) star_columns: LayeredArena<ColumnId>,
+    pub savepoints: LayeredArena<Savepoint>,
+    pub cursors: LayeredArena<Cursor>,
+    pub transactions: LayeredArena<Transaction>,
+    pub prepared_transactions: LayeredArena<PreparedTransaction>,
+    pub prepared_statements: LayeredArena<PreparedStatement>,
+    pub channels: LayeredArena<Channel>,
+    pub cases: LayeredArena<Case>,
+    pub stars: LayeredArena<Star>,
+    pub star_columns: LayeredArena<ColumnId>,
     pub(crate) builtins: Option<&'static SemanticIndex>,
     pub(crate) items: Vec<InFile<ItemRange>>,
     pub(crate) search_paths: Vec<InFile<SearchPathChange>>,
@@ -293,7 +293,7 @@ pub(crate) struct NameVersion {
 }
 
 #[derive(Clone, Copy)]
-pub(crate) enum AsOf {
+pub enum AsOf {
     Ref(RefId),
     Def(FileRange),
     Latest,
@@ -309,7 +309,7 @@ impl IndexData {
         Some(ty)
     }
 
-    pub(crate) fn type_name(&self, ty: Ty) -> TypeName<'_> {
+    pub fn type_name(&self, ty: Ty) -> TypeName<'_> {
         TypeName { index: self, ty }
     }
 
@@ -340,7 +340,7 @@ impl IndexData {
         }
     }
 
-    pub(crate) fn name_at(&self, item: Item, current: IrFileRange, as_of: AsOf) -> IrFileRange {
+    pub fn name_at(&self, item: Item, current: IrFileRange, as_of: AsOf) -> IrFileRange {
         let Some(versions) = self.renames.get(&item) else {
             return current;
         };
@@ -357,7 +357,7 @@ impl IndexData {
         }
     }
 
-    pub(crate) fn item_at_range(&self, range: FileRange) -> Option<InFile<ItemRange>> {
+    pub fn item_at_range(&self, range: FileRange) -> Option<InFile<ItemRange>> {
         if range.file_id == FileId::Builtins
             && let Some(builtins) = self.builtins
         {
@@ -371,7 +371,7 @@ impl IndexData {
             .then_some(item)
     }
 
-    pub(crate) fn search_path_at(&self, range: FileRange) -> Option<&[Name]> {
+    pub fn search_path_at(&self, range: FileRange) -> Option<&[Name]> {
         let idx = self.search_paths.partition_point(|change| {
             (change.file_id, change.value.start) <= (range.file_id, range.value.start())
         });
@@ -379,7 +379,7 @@ impl IndexData {
         (change.file_id == range.file_id).then_some(&*change.value.path)
     }
 
-    pub(crate) fn items_at_range(&self, range: FileRange) -> impl Iterator<Item = Item> + '_ {
+    pub fn items_at_range(&self, range: FileRange) -> impl Iterator<Item = Item> + '_ {
         let start = self.items.partition_point(|item| {
             (item.file_id, item.value.range.start()) < (range.file_id, range.value.start())
         });
@@ -392,7 +392,7 @@ impl IndexData {
             .map(|item| item.value.item)
     }
 
-    pub(crate) fn file(&self, mut file_id: IrFileId) -> FileId {
+    pub fn file(&self, mut file_id: IrFileId) -> FileId {
         loop {
             match file_id {
                 IrFileId::File(file_id) => return file_id,
@@ -401,7 +401,7 @@ impl IndexData {
         }
     }
 
-    pub(crate) fn range(&self, mut range: IrFileRange) -> FileRange {
+    pub fn range(&self, mut range: IrFileRange) -> FileRange {
         loop {
             match range.file_id {
                 IrFileId::File(file_id) => return InFile::new(file_id, range.value),
@@ -413,7 +413,7 @@ impl IndexData {
         }
     }
 
-    pub(crate) fn column_owner(&self, column: ColumnId) -> ColumnOwner {
+    pub fn column_owner(&self, column: ColumnId) -> ColumnOwner {
         self.column_owners
             .get(&column)
             .or_else(|| {
@@ -424,7 +424,7 @@ impl IndexData {
             .unwrap_or(ColumnOwner::Anonymous)
     }
 
-    pub(crate) fn comment(&self, item: Item) -> Option<&str> {
+    pub fn comment(&self, item: Item) -> Option<&str> {
         self.comments
             .get(&item)
             .or_else(|| {
@@ -434,7 +434,7 @@ impl IndexData {
             .map(|comment| &**comment)
     }
 
-    pub(crate) fn param_function(&self, param: ParamId) -> Option<FunctionId> {
+    pub fn param_function(&self, param: ParamId) -> Option<FunctionId> {
         self.param_functions
             .get(&param)
             .or_else(|| {
@@ -444,7 +444,7 @@ impl IndexData {
             .copied()
     }
 
-    pub(crate) fn enum_labels(&self, ty: TypeId) -> impl Iterator<Item = EnumLabelId> + '_ {
+    pub fn enum_labels(&self, ty: TypeId) -> impl Iterator<Item = EnumLabelId> + '_ {
         self.builtins
             .and_then(|builtins| builtins.type_enum_labels.get(&ty))
             .into_iter()
@@ -453,14 +453,14 @@ impl IndexData {
             .copied()
     }
 
-    pub(crate) fn merged_columns(&self, column: ColumnId) -> IdxRange<Column> {
+    pub fn merged_columns(&self, column: ColumnId) -> IdxRange<Column> {
         match self.columns[column].merge {
             Some(merge) => self.merges[merge].columns,
             None => IdxRange::single(column),
         }
     }
 
-    pub(crate) fn source_type(&self, source: SourceId) -> Option<Ty> {
+    pub fn source_type(&self, source: SourceId) -> Option<Ty> {
         match self.sources[source].kind {
             SourceKind::Table(table) => Some(Ty::Table(table)),
             SourceKind::Cte(cte) => Some(Ty::Cte(cte)),
@@ -477,13 +477,13 @@ impl IndexData {
         }
     }
 
-    pub(crate) fn file_items(&self, file_id: FileId) -> &[InFile<ItemRange>] {
+    pub fn file_items(&self, file_id: FileId) -> &[InFile<ItemRange>] {
         let start = self.items.partition_point(|item| item.file_id < file_id);
         let end = self.items.partition_point(|item| item.file_id <= file_id);
         &self.items[start..end]
     }
 
-    pub(crate) fn items(&self) -> impl Iterator<Item = InFile<ItemRange>> + '_ {
+    pub fn items(&self) -> impl Iterator<Item = InFile<ItemRange>> + '_ {
         self.builtins
             .into_iter()
             .flat_map(|builtins| &builtins.items)
@@ -491,7 +491,7 @@ impl IndexData {
             .copied()
     }
 
-    pub(crate) fn diagnostics(&self) -> Vec<Diagnostic> {
+    pub fn diagnostics(&self) -> Vec<Diagnostic> {
         let mut diagnostics: Vec<Diagnostic> = self
             .errors
             .entries

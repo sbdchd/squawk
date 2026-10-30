@@ -3162,10 +3162,10 @@ pub(crate) fn sync_builtins() -> Result<()> {
     query_operator_classes(&mut modules)?;
     query_text_search(&mut modules)?;
 
-    let extensions_root = project_root().join("crates/squawk_ide/src/generated/extensions");
-    let builtins_path = project_root().join("crates/squawk_ide/src/generated/builtins.sql");
+    let extensions_root = project_root().join("crates/squawk_sema/src/generated/extensions");
+    let builtins_path = project_root().join("crates/squawk_sema/src/generated/builtins.sql");
     let non_unique_index_access_methods_path =
-        project_root().join("crates/squawk_ide/src/generated/non_unique_index_access_methods.rs");
+        project_root().join("crates/squawk_sema/src/generated/non_unique_index_access_methods.rs");
 
     std::fs::create_dir_all(&extensions_root).context("Failed to create builtins directory")?;
     if extensions_root.exists() {

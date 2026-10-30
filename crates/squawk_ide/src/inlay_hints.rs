@@ -1,20 +1,25 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
 use squawk_syntax::{
     ast::{self, AstNode, NameLike},
     match_ast,
 };
 
-use crate::db::{File, parse, semantic_index};
-use crate::file::{FileId, FileRange, InFile};
-use crate::ir::{ColumnId, FunctionKind, Item, ParamMode, Resolution};
-use crate::semantic_index::SemanticIndex;
+use squawk_sema::file::{FileId, FileRange, InFile};
+use squawk_sema::ir::{ColumnId, FunctionKind, Item, ParamMode, Resolution};
+use squawk_sema::semantic_index::SemanticIndex;
+
+use crate::db::{Db, File, original_file, parse, semantic_index};
+
+pub fn inlay_hints(db: &dyn Db, file_id: FileId) -> Vec<InlayHint> {
+    file_inlay_hints(db, original_file(db, file_id))
+}
 
 #[salsa::tracked]
-pub fn inlay_hints(db: &dyn Db, file: File) -> Vec<InlayHint> {
+fn file_inlay_hints(db: &dyn Db, file: File) -> Vec<InlayHint> {
+    let file_id = file.file_id(db);
     inlay_hints_with_index(
-        semantic_index(db, file.into()),
-        InFile::new(file, &parse(db, file).tree()),
+        semantic_index(db, file_id),
+        InFile::new(file_id, &parse(db, file_id).tree()),
     )
 }
 

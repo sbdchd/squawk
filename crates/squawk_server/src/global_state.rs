@@ -9,9 +9,9 @@ use gen_lsp_types::{
 use log::info;
 use lsp_server::{Message, Request, Response};
 use rustc_hash::FxHashMap;
-use salsa::Setter;
 use squawk_ide::builtins::{builtins_file, builtins_url};
-use squawk_ide::db::{Database, File};
+use squawk_ide::db::{Database, Db, File};
+use squawk_sema::file::{FileId, FileIndex};
 use squawk_thread::TaskPool;
 use url::Url;
 
@@ -41,7 +41,7 @@ pub(crate) struct Handle<H, C> {
 
 pub(super) struct GlobalState {
     db: Database,
-    files: Arc<FxHashMap<Url, File>>,
+    files: Arc<FxHashMap<Url, FileIndex>>,
     uris: Arc<FxHashMap<File, Url>>,
     req_queue: ReqQueue,
     sender: Sender<Message>,
@@ -87,17 +87,17 @@ impl GlobalState {
         &self.db
     }
 
-    pub(crate) fn file(&self, uri: &Url) -> Option<File> {
-        self.files.get(uri).copied()
+    pub(crate) fn file(&self, uri: &Url) -> Option<FileId> {
+        self.files.get(uri).copied().map(FileId::from)
     }
 
     pub(crate) fn set(&mut self, uri: Url, content: String) {
         if let Some(file) = self.files.get(&uri).copied() {
-            file.set_content(&mut self.db).to(content.into());
+            self.db.set_file_content(file, content.into());
         } else {
-            let file = File::new(&self.db, content.into());
+            let file = self.db.add_file(content.into());
             Arc::make_mut(&mut self.files).insert(uri.clone(), file);
-            Arc::make_mut(&mut self.uris).insert(file, uri);
+            Arc::make_mut(&mut self.uris).insert(self.db.file(file), uri);
         }
     }
 
@@ -105,8 +105,8 @@ impl GlobalState {
         if let Some(file) = Arc::make_mut(&mut self.files).remove(uri) {
             // We can't delete file inputs in Salsa, so just set the content to
             // empty string.
-            file.set_content(&mut self.db).to("".into());
-            Arc::make_mut(&mut self.uris).remove(&file);
+            self.db.set_file_content(file, "".into());
+            Arc::make_mut(&mut self.uris).remove(&self.db.file(file));
         }
     }
 
@@ -295,7 +295,7 @@ impl GlobalState {
 
 pub(crate) struct Snapshot {
     pub(crate) db: Database,
-    pub(crate) files: Arc<FxHashMap<Url, File>>,
+    pub(crate) files: Arc<FxHashMap<Url, FileIndex>>,
     pub(crate) uris: Arc<FxHashMap<File, Url>>,
 }
 
@@ -304,8 +304,8 @@ impl Snapshot {
         &self.db
     }
 
-    pub(crate) fn file(&self, uri: &Url) -> Option<File> {
-        self.files.get(uri).copied()
+    pub(crate) fn file(&self, uri: &Url) -> Option<FileId> {
+        self.files.get(uri).copied().map(FileId::from)
     }
 
     pub(crate) fn uri(&self, file: File) -> Option<Url> {

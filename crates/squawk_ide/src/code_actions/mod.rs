@@ -1,8 +1,7 @@
 use rowan::TextSize;
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
 
-use crate::file::InFile;
+use squawk_sema::file::InFile;
 
 mod add_explicit_alias;
 mod add_schema;
@@ -102,6 +101,8 @@ use rewrite_unnest_as_rows_from::rewrite_unnest_as_rows_from;
 use rewrite_values_as_select::rewrite_values_as_select;
 use rewrite_xmlexists_as_function_call::rewrite_xmlexists_as_function_call;
 use unquote_identifier::unquote_identifier;
+
+use crate::db::Db;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ActionKind {

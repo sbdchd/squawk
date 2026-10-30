@@ -1,9 +1,10 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
+use squawk_sema::file::InFile;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{code_actions::name::Name, file::InFile, offsets::token_from_offset};
+use crate::db::Db;
+use crate::{code_actions::name::Name, offsets::token_from_offset};
 use squawk_syntax::column_name::ColumnName;
 
 use super::{ActionKind, CodeAction};

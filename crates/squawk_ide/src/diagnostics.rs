@@ -1,11 +1,9 @@
-use salsa::Database as Db;
+use squawk_sema::file::FileId;
+pub use squawk_sema::semantic_index::{Diagnostic, DiagnosticKind, Suggestion};
 
-use crate::db::{File, semantic_index};
-use crate::file::FileId;
-pub use crate::semantic_index::{Diagnostic, DiagnosticKind, Suggestion};
+use crate::db::{Db, semantic_index};
 
-pub fn diagnostics(db: &dyn Db, file: File) -> Vec<Diagnostic> {
-    let file_id = FileId::from(file);
+pub fn diagnostics(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
     let mut diagnostics = semantic_index(db, file_id).diagnostics();
     diagnostics.retain(|diagnostic| diagnostic.range.file_id == file_id);
     diagnostics

@@ -7,13 +7,13 @@ use gen_lsp_types::{
     SemanticToken, TextDocumentContentChangeEvent, WorkspaceEdit,
 };
 use log::warn;
-use salsa::Database as Db;
 use squawk_ide::code_actions::ActionKind;
-use squawk_ide::db::{File, line_index};
-use squawk_ide::file::InFile;
+use squawk_ide::db::{Db, line_index, original_file};
 use squawk_ide::folding_ranges::{Fold, FoldKind};
 use squawk_ide::semantic_tokens::{SemanticTokenModifier, SemanticTokenType};
 use squawk_line_index::{LineIndex, TextRange, TextSize, find_newline};
+use squawk_sema::file::FileId;
+use squawk_sema::file::InFile;
 use url::Url;
 
 use crate::global_state::Snapshot;
@@ -54,7 +54,7 @@ fn text_size(index: &LineIndex, position: gen_lsp_types::Position) -> Option<Tex
 
 pub(crate) fn offset(
     db: &dyn Db,
-    file: File,
+    file: FileId,
     position: gen_lsp_types::Position,
 ) -> Option<InFile<TextSize>> {
     let line_index = line_index(db, file);
@@ -240,13 +240,13 @@ pub(crate) fn apply_incremental_changes(
 
 pub(crate) fn to_location(
     snapshot: &Snapshot,
-    loc: squawk_ide::file::InFile<rowan::TextRange>,
+    loc: squawk_sema::file::InFile<rowan::TextRange>,
 ) -> Option<Location> {
     let db = snapshot.db();
-    let file = loc.file_id.original_file(db);
+    let file = original_file(db, loc.file_id);
     let uri = snapshot.uri(file)?;
 
-    let line_index = line_index(db, file);
+    let line_index = line_index(db, loc.file_id);
     let range = range(line_index, loc.value);
     Some(Location { uri, range })
 }

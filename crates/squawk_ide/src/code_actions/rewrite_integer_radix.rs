@@ -1,13 +1,14 @@
 use num_bigint::BigUint;
 use rowan::TextSize;
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
+use squawk_sema::file::InFile;
 use squawk_syntax::{
     SyntaxKind,
     ast::{self, AstNode},
 };
 
-use crate::{file::InFile, offsets::token_from_offset};
+use crate::db::Db;
+use crate::offsets::token_from_offset;
 
 use super::{ActionKind, CodeAction};
 

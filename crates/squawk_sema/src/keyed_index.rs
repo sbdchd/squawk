@@ -12,14 +12,14 @@ use crate::ir::{
     Subscription, TableId, Tablespace, Trigger,
 };
 
-pub(crate) trait Keyed {
+pub trait Keyed {
     type Key: Copy + Eq + Hash + Debug + 'static;
 
     fn key(&self) -> Self::Key;
 }
 
 #[derive(Debug)]
-pub(crate) struct KeyedIndex<T: Keyed + 'static> {
+pub struct KeyedIndex<T: Keyed + 'static> {
     arena: LayeredArena<T>,
     by_key: LayeredMultimap<T::Key, Idx<T>>,
 }
@@ -48,11 +48,11 @@ impl<T: Keyed> KeyedIndex<T> {
         id
     }
 
-    pub(crate) fn get(&self, key: T::Key) -> impl DoubleEndedIterator<Item = Idx<T>> + '_ {
+    pub fn get(&self, key: T::Key) -> impl DoubleEndedIterator<Item = Idx<T>> + '_ {
         self.by_key.get(key)
     }
 
-    pub(crate) fn iter(&self) -> impl DoubleEndedIterator<Item = (Idx<T>, &T)> {
+    pub fn iter(&self) -> impl DoubleEndedIterator<Item = (Idx<T>, &T)> {
         self.arena.iter()
     }
 

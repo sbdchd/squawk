@@ -1,13 +1,12 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
 use smallvec::{SmallVec, smallvec};
+use squawk_sema::file::{FilePosition, FileRange, InFile, IrFileRange};
+use squawk_sema::ir::{ColumnId, FunctionId, Item, ParamId, SourceId, SourceKind, TypeId};
+use squawk_sema::semantic_index::{AsOf, SemanticIndex};
 use squawk_syntax::ast;
 
-use crate::db::{parse, semantic_index};
-use crate::file::{FilePosition, FileRange, InFile, IrFileRange};
-use crate::ir::{ColumnId, FunctionId, Item, ParamId, SourceId, SourceKind, TypeId};
+use crate::db::{Db, parse, semantic_index};
 use crate::offsets::item_at_position;
-use crate::semantic_index::{AsOf, SemanticIndex};
 
 pub fn goto_definition(
     db: &dyn Db,

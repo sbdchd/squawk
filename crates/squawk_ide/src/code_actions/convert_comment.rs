@@ -1,5 +1,4 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
 use squawk_line_index::{NewlineWithTrailingNewline, find_newline};
 use squawk_syntax::{
@@ -7,15 +6,16 @@ use squawk_syntax::{
     ast::{self, AstNode, AstToken},
 };
 
-use crate::{
+use squawk_sema::{
     comments::{
         block_comment_content, line_comment_content, line_comment_group, strip_block_decoration,
     },
-    db::parse,
     file::InFile,
 };
 
 use super::{ActionKind, CodeAction};
+
+use crate::db::{Db, parse};
 
 pub(super) fn convert_comment(
     db: &dyn Db,

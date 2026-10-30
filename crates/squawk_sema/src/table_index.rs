@@ -10,7 +10,7 @@ use crate::ir::{Column, ColumnTypeRef};
 use crate::ir::{Columns, SequenceOwner, Table, TableId, TypeId};
 
 #[derive(Debug, Default)]
-pub(crate) struct TableIndex {
+pub struct TableIndex {
     arena: LayeredArena<Table>,
     by_name: LayeredMultimap<QualifiedName, TableId>,
     by_schema: LayeredMultimap<Name, TableId>,
@@ -59,7 +59,7 @@ impl TableIndex {
         self.by_name.get(QualifiedName { schema, name })
     }
 
-    pub(crate) fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = TableId> + '_ {
+    pub fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = TableId> + '_ {
         self.by_schema.get(schema)
     }
 

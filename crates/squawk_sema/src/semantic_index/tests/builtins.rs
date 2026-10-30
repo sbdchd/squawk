@@ -3,7 +3,7 @@ use squawk_syntax::SourceFile;
 
 use super::check;
 use crate::extensions::BundledExtension;
-use crate::file::{FileId, InFile};
+use crate::file::{FileId, FileIndex, InFile};
 use crate::semantic_index_builder::SemanticIndexBuilder;
 
 #[test]
@@ -115,7 +115,8 @@ fn extension_file_lookup() {
     }
     assert_eq!(BundledExtension::from_name("not_an_extension"), None);
     assert_eq!(BundledExtension::from_file(FileId::Builtins), None);
-    let db = crate::db::Database::default();
-    let file = crate::db::File::new(&db, "".into());
-    assert_eq!(BundledExtension::from_file(file.into()), None);
+    assert_eq!(
+        BundledExtension::from_file(FileId::File(FileIndex::from_raw(0))),
+        None
+    );
 }

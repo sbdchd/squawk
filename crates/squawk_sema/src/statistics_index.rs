@@ -6,7 +6,7 @@ use crate::ir::{Statistics, StatisticsId, TableId};
 use crate::qualified_index::QualifiedIndex;
 
 #[derive(Debug, Default)]
-pub(crate) struct StatisticsIndex {
+pub struct StatisticsIndex {
     statistics: QualifiedIndex<Statistics>,
     by_table: LayeredMultimap<TableId, StatisticsId>,
 }

@@ -1,5 +1,4 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
 use smallvec::SmallVec;
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxToken,
@@ -7,10 +6,11 @@ use squawk_syntax::{
     sql_body::SqlBody,
 };
 
-use crate::db::parse;
-use crate::file::{FilePosition, InFile};
-use crate::ir::ItemRange;
-use crate::semantic_index::SemanticIndex;
+use squawk_sema::file::{FilePosition, InFile};
+use squawk_sema::ir::ItemRange;
+use squawk_sema::semantic_index::SemanticIndex;
+
+use crate::db::{Db, parse};
 
 pub(crate) fn token_from_offset(db: &dyn Db, position: InFile<TextSize>) -> Option<SyntaxToken> {
     token_from_syntax_offset(parse(db, position.file_id).tree().syntax(), position.value)

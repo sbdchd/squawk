@@ -1,17 +1,16 @@
-use super::semantic_index;
-use crate::db::parse;
-use crate::db::{CompletionFile, Database, File, FileId};
-use crate::file::InFile;
+use squawk_sema::file::FileId;
+use squawk_sema::file::InFile;
+use squawk_sema::semantic_index_builder::SemanticIndexBuilder;
+
+use crate::db::{Database, original_file, parse, semantic_index};
 use crate::goto_definition::goto_definition;
-use crate::semantic_index_builder::SemanticIndexBuilder;
 use rowan::TextSize;
-use salsa::Setter;
 
 #[test]
 fn source_file_identity() {
-    let db = Database::default();
-    let definition = File::new(&db, "create table t (a int);".into());
-    let reference = File::new(&db, "select a from t;".into());
+    let mut db = Database::default();
+    let definition: FileId = db.add_file("create table t (a int);".into()).into();
+    let reference: FileId = db.add_file("select a from t;".into()).into();
     let mut builder = SemanticIndexBuilder::new();
     builder.add_file(InFile::new(definition, &parse(&db, definition).tree()));
     builder.add_file(InFile::new(reference, &parse(&db, reference).tree()));
@@ -22,20 +21,28 @@ fn source_file_identity() {
         InFile::new(reference, TextSize::from(7)),
     );
     assert_eq!(definitions.len(), 1);
-    assert_eq!(definitions[0].file_id, definition.into());
-    assert_eq!(&definition.content(&db)[definitions[0].value], "a");
+    assert_eq!(definitions[0].file_id, definition);
+    assert_eq!(
+        &original_file(&db, definition).content(&db)[definitions[0].value],
+        "a"
+    );
 }
 
 #[test]
 fn completion_file_identity() {
-    let db = Database::default();
-    let file = File::new(&db, "create table t (a int); select a from t; ".into());
-    let completion = CompletionFile::new(&db, file, TextSize::from(41));
-    let completion = FileId::Completion(completion);
+    let mut db = Database::default();
+    let file = db.add_file("create table t (a int); select a from t; ".into());
+    let completion = FileId::Completion {
+        file,
+        offset: TextSize::from(41),
+    };
     let definitions = goto_definition(&db, InFile::new(completion, TextSize::from(31)));
     assert_eq!(definitions.len(), 1);
     assert_eq!(definitions[0].file_id, completion);
-    assert_eq!(&file.content(&db)[definitions[0].value], "a");
+    assert_eq!(
+        &original_file(&db, file.into()).content(&db)[definitions[0].value],
+        "a"
+    );
     assert!(!std::ptr::eq(
         semantic_index(&db, file.into()),
         semantic_index(&db, completion),
@@ -44,23 +51,23 @@ fn completion_file_identity() {
 
 #[test]
 fn extension_target() {
-    let db = Database::default();
-    let file = File::new(&db, "create extension vector; select null::vector;".into());
+    let mut db = Database::default();
+    let file = db.add_file("create extension vector; select null::vector;".into());
     let definitions = goto_definition(&db, InFile::new(file, TextSize::from(38)));
     assert!(!definitions.is_empty());
     for target in definitions {
         assert!(matches!(target.file_id, FileId::Extension(_)));
-        let extension = target.file_id.original_file(&db);
+        let extension = original_file(&db, target.file_id);
         assert_eq!(&extension.content(&db)[target.value], "vector");
-        assert_eq!(target.file_id.original_file(&db), extension);
+        assert_eq!(original_file(&db, target.file_id), extension);
     }
 }
 
 #[test]
 fn embedded_sql_target() {
-    let db = Database::default();
+    let mut db = Database::default();
     let sql = "create function f(a int) returns int language sql as 'select a';";
-    let file = File::new(&db, sql.into());
+    let file = db.add_file(sql.into());
     let definitions = goto_definition(&db, InFile::new(file, TextSize::from(61)));
     assert_eq!(definitions.len(), 1);
     assert_eq!(definitions[0].file_id, file.into());
@@ -71,7 +78,7 @@ fn embedded_sql_target() {
 #[test]
 fn reuses_index_until_file_changes() {
     let mut db = Database::default();
-    let file = File::new(&db, "create table t (a int); select a from t;".into());
+    let file = db.add_file("create table t (a int); select a from t;".into());
     assert!(std::ptr::eq(
         semantic_index(&db, file.into()),
         semantic_index(&db, file.into()),
@@ -80,8 +87,10 @@ fn reuses_index_until_file_changes() {
     let definitions = goto_definition(&db, position);
     assert_eq!(definitions.len(), 1);
     assert_eq!(definitions[0].file_id, file.into());
-    assert_eq!(&file.content(&db)[definitions[0].value], "a");
-    file.set_content(&mut db)
-        .to("create table t (b int); select a from t;".into());
+    assert_eq!(
+        &original_file(&db, file.into()).content(&db)[definitions[0].value],
+        "a"
+    );
+    db.set_file_content(file, "create table t (b int); select a from t;".into());
     assert!(goto_definition(&db, position).is_empty());
 }
