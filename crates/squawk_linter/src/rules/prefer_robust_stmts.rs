@@ -1,11 +1,12 @@
 use rustc_hash::{FxHashMap, FxHashSet};
 
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode, NameLike},
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation};
 
 #[derive(PartialEq)]
 enum Constraint {

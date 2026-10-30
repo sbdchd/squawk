@@ -1,9 +1,10 @@
 use rustc_hash::FxHashSet;
 
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast};
 
-use crate::{Edit, Fix, Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation};
 
 use crate::visitors::check_not_allowed_types;
 use crate::visitors::is_not_valid_int_type;

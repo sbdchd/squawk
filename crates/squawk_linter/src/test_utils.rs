@@ -1,5 +1,6 @@
-use crate::{Edit, Linter, LinterSettings, Rule, Violation};
+use crate::{Linter, LinterSettings, Rule, Violation};
 use annotate_snippets::{AnnotationKind, Level, Patch, Renderer, Snippet, renderer::DecorStyle};
+use squawk_diagnostics::Edit;
 
 fn lint(sql: &str, rule: Rule) -> Vec<Violation> {
     lint_settings(sql, LinterSettings::default(), rule)

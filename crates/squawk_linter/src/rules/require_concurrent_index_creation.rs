@@ -1,9 +1,10 @@
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
 };
 
-use crate::{Edit, Fix, Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
+use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 fn concurrently_fix(create_index: &ast::CreateIndex) -> Option<Fix> {
     let index_token = create_index.index_token()?;

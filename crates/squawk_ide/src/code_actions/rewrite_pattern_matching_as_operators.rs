@@ -1,6 +1,6 @@
 use rowan::TextSize;
 use salsa::Database as Db;
-use squawk_linter::Edit;
+use squawk_diagnostics::Edit;
 use squawk_syntax::ast::{self, AstNode, BinOp};
 
 use crate::{file::InFile, offsets::token_from_offset};

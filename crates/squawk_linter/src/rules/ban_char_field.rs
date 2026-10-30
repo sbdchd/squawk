@@ -1,13 +1,14 @@
 use rustc_hash::FxHashSet;
 
 use rowan::TextRange;
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
 };
 
 use crate::visitors::check_not_allowed_types;
-use crate::{Edit, Fix, Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation};
 
 use std::sync::OnceLock;
 

@@ -1,7 +1,7 @@
 use rowan::{TextRange, TextSize};
 use salsa::Database as Db;
+use squawk_diagnostics::Edit;
 use squawk_line_index::{NewlineWithTrailingNewline, find_newline};
-use squawk_linter::Edit;
 use squawk_syntax::{
     SyntaxToken,
     ast::{self, AstNode, AstToken},

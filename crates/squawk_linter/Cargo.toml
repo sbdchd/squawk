@@ -15,6 +15,7 @@ doctest = false
 
 [dependencies]
 squawk-syntax.workspace = true
+squawk-diagnostics.workspace = true
 
 rowan.workspace = true
 serde.workspace = true

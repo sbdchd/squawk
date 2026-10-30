@@ -7,7 +7,7 @@ use crate::ir::{
     AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
 };
 use rowan::{TextRange, TextSize};
-use squawk_linter::{Edit, Fix};
+use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
