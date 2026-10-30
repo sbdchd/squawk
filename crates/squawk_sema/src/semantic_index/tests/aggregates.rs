@@ -170,10 +170,16 @@ drop aggregate s(int);
 drop aggregate if exists s(int);
 drop aggregate add(int, int);
 "), @"
-    error: function `s(int4)` does not exist
+    error: `s` is an aggregate function
       ╭▸ 
     5 │ drop function s(int);
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+      ╭╴
+    5 - drop function s(int);
+    5 + drop aggregate s(int);
+      ╰╴
     error: function `s(int4)` does not exist
       ╭▸ 
     7 │ select s(1), c();
@@ -635,5 +641,75 @@ $$;
        │          ━━━━━━━━━━
        │
        ╰ hint: `order by` must appear after all regular arguments of the aggregate
+    ");
+}
+
+#[test]
+fn drop_function_on_aggregate() {
+    assert_snapshot!(check("
+create schema s;
+create aggregate a(int) (
+  sfunc = int4pl,
+  stype = int
+);
+create aggregate s.b(int) (
+  sfunc = int4pl,
+  stype = int
+);
+drop function a(int);
+drop function if exists a(int) cascade;
+drop function a;
+drop function s.b(int);
+drop function a(int), s.b(int);
+drop aggregate a(int);
+"), @"
+    error: `a` is an aggregate function
+       ╭▸ 
+    11 │ drop function a(int);
+       │               ━
+       ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+       ╭╴
+    11 - drop function a(int);
+    11 + drop aggregate a(int);
+       ╰╴
+    error: `a` is an aggregate function
+       ╭▸ 
+    12 │ drop function if exists a(int) cascade;
+       │                         ━
+       ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+       ╭╴
+    12 - drop function if exists a(int) cascade;
+    12 + drop aggregate if exists a(int) cascade;
+       ╰╴
+    error: `a` is an aggregate function
+       ╭▸ 
+    13 │ drop function a;
+       │               ━
+       │
+       ╰ hint: use `drop aggregate` to drop aggregate functions
+    error: `s.b` is an aggregate function
+       ╭▸ 
+    14 │ drop function s.b(int);
+       │                 ━
+       ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+       ╭╴
+    14 - drop function s.b(int);
+    14 + drop aggregate s.b(int);
+       ╰╴
+    error: `a` is an aggregate function
+       ╭▸ 
+    15 │ drop function a(int), s.b(int);
+       │               ━
+       │
+       ╰ hint: use `drop aggregate` to drop aggregate functions
+    error: `s.b` is an aggregate function
+       ╭▸ 
+    15 │ drop function a(int), s.b(int);
+       │                         ━
+       │
+       ╰ hint: use `drop aggregate` to drop aggregate functions
     ");
 }

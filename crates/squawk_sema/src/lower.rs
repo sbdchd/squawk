@@ -191,6 +191,11 @@ enum LabelPosition {
     After(EnumLabelId),
 }
 
+#[derive(Clone, Copy)]
+struct DropRoutine {
+    function_range: Option<TextRange>,
+}
+
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum CalleeKind {
     Plain,
@@ -2554,6 +2559,7 @@ impl Lowerer {
                     RoutineKind::Aggregate,
                     if_missing,
                     drop_behavior.as_ref(),
+                    None,
                 );
             }
         }
@@ -9541,6 +9547,17 @@ impl Lowerer {
         kind: RoutineKind,
         if_missing: IfMissing,
     ) -> Option<FunctionId> {
+        self.lower_routine_sig_for(path, param_list, kind, if_missing, None)
+    }
+
+    fn lower_routine_sig_for(
+        &mut self,
+        path: &ast::PathRef,
+        param_list: Option<ast::ParamList>,
+        kind: RoutineKind,
+        if_missing: IfMissing,
+        drop: Option<DropRoutine>,
+    ) -> Option<FunctionId> {
         let segment = path.segment()?;
         let schema = self.lower_schema_qualifier(path.qualifier());
         let name = self.intern(&segment.text());
@@ -9567,9 +9584,22 @@ impl Lowerer {
                 if missing {
                     Some(Resolution::Unknown)
                 } else {
-                    match self.find_function_by(schema, name, |function| {
-                        kind.matches(function.kind) && self.has_arg_types(function, &arg_types)
-                    }) {
+                    let function =
+                        self.find_function_with_arg_types(schema, name, kind, &arg_types);
+                    if function.is_none()
+                        && let Some(drop) = drop
+                        && let Some(aggregate) = self.find_function_with_arg_types(
+                            schema,
+                            name,
+                            RoutineKind::Aggregate,
+                            &arg_types,
+                        )
+                    {
+                        return self.aggregate_dropped_as_function(
+                            &segment, schema, name, aggregate, drop,
+                        );
+                    }
+                    match function {
                         Some(function) => Some(Resolution::Function(function)),
                         None if matches!(if_missing, IfMissing::Error)
                             && arg_types.iter().all(Option::is_some) =>
@@ -9607,7 +9637,18 @@ impl Lowerer {
                     }
                 }
             }
-            None => self.find_unique_function(schema, name, kind),
+            None => {
+                let resolution = self.find_unique_function(schema, name, kind);
+                if resolution.is_none()
+                    && let Some(drop) = drop
+                    && let Some(Resolution::Function(aggregate)) =
+                        self.find_unique_function(schema, name, RoutineKind::Aggregate)
+                {
+                    return self
+                        .aggregate_dropped_as_function(&segment, schema, name, aggregate, drop);
+                }
+                resolution
+            }
         };
         let resolution = resolution.unwrap_or(match if_missing {
             IfMissing::Error => Resolution::Unresolved,
@@ -9623,6 +9664,43 @@ impl Lowerer {
             Resolution::Function(function) => Some(function),
             _ => None,
         }
+    }
+
+    fn find_function_with_arg_types(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: RoutineKind,
+        arg_types: &[Option<Ty>],
+    ) -> Option<FunctionId> {
+        self.find_function_by(schema, name, |function| {
+            kind.matches(function.kind) && self.has_arg_types(function, arg_types)
+        })
+    }
+
+    fn aggregate_dropped_as_function(
+        &mut self,
+        segment: &ast::PathSegmentRef,
+        schema: Option<Name>,
+        name: Name,
+        aggregate: FunctionId,
+        drop: DropRoutine,
+    ) -> Option<FunctionId> {
+        self.push_error(
+            segment.syntax(),
+            SemaError::AggregateDroppedAsFunction {
+                schema,
+                name,
+                function_range: drop.function_range,
+            },
+        );
+        self.add_ref(
+            name,
+            ReferenceKind::Function(RoutineKind::Aggregate),
+            segment.syntax(),
+            Resolution::Function(aggregate),
+        );
+        None
     }
 
     fn find_unique_function(
@@ -9650,18 +9728,26 @@ impl Lowerer {
 
     fn lower_drop_function(&mut self, drop_function: &ast::DropFunction) {
         let if_missing = IfMissing::from_if_exists(drop_function.if_exists().as_ref());
-        for sig in drop_function
-            .function_sig_list()
-            .iter()
-            .flat_map(|list| list.function_sigs())
-        {
+        let sigs = drop_function.function_sig_list();
+        let single_sig = sigs
+            .as_ref()
+            .is_some_and(|list| list.function_sigs().nth(1).is_none());
+        for sig in sigs.iter().flat_map(|list| list.function_sigs()) {
             if let Some(path) = sig.function_name_ref().and_then(|name| name.path_ref()) {
+                let param_list = sig.param_list();
+                let drop = DropRoutine {
+                    function_range: drop_function
+                        .function_token()
+                        .filter(|_| single_sig && param_list.is_some())
+                        .map(|token| self.token_range(&token)),
+                };
                 self.drop_routine_sig(
                     &path,
-                    sig.param_list(),
+                    param_list,
                     RoutineKind::Function,
                     if_missing,
                     drop_function.drop_behavior().as_ref(),
+                    Some(drop),
                 );
             }
         }
@@ -9681,6 +9767,7 @@ impl Lowerer {
                     RoutineKind::Procedure,
                     if_missing,
                     drop_procedure.drop_behavior().as_ref(),
+                    None,
                 );
             }
         }
@@ -9700,6 +9787,7 @@ impl Lowerer {
                     RoutineKind::Routine,
                     if_missing,
                     drop_routine.drop_behavior().as_ref(),
+                    None,
                 );
             }
         }
@@ -9712,8 +9800,10 @@ impl Lowerer {
         kind: RoutineKind,
         if_missing: IfMissing,
         drop_behavior: Option<&ast::DropBehavior>,
+        drop: Option<DropRoutine>,
     ) {
-        let Some(function) = self.lower_routine_sig(path, param_list, kind, if_missing) else {
+        let Some(function) = self.lower_routine_sig_for(path, param_list, kind, if_missing, drop)
+        else {
             return;
         };
         match drop_behavior {

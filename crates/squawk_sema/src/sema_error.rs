@@ -324,6 +324,11 @@ pub(crate) enum SemaError {
         args: ErrorArgs,
         call_range: Option<TextRange>,
     },
+    AggregateDroppedAsFunction {
+        schema: Option<Name>,
+        name: Name,
+        function_range: Option<TextRange>,
+    },
     UnresolvedOperator {
         schema: Option<Name>,
         name: Name,
@@ -859,6 +864,7 @@ impl SemaError {
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
+            | SemaError::AggregateDroppedAsFunction { .. }
             | SemaError::ParameterlessAggregate { .. } => DiagnosticKind::WrongRoutineKind,
             SemaError::UnresolvedQualifiedColumn { .. } | SemaError::QualifiedSetTarget { .. } => {
                 DiagnosticKind::UnresolvedColumn
@@ -994,6 +1000,16 @@ impl SemaError {
                     edits: vec![Edit::replace(call_range, "select")],
                 },
             },
+            SemaError::AggregateDroppedAsFunction {
+                function_range: Some(function_range),
+                ..
+            } => Suggestion {
+                message: "use `drop aggregate` to drop aggregate functions".into(),
+                fix: Fix {
+                    title: "Replace with `aggregate`".into(),
+                    edits: vec![Edit::replace(function_range, "aggregate")],
+                },
+            },
             SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
                 message: "use `*` to call an aggregate with no arguments".into(),
                 fix: Fix {
@@ -1114,6 +1130,10 @@ impl SemaError {
             SemaError::FunctionCalledAsProcedure {
                 call_range: None, ..
             } => Some("to call a function, use `select`"),
+            SemaError::AggregateDroppedAsFunction {
+                function_range: None,
+                ..
+            } => Some("use `drop aggregate` to drop aggregate functions"),
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
@@ -1601,6 +1621,10 @@ impl fmt::Display for ErrorMessage<'_> {
                 "`{}` is not a procedure",
                 self.signature(schema, name, args)
             ),
+            SemaError::AggregateDroppedAsFunction { schema, name, .. } => match schema {
+                Some(schema) => write!(f, "`{}.{}` is an aggregate function", n(schema), n(name)),
+                None => write!(f, "`{}` is an aggregate function", n(name)),
+            },
             SemaError::UnresolvedOperator {
                 schema,
                 name,
