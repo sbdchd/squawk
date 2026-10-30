@@ -69,9 +69,10 @@ fn is_ignore_comment(token: &SyntaxToken) -> bool {
 
 #[cfg(test)]
 mod test {
+    use squawk_ide::db::Database;
+
     use crate::{diagnostic::AssociatedDiagnosticData, lint::lint};
     use insta::assert_snapshot;
-    use squawk_ide::db::{Database, File};
 
     #[test]
     fn ignore_line() {
@@ -205,9 +206,9 @@ create table c (
     }
 
     fn lint_sql(sql: &str) -> Vec<gen_lsp_types::Diagnostic> {
-        let db = Database::default();
-        let file = File::new(&db, sql.to_owned().into());
-        lint(&db, file)
+        let mut db = Database::default();
+        let file = db.add_file(sql.into());
+        lint(&db, file.into())
     }
 
     fn ignore_line_edits_with_line_ending(line_ending: &str) -> String {

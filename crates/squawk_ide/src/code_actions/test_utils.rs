@@ -1,9 +1,9 @@
 use rowan::TextSize;
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
+use squawk_sema::file::InFile;
 use squawk_syntax::ast;
 
-use crate::file::InFile;
+use crate::db::{Db, original_file};
 use crate::test_utils::Fixture;
 
 use super::{ActionKind, CodeAction};
@@ -48,7 +48,7 @@ fn apply_code_action_(
 
     let action = &actions[0];
 
-    let mut result = file.original_file(db).content(db).to_string();
+    let mut result = original_file(db, file).content(db).to_string();
 
     let mut edits = action.edits.clone();
     edits.sort_by_key(|e| e.text_range.start());

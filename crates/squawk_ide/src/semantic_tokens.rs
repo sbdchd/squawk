@@ -1,26 +1,25 @@
 use rowan::{NodeOrToken, TextRange, TextSize, WalkEvent};
-use salsa::Database as Db;
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxToken,
     ast::{self, AstNode},
     match_ast,
 };
 
-use crate::db::{File, parse, semantic_index};
-use crate::file::{FileId, InFile, InIrFile, IrFileId};
-use crate::ir::{Item, Resolution, TableId, TableKind};
-use crate::lower::is_public_role;
-use crate::semantic_index::SemanticIndex;
+use squawk_sema::file::{FileId, InFile, InIrFile, IrFileId};
+use squawk_sema::ir::{Item, Resolution, TableId, TableKind};
+use squawk_sema::lower::is_public_role;
+use squawk_sema::semantic_index::SemanticIndex;
 
-#[salsa::tracked]
+use crate::db::{Db, parse, semantic_index};
+
 pub fn semantic_tokens(
     db: &dyn Db,
-    file: File,
+    file_id: FileId,
     range_to_highlight: Option<TextRange>,
 ) -> Vec<SemanticToken> {
     semantic_tokens_with_index(
-        semantic_index(db, file.into()),
-        crate::file::InFile::new(file, &parse(db, file).tree()),
+        semantic_index(db, file_id),
+        squawk_sema::file::InFile::new(file_id, &parse(db, file_id).tree()),
         range_to_highlight,
     )
 }

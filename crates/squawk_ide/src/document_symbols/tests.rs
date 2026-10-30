@@ -1,21 +1,18 @@
 use annotate_snippets::{AnnotationKind, Group, Level, Renderer, Snippet, renderer::DecorStyle};
 use insta::assert_snapshot;
+use squawk_sema::{file::InFile, semantic_index_builder::SemanticIndexBuilder};
 use squawk_syntax::SourceFile;
 
-use crate::{
-    document_symbols::{
-        DocumentSymbol, DocumentSymbolKind, document_symbols_with_index as document_symbols,
-    },
-    file::InFile,
-    semantic_index_builder::SemanticIndexBuilder,
+use crate::document_symbols::{
+    DocumentSymbol, DocumentSymbolKind, document_symbols_with_index as document_symbols,
 };
 
 fn find_symbols(sql: &str) -> Vec<DocumentSymbol> {
     let parse = SourceFile::parse(sql);
     assert_eq!(parse.errors(), vec![]);
     let file = parse.tree();
-    let db = crate::db::Database::default();
-    let file = InFile::new(crate::db::File::new(&db, sql.into()), &file);
+    let mut db = crate::db::Database::default();
+    let file = InFile::new(db.add_file(sql.into()), &file);
     let mut builder = SemanticIndexBuilder::new();
     builder.add_file(file);
     let index = builder.build();

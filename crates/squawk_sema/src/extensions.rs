@@ -4,7 +4,7 @@ use squawk_syntax::{Parse, SourceFile};
 
 use crate::file::FileId;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, salsa::Update)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum BundledExtension {
     Bloom,
     BtreeGin,
@@ -78,8 +78,7 @@ impl BundledExtension {
         })
     }
 
-    #[cfg(test)]
-    pub(crate) fn from_file(file_id: FileId) -> Option<BundledExtension> {
+    pub fn from_file(file_id: FileId) -> Option<BundledExtension> {
         match file_id {
             FileId::Extension(extension) => Some(extension),
             _ => None,
@@ -114,8 +113,7 @@ impl BundledExtension {
         }
     }
 
-    #[cfg(test)]
-    pub(crate) fn path(self) -> &'static str {
+    pub fn path(self) -> &'static str {
         match self {
             BundledExtension::Bloom => "bloom.sql",
             BundledExtension::BtreeGin => "btree_gin.sql",
@@ -138,7 +136,7 @@ impl BundledExtension {
         }
     }
 
-    pub(crate) fn sql(self) -> &'static str {
+    pub fn sql(self) -> &'static str {
         match self {
             BundledExtension::Bloom => include_str!("generated/extensions/bloom.sql"),
             BundledExtension::BtreeGin => include_str!("generated/extensions/btree_gin.sql"),

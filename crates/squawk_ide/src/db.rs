@@ -1,21 +1,22 @@
 use rowan::TextSize;
-use salsa::Database as Db;
-use salsa::Storage;
+use salsa::{Setter, Storage};
 use squawk_line_index::{LineIndex, find_newline};
+use squawk_sema::extensions::BundledExtension;
+use squawk_sema::file::{FileId, FileIndex, InFile};
+use squawk_sema::semantic_index::SemanticIndex;
+use squawk_sema::semantic_index_builder::SemanticIndexBuilder;
 use squawk_syntax::{Parse, SourceFile};
 use std::sync::Arc;
 
+use crate::builtins::builtins_file;
 use crate::completion::COMPLETION_MARKER;
-pub use crate::extensions::BundledExtension;
-use crate::file::InFile;
-use crate::semantic_index::SemanticIndex;
-use crate::semantic_index_builder::SemanticIndexBuilder;
 
 #[salsa::input(debug)]
 #[derive(PartialOrd, Ord)]
 pub struct File {
     #[returns(ref)]
     pub content: Arc<str>,
+    pub file_id: FileId,
 }
 
 #[salsa::interned(no_lifetime, debug)]
@@ -25,36 +26,26 @@ pub struct CompletionFile {
     pub offset: TextSize,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, salsa::Update)]
-pub enum FileId {
-    File(File),
-    Completion(CompletionFile),
-    Builtins,
-    Extension(BundledExtension),
+#[salsa::db]
+pub trait Db: salsa::Database {
+    fn file(&self, file: FileIndex) -> File;
 }
 
-impl From<File> for FileId {
-    fn from(file: File) -> Self {
-        FileId::File(file)
+pub fn original_file(db: &dyn Db, file_id: FileId) -> File {
+    match file_id {
+        FileId::File(file) | FileId::Completion { file, .. } => db.file(file),
+        FileId::Builtins => builtins_file(db),
+        FileId::Extension(extension) => extension_file(db, extension),
     }
 }
 
-impl FileId {
-    pub fn original_file(self, db: &dyn Db) -> File {
-        match self {
-            FileId::File(file) => file,
-            FileId::Completion(completion) => completion.file(db),
-            FileId::Builtins => crate::builtins::builtins_file(db),
-            FileId::Extension(extension) => extension_file(db, extension),
+pub fn parse(db: &dyn Db, file_id: FileId) -> Parse<SourceFile> {
+    match file_id {
+        FileId::File(file) => parse_file(db, db.file(file)),
+        FileId::Completion { file, offset } => {
+            parse_completion_file(db, CompletionFile::new(db, db.file(file), offset))
         }
-    }
-}
-
-pub fn parse(db: &dyn Db, file: impl Into<FileId>) -> Parse<SourceFile> {
-    match file.into() {
-        FileId::File(file) => parse_file(db, file),
-        FileId::Completion(completion) => parse_completion_file(db, completion),
-        FileId::Builtins => parse_file(db, crate::builtins::builtins_file(db)),
+        FileId::Builtins => parse_file(db, builtins_file(db)),
         FileId::Extension(extension) => parse_file(db, extension_file(db, extension)),
     }
 }
@@ -70,7 +61,8 @@ fn extension_file(db: &dyn Db, extension: BundledExtension) -> File {
 
 #[salsa::tracked]
 fn extension_source(db: &dyn Db, file: ExtensionFile) -> File {
-    File::new(db, file.extension(db).sql().into())
+    let extension = file.extension(db);
+    File::new(db, extension.sql().into(), FileId::Extension(extension))
 }
 
 #[salsa::tracked]
@@ -96,17 +88,19 @@ impl PartialEq for CachedIndex {
     }
 }
 
-pub(crate) fn semantic_index(db: &dyn Db, file: FileId) -> &SemanticIndex {
-    match file {
-        FileId::File(file) => &file_index(db, file).index,
-        FileId::Completion(file) => &completion_index(db, file).index,
+pub fn semantic_index(db: &dyn Db, file_id: FileId) -> &SemanticIndex {
+    match file_id {
+        FileId::File(file) => &file_index(db, db.file(file)).index,
+        FileId::Completion { file, offset } => {
+            &completion_index(db, CompletionFile::new(db, db.file(file), offset)).index
+        }
         FileId::Builtins | FileId::Extension(_) => unreachable!(),
     }
 }
 
-fn build_index(db: &dyn Db, file: FileId) -> CachedIndex {
+fn build_index(db: &dyn Db, file_id: FileId) -> CachedIndex {
     let mut builder = SemanticIndexBuilder::new();
-    builder.add_file(InFile::new(file, &parse(db, file).tree()));
+    builder.add_file(InFile::new(file_id, &parse(db, file_id).tree()));
     CachedIndex {
         index: Arc::new(builder.build()),
     }
@@ -114,21 +108,39 @@ fn build_index(db: &dyn Db, file: FileId) -> CachedIndex {
 
 #[salsa::tracked(returns(ref), no_eq)]
 fn file_index(db: &dyn Db, file: File) -> CachedIndex {
-    build_index(db, file.into())
+    build_index(db, file.file_id(db))
 }
 
 #[salsa::tracked(returns(ref), no_eq)]
-fn completion_index(db: &dyn Db, file: CompletionFile) -> CachedIndex {
-    build_index(db, FileId::Completion(file))
+fn completion_index(db: &dyn Db, completion: CompletionFile) -> CachedIndex {
+    let FileId::File(file) = completion.file(db).file_id(db) else {
+        unreachable!()
+    };
+    build_index(
+        db,
+        FileId::Completion {
+            file,
+            offset: completion.offset(db),
+        },
+    )
 }
 
-#[salsa::tracked(returns(ref))]
-pub fn line_index(db: &dyn Db, file: File) -> LineIndex {
-    LineIndex::new(file.content(db))
+pub fn line_index(db: &dyn Db, file_id: FileId) -> &LineIndex {
+    #[salsa::interned(no_lifetime)]
+    struct InternedFileId {
+        id: FileId,
+    }
+
+    #[salsa::tracked(returns(ref))]
+    fn line_index(db: &dyn Db, file_id: InternedFileId) -> LineIndex {
+        LineIndex::new(original_file(db, file_id.id(db)).content(db))
+    }
+
+    line_index(db, InternedFileId::new(db, file_id))
 }
 
-pub(crate) fn line_ending(db: &dyn Db, file: impl Into<FileId>) -> &'static str {
-    find_newline(file.into().original_file(db).content(db))
+pub fn line_ending(db: &dyn Db, file_id: FileId) -> &'static str {
+    find_newline(original_file(db, file_id).content(db))
         .map(|(_, line_ending)| line_ending)
         .unwrap_or_default()
         .as_str()
@@ -138,9 +150,32 @@ pub(crate) fn line_ending(db: &dyn Db, file: impl Into<FileId>) -> &'static str 
 #[derive(Clone, Default)]
 pub struct Database {
     storage: Storage<Self>,
+    files: Vec<File>,
 }
 
+impl Database {
+    pub fn add_file(&mut self, content: Arc<str>) -> FileIndex {
+        let index = FileIndex::from_raw(u32::try_from(self.files.len()).unwrap());
+        let file = File::new(self, content, FileId::File(index));
+        self.files.push(file);
+        index
+    }
+
+    pub fn set_file_content(&mut self, file: FileIndex, content: Arc<str>) {
+        let file = self.files[file.index()];
+        file.set_content(self).to(content);
+    }
+}
+
+#[salsa::db]
 impl salsa::Database for Database {}
+
+#[salsa::db]
+impl Db for Database {
+    fn file(&self, file: FileIndex) -> File {
+        self.files[file.index()]
+    }
+}
 
 #[cfg(test)]
 mod tests;

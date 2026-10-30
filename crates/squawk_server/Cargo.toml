@@ -26,6 +26,7 @@ serde.workspace = true
 serde_json.workspace = true
 squawk-fmt.workspace = true
 squawk-ide.workspace = true
+squawk-sema.workspace = true
 squawk-lexer.workspace = true
 squawk-linter.workspace = true
 squawk-syntax.workspace = true

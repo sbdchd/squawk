@@ -2506,7 +2506,6 @@ dependencies = [
  "etcetera",
  "insta",
  "itertools",
- "la-arena",
  "log",
  "num-bigint",
  "rowan",
@@ -2516,6 +2515,7 @@ dependencies = [
  "smol_str",
  "squawk-diagnostics",
  "squawk-line-index",
+ "squawk-sema",
  "squawk-syntax",
  "tabled",
  "url",
@@ -2572,6 +2572,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "squawk-sema"
+version = "2.71.0"
+dependencies = [
+ "annotate-snippets",
+ "insta",
+ "la-arena",
+ "rowan",
+ "rustc-hash 2.1.1",
+ "smallvec",
+ "squawk-diagnostics",
+ "squawk-line-index",
+ "squawk-syntax",
+]
+
+[[package]]
 name = "squawk-server"
 version = "2.71.0"
 dependencies = [
@@ -2594,6 +2609,7 @@ dependencies = [
  "squawk-lexer",
  "squawk-line-index",
  "squawk-linter",
+ "squawk-sema",
  "squawk-syntax",
  "squawk-thread",
  "tracing",
@@ -2637,7 +2653,6 @@ dependencies = [
  "console_log",
  "log",
  "rowan",
- "salsa",
  "serde",
  "serde-wasm-bindgen",
  "squawk-diagnostics",
@@ -2646,6 +2661,7 @@ dependencies = [
  "squawk-lexer",
  "squawk-line-index",
  "squawk-linter",
+ "squawk-sema",
  "squawk-syntax",
  "wasm-bindgen",
  "wasm-bindgen-test",

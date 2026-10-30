@@ -24,9 +24,9 @@ squawk-diagnostics.workspace = true
 squawk-linter.workspace = true
 squawk-lexer.workspace = true
 squawk-ide.workspace = true
+squawk-sema.workspace = true
 squawk-fmt.workspace = true
 rowan.workspace = true
-salsa.workspace = true
 
 wasm-bindgen.workspace = true
 serde-wasm-bindgen.workspace = true

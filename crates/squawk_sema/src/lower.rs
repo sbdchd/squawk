@@ -22705,7 +22705,7 @@ enum ConstraintName {
     Generated(Name),
 }
 
-pub(crate) fn is_public_role(name_ref: &ast::RoleNameRef) -> bool {
+pub fn is_public_role(name_ref: &ast::RoleNameRef) -> bool {
     name_ref.text() == "public"
 }
 
@@ -23041,7 +23041,7 @@ fn like_includes_indexes(like: &ast::LikeClause) -> bool {
     includes
 }
 
-pub(crate) fn literal_type_name(literal: &ast::Literal) -> Option<&'static str> {
+pub fn literal_type_name(literal: &ast::Literal) -> Option<&'static str> {
     let name = match literal.kind()? {
         ast::LitKind::IntNumber(_) => match literal.integer_value_u64() {
             Some(value) if i32::try_from(value).is_ok() => "int4",

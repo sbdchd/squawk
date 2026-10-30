@@ -1,9 +1,10 @@
 use rowan::TextSize;
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
+use squawk_sema::{file::InFile, ir::FunctionKind};
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{db::semantic_index, file::InFile, ir::FunctionKind, offsets::token_from_offset};
+use crate::db::{Db, semantic_index};
+use crate::offsets::token_from_offset;
 
 use super::unnest::unnest_call;
 use super::{ActionKind, CodeAction};

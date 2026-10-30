@@ -1,10 +1,11 @@
 use rowan::TextSize;
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
+use squawk_sema::{file::InFile, ir::Item};
 use squawk_syntax::ast::{self, AstNode};
 
 use super::{ActionKind, CodeAction};
-use crate::{db::semantic_index, file::InFile, ir::Item, offsets::token_from_offset};
+use crate::db::{Db, semantic_index};
+use crate::offsets::token_from_offset;
 
 pub(super) fn add_schema(
     db: &dyn Db,

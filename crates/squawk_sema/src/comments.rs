@@ -6,15 +6,15 @@ use squawk_syntax::{
     ast::{self, AstToken},
 };
 
-pub(crate) fn line_comment_content(comment: &str) -> Option<&str> {
+pub fn line_comment_content(comment: &str) -> Option<&str> {
     comment.strip_prefix("--").map(str::trim)
 }
 
-pub(crate) fn block_comment_content(comment: &str) -> Option<&str> {
+pub fn block_comment_content(comment: &str) -> Option<&str> {
     comment.strip_prefix("/*")?.strip_suffix("*/")
 }
 
-pub(crate) fn strip_block_decoration(line: &str) -> &str {
+pub fn strip_block_decoration(line: &str) -> &str {
     let line = line.trim();
     let Some(content) = line.strip_prefix('*') else {
         return line;
@@ -27,7 +27,7 @@ pub(crate) fn strip_block_decoration(line: &str) -> &str {
     }
 }
 
-pub(crate) fn line_comment_group(comment: &ast::Comment) -> Vec<ast::Comment> {
+pub fn line_comment_group(comment: &ast::Comment) -> Vec<ast::Comment> {
     let mut comments = vec![comment.clone()];
 
     let mut current = comment.clone();

@@ -1,7 +1,7 @@
 use rustc_hash::FxHashMap;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) struct Name(u32);
+pub struct Name(u32);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct QualifiedName {
@@ -10,7 +10,7 @@ pub(crate) struct QualifiedName {
 }
 
 #[derive(Debug, Default)]
-pub(crate) struct Interner {
+pub struct Interner {
     base: Option<&'static Interner>,
     names: Vec<Box<str>>,
     map: FxHashMap<Box<str>, Name>,
@@ -41,13 +41,13 @@ impl Interner {
         self.map.shrink_to_fit();
     }
 
-    pub(crate) fn lookup(&self, text: &str) -> Option<Name> {
+    pub fn lookup(&self, text: &str) -> Option<Name> {
         self.base
             .and_then(|base| base.lookup(text))
             .or_else(|| self.map.get(text).copied())
     }
 
-    pub(crate) fn resolve(&self, name: Name) -> &str {
+    pub fn resolve(&self, name: Name) -> &str {
         let i = name.0 as usize;
         match self.base {
             Some(base) if i < base.names.len() => base.resolve(name),

@@ -1,0 +1,31 @@
+[package]
+name = "squawk-sema"
+version.workspace = true
+description.workspace = true
+documentation.workspace = true
+homepage.workspace = true
+repository.workspace = true
+
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[lib]
+doctest = false
+
+[dependencies]
+squawk-syntax.workspace = true
+squawk-diagnostics.workspace = true
+squawk-line-index.workspace = true
+rowan.workspace = true
+la-arena.workspace = true
+smallvec.workspace = true
+rustc-hash.workspace = true
+
+[dev-dependencies]
+insta.workspace = true
+annotate-snippets.workspace = true
+
+[lints]
+workspace = true

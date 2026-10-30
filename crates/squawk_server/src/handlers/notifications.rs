@@ -5,6 +5,7 @@ use gen_lsp_types::{
     PublishDiagnosticsParams,
 };
 use lsp_server::{Message, Notification};
+use squawk_ide::db::original_file;
 
 use crate::global_state::GlobalState;
 use crate::lsp_utils;
@@ -29,7 +30,7 @@ pub(crate) fn handle_did_change(state: &mut GlobalState, params: DidChangeTextDo
 
     let db = state.db();
     let file = state.file(&uri).unwrap();
-    let content = file.content(db);
+    let content = original_file(db, file).content(db);
 
     let updated_content = lsp_utils::apply_incremental_changes(content, params.content_changes);
 

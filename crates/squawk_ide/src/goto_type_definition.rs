@@ -1,14 +1,13 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
-use squawk_syntax::ast;
-
-use crate::{
-    db::{parse, semantic_index},
+use squawk_sema::{
     file::{FilePosition, FileRange, InFile, IrFileRange},
     ir::{Item, Ty},
-    offsets::item_at_position,
     semantic_index::SemanticIndex,
 };
+use squawk_syntax::ast;
+
+use crate::db::{Db, parse, semantic_index};
+use crate::offsets::item_at_position;
 
 pub fn goto_type_definition(db: &dyn Db, position: InFile<TextSize>) -> Option<InFile<TextRange>> {
     let file = position.file_id;

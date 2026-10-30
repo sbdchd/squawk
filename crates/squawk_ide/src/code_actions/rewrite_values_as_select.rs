@@ -1,10 +1,11 @@
 use itertools::Itertools;
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
+use squawk_sema::file::InFile;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{db::line_ending, file::InFile, offsets::token_from_offset};
+use crate::db::{Db, line_ending};
+use crate::offsets::token_from_offset;
 
 use super::{ActionKind, CodeAction};
 

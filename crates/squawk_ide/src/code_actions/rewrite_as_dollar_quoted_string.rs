@@ -1,12 +1,12 @@
 use rowan::TextSize;
-use salsa::Database as Db;
 use squawk_diagnostics::Edit;
 use squawk_syntax::{SyntaxKind, ast::AstNode};
 
-use crate::db::parse;
-use crate::file::InFile;
+use squawk_sema::file::InFile;
 
 use super::{ActionKind, CodeAction};
+
+use crate::db::{Db, parse};
 
 pub(super) fn rewrite_as_dollar_quoted_string(
     db: &dyn Db,

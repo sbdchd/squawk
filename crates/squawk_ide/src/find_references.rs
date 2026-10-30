@@ -1,13 +1,12 @@
 use rowan::{TextRange, TextSize};
-use salsa::Database as Db;
+use squawk_sema::file::{FilePosition, FileRange, InFile};
+use squawk_sema::ir::Item;
+use squawk_sema::semantic_index::{AsOf, SemanticIndex};
 use squawk_syntax::ast;
 
-use crate::db::{parse, semantic_index};
-use crate::file::{FilePosition, FileRange, InFile};
+use crate::db::{Db, parse, semantic_index};
 use crate::goto_definition::item_definitions;
-use crate::ir::Item;
 use crate::offsets::item_at_position;
-use crate::semantic_index::{AsOf, SemanticIndex};
 
 pub fn find_references(db: &dyn Db, position: InFile<TextSize>) -> Vec<InFile<TextRange>> {
     let file = position.file_id;

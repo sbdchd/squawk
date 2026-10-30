@@ -1,7 +1,7 @@
 use gen_lsp_types::{
     InlayHint, InlayHintKind, InlayHintLabelPart, InlayHintParams, Label, Location,
 };
-use squawk_ide::db::line_index;
+use squawk_ide::db::{line_index, original_file};
 use squawk_ide::inlay_hints::inlay_hints;
 
 use crate::global_state::Snapshot;
@@ -28,9 +28,9 @@ pub(crate) fn handle_inlay_hints(snapshot: &Snapshot, params: InlayHintParams) -
             };
 
             let label = if let Some(target) = hint.target {
-                let target_file = target.file_id.original_file(db);
+                let target_file = original_file(db, target.file_id);
                 let target_uri = snapshot.uri(target_file)?;
-                let target_line_index = line_index(db, target_file);
+                let target_line_index = line_index(db, target.file_id);
                 Label::InlayHintLabelPartList(vec![InlayHintLabelPart {
                     value: hint.label,
                     location: Some(Location {

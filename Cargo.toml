@@ -93,6 +93,7 @@ squawk-line-index = { path = "./crates/squawk_line_index", version = "2.61.0" }
 squawk-parser = { path = "./crates/squawk_parser", version = "2.71.0" }
 squawk-syntax = { path = "./crates/squawk_syntax", version = "2.71.0" }
 squawk-linter = { path = "./crates/squawk_linter", version = "2.71.0" }
+squawk-sema = { path = "./crates/squawk_sema", version = "2.71.0" }
 squawk-server = { path = "./crates/squawk_server", version = "2.71.0" }
 squawk-thread = { path = "./crates/squawk_thread", version = "2.71.0" }
 

@@ -1,7 +1,7 @@
 use anyhow::Result;
 use gen_lsp_types::{DocumentFormattingParams, TextEdit};
 use rowan::{TextRange, TextSize};
-use squawk_ide::db::{line_index, parse};
+use squawk_ide::db::{line_index, original_file, parse};
 use squawk_line_index::find_newline;
 
 use crate::global_state::Snapshot;
@@ -13,7 +13,7 @@ pub(crate) fn handle_formatting(
 ) -> Result<Option<Vec<TextEdit>>> {
     let db = snapshot.db();
     let file = snapshot.file(&params.text_document.uri).unwrap();
-    let content = file.content(db);
+    let content = original_file(db, file).content(db);
     let line_ending = find_newline(content)
         .map(|(_, ending)| ending)
         .unwrap_or_default();

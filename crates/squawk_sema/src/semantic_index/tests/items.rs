@@ -1,7 +1,7 @@
 use insta::assert_snapshot;
 use squawk_syntax::SourceFile;
 
-use crate::file::InFile;
+use crate::file::{FileId, FileIndex, InFile};
 use crate::{ir::ItemRange, semantic_index_builder::SemanticIndexBuilder};
 
 #[test]
@@ -9,8 +9,7 @@ fn item_at_range() {
     let sql = "with t as (select 1 a) select a, b from t;";
     let parse = SourceFile::parse(sql);
     let mut builder = SemanticIndexBuilder::new();
-    let db = crate::db::Database::default();
-    let file = crate::db::File::new(&db, sql.into()).into();
+    let file = FileId::File(FileIndex::from_raw(0));
     builder.add_file(InFile::new(file, &parse.tree()));
     let index = builder.build();
     let items = index

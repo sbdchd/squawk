@@ -2,12 +2,10 @@ use std::fmt::Write;
 
 use insta::assert_snapshot;
 use rowan::{TextRange, TextSize};
+use squawk_sema::{file::InFile, semantic_index_builder::SemanticIndexBuilder};
 use squawk_syntax::SourceFile;
 
-use crate::{
-    file::InFile, semantic_index_builder::SemanticIndexBuilder,
-    semantic_tokens::semantic_tokens_with_index as semantic_tokens,
-};
+use crate::semantic_tokens::semantic_tokens_with_index as semantic_tokens;
 
 #[must_use]
 #[track_caller]
@@ -21,8 +19,8 @@ fn check_semantic_tokens_in_range(sql: &str, range: Option<TextRange>) -> String
     let parse = SourceFile::parse(sql);
     assert_eq!(parse.errors(), vec![]);
     let tree = parse.tree();
-    let db = crate::db::Database::default();
-    let file = InFile::new(crate::db::File::new(&db, sql.into()), &tree);
+    let mut db = crate::db::Database::default();
+    let file = InFile::new(db.add_file(sql.into()), &tree);
     let mut builder = SemanticIndexBuilder::new();
     builder.add_file(file);
     let index = builder.build();
