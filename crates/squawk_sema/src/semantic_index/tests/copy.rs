@@ -12,6 +12,7 @@ create sequence s;
 create foreign data wrapper w;
 create server srv foreign data wrapper w;
 create foreign table ft (a int) server srv;
+create index i on t (a);
 copy t to stdout;
 copy m to stdout;
 copy ft to stdout;
@@ -21,31 +22,45 @@ copy ft from stdin;
 copy v from stdin;
 copy m from stdin;
 copy s from stdin;
+copy i to stdout;
+copy public.i (a) from stdin;
 "), @"
     error: cannot copy from foreign table `ft`
        ╭▸ 
-    11 │ copy ft to stdout;
+    12 │ copy ft to stdout;
        │      ━━
        │
        ╰ hint: try the `copy (select ...) to` variant
     error: cannot copy from sequence `s`
        ╭▸ 
-    12 │ copy s to stdout;
+    13 │ copy s to stdout;
        ╰╴     ━
     error: cannot copy to view `v`
        ╭▸ 
-    15 │ copy v from stdin;
+    16 │ copy v from stdin;
        │      ━
        │
        ╰ hint: to enable copying to a view, provide an `instead of insert` trigger
     error: cannot copy to materialized view `m`
        ╭▸ 
-    16 │ copy m from stdin;
+    17 │ copy m from stdin;
        ╰╴     ━
     error: cannot copy to sequence `s`
        ╭▸ 
-    17 │ copy s from stdin;
+    18 │ copy s from stdin;
        ╰╴     ━
+    error: cannot open relation `i`
+       ╭▸ 
+    19 │ copy i to stdout;
+       │      ━
+       │
+       ╰ hint: this operation is not supported for indexes
+    error: cannot open relation `i`
+       ╭▸ 
+    20 │ copy public.i (a) from stdin;
+       │             ━
+       │
+       ╰ hint: this operation is not supported for indexes
     ");
 }
 

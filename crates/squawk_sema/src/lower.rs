@@ -14910,6 +14910,19 @@ impl Lowerer {
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier(path.qualifier());
         let found = self.find_table(schema, name);
+        if found.is_none()
+            && matches!(lookup, TableLookup::CopyTo | TableLookup::CopyFrom)
+            && let Some(index) = self.find_index(schema, name)
+        {
+            self.add_ref(
+                name,
+                ReferenceKind::Table,
+                segment.syntax(),
+                Resolution::Index(index),
+            );
+            self.push_error(segment.syntax(), SemaError::CannotOpenIndex { name });
+            return None;
+        }
         let resolution = match found {
             Some(table) => Resolution::Table(table),
             None => match if_missing {
@@ -17264,9 +17277,7 @@ impl Lowerer {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier(path.qualifier());
-        let index = self
-            .search_path(schema, Lookup::Relation)
-            .find_map(|schema| self.find_index_in(schema, name));
+        let index = self.find_index(schema, name);
         let resolution = match index {
             Some(index) => Resolution::Index(index),
             None => match if_missing {
@@ -18923,6 +18934,11 @@ impl Lowerer {
                 && !self.dropped_constraints.contains(id)
                 && !self.dropped_tables.contains(&table_id)
         })
+    }
+
+    fn find_index(&self, schema: Option<Name>, name: Name) -> Option<IndexId> {
+        self.search_path(schema, Lookup::Relation)
+            .find_map(|schema| self.find_index_in(schema, name))
     }
 
     fn find_index_in(&self, schema: Name, name: Name) -> Option<IndexId> {

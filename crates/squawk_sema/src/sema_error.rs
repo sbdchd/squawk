@@ -375,6 +375,9 @@ pub(crate) enum SemaError {
         copy_from: bool,
         kind: TableKind,
     },
+    CannotOpenIndex {
+        name: Name,
+    },
     CannotCreateIndex {
         name: Name,
         kind: TableKind,
@@ -878,6 +881,7 @@ impl SemaError {
             SemaError::MissingShellType => DiagnosticKind::MissingShellType,
             SemaError::WrongRelationKind { .. }
             | SemaError::CannotCopy { .. }
+            | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
             SemaError::NotIdentityColumn { .. } => DiagnosticKind::NotIdentityColumn,
             SemaError::ConstraintTrigger { .. } => DiagnosticKind::ReplaceConstraintTrigger,
@@ -1059,6 +1063,9 @@ impl SemaError {
             SemaError::CannotCopy {
                 copy_from, kind, ..
             } => copy_target(copy_from, kind).1,
+            SemaError::CannotOpenIndex { .. } => {
+                Some("this operation is not supported for indexes")
+            }
             SemaError::WindowFrameCopy { hint, .. } => {
                 hint.then_some("omit the parentheses in this `over` clause")
             }
@@ -1636,6 +1643,9 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::WrongRelationKind { name, expected, .. } => {
                 write!(f, "`{}` is not a {}", n(name), expected.label())
+            }
+            SemaError::CannotOpenIndex { name } => {
+                write!(f, "cannot open relation `{}`", n(name))
             }
             SemaError::CannotCopy {
                 name,
