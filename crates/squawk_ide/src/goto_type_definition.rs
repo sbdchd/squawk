@@ -6,8 +6,8 @@ use squawk_sema::{
 };
 use squawk_syntax::ast;
 
-use crate::db::{Db, parse, semantic_index};
-use crate::offsets::item_at_position;
+use squawk_ide_db::offsets::item_at_position;
+use squawk_ide_db::{Db, parse, semantic_index};
 
 pub fn goto_type_definition(db: &dyn Db, position: InFile<TextSize>) -> Option<InFile<TextRange>> {
     let file = position.file_id;

@@ -18,7 +18,7 @@ fn check_inlay_hints(sql: &str) -> String {
     let parse = SourceFile::parse(sql);
     assert_eq!(parse.errors(), vec![]);
     let tree = parse.tree();
-    let mut db = crate::db::Database::default();
+    let mut db = squawk_ide_db::Database::default();
     let file = InFile::new(db.add_file(sql.into()), &tree);
     let mut builder = SemanticIndexBuilder::new();
     builder.add_file(file);

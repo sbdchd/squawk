@@ -5,8 +5,8 @@ use squawk_sema::ir::{ColumnId, FunctionId, Item, ParamId, SourceId, SourceKind,
 use squawk_sema::semantic_index::{AsOf, SemanticIndex};
 use squawk_syntax::ast;
 
-use crate::db::{Db, parse, semantic_index};
-use crate::offsets::item_at_position;
+use squawk_ide_db::offsets::item_at_position;
+use squawk_ide_db::{Db, parse, semantic_index};
 
 pub fn goto_definition(
     db: &dyn Db,

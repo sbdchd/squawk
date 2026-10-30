@@ -9,9 +9,9 @@ use squawk_sema::semantic_index::SemanticIndex;
 use squawk_sema::semantic_index_builder::SemanticIndexBuilder;
 use squawk_syntax::SourceFile;
 
-use crate::db::Database;
 use crate::hover::hover_with_index as hover;
-use crate::offsets::item_at_position;
+use squawk_ide_db::Database;
+use squawk_ide_db::offsets::item_at_position;
 
 // TODO: we should probably use something else since `$0` is valid syntax, maybe `%0`?
 const MARKER: &str = "$0";
@@ -35,7 +35,7 @@ impl Fixture {
     pub(crate) fn new(sql: &str) -> Self {
         let fixture = Self::new_allow_errors(sql);
         assert_eq!(
-            crate::db::parse(&fixture.db, fixture.file.into()).errors(),
+            squawk_ide_db::parse(&fixture.db, fixture.file.into()).errors(),
             vec![]
         );
         fixture

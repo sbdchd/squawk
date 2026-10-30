@@ -8,7 +8,7 @@ use squawk_sema::file::{FileId, FileRange, InFile};
 use squawk_sema::ir::{ColumnId, FunctionKind, Item, ParamMode, Resolution};
 use squawk_sema::semantic_index::SemanticIndex;
 
-use crate::db::{Db, parse, semantic_index};
+use squawk_ide_db::{Db, parse, semantic_index};
 
 pub fn inlay_hints(db: &dyn Db, file_id: FileId) -> Vec<InlayHint> {
     inlay_hints_with_index(

@@ -12,7 +12,7 @@ use squawk_sema::ir::{
 };
 use squawk_sema::semantic_index::SemanticIndex;
 
-use crate::db::{Db, parse, semantic_index};
+use squawk_ide_db::{Db, parse, semantic_index};
 
 pub fn document_symbols(db: &dyn Db, file_id: FileId) -> Vec<DocumentSymbol> {
     document_symbols_with_index(

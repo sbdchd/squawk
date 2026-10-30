@@ -2461,6 +2461,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "squawk-code-actions"
+version = "2.71.0"
+dependencies = [
+ "insta",
+ "itertools",
+ "num-bigint",
+ "rowan",
+ "smol_str",
+ "squawk-diagnostics",
+ "squawk-ide-db",
+ "squawk-line-index",
+ "squawk-sema",
+ "squawk-syntax",
+]
+
+[[package]]
 name = "squawk-diagnostics"
 version = "2.71.0"
 dependencies = [
@@ -2503,21 +2519,31 @@ name = "squawk-ide"
 version = "2.71.0"
 dependencies = [
  "annotate-snippets",
- "etcetera",
  "insta",
- "itertools",
  "log",
- "num-bigint",
  "rowan",
  "rustc-hash 2.1.1",
- "salsa",
  "smallvec",
- "smol_str",
+ "squawk-code-actions",
  "squawk-diagnostics",
+ "squawk-ide-db",
  "squawk-line-index",
  "squawk-sema",
  "squawk-syntax",
  "tabled",
+]
+
+[[package]]
+name = "squawk-ide-db"
+version = "2.71.0"
+dependencies = [
+ "etcetera",
+ "rowan",
+ "salsa",
+ "smallvec",
+ "squawk-line-index",
+ "squawk-sema",
+ "squawk-syntax",
  "url",
 ]
 

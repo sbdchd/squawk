@@ -1,0 +1,229 @@
+use rowan::TextSize;
+use squawk_diagnostics::Edit;
+use squawk_sema::file::InFile;
+use squawk_syntax::ast::{self, AstNode};
+
+use squawk_ide_db::Db;
+use squawk_ide_db::offsets::token_from_offset;
+
+use super::{ActionKind, CodeAction};
+
+pub(super) fn rewrite_select_as_table(
+    db: &dyn Db,
+    position: InFile<TextSize>,
+    actions: &mut Vec<CodeAction>,
+) -> Option<()> {
+    let token = token_from_offset(db, position)?;
+    let select = token.parent_ancestors().find_map(ast::Select::cast)?;
+
+    if !can_transform_select_to_table(&select) {
+        return None;
+    }
+
+    let from_clause = select.from_clause()?;
+    let ast::FromListItem::FromItem(ast::FromItem::RelationFromItem(relation)) =
+        from_clause.items().next()?
+    else {
+        return None;
+    };
+    let table_name = relation.relation_name_ref()?.syntax().text().to_string();
+
+    let mut replacement = format!("table {table_name}");
+    if select.semicolon_token().is_some() {
+        replacement.push(';');
+    }
+
+    actions.push(CodeAction {
+        title: "Rewrite as `table`".to_owned(),
+        edits: vec![Edit::replace(select.syntax().text_range(), replacement)],
+        kind: ActionKind::RefactorRewrite,
+    });
+
+    Some(())
+}
+
+fn can_transform_select_to_table(select: &ast::Select) -> bool {
+    if select.with_clause().is_some()
+        || select.where_clause().is_some()
+        || select.group_by_clause().is_some()
+        || select.having_clause().is_some()
+        || select.window_clause().is_some()
+        || select.filter_clause().is_some()
+        || select.tail_clauses().next().is_some()
+    {
+        return false;
+    }
+
+    let Some(select_clause) = select.select_clause() else {
+        return false;
+    };
+
+    if matches!(
+        select_clause.select_quantifier(),
+        Some(ast::SelectQuantifier::DistinctClause(_))
+    ) {
+        return false;
+    }
+
+    let Some(target_list) = select_clause.target_list() else {
+        return false;
+    };
+
+    let mut targets = target_list.targets();
+    let Some(target) = targets.next() else {
+        return false;
+    };
+
+    if targets.next().is_some() {
+        return false;
+    }
+
+    // only want to support: `select *`
+    if target.expr().is_some() || target.star_token().is_none() {
+        return false;
+    }
+
+    let Some(from_clause) = select.from_clause() else {
+        return false;
+    };
+
+    let mut items = from_clause.items();
+    let Some(item) = items.next() else {
+        return false;
+    };
+
+    // only can have one from item & no join exprs
+    if items.next().is_some() {
+        return false;
+    }
+
+    let ast::FromListItem::FromItem(ast::FromItem::RelationFromItem(relation)) = item else {
+        return false;
+    };
+    if relation.alias().is_some()
+        || relation.tablesample_clause().is_some()
+        || relation.only_token().is_some()
+        || relation.star_token().is_some()
+    {
+        return false;
+    }
+
+    relation.relation_name_ref().is_some()
+}
+
+#[cfg(test)]
+mod test {
+    use insta::assert_snapshot;
+
+    use crate::test_utils::{apply_code_action, code_action_not_applicable};
+
+    use super::rewrite_select_as_table;
+
+    #[test]
+    fn rewrite_select_as_table_simple() {
+        assert_snapshot!(apply_code_action(
+            rewrite_select_as_table,
+            "sel$0ect * from foo;"),
+            @"table foo;"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_table_qualified() {
+        assert_snapshot!(apply_code_action(
+            rewrite_select_as_table,
+            "select * from sch$0ema.foo;"),
+            @"table schema.foo;"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_table_on_star() {
+        assert_snapshot!(apply_code_action(
+            rewrite_select_as_table,
+            "select $0* from bar;"),
+            @"table bar;"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_table_on_from() {
+        assert_snapshot!(apply_code_action(
+            rewrite_select_as_table,
+            "select * fr$0om baz;"),
+            @"table baz;"
+        );
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_where() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select * from foo$0 where x = 1;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_order_by() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select * from foo$0 order by x;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_limit() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select * from foo$0 limit 10;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_distinct() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select distinct * from foo$0;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_columns() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select id, name from foo$0;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_join() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select * from foo$0 join bar on foo.id = bar.id;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_alias() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select * from foo$0 f;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_with_multiple_tables() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "select * from foo$0, bar;"
+        ));
+    }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_on_table() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            "table foo$0;"
+        ));
+    }
+}

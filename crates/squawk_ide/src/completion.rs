@@ -13,10 +13,8 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::db::{Db, parse, semantic_index};
 use crate::hover::function_signature;
-
-pub(crate) const COMPLETION_MARKER: &str = "squawkCompletionMarker";
+use squawk_ide_db::{COMPLETION_MARKER, Db, parse, semantic_index};
 
 const STATEMENTS: &[&str] = &["delete from", "select", "table", "truncate"];
 const SELECT_CLAUSES: &[&str] = &[

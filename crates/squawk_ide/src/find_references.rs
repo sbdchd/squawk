@@ -4,9 +4,9 @@ use squawk_sema::ir::Item;
 use squawk_sema::semantic_index::{AsOf, SemanticIndex};
 use squawk_syntax::ast;
 
-use crate::db::{Db, parse, semantic_index};
 use crate::goto_definition::item_definitions;
-use crate::offsets::item_at_position;
+use squawk_ide_db::offsets::item_at_position;
+use squawk_ide_db::{Db, parse, semantic_index};
 
 pub fn find_references(db: &dyn Db, position: InFile<TextSize>) -> Vec<InFile<TextRange>> {
     let file = position.file_id;

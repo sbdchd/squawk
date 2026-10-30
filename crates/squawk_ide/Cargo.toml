@@ -15,20 +15,16 @@ rust-version.workspace = true
 doctest = false
 
 [dependencies]
+squawk-code-actions.workspace = true
+squawk-ide-db.workspace = true
 squawk-sema.workspace = true
 squawk-syntax.workspace = true
 squawk-diagnostics.workspace = true
 rowan.workspace = true
 squawk-line-index.workspace = true
 annotate-snippets.workspace = true
-salsa.workspace = true
-etcetera.workspace = true
-url.workspace = true
 log.workspace = true
-num-bigint.workspace = true
-smol_str.workspace = true
 smallvec.workspace = true
-itertools.workspace = true
 rustc-hash.workspace = true
 
 [dev-dependencies]

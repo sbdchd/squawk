@@ -37,7 +37,7 @@ use squawk_syntax::ast::{self, AstNode, AstToken};
 use squawk_sema::comments::line_comment_group;
 use squawk_sema::file::FileId;
 
-use crate::db::{Db, parse};
+use squawk_ide_db::{Db, parse};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum FoldKind {
@@ -237,7 +237,7 @@ mod tests {
     use insta::assert_snapshot;
     use std::fmt::Write as _;
 
-    use crate::db::Database;
+    use squawk_ide_db::Database;
 
     use super::*;
 

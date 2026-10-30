@@ -11,7 +11,7 @@ fn find_symbols(sql: &str) -> Vec<DocumentSymbol> {
     let parse = SourceFile::parse(sql);
     assert_eq!(parse.errors(), vec![]);
     let file = parse.tree();
-    let mut db = crate::db::Database::default();
+    let mut db = squawk_ide_db::Database::default();
     let file = InFile::new(db.add_file(sql.into()), &file);
     let mut builder = SemanticIndexBuilder::new();
     builder.add_file(file);
