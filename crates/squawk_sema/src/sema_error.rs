@@ -310,6 +310,7 @@ pub(crate) enum SemaError {
         args: ErrorArgs,
         lookup: LookupKind,
         similar: Option<Name>,
+        misplaced_order_by: bool,
     },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
@@ -1010,6 +1011,7 @@ impl SemaError {
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),
+                misplaced_order_by: false,
                 ..
             } => {
                 let message = match kind {
@@ -1085,12 +1087,17 @@ impl SemaError {
                 "create a unique index with no `where` clause on one or more columns of the materialized view",
             ),
             SemaError::UnresolvedRoutine {
+                misplaced_order_by: true,
+                ..
+            } => Some("`order by` must appear after all regular arguments of the aggregate"),
+            SemaError::UnresolvedRoutine {
                 similar: Some(_), ..
             } => None,
             SemaError::UnresolvedRoutine {
                 args,
                 lookup,
                 similar: None,
+                misplaced_order_by: false,
                 ..
             } => match (lookup, args) {
                 (LookupKind::Call, ErrorArgs::List(args)) if !args.is_empty() => {
@@ -1570,6 +1577,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 args,
                 lookup: _,
                 similar: _,
+                misplaced_order_by: _,
             } => {
                 let label = match kind {
                     RoutineKind::Routine => RoutineKind::Function.label(),

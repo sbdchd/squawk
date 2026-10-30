@@ -600,3 +600,40 @@ select count(*), count(*) over (), now(), rank() over (order by 1);
       ╰╴                        +
     ");
 }
+
+#[test]
+fn misplaced_aggregate_order_by() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b text
+);
+select string_agg(a order by a, ',') from t;
+select string_agg(b, ',' order by a, b) from t;
+call p(1 order by 1, 2);
+create function f() returns text
+  language sql
+  as $$
+  select string_agg(b order by b, ',') from t
+$$;
+"), @"
+    error: function `string_agg(int4)` does not exist
+      ╭▸ 
+    6 │ select string_agg(a order by a, ',') from t;
+      │        ━━━━━━━━━━
+      │
+      ╰ hint: `order by` must appear after all regular arguments of the aggregate
+    error: procedure `p(int4)` does not exist
+      ╭▸ 
+    8 │ call p(1 order by 1, 2);
+      │      ━
+      │
+      ╰ hint: `order by` must appear after all regular arguments of the aggregate
+    error: function `string_agg(text)` does not exist
+       ╭▸ 
+    12 │   select string_agg(b order by b, ',') from t
+       │          ━━━━━━━━━━
+       │
+       ╰ hint: `order by` must appear after all regular arguments of the aggregate
+    ");
+}

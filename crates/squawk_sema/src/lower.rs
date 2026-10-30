@@ -9598,6 +9598,7 @@ impl Lowerer {
                                     args,
                                     lookup: LookupKind::Signature,
                                     similar,
+                                    misplaced_order_by: false,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -9961,6 +9962,7 @@ impl Lowerer {
                     schema,
                     name,
                     &args,
+                    call.arg_list().as_ref(),
                     segment.syntax(),
                 );
                 self.add_ref(
@@ -15974,7 +15976,7 @@ impl Lowerer {
         if let Some(Callee {
             name,
             resolution: Resolution::Function(function),
-        }) = self.lower_callee(callee, &[], None, CalleeKind::Plain)
+        }) = self.lower_callee(callee, &[], None, CalleeKind::Plain, None)
             && let Some(ret) = self.index.functions[function].ret
             && let Some(expected) = self.builtin_type(kind.return_type())
             && ret != expected
@@ -18172,6 +18174,7 @@ impl Lowerer {
         schema: Option<Name>,
         name: Name,
         args: &[CallArg],
+        arg_list: Option<&ast::ArgList>,
         node: &SyntaxNode,
     ) -> Resolution {
         if !matches!(resolution, Resolution::Unresolved)
@@ -18195,7 +18198,12 @@ impl Lowerer {
             self.push_error(node, error);
             return Resolution::Unknown;
         }
-        let similar = self.similar_function(schema, name, kind, LookupKind::Call);
+        let misplaced_order_by = arg_list.is_some_and(Self::misplaced_order_by);
+        let similar = if misplaced_order_by {
+            None
+        } else {
+            self.similar_function(schema, name, kind, LookupKind::Call)
+        };
         self.push_error(
             node,
             SemaError::UnresolvedRoutine {
@@ -18205,6 +18213,7 @@ impl Lowerer {
                 args: error_args,
                 lookup: LookupKind::Call,
                 similar,
+                misplaced_order_by,
             },
         );
         Resolution::Unknown
@@ -20469,9 +20478,10 @@ impl Lowerer {
         } else {
             CalleeKind::Plain
         };
-        let target = callee
-            .as_ref()
-            .and_then(|callee| self.lower_callee(callee, &args, row_source, kind));
+        let arg_list = call.arg_list();
+        let target = callee.as_ref().and_then(|callee| {
+            self.lower_callee(callee, &args, row_source, kind, arg_list.as_ref())
+        });
         args.truncate(direct_args);
         let function = match target.map(|target| target.resolution) {
             Some(Resolution::Function(function)) => Some(function),
@@ -20775,6 +20785,7 @@ impl Lowerer {
         args: &[CallArg],
         row_source: Option<SourceId>,
         kind: CalleeKind,
+        arg_list: Option<&ast::ArgList>,
     ) -> Option<Callee> {
         let (schema, name_ref) = match callee {
             ast::Expr::NameRef(name_ref) => (None, name_ref.clone()),
@@ -20861,6 +20872,7 @@ impl Lowerer {
                         schema,
                         name,
                         args,
+                        arg_list,
                         name_ref.syntax(),
                     ),
                 };
@@ -20869,6 +20881,15 @@ impl Lowerer {
         };
         self.add_ref(name, kind, name_ref.syntax(), resolution);
         Some(Callee { name, resolution })
+    }
+
+    fn misplaced_order_by(arg_list: &ast::ArgList) -> bool {
+        arg_list
+            .args()
+            .last()
+            .and_then(|arg| arg.order_by_clause())
+            .and_then(|clause| clause.sort_by_list())
+            .is_some_and(|list| list.sort_bys().nth(1).is_some())
     }
 
     fn row_source_arg(&mut self, call: &ast::CallExpr) -> Option<SourceId> {
