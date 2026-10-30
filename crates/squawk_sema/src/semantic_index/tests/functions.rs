@@ -783,6 +783,9 @@ call p(1, 'y');
 call p(a => 1, b => 'y');
 call p(c => 1);
 call f();
+call public.f();
+call f(1);
+call count(1);
 call nope();
 call p((select x from nope));
 "), @"
@@ -792,27 +795,57 @@ call p((select x from nope));
       │      ━
       │
       ╰ hint: consider adding explicit type casts
-    error: procedure `f()` does not exist
+    error: `f()` is not a procedure
       ╭▸ 
     8 │ call f();
       │      ━
       ╰╴
-    help: a procedure with a similar name exists
+    help: to call a function, use `select`
       ╭╴
     8 - call f();
-    8 + call p();
+    8 + select f();
       ╰╴
-    error: procedure `nope()` does not exist
+    error: `public.f()` is not a procedure
       ╭▸ 
-    9 │ call nope();
-      ╰╴     ━━━━
+    9 │ call public.f();
+      │             ━
+      ╰╴
+    help: to call a function, use `select`
+      ╭╴
+    9 - call public.f();
+    9 + select public.f();
+      ╰╴
+    error: procedure `f(int4)` does not exist
+       ╭▸ 
+    10 │ call f(1);
+       │      ━
+       ╰╴
+    help: a procedure with a similar name exists
+       ╭╴
+    10 - call f(1);
+    10 + call p(1);
+       ╰╴
+    error: `count(int4)` is not a procedure
+       ╭▸ 
+    11 │ call count(1);
+       │      ━━━━━
+       ╰╴
+    help: to call a function, use `select`
+       ╭╴
+    11 - call count(1);
+    11 + select count(1);
+       ╰╴
+    error: procedure `nope()` does not exist
+       ╭▸ 
+    12 │ call nope();
+       ╰╴     ━━━━
     error: cannot use subquery in `call` argument
        ╭▸ 
-    10 │ call p((select x from nope));
+    13 │ call p((select x from nope));
        ╰╴        ━━━━━━━━━━━━━━━━━━
     error: relation `nope` does not exist
        ╭▸ 
-    10 │ call p((select x from nope));
+    13 │ call p((select x from nope));
        ╰╴                      ━━━━
     ");
 }

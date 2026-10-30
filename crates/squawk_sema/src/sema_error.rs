@@ -317,6 +317,12 @@ pub(crate) enum SemaError {
         args: ErrorArgs,
         select_range: Option<TextRange>,
     },
+    FunctionCalledAsProcedure {
+        schema: Option<Name>,
+        name: Name,
+        args: ErrorArgs,
+        call_range: Option<TextRange>,
+    },
     UnresolvedOperator {
         schema: Option<Name>,
         name: Name,
@@ -843,7 +849,8 @@ impl SemaError {
             SemaError::UnresolvedTransform { .. } => DiagnosticKind::UnresolvedTransform,
             SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
-            SemaError::ProcedureCalledAsFunction { .. } => DiagnosticKind::WrongRoutineKind,
+            SemaError::ProcedureCalledAsFunction { .. }
+            | SemaError::FunctionCalledAsProcedure { .. } => DiagnosticKind::WrongRoutineKind,
             SemaError::UnresolvedQualifiedColumn { .. } | SemaError::QualifiedSetTarget { .. } => {
                 DiagnosticKind::UnresolvedColumn
             }
@@ -967,6 +974,16 @@ impl SemaError {
                     edits: vec![Edit::replace(select_range, "call")],
                 },
             },
+            SemaError::FunctionCalledAsProcedure {
+                call_range: Some(call_range),
+                ..
+            } => Suggestion {
+                message: "to call a function, use `select`".into(),
+                fix: Fix {
+                    title: "Replace with `select`".into(),
+                    edits: vec![Edit::replace(call_range, "select")],
+                },
+            },
             SemaError::QualifiedSetTarget { column, .. } => Suggestion {
                 message: "`set` target columns cannot be qualified with the relation name".into(),
                 fix: Fix {
@@ -1068,6 +1085,9 @@ impl SemaError {
                 select_range: None,
                 ..
             } => Some("to call a procedure, use `call`"),
+            SemaError::FunctionCalledAsProcedure {
+                call_range: None, ..
+            } => Some("to call a function, use `select`"),
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
@@ -1547,6 +1567,13 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::ProcedureCalledAsFunction {
                 schema, name, args, ..
             } => write!(f, "`{}` is a procedure", self.signature(schema, name, args)),
+            SemaError::FunctionCalledAsProcedure {
+                schema, name, args, ..
+            } => write!(
+                f,
+                "`{}` is not a procedure",
+                self.signature(schema, name, args)
+            ),
             SemaError::UnresolvedOperator {
                 schema,
                 name,

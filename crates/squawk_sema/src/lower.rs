@@ -18184,28 +18184,8 @@ impl Lowerer {
             });
         }
         let error_args = ErrorArgs::List(self.index.errors.args.range_from(start));
-        if kind == RoutineKind::Function
-            && let Resolution::Function(_) =
-                self.find_routine(schema, name, args, FunctionKind::Procedure)
-        {
-            let select_range = node
-                .ancestors()
-                .find_map(ast::CallExpr::cast)
-                .and_then(|call| standalone_select_keyword(&call))
-                .map(|token| {
-                    self.index
-                        .range(InIrFile::new(self.file_id, token.text_range()))
-                        .value
-                });
-            self.push_error(
-                node,
-                SemaError::ProcedureCalledAsFunction {
-                    schema,
-                    name,
-                    args: error_args,
-                    select_range,
-                },
-            );
+        if let Some(error) = self.wrong_routine_kind(kind, schema, name, args, error_args, node) {
+            self.push_error(node, error);
             return Resolution::Unknown;
         }
         let similar = self.similar_function(schema, name, kind, LookupKind::Call);
@@ -18221,6 +18201,68 @@ impl Lowerer {
             },
         );
         Resolution::Unknown
+    }
+
+    fn wrong_routine_kind(
+        &self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+        error_args: ErrorArgs,
+        node: &SyntaxNode,
+    ) -> Option<SemaError> {
+        let error = match kind {
+            RoutineKind::Function => {
+                let Resolution::Function(_) =
+                    self.find_routine(schema, name, args, FunctionKind::Procedure)
+                else {
+                    return None;
+                };
+                let select_range = node
+                    .ancestors()
+                    .find_map(ast::CallExpr::cast)
+                    .and_then(|call| standalone_select_keyword(&call))
+                    .map(|token| self.token_range(&token));
+                SemaError::ProcedureCalledAsFunction {
+                    schema,
+                    name,
+                    args: error_args,
+                    select_range,
+                }
+            }
+            RoutineKind::Procedure => {
+                let Resolution::Function(_) =
+                    self.find_routine(schema, name, args, FunctionKind::Function)
+                else {
+                    return None;
+                };
+                let call_range = node
+                    .ancestors()
+                    .find_map(ast::Call::cast)
+                    .filter(|call| {
+                        call.syntax()
+                            .parent()
+                            .is_some_and(|parent| ast::SourceFile::can_cast(parent.kind()))
+                    })
+                    .and_then(|call| call.call_token())
+                    .map(|token| self.token_range(&token));
+                SemaError::FunctionCalledAsProcedure {
+                    schema,
+                    name,
+                    args: error_args,
+                    call_range,
+                }
+            }
+            RoutineKind::Aggregate | RoutineKind::Routine => return None,
+        };
+        Some(error)
+    }
+
+    fn token_range(&self, token: &SyntaxToken) -> TextRange {
+        self.index
+            .range(InIrFile::new(self.file_id, token.text_range()))
+            .value
     }
 
     fn operand_name(&self, ty: ArgType) -> Option<OperandName> {
@@ -22388,15 +22430,7 @@ impl Lowerer {
                 })
         })?;
         let with_token = future.with_clause.with_token()?;
-        let recursive_at = self
-            .index
-            .range(InIrFile::new(
-                self.file_id,
-                TextRange::empty(with_token.text_range().end()),
-            ))
-            .value
-            .start();
-        Some(recursive_at)
+        Some(self.token_range(&with_token).end())
     }
 
     fn lateral_source(&self, name: Name, column: Option<Name>) -> Option<LateralSource> {
