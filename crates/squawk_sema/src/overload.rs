@@ -824,6 +824,14 @@ impl<'a> Overloads<'a> {
         })
     }
 
+    pub(crate) fn is_string(&self, ty: ArgType) -> bool {
+        match ty {
+            ArgType::Known(ty) => self.category(ty) == Some(Category::String),
+            ArgType::UnknownLiteral => true,
+            ArgType::Untyped => false,
+        }
+    }
+
     fn category(&self, ty: Ty) -> Option<Category> {
         let id = match ty {
             Ty::Array(_) => return Some(Category::Array),

@@ -221,10 +221,12 @@ fn operator_prefix_expr_unknown_literal() {
     assert_snapshot!(check("
 select @ '-4.5', -'1';
 "), @"
-    error: operator `-` is not unique
+    error: operator is not unique: `- unknown`
       ╭▸ 
     2 │ select @ '-4.5', -'1';
-      ╰╴                 ━
+      │                  ━
+      │
+      ╰ hint: could not choose a best candidate operator; consider adding explicit type casts
     ");
 }
 
@@ -379,6 +381,104 @@ select a === 1 from t;
       ╭▸ 
     6 │ select a === 1 from t;
       │          ━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn string_plus_suggests_concat() {
+    assert_snapshot!(check("
+create table t (s text, v varchar, i int);
+select '1' + 'foo';
+select s + i, i + s, v + 'x' from t;
+select 1 + true, s - 'a' from t;
+"), @"
+    error: operator is not unique: `unknown + unknown`
+      ╭▸ 
+    3 │ select '1' + 'foo';
+      │            ━
+      ╰╴
+    help: use `||` to concatenate strings
+      ╭╴
+    3 - select '1' + 'foo';
+    3 + select '1' || 'foo';
+      ╰╴
+    error: operator does not exist: `text + int4`
+      ╭▸ 
+    4 │ select s + i, i + s, v + 'x' from t;
+      │          ━
+      ╰╴
+    help: use `||` to concatenate strings
+      ╭╴
+    4 - select s + i, i + s, v + 'x' from t;
+    4 + select s || i, i + s, v + 'x' from t;
+      ╰╴
+    error: operator does not exist: `int4 + text`
+      ╭▸ 
+    4 │ select s + i, i + s, v + 'x' from t;
+      │                 ━
+      ╰╴
+    help: use `||` to concatenate strings
+      ╭╴
+    4 - select s + i, i + s, v + 'x' from t;
+    4 + select s + i, i || s, v + 'x' from t;
+      ╰╴
+    error: operator does not exist: `varchar + unknown`
+      ╭▸ 
+    4 │ select s + i, i + s, v + 'x' from t;
+      │                        ━
+      ╰╴
+    help: use `||` to concatenate strings
+      ╭╴
+    4 - select s + i, i + s, v + 'x' from t;
+    4 + select s + i, i + s, v || 'x' from t;
+      ╰╴
+    error: operator does not exist: `int4 + bool`
+      ╭▸ 
+    5 │ select 1 + true, s - 'a' from t;
+      │          ━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: operator does not exist: `text - unknown`
+      ╭▸ 
+    5 │ select 1 + true, s - 'a' from t;
+      │                    ━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn double_equals_suggests_equals() {
+    assert_snapshot!(check("
+create table t (s text, i int);
+select 1 == 2, s == 'a', i == s from t;
+"), @"
+    error: operator does not exist: `int4 == int4`
+      ╭▸ 
+    3 │ select 1 == 2, s == 'a', i == s from t;
+      │          ━━
+      ╰╴
+    help: use `=` to compare for equality
+      ╭╴
+    3 - select 1 == 2, s == 'a', i == s from t;
+    3 + select 1 = 2, s == 'a', i == s from t;
+      ╰╴
+    error: operator does not exist: `text == unknown`
+      ╭▸ 
+    3 │ select 1 == 2, s == 'a', i == s from t;
+      │                  ━━
+      ╰╴
+    help: use `=` to compare for equality
+      ╭╴
+    3 - select 1 == 2, s == 'a', i == s from t;
+    3 + select 1 == 2, s = 'a', i == s from t;
+      ╰╴
+    error: operator does not exist: `int4 == text`
+      ╭▸ 
+    3 │ select 1 == 2, s == 'a', i == s from t;
+      │                            ━━
       │
       ╰ hint: consider adding explicit type casts
     ");
