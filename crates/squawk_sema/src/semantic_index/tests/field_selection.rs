@@ -146,3 +146,36 @@ select (t.*).a from t as t(x, y);
       ╰╴
     ");
 }
+
+#[test]
+fn paren_scalar_function_source_is_not_composite() {
+    assert_snapshot!(check("
+select f.x, (f).x, (f).* from generate_series(1, 2) as f(x);
+select (f).f from generate_series(1, 2) as f;
+select (f).x from unnest(array[1]) as f(x);
+select (f).x from unnest(array[1], array[2]) as f(x, y);
+select (f).x from generate_series(1, 2) with ordinality as f(x, n);
+select (f).x from rows from (generate_series(1, 2)) as f(x);
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    2 │ select f.x, (f).x, (f).* from generate_series(1, 2) as f(x);
+      ╰╴                ━
+    error: type `int4` is not a composite type
+      ╭▸ 
+    2 │ select f.x, (f).x, (f).* from generate_series(1, 2) as f(x);
+      ╰╴                       ━
+    error: column notation `.f` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (f).f from generate_series(1, 2) as f;
+      ╰╴           ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    4 │ select (f).x from unnest(array[1]) as f(x);
+      ╰╴           ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    7 │ select (f).x from rows from (generate_series(1, 2)) as f(x);
+      ╰╴           ━
+    ");
+}

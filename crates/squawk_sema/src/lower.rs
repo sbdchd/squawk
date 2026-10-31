@@ -86,6 +86,7 @@ impl Lowerer {
             transaction: None,
             savepoints: vec![],
             cursors: FxHashMap::default(),
+            scalar_sources: FxHashMap::default(),
             prepared_transactions: FxHashMap::default(),
             prepared_statements: FxHashMap::default(),
             channels: FxHashMap::default(),
@@ -385,6 +386,7 @@ pub(crate) struct Lowerer {
     transaction: Option<OpenTransaction>,
     savepoints: Vec<OpenSavepoint>,
     cursors: FxHashMap<Name, CursorId>,
+    scalar_sources: FxHashMap<SourceId, Ty>,
     prepared_transactions: FxHashMap<Name, PreparedTransactionId>,
     prepared_statements: FxHashMap<Name, PreparedStatementId>,
     channels: FxHashMap<Name, ChannelId>,
@@ -622,6 +624,12 @@ struct FunctionSource {
     callee: Option<Callee>,
     function: Option<FunctionId>,
     columns: Columns,
+    scalar: Option<Ty>,
+}
+
+struct FunctionColumns {
+    columns: Columns,
+    scalar: Option<Ty>,
 }
 
 struct LoweredCall {
@@ -984,6 +992,7 @@ enum Undo {
 
 enum FieldBase {
     Source(Option<SourceId>),
+    Scalar(Ty),
     Expr(Option<Ty>),
     Columns { columns: Columns, ty: Option<Ty> },
 }
@@ -14743,6 +14752,7 @@ impl Lowerer {
     }
 
     fn lower_from_item(&mut self, from_item: &ast::FromItem) {
+        let mut scalar = None;
         let RelationSource {
             mut name,
             kind,
@@ -14803,6 +14813,7 @@ impl Lowerer {
                     callee,
                     function,
                     columns,
+                    scalar: function_scalar,
                 } = match function_item.call_expr() {
                     Some(call) => self.lower_function_source(
                         &call,
@@ -14813,8 +14824,10 @@ impl Lowerer {
                         callee: None,
                         function: None,
                         columns: self.unknown_columns(),
+                        scalar: None,
                     },
                 };
+                scalar = function_scalar;
                 RelationSource {
                     name: callee.map(|callee| callee.name),
                     kind: function.map_or(SourceKind::Other, SourceKind::Function),
@@ -14878,11 +14891,18 @@ impl Lowerer {
                     columns,
                 }
             }
-            ast::FromItem::RowsFromItem(rows_from_item) => RelationSource {
-                name: None,
-                kind: SourceKind::Other,
-                columns: self.lower_rows_from_columns(rows_from_item),
-            },
+            ast::FromItem::RowsFromItem(rows_from_item) => {
+                let FunctionColumns {
+                    columns,
+                    scalar: rows_from_scalar,
+                } = self.lower_rows_from_columns(rows_from_item);
+                scalar = rows_from_scalar;
+                RelationSource {
+                    name: None,
+                    kind: SourceKind::Other,
+                    columns,
+                }
+            }
             ast::FromItem::XmlTableFromItem(xml_table_item) => {
                 let columns = match xml_table_item.xml_table() {
                     Some(xml_table) => {
@@ -14900,6 +14920,7 @@ impl Lowerer {
 
         if let Some(with_ordinality) = from_item.with_ordinality() {
             columns = self.with_ordinality_column(&columns, &with_ordinality);
+            scalar = None;
         }
 
         let mut alias_ptr = None;
@@ -14924,13 +14945,16 @@ impl Lowerer {
         }
 
         self.check_duplicate_source(name, kind, alias_ptr.is_some(), from_item);
-        self.push_source(Source {
+        let source = self.push_source(Source {
             name,
             kind,
             ptr: self.ptr(from_item.syntax()),
             alias_ptr,
             columns,
         });
+        if let Some(ty) = scalar {
+            self.scalar_sources.insert(source, ty);
+        }
     }
 
     fn check_duplicate_source(
@@ -15044,7 +15068,7 @@ impl Lowerer {
         self.push_source(source);
     }
 
-    fn push_source(&mut self, source: Source) {
+    fn push_source(&mut self, source: Source) -> SourceId {
         let alias_ptr = source.alias_ptr;
         let id = self.index.sources.alloc(source);
         if let Some(alias_ptr) = alias_ptr {
@@ -15052,6 +15076,7 @@ impl Lowerer {
         }
         let query = self.scope().query;
         self.index.queries[query].sources.push(id);
+        id
     }
 
     fn push_scope(&mut self, query: QueryId) {
@@ -15377,27 +15402,50 @@ impl Lowerer {
         }
     }
 
-    fn lower_rows_from_columns(&mut self, rows_from_item: &ast::RowsFromItem) -> Columns {
-        let mut items: SmallVec<[Columns; 4]> = smallvec![];
+    fn lower_rows_from_columns(&mut self, rows_from_item: &ast::RowsFromItem) -> FunctionColumns {
+        let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in rows_from_item.rows_from_args() {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
                 (Some(call), Some(list)) => {
                     self.with_from_function(|this| this.lower_call(&call));
-                    self.column_def_list_columns(&list)
+                    FunctionColumns {
+                        columns: self.column_def_list_columns(&list),
+                        scalar: None,
+                    }
                 }
-                (Some(call), None) => self.lower_function_source(&call, None, None).columns,
-                (None, Some(list)) => self.column_def_list_columns(&list),
-                (None, None) => self.unknown_columns(),
+                (Some(call), None) => {
+                    let FunctionSource {
+                        columns, scalar, ..
+                    } = self.lower_function_source(&call, None, None);
+                    FunctionColumns { columns, scalar }
+                }
+                (None, Some(list)) => FunctionColumns {
+                    columns: self.column_def_list_columns(&list),
+                    scalar: None,
+                },
+                (None, None) => FunctionColumns {
+                    columns: self.unknown_columns(),
+                    scalar: None,
+                },
             };
             items.push(columns);
         }
-        Columns {
+        self.combine_function_columns(&items)
+    }
+
+    fn combine_function_columns(&mut self, items: &[FunctionColumns]) -> FunctionColumns {
+        let scalar = match items {
+            [item] => item.scalar,
+            _ => None,
+        };
+        let columns = Columns {
             range: self
                 .index
                 .columns
-                .alloc_copies(items.iter().flat_map(|columns| columns.range)),
-            complete: items.iter().all(|columns| columns.complete),
-        }
+                .alloc_copies(items.iter().flat_map(|item| item.columns.range)),
+            complete: items.iter().all(|item| item.columns.complete),
+        };
+        FunctionColumns { columns, scalar }
     }
 
     fn lower_function_source(
@@ -15419,15 +15467,32 @@ impl Lowerer {
                 callee,
                 function: None,
                 columns: self.unknown_columns(),
+                scalar: None,
             };
         };
-        let columns = self
-            .function_row_columns(function, &args)
-            .unwrap_or_else(|| self.scalar_function_columns(function, &args, call, scalar_alias));
+        let FunctionColumns { columns, scalar } =
+            self.function_columns(function, &args, call, scalar_alias);
         FunctionSource {
             callee,
             function: Some(function),
             columns,
+            scalar,
+        }
+    }
+
+    fn function_columns(
+        &mut self,
+        function: FunctionId,
+        args: &[CallArg],
+        call: &ast::CallExpr,
+        scalar_alias: Option<&ast::TableAlias>,
+    ) -> FunctionColumns {
+        match self.function_row_columns(function, args) {
+            Some(columns) => FunctionColumns {
+                columns,
+                scalar: None,
+            },
+            None => self.scalar_function_columns(function, args, call, scalar_alias),
         }
     }
 
@@ -15440,16 +15505,17 @@ impl Lowerer {
             self.with_from_function(|this| this.lower_call_args(call.arg_list()));
         let name = self.intern("unnest");
         let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
-        let mut items: SmallVec<[Columns; 4]> = smallvec![];
+        let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in &args {
             let arg = std::slice::from_ref(arg);
             let resolution =
                 self.find_routine(Some(self.pg_catalog), name, arg, FunctionKind::Function);
             let columns = match resolution {
-                Resolution::Function(function) => self
-                    .function_row_columns(function, arg)
-                    .unwrap_or_else(|| self.scalar_function_columns(function, arg, call, None)),
-                _ => self.unknown_columns(),
+                Resolution::Function(function) => self.function_columns(function, arg, call, None),
+                _ => FunctionColumns {
+                    columns: self.unknown_columns(),
+                    scalar: None,
+                },
             };
             resolutions.push(resolution);
             items.push(columns);
@@ -15466,17 +15532,12 @@ impl Lowerer {
             name_ref.syntax(),
             resolution,
         );
-        let columns = Columns {
-            range: self
-                .index
-                .columns
-                .alloc_copies(items.iter().flat_map(|columns| columns.range)),
-            complete: items.iter().all(|columns| columns.complete),
-        };
+        let FunctionColumns { columns, scalar } = self.combine_function_columns(&items);
         FunctionSource {
             callee: Some(Callee { name, resolution }),
             function: None,
             columns,
+            scalar,
         }
     }
 
@@ -15486,11 +15547,14 @@ impl Lowerer {
         args: &[CallArg],
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
-    ) -> Columns {
+    ) -> FunctionColumns {
         let record = self.builtin_type("record");
         let ret = self.index.functions[function].ret;
         if ret.is_none() || ret == record {
-            return self.unknown_columns();
+            return FunctionColumns {
+                columns: self.unknown_columns(),
+                scalar: None,
+            };
         }
         let (name, ptr) = match (scalar_alias, call.expr()) {
             (Some(alias), _) => (self.intern(&alias.text()), self.ptr(alias.syntax())),
@@ -15504,9 +15568,12 @@ impl Lowerer {
             ty,
             merge: None,
         }));
-        Columns {
-            range,
-            complete: true,
+        FunctionColumns {
+            columns: Columns {
+                range,
+                complete: true,
+            },
+            scalar: ty,
         }
     }
 
@@ -20188,6 +20255,13 @@ impl Lowerer {
         star: &SyntaxToken,
     ) -> Option<FieldBase> {
         let base = self.lower_field_base(field_expr);
+        if let Some(FieldBase::Scalar(ty)) = base {
+            let range = InIrFile::new(self.file_id, star.text_range());
+            let error = SemaError::StarNotComposite {
+                ty: self.index.ty_name(ty),
+            };
+            self.push_error_at(range, error);
+        }
         if let Some(columns) = self.field_base_star(base.as_ref()).columns {
             let start = self.index.star_columns.next_idx();
             self.index.star_columns.alloc_many(columns.range);
@@ -20202,6 +20276,7 @@ impl Lowerer {
                 self.index.source_type(*source),
                 Some(self.index.sources[*source].columns),
             ),
+            Some(FieldBase::Scalar(ty)) => (Some(*ty), None),
             Some(FieldBase::Expr(Some(ty))) => (Some(*ty), self.ty_columns(*ty).copied()),
             Some(FieldBase::Columns { columns, ty }) => (*ty, Some(*columns)),
             Some(FieldBase::Source(None) | FieldBase::Expr(None)) | None => (None, None),
@@ -22162,6 +22237,22 @@ impl Lowerer {
                 );
                 return None;
             }
+            FieldBase::Scalar(ty) => {
+                let field = field_expr.field()?;
+                let column = self.name_ref_name(&field)?;
+                let error = SemaError::ColumnNotationNotComposite {
+                    column,
+                    ty: self.index.ty_name(ty),
+                };
+                self.push_error(field.syntax(), error);
+                self.add_ref(
+                    column,
+                    ReferenceKind::Column,
+                    field.syntax(),
+                    Resolution::Unknown,
+                );
+                return None;
+            }
             FieldBase::Expr(ty) => {
                 let field = field_expr.field()?;
                 return self.add_field_ref(ty, &field);
@@ -22240,10 +22331,21 @@ impl Lowerer {
         {
             let name = self.name_ref_name(&name_ref)?;
             return Some(match self.add_name_ref(name, name_ref.syntax()) {
-                Resolution::Source(source) => FieldBase::Source(Some(source)),
+                Resolution::Source(source) => match self.scalar_sources.get(&source) {
+                    Some(ty) => FieldBase::Scalar(*ty),
+                    None => FieldBase::Source(Some(source)),
+                },
                 resolution => {
                     self.check_default_column_ref(name_ref.syntax(), resolution);
-                    FieldBase::Expr(self.resolution_type(resolution))
+                    match resolution {
+                        Resolution::Column {
+                            source: Some(source),
+                            ..
+                        } if let Some(ty) = self.scalar_sources.get(&source) => {
+                            FieldBase::Scalar(*ty)
+                        }
+                        _ => FieldBase::Expr(self.resolution_type(resolution)),
+                    }
                 }
             });
         }

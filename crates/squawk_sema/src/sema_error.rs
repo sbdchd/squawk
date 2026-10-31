@@ -393,6 +393,13 @@ pub(crate) enum SemaError {
     NotComposite {
         name: Name,
     },
+    StarNotComposite {
+        ty: TyName,
+    },
+    ColumnNotationNotComposite {
+        column: Name,
+        ty: TyName,
+    },
     WrongTypeKind {
         name: Name,
         expected: TypeKind,
@@ -979,6 +986,8 @@ impl SemaError {
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
+            | SemaError::StarNotComposite { .. }
+            | SemaError::ColumnNotationNotComposite { .. }
             | SemaError::WrongTypeKind { .. }
             | SemaError::TableRowTypeAlteredAsType { .. } => DiagnosticKind::WrongTypeKind,
             SemaError::TypedTableAlter { .. } => DiagnosticKind::TypedTableAlter,
@@ -1923,6 +1932,15 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::NotEnum { name } => write!(f, "`{}` is not an enum", n(name)),
             SemaError::NotComposite { name } => write!(f, "`{}` is not a composite type", n(name)),
+            SemaError::StarNotComposite { ty } => {
+                write!(f, "type `{}` is not a composite type", self.ty(ty))
+            }
+            SemaError::ColumnNotationNotComposite { column, ty } => write!(
+                f,
+                "column notation `.{}` applied to type `{}`, which is not a composite type",
+                n(column),
+                self.ty(ty)
+            ),
             SemaError::WrongTypeKind { name, expected } => {
                 write!(f, "`{}` is not a {}", n(name), expected.label())
             }
