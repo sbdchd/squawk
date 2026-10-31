@@ -22398,6 +22398,11 @@ impl Lowerer {
             Some(qualifier) => FieldBase::Source(self.lower_qualifier(&qualifier)),
             None => {
                 let ty = self.lower_expr(&base);
+                let ty = if is_unknown_literal_expr(&base) {
+                    self.builtin_type("unknown")
+                } else {
+                    ty
+                };
                 self.expr_field_base(ty)
             }
         })

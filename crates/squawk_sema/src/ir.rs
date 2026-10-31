@@ -651,7 +651,7 @@ impl Type {
             TypeKind::Shell | TypeKind::Domain => false,
         };
         let category = match self.category {
-            Some(TypeCategory::Composite | TypeCategory::Pseudo | TypeCategory::Unknown) => false,
+            Some(TypeCategory::Composite | TypeCategory::Pseudo) => false,
             Some(
                 TypeCategory::Array
                 | TypeCategory::Bool
@@ -665,6 +665,7 @@ impl Type {
                 | TypeCategory::Timespan
                 | TypeCategory::User
                 | TypeCategory::BitString
+                | TypeCategory::Unknown
                 | TypeCategory::Internal
                 | TypeCategory::Other(_),
             )

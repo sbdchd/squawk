@@ -243,3 +243,15 @@ select (a).f, (a).* from t;
       ╰╴                  ━
     ");
 }
+
+#[test]
+fn unknown_field_selection_is_not_composite() {
+    assert_snapshot!(check("
+select (null).zz;
+"), @"
+    error: column notation `.zz` applied to type `unknown`, which is not a composite type
+      ╭▸ 
+    2 │ select (null).zz;
+      ╰╴              ━━
+    ");
+}
