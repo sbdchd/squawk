@@ -17068,7 +17068,9 @@ fn opt_referencing_table(p: &mut Parser<'_>) -> bool {
     let kind = if p.at(OLD_KW) { OLD_TABLE } else { NEW_TABLE };
     let m = p.start();
     p.bump_any();
-    p.expect(TABLE_KW);
+    if !p.eat(ROW_KW) {
+        p.expect(TABLE_KW);
+    }
     p.eat(AS_KW);
     // transition_relation_name
     transition_relation_name(p);

@@ -33,3 +33,8 @@ execute procedure foo('bar');
 create trigger bar before truncate or delete or insert
 on buzz
 execute function a();
+
+create trigger tr after update on t
+  referencing old row as o new row as n
+  for each statement
+  execute function tf();

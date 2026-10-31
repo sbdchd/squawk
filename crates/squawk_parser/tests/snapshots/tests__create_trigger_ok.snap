@@ -356,4 +356,69 @@ SOURCE_FILE
         L_PAREN "("
         R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TRIGGER
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    TRIGGER
+      IDENT "tr"
+    WHITESPACE " "
+    TIMING_AFTER
+      AFTER_KW "after"
+    WHITESPACE " "
+    TRIGGER_EVENT_LIST
+      TRIGGER_EVENT_UPDATE
+        UPDATE_KW "update"
+    WHITESPACE " "
+    ON_RELATION
+      ON_KW "on"
+      WHITESPACE " "
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE "\n  "
+    REFERENCING
+      REFERENCING_KW "referencing"
+      WHITESPACE " "
+      OLD_TABLE
+        OLD_KW "old"
+        WHITESPACE " "
+        ROW_KW "row"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        TRANSITION_RELATION_NAME
+          IDENT "o"
+      WHITESPACE " "
+      NEW_TABLE
+        NEW_KW "new"
+        WHITESPACE " "
+        ROW_KW "row"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        TRANSITION_RELATION_NAME
+          IDENT "n"
+    WHITESPACE "\n  "
+    FOR_EACH_STATEMENT
+      FOR_KW "for"
+      WHITESPACE " "
+      EACH_KW "each"
+      WHITESPACE " "
+      STATEMENT_KW "statement"
+    WHITESPACE "\n  "
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "tf"
+      ARG_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

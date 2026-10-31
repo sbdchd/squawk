@@ -15802,6 +15802,10 @@ impl NewTable {
         support::token(&self.syntax, SyntaxKind::NEW_KW)
     }
     #[inline]
+    pub fn row_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROW_KW)
+    }
+    #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TABLE_KW)
     }
@@ -17171,6 +17175,10 @@ impl OldTable {
     #[inline]
     pub fn old_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::OLD_KW)
+    }
+    #[inline]
+    pub fn row_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROW_KW)
     }
     #[inline]
     pub fn table_token(&self) -> Option<SyntaxToken> {

@@ -81,3 +81,10 @@ create /*a*/ or /*b*/ replace /*c*/ constraint /*d*/ trigger /*e*/ commented_tri
       /*av*/ 1 /*aw*/,
       /*ax*/ 'two' /*ay*/
     ) /*az*/;
+
+create trigger tr
+  after update
+  on t
+  referencing old row as o new row as n
+  for each statement
+  execute function tf();

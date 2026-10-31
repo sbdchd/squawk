@@ -6212,10 +6212,10 @@ ReferencingTable =
 | NewTable
 
 OldTable =
-  'old' 'table' 'as'? TransitionRelationName
+  'old' ('table' | 'row') 'as'? TransitionRelationName
 
 NewTable =
-  'new' 'table' 'as'? TransitionRelationName
+  'new' ('table' | 'row') 'as'? TransitionRelationName
 
 Referencing =
   'referencing' ReferencingTable*

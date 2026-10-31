@@ -476,6 +476,9 @@ pub(crate) enum SemaError {
     },
     RowLengthMismatch,
     UnnestColumnDefList,
+    TransitionRowVariable {
+        row_range: TextRange,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -863,7 +866,8 @@ impl SemaError {
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
             SemaError::MisplacedSubquery { .. }
             | SemaError::DefaultColumnReference
-            | SemaError::UnnestColumnDefList => DiagnosticKind::FeatureNotSupported,
+            | SemaError::UnnestColumnDefList
+            | SemaError::TransitionRowVariable { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
             SemaError::InheritedColumnRename { .. }
             | SemaError::InheritedConstraintRename { .. }
@@ -1072,6 +1076,13 @@ impl SemaError {
                     edits: vec![Edit::replace(table_range, "type")],
                 },
             },
+            SemaError::TransitionRowVariable { row_range } => Suggestion {
+                message: "use `old table` or `new table` to name transition tables".into(),
+                fix: Fix {
+                    title: "Replace with `table`".into(),
+                    edits: vec![Edit::replace(row_range, "table")],
+                },
+            },
             SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
                 message: "use `*` to call an aggregate with no arguments".into(),
                 fix: Fix {
@@ -1261,6 +1272,9 @@ impl SemaError {
             SemaError::UnnestColumnDefList => {
                 Some("`unnest` with multiple arguments cannot have a column definition list")
             }
+            SemaError::TransitionRowVariable { .. } => {
+                Some("row variable naming in the `referencing` clause is not supported")
+            }
             _ => None,
         }
     }
@@ -1363,6 +1377,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::SubqueryTooManyColumns
             | SemaError::SubqueryTooFewColumns
             | SemaError::UnnestColumnDefList
+            | SemaError::TransitionRowVariable { .. }
             | SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())

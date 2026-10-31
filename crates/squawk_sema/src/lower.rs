@@ -11593,6 +11593,22 @@ impl Lowerer {
         Some(table)
     }
 
+    fn lower_referencing(&mut self, referencing: &ast::Referencing) {
+        for table in referencing.referencing_tables() {
+            let row = match table {
+                ast::ReferencingTable::OldTable(old) => old.row_token(),
+                ast::ReferencingTable::NewTable(new) => new.row_token(),
+            };
+            if let Some(row) = row {
+                let row_range = self.token_range(&row);
+                self.push_error_at(
+                    InIrFile::new(self.file_id, row.text_range()),
+                    SemaError::TransitionRowVariable { row_range },
+                );
+            }
+        }
+    }
+
     fn lower_alter_type_attribute_action(
         &mut self,
         ty: Option<TypeId>,
@@ -16609,6 +16625,9 @@ impl Lowerer {
     }
 
     fn lower_create_trigger(&mut self, create_trigger: &ast::CreateTrigger) {
+        if let Some(referencing) = create_trigger.referencing() {
+            self.lower_referencing(&referencing);
+        }
         let refs = self.index.references.next_idx();
         let start = self.index.triggers.next_idx();
         let query = self.alloc_query(QueryKind::Trigger, create_trigger.syntax());
