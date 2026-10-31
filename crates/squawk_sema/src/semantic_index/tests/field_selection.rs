@@ -126,3 +126,23 @@ select (t).a from t as t(x, y);
       ╰╴
     ");
 }
+
+#[test]
+fn paren_star_source_uses_column_aliases() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (t.*).x, ((t.*)).* from t as t(x, y);
+select (t.*).a from t as t(x, y);
+"), @"
+    error: column `t.a` does not exist
+      ╭▸ 
+    4 │ select (t.*).a from t as t(x, y);
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select (t.*).a from t as t(x, y);
+    4 + select (t.*).x from t as t(x, y);
+      ╰╴
+    ");
+}

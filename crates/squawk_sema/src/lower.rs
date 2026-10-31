@@ -20178,20 +20178,34 @@ impl Lowerer {
     }
 
     fn lower_field_star(&mut self, field_expr: &ast::FieldExpr, star: &SyntaxToken) -> FieldStar {
-        let (ty, columns) = match self.lower_field_base(field_expr) {
-            Some(FieldBase::Source(Some(source))) => (
-                self.index.source_type(source),
-                Some(self.index.sources[source].columns),
-            ),
-            Some(FieldBase::Expr(Some(ty))) => (Some(ty), self.ty_columns(ty).copied()),
-            Some(FieldBase::Columns { columns, ty }) => (ty, Some(columns)),
-            Some(FieldBase::Source(None) | FieldBase::Expr(None)) | None => (None, None),
-        };
-        if let Some(columns) = columns {
+        let base = self.lower_field_star_base(field_expr, star);
+        self.field_base_star(base.as_ref())
+    }
+
+    fn lower_field_star_base(
+        &mut self,
+        field_expr: &ast::FieldExpr,
+        star: &SyntaxToken,
+    ) -> Option<FieldBase> {
+        let base = self.lower_field_base(field_expr);
+        if let Some(columns) = self.field_base_star(base.as_ref()).columns {
             let start = self.index.star_columns.next_idx();
             self.index.star_columns.alloc_many(columns.range);
             self.add_star(star, start);
         }
+        base
+    }
+
+    fn field_base_star(&self, base: Option<&FieldBase>) -> FieldStar {
+        let (ty, columns) = match base {
+            Some(FieldBase::Source(Some(source))) => (
+                self.index.source_type(*source),
+                Some(self.index.sources[*source].columns),
+            ),
+            Some(FieldBase::Expr(Some(ty))) => (Some(*ty), self.ty_columns(*ty).copied()),
+            Some(FieldBase::Columns { columns, ty }) => (*ty, Some(*columns)),
+            Some(FieldBase::Source(None) | FieldBase::Expr(None)) | None => (None, None),
+        };
         FieldStar { ty, columns }
     }
 
@@ -22232,6 +22246,12 @@ impl Lowerer {
                     FieldBase::Expr(self.resolution_type(resolution))
                 }
             });
+        }
+        if let ast::Expr::ParenExpr(_) = base
+            && let ast::Expr::FieldExpr(inner) = base.unparen()
+            && let Some(star) = inner.star_token()
+        {
+            return self.lower_field_star_base(&inner, &star);
         }
         let qualifier = match &base {
             ast::Expr::NameRef(name_ref) => Some(name_ref.clone()),
