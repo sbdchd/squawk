@@ -80,6 +80,10 @@ from t;
        ╭▸ 
     16 │   (array[p]).x,
        ╰╴             ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+       ╭▸ 
+    17 │   (1 + 1).x,
+       ╰╴          ━
     error: function `f()` does not exist
        ╭▸ 
     18 │   (f()).x,
@@ -90,6 +94,10 @@ from t;
        │    ━
        │
        ╰ hint: consider adding explicit type casts
+    error: column notation `.y` applied to type `int4`, which is not a composite type
+       ╭▸ 
+    20 │   ((p).x).y
+       ╰╴          ━
     ");
 }
 
@@ -216,5 +224,22 @@ select (arr).zz, (arr).* from u;
       ╭▸ 
     3 │ select (arr).zz, (arr).* from u;
       ╰╴                       ━
+    ");
+}
+
+#[test]
+fn cte_scalar_column_is_not_composite() {
+    assert_snapshot!(check("
+with t as (select 1 a)
+select (a).f, (a).* from t;
+"), @"
+    error: column notation `.f` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (a).f, (a).* from t;
+      ╰╴           ━
+    error: type `int4` is not a composite type
+      ╭▸ 
+    3 │ select (a).f, (a).* from t;
+      ╰╴                  ━
     ");
 }

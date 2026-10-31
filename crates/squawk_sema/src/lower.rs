@@ -22413,7 +22413,8 @@ impl Lowerer {
     fn is_not_composite(&self, ty: Ty) -> bool {
         match self.index.base_type(ty) {
             Some(Ty::Array(_)) => true,
-            Some(Ty::Type(_) | Ty::Table(_) | Ty::Cte(_)) | None => false,
+            Some(Ty::Type(id)) => self.index.types[id].is_not_composite(),
+            Some(Ty::Table(_) | Ty::Cte(_)) | None => false,
         }
     }
 
