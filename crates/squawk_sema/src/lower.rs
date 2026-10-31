@@ -22220,6 +22220,19 @@ impl Lowerer {
         if let Some(call) = call_field_base(&base) {
             return Some(self.lower_call_field_base(&call));
         }
+        if let ast::Expr::ParenExpr(_) = base
+            && let ast::Expr::NameRef(name_ref) = base.unparen()
+            && name_ref.sql_value_function().is_none()
+        {
+            let name = self.name_ref_name(&name_ref)?;
+            return Some(match self.add_name_ref(name, name_ref.syntax()) {
+                Resolution::Source(source) => FieldBase::Source(Some(source)),
+                resolution => {
+                    self.check_default_column_ref(name_ref.syntax(), resolution);
+                    FieldBase::Expr(self.resolution_type(resolution))
+                }
+            });
+        }
         let qualifier = match &base {
             ast::Expr::NameRef(name_ref) => Some(name_ref.clone()),
             ast::Expr::FieldExpr(inner) => match inner.base() {

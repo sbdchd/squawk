@@ -557,7 +557,7 @@ create table pt_1
     error: cannot use column reference in `default` expression
       ╭▸ 
     6 │   d int default (t).a,
-      ╰╴                 ━
+      ╰╴                ━━━━━
     error: cannot use column reference in `default` expression
       ╭▸ 
     7 │   e int default t
