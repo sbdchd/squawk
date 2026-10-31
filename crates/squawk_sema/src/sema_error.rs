@@ -179,6 +179,7 @@ pub(crate) enum SemaError {
     NestedWindow,
     WindowWithoutOver {
         name: Name,
+        over_at: TextSize,
     },
     MisplacedAggregate {
         context: ExprContext,
@@ -329,6 +330,27 @@ pub(crate) enum SemaError {
         name: Name,
         function_range: Option<TextRange>,
     },
+    TableRowTypeAlteredAsType {
+        name: Name,
+        kind: TableKind,
+        type_range: Option<TextRange>,
+    },
+    CompositeTypeAlteredAsTable {
+        name: Name,
+        table_range: Option<TextRange>,
+    },
+    InheritedColumnRename {
+        column: Name,
+    },
+    InheritedConstraintRename {
+        name: Name,
+    },
+    CannotRenameInheritedColumn {
+        column: Name,
+    },
+    CannotRenameInheritedConstraint {
+        name: Name,
+    },
     UnresolvedOperator {
         schema: Option<Name>,
         name: Name,
@@ -374,7 +396,7 @@ pub(crate) enum SemaError {
         name: Name,
         expected: TableLookup,
         kind: TableKind,
-        drop: bool,
+        drop: Option<DropRelation>,
     },
     CannotCopy {
         name: Name,
@@ -454,6 +476,33 @@ pub(crate) enum SemaError {
         table: Name,
     },
     RowLengthMismatch,
+    UnnestColumnDefList,
+    TransitionRowVariable {
+        row_range: TextRange,
+    },
+    ViewDropColumns,
+    ViewColumnRenamed {
+        from: Name,
+        to: Name,
+        rename: Option<ViewColumnRename>,
+    },
+    ViewColumnTypeChanged {
+        column: Name,
+        from: TyName,
+        to: TyName,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ViewColumnRename {
+    pub(crate) schema: Option<Name>,
+    pub(crate) view: Name,
+    pub(crate) insert_at: TextSize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct DropRelation {
+    pub(crate) keyword_range: Option<TextRange>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -742,6 +791,17 @@ fn drop_hint(kind: TableKind) -> &'static str {
     }
 }
 
+fn alter_relation_hint(kind: TableKind) -> &'static str {
+    match kind {
+        TableKind::Table => "use `alter table` instead",
+        TableKind::ForeignTable => "use `alter foreign table` instead",
+        TableKind::View => "use `alter view` instead",
+        TableKind::MaterializedView => "use `alter materialized view` instead",
+        TableKind::Sequence => "use `alter sequence` instead",
+        TableKind::PropertyGraph => "use `alter property graph` instead",
+    }
+}
+
 fn replace_suggestion(message: &'static str, range: TextRange, replacement: String) -> Suggestion {
     Suggestion {
         message: message.into(),
@@ -828,10 +888,20 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
-            SemaError::MisplacedSubquery { .. } | SemaError::DefaultColumnReference => {
-                DiagnosticKind::FeatureNotSupported
-            }
+            SemaError::MisplacedSubquery { .. }
+            | SemaError::DefaultColumnReference
+            | SemaError::UnnestColumnDefList
+            | SemaError::TransitionRowVariable { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
+            SemaError::InheritedColumnRename { .. }
+            | SemaError::ViewDropColumns
+            | SemaError::ViewColumnRenamed { .. }
+            | SemaError::ViewColumnTypeChanged { .. }
+            | SemaError::InheritedConstraintRename { .. }
+            | SemaError::CannotRenameInheritedColumn { .. }
+            | SemaError::CannotRenameInheritedConstraint { .. } => {
+                DiagnosticKind::InvalidTableDefinition
+            }
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -880,7 +950,8 @@ impl SemaError {
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
-            | SemaError::WrongTypeKind { .. } => DiagnosticKind::WrongTypeKind,
+            | SemaError::WrongTypeKind { .. }
+            | SemaError::TableRowTypeAlteredAsType { .. } => DiagnosticKind::WrongTypeKind,
             SemaError::TypedTableAlter { .. } => DiagnosticKind::TypedTableAlter,
             SemaError::InvalidDomainConstraint { .. } => DiagnosticKind::InvalidDomainConstraint,
             SemaError::CompoundColumnCount { .. }
@@ -892,6 +963,7 @@ impl SemaError {
             | SemaError::SubqueryTooFewColumns => DiagnosticKind::ColumnCountMismatch,
             SemaError::MissingShellType => DiagnosticKind::MissingShellType,
             SemaError::WrongRelationKind { .. }
+            | SemaError::CompositeTypeAlteredAsTable { .. }
             | SemaError::CannotCopy { .. }
             | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
@@ -1010,6 +1082,86 @@ impl SemaError {
                     edits: vec![Edit::replace(function_range, "aggregate")],
                 },
             },
+            SemaError::TableRowTypeAlteredAsType {
+                kind,
+                type_range: Some(type_range),
+                ..
+            } => Suggestion {
+                message: alter_relation_hint(kind).into(),
+                fix: Fix {
+                    title: format!("Replace with `{}`", kind.label()).into(),
+                    edits: vec![Edit::replace(type_range, kind.label())],
+                },
+            },
+            SemaError::CompositeTypeAlteredAsTable {
+                table_range: Some(table_range),
+                ..
+            } => Suggestion {
+                message: "use `alter type` instead".into(),
+                fix: Fix {
+                    title: "Replace with `type`".into(),
+                    edits: vec![Edit::replace(table_range, "type")],
+                },
+            },
+            SemaError::ViewColumnRenamed {
+                from,
+                to,
+                rename:
+                    Some(ViewColumnRename {
+                        schema,
+                        view,
+                        insert_at,
+                    }),
+            } => {
+                let view = match schema {
+                    Some(schema) => format!(
+                        "{}.{}",
+                        quote_ident(names.resolve(schema)),
+                        quote_ident(names.resolve(view))
+                    ),
+                    None => quote_ident(names.resolve(view)),
+                };
+                let rename = format!(
+                    "alter view {view} rename column {} to {}",
+                    quote_ident(names.resolve(from)),
+                    quote_ident(names.resolve(to))
+                );
+                Suggestion {
+                    message: "rename the view column with `alter view` first".into(),
+                    fix: Fix {
+                        title: format!("Insert `{rename}`").into(),
+                        edits: vec![Edit::insert(format!("{rename};\n"), insert_at)],
+                    },
+                }
+            }
+            SemaError::TransitionRowVariable { row_range } => Suggestion {
+                message: "use `old table` or `new table` to name transition tables".into(),
+                fix: Fix {
+                    title: "Replace with `table`".into(),
+                    edits: vec![Edit::replace(row_range, "table")],
+                },
+            },
+            SemaError::WrongRelationKind {
+                kind,
+                drop:
+                    Some(DropRelation {
+                        keyword_range: Some(keyword_range),
+                    }),
+                ..
+            } => Suggestion {
+                message: drop_hint(kind).into(),
+                fix: Fix {
+                    title: format!("Replace with `{}`", kind.label()).into(),
+                    edits: vec![Edit::replace(keyword_range, kind.label())],
+                },
+            },
+            SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
+                message: "add an empty `over` clause to compute it over all rows".into(),
+                fix: Fix {
+                    title: "Insert `over ()`".into(),
+                    edits: vec![Edit::insert(" over ()", over_at)],
+                },
+            },
             SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
                 message: "use `*` to call an aggregate with no arguments".into(),
                 fix: Fix {
@@ -1089,7 +1241,14 @@ impl SemaError {
             SemaError::MissingShellType => Some(
                 "create the type as a shell type, then create its canonicalization function, then do a full `create type`",
             ),
-            SemaError::WrongRelationKind { kind, drop, .. } => drop.then(|| drop_hint(kind)),
+            SemaError::WrongRelationKind {
+                kind,
+                drop:
+                    Some(DropRelation {
+                        keyword_range: None,
+                    }),
+                ..
+            } => Some(drop_hint(kind)),
             SemaError::CannotCopy {
                 copy_from, kind, ..
             } => copy_target(copy_from, kind).1,
@@ -1134,6 +1293,20 @@ impl SemaError {
                 function_range: None,
                 ..
             } => Some("use `drop aggregate` to drop aggregate functions"),
+            SemaError::TableRowTypeAlteredAsType {
+                kind,
+                type_range: None,
+                ..
+            } => Some(alter_relation_hint(kind)),
+            SemaError::CompositeTypeAlteredAsTable {
+                table_range: None, ..
+            } => Some("use `alter type` instead"),
+            SemaError::ViewColumnRenamed { rename: None, .. } => Some(
+                "use `alter view ... rename column ...` to change the name of a view column instead",
+            ),
+            SemaError::UnnestColumnDefList => Some(
+                "use a separate `unnest` call for each array inside `rows from`, each with its own column definition list",
+            ),
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
@@ -1185,6 +1358,13 @@ impl SemaError {
             SemaError::SubqueryNotSingleColumn => Some("subquery must return only one column"),
             SemaError::SubqueryTooManyColumns => Some("subquery has too many columns"),
             SemaError::SubqueryTooFewColumns => Some("subquery has too few columns"),
+            SemaError::UnnestColumnDefList => {
+                Some("`unnest` with multiple arguments cannot have a column definition list")
+            }
+            SemaError::TransitionRowVariable { .. } => {
+                Some("row variable naming in the `referencing` clause is not supported")
+            }
+            SemaError::ViewDropColumns => Some("cannot drop columns from view"),
             _ => None,
         }
     }
@@ -1286,6 +1466,9 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::SubqueryNotSingleColumn
             | SemaError::SubqueryTooManyColumns
             | SemaError::SubqueryTooFewColumns
+            | SemaError::UnnestColumnDefList
+            | SemaError::TransitionRowVariable { .. }
+            | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())
@@ -1314,7 +1497,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 "cannot use generated column `{}` in column generation expression",
                 n(column)
             ),
-            SemaError::WindowWithoutOver { name } => {
+            SemaError::WindowWithoutOver { name, .. } => {
                 write!(f, "window function `{}` requires an `over` clause", n(name))
             }
             SemaError::Duplicate { object, name } => {
@@ -1621,6 +1804,41 @@ impl fmt::Display for ErrorMessage<'_> {
                 "`{}` is not a procedure",
                 self.signature(schema, name, args)
             ),
+            SemaError::TableRowTypeAlteredAsType { name, kind, .. } => {
+                write!(f, "`{}` is a {}'s row type", n(name), kind.label())
+            }
+            SemaError::CompositeTypeAlteredAsTable { name, .. } => {
+                write!(f, "`{}` is a composite type", n(name))
+            }
+            SemaError::InheritedColumnRename { column } => write!(
+                f,
+                "inherited column `{}` must be renamed in child tables too",
+                n(column)
+            ),
+            SemaError::ViewColumnRenamed { from, to, .. } => write!(
+                f,
+                "cannot change name of view column `{}` to `{}`",
+                n(from),
+                n(to)
+            ),
+            SemaError::ViewColumnTypeChanged { column, from, to } => write!(
+                f,
+                "cannot change data type of view column `{}` from `{}` to `{}`",
+                n(column),
+                self.ty(from),
+                self.ty(to)
+            ),
+            SemaError::InheritedConstraintRename { name } => write!(
+                f,
+                "inherited constraint `{}` must be renamed in child tables too",
+                n(name)
+            ),
+            SemaError::CannotRenameInheritedColumn { column } => {
+                write!(f, "cannot rename inherited column `{}`", n(column))
+            }
+            SemaError::CannotRenameInheritedConstraint { name } => {
+                write!(f, "cannot rename inherited constraint `{}`", n(name))
+            }
             SemaError::AggregateDroppedAsFunction { schema, name, .. } => match schema {
                 Some(schema) => write!(f, "`{}.{}` is an aggregate function", n(schema), n(name)),
                 None => write!(f, "`{}` is an aggregate function", n(name)),

@@ -136,8 +136,12 @@ drop property graph g2;
       ╭▸ 
     7 │ drop property graph t;
       │                     ━
-      │
-      ╰ hint: use `drop table` to remove a table
+      ╰╴
+    help: use `drop table` to remove a table
+      ╭╴
+    7 - drop property graph t;
+    7 + drop table t;
+      ╰╴
     error: relation `g2` does not exist
        ╭▸ 
     11 │ drop property graph g2;

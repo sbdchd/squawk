@@ -199,3 +199,5 @@ SELECT (
     3 AND p[] = ''::r AND p[] = ''::r AND p[] = ''::r
   )
 );
+
+select * from t limit 1, 2;

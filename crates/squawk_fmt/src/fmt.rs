@@ -1571,6 +1571,7 @@ fn build_referencing_table<'a>(table: ast::ReferencingTable) -> Doc<'a> {
             let mut doc = build_keyword_tokens([
                 (table.old_token(), "old"),
                 (table.table_token(), "table"),
+                (table.row_token(), "row"),
                 (table.as_token(), "as"),
             ]);
             if let Some(name) = table.transition_relation_name() {
@@ -1584,6 +1585,7 @@ fn build_referencing_table<'a>(table: ast::ReferencingTable) -> Doc<'a> {
             let mut doc = build_keyword_tokens([
                 (table.new_token(), "new"),
                 (table.table_token(), "table"),
+                (table.row_token(), "row"),
                 (table.as_token(), "as"),
             ]);
             if let Some(name) = table.transition_relation_name() {

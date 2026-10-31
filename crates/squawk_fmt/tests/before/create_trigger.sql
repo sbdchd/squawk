@@ -14,3 +14,5 @@ create constraint trigger commented_constraint_options after insert on foo /*a*/
 
 -- comments in every position
 create /*a*/ or /*b*/ replace /*c*/ constraint /*d*/ trigger /*e*/ commented_trigger /*f*/ instead /*g*/ of /*h*/ update /*i*/ of /*j*/ first_column /*k*/, /*l*/ second_column /*m*/ or /*n*/ delete /*o*/ on /*p*/ app /*q*/. /*r*/ records /*s*/ from /*t*/ app /*u*/. /*v*/ source_records /*w*/ deferrable /*x*/ initially /*y*/ deferred /*z*/ referencing /*aa*/ old /*ab*/ table /*ac*/ as /*ad*/ old_rows /*ae*/ new /*af*/ table /*ag*/ new_rows /*ah*/ for /*ai*/ each /*aj*/ row /*ak*/ when /*al*/ (/*am*/ old_rows.first_column /*an*/ > /*ao*/ 1 /*ap*/) /*aq*/ execute /*ar*/ function /*as*/ app /*at*/. /*au*/ handle_records(/*av*/ 1 /*aw*/, /*ax*/ 'two' /*ay*/) /*az*/;
+
+create trigger tr after update on t referencing old row as o new row as n for each statement execute function tf();

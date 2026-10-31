@@ -73,6 +73,17 @@ impl IndexIndex {
         std::mem::replace(&mut self.local_mut(id).key, key)
     }
 
+    pub(crate) fn columns(&self, id: IndexId) -> impl Iterator<Item = Name> + '_ {
+        self.arena[id]
+            .columns
+            .iter()
+            .map(|column| self.keys[column])
+    }
+
+    pub(crate) fn set_columns(&mut self, id: IndexId, columns: IdxRange<Name>) -> IdxRange<Name> {
+        std::mem::replace(&mut self.local_mut(id).columns, columns)
+    }
+
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = IndexId> + '_ {
         self.by_name.get(QualifiedName { schema, name })
     }

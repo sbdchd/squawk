@@ -6316,6 +6316,13 @@ fn opt_limit_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         value.complete(p, ALL);
     } else {
         expr(p);
+        if p.at(COMMA) {
+            let m = p.start();
+            p.error("`limit x, y` is not supported, use `limit y offset x`");
+            p.bump(COMMA);
+            expr(p);
+            m.complete(p, ERROR);
+        }
     }
     Some(m.complete(p, LIMIT_CLAUSE))
 }
@@ -17061,7 +17068,9 @@ fn opt_referencing_table(p: &mut Parser<'_>) -> bool {
     let kind = if p.at(OLD_KW) { OLD_TABLE } else { NEW_TABLE };
     let m = p.start();
     p.bump_any();
-    p.expect(TABLE_KW);
+    if !p.eat(ROW_KW) {
+        p.expect(TABLE_KW);
+    }
     p.eat(AS_KW);
     // transition_relation_name
     transition_relation_name(p);

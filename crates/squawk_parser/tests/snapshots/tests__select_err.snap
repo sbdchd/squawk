@@ -2393,6 +2393,35 @@ SOURCE_FILE
             WHITESPACE "\n"
             R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    LIMIT_CLAUSE
+      LIMIT_KW "limit"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+      ERROR
+        COMMA ","
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "2"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: unexpected trailing `,`
@@ -2729,3 +2758,7 @@ error[syntax-error]: expected function name before argument list
     ╭▸ 
 198 │   (2 AND p[] = ''::r AND p[] = ''::r)(
     ╰╴                                     ━
+error[syntax-error]: `limit x, y` is not supported, use `limit y offset x`
+    ╭▸ 
+203 │ select * from t limit 1, 2;
+    ╰╴                       ━

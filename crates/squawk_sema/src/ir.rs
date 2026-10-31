@@ -112,6 +112,7 @@ pub struct Index {
     pub name: Name,
     pub table: Option<TableId>,
     pub(crate) key: Option<IdxRange<Name>>,
+    pub(crate) columns: IdxRange<Name>,
     pub(crate) unique: bool,
     pub(crate) partial: bool,
     pub(crate) deferrable: bool,
@@ -142,6 +143,7 @@ pub struct Constraint {
     pub name: Name,
     pub owner: ConstraintOwner,
     pub(crate) index: Option<IndexId>,
+    pub(crate) no_inherit: bool,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     pub name_ptr: InIrFile<SyntaxNodePtr>,
 }

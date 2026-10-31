@@ -289,3 +289,26 @@ create event trigger et3 on ddl_command_start execute function etf();
        ╰╴                                                               ━━
     ");
 }
+
+#[test]
+fn create_trigger_referencing_row() {
+    assert_snapshot!(check("
+create table t (a int);
+create function tf() returns trigger language plpgsql as 'begin return null; end';
+create trigger tr after update on t
+  referencing old row as o new table as n
+  for each statement
+  execute function tf();
+"), @"
+    error: row variable naming in the `referencing` clause is not supported
+      ╭▸ 
+    5 │   referencing old row as o new table as n
+      │                   ━━━
+      ╰╴
+    help: use `old table` or `new table` to name transition tables
+      ╭╴
+    5 -   referencing old row as o new table as n
+    5 +   referencing old table as o new table as n
+      ╰╴
+    ");
+}

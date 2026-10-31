@@ -43,8 +43,8 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
-        SimilarColumn, SimilarType, TriggerFunctionKind, WindowClause,
+        DropRelation, ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
+        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -732,6 +732,48 @@ impl InheritanceGraph {
             .get(&child)
             .map_or(&[], |parents| parents.as_slice())
     }
+
+    fn descendants(
+        &self,
+        table: TableId,
+        is_live: impl Fn(TableId) -> bool,
+    ) -> SmallVec<[TableId; 8]> {
+        Self::walk(table, is_live, |table| {
+            self.children(table)
+                .iter()
+                .map(|inheritance| inheritance.child)
+        })
+    }
+
+    fn ancestors(
+        &self,
+        table: TableId,
+        is_live: impl Fn(TableId) -> bool,
+    ) -> SmallVec<[TableId; 8]> {
+        Self::walk(table, is_live, |table| {
+            self.parents(table)
+                .iter()
+                .map(|inheritance| inheritance.parent)
+        })
+    }
+
+    fn walk<I: Iterator<Item = TableId>>(
+        table: TableId,
+        is_live: impl Fn(TableId) -> bool,
+        next: impl Fn(TableId) -> I,
+    ) -> SmallVec<[TableId; 8]> {
+        let mut found: SmallVec<[TableId; 8]> = smallvec![];
+        let mut stack: SmallVec<[TableId; 8]> = smallvec![table];
+        while let Some(current) = stack.pop() {
+            for related in next(current) {
+                if related != table && is_live(related) && !found.contains(&related) {
+                    found.push(related);
+                    stack.push(related);
+                }
+            }
+        }
+        found
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -930,6 +972,7 @@ enum Undo {
     SequenceOwner(TableId, SequenceOwner),
     ConstraintKind(ConstraintId, ConstraintKind),
     IndexKey(IndexId, Option<IdxRange<Name>>),
+    IndexColumns(IndexId, IdxRange<Name>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
@@ -1670,6 +1713,10 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_table.if_exists().as_ref()),
             TableLookup::Table,
             drop_table.drop_behavior().as_ref(),
+            drop_table
+                .table_token()
+                .filter(|_| drop_table.table_name_refs().nth(1).is_none())
+                .map(|token| self.token_range(&token)),
         );
     }
 
@@ -1679,6 +1726,10 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_view.if_exists().as_ref()),
             TableLookup::View,
             drop_view.drop_behavior().as_ref(),
+            drop_view
+                .view_token()
+                .filter(|_| drop_view.view_refs().nth(1).is_none())
+                .map(|token| self.token_range(&token)),
         );
     }
 
@@ -1688,6 +1739,11 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_view.if_exists().as_ref()),
             TableLookup::MaterializedView,
             drop_view.drop_behavior().as_ref(),
+            drop_view
+                .materialized_token()
+                .zip(drop_view.view_token())
+                .filter(|_| drop_view.view_refs().nth(1).is_none())
+                .map(|(first, last)| self.token_range(&first).cover(self.token_range(&last))),
         );
     }
 
@@ -1834,6 +1890,147 @@ impl Lowerer {
         }
     }
 
+    fn rename_table_column_checked(
+        &mut self,
+        table: TableId,
+        from: Name,
+        from_node: &SyntaxNode,
+        name_node: &impl NameLike,
+        recurse: bool,
+    ) {
+        if !recurse && self.has_live_children(table) {
+            self.push_error(from_node, SemaError::InheritedColumnRename { column: from });
+            return;
+        }
+        if self.find_table_column(table, from).is_none() {
+            return;
+        }
+        if self.inherited_from_outside(table, recurse, |this, table| {
+            this.inherited_column_count(table, from)
+        }) {
+            self.push_error(
+                from_node,
+                SemaError::CannotRenameInheritedColumn { column: from },
+            );
+            return;
+        }
+        self.rename_table_column(table, from, name_node);
+    }
+
+    fn rename_table_constraint(
+        &mut self,
+        table: TableId,
+        constraint: Option<ConstraintId>,
+        name_ref: &ast::ConstraintNameRef,
+        new_name: &ast::ConstraintName,
+        recurse: bool,
+        node: &SyntaxNode,
+    ) {
+        let Some(segment) = name_ref.path_ref().and_then(|path| path.segment()) else {
+            return;
+        };
+        let name = self.intern(&segment.text());
+        let inheritable =
+            constraint.is_none_or(|constraint| self.inheritable_constraint(constraint));
+        if inheritable {
+            if constraint.is_some() && !recurse && self.has_live_children(table) {
+                self.push_error(
+                    segment.syntax(),
+                    SemaError::InheritedConstraintRename { name },
+                );
+                return;
+            }
+            if self.inherited_from_outside(table, recurse, |this, table| {
+                this.inherited_constraint_count(table, name)
+            }) {
+                self.push_error(
+                    segment.syntax(),
+                    SemaError::CannotRenameInheritedConstraint { name },
+                );
+                return;
+            }
+        }
+        if let Some(constraint) = constraint {
+            self.rename_constraint(constraint, new_name, node);
+        }
+    }
+
+    fn has_live_children(&self, table: TableId) -> bool {
+        self.inheritances
+            .children(table)
+            .iter()
+            .any(|inheritance| self.is_live_child(inheritance.child))
+    }
+
+    fn live_parents(&self, table: TableId) -> impl Iterator<Item = TableId> + '_ {
+        self.inheritances
+            .parents(table)
+            .iter()
+            .map(|inheritance| inheritance.parent)
+            .filter(|parent| !self.dropped_tables.contains(parent))
+    }
+
+    fn inherited_from_outside(
+        &self,
+        table: TableId,
+        recurse: bool,
+        inherited_count: impl Fn(&Self, TableId) -> usize,
+    ) -> bool {
+        if inherited_count(self, table) > 0 {
+            return true;
+        }
+        if !recurse {
+            return false;
+        }
+        let descendants = self
+            .inheritances
+            .descendants(table, |child| self.is_live_child(child));
+        descendants.iter().any(|&descendant| {
+            let parents_in_hierarchy = self
+                .live_parents(descendant)
+                .filter(|parent| *parent == table || descendants.contains(parent))
+                .count();
+            inherited_count(self, descendant) > parents_in_hierarchy
+        })
+    }
+
+    fn inherited_column_count(&self, table: TableId, column: Name) -> usize {
+        self.live_parents(table)
+            .filter(|parent| self.find_table_column(*parent, column).is_some())
+            .count()
+    }
+
+    fn inherited_constraint_count(&self, table: TableId, name: Name) -> usize {
+        self.live_parents(table)
+            .filter(|parent| self.has_inheritable_constraint(*parent, name))
+            .count()
+    }
+
+    fn has_inheritable_constraint(&self, table: TableId, name: Name) -> bool {
+        std::iter::once(table)
+            .chain(
+                self.inheritances
+                    .ancestors(table, |parent| !self.dropped_tables.contains(&parent)),
+            )
+            .any(|table| {
+                self.find_constraint(ConstraintOwner::Table(table), name)
+                    .is_some_and(|constraint| self.inheritable_constraint(constraint))
+            })
+    }
+
+    fn inheritable_constraint(&self, constraint: ConstraintId) -> bool {
+        let constraint = &self.index.constraints[constraint];
+        let inheritable_kind = match constraint.kind {
+            ConstraintKind::Check | ConstraintKind::NotNull { .. } => true,
+            ConstraintKind::PrimaryKey
+            | ConstraintKind::Unique
+            | ConstraintKind::ForeignKey
+            | ConstraintKind::Exclude
+            | ConstraintKind::DomainNotNull => false,
+        };
+        inheritable_kind && !constraint.no_inherit
+    }
+
     fn rename_column_dependents(&mut self, table: TableId, from: Name, to: Name) {
         if !self.index.tables.is_local(table) {
             return;
@@ -1888,7 +2085,16 @@ impl Lowerer {
             }
         }
         for id in self.index.indexes.on_table(table) {
-            if self.dropped_indexes.contains(&id) || !self.index_key_contains(id, from) {
+            if self.dropped_indexes.contains(&id) || !self.index_columns_contain(id, from) {
+                continue;
+            }
+            let columns = self.index.indexes[id].columns;
+            let columns = self.index.indexes.alloc_renamed_key(columns, from, to);
+            let previous = self.index.indexes.set_columns(id, columns);
+            if in_transaction {
+                self.undo.push(Undo::IndexColumns(id, previous));
+            }
+            if !self.index_key_contains(id, from) {
                 continue;
             }
             let Some(key) = self.index.indexes[id].key else {
@@ -1907,6 +2113,27 @@ impl Lowerer {
             .indexes
             .key(index)
             .is_some_and(|mut key| key.any(|name| name == column))
+    }
+
+    fn index_columns_contain(&self, index: IndexId, column: Name) -> bool {
+        self.index.indexes.columns(index).any(|name| name == column)
+    }
+
+    fn alloc_referenced_columns(&mut self, refs: RefId) -> IdxRange<Name> {
+        let index = &mut self.index;
+        index.indexes.alloc_key(
+            index
+                .references
+                .range_from(refs)
+                .iter()
+                .filter_map(|reference| {
+                    let Resolution::Column { column, .. } = index.references[reference].resolution
+                    else {
+                        return None;
+                    };
+                    index.columns[column].name
+                }),
+        )
     }
 
     fn set_table_columns(&mut self, table: TableId, range: IdxRange<Column>) {
@@ -2287,12 +2514,16 @@ impl Lowerer {
 
     fn lower_drop_sequence(&mut self, drop_sequence: &ast::DropSequence) {
         let if_missing = IfMissing::from_if_exists(drop_sequence.if_exists().as_ref());
+        let keyword_range = drop_sequence
+            .sequence_token()
+            .filter(|_| drop_sequence.sequence_refs().nth(1).is_none())
+            .map(|token| self.token_range(&token));
         for path in drop_sequence
             .sequence_refs()
             .filter_map(|sequence| sequence.path_ref())
         {
             if let Some(sequence) =
-                self.lower_drop_table_ref(&path, if_missing, TableLookup::Sequence)
+                self.lower_drop_table_ref(&path, if_missing, TableLookup::Sequence, keyword_range)
             {
                 self.drop_table(sequence);
             }
@@ -2972,6 +3203,9 @@ impl Lowerer {
                 Undo::IndexKey(id, key) => {
                     self.index.indexes.set_key(id, key);
                 }
+                Undo::IndexColumns(id, columns) => {
+                    self.index.indexes.set_columns(id, columns);
+                }
                 Undo::TypeColumns(ty, columns) => {
                     self.index
                         .types
@@ -3296,7 +3530,7 @@ impl Lowerer {
 
     fn drop_column_indexes(&mut self, table: TableId, column: Name) {
         for index in self.index.indexes.on_table(table) {
-            if self.dropped_indexes.contains(&index) || !self.index_key_contains(index, column) {
+            if self.dropped_indexes.contains(&index) || !self.index_columns_contain(index, column) {
                 continue;
             }
             self.drop_index(index);
@@ -3740,10 +3974,12 @@ impl Lowerer {
         if_missing: IfMissing,
         lookup: TableLookup,
         drop_behavior: Option<&ast::DropBehavior>,
+        keyword_range: Option<TextRange>,
     ) {
         let mut targets: SmallVec<[(ast::PathRef, TableId); 4]> = SmallVec::new();
         for path in paths {
-            if let Some(table) = self.lower_drop_table_ref(&path, if_missing, lookup) {
+            if let Some(table) = self.lower_drop_table_ref(&path, if_missing, lookup, keyword_range)
+            {
                 targets.push((path, table));
             }
         }
@@ -6953,9 +7189,15 @@ impl Lowerer {
             .and_then(|graph| graph.path_ref())
         {
             let if_missing = IfMissing::from_if_exists(drop_property_graph.if_exists().as_ref());
-            if let Some(graph) =
-                self.lower_drop_table_ref(&path, if_missing, TableLookup::PropertyGraph)
-            {
+            if let Some(graph) = self.lower_drop_table_ref(
+                &path,
+                if_missing,
+                TableLookup::PropertyGraph,
+                drop_property_graph
+                    .property_token()
+                    .zip(drop_property_graph.graph_token())
+                    .map(|(first, last)| self.token_range(&first).cover(self.token_range(&last))),
+            ) {
                 self.drop_table(graph);
             }
         }
@@ -10385,6 +10627,7 @@ impl Lowerer {
         }
         for LikePrimaryKey { like, source } in like_primary_keys {
             let key = self.copy_primary_key(source);
+            let columns = key.unwrap_or_else(|| self.index.indexes.alloc_key([]));
             let deferrable = self
                 .inherited_primary_key(source)
                 .and_then(|constraint| self.index.constraints[constraint].index)
@@ -10403,6 +10646,7 @@ impl Lowerer {
                 None,
                 None,
                 key,
+                columns,
                 deferrable,
                 None,
                 "pkey",
@@ -10578,7 +10822,7 @@ impl Lowerer {
                         table,
                         TableLookup::Like,
                         segment.syntax(),
-                        false,
+                        None,
                     );
                     return None;
                 }
@@ -10651,17 +10895,95 @@ impl Lowerer {
             None => columns,
         };
         let persistence = Persistence::from_ast(create_view.persistence().as_ref());
-        if let Some(table) = self.alloc_table(
-            TableKind::View,
-            persistence,
-            IfExists::from_or_replace(create_view.or_replace().as_ref()),
-            create_view.syntax(),
-            &path,
-            columns,
-        ) {
-            self.alloc_return_rule(table);
+        let Some(segment) = path.segment() else {
+            return;
+        };
+        let name = self.intern(&segment.text());
+        let schema = match path.qualifier() {
+            None if persistence == Persistence::Temp => self.pg_temp,
+            _ => self.creation_schema(&path),
+        };
+        let if_exists = IfExists::from_or_replace(create_view.or_replace().as_ref());
+        if if_exists == IfExists::Replace
+            && let Some(old) = self
+                .find_table(Some(schema), name)
+                .filter(|table| self.index.tables[*table].kind == TableKind::View)
+            && self.view_replace_rejected(old, &columns, create_view)
+        {
+            return;
         }
+        let table = self.alloc_table_in(
+            TableKind::View,
+            if_exists,
+            create_view.syntax(),
+            schema,
+            name,
+            segment.syntax(),
+            columns,
+        );
+        self.alloc_return_rule(table);
         self.depend_on_refs(refs, self.index.tables.range_from(start), Object::Table);
+    }
+
+    fn view_replace_rejected(
+        &mut self,
+        view: TableId,
+        new: &Columns,
+        create_view: &ast::CreateView,
+    ) -> bool {
+        let old = self.index.tables[view].columns;
+        if !old.complete || !new.complete {
+            return false;
+        }
+        if new.range.len() < old.range.len() {
+            match create_view.query() {
+                Some(query) => self.push_error(query.syntax(), SemaError::ViewDropColumns),
+                None => self.push_error(create_view.syntax(), SemaError::ViewDropColumns),
+            }
+            return true;
+        }
+        for (old_id, new_id) in old.range.iter().zip(new.range.iter()) {
+            let old_column = self.index.columns[old_id];
+            let new_column = self.index.columns[new_id];
+            let (Some(from), Some(to)) = (old_column.name, new_column.name) else {
+                continue;
+            };
+            if from != to {
+                let clear =
+                    !self.columns_contain(new.range, from) && !self.columns_contain(old.range, to);
+                let rename = clear.then(|| {
+                    let Table { schema, name, .. } = self.index.tables[view];
+                    let qualified = create_view
+                        .view()
+                        .and_then(|view| view.path())
+                        .is_some_and(|path| path.qualifier().is_some());
+                    ViewColumnRename {
+                        schema: qualified.then_some(schema),
+                        view: name,
+                        insert_at: self.node_range(create_view.syntax()).start(),
+                    }
+                });
+                self.push_error_ptr(
+                    new_column.ptr,
+                    SemaError::ViewColumnRenamed { from, to, rename },
+                );
+                return true;
+            }
+            if let (Some(old_ty), Some(new_ty)) = (old_column.ty, new_column.ty)
+                && old_ty != new_ty
+            {
+                self.push_error_ptr(
+                    new_column.ptr,
+                    SemaError::ViewColumnTypeChanged {
+                        column: from,
+                        from: self.index.ty_name(old_ty),
+                        to: self.index.ty_name(new_ty),
+                    },
+                );
+                return true;
+            }
+        }
+        false
     }
 
     fn lower_create_materialized_view(&mut self, create_view: &ast::CreateMaterializedView) {
@@ -11229,8 +11551,26 @@ impl Lowerer {
         let Some(path) = alter_type.type_name_ref().and_then(|name| name.path_ref()) else {
             return;
         };
-        let ty = self.lower_type_path_ref(&path, IfMissing::Error, None);
+        let row_table = self.lower_table_row_type_alter(alter_type, &path);
+        let ty = match row_table {
+            Some(_) => None,
+            None => self.lower_type_path_ref(&path, IfMissing::Error, None),
+        };
         match alter_type.action() {
+            Some(ast::AlterTypeAction::RenameAttribute(rename)) if let Some(table) = row_table => {
+                if let Some(field_ref) = rename.composite_field_ref() {
+                    let from = self.lower_table_column_name(Some(table), &field_ref);
+                    if let Some(field) = rename.composite_field() {
+                        self.rename_table_column_checked(
+                            table,
+                            from,
+                            field_ref.syntax(),
+                            &field,
+                            false,
+                        );
+                    }
+                }
+            }
             Some(ast::AlterTypeAction::AlterTypeAttributeActionList(list)) => {
                 let ty = ty.filter(|ty| self.require_composite_type(*ty, &path));
                 for action in list.actions() {
@@ -11330,6 +11670,81 @@ impl Lowerer {
                 }
             }
             None => {}
+        }
+    }
+
+    fn lower_table_row_type_alter(
+        &mut self,
+        alter_type: &ast::AlterType,
+        path: &ast::PathRef,
+    ) -> Option<TableId> {
+        let action = alter_type.action();
+        let type_range = match &action {
+            None => return None,
+            Some(ast::AlterTypeAction::RenameAttribute(_)) => None,
+            Some(
+                ast::AlterTypeAction::TypeRenameTo(_)
+                | ast::AlterTypeAction::SetSchema(_)
+                | ast::AlterTypeAction::OwnerTo(_),
+            ) => alter_type
+                .type_token()
+                .map(|token| self.token_range(&token)),
+            Some(
+                ast::AlterTypeAction::AlterTypeAttributeActionList(_)
+                | ast::AlterTypeAction::SetOptions(_)
+                | ast::AlterTypeAction::AddValue(_)
+                | ast::AlterTypeAction::RenameValue(_),
+            ) => None,
+        };
+        let segment = path.segment()?;
+        let name = self.intern(&segment.text());
+        let schema = path
+            .qualifier()
+            .and_then(|qualifier| qualifier.segment())
+            .map(|segment| self.intern_schema(&segment.text()));
+        let Some(Resolution::Table(table)) = self
+            .search_path(schema, Lookup::Type)
+            .find_map(|schema| self.find_type_in_schema(schema, name))
+        else {
+            return None;
+        };
+        let kind = self.index.tables[table].kind;
+        if matches!(kind, TableKind::PropertyGraph) {
+            return None;
+        }
+        self.lower_schema_qualifier(path.qualifier());
+        self.add_ref(
+            name,
+            ReferenceKind::Type,
+            segment.syntax(),
+            Resolution::Table(table),
+        );
+        if !matches!(action, Some(ast::AlterTypeAction::RenameAttribute(_))) {
+            self.push_error(
+                segment.syntax(),
+                SemaError::TableRowTypeAlteredAsType {
+                    name,
+                    kind,
+                    type_range,
+                },
+            );
+        }
+        Some(table)
+    }
+
+    fn lower_referencing(&mut self, referencing: &ast::Referencing) {
+        for table in referencing.referencing_tables() {
+            let row = match table {
+                ast::ReferencingTable::OldTable(old) => old.row_token(),
+                ast::ReferencingTable::NewTable(new) => new.row_token(),
+            };
+            if let Some(row) = row {
+                let row_range = self.token_range(&row);
+                self.push_error_at(
+                    InIrFile::new(self.file_id, row.text_range()),
+                    SemaError::TransitionRowVariable { row_range },
+                );
+            }
         }
     }
 
@@ -11981,7 +12396,11 @@ impl Lowerer {
         node: &SyntaxNode,
     ) {
         let Constraint {
-            kind, owner, index, ..
+            kind,
+            owner,
+            index,
+            no_inherit,
+            ..
         } = self.index.constraints[constraint];
         let moved = self.index.constraints.next_idx();
         if self.dropped_constraints.insert(constraint) && self.in_transaction() {
@@ -11992,6 +12411,7 @@ impl Lowerer {
             name,
             owner,
             index,
+            no_inherit,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node),
         });
@@ -14372,16 +14792,20 @@ impl Lowerer {
                     .alias()
                     .filter(|_| alias_columns.is_none())
                     .and_then(|alias| alias.name());
-                let has_column_defs =
-                    matches!(alias_columns, Some(ast::FromAliasColumns::ColumnDefList(_)));
+                let column_defs = match alias_columns {
+                    Some(ast::FromAliasColumns::ColumnDefList(list)) => Some(list),
+                    Some(ast::FromAliasColumns::ColumnList(_)) | None => None,
+                };
                 let FunctionSource {
                     callee,
                     function,
                     columns,
                 } = match function_item.call_expr() {
-                    Some(call) => {
-                        self.lower_function_source(&call, scalar_alias.as_ref(), has_column_defs)
-                    }
+                    Some(call) => self.lower_function_source(
+                        &call,
+                        scalar_alias.as_ref(),
+                        column_defs.as_ref(),
+                    ),
                     None => FunctionSource {
                         callee: None,
                         function: None,
@@ -14958,7 +15382,7 @@ impl Lowerer {
                     self.with_from_function(|this| this.lower_call(&call));
                     self.column_def_list_columns(&list)
                 }
-                (Some(call), None) => self.lower_function_source(&call, None, false).columns,
+                (Some(call), None) => self.lower_function_source(&call, None, None).columns,
                 (None, Some(list)) => self.column_def_list_columns(&list),
                 (None, None) => self.unknown_columns(),
             };
@@ -14977,9 +15401,12 @@ impl Lowerer {
         &mut self,
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
-        has_column_defs: bool,
+        column_defs: Option<&ast::ColumnDefList>,
     ) -> FunctionSource {
-        if !has_column_defs && let Some(name_ref) = expanded_unnest(call) {
+        if let Some(name_ref) = expanded_unnest(call) {
+            if let Some(column_defs) = column_defs {
+                self.push_error(column_defs.syntax(), SemaError::UnnestColumnDefList);
+            }
             return self.lower_expanded_unnest(call, &name_ref);
         }
         let LoweredCall { args, callee } =
@@ -15128,7 +15555,7 @@ impl Lowerer {
         if_missing: IfMissing,
         lookup: TableLookup,
     ) -> Option<TableId> {
-        self.resolve_table_ref(path, if_missing, lookup, false)
+        self.resolve_table_ref(path, if_missing, lookup, None)
     }
 
     fn lower_drop_table_ref(
@@ -15136,8 +15563,14 @@ impl Lowerer {
         path: &ast::PathRef,
         if_missing: IfMissing,
         lookup: TableLookup,
+        keyword_range: Option<TextRange>,
     ) -> Option<TableId> {
-        self.resolve_table_ref(path, if_missing, lookup, true)
+        self.resolve_table_ref(
+            path,
+            if_missing,
+            lookup,
+            Some(DropRelation { keyword_range }),
+        )
     }
 
     fn resolve_table_ref(
@@ -15145,7 +15578,7 @@ impl Lowerer {
         path: &ast::PathRef,
         if_missing: IfMissing,
         lookup: TableLookup,
-        drop: bool,
+        drop: Option<DropRelation>,
     ) -> Option<TableId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
@@ -15190,7 +15623,7 @@ impl Lowerer {
         table: TableId,
         lookup: TableLookup,
         node: &SyntaxNode,
-        drop: bool,
+        drop: Option<DropRelation>,
     ) {
         let Table { kind, name, .. } = self.index.tables[table];
         let error = match lookup {
@@ -15234,13 +15667,111 @@ impl Lowerer {
         else {
             return;
         };
-        let table = self.lower_table_ref(
-            &path,
-            IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
-            TableLookup::TableOrForeignTable,
-        );
+        let composite = relation_name.as_ref().and_then(|relation_name| {
+            self.lower_composite_type_alter(alter_table, relation_name, &path)
+        });
+        let table = match composite {
+            Some(ty) => {
+                if self.rename_composite_type_columns(ty, alter_table, &path) {
+                    return;
+                }
+                None
+            }
+            None => self.lower_table_ref(
+                &path,
+                IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
+                TableLookup::TableOrForeignTable,
+            ),
+        };
         let recurse = relation_name.is_some_and(|name| name.only_token().is_none());
         self.lower_alter_table_actions(table, recurse, alter_table.actions(), alter_table.syntax());
+    }
+
+    fn lower_composite_type_alter(
+        &mut self,
+        alter_table: &ast::AlterTable,
+        relation_name: &ast::TableRelationName,
+        path: &ast::PathRef,
+    ) -> Option<TypeId> {
+        let segment = path.segment()?;
+        let name = self.intern(&segment.text());
+        let schema = path
+            .qualifier()
+            .and_then(|qualifier| qualifier.segment())
+            .map(|segment| self.intern_schema(&segment.text()));
+        if self.find_table(schema, name).is_some() {
+            return None;
+        }
+        let ty = self
+            .search_path(schema, Lookup::Type)
+            .find_map(|schema| self.find_type_in(schema, name))
+            .filter(|ty| self.index.types[*ty].columns.is_some())?;
+        let mut actions = alter_table.actions();
+        let equivalent = matches!(
+            (actions.next(), actions.next()),
+            (
+                Some(
+                    ast::AlterTableAction::OwnerTo(_)
+                        | ast::AlterTableAction::SetSchema(_)
+                        | ast::AlterTableAction::TableRenameTo(_)
+                ),
+                None
+            )
+        ) && alter_table.if_exists().is_none()
+            && relation_name.only_token().is_none()
+            && relation_name.star_token().is_none();
+        let table_range = alter_table
+            .table_token()
+            .filter(|_| equivalent)
+            .map(|token| self.token_range(&token));
+        self.lower_schema_qualifier(path.qualifier());
+        self.add_ref(
+            name,
+            ReferenceKind::Type,
+            segment.syntax(),
+            Resolution::Type(ty),
+        );
+        if !alter_table
+            .actions()
+            .all(|action| matches!(action, ast::AlterTableAction::RenameColumn(_)))
+        {
+            self.push_error(
+                segment.syntax(),
+                SemaError::CompositeTypeAlteredAsTable { name, table_range },
+            );
+        }
+        Some(ty)
+    }
+
+    fn rename_composite_type_columns(
+        &mut self,
+        ty: TypeId,
+        alter_table: &ast::AlterTable,
+        path: &ast::PathRef,
+    ) -> bool {
+        if !alter_table
+            .actions()
+            .all(|action| matches!(action, ast::AlterTableAction::RenameColumn(_)))
+        {
+            return false;
+        }
+        for action in alter_table.actions() {
+            let ast::AlterTableAction::RenameColumn(rename) = action else {
+                continue;
+            };
+            let column = rename.column_name_ref().and_then(|column_ref| {
+                self.lower_type_attribute_ref(Some(ty), &column_ref, IfMissing::Error)
+            });
+            if let Some(column) = column
+                && let Some(new_name) = rename.column_name()
+                && self
+                    .typed_tables_to_alter(ty, None, path.syntax())
+                    .is_some()
+            {
+                self.rename_type_attribute(ty, column, &new_name);
+            }
+        }
+        true
     }
 
     fn lower_alter_foreign_table(&mut self, alter_table: &ast::AlterForeignTable) {
@@ -15269,6 +15800,11 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_table.if_exists().as_ref()),
             TableLookup::ForeignTable,
             drop_table.drop_behavior().as_ref(),
+            drop_table
+                .foreign_token()
+                .zip(drop_table.table_token())
+                .filter(|_| drop_table.table_name_refs().nth(1).is_none())
+                .map(|(first, last)| self.token_range(&first).cover(self.token_range(&last))),
         );
     }
 
@@ -15476,7 +16012,13 @@ impl Lowerer {
                         if let Some(table) = table
                             && let Some(new_name) = rename.column_name()
                         {
-                            self.rename_table_column(table, name, &new_name);
+                            self.rename_table_column_checked(
+                                table,
+                                name,
+                                column_ref.syntax(),
+                                &new_name,
+                                recurse,
+                            );
                         }
                     }
                     continue;
@@ -15518,15 +16060,19 @@ impl Lowerer {
                     continue;
                 }
                 ast::AlterTableAction::RenameConstraint(rename) => {
-                    if let Some(name_ref) = rename.constraint_name_ref()
-                        && let Some(constraint) = self.lower_constraint_ref(
+                    if let Some(name_ref) = rename.constraint_name_ref() {
+                        let constraint = self.lower_constraint_ref(
                             table.map(ConstraintOwner::Table),
                             &name_ref,
                             IfMissing::Error,
-                        )
-                        && let Some(name) = rename.constraint_name()
-                    {
-                        self.rename_constraint(constraint, &name, node);
+                        );
+                        if let Some(table) = table
+                            && let Some(name) = rename.constraint_name()
+                        {
+                            self.rename_table_constraint(
+                                table, constraint, &name_ref, &name, recurse, node,
+                            );
+                        }
                     }
                     continue;
                 }
@@ -16107,6 +16653,7 @@ impl Lowerer {
             self.lower_expr_in(ExprContext::IndexPredicate, &expr);
         }
         self.scopes.pop();
+        let columns = self.alloc_referenced_columns(refs);
 
         if let Some(table) = table
             && let Some(table_segment) = path.as_ref().and_then(|path| path.segment())
@@ -16165,6 +16712,7 @@ impl Lowerer {
                     schema,
                     table,
                     key,
+                    columns,
                     unique,
                     partial,
                 );
@@ -16189,6 +16737,7 @@ impl Lowerer {
                     name,
                     table: Some(table),
                     key,
+                    columns,
                     unique,
                     partial,
                     deferrable: false,
@@ -16229,6 +16778,9 @@ impl Lowerer {
     }
 
     fn lower_create_trigger(&mut self, create_trigger: &ast::CreateTrigger) {
+        if let Some(referencing) = create_trigger.referencing() {
+            self.lower_referencing(&referencing);
+        }
         let refs = self.index.references.next_idx();
         let start = self.index.triggers.next_idx();
         let query = self.alloc_query(QueryKind::Trigger, create_trigger.syntax());
@@ -17964,6 +18516,7 @@ impl Lowerer {
                 .indexes
                 .alloc_key(columns[..key_len].iter().copied())
         });
+        let index_columns = self.index.indexes.alloc_key(columns.iter().copied());
         self.alloc_index_constraint(
             ConstraintKind::PrimaryKey,
             table,
@@ -17971,6 +18524,7 @@ impl Lowerer {
             name,
             index,
             key,
+            index_columns,
             is_deferrable(primary_key.constraint_options()),
             None,
             "pkey",
@@ -18037,6 +18591,7 @@ impl Lowerer {
                 .indexes
                 .alloc_key(columns[..key_len].iter().copied())
         });
+        let index_columns = self.index.indexes.alloc_key(columns.iter().copied());
         self.alloc_index_constraint(
             ConstraintKind::Unique,
             table,
@@ -18044,6 +18599,7 @@ impl Lowerer {
             name,
             index,
             key,
+            index_columns,
             is_deferrable(unique.constraint_options()),
             Some(&addition),
             "key",
@@ -18524,6 +19080,12 @@ impl Lowerer {
             .value
     }
 
+    fn node_range(&self, node: &SyntaxNode) -> TextRange {
+        self.index
+            .range(InIrFile::new(self.file_id, node.text_range()))
+            .value
+    }
+
     fn operand_name(&self, ty: ArgType) -> Option<OperandName> {
         match ty {
             ArgType::Known(ty) => Some(OperandName::Ty(self.index.ty_name(ty))),
@@ -18615,6 +19177,7 @@ impl Lowerer {
         let name = exclude
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
+        let columns = self.alloc_referenced_columns(refs);
         let constraint = self.alloc_index_constraint(
             ConstraintKind::Exclude,
             table,
@@ -18622,6 +19185,7 @@ impl Lowerer {
             name,
             None,
             None,
+            columns,
             is_deferrable(exclude.constraint_options()),
             Some(&addition),
             "excl",
@@ -20863,7 +21427,11 @@ impl Lowerer {
                 window: true, name, ..
             } = self.index.functions[function]
         {
-            self.push_error(call.syntax(), SemaError::WindowWithoutOver { name });
+            let over_at = self.node_range(call.syntax()).end();
+            self.push_error(
+                call.syntax(),
+                SemaError::WindowWithoutOver { name, over_at },
+            );
         }
         let kind = if call.over_clause().is_some() {
             AggregateCallKind::Window
@@ -22064,6 +22632,7 @@ impl Lowerer {
         schema: Name,
         table: Option<TableId>,
         key: Option<IdxRange<Name>>,
+        columns: IdxRange<Name>,
         unique: bool,
         partial: bool,
     ) -> Option<IndexId> {
@@ -22079,6 +22648,7 @@ impl Lowerer {
             name,
             table,
             key,
+            columns,
             unique,
             partial,
             deferrable: false,
@@ -22483,6 +23053,7 @@ impl Lowerer {
         name: Option<ast::ConstraintName>,
         using_index: Option<IndexId>,
         key: Option<IdxRange<Name>>,
+        columns: IdxRange<Name>,
         deferrable: bool,
         addition: Option<&str>,
         label: &str,
@@ -22531,6 +23102,7 @@ impl Lowerer {
             name: constraint.name,
             table: Some(table),
             key,
+            columns,
             unique,
             partial: false,
             deferrable,
@@ -22578,6 +23150,7 @@ impl Lowerer {
             name: name_id,
             owner,
             index,
+            no_inherit: constraint_no_inherit(node),
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.as_ref().map_or(node, |name| name.syntax())),
         });
@@ -23413,6 +23986,19 @@ fn index_column_names(create_index: &ast::CreateIndex) -> String {
             }
         },
     ))
+}
+
+fn constraint_no_inherit(node: &SyntaxNode) -> bool {
+    let options = if let Some(check) = ast::CheckConstraint::cast(node.clone()) {
+        check.constraint_options()
+    } else if let Some(not_null) = ast::NotNullConstraint::cast(node.clone()) {
+        not_null.constraint_options()
+    } else {
+        return false;
+    };
+    options
+        .into_iter()
+        .any(|option| matches!(option, ast::ConstraintOption::NoInherit(_)))
 }
 
 fn is_deferrable(mut options: ast::AstChildren<ast::ConstraintOption>) -> bool {

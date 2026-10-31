@@ -111,14 +111,22 @@ select 'x'::t;
       ╭▸ 
     7 │ drop table v;
       │            ━
-      │
-      ╰ hint: use `drop view` to remove a view
+      ╰╴
+    help: use `drop view` to remove a view
+      ╭╴
+    7 - drop table v;
+    7 + drop view v;
+      ╰╴
     error: `u` is not a view
       ╭▸ 
     9 │ drop view u;
       │           ━
-      │
-      ╰ hint: use `drop table` to remove a table
+      ╰╴
+    help: use `drop table` to remove a table
+      ╭╴
+    9 - drop view u;
+    9 + drop table u;
+      ╰╴
     error: relation `t` does not exist
        ╭▸ 
     10 │ select * from t;
@@ -741,5 +749,21 @@ create table n (like l, b int);
       ╭▸ 
     7 │ create table n (like l, b int);
       ╰╴                        ━
+    ");
+}
+
+#[test]
+fn drop_table_wrong_kind_multiple_targets() {
+    assert_snapshot!(check("
+create table t (a int);
+create view v as select 1;
+drop table t, v;
+"), @"
+    error: `v` is not a table
+      ╭▸ 
+    4 │ drop table t, v;
+      │               ━
+      │
+      ╰ hint: use `drop view` to remove a view
     ");
 }
