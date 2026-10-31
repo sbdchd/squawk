@@ -303,3 +303,20 @@ select (greatest(t, t)).zz, (least(t, t)).zz from t;
       ╰╴                                          ━━
     ");
 }
+
+#[test]
+fn nullif_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (nullif(1, 2)).x, (nullif(t, t)).zz from t;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (nullif(1, 2)).x, (nullif(t, t)).zz from t;
+      ╰╴                      ━
+    error: column `zz` does not exist
+      ╭▸ 
+    3 │ select (nullif(1, 2)).x, (nullif(t, t)).zz from t;
+      ╰╴                                        ━━
+    ");
+}

@@ -18892,6 +18892,16 @@ impl Lowerer {
         common.finish()
     }
 
+    fn keyword_call_type(&self, keyword: ast::FunctionLikeKeyword, args: &[CallArg]) -> Option<Ty> {
+        match keyword {
+            ast::FunctionLikeKeyword::Coalesce
+            | ast::FunctionLikeKeyword::Greatest
+            | ast::FunctionLikeKeyword::Least => self.common_args_type(args),
+            ast::FunctionLikeKeyword::Nullif => args.first().and_then(|arg| arg.ty.known()),
+            ast::FunctionLikeKeyword::Grouping | ast::FunctionLikeKeyword::MergeAction => None,
+        }
+    }
+
     fn common_args_type(&self, args: &[CallArg]) -> Option<Ty> {
         let mut common = CommonType::new(ArgType::UnknownLiteral);
         for arg in args {
@@ -20459,8 +20469,8 @@ impl Lowerer {
             }
             ast::Expr::CallExpr(call) => {
                 let LoweredCall { args, callee } = self.lower_call_with_args(call);
-                if is_common_type_call(call) {
-                    return self.common_args_type(&args);
+                if let Some(keyword) = call_function_like_keyword(call) {
+                    return self.keyword_call_type(keyword, &args);
                 }
                 return match callee?.resolution {
                     Resolution::Function(function) => self.call_type(function, &args),
@@ -21767,7 +21777,7 @@ impl Lowerer {
             | ast::Expr::SliceExpr(_)
             | ast::Expr::TupleExpr(_) => return None,
         };
-        if schema.is_none() && name_ref.is_function_like_keyword() {
+        if schema.is_none() && name_ref.function_like_keyword().is_some() {
             return None;
         }
         let name = self.name_ref_name(&name_ref)?;
@@ -22421,8 +22431,8 @@ impl Lowerer {
 
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
         let LoweredCall { args, callee } = self.lower_call_with_args(call);
-        if is_common_type_call(call) {
-            return self.expr_field_base(self.common_args_type(&args));
+        if let Some(keyword) = call_function_like_keyword(call) {
+            return self.expr_field_base(self.keyword_call_type(keyword, &args));
         }
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return self.expr_field_base(
@@ -23824,8 +23834,25 @@ fn expr_arg_type(expr: Option<&ast::Expr>, ty: Option<Ty>) -> ArgType {
     }
 }
 
-fn is_common_type_call(call: &ast::CallExpr) -> bool {
-    matches!(call.expr(), Some(ast::Expr::NameRef(name_ref)) if name_ref.is_common_type_keyword())
+fn call_function_like_keyword(call: &ast::CallExpr) -> Option<ast::FunctionLikeKeyword> {
+    match call.expr()? {
+        ast::Expr::NameRef(name_ref) => name_ref.function_like_keyword(),
+        ast::Expr::ArrayExpr(_)
+        | ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::CallExpr(_)
+        | ast::Expr::CaseExpr(_)
+        | ast::Expr::CastExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::FieldExpr(_)
+        | ast::Expr::IndexExpr(_)
+        | ast::Expr::Literal(_)
+        | ast::Expr::ParenExpr(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::PrefixExpr(_)
+        | ast::Expr::SliceExpr(_)
+        | ast::Expr::TupleExpr(_) => None,
+    }
 }
 
 fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
