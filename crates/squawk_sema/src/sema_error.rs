@@ -329,6 +329,15 @@ pub(crate) enum SemaError {
         name: Name,
         function_range: Option<TextRange>,
     },
+    TableRowTypeAlteredAsType {
+        name: Name,
+        kind: TableKind,
+        type_range: Option<TextRange>,
+    },
+    CompositeTypeAlteredAsTable {
+        name: Name,
+        table_range: Option<TextRange>,
+    },
     UnresolvedOperator {
         schema: Option<Name>,
         name: Name,
@@ -743,6 +752,17 @@ fn drop_hint(kind: TableKind) -> &'static str {
     }
 }
 
+fn alter_relation_hint(kind: TableKind) -> &'static str {
+    match kind {
+        TableKind::Table => "use `alter table` instead",
+        TableKind::ForeignTable => "use `alter foreign table` instead",
+        TableKind::View => "use `alter view` instead",
+        TableKind::MaterializedView => "use `alter materialized view` instead",
+        TableKind::Sequence => "use `alter sequence` instead",
+        TableKind::PropertyGraph => "use `alter property graph` instead",
+    }
+}
+
 fn replace_suggestion(message: &'static str, range: TextRange, replacement: String) -> Suggestion {
     Suggestion {
         message: message.into(),
@@ -881,7 +901,8 @@ impl SemaError {
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
-            | SemaError::WrongTypeKind { .. } => DiagnosticKind::WrongTypeKind,
+            | SemaError::WrongTypeKind { .. }
+            | SemaError::TableRowTypeAlteredAsType { .. } => DiagnosticKind::WrongTypeKind,
             SemaError::TypedTableAlter { .. } => DiagnosticKind::TypedTableAlter,
             SemaError::InvalidDomainConstraint { .. } => DiagnosticKind::InvalidDomainConstraint,
             SemaError::CompoundColumnCount { .. }
@@ -893,6 +914,7 @@ impl SemaError {
             | SemaError::SubqueryTooFewColumns => DiagnosticKind::ColumnCountMismatch,
             SemaError::MissingShellType => DiagnosticKind::MissingShellType,
             SemaError::WrongRelationKind { .. }
+            | SemaError::CompositeTypeAlteredAsTable { .. }
             | SemaError::CannotCopy { .. }
             | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
@@ -1009,6 +1031,27 @@ impl SemaError {
                 fix: Fix {
                     title: "Replace with `aggregate`".into(),
                     edits: vec![Edit::replace(function_range, "aggregate")],
+                },
+            },
+            SemaError::TableRowTypeAlteredAsType {
+                kind,
+                type_range: Some(type_range),
+                ..
+            } => Suggestion {
+                message: alter_relation_hint(kind).into(),
+                fix: Fix {
+                    title: format!("Replace with `{}`", kind.label()).into(),
+                    edits: vec![Edit::replace(type_range, kind.label())],
+                },
+            },
+            SemaError::CompositeTypeAlteredAsTable {
+                table_range: Some(table_range),
+                ..
+            } => Suggestion {
+                message: "use `alter type` instead".into(),
+                fix: Fix {
+                    title: "Replace with `type`".into(),
+                    edits: vec![Edit::replace(table_range, "type")],
                 },
             },
             SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
@@ -1135,6 +1178,14 @@ impl SemaError {
                 function_range: None,
                 ..
             } => Some("use `drop aggregate` to drop aggregate functions"),
+            SemaError::TableRowTypeAlteredAsType {
+                kind,
+                type_range: None,
+                ..
+            } => Some(alter_relation_hint(kind)),
+            SemaError::CompositeTypeAlteredAsTable {
+                table_range: None, ..
+            } => Some("use `alter type` instead"),
             SemaError::UnnestColumnDefList => Some(
                 "use a separate `unnest` call for each array inside `rows from`, each with its own column definition list",
             ),
@@ -1629,6 +1680,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 "`{}` is not a procedure",
                 self.signature(schema, name, args)
             ),
+            SemaError::TableRowTypeAlteredAsType { name, kind, .. } => {
+                write!(f, "`{}` is a {}'s row type", n(name), kind.label())
+            }
+            SemaError::CompositeTypeAlteredAsTable { name, .. } => {
+                write!(f, "`{}` is a composite type", n(name))
+            }
             SemaError::AggregateDroppedAsFunction { schema, name, .. } => match schema {
                 Some(schema) => write!(f, "`{}.{}` is an aggregate function", n(schema), n(name)),
                 None => write!(f, "`{}` is an aggregate function", n(name)),

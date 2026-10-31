@@ -11229,8 +11229,20 @@ impl Lowerer {
         let Some(path) = alter_type.type_name_ref().and_then(|name| name.path_ref()) else {
             return;
         };
-        let ty = self.lower_type_path_ref(&path, IfMissing::Error, None);
+        let row_table = self.lower_table_row_type_alter(alter_type, &path);
+        let ty = match row_table {
+            Some(_) => None,
+            None => self.lower_type_path_ref(&path, IfMissing::Error, None),
+        };
         match alter_type.action() {
+            Some(ast::AlterTypeAction::RenameAttribute(rename)) if let Some(table) = row_table => {
+                if let Some(field_ref) = rename.composite_field_ref() {
+                    let from = self.lower_table_column_name(Some(table), &field_ref);
+                    if let Some(field) = rename.composite_field() {
+                        self.rename_table_column(table, from, &field);
+                    }
+                }
+            }
             Some(ast::AlterTypeAction::AlterTypeAttributeActionList(list)) => {
                 let ty = ty.filter(|ty| self.require_composite_type(*ty, &path));
                 for action in list.actions() {
@@ -11331,6 +11343,65 @@ impl Lowerer {
             }
             None => {}
         }
+    }
+
+    fn lower_table_row_type_alter(
+        &mut self,
+        alter_type: &ast::AlterType,
+        path: &ast::PathRef,
+    ) -> Option<TableId> {
+        let action = alter_type.action();
+        let type_range = match &action {
+            None => return None,
+            Some(ast::AlterTypeAction::RenameAttribute(_)) => None,
+            Some(
+                ast::AlterTypeAction::TypeRenameTo(_)
+                | ast::AlterTypeAction::SetSchema(_)
+                | ast::AlterTypeAction::OwnerTo(_),
+            ) => alter_type
+                .type_token()
+                .map(|token| self.token_range(&token)),
+            Some(
+                ast::AlterTypeAction::AlterTypeAttributeActionList(_)
+                | ast::AlterTypeAction::SetOptions(_)
+                | ast::AlterTypeAction::AddValue(_)
+                | ast::AlterTypeAction::RenameValue(_),
+            ) => None,
+        };
+        let segment = path.segment()?;
+        let name = self.intern(&segment.text());
+        let schema = path
+            .qualifier()
+            .and_then(|qualifier| qualifier.segment())
+            .map(|segment| self.intern_schema(&segment.text()));
+        let Some(Resolution::Table(table)) = self
+            .search_path(schema, Lookup::Type)
+            .find_map(|schema| self.find_type_in_schema(schema, name))
+        else {
+            return None;
+        };
+        let kind = self.index.tables[table].kind;
+        if matches!(kind, TableKind::PropertyGraph) {
+            return None;
+        }
+        self.lower_schema_qualifier(path.qualifier());
+        self.add_ref(
+            name,
+            ReferenceKind::Type,
+            segment.syntax(),
+            Resolution::Table(table),
+        );
+        if !matches!(action, Some(ast::AlterTypeAction::RenameAttribute(_))) {
+            self.push_error(
+                segment.syntax(),
+                SemaError::TableRowTypeAlteredAsType {
+                    name,
+                    kind,
+                    type_range,
+                },
+            );
+        }
+        Some(table)
     }
 
     fn lower_alter_type_attribute_action(
@@ -15241,13 +15312,111 @@ impl Lowerer {
         else {
             return;
         };
-        let table = self.lower_table_ref(
-            &path,
-            IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
-            TableLookup::TableOrForeignTable,
-        );
+        let composite = relation_name.as_ref().and_then(|relation_name| {
+            self.lower_composite_type_alter(alter_table, relation_name, &path)
+        });
+        let table = match composite {
+            Some(ty) => {
+                if self.rename_composite_type_columns(ty, alter_table, &path) {
+                    return;
+                }
+                None
+            }
+            None => self.lower_table_ref(
+                &path,
+                IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
+                TableLookup::TableOrForeignTable,
+            ),
+        };
         let recurse = relation_name.is_some_and(|name| name.only_token().is_none());
         self.lower_alter_table_actions(table, recurse, alter_table.actions(), alter_table.syntax());
+    }
+
+    fn lower_composite_type_alter(
+        &mut self,
+        alter_table: &ast::AlterTable,
+        relation_name: &ast::TableRelationName,
+        path: &ast::PathRef,
+    ) -> Option<TypeId> {
+        let segment = path.segment()?;
+        let name = self.intern(&segment.text());
+        let schema = path
+            .qualifier()
+            .and_then(|qualifier| qualifier.segment())
+            .map(|segment| self.intern_schema(&segment.text()));
+        if self.find_table(schema, name).is_some() {
+            return None;
+        }
+        let ty = self
+            .search_path(schema, Lookup::Type)
+            .find_map(|schema| self.find_type_in(schema, name))
+            .filter(|ty| self.index.types[*ty].columns.is_some())?;
+        let mut actions = alter_table.actions();
+        let equivalent = matches!(
+            (actions.next(), actions.next()),
+            (
+                Some(
+                    ast::AlterTableAction::OwnerTo(_)
+                        | ast::AlterTableAction::SetSchema(_)
+                        | ast::AlterTableAction::TableRenameTo(_)
+                ),
+                None
+            )
+        ) && alter_table.if_exists().is_none()
+            && relation_name.only_token().is_none()
+            && relation_name.star_token().is_none();
+        let table_range = alter_table
+            .table_token()
+            .filter(|_| equivalent)
+            .map(|token| self.token_range(&token));
+        self.lower_schema_qualifier(path.qualifier());
+        self.add_ref(
+            name,
+            ReferenceKind::Type,
+            segment.syntax(),
+            Resolution::Type(ty),
+        );
+        if !alter_table
+            .actions()
+            .all(|action| matches!(action, ast::AlterTableAction::RenameColumn(_)))
+        {
+            self.push_error(
+                segment.syntax(),
+                SemaError::CompositeTypeAlteredAsTable { name, table_range },
+            );
+        }
+        Some(ty)
+    }
+
+    fn rename_composite_type_columns(
+        &mut self,
+        ty: TypeId,
+        alter_table: &ast::AlterTable,
+        path: &ast::PathRef,
+    ) -> bool {
+        if !alter_table
+            .actions()
+            .all(|action| matches!(action, ast::AlterTableAction::RenameColumn(_)))
+        {
+            return false;
+        }
+        for action in alter_table.actions() {
+            let ast::AlterTableAction::RenameColumn(rename) = action else {
+                continue;
+            };
+            let column = rename.column_name_ref().and_then(|column_ref| {
+                self.lower_type_attribute_ref(Some(ty), &column_ref, IfMissing::Error)
+            });
+            if let Some(column) = column
+                && let Some(new_name) = rename.column_name()
+                && self
+                    .typed_tables_to_alter(ty, None, path.syntax())
+                    .is_some()
+            {
+                self.rename_type_attribute(ty, column, &new_name);
+            }
+        }
+        true
     }
 
     fn lower_alter_foreign_table(&mut self, alter_table: &ast::AlterForeignTable) {
