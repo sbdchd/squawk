@@ -22344,7 +22344,7 @@ impl Lowerer {
                         } if let Some(ty) = self.scalar_sources.get(&source) => {
                             FieldBase::Scalar(*ty)
                         }
-                        _ => FieldBase::Expr(self.resolution_type(resolution)),
+                        _ => self.expr_field_base(self.resolution_type(resolution)),
                     }
                 }
             });
@@ -22396,21 +22396,38 @@ impl Lowerer {
         };
         Some(match qualifier {
             Some(qualifier) => FieldBase::Source(self.lower_qualifier(&qualifier)),
-            None => FieldBase::Expr(self.lower_expr(&base)),
+            None => {
+                let ty = self.lower_expr(&base);
+                self.expr_field_base(ty)
+            }
         })
+    }
+
+    fn expr_field_base(&self, ty: Option<Ty>) -> FieldBase {
+        match ty {
+            Some(ty) if self.is_not_composite(ty) => FieldBase::Scalar(ty),
+            ty => FieldBase::Expr(ty),
+        }
+    }
+
+    fn is_not_composite(&self, ty: Ty) -> bool {
+        match self.index.base_type(ty) {
+            Some(Ty::Array(_)) => true,
+            Some(Ty::Type(_) | Ty::Table(_) | Ty::Cte(_)) | None => false,
+        }
     }
 
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
         let LoweredCall { args, callee } = self.lower_call_with_args(call);
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
-            return FieldBase::Expr(
+            return self.expr_field_base(
                 callee.and_then(|callee| self.resolution_type(callee.resolution)),
             );
         };
         let ty = self.call_type(function, &args);
         match self.index.functions[function].columns {
             Some(columns) => FieldBase::Columns { columns, ty },
-            None => FieldBase::Expr(ty),
+            None => self.expr_field_base(ty),
         }
     }
 

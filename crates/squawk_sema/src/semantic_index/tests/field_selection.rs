@@ -72,11 +72,11 @@ from t;
       ╭▸ 
     6 │   (p).nope,
       ╰╴      ━━━━
-    error: column `x` does not exist
+    error: column notation `.x` applied to type `pair[]`, which is not a composite type
        ╭▸ 
     10 │   (ps[1:2]).x,
        ╰╴            ━
-    error: column `x` does not exist
+    error: column notation `.x` applied to type `pair[]`, which is not a composite type
        ╭▸ 
     16 │   (array[p]).x,
        ╰╴             ━
@@ -199,5 +199,22 @@ select (dc).x, (dc).*, (dc).zz from u;
       ╭▸ 
     5 │ select (dc).x, (dc).*, (dc).zz from u;
       ╰╴                            ━━
+    ");
+}
+
+#[test]
+fn array_field_selection_is_not_composite() {
+    assert_snapshot!(check("
+create table u (arr int[]);
+select (arr).zz, (arr).* from u;
+"), @"
+    error: column notation `.zz` applied to type `int4[]`, which is not a composite type
+      ╭▸ 
+    3 │ select (arr).zz, (arr).* from u;
+      ╰╴             ━━
+    error: type `int4[]` is not a composite type
+      ╭▸ 
+    3 │ select (arr).zz, (arr).* from u;
+      ╰╴                       ━
     ");
 }
