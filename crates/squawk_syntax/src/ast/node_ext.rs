@@ -1249,8 +1249,11 @@ impl ast::NameRef {
         }
     }
 
-    pub fn is_coalesce(&self) -> bool {
-        self.first_token_kind() == Some(SyntaxKind::COALESCE_KW)
+    pub fn is_common_type_keyword(&self) -> bool {
+        matches!(
+            self.first_token_kind(),
+            Some(SyntaxKind::COALESCE_KW | SyntaxKind::GREATEST_KW | SyntaxKind::LEAST_KW)
+        )
     }
 
     pub fn is_function_like_keyword(&self) -> bool {

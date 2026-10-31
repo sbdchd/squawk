@@ -277,3 +277,29 @@ select (coalesce(t, t)).zz, (case when true then t end).zz from t;
       ╰╴                                                        ━━
     ");
 }
+
+#[test]
+fn greatest_least_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (greatest(1, 2)).x, (least(1, 2)).x;
+select (greatest(t, t)).zz, (least(t, t)).zz from t;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (greatest(1, 2)).x, (least(1, 2)).x;
+      ╰╴                        ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (greatest(1, 2)).x, (least(1, 2)).x;
+      ╰╴                                         ━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (greatest(t, t)).zz, (least(t, t)).zz from t;
+      ╰╴                        ━━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (greatest(t, t)).zz, (least(t, t)).zz from t;
+      ╰╴                                          ━━
+    ");
+}

@@ -18892,7 +18892,7 @@ impl Lowerer {
         common.finish()
     }
 
-    fn coalesce_type(&self, args: &[CallArg]) -> Option<Ty> {
+    fn common_args_type(&self, args: &[CallArg]) -> Option<Ty> {
         let mut common = CommonType::new(ArgType::UnknownLiteral);
         for arg in args {
             common.push(&self.overloads(), arg.ty);
@@ -20459,8 +20459,8 @@ impl Lowerer {
             }
             ast::Expr::CallExpr(call) => {
                 let LoweredCall { args, callee } = self.lower_call_with_args(call);
-                if is_coalesce_call(call) {
-                    return self.coalesce_type(&args);
+                if is_common_type_call(call) {
+                    return self.common_args_type(&args);
                 }
                 return match callee?.resolution {
                     Resolution::Function(function) => self.call_type(function, &args),
@@ -22421,8 +22421,8 @@ impl Lowerer {
 
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
         let LoweredCall { args, callee } = self.lower_call_with_args(call);
-        if is_coalesce_call(call) {
-            return self.expr_field_base(self.coalesce_type(&args));
+        if is_common_type_call(call) {
+            return self.expr_field_base(self.common_args_type(&args));
         }
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return self.expr_field_base(
@@ -23824,8 +23824,8 @@ fn expr_arg_type(expr: Option<&ast::Expr>, ty: Option<Ty>) -> ArgType {
     }
 }
 
-fn is_coalesce_call(call: &ast::CallExpr) -> bool {
-    matches!(call.expr(), Some(ast::Expr::NameRef(name_ref)) if name_ref.is_coalesce())
+fn is_common_type_call(call: &ast::CallExpr) -> bool {
+    matches!(call.expr(), Some(ast::Expr::NameRef(name_ref)) if name_ref.is_common_type_keyword())
 }
 
 fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
