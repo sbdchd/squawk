@@ -972,6 +972,7 @@ enum Undo {
     SequenceOwner(TableId, SequenceOwner),
     ConstraintKind(ConstraintId, ConstraintKind),
     IndexKey(IndexId, Option<IdxRange<Name>>),
+    IndexColumns(IndexId, IdxRange<Name>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
@@ -2084,7 +2085,16 @@ impl Lowerer {
             }
         }
         for id in self.index.indexes.on_table(table) {
-            if self.dropped_indexes.contains(&id) || !self.index_key_contains(id, from) {
+            if self.dropped_indexes.contains(&id) || !self.index_columns_contain(id, from) {
+                continue;
+            }
+            let columns = self.index.indexes[id].columns;
+            let columns = self.index.indexes.alloc_renamed_key(columns, from, to);
+            let previous = self.index.indexes.set_columns(id, columns);
+            if in_transaction {
+                self.undo.push(Undo::IndexColumns(id, previous));
+            }
+            if !self.index_key_contains(id, from) {
                 continue;
             }
             let Some(key) = self.index.indexes[id].key else {
@@ -2103,6 +2113,27 @@ impl Lowerer {
             .indexes
             .key(index)
             .is_some_and(|mut key| key.any(|name| name == column))
+    }
+
+    fn index_columns_contain(&self, index: IndexId, column: Name) -> bool {
+        self.index.indexes.columns(index).any(|name| name == column)
+    }
+
+    fn alloc_referenced_columns(&mut self, refs: RefId) -> IdxRange<Name> {
+        let index = &mut self.index;
+        index.indexes.alloc_key(
+            index
+                .references
+                .range_from(refs)
+                .iter()
+                .filter_map(|reference| {
+                    let Resolution::Column { column, .. } = index.references[reference].resolution
+                    else {
+                        return None;
+                    };
+                    index.columns[column].name
+                }),
+        )
     }
 
     fn set_table_columns(&mut self, table: TableId, range: IdxRange<Column>) {
@@ -3172,6 +3203,9 @@ impl Lowerer {
                 Undo::IndexKey(id, key) => {
                     self.index.indexes.set_key(id, key);
                 }
+                Undo::IndexColumns(id, columns) => {
+                    self.index.indexes.set_columns(id, columns);
+                }
                 Undo::TypeColumns(ty, columns) => {
                     self.index
                         .types
@@ -3496,7 +3530,7 @@ impl Lowerer {
 
     fn drop_column_indexes(&mut self, table: TableId, column: Name) {
         for index in self.index.indexes.on_table(table) {
-            if self.dropped_indexes.contains(&index) || !self.index_key_contains(index, column) {
+            if self.dropped_indexes.contains(&index) || !self.index_columns_contain(index, column) {
                 continue;
             }
             self.drop_index(index);
@@ -10593,6 +10627,7 @@ impl Lowerer {
         }
         for LikePrimaryKey { like, source } in like_primary_keys {
             let key = self.copy_primary_key(source);
+            let columns = key.unwrap_or_else(|| self.index.indexes.alloc_key([]));
             let deferrable = self
                 .inherited_primary_key(source)
                 .and_then(|constraint| self.index.constraints[constraint].index)
@@ -10611,6 +10646,7 @@ impl Lowerer {
                 None,
                 None,
                 key,
+                columns,
                 deferrable,
                 None,
                 "pkey",
@@ -16617,6 +16653,7 @@ impl Lowerer {
             self.lower_expr_in(ExprContext::IndexPredicate, &expr);
         }
         self.scopes.pop();
+        let columns = self.alloc_referenced_columns(refs);
 
         if let Some(table) = table
             && let Some(table_segment) = path.as_ref().and_then(|path| path.segment())
@@ -16675,6 +16712,7 @@ impl Lowerer {
                     schema,
                     table,
                     key,
+                    columns,
                     unique,
                     partial,
                 );
@@ -16699,6 +16737,7 @@ impl Lowerer {
                     name,
                     table: Some(table),
                     key,
+                    columns,
                     unique,
                     partial,
                     deferrable: false,
@@ -18477,6 +18516,7 @@ impl Lowerer {
                 .indexes
                 .alloc_key(columns[..key_len].iter().copied())
         });
+        let index_columns = self.index.indexes.alloc_key(columns.iter().copied());
         self.alloc_index_constraint(
             ConstraintKind::PrimaryKey,
             table,
@@ -18484,6 +18524,7 @@ impl Lowerer {
             name,
             index,
             key,
+            index_columns,
             is_deferrable(primary_key.constraint_options()),
             None,
             "pkey",
@@ -18550,6 +18591,7 @@ impl Lowerer {
                 .indexes
                 .alloc_key(columns[..key_len].iter().copied())
         });
+        let index_columns = self.index.indexes.alloc_key(columns.iter().copied());
         self.alloc_index_constraint(
             ConstraintKind::Unique,
             table,
@@ -18557,6 +18599,7 @@ impl Lowerer {
             name,
             index,
             key,
+            index_columns,
             is_deferrable(unique.constraint_options()),
             Some(&addition),
             "key",
@@ -19134,6 +19177,7 @@ impl Lowerer {
         let name = exclude
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
+        let columns = self.alloc_referenced_columns(refs);
         let constraint = self.alloc_index_constraint(
             ConstraintKind::Exclude,
             table,
@@ -19141,6 +19185,7 @@ impl Lowerer {
             name,
             None,
             None,
+            columns,
             is_deferrable(exclude.constraint_options()),
             Some(&addition),
             "excl",
@@ -22587,6 +22632,7 @@ impl Lowerer {
         schema: Name,
         table: Option<TableId>,
         key: Option<IdxRange<Name>>,
+        columns: IdxRange<Name>,
         unique: bool,
         partial: bool,
     ) -> Option<IndexId> {
@@ -22602,6 +22648,7 @@ impl Lowerer {
             name,
             table,
             key,
+            columns,
             unique,
             partial,
             deferrable: false,
@@ -23006,6 +23053,7 @@ impl Lowerer {
         name: Option<ast::ConstraintName>,
         using_index: Option<IndexId>,
         key: Option<IdxRange<Name>>,
+        columns: IdxRange<Name>,
         deferrable: bool,
         addition: Option<&str>,
         label: &str,
@@ -23054,6 +23102,7 @@ impl Lowerer {
             name: constraint.name,
             table: Some(table),
             key,
+            columns,
             unique,
             partial: false,
             deferrable,

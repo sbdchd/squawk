@@ -323,3 +323,72 @@ create unique index on t using bloom (a);
        ╰╴                               ━━━━━
     ");
 }
+
+#[test]
+fn drop_column_drops_dependent_indexes() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int,
+  c int
+);
+create index t_inc on t (a) include (b);
+create index t_expr on t (lower(b::text));
+create index t_pred on t (a) where c > 0;
+alter table t drop column b;
+alter table t drop column c;
+drop index t_inc;
+drop index t_expr;
+drop index t_pred;
+
+create table u (
+  a int,
+  b int,
+  unique (a) include (b)
+);
+alter table u drop column b;
+alter table u drop constraint u_a_key;
+
+create table e (
+  a int,
+  b int,
+  exclude ((a + b) with =)
+);
+alter table e drop column b;
+alter table e drop constraint e_expr_excl;
+
+create table r (
+  a int,
+  b int
+);
+create index r_expr on r ((a + b));
+alter table r rename column b to x;
+alter table r drop column x;
+drop index r_expr;
+"), @"
+    error: index `t_inc` does not exist
+       ╭▸ 
+    12 │ drop index t_inc;
+       ╰╴           ━━━━━
+    error: index `t_expr` does not exist
+       ╭▸ 
+    13 │ drop index t_expr;
+       ╰╴           ━━━━━━
+    error: index `t_pred` does not exist
+       ╭▸ 
+    14 │ drop index t_pred;
+       ╰╴           ━━━━━━
+    error: constraint `u_a_key` does not exist
+       ╭▸ 
+    22 │ alter table u drop constraint u_a_key;
+       ╰╴                              ━━━━━━━
+    error: constraint `e_expr_excl` does not exist
+       ╭▸ 
+    30 │ alter table e drop constraint e_expr_excl;
+       ╰╴                              ━━━━━━━━━━━
+    error: index `r_expr` does not exist
+       ╭▸ 
+    39 │ drop index r_expr;
+       ╰╴           ━━━━━━
+    ");
+}

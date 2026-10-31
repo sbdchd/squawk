@@ -112,6 +112,7 @@ pub struct Index {
     pub name: Name,
     pub table: Option<TableId>,
     pub(crate) key: Option<IdxRange<Name>>,
+    pub(crate) columns: IdxRange<Name>,
     pub(crate) unique: bool,
     pub(crate) partial: bool,
     pub(crate) deferrable: bool,
