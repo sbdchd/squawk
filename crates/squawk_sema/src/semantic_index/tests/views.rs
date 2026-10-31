@@ -427,3 +427,62 @@ refresh materialized view concurrently mv;
        ╰ hint: create a unique index with no `where` clause on one or more columns of the materialized view
     ");
 }
+
+#[test]
+fn create_or_replace_view_column_changes() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+create view v as select a, b from t;
+create or replace view v as select a from t;
+create or replace view v as select b, a from t;
+create or replace view v as select a, b as c from t;
+create or replace view v as select a::text, b from t;
+select b from v;
+create or replace view v as select a, b, 'x' as c from t;
+select c from v;
+"), @"
+    error: cannot drop columns from view
+      ╭▸ 
+    4 │ create or replace view v as select a from t;
+      ╰╴                            ━━━━━━━━━━━━━━━
+    error: cannot change name of view column `a` to `b`
+      ╭▸ 
+    5 │ create or replace view v as select b, a from t;
+      │                                    ━
+      │
+      ╰ hint: use `alter view ... rename column ...` to change the name of a view column instead
+    error: cannot change name of view column `b` to `c`
+      ╭▸ 
+    6 │ create or replace view v as select a, b as c from t;
+      │                                            ━
+      ╰╴
+    help: rename the view column with `alter view` first
+      ╭╴
+    6 + alter view v rename column b to c;
+      ╰╴
+    error: cannot change data type of view column `a` from `int4` to `text`
+      ╭▸ 
+    7 │ create or replace view v as select a::text, b from t;
+      ╰╴                                   ━
+    ");
+}
+
+#[test]
+fn create_or_replace_view_rename_qualified() {
+    assert_snapshot!(check("
+create schema s;
+create table t (a int);
+create view s.v as select a from t;
+create or replace view s.v as select a as x from t;
+"), @"
+    error: cannot change name of view column `a` to `x`
+      ╭▸ 
+    5 │ create or replace view s.v as select a as x from t;
+      │                                           ━
+      ╰╴
+    help: rename the view column with `alter view` first
+      ╭╴
+    5 + alter view s.v rename column a to x;
+      ╰╴
+    ");
+}

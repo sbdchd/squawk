@@ -480,6 +480,24 @@ pub(crate) enum SemaError {
     TransitionRowVariable {
         row_range: TextRange,
     },
+    ViewDropColumns,
+    ViewColumnRenamed {
+        from: Name,
+        to: Name,
+        rename: Option<ViewColumnRename>,
+    },
+    ViewColumnTypeChanged {
+        column: Name,
+        from: TyName,
+        to: TyName,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ViewColumnRename {
+    pub(crate) schema: Option<Name>,
+    pub(crate) view: Name,
+    pub(crate) insert_at: TextSize,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -876,6 +894,9 @@ impl SemaError {
             | SemaError::TransitionRowVariable { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
             SemaError::InheritedColumnRename { .. }
+            | SemaError::ViewDropColumns
+            | SemaError::ViewColumnRenamed { .. }
+            | SemaError::ViewColumnTypeChanged { .. }
             | SemaError::InheritedConstraintRename { .. }
             | SemaError::CannotRenameInheritedColumn { .. }
             | SemaError::CannotRenameInheritedConstraint { .. } => {
@@ -1082,6 +1103,37 @@ impl SemaError {
                     edits: vec![Edit::replace(table_range, "type")],
                 },
             },
+            SemaError::ViewColumnRenamed {
+                from,
+                to,
+                rename:
+                    Some(ViewColumnRename {
+                        schema,
+                        view,
+                        insert_at,
+                    }),
+            } => {
+                let view = match schema {
+                    Some(schema) => format!(
+                        "{}.{}",
+                        quote_ident(names.resolve(schema)),
+                        quote_ident(names.resolve(view))
+                    ),
+                    None => quote_ident(names.resolve(view)),
+                };
+                let rename = format!(
+                    "alter view {view} rename column {} to {}",
+                    quote_ident(names.resolve(from)),
+                    quote_ident(names.resolve(to))
+                );
+                Suggestion {
+                    message: "rename the view column with `alter view` first".into(),
+                    fix: Fix {
+                        title: format!("Insert `{rename}`").into(),
+                        edits: vec![Edit::insert(format!("{rename};\n"), insert_at)],
+                    },
+                }
+            }
             SemaError::TransitionRowVariable { row_range } => Suggestion {
                 message: "use `old table` or `new table` to name transition tables".into(),
                 fix: Fix {
@@ -1249,6 +1301,9 @@ impl SemaError {
             SemaError::CompositeTypeAlteredAsTable {
                 table_range: None, ..
             } => Some("use `alter type` instead"),
+            SemaError::ViewColumnRenamed { rename: None, .. } => Some(
+                "use `alter view ... rename column ...` to change the name of a view column instead",
+            ),
             SemaError::UnnestColumnDefList => Some(
                 "use a separate `unnest` call for each array inside `rows from`, each with its own column definition list",
             ),
@@ -1309,6 +1364,7 @@ impl SemaError {
             SemaError::TransitionRowVariable { .. } => {
                 Some("row variable naming in the `referencing` clause is not supported")
             }
+            SemaError::ViewDropColumns => Some("cannot drop columns from view"),
             _ => None,
         }
     }
@@ -1412,6 +1468,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::SubqueryTooFewColumns
             | SemaError::UnnestColumnDefList
             | SemaError::TransitionRowVariable { .. }
+            | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())
@@ -1757,6 +1814,19 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "inherited column `{}` must be renamed in child tables too",
                 n(column)
+            ),
+            SemaError::ViewColumnRenamed { from, to, .. } => write!(
+                f,
+                "cannot change name of view column `{}` to `{}`",
+                n(from),
+                n(to)
+            ),
+            SemaError::ViewColumnTypeChanged { column, from, to } => write!(
+                f,
+                "cannot change data type of view column `{}` from `{}` to `{}`",
+                n(column),
+                self.ty(from),
+                self.ty(to)
             ),
             SemaError::InheritedConstraintRename { name } => write!(
                 f,

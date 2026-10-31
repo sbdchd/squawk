@@ -44,7 +44,7 @@ use crate::{
     },
     sema_error::{
         DropRelation, ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
-        SimilarColumn, SimilarType, TriggerFunctionKind, WindowClause,
+        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -10859,17 +10859,95 @@ impl Lowerer {
             None => columns,
         };
         let persistence = Persistence::from_ast(create_view.persistence().as_ref());
-        if let Some(table) = self.alloc_table(
-            TableKind::View,
-            persistence,
-            IfExists::from_or_replace(create_view.or_replace().as_ref()),
-            create_view.syntax(),
-            &path,
-            columns,
-        ) {
-            self.alloc_return_rule(table);
+        let Some(segment) = path.segment() else {
+            return;
+        };
+        let name = self.intern(&segment.text());
+        let schema = match path.qualifier() {
+            None if persistence == Persistence::Temp => self.pg_temp,
+            _ => self.creation_schema(&path),
+        };
+        let if_exists = IfExists::from_or_replace(create_view.or_replace().as_ref());
+        if if_exists == IfExists::Replace
+            && let Some(old) = self
+                .find_table(Some(schema), name)
+                .filter(|table| self.index.tables[*table].kind == TableKind::View)
+            && self.view_replace_rejected(old, &columns, create_view)
+        {
+            return;
         }
+        let table = self.alloc_table_in(
+            TableKind::View,
+            if_exists,
+            create_view.syntax(),
+            schema,
+            name,
+            segment.syntax(),
+            columns,
+        );
+        self.alloc_return_rule(table);
         self.depend_on_refs(refs, self.index.tables.range_from(start), Object::Table);
+    }
+
+    fn view_replace_rejected(
+        &mut self,
+        view: TableId,
+        new: &Columns,
+        create_view: &ast::CreateView,
+    ) -> bool {
+        let old = self.index.tables[view].columns;
+        if !old.complete || !new.complete {
+            return false;
+        }
+        if new.range.len() < old.range.len() {
+            match create_view.query() {
+                Some(query) => self.push_error(query.syntax(), SemaError::ViewDropColumns),
+                None => self.push_error(create_view.syntax(), SemaError::ViewDropColumns),
+            }
+            return true;
+        }
+        for (old_id, new_id) in old.range.iter().zip(new.range.iter()) {
+            let old_column = self.index.columns[old_id];
+            let new_column = self.index.columns[new_id];
+            let (Some(from), Some(to)) = (old_column.name, new_column.name) else {
+                continue;
+            };
+            if from != to {
+                let clear =
+                    !self.columns_contain(new.range, from) && !self.columns_contain(old.range, to);
+                let rename = clear.then(|| {
+                    let Table { schema, name, .. } = self.index.tables[view];
+                    let qualified = create_view
+                        .view()
+                        .and_then(|view| view.path())
+                        .is_some_and(|path| path.qualifier().is_some());
+                    ViewColumnRename {
+                        schema: qualified.then_some(schema),
+                        view: name,
+                        insert_at: self.node_range(create_view.syntax()).start(),
+                    }
+                });
+                self.push_error_ptr(
+                    new_column.ptr,
+                    SemaError::ViewColumnRenamed { from, to, rename },
+                );
+                return true;
+            }
+            if let (Some(old_ty), Some(new_ty)) = (old_column.ty, new_column.ty)
+                && old_ty != new_ty
+            {
+                self.push_error_ptr(
+                    new_column.ptr,
+                    SemaError::ViewColumnTypeChanged {
+                        column: from,
+                        from: self.index.ty_name(old_ty),
+                        to: self.index.ty_name(new_ty),
+                    },
+                );
+                return true;
+            }
+        }
+        false
     }
 
     fn lower_create_materialized_view(&mut self, create_view: &ast::CreateMaterializedView) {
