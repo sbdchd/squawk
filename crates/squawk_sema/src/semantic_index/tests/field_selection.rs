@@ -179,3 +179,25 @@ select (f).x from rows from (generate_series(1, 2)) as f(x);
       ╰╴           ━
     ");
 }
+
+#[test]
+fn record_field_selection_is_unchecked() {
+    assert_snapshot!(check("
+select (row(1, 2)).f1, ((1, 2)).f2;
+"), @"no diagnostics");
+}
+
+#[test]
+fn domain_over_composite_field_selection() {
+    assert_snapshot!(check("
+create type c as (x int);
+create domain d as c;
+create table u (dc d);
+select (dc).x, (dc).*, (dc).zz from u;
+"), @"
+    error: column `zz` does not exist
+      ╭▸ 
+    5 │ select (dc).x, (dc).*, (dc).zz from u;
+      ╰╴                            ━━
+    ");
+}

@@ -14308,7 +14308,7 @@ impl Lowerer {
     }
 
     fn ty_columns(&self, ty: Ty) -> Option<&Columns> {
-        match ty {
+        match self.index.base_type(ty)? {
             Ty::Type(ty) => self.index.types[ty].columns.as_ref(),
             Ty::Table(table) => Some(&self.index.tables[table].columns),
             Ty::Cte(cte) => Some(&self.index.ctes[cte].columns),
