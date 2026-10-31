@@ -231,3 +231,36 @@ select a from u;
       ╰╴           ━
     ");
 }
+
+#[test]
+fn rename_column_only_with_children() {
+    assert_snapshot!(check("
+create table t (a int);
+create table child () inherits (t);
+create table p (a int) partition by list (a);
+create table p1 partition of p for values in (1);
+create table lone (a int);
+alter type t rename attribute a to z;
+alter table only t rename column a to z;
+alter table only p rename column a to z;
+alter table only lone rename column a to z;
+select a from t;
+select a from child;
+select z from lone;
+alter table t rename column a to z;
+select z from child;
+"), @"
+    error: inherited column `a` must be renamed in child tables too
+      ╭▸ 
+    7 │ alter type t rename attribute a to z;
+      ╰╴                              ━
+    error: inherited column `a` must be renamed in child tables too
+      ╭▸ 
+    8 │ alter table only t rename column a to z;
+      ╰╴                                 ━
+    error: inherited column `a` must be renamed in child tables too
+      ╭▸ 
+    9 │ alter table only p rename column a to z;
+      ╰╴                                 ━
+    ");
+}

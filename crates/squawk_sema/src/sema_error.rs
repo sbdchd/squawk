@@ -338,6 +338,9 @@ pub(crate) enum SemaError {
         name: Name,
         table_range: Option<TextRange>,
     },
+    InheritedColumnRename {
+        column: Name,
+    },
     UnresolvedOperator {
         schema: Option<Name>,
         name: Name,
@@ -853,6 +856,7 @@ impl SemaError {
             | SemaError::DefaultColumnReference
             | SemaError::UnnestColumnDefList => DiagnosticKind::FeatureNotSupported,
             SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
+            SemaError::InheritedColumnRename { .. } => DiagnosticKind::InvalidTableDefinition,
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -1686,6 +1690,11 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::CompositeTypeAlteredAsTable { name, .. } => {
                 write!(f, "`{}` is a composite type", n(name))
             }
+            SemaError::InheritedColumnRename { column } => write!(
+                f,
+                "inherited column `{}` must be renamed in child tables too",
+                n(column)
+            ),
             SemaError::AggregateDroppedAsFunction { schema, name, .. } => match schema {
                 Some(schema) => write!(f, "`{}.{}` is an aggregate function", n(schema), n(name)),
                 None => write!(f, "`{}` is an aggregate function", n(name)),

@@ -145,6 +145,7 @@ pub enum DiagnosticKind {
     ConflictingNullability,
     FeatureNotSupported,
     InvalidColumnReference,
+    InvalidTableDefinition,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]

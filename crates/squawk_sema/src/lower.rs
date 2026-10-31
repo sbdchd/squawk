@@ -1834,6 +1834,25 @@ impl Lowerer {
         }
     }
 
+    fn rename_table_column_only(
+        &mut self,
+        table: TableId,
+        from: Name,
+        from_node: &SyntaxNode,
+        name_node: &impl NameLike,
+    ) {
+        if self
+            .inheritances
+            .children(table)
+            .iter()
+            .any(|inheritance| self.is_live_child(inheritance.child))
+        {
+            self.push_error(from_node, SemaError::InheritedColumnRename { column: from });
+            return;
+        }
+        self.rename_table_column(table, from, name_node);
+    }
+
     fn rename_column_dependents(&mut self, table: TableId, from: Name, to: Name) {
         if !self.index.tables.is_local(table) {
             return;
@@ -11239,7 +11258,7 @@ impl Lowerer {
                 if let Some(field_ref) = rename.composite_field_ref() {
                     let from = self.lower_table_column_name(Some(table), &field_ref);
                     if let Some(field) = rename.composite_field() {
-                        self.rename_table_column(table, from, &field);
+                        self.rename_table_column_only(table, from, field_ref.syntax(), &field);
                     }
                 }
             }
@@ -15652,7 +15671,16 @@ impl Lowerer {
                         if let Some(table) = table
                             && let Some(new_name) = rename.column_name()
                         {
-                            self.rename_table_column(table, name, &new_name);
+                            if recurse {
+                                self.rename_table_column(table, name, &new_name);
+                            } else {
+                                self.rename_table_column_only(
+                                    table,
+                                    name,
+                                    column_ref.syntax(),
+                                    &new_name,
+                                );
+                            }
                         }
                     }
                     continue;
