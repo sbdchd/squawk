@@ -341,6 +341,15 @@ pub(crate) enum SemaError {
     InheritedColumnRename {
         column: Name,
     },
+    InheritedConstraintRename {
+        name: Name,
+    },
+    CannotRenameInheritedColumn {
+        column: Name,
+    },
+    CannotRenameInheritedConstraint {
+        name: Name,
+    },
     UnresolvedOperator {
         schema: Option<Name>,
         name: Name,
@@ -856,7 +865,12 @@ impl SemaError {
             | SemaError::DefaultColumnReference
             | SemaError::UnnestColumnDefList => DiagnosticKind::FeatureNotSupported,
             SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
-            SemaError::InheritedColumnRename { .. } => DiagnosticKind::InvalidTableDefinition,
+            SemaError::InheritedColumnRename { .. }
+            | SemaError::InheritedConstraintRename { .. }
+            | SemaError::CannotRenameInheritedColumn { .. }
+            | SemaError::CannotRenameInheritedConstraint { .. } => {
+                DiagnosticKind::InvalidTableDefinition
+            }
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -1695,6 +1709,17 @@ impl fmt::Display for ErrorMessage<'_> {
                 "inherited column `{}` must be renamed in child tables too",
                 n(column)
             ),
+            SemaError::InheritedConstraintRename { name } => write!(
+                f,
+                "inherited constraint `{}` must be renamed in child tables too",
+                n(name)
+            ),
+            SemaError::CannotRenameInheritedColumn { column } => {
+                write!(f, "cannot rename inherited column `{}`", n(column))
+            }
+            SemaError::CannotRenameInheritedConstraint { name } => {
+                write!(f, "cannot rename inherited constraint `{}`", n(name))
+            }
             SemaError::AggregateDroppedAsFunction { schema, name, .. } => match schema {
                 Some(schema) => write!(f, "`{}.{}` is an aggregate function", n(schema), n(name)),
                 None => write!(f, "`{}` is an aggregate function", n(name)),

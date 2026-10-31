@@ -142,6 +142,7 @@ pub struct Constraint {
     pub name: Name,
     pub owner: ConstraintOwner,
     pub(crate) index: Option<IndexId>,
+    pub(crate) no_inherit: bool,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     pub name_ptr: InIrFile<SyntaxNodePtr>,
 }

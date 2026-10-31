@@ -264,3 +264,83 @@ select z from child;
       ╰╴                                 ━
     ");
 }
+
+#[test]
+fn rename_inherited_column() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+create table child () inherits (t);
+create table grandchild () inherits (child);
+create table p (a int) partition by list (a);
+create table p1 partition of p for values in (1);
+create table q (a int);
+create table multi () inherits (t, q);
+alter table child rename column a to z;
+alter table grandchild rename column a to z;
+alter table p1 rename column a to z;
+alter table t rename column a to z;
+alter table t rename column b to z;
+"), @"
+    error: cannot rename inherited column `a`
+      ╭▸ 
+    9 │ alter table child rename column a to z;
+      ╰╴                                ━
+    error: cannot rename inherited column `a`
+       ╭▸ 
+    10 │ alter table grandchild rename column a to z;
+       ╰╴                                     ━
+    error: cannot rename inherited column `a`
+       ╭▸ 
+    11 │ alter table p1 rename column a to z;
+       ╰╴                             ━
+    error: cannot rename inherited column `a`
+       ╭▸ 
+    12 │ alter table t rename column a to z;
+       ╰╴                            ━
+    ");
+}
+
+#[test]
+fn rename_inherited_constraint() {
+    assert_snapshot!(check("
+create table t (
+  a int constraint c check (a > 0),
+  b int constraint nn not null,
+  constraint ni check (b > 0) no inherit,
+  constraint u unique (a)
+);
+create table child () inherits (t);
+create table grandchild () inherits (child);
+create table q (a int constraint c check (a > 0));
+create table multi () inherits (t, q);
+alter table child rename constraint c to d;
+alter table child rename constraint nn to d;
+alter table grandchild rename constraint c to d;
+alter table only t rename constraint c to d;
+alter table only t rename constraint ni to d2;
+alter table only t rename constraint u to d3;
+alter table t rename constraint c to d;
+alter table t rename constraint nn to d4;
+"), @"
+    error: cannot rename inherited constraint `c`
+       ╭▸ 
+    12 │ alter table child rename constraint c to d;
+       ╰╴                                    ━
+    error: cannot rename inherited constraint `nn`
+       ╭▸ 
+    13 │ alter table child rename constraint nn to d;
+       ╰╴                                    ━━
+    error: cannot rename inherited constraint `c`
+       ╭▸ 
+    14 │ alter table grandchild rename constraint c to d;
+       ╰╴                                         ━
+    error: inherited constraint `c` must be renamed in child tables too
+       ╭▸ 
+    15 │ alter table only t rename constraint c to d;
+       ╰╴                                     ━
+    error: cannot rename inherited constraint `c`
+       ╭▸ 
+    18 │ alter table t rename constraint c to d;
+       ╰╴                                ━
+    ");
+}

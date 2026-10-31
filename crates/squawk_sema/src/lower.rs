@@ -732,6 +732,48 @@ impl InheritanceGraph {
             .get(&child)
             .map_or(&[], |parents| parents.as_slice())
     }
+
+    fn descendants(
+        &self,
+        table: TableId,
+        is_live: impl Fn(TableId) -> bool,
+    ) -> SmallVec<[TableId; 8]> {
+        Self::walk(table, is_live, |table| {
+            self.children(table)
+                .iter()
+                .map(|inheritance| inheritance.child)
+        })
+    }
+
+    fn ancestors(
+        &self,
+        table: TableId,
+        is_live: impl Fn(TableId) -> bool,
+    ) -> SmallVec<[TableId; 8]> {
+        Self::walk(table, is_live, |table| {
+            self.parents(table)
+                .iter()
+                .map(|inheritance| inheritance.parent)
+        })
+    }
+
+    fn walk<I: Iterator<Item = TableId>>(
+        table: TableId,
+        is_live: impl Fn(TableId) -> bool,
+        next: impl Fn(TableId) -> I,
+    ) -> SmallVec<[TableId; 8]> {
+        let mut found: SmallVec<[TableId; 8]> = smallvec![];
+        let mut stack: SmallVec<[TableId; 8]> = smallvec![table];
+        while let Some(current) = stack.pop() {
+            for related in next(current) {
+                if related != table && is_live(related) && !found.contains(&related) {
+                    found.push(related);
+                    stack.push(related);
+                }
+            }
+        }
+        found
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -1834,23 +1876,145 @@ impl Lowerer {
         }
     }
 
-    fn rename_table_column_only(
+    fn rename_table_column_checked(
         &mut self,
         table: TableId,
         from: Name,
         from_node: &SyntaxNode,
         name_node: &impl NameLike,
+        recurse: bool,
     ) {
-        if self
-            .inheritances
-            .children(table)
-            .iter()
-            .any(|inheritance| self.is_live_child(inheritance.child))
-        {
+        if !recurse && self.has_live_children(table) {
             self.push_error(from_node, SemaError::InheritedColumnRename { column: from });
             return;
         }
+        if self.find_table_column(table, from).is_none() {
+            return;
+        }
+        if self.inherited_from_outside(table, recurse, |this, table| {
+            this.inherited_column_count(table, from)
+        }) {
+            self.push_error(
+                from_node,
+                SemaError::CannotRenameInheritedColumn { column: from },
+            );
+            return;
+        }
         self.rename_table_column(table, from, name_node);
+    }
+
+    fn rename_table_constraint(
+        &mut self,
+        table: TableId,
+        constraint: Option<ConstraintId>,
+        name_ref: &ast::ConstraintNameRef,
+        new_name: &ast::ConstraintName,
+        recurse: bool,
+        node: &SyntaxNode,
+    ) {
+        let Some(segment) = name_ref.path_ref().and_then(|path| path.segment()) else {
+            return;
+        };
+        let name = self.intern(&segment.text());
+        let inheritable =
+            constraint.is_none_or(|constraint| self.inheritable_constraint(constraint));
+        if inheritable {
+            if constraint.is_some() && !recurse && self.has_live_children(table) {
+                self.push_error(
+                    segment.syntax(),
+                    SemaError::InheritedConstraintRename { name },
+                );
+                return;
+            }
+            if self.inherited_from_outside(table, recurse, |this, table| {
+                this.inherited_constraint_count(table, name)
+            }) {
+                self.push_error(
+                    segment.syntax(),
+                    SemaError::CannotRenameInheritedConstraint { name },
+                );
+                return;
+            }
+        }
+        if let Some(constraint) = constraint {
+            self.rename_constraint(constraint, new_name, node);
+        }
+    }
+
+    fn has_live_children(&self, table: TableId) -> bool {
+        self.inheritances
+            .children(table)
+            .iter()
+            .any(|inheritance| self.is_live_child(inheritance.child))
+    }
+
+    fn live_parents(&self, table: TableId) -> impl Iterator<Item = TableId> + '_ {
+        self.inheritances
+            .parents(table)
+            .iter()
+            .map(|inheritance| inheritance.parent)
+            .filter(|parent| !self.dropped_tables.contains(parent))
+    }
+
+    fn inherited_from_outside(
+        &self,
+        table: TableId,
+        recurse: bool,
+        inherited_count: impl Fn(&Self, TableId) -> usize,
+    ) -> bool {
+        if inherited_count(self, table) > 0 {
+            return true;
+        }
+        if !recurse {
+            return false;
+        }
+        let descendants = self
+            .inheritances
+            .descendants(table, |child| self.is_live_child(child));
+        descendants.iter().any(|&descendant| {
+            let parents_in_hierarchy = self
+                .live_parents(descendant)
+                .filter(|parent| *parent == table || descendants.contains(parent))
+                .count();
+            inherited_count(self, descendant) > parents_in_hierarchy
+        })
+    }
+
+    fn inherited_column_count(&self, table: TableId, column: Name) -> usize {
+        self.live_parents(table)
+            .filter(|parent| self.find_table_column(*parent, column).is_some())
+            .count()
+    }
+
+    fn inherited_constraint_count(&self, table: TableId, name: Name) -> usize {
+        self.live_parents(table)
+            .filter(|parent| self.has_inheritable_constraint(*parent, name))
+            .count()
+    }
+
+    fn has_inheritable_constraint(&self, table: TableId, name: Name) -> bool {
+        std::iter::once(table)
+            .chain(
+                self.inheritances
+                    .ancestors(table, |parent| !self.dropped_tables.contains(&parent)),
+            )
+            .any(|table| {
+                self.find_constraint(ConstraintOwner::Table(table), name)
+                    .is_some_and(|constraint| self.inheritable_constraint(constraint))
+            })
+    }
+
+    fn inheritable_constraint(&self, constraint: ConstraintId) -> bool {
+        let constraint = &self.index.constraints[constraint];
+        let inheritable_kind = match constraint.kind {
+            ConstraintKind::Check | ConstraintKind::NotNull { .. } => true,
+            ConstraintKind::PrimaryKey
+            | ConstraintKind::Unique
+            | ConstraintKind::ForeignKey
+            | ConstraintKind::Exclude
+            | ConstraintKind::DomainNotNull => false,
+        };
+        inheritable_kind && !constraint.no_inherit
     }
 
     fn rename_column_dependents(&mut self, table: TableId, from: Name, to: Name) {
@@ -11258,7 +11422,13 @@ impl Lowerer {
                 if let Some(field_ref) = rename.composite_field_ref() {
                     let from = self.lower_table_column_name(Some(table), &field_ref);
                     if let Some(field) = rename.composite_field() {
-                        self.rename_table_column_only(table, from, field_ref.syntax(), &field);
+                        self.rename_table_column_checked(
+                            table,
+                            from,
+                            field_ref.syntax(),
+                            &field,
+                            false,
+                        );
                     }
                 }
             }
@@ -12071,7 +12241,11 @@ impl Lowerer {
         node: &SyntaxNode,
     ) {
         let Constraint {
-            kind, owner, index, ..
+            kind,
+            owner,
+            index,
+            no_inherit,
+            ..
         } = self.index.constraints[constraint];
         let moved = self.index.constraints.next_idx();
         if self.dropped_constraints.insert(constraint) && self.in_transaction() {
@@ -12082,6 +12256,7 @@ impl Lowerer {
             name,
             owner,
             index,
+            no_inherit,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node),
         });
@@ -15671,16 +15846,13 @@ impl Lowerer {
                         if let Some(table) = table
                             && let Some(new_name) = rename.column_name()
                         {
-                            if recurse {
-                                self.rename_table_column(table, name, &new_name);
-                            } else {
-                                self.rename_table_column_only(
-                                    table,
-                                    name,
-                                    column_ref.syntax(),
-                                    &new_name,
-                                );
-                            }
+                            self.rename_table_column_checked(
+                                table,
+                                name,
+                                column_ref.syntax(),
+                                &new_name,
+                                recurse,
+                            );
                         }
                     }
                     continue;
@@ -15722,15 +15894,19 @@ impl Lowerer {
                     continue;
                 }
                 ast::AlterTableAction::RenameConstraint(rename) => {
-                    if let Some(name_ref) = rename.constraint_name_ref()
-                        && let Some(constraint) = self.lower_constraint_ref(
+                    if let Some(name_ref) = rename.constraint_name_ref() {
+                        let constraint = self.lower_constraint_ref(
                             table.map(ConstraintOwner::Table),
                             &name_ref,
                             IfMissing::Error,
-                        )
-                        && let Some(name) = rename.constraint_name()
-                    {
-                        self.rename_constraint(constraint, &name, node);
+                        );
+                        if let Some(table) = table
+                            && let Some(name) = rename.constraint_name()
+                        {
+                            self.rename_table_constraint(
+                                table, constraint, &name_ref, &name, recurse, node,
+                            );
+                        }
                     }
                     continue;
                 }
@@ -22782,6 +22958,7 @@ impl Lowerer {
             name: name_id,
             owner,
             index,
+            no_inherit: constraint_no_inherit(node),
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.as_ref().map_or(node, |name| name.syntax())),
         });
@@ -23617,6 +23794,19 @@ fn index_column_names(create_index: &ast::CreateIndex) -> String {
             }
         },
     ))
+}
+
+fn constraint_no_inherit(node: &SyntaxNode) -> bool {
+    let options = if let Some(check) = ast::CheckConstraint::cast(node.clone()) {
+        check.constraint_options()
+    } else if let Some(not_null) = ast::NotNullConstraint::cast(node.clone()) {
+        not_null.constraint_options()
+    } else {
+        return false;
+    };
+    options
+        .into_iter()
+        .any(|option| matches!(option, ast::ConstraintOption::NoInherit(_)))
 }
 
 fn is_deferrable(mut options: ast::AstChildren<ast::ConstraintOption>) -> bool {
