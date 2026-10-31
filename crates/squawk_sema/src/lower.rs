@@ -14372,16 +14372,20 @@ impl Lowerer {
                     .alias()
                     .filter(|_| alias_columns.is_none())
                     .and_then(|alias| alias.name());
-                let has_column_defs =
-                    matches!(alias_columns, Some(ast::FromAliasColumns::ColumnDefList(_)));
+                let column_defs = match alias_columns {
+                    Some(ast::FromAliasColumns::ColumnDefList(list)) => Some(list),
+                    Some(ast::FromAliasColumns::ColumnList(_)) | None => None,
+                };
                 let FunctionSource {
                     callee,
                     function,
                     columns,
                 } = match function_item.call_expr() {
-                    Some(call) => {
-                        self.lower_function_source(&call, scalar_alias.as_ref(), has_column_defs)
-                    }
+                    Some(call) => self.lower_function_source(
+                        &call,
+                        scalar_alias.as_ref(),
+                        column_defs.as_ref(),
+                    ),
                     None => FunctionSource {
                         callee: None,
                         function: None,
@@ -14958,7 +14962,7 @@ impl Lowerer {
                     self.with_from_function(|this| this.lower_call(&call));
                     self.column_def_list_columns(&list)
                 }
-                (Some(call), None) => self.lower_function_source(&call, None, false).columns,
+                (Some(call), None) => self.lower_function_source(&call, None, None).columns,
                 (None, Some(list)) => self.column_def_list_columns(&list),
                 (None, None) => self.unknown_columns(),
             };
@@ -14977,9 +14981,12 @@ impl Lowerer {
         &mut self,
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
-        has_column_defs: bool,
+        column_defs: Option<&ast::ColumnDefList>,
     ) -> FunctionSource {
-        if !has_column_defs && let Some(name_ref) = expanded_unnest(call) {
+        if let Some(name_ref) = expanded_unnest(call) {
+            if let Some(column_defs) = column_defs {
+                self.push_error(column_defs.syntax(), SemaError::UnnestColumnDefList);
+            }
             return self.lower_expanded_unnest(call, &name_ref);
         }
         let LoweredCall { args, callee } =

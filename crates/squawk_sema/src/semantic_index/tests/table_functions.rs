@@ -125,12 +125,12 @@ select x, y
 from t,
   unnest(a, b) as u (x int, y text);
 "), @"
-    error: function `unnest(int4[], text[])` does not exist
+    error: `unnest` with multiple arguments cannot have a column definition list
       ╭▸ 
     5 │   unnest(a, b) as u (x int, y text);
-      │   ━━━━━━
+      │                     ━━━━━━━━━━━━━━━
       │
-      ╰ hint: consider adding explicit type casts
+      ╰ hint: use a separate `unnest` call for each array inside `rows from`, each with its own column definition list
     ");
 }
 

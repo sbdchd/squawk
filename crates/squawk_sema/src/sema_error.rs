@@ -454,6 +454,7 @@ pub(crate) enum SemaError {
         table: Name,
     },
     RowLengthMismatch,
+    UnnestColumnDefList,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -828,9 +829,9 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
-            SemaError::MisplacedSubquery { .. } | SemaError::DefaultColumnReference => {
-                DiagnosticKind::FeatureNotSupported
-            }
+            SemaError::MisplacedSubquery { .. }
+            | SemaError::DefaultColumnReference
+            | SemaError::UnnestColumnDefList => DiagnosticKind::FeatureNotSupported,
             SemaError::GeneratedColumnReference { .. } => DiagnosticKind::InvalidColumnReference,
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
@@ -1134,6 +1135,9 @@ impl SemaError {
                 function_range: None,
                 ..
             } => Some("use `drop aggregate` to drop aggregate functions"),
+            SemaError::UnnestColumnDefList => Some(
+                "use a separate `unnest` call for each array inside `rows from`, each with its own column definition list",
+            ),
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
@@ -1185,6 +1189,9 @@ impl SemaError {
             SemaError::SubqueryNotSingleColumn => Some("subquery must return only one column"),
             SemaError::SubqueryTooManyColumns => Some("subquery has too many columns"),
             SemaError::SubqueryTooFewColumns => Some("subquery has too few columns"),
+            SemaError::UnnestColumnDefList => {
+                Some("`unnest` with multiple arguments cannot have a column definition list")
+            }
             _ => None,
         }
     }
@@ -1286,6 +1293,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::SubqueryNotSingleColumn
             | SemaError::SubqueryTooManyColumns
             | SemaError::SubqueryTooFewColumns
+            | SemaError::UnnestColumnDefList
             | SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())
