@@ -255,3 +255,25 @@ select (null).zz;
       ╰╴              ━━
     ");
 }
+
+#[test]
+fn untyped_composite_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+prepare p(t) as select ($1).zz;
+select (coalesce(t, t)).zz, (case when true then t end).zz from t;
+"), @"
+    error: column `zz` does not exist
+      ╭▸ 
+    3 │ prepare p(t) as select ($1).zz;
+      ╰╴                            ━━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (coalesce(t, t)).zz, (case when true then t end).zz from t;
+      ╰╴                        ━━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (coalesce(t, t)).zz, (case when true then t end).zz from t;
+      ╰╴                                                        ━━
+    ");
+}

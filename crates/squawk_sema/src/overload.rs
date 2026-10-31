@@ -18,6 +18,15 @@ pub(crate) enum ArgType {
     Untyped,
 }
 
+impl ArgType {
+    pub(crate) fn known(self) -> Option<Ty> {
+        match self {
+            ArgType::Known(ty) => Some(ty),
+            ArgType::UnknownLiteral | ArgType::Untyped => None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, Default)]
 pub(crate) struct CallArg {
     pub(crate) name: Option<Name>,
@@ -31,6 +40,54 @@ impl CallArg {
             ty,
             ..CallArg::default()
         }
+    }
+}
+
+pub(crate) struct CommonType {
+    common: Option<Ty>,
+    untyped: bool,
+    all_unknown: bool,
+}
+
+impl CommonType {
+    pub(crate) fn new(start: ArgType) -> CommonType {
+        CommonType {
+            common: match start {
+                ArgType::Known(ty) => Some(ty),
+                ArgType::UnknownLiteral | ArgType::Untyped => None,
+            },
+            untyped: start == ArgType::Untyped,
+            all_unknown: true,
+        }
+    }
+
+    pub(crate) fn push(&mut self, overloads: &Overloads<'_>, arg: ArgType) {
+        match arg {
+            ArgType::Known(ty) => {
+                self.all_unknown = false;
+                self.common = match self.common {
+                    Some(common) => overloads.select_common_type(common, ty),
+                    None if self.untyped => None,
+                    None => Some(ty),
+                };
+                self.untyped |= self.common.is_none();
+            }
+            ArgType::UnknownLiteral => {}
+            ArgType::Untyped => {
+                self.all_unknown = false;
+                self.untyped = true;
+            }
+        }
+    }
+
+    pub(crate) fn finish(self) -> ArgType {
+        if self.untyped {
+            return ArgType::Untyped;
+        }
+        if self.all_unknown {
+            return ArgType::UnknownLiteral;
+        }
+        self.common.map_or(ArgType::Untyped, ArgType::Known)
     }
 }
 
