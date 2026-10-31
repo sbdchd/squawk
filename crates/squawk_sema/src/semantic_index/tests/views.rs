@@ -131,14 +131,21 @@ select * from m;
        ╭▸ 
     10 │ drop materialized view v;
        │                        ━
-       │
-       ╰ hint: use `drop view` to remove a view
+       ╰╴
+    help: use `drop view` to remove a view
+       ╭╴
+    10 - drop materialized view v;
+    10 + drop view v;
+       ╰╴
     error: `m` is not a view
        ╭▸ 
     11 │ drop view m;
        │           ━
-       │
-       ╰ hint: use `drop materialized view` to remove a materialized view
+       ╰╴
+    help: use `drop materialized view` to remove a materialized view
+       ╭╴
+    11 │ drop materialized view m;
+       ╰╴     ++++++++++++
     error: relation `nope` does not exist
        ╭▸ 
     12 │ drop materialized view m, nope;

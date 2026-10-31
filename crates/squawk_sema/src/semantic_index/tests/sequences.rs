@@ -32,20 +32,32 @@ alter sequence if exists s restart;
       ╭▸ 
     7 │ drop sequence s;
       │               ━
-      │
-      ╰ hint: use `drop table` to remove a table
+      ╰╴
+    help: use `drop table` to remove a table
+      ╭╴
+    7 - drop sequence s;
+    7 + drop table s;
+      ╰╴
     error: `s` is not a sequence
       ╭▸ 
     8 │ drop sequence s;
       │               ━
-      │
-      ╰ hint: use `drop table` to remove a table
+      ╰╴
+    help: use `drop table` to remove a table
+      ╭╴
+    8 - drop sequence s;
+    8 + drop table s;
+      ╰╴
     error: `s` is not a sequence
       ╭▸ 
     9 │ drop sequence if exists s;
       │                         ━
-      │
-      ╰ hint: use `drop table` to remove a table
+      ╰╴
+    help: use `drop table` to remove a table
+      ╭╴
+    9 - drop sequence if exists s;
+    9 + drop table if exists s;
+      ╰╴
     error: `s` is not a sequence
        ╭▸ 
     10 │ alter sequence s restart;
@@ -106,20 +118,32 @@ drop view s;
       ╭▸ 
     4 │ drop table s;
       │            ━
-      │
-      ╰ hint: use `drop sequence` to remove a sequence
+      ╰╴
+    help: use `drop sequence` to remove a sequence
+      ╭╴
+    4 - drop table s;
+    4 + drop sequence s;
+      ╰╴
     error: `t` is not a sequence
       ╭▸ 
     5 │ drop sequence t;
       │               ━
-      │
-      ╰ hint: use `drop table` to remove a table
+      ╰╴
+    help: use `drop table` to remove a table
+      ╭╴
+    5 - drop sequence t;
+    5 + drop table t;
+      ╰╴
     error: `s` is not a view
       ╭▸ 
     6 │ drop view s;
       │           ━
-      │
-      ╰ hint: use `drop sequence` to remove a sequence
+      ╰╴
+    help: use `drop sequence` to remove a sequence
+      ╭╴
+    6 - drop view s;
+    6 + drop sequence s;
+      ╰╴
     ");
 }
 

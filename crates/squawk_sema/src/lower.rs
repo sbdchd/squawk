@@ -43,7 +43,7 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
+        DropRelation, ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
         SimilarColumn, SimilarType, TriggerFunctionKind, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
@@ -1712,6 +1712,10 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_table.if_exists().as_ref()),
             TableLookup::Table,
             drop_table.drop_behavior().as_ref(),
+            drop_table
+                .table_token()
+                .filter(|_| drop_table.table_name_refs().nth(1).is_none())
+                .map(|token| self.token_range(&token)),
         );
     }
 
@@ -1721,6 +1725,10 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_view.if_exists().as_ref()),
             TableLookup::View,
             drop_view.drop_behavior().as_ref(),
+            drop_view
+                .view_token()
+                .filter(|_| drop_view.view_refs().nth(1).is_none())
+                .map(|token| self.token_range(&token)),
         );
     }
 
@@ -1730,6 +1738,11 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_view.if_exists().as_ref()),
             TableLookup::MaterializedView,
             drop_view.drop_behavior().as_ref(),
+            drop_view
+                .materialized_token()
+                .zip(drop_view.view_token())
+                .filter(|_| drop_view.view_refs().nth(1).is_none())
+                .map(|(first, last)| self.token_range(&first).cover(self.token_range(&last))),
         );
     }
 
@@ -2470,12 +2483,16 @@ impl Lowerer {
 
     fn lower_drop_sequence(&mut self, drop_sequence: &ast::DropSequence) {
         let if_missing = IfMissing::from_if_exists(drop_sequence.if_exists().as_ref());
+        let keyword_range = drop_sequence
+            .sequence_token()
+            .filter(|_| drop_sequence.sequence_refs().nth(1).is_none())
+            .map(|token| self.token_range(&token));
         for path in drop_sequence
             .sequence_refs()
             .filter_map(|sequence| sequence.path_ref())
         {
             if let Some(sequence) =
-                self.lower_drop_table_ref(&path, if_missing, TableLookup::Sequence)
+                self.lower_drop_table_ref(&path, if_missing, TableLookup::Sequence, keyword_range)
             {
                 self.drop_table(sequence);
             }
@@ -3923,10 +3940,12 @@ impl Lowerer {
         if_missing: IfMissing,
         lookup: TableLookup,
         drop_behavior: Option<&ast::DropBehavior>,
+        keyword_range: Option<TextRange>,
     ) {
         let mut targets: SmallVec<[(ast::PathRef, TableId); 4]> = SmallVec::new();
         for path in paths {
-            if let Some(table) = self.lower_drop_table_ref(&path, if_missing, lookup) {
+            if let Some(table) = self.lower_drop_table_ref(&path, if_missing, lookup, keyword_range)
+            {
                 targets.push((path, table));
             }
         }
@@ -7136,9 +7155,15 @@ impl Lowerer {
             .and_then(|graph| graph.path_ref())
         {
             let if_missing = IfMissing::from_if_exists(drop_property_graph.if_exists().as_ref());
-            if let Some(graph) =
-                self.lower_drop_table_ref(&path, if_missing, TableLookup::PropertyGraph)
-            {
+            if let Some(graph) = self.lower_drop_table_ref(
+                &path,
+                if_missing,
+                TableLookup::PropertyGraph,
+                drop_property_graph
+                    .property_token()
+                    .zip(drop_property_graph.graph_token())
+                    .map(|(first, last)| self.token_range(&first).cover(self.token_range(&last))),
+            ) {
                 self.drop_table(graph);
             }
         }
@@ -10761,7 +10786,7 @@ impl Lowerer {
                         table,
                         TableLookup::Like,
                         segment.syntax(),
-                        false,
+                        None,
                     );
                     return None;
                 }
@@ -15416,7 +15441,7 @@ impl Lowerer {
         if_missing: IfMissing,
         lookup: TableLookup,
     ) -> Option<TableId> {
-        self.resolve_table_ref(path, if_missing, lookup, false)
+        self.resolve_table_ref(path, if_missing, lookup, None)
     }
 
     fn lower_drop_table_ref(
@@ -15424,8 +15449,14 @@ impl Lowerer {
         path: &ast::PathRef,
         if_missing: IfMissing,
         lookup: TableLookup,
+        keyword_range: Option<TextRange>,
     ) -> Option<TableId> {
-        self.resolve_table_ref(path, if_missing, lookup, true)
+        self.resolve_table_ref(
+            path,
+            if_missing,
+            lookup,
+            Some(DropRelation { keyword_range }),
+        )
     }
 
     fn resolve_table_ref(
@@ -15433,7 +15464,7 @@ impl Lowerer {
         path: &ast::PathRef,
         if_missing: IfMissing,
         lookup: TableLookup,
-        drop: bool,
+        drop: Option<DropRelation>,
     ) -> Option<TableId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
@@ -15478,7 +15509,7 @@ impl Lowerer {
         table: TableId,
         lookup: TableLookup,
         node: &SyntaxNode,
-        drop: bool,
+        drop: Option<DropRelation>,
     ) {
         let Table { kind, name, .. } = self.index.tables[table];
         let error = match lookup {
@@ -15655,6 +15686,11 @@ impl Lowerer {
             IfMissing::from_if_exists(drop_table.if_exists().as_ref()),
             TableLookup::ForeignTable,
             drop_table.drop_behavior().as_ref(),
+            drop_table
+                .foreign_token()
+                .zip(drop_table.table_token())
+                .filter(|_| drop_table.table_name_refs().nth(1).is_none())
+                .map(|(first, last)| self.token_range(&first).cover(self.token_range(&last))),
         );
     }
 

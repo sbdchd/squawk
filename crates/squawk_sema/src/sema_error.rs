@@ -396,7 +396,7 @@ pub(crate) enum SemaError {
         name: Name,
         expected: TableLookup,
         kind: TableKind,
-        drop: bool,
+        drop: Option<DropRelation>,
     },
     CannotCopy {
         name: Name,
@@ -480,6 +480,11 @@ pub(crate) enum SemaError {
     TransitionRowVariable {
         row_range: TextRange,
     },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct DropRelation {
+    pub(crate) keyword_range: Option<TextRange>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1084,6 +1089,20 @@ impl SemaError {
                     edits: vec![Edit::replace(row_range, "table")],
                 },
             },
+            SemaError::WrongRelationKind {
+                kind,
+                drop:
+                    Some(DropRelation {
+                        keyword_range: Some(keyword_range),
+                    }),
+                ..
+            } => Suggestion {
+                message: drop_hint(kind).into(),
+                fix: Fix {
+                    title: format!("Replace with `{}`", kind.label()).into(),
+                    edits: vec![Edit::replace(keyword_range, kind.label())],
+                },
+            },
             SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
                 message: "add an empty `over` clause to compute it over all rows".into(),
                 fix: Fix {
@@ -1170,7 +1189,14 @@ impl SemaError {
             SemaError::MissingShellType => Some(
                 "create the type as a shell type, then create its canonicalization function, then do a full `create type`",
             ),
-            SemaError::WrongRelationKind { kind, drop, .. } => drop.then(|| drop_hint(kind)),
+            SemaError::WrongRelationKind {
+                kind,
+                drop:
+                    Some(DropRelation {
+                        keyword_range: None,
+                    }),
+                ..
+            } => Some(drop_hint(kind)),
             SemaError::CannotCopy {
                 copy_from, kind, ..
             } => copy_target(copy_from, kind).1,

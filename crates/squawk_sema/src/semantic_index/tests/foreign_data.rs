@@ -294,14 +294,21 @@ select a from t;
       ╭▸ 
     6 │ drop table ft;
       │            ━━
-      │
-      ╰ hint: use `drop foreign table` to remove a foreign table
+      ╰╴
+    help: use `drop foreign table` to remove a foreign table
+      ╭╴
+    6 │ drop foreign table ft;
+      ╰╴     +++++++
     error: `t` is not a foreign table
       ╭▸ 
     7 │ drop foreign table t;
       │                    ━
-      │
-      ╰ hint: use `drop table` to remove a table
+      ╰╴
+    help: use `drop table` to remove a table
+      ╭╴
+    7 - drop foreign table t;
+    7 + drop table t;
+      ╰╴
     error: relation `ft` does not exist
       ╭▸ 
     9 │ select a from ft;
