@@ -191,6 +191,27 @@ enum LabelPosition {
     After(EnumLabelId),
 }
 
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ArrayOwner {
+    Type(TypeId),
+    Table(TableId),
+}
+
+impl ArrayOwner {
+    fn resolution(self) -> Resolution {
+        match self {
+            ArrayOwner::Type(ty) => Resolution::Type(ty),
+            ArrayOwner::Table(table) => Resolution::Table(table),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+enum TypeMatch {
+    Named(Resolution),
+    Array(ArrayOwner),
+}
+
 #[derive(Clone, Copy)]
 struct DropRoutine {
     function_range: Option<TextRange>,
@@ -914,6 +935,7 @@ enum Undo {
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
     FinishShellType(TypeId, Box<Type>),
     MoveType(TypeId, Name, Name, InIrFile<AstPtr<ast::PathSegment>>),
+    ArrayName(ArrayOwner, Option<Name>),
 }
 
 enum FieldBase {
@@ -1927,8 +1949,24 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        let Table { name, name_ptr, .. } = self.index.tables[table];
+        let Table {
+            name,
+            name_ptr,
+            array_name,
+            ..
+        } = self.index.tables[table];
         if self.report_relation_name_taken(schema, name, schema_ref.syntax()) {
+            return;
+        }
+        if let Some(array_name) = array_name
+            && self.pg_type_exists(schema, array_name)
+        {
+            let error = SemaError::DuplicateInSchema {
+                object: ObjectKind::Type,
+                name: array_name,
+                schema,
+            };
+            self.push_error(schema_ref.syntax(), error);
             return;
         }
         for sequence in self.index.tables.owned_sequences(table) {
@@ -1989,6 +2027,11 @@ impl Lowerer {
             return;
         }
         let current = &self.index.tables[table];
+        let renamed = current.name != name;
+        if renamed && current.kind != TableKind::Sequence {
+            self.move_array_name_out_of(schema, name);
+        }
+        let current = &self.index.tables[table];
         let previous = Undo::MoveTable(table, current.schema, current.name, current.name_ptr);
         let previous_name = current.name_ptr.file_range();
         self.index.tables.move_to(table, schema, name, name_ptr);
@@ -1997,6 +2040,10 @@ impl Lowerer {
         }
         self.index
             .record_rename(Item::Table(table), previous_name, name_ptr.file_range());
+        if renamed && self.index.tables[table].array_name.is_some() {
+            let array_name = self.choose_array_name(schema, name);
+            self.set_array_name(ArrayOwner::Table(table), Some(array_name));
+        }
     }
 
     fn lower_refresh(&mut self, refresh: &ast::Refresh) {
@@ -2167,6 +2214,7 @@ impl Lowerer {
                 constraints_complete: true,
                 sequence_owner: None,
                 of_type: None,
+                array_name: None,
             },
             &self.index.columns,
         );
@@ -2946,6 +2994,14 @@ impl Lowerer {
                 Undo::FinishShellType(id, shell) => {
                     self.index.types.replace(id, *shell, &self.index.columns);
                 }
+                Undo::ArrayName(owner, name) => match owner {
+                    ArrayOwner::Type(ty) => {
+                        self.index.types.set_array_name(ty, name);
+                    }
+                    ArrayOwner::Table(table) => {
+                        self.index.tables.set_array_name(table, name);
+                    }
+                },
             }
         }
         self.dropped_tables
@@ -10944,6 +11000,8 @@ impl Lowerer {
         columns: Option<Columns>,
     ) -> Option<TypeId> {
         let segment = path.segment()?;
+        let Type { schema, name, .. } = self.index.types[id];
+        let array_name = Some(self.choose_array_name(schema, name));
         let ty = &self.index.types[id];
         let shell = self.index.types.replace(
             id,
@@ -10964,6 +11022,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                array_name,
             },
             &self.index.columns,
         );
@@ -12009,8 +12068,15 @@ impl Lowerer {
         let Some(ty) = ty else {
             return;
         };
-        let name = self.index.types[ty].name;
-        if self.type_name_taken(schema, name) {
+        let Type {
+            name, array_name, ..
+        } = self.index.types[ty];
+        let taken = if self.type_name_taken(schema, name) {
+            Some(name)
+        } else {
+            array_name.filter(|array_name| self.pg_type_exists(schema, *array_name))
+        };
+        if let Some(name) = taken {
             let error = SemaError::DuplicateInSchema {
                 object: ObjectKind::Type,
                 name,
@@ -12038,6 +12104,10 @@ impl Lowerer {
         if !self.index.types.is_local(ty) {
             return;
         }
+        let renamed = self.index.types[ty].name != name;
+        if renamed {
+            self.move_array_name_out_of(schema, name);
+        }
         let current = &self.index.types[ty];
         let previous = Undo::MoveType(ty, current.schema, current.name, current.name_ptr);
         let previous_name = current.name_ptr.file_range();
@@ -12047,6 +12117,10 @@ impl Lowerer {
         }
         self.index
             .record_rename(Item::Type(ty), previous_name, name_ptr.file_range());
+        if renamed && self.index.types[ty].array_name.is_some() {
+            let array_name = self.choose_array_name(schema, name);
+            self.set_array_name(ArrayOwner::Type(ty), Some(array_name));
+        }
     }
 
     fn lower_type(&mut self, ty: &ast::Type) -> Option<Ty> {
@@ -12145,10 +12219,16 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> TypeLookup {
         let name = self.intern(name);
-        let resolution = match (self.find_type(schema, name), if_missing) {
+        let (resolution, array) = match self.find_type_match(schema, name) {
+            Some(TypeMatch::Named(resolution)) => (resolution, false),
+            Some(TypeMatch::Array(owner)) => (owner.resolution(), true),
+            None => (Resolution::Unresolved, false),
+        };
+        let resolution = match (resolution, if_missing) {
             (Resolution::Unresolved, IfMissing::Ignore) => Resolution::Unknown,
             (resolution, IfMissing::Error | IfMissing::Ignore) => resolution,
         };
+        let found = |ty: Ty| TypeLookup::Found(if array { ty.array() } else { ty });
         self.add_ref_from(
             name,
             node,
@@ -12159,8 +12239,8 @@ impl Lowerer {
             },
         );
         match resolution {
-            Resolution::Type(ty) => TypeLookup::Found(Ty::Type(ty)),
-            Resolution::Table(table) => TypeLookup::Found(Ty::Table(table)),
+            Resolution::Type(ty) => found(Ty::Type(ty)),
+            Resolution::Table(table) => found(Ty::Table(table)),
             Resolution::Unresolved => TypeLookup::Missing,
             Resolution::Column { .. }
             | Resolution::Source(_)
@@ -12288,6 +12368,78 @@ impl Lowerer {
         Some(ty)
     }
 
+    fn find_type_match(&self, schema: Option<Name>, name: Name) -> Option<TypeMatch> {
+        self.search_path(schema, Lookup::Type).find_map(|schema| {
+            self.find_type_in_schema(schema, name)
+                .map(TypeMatch::Named)
+                .or_else(|| self.find_array_owner(schema, name).map(TypeMatch::Array))
+        })
+    }
+
+    fn find_array_owner(&self, schema: Name, name: Name) -> Option<ArrayOwner> {
+        let ty = self.index.types.with_array_name(schema, name).find(|id| {
+            let ty = &self.index.types[*id];
+            self.visible(ty.schema, ty.ptr.file_id) && !self.dropped_types.contains(id)
+        });
+        if let Some(ty) = ty {
+            return Some(ArrayOwner::Type(ty));
+        }
+        self.index
+            .tables
+            .with_array_name(schema, name)
+            .find(|id| {
+                let table = &self.index.tables[*id];
+                self.visible(table.schema, table.ptr.file_id) && !self.dropped_tables.contains(id)
+            })
+            .map(ArrayOwner::Table)
+    }
+
+    fn pg_type_exists(&self, schema: Name, name: Name) -> bool {
+        self.find_type_in(schema, name).is_some()
+            || self
+                .find_table(Some(schema), name)
+                .is_some_and(|table| self.index.tables[table].kind != TableKind::Sequence)
+            || self.find_array_owner(schema, name).is_some()
+    }
+
+    fn choose_array_name(&mut self, schema: Name, type_name: Name) -> Name {
+        let name =
+            postgres::make_array_type_name(self.index.names.resolve(type_name), |candidate| {
+                self.index
+                    .names
+                    .lookup(candidate)
+                    .is_some_and(|candidate| self.pg_type_exists(schema, candidate))
+            });
+        self.intern(&name)
+    }
+
+    fn new_array_name(&mut self, schema: Name, name: Name, has_array: bool) -> Option<Name> {
+        self.move_array_name_out_of(schema, name);
+        has_array.then(|| self.choose_array_name(schema, name))
+    }
+
+    fn move_array_name_out_of(&mut self, schema: Name, name: Name) {
+        if let Some(owner) = self.find_array_owner(schema, name) {
+            let array_name = self.choose_array_name(schema, name);
+            self.set_array_name(owner, Some(array_name));
+        }
+    }
+
+    fn set_array_name(&mut self, owner: ArrayOwner, array_name: Option<Name>) {
+        let previous = match owner {
+            ArrayOwner::Type(ty) if self.index.types.is_local(ty) => {
+                self.index.types.set_array_name(ty, array_name)
+            }
+            ArrayOwner::Table(table) if self.index.tables.is_local(table) => {
+                self.index.tables.set_array_name(table, array_name)
+            }
+            ArrayOwner::Type(_) | ArrayOwner::Table(_) => return,
+        };
+        if self.in_transaction() {
+            self.undo.push(Undo::ArrayName(owner, previous));
+        }
+    }
+
     fn drop_type(&mut self, ty: TypeId) {
         let in_transaction = self.in_transaction();
         for id in self.companion_types(ty) {
@@ -12298,15 +12450,16 @@ impl Lowerer {
     }
 
     fn find_type(&self, schema: Option<Name>, name: Name) -> Resolution {
-        for schema in self.search_path(schema, Lookup::Type) {
-            if let Some(ty) = self.find_type_in(schema, name) {
-                return Resolution::Type(ty);
-            }
-            if let Some(table) = self.find_table(Some(schema), name) {
-                return Resolution::Table(table);
-            }
+        self.search_path(schema, Lookup::Type)
+            .find_map(|schema| self.find_type_in_schema(schema, name))
+            .unwrap_or(Resolution::Unresolved)
+    }
+
+    fn find_type_in_schema(&self, schema: Name, name: Name) -> Option<Resolution> {
+        if let Some(ty) = self.find_type_in(schema, name) {
+            return Some(Resolution::Type(ty));
         }
-        Resolution::Unresolved
+        self.find_table(Some(schema), name).map(Resolution::Table)
     }
 
     fn find_type_in(&self, schema: Name, name: Name) -> Option<TypeId> {
@@ -22009,6 +22162,10 @@ impl Lowerer {
                 self.report_duplicate(ObjectKind::Type, name_node, name);
             }
         }
+        let array_name = match replaced {
+            Some(replaced) => self.index.tables[replaced].array_name,
+            None => self.new_array_name(schema, name, kind != TableKind::Sequence),
+        };
         let id = self.index.tables.alloc(
             Table {
                 kind,
@@ -22020,6 +22177,7 @@ impl Lowerer {
                 constraints_complete: true,
                 sequence_owner: None,
                 of_type: None,
+                array_name,
             },
             &self.index.columns,
         );
@@ -22059,6 +22217,7 @@ impl Lowerer {
             ),
         };
         let name = self.intern(&name);
+        let array_name = self.new_array_name(schema, name, true);
         self.index.types.alloc(
             Type {
                 kind: TypeKind::Multirange,
@@ -22077,6 +22236,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                array_name,
             },
             &self.index.columns,
         );
@@ -22113,6 +22273,7 @@ impl Lowerer {
         {
             self.report_duplicate(ObjectKind::Type, segment.syntax(), name);
         }
+        let array_name = self.new_array_name(schema, name, kind != TypeKind::Shell);
         let id = self.index.types.alloc(
             Type {
                 kind,
@@ -22131,6 +22292,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                array_name,
             },
             &self.index.columns,
         );

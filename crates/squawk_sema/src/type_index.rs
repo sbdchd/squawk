@@ -16,12 +16,14 @@ pub struct TypeIndex {
     by_schema: LayeredMultimap<Name, TypeId>,
     by_range: LayeredMultimap<TypeId, TypeId>,
     by_column_type: LayeredMultimap<ColumnTypeRef, TypeId>,
+    by_array_name: LayeredMultimap<QualifiedName, TypeId>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 struct Keys {
     name: QualifiedName,
     range: Option<TypeId>,
+    array_name: Option<QualifiedName>,
 }
 
 impl Keys {
@@ -32,6 +34,10 @@ impl Keys {
                 name: ty.name,
             },
             range: ty.range,
+            array_name: ty.array_name.map(|name| QualifiedName {
+                schema: ty.schema,
+                name,
+            }),
         }
     }
 }
@@ -44,6 +50,7 @@ impl TypeIndex {
             by_schema: LayeredMultimap::on_top_of(&base.by_schema),
             by_range: LayeredMultimap::on_top_of(&base.by_range),
             by_column_type: LayeredMultimap::on_top_of(&base.by_column_type),
+            by_array_name: LayeredMultimap::on_top_of(&base.by_array_name),
         }
     }
 
@@ -57,11 +64,22 @@ impl TypeIndex {
         if let Some(range) = keys.range {
             self.by_range.insert(range, id);
         }
+        if let Some(array_name) = keys.array_name {
+            self.by_array_name.insert(array_name, id);
+        }
         id
     }
 
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = TypeId> + '_ {
         self.by_name.get(QualifiedName { schema, name })
+    }
+
+    pub(crate) fn with_array_name(
+        &self,
+        schema: Name,
+        name: Name,
+    ) -> impl Iterator<Item = TypeId> + '_ {
+        self.by_array_name.get(QualifiedName { schema, name })
     }
 
     pub(crate) fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = TypeId> + '_ {
@@ -105,6 +123,10 @@ impl TypeIndex {
             ty.name = name;
             ty.name_ptr = name_ptr;
         });
+    }
+
+    pub(crate) fn set_array_name(&mut self, id: TypeId, array_name: Option<Name>) -> Option<Name> {
+        self.rekey(id, |ty| std::mem::replace(&mut ty.array_name, array_name))
     }
 
     pub(crate) fn set_schema(&mut self, id: TypeId, schema: Name) -> bool {
@@ -214,6 +236,14 @@ impl TypeIndex {
                 self.by_range.insert(range, id);
             }
         }
+        if previous.array_name != current.array_name {
+            if let Some(array_name) = previous.array_name {
+                self.by_array_name.remove(array_name, id);
+            }
+            if let Some(array_name) = current.array_name {
+                self.by_array_name.insert(array_name, id);
+            }
+        }
         result
     }
 
@@ -229,6 +259,7 @@ impl TypeIndex {
         self.by_schema.shrink_to_fit();
         self.by_range.shrink_to_fit();
         self.by_column_type.shrink_to_fit();
+        self.by_array_name.shrink_to_fit();
     }
 }
 

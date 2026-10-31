@@ -355,3 +355,111 @@ select 'a'::moood;
       ╰╴            ━━━━━
     ");
 }
+
+#[test]
+fn derived_array_type_names() {
+    assert_snapshot!(check("
+create type e as enum (
+  'a'
+);
+create table t (a int);
+create function f(e[]) returns int
+  language sql
+  return 1;
+create table u (
+  a _e,
+  b _t
+);
+select '{a}'::_e, '{1}'::_int4, null::_t, f('{a}'::_e);
+select f('a'::e);
+"), @"
+    error: function `f(e)` does not exist
+       ╭▸ 
+    14 │ select f('a'::e);
+       │        ━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn array_type_names_follow_creation_order() {
+    assert_snapshot!(check("
+create schema s;
+create type _x as enum (
+  'a'
+);
+create type x as enum (
+  'b'
+);
+create function fx(x[]) returns int
+  language sql
+  return 1;
+select fx(null::_x_1);
+select fx(null::_x);
+select '{a}'::__x;
+create type y as enum (
+  'a'
+);
+create type _y as enum (
+  'b'
+);
+create function fy(y[]) returns int
+  language sql
+  return 1;
+select fy(null::__y);
+select '{b}'::__y_1;
+select '{b}'::_y_1;
+alter type y rename to w;
+select fy(null::_w);
+select '{a}'::__y;
+create type aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa as enum (
+  'a'
+);
+select '{a}'::_aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa;
+create table _t (a int);
+create table t (a int);
+select null::_t_1;
+create type s._q as enum (
+  'a'
+);
+create type q as enum (
+  'a'
+);
+alter type q set schema s;
+create type z as enum (
+  'a'
+);
+begin;
+create type _z as enum (
+  'a'
+);
+rollback;
+select '{a}'::_z;
+"), @"
+    error: function `fx(_x)` does not exist
+       ╭▸ 
+    13 │ select fx(null::_x);
+       │        ━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: type `_y_1` does not exist
+       ╭▸ 
+    26 │ select '{b}'::_y_1;
+       ╰╴              ━━━━
+    error: type `__y` does not exist
+       ╭▸ 
+    29 │ select '{a}'::__y;
+       │               ━━━
+       ╰╴
+    help: a type with a similar name exists
+       ╭╴
+    29 - select '{a}'::__y;
+    29 + select '{a}'::_y;
+       ╰╴
+    error: type `_q` already exists in schema `s`
+       ╭▸ 
+    43 │ alter type q set schema s;
+       ╰╴                        ━
+    ");
+}

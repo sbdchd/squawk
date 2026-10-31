@@ -96,6 +96,7 @@ pub struct Table {
     pub(crate) constraints_complete: bool,
     pub(crate) sequence_owner: Option<SequenceOwner>,
     pub(crate) of_type: Option<TypeId>,
+    pub(crate) array_name: Option<Name>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -635,6 +636,7 @@ pub struct Type {
     pub(crate) slice_result: Option<Ty>,
     pub(crate) category: Option<TypeCategory>,
     pub(crate) preferred: bool,
+    pub(crate) array_name: Option<Name>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
