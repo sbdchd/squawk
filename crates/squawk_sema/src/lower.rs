@@ -192,6 +192,32 @@ enum LabelPosition {
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
+enum ArrayOwner {
+    Type(TypeId),
+    Table(TableId),
+}
+
+impl ArrayOwner {
+    fn resolution(self) -> Resolution {
+        match self {
+            ArrayOwner::Type(ty) => Resolution::Type(ty),
+            ArrayOwner::Table(table) => Resolution::Table(table),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+enum TypeMatch {
+    Named(Resolution),
+    Array(ArrayOwner),
+}
+
+#[derive(Clone, Copy)]
+struct DropRoutine {
+    function_range: Option<TextRange>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
 enum CalleeKind {
     Plain,
     OrderedSet,
@@ -909,6 +935,7 @@ enum Undo {
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
     FinishShellType(TypeId, Box<Type>),
     MoveType(TypeId, Name, Name, InIrFile<AstPtr<ast::PathSegment>>),
+    ArrayName(ArrayOwner, Option<Name>),
 }
 
 enum FieldBase {
@@ -1922,8 +1949,24 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        let Table { name, name_ptr, .. } = self.index.tables[table];
+        let Table {
+            name,
+            name_ptr,
+            array_name,
+            ..
+        } = self.index.tables[table];
         if self.report_relation_name_taken(schema, name, schema_ref.syntax()) {
+            return;
+        }
+        if let Some(array_name) = array_name
+            && self.pg_type_exists(schema, array_name)
+        {
+            let error = SemaError::DuplicateInSchema {
+                object: ObjectKind::Type,
+                name: array_name,
+                schema,
+            };
+            self.push_error(schema_ref.syntax(), error);
             return;
         }
         for sequence in self.index.tables.owned_sequences(table) {
@@ -1984,6 +2027,11 @@ impl Lowerer {
             return;
         }
         let current = &self.index.tables[table];
+        let renamed = current.name != name;
+        if renamed && current.kind != TableKind::Sequence {
+            self.move_array_name_out_of(schema, name);
+        }
+        let current = &self.index.tables[table];
         let previous = Undo::MoveTable(table, current.schema, current.name, current.name_ptr);
         let previous_name = current.name_ptr.file_range();
         self.index.tables.move_to(table, schema, name, name_ptr);
@@ -1992,6 +2040,10 @@ impl Lowerer {
         }
         self.index
             .record_rename(Item::Table(table), previous_name, name_ptr.file_range());
+        if renamed && self.index.tables[table].array_name.is_some() {
+            let array_name = self.choose_array_name(schema, name);
+            self.set_array_name(ArrayOwner::Table(table), Some(array_name));
+        }
     }
 
     fn lower_refresh(&mut self, refresh: &ast::Refresh) {
@@ -2162,6 +2214,7 @@ impl Lowerer {
                 constraints_complete: true,
                 sequence_owner: None,
                 of_type: None,
+                array_name: None,
             },
             &self.index.columns,
         );
@@ -2554,6 +2607,7 @@ impl Lowerer {
                     RoutineKind::Aggregate,
                     if_missing,
                     drop_behavior.as_ref(),
+                    None,
                 );
             }
         }
@@ -2940,6 +2994,14 @@ impl Lowerer {
                 Undo::FinishShellType(id, shell) => {
                     self.index.types.replace(id, *shell, &self.index.columns);
                 }
+                Undo::ArrayName(owner, name) => match owner {
+                    ArrayOwner::Type(ty) => {
+                        self.index.types.set_array_name(ty, name);
+                    }
+                    ArrayOwner::Table(table) => {
+                        self.index.tables.set_array_name(table, name);
+                    }
+                },
             }
         }
         self.dropped_tables
@@ -9541,6 +9603,17 @@ impl Lowerer {
         kind: RoutineKind,
         if_missing: IfMissing,
     ) -> Option<FunctionId> {
+        self.lower_routine_sig_for(path, param_list, kind, if_missing, None)
+    }
+
+    fn lower_routine_sig_for(
+        &mut self,
+        path: &ast::PathRef,
+        param_list: Option<ast::ParamList>,
+        kind: RoutineKind,
+        if_missing: IfMissing,
+        drop: Option<DropRoutine>,
+    ) -> Option<FunctionId> {
         let segment = path.segment()?;
         let schema = self.lower_schema_qualifier(path.qualifier());
         let name = self.intern(&segment.text());
@@ -9567,9 +9640,22 @@ impl Lowerer {
                 if missing {
                     Some(Resolution::Unknown)
                 } else {
-                    match self.find_function_by(schema, name, |function| {
-                        kind.matches(function.kind) && self.has_arg_types(function, &arg_types)
-                    }) {
+                    let function =
+                        self.find_function_with_arg_types(schema, name, kind, &arg_types);
+                    if function.is_none()
+                        && let Some(drop) = drop
+                        && let Some(aggregate) = self.find_function_with_arg_types(
+                            schema,
+                            name,
+                            RoutineKind::Aggregate,
+                            &arg_types,
+                        )
+                    {
+                        return self.aggregate_dropped_as_function(
+                            &segment, schema, name, aggregate, drop,
+                        );
+                    }
+                    match function {
                         Some(function) => Some(Resolution::Function(function)),
                         None if matches!(if_missing, IfMissing::Error)
                             && arg_types.iter().all(Option::is_some) =>
@@ -9598,6 +9684,7 @@ impl Lowerer {
                                     args,
                                     lookup: LookupKind::Signature,
                                     similar,
+                                    misplaced_order_by: false,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -9606,7 +9693,18 @@ impl Lowerer {
                     }
                 }
             }
-            None => self.find_unique_function(schema, name, kind),
+            None => {
+                let resolution = self.find_unique_function(schema, name, kind);
+                if resolution.is_none()
+                    && let Some(drop) = drop
+                    && let Some(Resolution::Function(aggregate)) =
+                        self.find_unique_function(schema, name, RoutineKind::Aggregate)
+                {
+                    return self
+                        .aggregate_dropped_as_function(&segment, schema, name, aggregate, drop);
+                }
+                resolution
+            }
         };
         let resolution = resolution.unwrap_or(match if_missing {
             IfMissing::Error => Resolution::Unresolved,
@@ -9622,6 +9720,43 @@ impl Lowerer {
             Resolution::Function(function) => Some(function),
             _ => None,
         }
+    }
+
+    fn find_function_with_arg_types(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: RoutineKind,
+        arg_types: &[Option<Ty>],
+    ) -> Option<FunctionId> {
+        self.find_function_by(schema, name, |function| {
+            kind.matches(function.kind) && self.has_arg_types(function, arg_types)
+        })
+    }
+
+    fn aggregate_dropped_as_function(
+        &mut self,
+        segment: &ast::PathSegmentRef,
+        schema: Option<Name>,
+        name: Name,
+        aggregate: FunctionId,
+        drop: DropRoutine,
+    ) -> Option<FunctionId> {
+        self.push_error(
+            segment.syntax(),
+            SemaError::AggregateDroppedAsFunction {
+                schema,
+                name,
+                function_range: drop.function_range,
+            },
+        );
+        self.add_ref(
+            name,
+            ReferenceKind::Function(RoutineKind::Aggregate),
+            segment.syntax(),
+            Resolution::Function(aggregate),
+        );
+        None
     }
 
     fn find_unique_function(
@@ -9649,18 +9784,26 @@ impl Lowerer {
 
     fn lower_drop_function(&mut self, drop_function: &ast::DropFunction) {
         let if_missing = IfMissing::from_if_exists(drop_function.if_exists().as_ref());
-        for sig in drop_function
-            .function_sig_list()
-            .iter()
-            .flat_map(|list| list.function_sigs())
-        {
+        let sigs = drop_function.function_sig_list();
+        let single_sig = sigs
+            .as_ref()
+            .is_some_and(|list| list.function_sigs().nth(1).is_none());
+        for sig in sigs.iter().flat_map(|list| list.function_sigs()) {
             if let Some(path) = sig.function_name_ref().and_then(|name| name.path_ref()) {
+                let param_list = sig.param_list();
+                let drop = DropRoutine {
+                    function_range: drop_function
+                        .function_token()
+                        .filter(|_| single_sig && param_list.is_some())
+                        .map(|token| self.token_range(&token)),
+                };
                 self.drop_routine_sig(
                     &path,
-                    sig.param_list(),
+                    param_list,
                     RoutineKind::Function,
                     if_missing,
                     drop_function.drop_behavior().as_ref(),
+                    Some(drop),
                 );
             }
         }
@@ -9680,6 +9823,7 @@ impl Lowerer {
                     RoutineKind::Procedure,
                     if_missing,
                     drop_procedure.drop_behavior().as_ref(),
+                    None,
                 );
             }
         }
@@ -9699,6 +9843,7 @@ impl Lowerer {
                     RoutineKind::Routine,
                     if_missing,
                     drop_routine.drop_behavior().as_ref(),
+                    None,
                 );
             }
         }
@@ -9711,8 +9856,10 @@ impl Lowerer {
         kind: RoutineKind,
         if_missing: IfMissing,
         drop_behavior: Option<&ast::DropBehavior>,
+        drop: Option<DropRoutine>,
     ) {
-        let Some(function) = self.lower_routine_sig(path, param_list, kind, if_missing) else {
+        let Some(function) = self.lower_routine_sig_for(path, param_list, kind, if_missing, drop)
+        else {
             return;
         };
         match drop_behavior {
@@ -9961,6 +10108,7 @@ impl Lowerer {
                     schema,
                     name,
                     &args,
+                    call.arg_list().as_ref(),
                     segment.syntax(),
                 );
                 self.add_ref(
@@ -10414,19 +10562,15 @@ impl Lowerer {
             Some(table) => Resolution::Table(table),
             None => self.find_type(schema, name),
         };
-        if matches!(resolution, Resolution::Table(_) | Resolution::Unresolved) {
-            self.add_ref_from(
-                name,
-                segment.syntax(),
-                resolution,
-                RefSource::Table {
-                    schema,
-                    lookup: TableLookup::Like,
-                },
-            );
-        } else {
-            self.add_ref(name, ReferenceKind::Type, segment.syntax(), resolution);
-        }
+        self.add_ref_from(
+            name,
+            segment.syntax(),
+            resolution,
+            RefSource::Table {
+                schema,
+                lookup: TableLookup::Like,
+            },
+        );
         match resolution {
             Resolution::Table(table) => {
                 if !TableLookup::Like.accepts(self.index.tables[table].kind) {
@@ -10856,6 +11000,8 @@ impl Lowerer {
         columns: Option<Columns>,
     ) -> Option<TypeId> {
         let segment = path.segment()?;
+        let Type { schema, name, .. } = self.index.types[id];
+        let array_name = Some(self.choose_array_name(schema, name));
         let ty = &self.index.types[id];
         let shell = self.index.types.replace(
             id,
@@ -10876,6 +11022,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                array_name,
             },
             &self.index.columns,
         );
@@ -11921,8 +12068,15 @@ impl Lowerer {
         let Some(ty) = ty else {
             return;
         };
-        let name = self.index.types[ty].name;
-        if self.type_name_taken(schema, name) {
+        let Type {
+            name, array_name, ..
+        } = self.index.types[ty];
+        let taken = if self.type_name_taken(schema, name) {
+            Some(name)
+        } else {
+            array_name.filter(|array_name| self.pg_type_exists(schema, *array_name))
+        };
+        if let Some(name) = taken {
             let error = SemaError::DuplicateInSchema {
                 object: ObjectKind::Type,
                 name,
@@ -11950,6 +12104,10 @@ impl Lowerer {
         if !self.index.types.is_local(ty) {
             return;
         }
+        let renamed = self.index.types[ty].name != name;
+        if renamed {
+            self.move_array_name_out_of(schema, name);
+        }
         let current = &self.index.types[ty];
         let previous = Undo::MoveType(ty, current.schema, current.name, current.name_ptr);
         let previous_name = current.name_ptr.file_range();
@@ -11959,6 +12117,10 @@ impl Lowerer {
         }
         self.index
             .record_rename(Item::Type(ty), previous_name, name_ptr.file_range());
+        if renamed && self.index.types[ty].array_name.is_some() {
+            let array_name = self.choose_array_name(schema, name);
+            self.set_array_name(ArrayOwner::Type(ty), Some(array_name));
+        }
     }
 
     fn lower_type(&mut self, ty: &ast::Type) -> Option<Ty> {
@@ -12057,10 +12219,16 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> TypeLookup {
         let name = self.intern(name);
-        let resolution = match (self.find_type(schema, name), if_missing) {
+        let (resolution, array) = match self.find_type_match(schema, name) {
+            Some(TypeMatch::Named(resolution)) => (resolution, false),
+            Some(TypeMatch::Array(owner)) => (owner.resolution(), true),
+            None => (Resolution::Unresolved, false),
+        };
+        let resolution = match (resolution, if_missing) {
             (Resolution::Unresolved, IfMissing::Ignore) => Resolution::Unknown,
             (resolution, IfMissing::Error | IfMissing::Ignore) => resolution,
         };
+        let found = |ty: Ty| TypeLookup::Found(if array { ty.array() } else { ty });
         self.add_ref_from(
             name,
             node,
@@ -12071,8 +12239,8 @@ impl Lowerer {
             },
         );
         match resolution {
-            Resolution::Type(ty) => TypeLookup::Found(Ty::Type(ty)),
-            Resolution::Table(table) => TypeLookup::Found(Ty::Table(table)),
+            Resolution::Type(ty) => found(Ty::Type(ty)),
+            Resolution::Table(table) => found(Ty::Table(table)),
             Resolution::Unresolved => TypeLookup::Missing,
             Resolution::Column { .. }
             | Resolution::Source(_)
@@ -12200,6 +12368,78 @@ impl Lowerer {
         Some(ty)
     }
 
+    fn find_type_match(&self, schema: Option<Name>, name: Name) -> Option<TypeMatch> {
+        self.search_path(schema, Lookup::Type).find_map(|schema| {
+            self.find_type_in_schema(schema, name)
+                .map(TypeMatch::Named)
+                .or_else(|| self.find_array_owner(schema, name).map(TypeMatch::Array))
+        })
+    }
+
+    fn find_array_owner(&self, schema: Name, name: Name) -> Option<ArrayOwner> {
+        let ty = self.index.types.with_array_name(schema, name).find(|id| {
+            let ty = &self.index.types[*id];
+            self.visible(ty.schema, ty.ptr.file_id) && !self.dropped_types.contains(id)
+        });
+        if let Some(ty) = ty {
+            return Some(ArrayOwner::Type(ty));
+        }
+        self.index
+            .tables
+            .with_array_name(schema, name)
+            .find(|id| {
+                let table = &self.index.tables[*id];
+                self.visible(table.schema, table.ptr.file_id) && !self.dropped_tables.contains(id)
+            })
+            .map(ArrayOwner::Table)
+    }
+
+    fn pg_type_exists(&self, schema: Name, name: Name) -> bool {
+        self.find_type_in(schema, name).is_some()
+            || self
+                .find_table(Some(schema), name)
+                .is_some_and(|table| self.index.tables[table].kind != TableKind::Sequence)
+            || self.find_array_owner(schema, name).is_some()
+    }
+
+    fn choose_array_name(&mut self, schema: Name, type_name: Name) -> Name {
+        let name =
+            postgres::make_array_type_name(self.index.names.resolve(type_name), |candidate| {
+                self.index
+                    .names
+                    .lookup(candidate)
+                    .is_some_and(|candidate| self.pg_type_exists(schema, candidate))
+            });
+        self.intern(&name)
+    }
+
+    fn new_array_name(&mut self, schema: Name, name: Name, has_array: bool) -> Option<Name> {
+        self.move_array_name_out_of(schema, name);
+        has_array.then(|| self.choose_array_name(schema, name))
+    }
+
+    fn move_array_name_out_of(&mut self, schema: Name, name: Name) {
+        if let Some(owner) = self.find_array_owner(schema, name) {
+            let array_name = self.choose_array_name(schema, name);
+            self.set_array_name(owner, Some(array_name));
+        }
+    }
+
+    fn set_array_name(&mut self, owner: ArrayOwner, array_name: Option<Name>) {
+        let previous = match owner {
+            ArrayOwner::Type(ty) if self.index.types.is_local(ty) => {
+                self.index.types.set_array_name(ty, array_name)
+            }
+            ArrayOwner::Table(table) if self.index.tables.is_local(table) => {
+                self.index.tables.set_array_name(table, array_name)
+            }
+            ArrayOwner::Type(_) | ArrayOwner::Table(_) => return,
+        };
+        if self.in_transaction() {
+            self.undo.push(Undo::ArrayName(owner, previous));
+        }
+    }
+
     fn drop_type(&mut self, ty: TypeId) {
         let in_transaction = self.in_transaction();
         for id in self.companion_types(ty) {
@@ -12210,15 +12450,16 @@ impl Lowerer {
     }
 
     fn find_type(&self, schema: Option<Name>, name: Name) -> Resolution {
-        for schema in self.search_path(schema, Lookup::Type) {
-            if let Some(ty) = self.find_type_in(schema, name) {
-                return Resolution::Type(ty);
-            }
-            if let Some(table) = self.find_table(Some(schema), name) {
-                return Resolution::Table(table);
-            }
+        self.search_path(schema, Lookup::Type)
+            .find_map(|schema| self.find_type_in_schema(schema, name))
+            .unwrap_or(Resolution::Unresolved)
+    }
+
+    fn find_type_in_schema(&self, schema: Name, name: Name) -> Option<Resolution> {
+        if let Some(ty) = self.find_type_in(schema, name) {
+            return Some(Resolution::Type(ty));
         }
-        Resolution::Unresolved
+        self.find_table(Some(schema), name).map(Resolution::Table)
     }
 
     fn find_type_in(&self, schema: Name, name: Name) -> Option<TypeId> {
@@ -13513,6 +13754,11 @@ impl Lowerer {
         let Some(column_ref) = column_target.name() else {
             return;
         };
+        if context == ExprContext::Update
+            && self.check_qualified_set_target(target, &column_ref, column_target)
+        {
+            return;
+        }
         let mut ty = self.add_target_column_ref(target, &column_ref);
         let mut subscript = None;
         for accessor in column_target.accessors() {
@@ -13539,6 +13785,54 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn check_qualified_set_target(
+        &mut self,
+        target: SourceId,
+        column_ref: &ast::ColumnNameRef,
+        column_target: &ast::ColumnTarget,
+    ) -> bool {
+        let Some(ast::Accessor::FieldAccessor(field)) = column_target.accessors().next() else {
+            return false;
+        };
+        let Some(field_ref) = field.composite_field_ref() else {
+            return false;
+        };
+        let name = self.intern(&column_ref.text());
+        let source = &self.index.sources[target];
+        if source.name != Some(name)
+            || !source.columns.complete
+            || self.find_source_column(target, name).is_some()
+        {
+            return false;
+        }
+        let relation = match source.kind {
+            SourceKind::Table(table) => self.index.tables[table].name,
+            SourceKind::Cte(_)
+            | SourceKind::Returning(_)
+            | SourceKind::Excluded(_)
+            | SourceKind::RuleRelation(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::ElementVariable
+            | SourceKind::Other => name,
+        };
+        let range = TextRange::new(
+            column_ref.syntax().text_range().start(),
+            field_ref.syntax().text_range().start(),
+        );
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::QualifiedSetTarget {
+                column: name,
+                relation,
+            },
+        );
+        true
     }
 
     fn add_field_ref(&mut self, ty: Option<Ty>, field_ref: &impl NameLike) -> Option<Ty> {
@@ -14857,6 +15151,19 @@ impl Lowerer {
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier(path.qualifier());
         let found = self.find_table(schema, name);
+        if found.is_none()
+            && matches!(lookup, TableLookup::CopyTo | TableLookup::CopyFrom)
+            && let Some(index) = self.find_index(schema, name)
+        {
+            self.add_ref(
+                name,
+                ReferenceKind::Table,
+                segment.syntax(),
+                Resolution::Index(index),
+            );
+            self.push_error(segment.syntax(), SemaError::CannotOpenIndex { name });
+            return None;
+        }
         let resolution = match found {
             Some(table) => Resolution::Table(table),
             None => match if_missing {
@@ -15912,7 +16219,7 @@ impl Lowerer {
         if let Some(Callee {
             name,
             resolution: Resolution::Function(function),
-        }) = self.lower_callee(callee, &[], None, CalleeKind::Plain)
+        }) = self.lower_callee(callee, &[], None, CalleeKind::Plain, None)
             && let Some(ret) = self.index.functions[function].ret
             && let Some(expected) = self.builtin_type(kind.return_type())
             && ret != expected
@@ -17211,9 +17518,7 @@ impl Lowerer {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier(path.qualifier());
-        let index = self
-            .search_path(schema, Lookup::Relation)
-            .find_map(|schema| self.find_index_in(schema, name));
+        let index = self.find_index(schema, name);
         let resolution = match index {
             Some(index) => Resolution::Index(index),
             None => match if_missing {
@@ -18112,6 +18417,7 @@ impl Lowerer {
         schema: Option<Name>,
         name: Name,
         args: &[CallArg],
+        arg_list: Option<&ast::ArgList>,
         node: &SyntaxNode,
     ) -> Resolution {
         if !matches!(resolution, Resolution::Unresolved)
@@ -18130,20 +18436,92 @@ impl Lowerer {
                 variadic: arg.variadic,
             });
         }
-        let args = ErrorArgs::List(self.index.errors.args.range_from(start));
-        let similar = self.similar_function(schema, name, kind, LookupKind::Call);
+        let error_args = ErrorArgs::List(self.index.errors.args.range_from(start));
+        if let Some(error) = self.wrong_routine_kind(kind, schema, name, args, error_args, node) {
+            self.push_error(node, error);
+            return Resolution::Unknown;
+        }
+        let misplaced_order_by = arg_list.is_some_and(Self::misplaced_order_by);
+        let similar = if misplaced_order_by {
+            None
+        } else {
+            self.similar_function(schema, name, kind, LookupKind::Call)
+        };
         self.push_error(
             node,
             SemaError::UnresolvedRoutine {
                 kind,
                 schema,
                 name,
-                args,
+                args: error_args,
                 lookup: LookupKind::Call,
                 similar,
+                misplaced_order_by,
             },
         );
         Resolution::Unknown
+    }
+
+    fn wrong_routine_kind(
+        &self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+        error_args: ErrorArgs,
+        node: &SyntaxNode,
+    ) -> Option<SemaError> {
+        let error = match kind {
+            RoutineKind::Function => {
+                let Resolution::Function(_) =
+                    self.find_routine(schema, name, args, FunctionKind::Procedure)
+                else {
+                    return None;
+                };
+                let select_range = node
+                    .ancestors()
+                    .find_map(ast::CallExpr::cast)
+                    .and_then(|call| standalone_select_keyword(&call))
+                    .map(|token| self.token_range(&token));
+                SemaError::ProcedureCalledAsFunction {
+                    schema,
+                    name,
+                    args: error_args,
+                    select_range,
+                }
+            }
+            RoutineKind::Procedure => {
+                let Resolution::Function(_) =
+                    self.find_routine(schema, name, args, FunctionKind::Function)
+                else {
+                    return None;
+                };
+                let call_range = node
+                    .ancestors()
+                    .find_map(ast::Call::cast)
+                    .filter(|call| {
+                        call.syntax()
+                            .parent()
+                            .is_some_and(|parent| ast::SourceFile::can_cast(parent.kind()))
+                    })
+                    .and_then(|call| call.call_token())
+                    .map(|token| self.token_range(&token));
+                SemaError::FunctionCalledAsProcedure {
+                    schema,
+                    name,
+                    args: error_args,
+                    call_range,
+                }
+            }
+            RoutineKind::Aggregate | RoutineKind::Routine => return None,
+        };
+        Some(error)
+    }
+
+    fn token_range(&self, token: &SyntaxToken) -> TextRange {
+        self.index
+            .range(InIrFile::new(self.file_id, token.text_range()))
+            .value
     }
 
     fn operand_name(&self, ty: ArgType) -> Option<OperandName> {
@@ -18804,6 +19182,11 @@ impl Lowerer {
                 && !self.dropped_constraints.contains(id)
                 && !self.dropped_tables.contains(&table_id)
         })
+    }
+
+    fn find_index(&self, schema: Option<Name>, name: Name) -> Option<IndexId> {
+        self.search_path(schema, Lookup::Relation)
+            .find_map(|schema| self.find_index_in(schema, name))
     }
 
     fn find_index_in(&self, schema: Name, name: Name) -> Option<IndexId> {
@@ -20338,9 +20721,10 @@ impl Lowerer {
         } else {
             CalleeKind::Plain
         };
-        let target = callee
-            .as_ref()
-            .and_then(|callee| self.lower_callee(callee, &args, row_source, kind));
+        let arg_list = call.arg_list();
+        let target = callee.as_ref().and_then(|callee| {
+            self.lower_callee(callee, &args, row_source, kind, arg_list.as_ref())
+        });
         args.truncate(direct_args);
         let function = match target.map(|target| target.resolution) {
             Some(Resolution::Function(function)) => Some(function),
@@ -20400,6 +20784,25 @@ impl Lowerer {
         {
             let ty = self.index.ty_name(element);
             self.push_error(callee.syntax(), SemaError::MissingArrayType { ty });
+        }
+        if let Some(function) = function
+            && let Some(callee) = &callee
+            && within.is_none()
+            && let Function {
+                kind: FunctionKind::Aggregate,
+                name,
+                ..
+            } = self.index.functions[function]
+            && let Some(arg_list) = call.arg_list()
+            && arg_list.star_token().is_none()
+            && arg_list.args().next().is_none()
+            && let Some(r_paren) = arg_list.r_paren_token()
+        {
+            let star_at = self.token_range(&r_paren).start();
+            self.push_error(
+                callee.syntax(),
+                SemaError::ParameterlessAggregate { name, star_at },
+            );
         }
         if self.function.is_none()
             && let Some(function) = function
@@ -20625,6 +21028,7 @@ impl Lowerer {
         args: &[CallArg],
         row_source: Option<SourceId>,
         kind: CalleeKind,
+        arg_list: Option<&ast::ArgList>,
     ) -> Option<Callee> {
         let (schema, name_ref) = match callee {
             ast::Expr::NameRef(name_ref) => (None, name_ref.clone()),
@@ -20711,6 +21115,7 @@ impl Lowerer {
                         schema,
                         name,
                         args,
+                        arg_list,
                         name_ref.syntax(),
                     ),
                 };
@@ -20719,6 +21124,15 @@ impl Lowerer {
         };
         self.add_ref(name, kind, name_ref.syntax(), resolution);
         Some(Callee { name, resolution })
+    }
+
+    fn misplaced_order_by(arg_list: &ast::ArgList) -> bool {
+        arg_list
+            .args()
+            .last()
+            .and_then(|arg| arg.order_by_clause())
+            .and_then(|clause| clause.sort_by_list())
+            .is_some_and(|list| list.sort_bys().nth(1).is_some())
     }
 
     fn row_source_arg(&mut self, call: &ast::CallExpr) -> Option<SourceId> {
@@ -21748,6 +22162,10 @@ impl Lowerer {
                 self.report_duplicate(ObjectKind::Type, name_node, name);
             }
         }
+        let array_name = match replaced {
+            Some(replaced) => self.index.tables[replaced].array_name,
+            None => self.new_array_name(schema, name, kind != TableKind::Sequence),
+        };
         let id = self.index.tables.alloc(
             Table {
                 kind,
@@ -21759,6 +22177,7 @@ impl Lowerer {
                 constraints_complete: true,
                 sequence_owner: None,
                 of_type: None,
+                array_name,
             },
             &self.index.columns,
         );
@@ -21798,6 +22217,7 @@ impl Lowerer {
             ),
         };
         let name = self.intern(&name);
+        let array_name = self.new_array_name(schema, name, true);
         self.index.types.alloc(
             Type {
                 kind: TypeKind::Multirange,
@@ -21816,6 +22236,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                array_name,
             },
             &self.index.columns,
         );
@@ -21852,6 +22273,7 @@ impl Lowerer {
         {
             self.report_duplicate(ObjectKind::Type, segment.syntax(), name);
         }
+        let array_name = self.new_array_name(schema, name, kind != TypeKind::Shell);
         let id = self.index.types.alloc(
             Type {
                 kind,
@@ -21870,6 +22292,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                array_name,
             },
             &self.index.columns,
         );
@@ -22311,15 +22734,7 @@ impl Lowerer {
                 })
         })?;
         let with_token = future.with_clause.with_token()?;
-        let recursive_at = self
-            .index
-            .range(InIrFile::new(
-                self.file_id,
-                TextRange::empty(with_token.text_range().end()),
-            ))
-            .value
-            .start();
-        Some(recursive_at)
+        Some(self.token_range(&with_token).end())
     }
 
     fn lateral_source(&self, name: Name, column: Option<Name>) -> Option<LateralSource> {
@@ -23063,4 +23478,41 @@ pub fn literal_type_name(literal: &ast::Literal) -> Option<&'static str> {
         | ast::LitKind::PositionalParam(_) => return None,
     };
     Some(name)
+}
+
+fn standalone_select_keyword(call: &ast::CallExpr) -> Option<SyntaxToken> {
+    if call.filter_clause().is_some()
+        || call.over_clause().is_some()
+        || call.within_clause().is_some()
+    {
+        return None;
+    }
+    let target = ast::Target::cast(call.syntax().parent()?)?;
+    if target.as_name().is_some() {
+        return None;
+    }
+    let target_list = ast::TargetList::cast(target.syntax().parent()?)?;
+    if target_list.targets().nth(1).is_some() {
+        return None;
+    }
+    let select_clause = ast::SelectClause::cast(target_list.syntax().parent()?)?;
+    if select_clause.select_quantifier().is_some() {
+        return None;
+    }
+    let select = ast::Select::cast(select_clause.syntax().parent()?)?;
+    if select.with_clause().is_some()
+        || select.from_clause().is_some()
+        || select.where_clause().is_some()
+        || select.group_by_clause().is_some()
+        || select.having_clause().is_some()
+        || select.window_clause().is_some()
+        || select.filter_clause().is_some()
+        || select.tail_clauses().next().is_some()
+    {
+        return None;
+    }
+    if !ast::SourceFile::can_cast(select.syntax().parent()?.kind()) {
+        return None;
+    }
+    select_clause.select_token()
 }

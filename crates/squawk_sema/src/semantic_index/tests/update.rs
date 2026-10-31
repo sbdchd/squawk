@@ -178,6 +178,60 @@ update t for portion of valid_at (daterange('2020-01-01', nope3)) set b = 1;
 }
 
 #[test]
+fn update_set_qualified_target() {
+    assert_snapshot!(check("
+create type pair as (x int, y int);
+create table t(a int);
+create table u(u pair);
+update t set t.a = 1;
+update t as x set x.a = 1, t.a = 2;
+update u set u.x = 1;
+insert into t values (1) on conflict do update set t.a = 2;
+"), @"
+    error: column `t` of relation `t` does not exist
+      ╭▸ 
+    5 │ update t set t.a = 1;
+      │              ━━
+      ╰╴
+    help: `set` target columns cannot be qualified with the relation name
+      ╭╴
+    5 - update t set t.a = 1;
+    5 + update t set a = 1;
+      ╰╴
+    error: column `x` of relation `t` does not exist
+      ╭▸ 
+    6 │ update t as x set x.a = 1, t.a = 2;
+      │                   ━━
+      ╰╴
+    help: `set` target columns cannot be qualified with the relation name
+      ╭╴
+    6 - update t as x set x.a = 1, t.a = 2;
+    6 + update t as x set a = 1, t.a = 2;
+      ╰╴
+    error: column `t.t` does not exist
+      ╭▸ 
+    6 │ update t as x set x.a = 1, t.a = 2;
+      │                            ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    6 - update t as x set x.a = 1, t.a = 2;
+    6 + update t as x set x.a = 1, a.a = 2;
+      ╰╴
+    error: column `t` of relation `t` does not exist
+      ╭▸ 
+    8 │ insert into t values (1) on conflict do update set t.a = 2;
+      │                                                    ━━
+      ╰╴
+    help: `set` target columns cannot be qualified with the relation name
+      ╭╴
+    8 - insert into t values (1) on conflict do update set t.a = 2;
+    8 + insert into t values (1) on conflict do update set a = 2;
+      ╰╴
+    ");
+}
+
+#[test]
 fn update_set_composite_field_missing() {
     assert_snapshot!(check("
 create type pair as (x int, y int);

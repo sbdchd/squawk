@@ -281,6 +281,10 @@ pub(crate) enum SemaError {
         column: Name,
         similar: Option<Name>,
     },
+    QualifiedSetTarget {
+        column: Name,
+        relation: Name,
+    },
     UnresolvedReference {
         kind: ReferenceKind,
         name: Name,
@@ -306,6 +310,24 @@ pub(crate) enum SemaError {
         args: ErrorArgs,
         lookup: LookupKind,
         similar: Option<Name>,
+        misplaced_order_by: bool,
+    },
+    ProcedureCalledAsFunction {
+        schema: Option<Name>,
+        name: Name,
+        args: ErrorArgs,
+        select_range: Option<TextRange>,
+    },
+    FunctionCalledAsProcedure {
+        schema: Option<Name>,
+        name: Name,
+        args: ErrorArgs,
+        call_range: Option<TextRange>,
+    },
+    AggregateDroppedAsFunction {
+        schema: Option<Name>,
+        name: Name,
+        function_range: Option<TextRange>,
     },
     UnresolvedOperator {
         schema: Option<Name>,
@@ -358,6 +380,13 @@ pub(crate) enum SemaError {
         name: Name,
         copy_from: bool,
         kind: TableKind,
+    },
+    CannotOpenIndex {
+        name: Name,
+    },
+    ParameterlessAggregate {
+        name: Name,
+        star_at: TextSize,
     },
     CannotCreateIndex {
         name: Name,
@@ -833,7 +862,13 @@ impl SemaError {
             SemaError::UnresolvedTransform { .. } => DiagnosticKind::UnresolvedTransform,
             SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
-            SemaError::UnresolvedQualifiedColumn { .. } => DiagnosticKind::UnresolvedColumn,
+            SemaError::ProcedureCalledAsFunction { .. }
+            | SemaError::FunctionCalledAsProcedure { .. }
+            | SemaError::AggregateDroppedAsFunction { .. }
+            | SemaError::ParameterlessAggregate { .. } => DiagnosticKind::WrongRoutineKind,
+            SemaError::UnresolvedQualifiedColumn { .. } | SemaError::QualifiedSetTarget { .. } => {
+                DiagnosticKind::UnresolvedColumn
+            }
             SemaError::UnresolvedReference { kind, .. } => unresolved_kind(kind),
             SemaError::AmbiguousReference { kind, .. } => ambiguous_kind(kind),
             SemaError::NotLateral {
@@ -858,6 +893,7 @@ impl SemaError {
             SemaError::MissingShellType => DiagnosticKind::MissingShellType,
             SemaError::WrongRelationKind { .. }
             | SemaError::CannotCopy { .. }
+            | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
             SemaError::NotIdentityColumn { .. } => DiagnosticKind::NotIdentityColumn,
             SemaError::ConstraintTrigger { .. } => DiagnosticKind::ReplaceConstraintTrigger,
@@ -944,9 +980,54 @@ impl SemaError {
                 range,
                 quote_ident(names.resolve(similar)),
             ),
+            SemaError::ProcedureCalledAsFunction {
+                select_range: Some(select_range),
+                ..
+            } => Suggestion {
+                message: "to call a procedure, use `call`".into(),
+                fix: Fix {
+                    title: "Replace with `call`".into(),
+                    edits: vec![Edit::replace(select_range, "call")],
+                },
+            },
+            SemaError::FunctionCalledAsProcedure {
+                call_range: Some(call_range),
+                ..
+            } => Suggestion {
+                message: "to call a function, use `select`".into(),
+                fix: Fix {
+                    title: "Replace with `select`".into(),
+                    edits: vec![Edit::replace(call_range, "select")],
+                },
+            },
+            SemaError::AggregateDroppedAsFunction {
+                function_range: Some(function_range),
+                ..
+            } => Suggestion {
+                message: "use `drop aggregate` to drop aggregate functions".into(),
+                fix: Fix {
+                    title: "Replace with `aggregate`".into(),
+                    edits: vec![Edit::replace(function_range, "aggregate")],
+                },
+            },
+            SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
+                message: "use `*` to call an aggregate with no arguments".into(),
+                fix: Fix {
+                    title: "Insert `*`".into(),
+                    edits: vec![Edit::insert("*", star_at)],
+                },
+            },
+            SemaError::QualifiedSetTarget { column, .. } => Suggestion {
+                message: "`set` target columns cannot be qualified with the relation name".into(),
+                fix: Fix {
+                    title: format!("Remove `{}.`", quote_ident(names.resolve(column))).into(),
+                    edits: vec![Edit::delete(range)],
+                },
+            },
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),
+                misplaced_order_by: false,
                 ..
             } => {
                 let message = match kind {
@@ -1012,6 +1093,9 @@ impl SemaError {
             SemaError::CannotCopy {
                 copy_from, kind, ..
             } => copy_target(copy_from, kind).1,
+            SemaError::CannotOpenIndex { .. } => {
+                Some("this operation is not supported for indexes")
+            }
             SemaError::WindowFrameCopy { hint, .. } => {
                 hint.then_some("omit the parentheses in this `over` clause")
             }
@@ -1019,12 +1103,17 @@ impl SemaError {
                 "create a unique index with no `where` clause on one or more columns of the materialized view",
             ),
             SemaError::UnresolvedRoutine {
+                misplaced_order_by: true,
+                ..
+            } => Some("`order by` must appear after all regular arguments of the aggregate"),
+            SemaError::UnresolvedRoutine {
                 similar: Some(_), ..
             } => None,
             SemaError::UnresolvedRoutine {
                 args,
                 lookup,
                 similar: None,
+                misplaced_order_by: false,
                 ..
             } => match (lookup, args) {
                 (LookupKind::Call, ErrorArgs::List(args)) if !args.is_empty() => {
@@ -1034,6 +1123,17 @@ impl SemaError {
                     None
                 }
             },
+            SemaError::ProcedureCalledAsFunction {
+                select_range: None,
+                ..
+            } => Some("to call a procedure, use `call`"),
+            SemaError::FunctionCalledAsProcedure {
+                call_range: None, ..
+            } => Some("to call a function, use `select`"),
+            SemaError::AggregateDroppedAsFunction {
+                function_range: None,
+                ..
+            } => Some("use `drop aggregate` to drop aggregate functions"),
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
@@ -1119,6 +1219,39 @@ impl ErrorMessage<'_> {
         fmt::from_fn(move |f| {
             let suffix = if ty.array { "[]" } else { "" };
             write!(f, "{}{suffix}", self.names.resolve(ty.name))
+        })
+    }
+
+    fn signature(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        args: ErrorArgs,
+    ) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            let n = |name| self.names.resolve(name);
+            if let Some(schema) = schema {
+                write!(f, "{}.", n(schema))?;
+            }
+            write!(f, "{}(", n(name))?;
+            let args = match args {
+                ErrorArgs::List(args) => args,
+                ErrorArgs::Star => return f.write_str("*)"),
+            };
+            for (i, arg) in args.iter().enumerate() {
+                let arg = self.args[arg];
+                if i > 0 {
+                    f.write_str(", ")?;
+                }
+                if arg.variadic {
+                    f.write_str("variadic ")?;
+                }
+                if let Some(name) = arg.name {
+                    write!(f, "{} => ", n(name))?;
+                }
+                write!(f, "{}", self.operand(arg.ty))?;
+            }
+            f.write_str(")")
         })
     }
 
@@ -1435,6 +1568,12 @@ impl fmt::Display for ErrorMessage<'_> {
             } => {
                 write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
             }
+            SemaError::QualifiedSetTarget { column, relation } => write!(
+                f,
+                "column `{}` of relation `{}` does not exist",
+                n(column),
+                n(relation)
+            ),
             SemaError::NotLateral {
                 column: Some(column),
                 ..
@@ -1458,6 +1597,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 args,
                 lookup: _,
                 similar: _,
+                misplaced_order_by: _,
             } => {
                 let label = match kind {
                     RoutineKind::Routine => RoutineKind::Function.label(),
@@ -1465,30 +1605,26 @@ impl fmt::Display for ErrorMessage<'_> {
                         kind.label()
                     }
                 };
-                write!(f, "{label} `")?;
-                if let Some(schema) = schema {
-                    write!(f, "{}.", n(schema))?;
-                }
-                write!(f, "{}(", n(name))?;
-                let args = match args {
-                    ErrorArgs::List(args) => args,
-                    ErrorArgs::Star => return f.write_str("*)` does not exist"),
-                };
-                for (i, arg) in args.iter().enumerate() {
-                    let arg = self.args[arg];
-                    if i > 0 {
-                        f.write_str(", ")?;
-                    }
-                    if arg.variadic {
-                        f.write_str("variadic ")?;
-                    }
-                    if let Some(name) = arg.name {
-                        write!(f, "{} => ", n(name))?;
-                    }
-                    write!(f, "{}", self.operand(arg.ty))?;
-                }
-                f.write_str(")` does not exist")
+                write!(
+                    f,
+                    "{label} `{}` does not exist",
+                    self.signature(schema, name, args)
+                )
             }
+            SemaError::ProcedureCalledAsFunction {
+                schema, name, args, ..
+            } => write!(f, "`{}` is a procedure", self.signature(schema, name, args)),
+            SemaError::FunctionCalledAsProcedure {
+                schema, name, args, ..
+            } => write!(
+                f,
+                "`{}` is not a procedure",
+                self.signature(schema, name, args)
+            ),
+            SemaError::AggregateDroppedAsFunction { schema, name, .. } => match schema {
+                Some(schema) => write!(f, "`{}.{}` is an aggregate function", n(schema), n(name)),
+                None => write!(f, "`{}` is an aggregate function", n(name)),
+            },
             SemaError::UnresolvedOperator {
                 schema,
                 name,
@@ -1552,6 +1688,14 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::WrongRelationKind { name, expected, .. } => {
                 write!(f, "`{}` is not a {}", n(name), expected.label())
             }
+            SemaError::CannotOpenIndex { name } => {
+                write!(f, "cannot open relation `{}`", n(name))
+            }
+            SemaError::ParameterlessAggregate { name, .. } => write!(
+                f,
+                "`{}(*)` must be used to call a parameterless aggregate function",
+                n(name)
+            ),
             SemaError::CannotCopy {
                 name,
                 copy_from,

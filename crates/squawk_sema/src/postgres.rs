@@ -48,7 +48,7 @@ fn choose_name(
             0 => Cow::Borrowed(label),
             _ => Cow::Owned(format!("{label}{pass}")),
         };
-        let name = make_object_name(name1, name2, &label);
+        let name = make_object_name(name1, name2, Some(&label));
         if !used(&name) {
             return name;
         }
@@ -57,8 +57,8 @@ fn choose_name(
 }
 
 // see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/commands/indexcmds.c#L2556
-fn make_object_name(name1: &str, name2: Option<&str>, label: &str) -> String {
-    let overhead = usize::from(name2.is_some()) + label.len() + 1;
+fn make_object_name(name1: &str, name2: Option<&str>, label: Option<&str>) -> String {
+    let overhead = usize::from(name2.is_some()) + label.map_or(0, |label| label.len() + 1);
     let available = MAX_IDENTIFIER_LEN.saturating_sub(overhead);
     let mut len1 = name1.len();
     let mut len2 = name2.map_or(0, str::len);
@@ -75,8 +75,21 @@ fn make_object_name(name1: &str, name2: Option<&str>, label: &str) -> String {
         name.push('_');
         name.push_str(clip_to_char_boundary(name2, len2));
     }
-    name.push('_');
-    name.push_str(label);
+    if let Some(label) = label {
+        name.push('_');
+        name.push_str(label);
+    }
+    name
+}
+
+// see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/catalog/pg_type.c#L844
+pub(crate) fn make_array_type_name(type_name: &str, mut used: impl FnMut(&str) -> bool) -> String {
+    let mut name = make_object_name("", Some(type_name), None);
+    let mut pass = 0;
+    while used(&name) {
+        pass += 1;
+        name = make_object_name("", Some(type_name), Some(&pass.to_string()));
+    }
     name
 }
 
@@ -187,7 +200,10 @@ fn clip_to_char_boundary(text: &str, mut len: usize) -> &str {
 
 #[cfg(test)]
 mod tests {
-    use super::{make_multirange_type_name, split_identifier_string, truncate_identifier};
+    use super::{
+        make_array_type_name, make_multirange_type_name, split_identifier_string,
+        truncate_identifier,
+    };
 
     #[track_caller]
     fn split(text: &str) -> Option<Vec<String>> {
@@ -265,6 +281,26 @@ mod tests {
         assert_eq!(truncate_identifier(&"a".repeat(64)), "a".repeat(63));
         let multibyte = format!("{}é", "a".repeat(62));
         assert_eq!(truncate_identifier(&multibyte), "a".repeat(62));
+    }
+
+    #[test]
+    fn array_type_names() {
+        assert_eq!(make_array_type_name("x", |_| false), "_x");
+        assert_eq!(make_array_type_name("x", |name| name == "_x"), "_x_1");
+        assert_eq!(
+            make_array_type_name("x", |name| ["_x", "_x_1"].contains(&name)),
+            "_x_2"
+        );
+        assert_eq!(make_array_type_name("_y", |_| false), "__y");
+        let long = "a".repeat(63);
+        assert_eq!(
+            make_array_type_name(&long, |_| false),
+            format!("_{}", "a".repeat(62))
+        );
+        assert_eq!(
+            make_array_type_name(&long, |name| name.len() == 63 && !name.ends_with("_1")),
+            format!("_{}_1", "a".repeat(60))
+        );
     }
 
     #[test]

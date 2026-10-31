@@ -23,6 +23,26 @@ select 'happy'::mood$0;
 }
 
 #[test]
+fn cast_to_derived_array_type() {
+    assert_snapshot!(goto("
+create type mood as enum (
+  'happy',
+  'sad'
+);
+select '{happy}'::_mood$0;
+"), @"
+    info: goto definition
+      ╭▸ file0.sql:2:13
+      │
+    2 │ create type mood as enum (
+      │             ──── 2. destination
+      ‡
+    6 │ select '{happy}'::_mood;
+      ╰╴                  ───── 1. source
+    ");
+}
+
+#[test]
 fn cast_function_syntax() {
     assert_snapshot!(goto("
 create domain posint as int check (value > 0);

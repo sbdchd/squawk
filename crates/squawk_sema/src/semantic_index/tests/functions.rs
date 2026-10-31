@@ -440,28 +440,93 @@ create or replace procedure p(a int) language sql as 'select 1';
 #[test]
 fn procedure_not_callable_in_expr() {
     assert_snapshot!(check("
-create procedure p() language sql as 'select 1';
-select p();
-select * from p();
+create procedure p(a int) language sql as 'select 1';
+select p(1);
+select public.p(a => 1);
+select p(1) + 1;
+select p(1), 2;
+select p(1) as x;
+select * from p(1);
+with c as (select 1) select p(1);
+select (select p(1));
+select p('a', 'b');
+create function f() returns void language sql as $$ select p(1) $$;
 "), @"
-    error: function `p()` does not exist
+    error: `p(int4)` is a procedure
       ╭▸ 
-    3 │ select p();
+    3 │ select p(1);
       │        ━
       ╰╴
-    help: a function with a similar name exists
+    help: to call a procedure, use `call`
       ╭╴
-    3 │ select pi();
-      ╰╴        +
-    error: function `p()` does not exist
+    3 - select p(1);
+    3 + call p(1);
+      ╰╴
+    error: `public.p(a => int4)` is a procedure
       ╭▸ 
-    4 │ select * from p();
+    4 │ select public.p(a => 1);
       │               ━
       ╰╴
-    help: a function with a similar name exists
+    help: to call a procedure, use `call`
       ╭╴
-    4 │ select * from pi();
-      ╰╴               +
+    4 - select public.p(a => 1);
+    4 + call public.p(a => 1);
+      ╰╴
+    error: `p(int4)` is a procedure
+      ╭▸ 
+    5 │ select p(1) + 1;
+      │        ━
+      │
+      ╰ hint: to call a procedure, use `call`
+    error: `p(int4)` is a procedure
+      ╭▸ 
+    6 │ select p(1), 2;
+      │        ━
+      │
+      ╰ hint: to call a procedure, use `call`
+    error: `p(int4)` is a procedure
+      ╭▸ 
+    7 │ select p(1) as x;
+      │        ━
+      │
+      ╰ hint: to call a procedure, use `call`
+    error: `p(int4)` is a procedure
+      ╭▸ 
+    8 │ select * from p(1);
+      │               ━
+      │
+      ╰ hint: to call a procedure, use `call`
+    error: `p(int4)` is a procedure
+      ╭▸ 
+    9 │ with c as (select 1) select p(1);
+      │                             ━
+      │
+      ╰ hint: to call a procedure, use `call`
+    error: `p(int4)` is a procedure
+       ╭▸ 
+    10 │ select (select p(1));
+       │                ━
+       │
+       ╰ hint: to call a procedure, use `call`
+    error: function `p(unknown, unknown)` does not exist
+       ╭▸ 
+    11 │ select p('a', 'b');
+       │        ━
+       ╰╴
+    help: a function with a similar name exists
+       ╭╴
+    11 │ select pi('a', 'b');
+       ╰╴        +
+    error: `p(int4)` is a procedure
+       ╭▸ 
+    12 │ create function f() returns void language sql as $$ select p(1) $$;
+       │                                                            ━
+       ╰╴
+    help: to call a procedure, use `call`
+       ╭╴
+    12 - create function f() returns void language sql as $$ select p(1) $$;
+    12 + create function f() returns void language sql as $$ call p(1) $$;
+       ╰╴
     ");
 }
 
@@ -718,6 +783,9 @@ call p(1, 'y');
 call p(a => 1, b => 'y');
 call p(c => 1);
 call f();
+call public.f();
+call f(1);
+call count(1);
 call nope();
 call p((select x from nope));
 "), @"
@@ -727,27 +795,57 @@ call p((select x from nope));
       │      ━
       │
       ╰ hint: consider adding explicit type casts
-    error: procedure `f()` does not exist
+    error: `f()` is not a procedure
       ╭▸ 
     8 │ call f();
       │      ━
       ╰╴
-    help: a procedure with a similar name exists
+    help: to call a function, use `select`
       ╭╴
     8 - call f();
-    8 + call p();
+    8 + select f();
       ╰╴
-    error: procedure `nope()` does not exist
+    error: `public.f()` is not a procedure
       ╭▸ 
-    9 │ call nope();
-      ╰╴     ━━━━
+    9 │ call public.f();
+      │             ━
+      ╰╴
+    help: to call a function, use `select`
+      ╭╴
+    9 - call public.f();
+    9 + select public.f();
+      ╰╴
+    error: procedure `f(int4)` does not exist
+       ╭▸ 
+    10 │ call f(1);
+       │      ━
+       ╰╴
+    help: a procedure with a similar name exists
+       ╭╴
+    10 - call f(1);
+    10 + call p(1);
+       ╰╴
+    error: `count(int4)` is not a procedure
+       ╭▸ 
+    11 │ call count(1);
+       │      ━━━━━
+       ╰╴
+    help: to call a function, use `select`
+       ╭╴
+    11 - call count(1);
+    11 + select count(1);
+       ╰╴
+    error: procedure `nope()` does not exist
+       ╭▸ 
+    12 │ call nope();
+       ╰╴     ━━━━
     error: cannot use subquery in `call` argument
        ╭▸ 
-    10 │ call p((select x from nope));
+    13 │ call p((select x from nope));
        ╰╴        ━━━━━━━━━━━━━━━━━━
     error: relation `nope` does not exist
        ╭▸ 
-    10 │ call p((select x from nope));
+    13 │ call p((select x from nope));
        ╰╴                      ━━━━
     ");
 }

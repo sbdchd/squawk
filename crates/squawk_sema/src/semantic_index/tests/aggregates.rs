@@ -170,10 +170,16 @@ drop aggregate s(int);
 drop aggregate if exists s(int);
 drop aggregate add(int, int);
 "), @"
-    error: function `s(int4)` does not exist
+    error: `s` is an aggregate function
       ╭▸ 
     5 │ drop function s(int);
-      ╰╴              ━
+      │               ━
+      ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+      ╭╴
+    5 - drop function s(int);
+    5 + drop aggregate s(int);
+      ╰╴
     error: function `s(int4)` does not exist
       ╭▸ 
     7 │ select s(1), c();
@@ -560,5 +566,150 @@ create rule r as on insert to t where count(*) > 1 do nothing;
        ╭▸ 
     23 │ create rule r as on insert to t where count(*) > 1 do nothing;
        ╰╴                                      ━━━━━━━━
+    ");
+}
+
+#[test]
+fn parameterless_aggregate_without_star() {
+    assert_snapshot!(check("
+select count();
+select count() over ();
+select pg_catalog.count();
+select count(*), count(*) over (), now(), rank() over (order by 1);
+"), @"
+    error: `count(*)` must be used to call a parameterless aggregate function
+      ╭▸ 
+    2 │ select count();
+      │        ━━━━━
+      ╰╴
+    help: use `*` to call an aggregate with no arguments
+      ╭╴
+    2 │ select count(*);
+      ╰╴             +
+    error: `count(*)` must be used to call a parameterless aggregate function
+      ╭▸ 
+    3 │ select count() over ();
+      │        ━━━━━
+      ╰╴
+    help: use `*` to call an aggregate with no arguments
+      ╭╴
+    3 │ select count(*) over ();
+      ╰╴             +
+    error: `count(*)` must be used to call a parameterless aggregate function
+      ╭▸ 
+    4 │ select pg_catalog.count();
+      │        ━━━━━━━━━━━━━━━━
+      ╰╴
+    help: use `*` to call an aggregate with no arguments
+      ╭╴
+    4 │ select pg_catalog.count(*);
+      ╰╴                        +
+    ");
+}
+
+#[test]
+fn misplaced_aggregate_order_by() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b text
+);
+select string_agg(a order by a, ',') from t;
+select string_agg(b, ',' order by a, b) from t;
+call p(1 order by 1, 2);
+create function f() returns text
+  language sql
+  as $$
+  select string_agg(b order by b, ',') from t
+$$;
+"), @"
+    error: function `string_agg(int4)` does not exist
+      ╭▸ 
+    6 │ select string_agg(a order by a, ',') from t;
+      │        ━━━━━━━━━━
+      │
+      ╰ hint: `order by` must appear after all regular arguments of the aggregate
+    error: procedure `p(int4)` does not exist
+      ╭▸ 
+    8 │ call p(1 order by 1, 2);
+      │      ━
+      │
+      ╰ hint: `order by` must appear after all regular arguments of the aggregate
+    error: function `string_agg(text)` does not exist
+       ╭▸ 
+    12 │   select string_agg(b order by b, ',') from t
+       │          ━━━━━━━━━━
+       │
+       ╰ hint: `order by` must appear after all regular arguments of the aggregate
+    ");
+}
+
+#[test]
+fn drop_function_on_aggregate() {
+    assert_snapshot!(check("
+create schema s;
+create aggregate a(int) (
+  sfunc = int4pl,
+  stype = int
+);
+create aggregate s.b(int) (
+  sfunc = int4pl,
+  stype = int
+);
+drop function a(int);
+drop function if exists a(int) cascade;
+drop function a;
+drop function s.b(int);
+drop function a(int), s.b(int);
+drop aggregate a(int);
+"), @"
+    error: `a` is an aggregate function
+       ╭▸ 
+    11 │ drop function a(int);
+       │               ━
+       ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+       ╭╴
+    11 - drop function a(int);
+    11 + drop aggregate a(int);
+       ╰╴
+    error: `a` is an aggregate function
+       ╭▸ 
+    12 │ drop function if exists a(int) cascade;
+       │                         ━
+       ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+       ╭╴
+    12 - drop function if exists a(int) cascade;
+    12 + drop aggregate if exists a(int) cascade;
+       ╰╴
+    error: `a` is an aggregate function
+       ╭▸ 
+    13 │ drop function a;
+       │               ━
+       │
+       ╰ hint: use `drop aggregate` to drop aggregate functions
+    error: `s.b` is an aggregate function
+       ╭▸ 
+    14 │ drop function s.b(int);
+       │                 ━
+       ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+       ╭╴
+    14 - drop function s.b(int);
+    14 + drop aggregate s.b(int);
+       ╰╴
+    error: `a` is an aggregate function
+       ╭▸ 
+    15 │ drop function a(int), s.b(int);
+       │               ━
+       │
+       ╰ hint: use `drop aggregate` to drop aggregate functions
+    error: `s.b` is an aggregate function
+       ╭▸ 
+    15 │ drop function a(int), s.b(int);
+       │                         ━
+       │
+       ╰ hint: use `drop aggregate` to drop aggregate functions
     ");
 }

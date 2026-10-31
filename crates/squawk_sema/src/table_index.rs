@@ -17,6 +17,7 @@ pub struct TableIndex {
     by_owner: LayeredMultimap<TableId, TableId>,
     by_type: LayeredMultimap<TypeId, TableId>,
     by_column_type: LayeredMultimap<ColumnTypeRef, TableId>,
+    by_array_name: LayeredMultimap<QualifiedName, TableId>,
 }
 
 impl TableIndex {
@@ -28,6 +29,7 @@ impl TableIndex {
             by_owner: LayeredMultimap::on_top_of(&base.by_owner),
             by_type: LayeredMultimap::on_top_of(&base.by_type),
             by_column_type: LayeredMultimap::on_top_of(&base.by_column_type),
+            by_array_name: LayeredMultimap::on_top_of(&base.by_array_name),
         }
     }
 
@@ -38,6 +40,7 @@ impl TableIndex {
             sequence_owner,
             of_type,
             columns: table_columns,
+            array_name,
             ..
         } = table;
         let id = self.arena.alloc(table);
@@ -52,11 +55,23 @@ impl TableIndex {
         if let Some(ty) = of_type {
             self.by_type.insert(ty, id);
         }
+        if let Some(name) = array_name {
+            self.by_array_name
+                .insert(QualifiedName { schema, name }, id);
+        }
         id
     }
 
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = TableId> + '_ {
         self.by_name.get(QualifiedName { schema, name })
+    }
+
+    pub(crate) fn with_array_name(
+        &self,
+        schema: Name,
+        name: Name,
+    ) -> impl Iterator<Item = TableId> + '_ {
+        self.by_array_name.get(QualifiedName { schema, name })
     }
 
     pub fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = TableId> + '_ {
@@ -101,6 +116,23 @@ impl TableIndex {
         self.requalify(id, QualifiedName { schema, name });
     }
 
+    pub(crate) fn set_array_name(&mut self, id: TableId, array_name: Option<Name>) -> Option<Name> {
+        let table = self.local_mut(id);
+        let schema = table.schema;
+        let previous = std::mem::replace(&mut table.array_name, array_name);
+        if previous != array_name {
+            if let Some(name) = previous {
+                self.by_array_name
+                    .remove(QualifiedName { schema, name }, id);
+            }
+            if let Some(name) = array_name {
+                self.by_array_name
+                    .insert(QualifiedName { schema, name }, id);
+            }
+        }
+        previous
+    }
+
     pub(crate) fn set_schema(&mut self, id: TableId, schema: Name) -> bool {
         let Some(table) = self.arena.get_local_mut(id) else {
             return false;
@@ -119,6 +151,7 @@ impl TableIndex {
 
     fn requalify(&mut self, id: TableId, current: QualifiedName) {
         let table = self.local_mut(id);
+        let array_name = table.array_name;
         let previous = QualifiedName {
             schema: std::mem::replace(&mut table.schema, current.schema),
             name: std::mem::replace(&mut table.name, current.name),
@@ -131,6 +164,14 @@ impl TableIndex {
         if previous.schema != current.schema {
             self.by_schema.remove(previous.schema, id);
             self.by_schema.insert(current.schema, id);
+            if let Some(name) = array_name {
+                let schema = previous.schema;
+                self.by_array_name
+                    .remove(QualifiedName { schema, name }, id);
+                let schema = current.schema;
+                self.by_array_name
+                    .insert(QualifiedName { schema, name }, id);
+            }
         }
     }
 
@@ -194,6 +235,7 @@ impl TableIndex {
         self.by_owner.shrink_to_fit();
         self.by_type.shrink_to_fit();
         self.by_column_type.shrink_to_fit();
+        self.by_array_name.shrink_to_fit();
     }
 }
 
