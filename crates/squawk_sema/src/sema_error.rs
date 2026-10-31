@@ -179,6 +179,7 @@ pub(crate) enum SemaError {
     NestedWindow,
     WindowWithoutOver {
         name: Name,
+        over_at: TextSize,
     },
     MisplacedAggregate {
         context: ExprContext,
@@ -1083,6 +1084,13 @@ impl SemaError {
                     edits: vec![Edit::replace(row_range, "table")],
                 },
             },
+            SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
+                message: "add an empty `over` clause to compute it over all rows".into(),
+                fix: Fix {
+                    title: "Insert `over ()`".into(),
+                    edits: vec![Edit::insert(" over ()", over_at)],
+                },
+            },
             SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
                 message: "use `*` to call an aggregate with no arguments".into(),
                 fix: Fix {
@@ -1406,7 +1414,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 "cannot use generated column `{}` in column generation expression",
                 n(column)
             ),
-            SemaError::WindowWithoutOver { name } => {
+            SemaError::WindowWithoutOver { name, .. } => {
                 write!(f, "window function `{}` requires an `over` clause", n(name))
             }
             SemaError::Duplicate { object, name } => {

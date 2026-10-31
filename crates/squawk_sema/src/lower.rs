@@ -18923,6 +18923,12 @@ impl Lowerer {
             .value
     }
 
+    fn node_range(&self, node: &SyntaxNode) -> TextRange {
+        self.index
+            .range(InIrFile::new(self.file_id, node.text_range()))
+            .value
+    }
+
     fn operand_name(&self, ty: ArgType) -> Option<OperandName> {
         match ty {
             ArgType::Known(ty) => Some(OperandName::Ty(self.index.ty_name(ty))),
@@ -21262,7 +21268,11 @@ impl Lowerer {
                 window: true, name, ..
             } = self.index.functions[function]
         {
-            self.push_error(call.syntax(), SemaError::WindowWithoutOver { name });
+            let over_at = self.node_range(call.syntax()).end();
+            self.push_error(
+                call.syntax(),
+                SemaError::WindowWithoutOver { name, over_at },
+            );
         }
         let kind = if call.over_clause().is_some() {
             AggregateCallKind::Window

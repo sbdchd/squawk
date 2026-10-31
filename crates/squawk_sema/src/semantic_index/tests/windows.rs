@@ -181,15 +181,30 @@ select count(*) from t;
     error: window function `rank` requires an `over` clause
       ╭▸ 
     3 │ select rank() from t;
-      ╰╴       ━━━━━━
+      │        ━━━━━━
+      ╰╴
+    help: add an empty `over` clause to compute it over all rows
+      ╭╴
+    3 │ select rank() over () from t;
+      ╰╴              +++++++
     error: window function `lag` requires an `over` clause
       ╭▸ 
     5 │ select lag(a) from t;
-      ╰╴       ━━━━━━
+      │        ━━━━━━
+      ╰╴
+    help: add an empty `over` clause to compute it over all rows
+      ╭╴
+    5 │ select lag(a) over () from t;
+      ╰╴              +++++++
     error: window function `w` requires an `over` clause
       ╭▸ 
     7 │ select w(a) from t;
-      ╰╴       ━━━━
+      │        ━━━━
+      ╰╴
+    help: add an empty `over` clause to compute it over all rows
+      ╭╴
+    7 │ select w(a) over () from t;
+      ╰╴            +++++++
     ");
 }
 
