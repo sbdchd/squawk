@@ -43,8 +43,9 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        DropRelation, ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName, SemaError, Similar,
-        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
+        DropRelation, ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName,
+        OperatorReplacement, SemaError, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
+        ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -9609,6 +9610,8 @@ impl Lowerer {
                                 left,
                                 right: OperandName::Ty(self.index.ty_name(right)),
                                 lookup: LookupKind::Signature,
+                                ambiguous: false,
+                                replacement: None,
                             };
                             self.push_error_at(InIrFile::new(self.file_id, range), error);
                             Resolution::Unknown
@@ -18936,16 +18939,19 @@ impl Lowerer {
     ) -> Option<Ty> {
         let name = self.intern(text);
         let mut resolution = self.select_operator(schema, name, left, right);
-        if matches!(resolution, Resolution::Unresolved)
-            && let Some(left) = left.map_or(Some(None), |left| self.operand_name(left).map(Some))
-            && let Some(right) = right.and_then(|right| self.operand_name(right))
+        if matches!(resolution, Resolution::Unresolved | Resolution::Ambiguous)
+            && let Some(left_name) =
+                left.map_or(Some(None), |left| self.operand_name(left).map(Some))
+            && let Some(right_name) = right.and_then(|right| self.operand_name(right))
         {
             let error = SemaError::UnresolvedOperator {
                 schema,
                 name,
-                left,
-                right,
+                left: left_name,
+                right: right_name,
                 lookup: LookupKind::Call,
+                ambiguous: matches!(resolution, Resolution::Ambiguous),
+                replacement: self.operator_replacement(schema, text, left, right),
             };
             self.push_error_at(InIrFile::new(self.file_id, range), error);
             resolution = Resolution::Unknown;
@@ -19084,6 +19090,35 @@ impl Lowerer {
         self.index
             .range(InIrFile::new(self.file_id, node.text_range()))
             .value
+    }
+
+    fn operator_replacement(
+        &self,
+        schema: Option<Name>,
+        text: &str,
+        left: Option<ArgType>,
+        right: Option<ArgType>,
+    ) -> Option<OperatorReplacement> {
+        let (None, Some(left), Some(right)) = (schema, left, right) else {
+            return None;
+        };
+        let replacement = match text {
+            "+" => {
+                let overloads = self.overloads();
+                if !overloads.is_string(left) && !overloads.is_string(right) {
+                    return None;
+                }
+                OperatorReplacement::Concat
+            }
+            "==" => OperatorReplacement::Equals,
+            _ => return None,
+        };
+        let name = self.index.names.lookup(replacement.text())?;
+        matches!(
+            self.select_operator(None, name, Some(left), Some(right)),
+            Resolution::Operator(_)
+        )
+        .then_some(replacement)
     }
 
     fn operand_name(&self, ty: ArgType) -> Option<OperandName> {

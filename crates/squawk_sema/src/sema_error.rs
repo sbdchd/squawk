@@ -47,6 +47,28 @@ pub(crate) enum OperandName {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum OperatorReplacement {
+    Concat,
+    Equals,
+}
+
+impl OperatorReplacement {
+    pub(crate) fn text(self) -> &'static str {
+        match self {
+            OperatorReplacement::Concat => "||",
+            OperatorReplacement::Equals => "=",
+        }
+    }
+
+    fn message(self) -> &'static str {
+        match self {
+            OperatorReplacement::Concat => "use `||` to concatenate strings",
+            OperatorReplacement::Equals => "use `=` to compare for equality",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum LookupKind {
     Call,
     Signature,
@@ -357,6 +379,8 @@ pub(crate) enum SemaError {
         left: Option<OperandName>,
         right: OperandName,
         lookup: LookupKind,
+        ambiguous: bool,
+        replacement: Option<OperatorReplacement>,
     },
     InvalidEnumValue {
         ty: Name,
@@ -930,7 +954,12 @@ impl SemaError {
             SemaError::AccessMethodKindMismatch { .. } => DiagnosticKind::AccessMethodKindMismatch,
             SemaError::UnresolvedCast { .. } => DiagnosticKind::UnresolvedCast,
             SemaError::UnresolvedTransform { .. } => DiagnosticKind::UnresolvedTransform,
-            SemaError::UnresolvedOperator { .. } => DiagnosticKind::UnresolvedOperator,
+            SemaError::UnresolvedOperator {
+                ambiguous: true, ..
+            } => DiagnosticKind::AmbiguousOperator,
+            SemaError::UnresolvedOperator {
+                ambiguous: false, ..
+            } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
@@ -1214,6 +1243,10 @@ impl SemaError {
                     },
                 }
             }
+            SemaError::UnresolvedOperator {
+                replacement: Some(replacement),
+                ..
+            } => replace_suggestion(replacement.message(), range, replacement.text().into()),
             SemaError::FutureCte { name, recursive_at } => Suggestion {
                 message: format!(
                     "to reference `{}`, mark the `with` clause as `recursive`",
@@ -1307,6 +1340,13 @@ impl SemaError {
             SemaError::UnnestColumnDefList => Some(
                 "use a separate `unnest` call for each array inside `rows from`, each with its own column definition list",
             ),
+            SemaError::UnresolvedOperator {
+                replacement: Some(_),
+                ..
+            } => None,
+            SemaError::UnresolvedOperator {
+                ambiguous: true, ..
+            } => Some("could not choose a best candidate operator; consider adding explicit type casts"),
             SemaError::UnresolvedOperator { lookup, .. } => match lookup {
                 LookupKind::Call => Some("consider adding explicit type casts"),
                 LookupKind::Signature => None,
@@ -1849,8 +1889,14 @@ impl fmt::Display for ErrorMessage<'_> {
                 left,
                 right,
                 lookup: _,
+                ambiguous,
+                replacement: _,
             } => {
-                f.write_str("operator does not exist: `")?;
+                if ambiguous {
+                    f.write_str("operator is not unique: `")?;
+                } else {
+                    f.write_str("operator does not exist: `")?;
+                }
                 if let Some(left) = left {
                     write!(f, "{} ", self.operand(left))?;
                 }
