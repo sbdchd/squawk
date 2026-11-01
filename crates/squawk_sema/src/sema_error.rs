@@ -371,6 +371,12 @@ pub(crate) enum SemaError {
         name: Name,
         arg: Name,
     },
+    ArgumentPositionalAndNamed {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg: Name,
+    },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
         name: Name,
@@ -1019,9 +1025,9 @@ impl SemaError {
             SemaError::ArgumentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
             SemaError::ArgumentCountMismatch { .. } => DiagnosticKind::ArgumentCountMismatch,
             SemaError::UnknownArgumentName { .. } => DiagnosticKind::UnresolvedParam,
-            SemaError::PositionalAfterNamed | SemaError::DuplicateArgumentName { .. } => {
-                DiagnosticKind::InvalidArgument
-            }
+            SemaError::PositionalAfterNamed
+            | SemaError::DuplicateArgumentName { .. }
+            | SemaError::ArgumentPositionalAndNamed { .. } => DiagnosticKind::InvalidArgument,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
@@ -1992,6 +1998,17 @@ impl fmt::Display for ErrorMessage<'_> {
                 kind.call_label(),
                 self.qualified(schema, name),
                 n(arg)
+            ),
+            SemaError::ArgumentPositionalAndNamed {
+                kind: _,
+                schema,
+                name,
+                arg,
+            } => write!(
+                f,
+                "argument `{}` of `{}` was specified both positionally and by name",
+                n(arg),
+                self.qualified(schema, name)
             ),
             SemaError::ProcedureCalledAsFunction {
                 schema, name, args, ..

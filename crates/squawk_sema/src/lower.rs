@@ -22284,6 +22284,15 @@ impl Lowerer {
                 },
                 target: call_arg_name(arg_list, args, arg),
             }),
+            CallMismatch::PositionalAndNamed { arg } => Some(CallMismatchError {
+                error: SemaError::ArgumentPositionalAndNamed {
+                    kind,
+                    schema,
+                    name,
+                    arg: args[arg].name?,
+                },
+                target: call_arg_name(arg_list, args, arg),
+            }),
             CallMismatch::ArgType(ArgMismatch {
                 position,
                 found,

@@ -38,6 +38,7 @@ impl CallArg {
 pub(crate) enum CallMismatch {
     ArgCount(ArgCount),
     UnknownName { arg: usize },
+    PositionalAndNamed { arg: usize },
     ArgType(ArgMismatch),
 }
 
@@ -372,7 +373,7 @@ impl<'a> Overloads<'a> {
                         return Some(CallMismatch::UnknownName { arg: i });
                     };
                     if assigned[position] {
-                        return None;
+                        return Some(CallMismatch::PositionalAndNamed { arg: i });
                     }
                     position
                 }

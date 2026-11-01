@@ -1225,3 +1225,21 @@ select foo(1, z => 2);
       ╰╴              ━
     ");
 }
+
+#[test]
+fn arg_positional_and_named() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+select foo(1, x => 2);
+select foo(1, 2, y => 3);
+"), @"
+    error: argument `x` of `foo` was specified both positionally and by name
+      ╭▸ 
+    3 │ select foo(1, x => 2);
+      ╰╴              ━
+    error: argument `y` of `foo` was specified both positionally and by name
+      ╭▸ 
+    4 │ select foo(1, 2, y => 3);
+      ╰╴                 ━
+    ");
+}
