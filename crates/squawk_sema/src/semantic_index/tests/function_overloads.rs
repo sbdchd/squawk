@@ -125,3 +125,38 @@ select to_char(true, 'x');
       ╰ hint: consider adding explicit type casts
     ");
 }
+
+#[test]
+fn overloads_reject_arg_names() {
+    assert_snapshot!(check("
+create function o(x int) returns int language sql return 1;
+create function o(x text) returns int language sql return 1;
+create procedure p(a int) language sql as '';
+create procedure p(a text) language sql as '';
+select o(z => 1);
+select o(x => true);
+call p(b => 1);
+"), @"
+    error: function `o(z => int4)` does not exist
+      ╭▸ 
+    6 │ select o(z => 1);
+      │        ━
+      │
+      ├ note: candidates are `o(int4)`, `o(text)`
+      ╰ hint: no function with that name accepts the given argument names
+    error: function `o(x => bool)` does not exist
+      ╭▸ 
+    7 │ select o(x => true);
+      │        ━
+      │
+      ├ note: candidates are `o(int4)`, `o(text)`
+      ╰ hint: consider adding explicit type casts
+    error: procedure `p(b => int4)` does not exist
+      ╭▸ 
+    8 │ call p(b => 1);
+      │      ━
+      │
+      ├ note: candidates are `p(int4)`, `p(text)`
+      ╰ hint: no procedure with that name accepts the given argument names
+    ");
+}

@@ -356,6 +356,7 @@ pub(crate) enum SemaError {
         similar: Option<Name>,
         misplaced_order_by: bool,
         candidates: Option<ErrorCandidates>,
+        unknown_names: bool,
     },
     ArgumentTypeMismatch {
         kind: RoutineKind,
@@ -1417,6 +1418,18 @@ impl SemaError {
                 similar: Some(_), ..
             } => None,
             SemaError::UnresolvedRoutine {
+                kind,
+                unknown_names: true,
+                ..
+            } => Some(match kind {
+                RoutineKind::Procedure => {
+                    "no procedure with that name accepts the given argument names"
+                }
+                RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Routine => {
+                    "no function with that name accepts the given argument names"
+                }
+            }),
+            SemaError::UnresolvedRoutine {
                 args,
                 lookup,
                 similar: None,
@@ -1994,6 +2007,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 similar: _,
                 misplaced_order_by: _,
                 candidates: _,
+                unknown_names: _,
             } => write!(
                 f,
                 "{} `{}` does not exist",

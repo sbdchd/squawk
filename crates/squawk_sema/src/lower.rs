@@ -10024,6 +10024,7 @@ impl Lowerer {
                                     similar,
                                     misplaced_order_by: false,
                                     candidates: None,
+                                    unknown_names: false,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -19219,6 +19220,8 @@ impl Lowerer {
         } else {
             self.similar_function(schema, name, kind, LookupKind::Call)
         };
+        let unknown_names =
+            candidates.is_some() && !self.accepts_arg_names(kind, schema, name, args);
         self.push_error(
             node,
             SemaError::UnresolvedRoutine {
@@ -19230,6 +19233,7 @@ impl Lowerer {
                 similar,
                 misplaced_order_by,
                 candidates,
+                unknown_names,
             },
         );
         Resolution::Unknown
@@ -22254,6 +22258,24 @@ impl Lowerer {
             });
         }
         ErrorArgs::List(self.index.errors.args.range_from(start))
+    }
+
+    fn accepts_arg_names(
+        &self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+    ) -> bool {
+        self.routine_candidates(schema, name, call_kind(kind))
+            .any(|function| {
+                let params = self.index.functions[function].params;
+                args.iter().filter_map(|arg| arg.name).all(|arg| {
+                    params
+                        .iter()
+                        .any(|param| self.index.params[param].name == Some(arg))
+                })
+            })
     }
 
     fn call_mismatch(
