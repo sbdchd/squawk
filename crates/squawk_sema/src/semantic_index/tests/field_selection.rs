@@ -459,6 +459,55 @@ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
 }
 
 #[test]
+fn date_time_keyword_field_selection() {
+    assert_snapshot!(check("
+select
+  (current_date).x,
+  (current_time).x,
+  (current_time(1)).x,
+  (current_timestamp(3)).x;
+select
+  (localtime).x,
+  (localtime(1)).x,
+  (localtimestamp).x,
+  (localtimestamp(1)).x;
+"), @"
+    error: column notation `.x` applied to type `date`, which is not a composite type
+      ╭▸ 
+    3 │   (current_date).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `timetz`, which is not a composite type
+      ╭▸ 
+    4 │   (current_time).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `timetz`, which is not a composite type
+      ╭▸ 
+    5 │   (current_time(1)).x,
+      ╰╴                    ━
+    error: column notation `.x` applied to type `timestamptz`, which is not a composite type
+      ╭▸ 
+    6 │   (current_timestamp(3)).x;
+      ╰╴                         ━
+    error: column notation `.x` applied to type `time`, which is not a composite type
+      ╭▸ 
+    8 │   (localtime).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `time`, which is not a composite type
+      ╭▸ 
+    9 │   (localtime(1)).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `timestamp`, which is not a composite type
+       ╭▸ 
+    10 │   (localtimestamp).x,
+       ╰╴                   ━
+    error: column notation `.x` applied to type `timestamp`, which is not a composite type
+       ╭▸ 
+    11 │   (localtimestamp(1)).x;
+       ╰╴                      ━
+    ");
+}
+
+#[test]
 fn grouping_field_selection() {
     assert_snapshot!(check("
 create table t (a int, b int);

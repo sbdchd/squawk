@@ -18910,6 +18910,11 @@ impl Lowerer {
         if call.exists_fn().is_some() {
             return self.builtin_type("bool");
         }
+        if let Some(ast::Expr::NameRef(name_ref)) = call.expr()
+            && let Some(function) = name_ref.sql_value_function()
+        {
+            return self.builtin_type(sql_value_function_type(function));
+        }
         None
     }
 
@@ -20477,11 +20482,12 @@ impl Lowerer {
     fn lower_expr(&mut self, expr: &ast::Expr) -> Option<Ty> {
         match expr {
             ast::Expr::NameRef(name_ref) => {
-                if let Some(function) = name_ref
-                    .sql_value_function()
-                    .and_then(sql_value_function_name)
-                {
-                    return self.lower_system_call(function, &[], name_ref.syntax().text_range());
+                if let Some(function) = name_ref.sql_value_function() {
+                    if let Some(name) = sql_value_function_name(function) {
+                        let range = name_ref.syntax().text_range();
+                        return self.lower_system_call(name, &[], range);
+                    }
+                    return self.builtin_type(sql_value_function_type(function));
                 }
                 let name = self.name_ref_name(name_ref)?;
                 let resolution = self.add_name_ref(name, name_ref.syntax());
@@ -24145,6 +24151,23 @@ fn sql_value_function_name(function: ast::SqlValueFunction) -> Option<&'static s
         | ast::SqlValueFunction::CurrentTime
         | ast::SqlValueFunction::Localtime
         | ast::SqlValueFunction::Localtimestamp => None,
+    }
+}
+
+fn sql_value_function_type(function: ast::SqlValueFunction) -> &'static str {
+    match function {
+        ast::SqlValueFunction::CurrentDate => "date",
+        ast::SqlValueFunction::CurrentTime => "timetz",
+        ast::SqlValueFunction::CurrentTimestamp => "timestamptz",
+        ast::SqlValueFunction::Localtime => "time",
+        ast::SqlValueFunction::Localtimestamp => "timestamp",
+        ast::SqlValueFunction::SystemUser => "text",
+        ast::SqlValueFunction::CurrentCatalog
+        | ast::SqlValueFunction::CurrentRole
+        | ast::SqlValueFunction::CurrentSchema
+        | ast::SqlValueFunction::CurrentUser
+        | ast::SqlValueFunction::SessionUser
+        | ast::SqlValueFunction::User => "name",
     }
 }
 
