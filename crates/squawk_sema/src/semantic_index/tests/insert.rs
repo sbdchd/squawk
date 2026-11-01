@@ -202,11 +202,11 @@ insert into t as x values (1) on conflict (a) do update set a = x.a + t.a return
 fn on_conflict_do_select_for_update_of_excluded() {
     assert_snapshot!(check("
 create table t (a int primary key);
-insert into t values (1) on conflict (a) do select for update of excluded;
+insert into t values (1) on conflict (a) do select for update of excluded returning *;
 "), @"
     error: missing `from` clause entry for table `excluded`
       ╭▸ 
-    3 │ insert into t values (1) on conflict (a) do select for update of excluded;
+    3 │ insert into t values (1) on conflict (a) do select for update of excluded returning *;
       ╰╴                                                                 ━━━━━━━━
     ");
 }
@@ -439,6 +439,38 @@ $$;
 }
 
 #[test]
+fn on_conflict_do_select_without_returning() {
+    assert_snapshot!(check("
+create table t (a int primary key);
+
+insert into t values (1) on conflict (a) do select;
+
+insert into t values (1) on conflict (a) do select for update where t.a > 0;
+
+insert into t values (1) on conflict (a) do select returning *;
+"), @"
+    error: `on conflict do select` requires a `returning` clause
+      ╭▸ 
+    4 │ insert into t values (1) on conflict (a) do select;
+      │                                          ━━━━━━━━━
+      ╰╴
+    help: add a `returning` clause to return the conflicting rows
+      ╭╴
+    4 │ insert into t values (1) on conflict (a) do select returning *;
+      ╰╴                                                   +++++++++++
+    error: `on conflict do select` requires a `returning` clause
+      ╭▸ 
+    6 │ insert into t values (1) on conflict (a) do select for update where t.a > 0;
+      │                                          ━━━━━━━━━
+      ╰╴
+    help: add a `returning` clause to return the conflicting rows
+      ╭╴
+    6 │ insert into t values (1) on conflict (a) do select for update where t.a > 0 returning *;
+      ╰╴                                                                            +++++++++++
+    ");
+}
+
+#[test]
 fn on_conflict_missing_target() {
     assert_snapshot!(check(r#"
 create table t (
@@ -474,7 +506,7 @@ insert into p values (1) on conflict do update set a = 1;
 
 insert into n values (1) on conflict do update set a = 1;
 
-insert into t values (1) on conflict do select for update;
+insert into t values (1) on conflict do select for update returning *;
 
 insert into t values (1) on conflict do nothing;
 
@@ -519,12 +551,12 @@ $$;
        ╰ hint: specify a conflict target, like `on conflict (column_name)`
     error: `on conflict do select` requires a conflict target
        ╭▸ 
-    35 │ insert into t values (1) on conflict do select for update;
+    35 │ insert into t values (1) on conflict do select for update returning *;
        │                          ━━━━━━━━━━━
        ╰╴
     help: specify the columns of a unique key
        ╭╴
-    35 │ insert into t values (1) on conflict (id) do select for update;
+    35 │ insert into t values (1) on conflict (id) do select for update returning *;
        ╰╴                                     ++++
     error: `on conflict do update` requires a conflict target
        ╭▸ 

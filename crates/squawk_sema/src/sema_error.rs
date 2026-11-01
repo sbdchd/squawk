@@ -571,6 +571,9 @@ pub(crate) enum SemaError {
         action: ConflictAction,
         key: Option<ConflictTargetKey>,
     },
+    DoSelectWithoutReturning {
+        returning_at: TextSize,
+    },
     RefreshConcurrentlyWithoutUniqueIndex {
         name: Name,
     },
@@ -1152,6 +1155,7 @@ impl SemaError {
             | SemaError::DeferrableConflictArbiter
             | SemaError::ExclusionConflictArbiter { .. }
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
+            SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
@@ -1353,6 +1357,13 @@ impl SemaError {
                     },
                 }
             }
+            SemaError::DoSelectWithoutReturning { returning_at } => Suggestion {
+                message: "add a `returning` clause to return the conflicting rows".into(),
+                fix: Fix {
+                    title: "Insert `returning *`".into(),
+                    edits: vec![Edit::insert(" returning *", returning_at)],
+                },
+            },
             SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
                 message: "add an empty `over` clause to compute it over all rows".into(),
                 fix: Fix {
@@ -1593,6 +1604,9 @@ impl SemaError {
             SemaError::DeferrableConflictArbiter => Some(
                 "`on conflict` does not support deferrable unique constraints/exclusion constraints as arbiters",
             ),
+            SemaError::DoSelectWithoutReturning { .. } => {
+                Some("`on conflict do select` requires a `returning` clause")
+            }
             SemaError::ValuesLengthMismatch => Some("`values` lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
                 Some("`insert` has more expressions than target columns")
@@ -1837,7 +1851,8 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter
-            | SemaError::DeferrableConflictArbiter => {
+            | SemaError::DeferrableConflictArbiter
+            | SemaError::DoSelectWithoutReturning { .. } => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MissingConflictTarget { action, .. } => {

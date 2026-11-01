@@ -13981,6 +13981,9 @@ impl Lowerer {
 
         if let Some(on_conflict) = insert.on_conflict_clause() {
             self.lower_on_conflict(id, target, &on_conflict);
+            if insert.returning_clause().is_none() {
+                self.check_do_select_returning(&on_conflict);
+            }
         }
         if let Some(returning_clause) = insert.returning_clause() {
             let columns = self.lower_returning(id, target, &returning_clause);
@@ -19757,6 +19760,24 @@ impl Lowerer {
         self.push_error(
             name_ref.syntax(),
             SemaError::ExclusionConflictArbiter { action },
+        );
+    }
+
+    fn check_do_select_returning(&mut self, on_conflict: &ast::OnConflictClause) {
+        let Some(ast::ConflictAction::ConflictDoSelect(do_select)) = on_conflict.conflict_action()
+        else {
+            return;
+        };
+        let (Some(do_token), Some(select)) = (do_select.do_token(), do_select.select_token())
+        else {
+            return;
+        };
+        let range = TextRange::new(do_token.text_range().start(), select.text_range().end());
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::DoSelectWithoutReturning {
+                returning_at: on_conflict.syntax().text_range().end(),
+            },
         );
     }
 

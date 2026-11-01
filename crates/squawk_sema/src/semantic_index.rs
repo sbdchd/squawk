@@ -100,6 +100,7 @@ pub enum DiagnosticKind {
     MultiplePrimaryKeys,
     InvalidForeignKey,
     InvalidConflictArbiter,
+    MissingReturning,
     MissingUniqueIndex,
     UniqueIndexNotSupported,
     DuplicateFunction,
