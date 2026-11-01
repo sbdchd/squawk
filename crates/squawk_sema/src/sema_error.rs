@@ -562,7 +562,9 @@ pub(crate) enum SemaError {
     DeferrableUniqueConstraintForReferencedTable {
         table: Name,
     },
-    NoConflictArbiter,
+    NoConflictArbiter {
+        foreign_table: bool,
+    },
     DeferrableConflictArbiter,
     ConflictConstraintWithoutIndex,
     WholeRowConflictTarget,
@@ -1174,7 +1176,7 @@ impl SemaError {
             | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
                 DiagnosticKind::InvalidForeignKey
             }
-            SemaError::NoConflictArbiter
+            SemaError::NoConflictArbiter { .. }
             | SemaError::DeferrableConflictArbiter
             | SemaError::ConflictConstraintWithoutIndex
             | SemaError::ExclusionConflictArbiter { .. }
@@ -1631,7 +1633,7 @@ impl SemaError {
             SemaError::PositionalAfterNamed => {
                 Some("positional argument cannot follow named argument")
             }
-            SemaError::NoConflictArbiter => Some(
+            SemaError::NoConflictArbiter { .. } => Some(
                 "there is no unique or exclusion constraint matching the `on conflict` specification",
             ),
             SemaError::DeferrableConflictArbiter => Some(
@@ -1698,6 +1700,14 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::NoConflictArbiter {
+            foreign_table: true,
+        } = *self
+        {
+            return Some(Cow::Borrowed(
+                "foreign tables can't have unique or exclusion constraints",
+            ));
+        }
         if let SemaError::ConflictWithRules { table, rule, event } = *self {
             return Some(Cow::Owned(format!(
                 "`{}` has an {} rule `{}`",
@@ -1903,7 +1913,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::UnnestColumnDefList
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
-            | SemaError::NoConflictArbiter
+            | SemaError::NoConflictArbiter { .. }
             | SemaError::DeferrableConflictArbiter
             | SemaError::ConflictConstraintWithoutIndex
             | SemaError::ConflictWithRules { .. }

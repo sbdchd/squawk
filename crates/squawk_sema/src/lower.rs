@@ -19726,7 +19726,21 @@ impl Lowerer {
     }
 
     fn check_conflict_arbiter(&mut self, table: TableId, on_index: &ast::ConflictOnIndex) {
-        if self.function.is_some() || !self.keys_known(table) {
+        if self.function.is_some() {
+            return;
+        }
+        if self.index.tables[table].kind == TableKind::ForeignTable {
+            if let Some(list) = on_index.conflict_index_item_list() {
+                self.push_error(
+                    list.syntax(),
+                    SemaError::NoConflictArbiter {
+                        foreign_table: true,
+                    },
+                );
+            }
+            return;
+        }
+        if !self.keys_known(table) {
             return;
         }
         let table_columns = self.index.tables[table].columns;
@@ -19773,7 +19787,9 @@ impl Lowerer {
         let error = match found {
             Some(UniqueIndexMatch::Immediate) => return,
             Some(UniqueIndexMatch::Deferrable) => SemaError::DeferrableConflictArbiter,
-            None => SemaError::NoConflictArbiter,
+            None => SemaError::NoConflictArbiter {
+                foreign_table: false,
+            },
         };
         self.push_error(list.syntax(), error);
     }

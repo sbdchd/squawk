@@ -674,6 +674,34 @@ insert into pg_catalog.mine values (1) on conflict do nothing;
 }
 
 #[test]
+fn on_conflict_foreign_table() {
+    assert_snapshot!(check("
+create foreign data wrapper w;
+create server s foreign data wrapper w;
+create foreign table ft (a int not null, b int) server s;
+
+insert into ft values (1) on conflict (a) do update set a = 1;
+
+insert into ft values (1) on conflict ((a + 1)) do nothing;
+
+insert into ft values (1) on conflict do nothing;
+"), @"
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+      ╭▸ 
+    6 │ insert into ft values (1) on conflict (a) do update set a = 1;
+      │                                       ━━━
+      │
+      ╰ note: foreign tables can't have unique or exclusion constraints
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+      ╭▸ 
+    8 │ insert into ft values (1) on conflict ((a + 1)) do nothing;
+      │                                       ━━━━━━━━━
+      │
+      ╰ note: foreign tables can't have unique or exclusion constraints
+    ");
+}
+
+#[test]
 fn on_conflict_do_select_without_returning() {
     assert_snapshot!(check("
 create table t (a int primary key);
