@@ -992,12 +992,10 @@ call p('a'::text);
        ╭▸ 
     11 │ select foo(y => 1);
        ╰╴           ━
-    error: function `public.foo(variadic int4[])` does not exist
+    error: argument 1 of `public.foo` is labeled `variadic` but its parameter is not variadic
        ╭▸ 
     12 │ select public.foo(variadic array[1]);
-       │               ━━━
-       │
-       ╰ hint: consider adding explicit type casts
+       ╰╴                  ━━━━━━━━━━━━━━━━━
     error: function `nope()` does not exist
        ╭▸ 
     13 │ select nope();
@@ -1386,5 +1384,29 @@ select v(1, 2, x) from t;
       │                ━
       │
       ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn variadic_on_non_variadic_param() {
+    assert_snapshot!(check("
+create function foo(x int) returns int language sql return x;
+create function v(a int, variadic b int[]) returns int language sql return a;
+select foo(variadic array[1]);
+select foo(variadic x => array[1]);
+select v(variadic a => 1, b => 2);
+"), @"
+    error: argument 1 of `foo` is labeled `variadic` but its parameter is not variadic
+      ╭▸ 
+    4 │ select foo(variadic array[1]);
+      ╰╴           ━━━━━━━━━━━━━━━━━
+    error: argument `x` of `foo` is labeled `variadic` but its parameter is not variadic
+      ╭▸ 
+    5 │ select foo(variadic x => array[1]);
+      ╰╴           ━━━━━━━━━━━━━━━━━━━━━━
+    error: argument `a` of `v` is labeled `variadic` but its parameter is not variadic
+      ╭▸ 
+    6 │ select v(variadic a => 1, b => 2);
+      ╰╴         ━━━━━━━━━━━━━━━
     ");
 }

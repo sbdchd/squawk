@@ -665,6 +665,13 @@ fn invalid_named_args(
     None
 }
 
+fn arg_label(args: &[CallArg], i: usize) -> ArgLabel {
+    match args[i].name {
+        Some(name) => ArgLabel::Name(name),
+        None => ArgLabel::Position(i),
+    }
+}
+
 fn call_arg(arg_list: Option<&ast::ArgList>, args: &[CallArg], i: usize) -> Option<ast::Arg> {
     arg_list
         .filter(|list| list.args().count() == args.len())
@@ -22315,6 +22322,15 @@ impl Lowerer {
                     target: None,
                 })
             }
+            CallMismatch::NotVariadic { arg } => Some(CallMismatchError {
+                error: SemaError::NotVariadic {
+                    kind,
+                    schema,
+                    name,
+                    arg: arg_label(args, arg),
+                },
+                target: call_arg(arg_list, args, arg).map(|arg| arg.syntax().clone()),
+            }),
             CallMismatch::ArgType(ArgMismatch {
                 position,
                 found,
@@ -22326,10 +22342,7 @@ impl Lowerer {
                         kind,
                         schema,
                         name,
-                        arg: match args[position].name {
-                            Some(name) => ArgLabel::Name(name),
-                            None => ArgLabel::Position(position),
-                        },
+                        arg: arg_label(args, position),
                         found: self.index.ty_name(found),
                         expected: self.index.ty_name(expected),
                     },

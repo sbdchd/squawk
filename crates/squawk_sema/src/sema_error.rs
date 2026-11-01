@@ -395,6 +395,12 @@ pub(crate) enum SemaError {
         name: Name,
         missing: IdxRange<ErrorParam>,
     },
+    NotVariadic {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg: ArgLabel,
+    },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
         name: Name,
@@ -1047,7 +1053,8 @@ impl SemaError {
             SemaError::UnknownArgumentName { .. } => DiagnosticKind::UnresolvedParam,
             SemaError::PositionalAfterNamed
             | SemaError::DuplicateArgumentName { .. }
-            | SemaError::ArgumentPositionalAndNamed { .. } => DiagnosticKind::InvalidArgument,
+            | SemaError::ArgumentPositionalAndNamed { .. }
+            | SemaError::NotVariadic { .. } => DiagnosticKind::InvalidArgument,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
@@ -2066,6 +2073,17 @@ impl fmt::Display for ErrorMessage<'_> {
                 }
                 Ok(())
             }
+            SemaError::NotVariadic {
+                kind: _,
+                schema,
+                name,
+                arg,
+            } => write!(
+                f,
+                "argument {} of `{}` is labeled `variadic` but its parameter is not variadic",
+                self.arg_label(arg),
+                self.qualified(schema, name)
+            ),
             SemaError::ProcedureCalledAsFunction {
                 schema, name, args, ..
             } => write!(f, "`{}` is a procedure", self.signature(schema, name, args)),

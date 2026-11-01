@@ -40,6 +40,7 @@ pub(crate) enum CallMismatch {
     UnknownName { arg: usize },
     PositionalAndNamed { arg: usize },
     Missing(SmallVec<[MissingParam; 2]>),
+    NotVariadic { arg: usize },
     ArgType(ArgMismatch),
 }
 
@@ -393,7 +394,7 @@ impl<'a> Overloads<'a> {
             };
             let param = inputs[position];
             if arg.variadic && param.mode != ParamMode::Variadic {
-                return None;
+                return Some(CallMismatch::NotVariadic { arg: i });
             }
             if param.mode == ParamMode::Variadic && arg.name.is_some() && !arg.variadic {
                 return None;
