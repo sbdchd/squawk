@@ -81,6 +81,12 @@ pub(crate) enum ErrorArgs {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ArgLabel {
+    Position(usize),
+    Name(Name),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ErrorParam {
     pub(crate) name: Option<Name>,
     pub(crate) position: usize,
@@ -355,7 +361,7 @@ pub(crate) enum SemaError {
         kind: RoutineKind,
         schema: Option<Name>,
         name: Name,
-        position: usize,
+        arg: ArgLabel,
         found: TyName,
         expected: TyName,
     },
@@ -1561,6 +1567,13 @@ impl ErrorMessage<'_> {
         })
     }
 
+    fn arg_label(&self, arg: ArgLabel) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| match arg {
+            ArgLabel::Position(position) => write!(f, "{}", position + 1),
+            ArgLabel::Name(name) => write!(f, "`{}`", self.names.resolve(name)),
+        })
+    }
+
     fn qualified(&self, schema: Option<Name>, name: Name) -> impl fmt::Display + '_ {
         fmt::from_fn(move |f| {
             if let Some(schema) = schema {
@@ -1963,13 +1976,13 @@ impl fmt::Display for ErrorMessage<'_> {
                 kind: _,
                 schema,
                 name,
-                position,
+                arg,
                 found,
                 expected,
             } => write!(
                 f,
                 "argument {} of `{}` has type `{}`, expected `{}`",
-                position + 1,
+                self.arg_label(arg),
                 self.qualified(schema, name),
                 self.ty(found),
                 self.ty(expected)

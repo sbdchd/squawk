@@ -404,9 +404,6 @@ impl<'a> Overloads<'a> {
         if !missing.is_empty() {
             return Some(CallMismatch::Missing(missing));
         }
-        if named {
-            return None;
-        }
         args.iter()
             .zip(&params)
             .enumerate()

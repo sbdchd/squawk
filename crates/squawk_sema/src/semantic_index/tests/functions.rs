@@ -1283,3 +1283,61 @@ select foo();
        ╰╴       ━━━
     ");
 }
+
+#[test]
+fn named_arg_type_mismatch() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+create table t (a text, b bool);
+select foo(y => 'a'::text, x => 1);
+select foo(1, y => 'a'::text);
+select foo(x => true);
+select foo(x => now());
+select foo(x => array[1]);
+select foo(x => a) from t;
+select foo(1, y => b) from t;
+"), @"
+    error: argument `y` of `foo` has type `text`, expected `int4`
+      ╭▸ 
+    4 │ select foo(y => 'a'::text, x => 1);
+      │            ━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `y` of `foo` has type `text`, expected `int4`
+      ╭▸ 
+    5 │ select foo(1, y => 'a'::text);
+      │               ━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `bool`, expected `int4`
+      ╭▸ 
+    6 │ select foo(x => true);
+      │            ━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `timestamptz`, expected `int4`
+      ╭▸ 
+    7 │ select foo(x => now());
+      │            ━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `int4[]`, expected `int4`
+      ╭▸ 
+    8 │ select foo(x => array[1]);
+      │            ━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `text`, expected `int4`
+      ╭▸ 
+    9 │ select foo(x => a) from t;
+      │            ━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `y` of `foo` has type `bool`, expected `int4`
+       ╭▸ 
+    10 │ select foo(1, y => b) from t;
+       │               ━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
+}

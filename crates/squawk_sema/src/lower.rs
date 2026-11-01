@@ -43,9 +43,9 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind,
-        OperandName, OperatorReplacement, SemaError, Similar, SimilarColumn, SimilarType,
-        TriggerFunctionKind, ViewColumnRename, WindowClause,
+        ArgLabel, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind,
+        ObjectKind, OperandName, OperatorReplacement, SemaError, Similar, SimilarColumn,
+        SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -22326,7 +22326,10 @@ impl Lowerer {
                         kind,
                         schema,
                         name,
-                        position,
+                        arg: match args[position].name {
+                            Some(name) => ArgLabel::Name(name),
+                            None => ArgLabel::Position(position),
+                        },
                         found: self.index.ty_name(found),
                         expected: self.index.ty_name(expected),
                     },
