@@ -575,6 +575,11 @@ pub(crate) enum SemaError {
     DoSelectWithoutReturning {
         returning_at: TextSize,
     },
+    ConflictWithRules {
+        table: Name,
+        rule: Name,
+        event: ConflictRuleEvent,
+    },
     RefreshConcurrentlyWithoutUniqueIndex {
         name: Name,
     },
@@ -645,6 +650,21 @@ pub(crate) struct DropRelation {
 pub(crate) enum ConflictAction {
     DoUpdate,
     DoSelect,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ConflictRuleEvent {
+    Insert,
+    Update,
+}
+
+impl ConflictRuleEvent {
+    fn label(self) -> &'static str {
+        match self {
+            ConflictRuleEvent::Insert => "`on insert`",
+            ConflictRuleEvent::Update => "`on update`",
+        }
+    }
 }
 
 impl ConflictAction {
@@ -1158,6 +1178,7 @@ impl SemaError {
             | SemaError::ExclusionConflictArbiter { .. }
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
+            SemaError::ConflictWithRules { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
@@ -1615,6 +1636,9 @@ impl SemaError {
             SemaError::ConflictConstraintWithoutIndex => {
                 Some("constraint in `on conflict` clause has no associated index")
             }
+            SemaError::ConflictWithRules { .. } => Some(
+                "`insert` with `on conflict` cannot be used with table that has `insert` or `update` rules",
+            ),
             SemaError::ValuesLengthMismatch => Some("`values` lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
                 Some("`insert` has more expressions than target columns")
@@ -1661,6 +1685,14 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::ConflictWithRules { table, rule, event } = *self {
+            return Some(Cow::Owned(format!(
+                "`{}` has an {} rule `{}`",
+                names.resolve(table),
+                event.label(),
+                names.resolve(rule)
+            )));
+        }
         if let SemaError::UnresolvedRoutine {
             kind,
             name,
@@ -1861,6 +1893,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter
             | SemaError::ConflictConstraintWithoutIndex
+            | SemaError::ConflictWithRules { .. }
             | SemaError::DoSelectWithoutReturning { .. } => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }

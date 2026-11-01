@@ -533,6 +533,71 @@ insert into t values (1) on conflict on constraint t_pkey do nothing;
 }
 
 #[test]
+fn on_conflict_with_rules() {
+    assert_snapshot!(check("
+create table t (a int primary key);
+create rule r as on update to t do instead nothing;
+insert into t values (1) on conflict do nothing;
+
+create table i (a int primary key);
+create rule r as on insert to i do also notify x;
+insert into i values (1) on conflict (a) do update set a = 2;
+
+create table n (a int primary key);
+create rule r1 as on insert to n do instead nothing;
+create rule r2 as on insert to n do also nothing;
+create rule r3 as on delete to n do also notify x;
+insert into n values (1) on conflict do nothing;
+
+create table d (a int primary key);
+create rule r as on update to d do also notify x;
+drop rule r on d;
+insert into d values (1) on conflict do nothing;
+
+create table b (a int primary key);
+
+create view v as select * from b;
+create rule r as on insert to v do also notify x;
+create rule r2 as on update to v do also notify x;
+insert into v values (1) on conflict do nothing;
+
+create view w as select * from b;
+create rule r as on insert to w do instead insert into t values (new.a);
+insert into w values (1) on conflict do nothing;
+
+create view u as select * from b;
+create rule r as on insert to u do instead nothing;
+create rule r2 as on update to u do also notify x;
+insert into u values (1) on conflict do nothing;
+"), @"
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+      ╭▸ 
+    4 │ insert into t values (1) on conflict do nothing;
+      │                          ━━━━━━━━━━━
+      │
+      ╰ note: `t` has an `on update` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+      ╭▸ 
+    8 │ insert into i values (1) on conflict (a) do update set a = 2;
+      │                          ━━━━━━━━━━━
+      │
+      ╰ note: `i` has an `on insert` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    30 │ insert into w values (1) on conflict do nothing;
+       │                          ━━━━━━━━━━━
+       │
+       ╰ note: `w` has an `on insert` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    35 │ insert into u values (1) on conflict do nothing;
+       │                          ━━━━━━━━━━━
+       │
+       ╰ note: `u` has an `on update` rule `r2`
+    ");
+}
+
+#[test]
 fn on_conflict_do_select_without_returning() {
     assert_snapshot!(check("
 create table t (a int primary key);
