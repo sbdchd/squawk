@@ -14080,6 +14080,7 @@ impl Lowerer {
                     .flat_map(|list| list.conflict_index_items())
                 {
                     if let Some(expr) = item.expr() {
+                        self.check_whole_row_conflict_target(target, &expr);
                         self.lower_expr_in(ExprContext::IndexExpression, &expr);
                     }
                     if let Some(path) = item.op_class_ref().and_then(|op_class| op_class.path_ref())
@@ -19808,6 +19809,27 @@ impl Lowerer {
             return;
         };
         self.push_error(name_ref.syntax(), error);
+    }
+
+    fn check_whole_row_conflict_target(&mut self, target: Option<SourceId>, expr: &ast::Expr) {
+        let ast::Expr::NameRef(name_ref) = expr.unparen() else {
+            return;
+        };
+        if name_ref.sql_value_function().is_some() {
+            return;
+        }
+        let Some(target) = target else {
+            return;
+        };
+        if !self.index.sources[target].columns.complete {
+            return;
+        }
+        let Some(name) = self.name_ref_name(&name_ref) else {
+            return;
+        };
+        if self.resolve_name(name).resolution == Resolution::Source(target) {
+            self.push_error(name_ref.syntax(), SemaError::WholeRowConflictTarget);
+        }
     }
 
     fn check_conflict_rules(&mut self, table: TableId, on_conflict: &ast::OnConflictClause) {

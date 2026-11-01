@@ -598,6 +598,59 @@ insert into u values (1) on conflict do nothing;
 }
 
 #[test]
+fn on_conflict_whole_row() {
+    assert_snapshot!(check("
+create table t (a int primary key);
+
+insert into t values (1) on conflict (t) do nothing;
+
+insert into t as x values (1) on conflict (x) do nothing;
+
+insert into t values (1) on conflict ((t)) do nothing;
+
+insert into t values (1) on conflict (a, t) do nothing;
+
+insert into t values (1) on conflict (t) do update set a = 1;
+
+insert into t values (1) on conflict (a) where t is not null do nothing;
+
+create table c (t int primary key);
+insert into c values (1) on conflict (t) do nothing;
+"), @"
+    error: whole row unique index inference specifications are not supported
+      ╭▸ 
+    4 │ insert into t values (1) on conflict (t) do nothing;
+      │                                       ━
+      │
+      ╰ hint: list the columns of a unique index instead
+    error: whole row unique index inference specifications are not supported
+      ╭▸ 
+    6 │ insert into t as x values (1) on conflict (x) do nothing;
+      │                                            ━
+      │
+      ╰ hint: list the columns of a unique index instead
+    error: whole row unique index inference specifications are not supported
+      ╭▸ 
+    8 │ insert into t values (1) on conflict ((t)) do nothing;
+      │                                        ━
+      │
+      ╰ hint: list the columns of a unique index instead
+    error: whole row unique index inference specifications are not supported
+       ╭▸ 
+    10 │ insert into t values (1) on conflict (a, t) do nothing;
+       │                                          ━
+       │
+       ╰ hint: list the columns of a unique index instead
+    error: whole row unique index inference specifications are not supported
+       ╭▸ 
+    12 │ insert into t values (1) on conflict (t) do update set a = 1;
+       │                                       ━
+       │
+       ╰ hint: list the columns of a unique index instead
+    ");
+}
+
+#[test]
 fn on_conflict_do_select_without_returning() {
     assert_snapshot!(check("
 create table t (a int primary key);

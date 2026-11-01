@@ -565,6 +565,7 @@ pub(crate) enum SemaError {
     NoConflictArbiter,
     DeferrableConflictArbiter,
     ConflictConstraintWithoutIndex,
+    WholeRowConflictTarget,
     ExclusionConflictArbiter {
         action: ConflictAction,
     },
@@ -1178,7 +1179,9 @@ impl SemaError {
             | SemaError::ExclusionConflictArbiter { .. }
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
-            SemaError::ConflictWithRules { .. } => DiagnosticKind::FeatureNotSupported,
+            SemaError::ConflictWithRules { .. } | SemaError::WholeRowConflictTarget => {
+                DiagnosticKind::FeatureNotSupported
+            }
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
@@ -1508,6 +1511,9 @@ impl SemaError {
             SemaError::ConflictConstraintWithoutIndex => Some(
                 "only primary key, unique, and exclusion constraints can be used as arbiters",
             ),
+            SemaError::WholeRowConflictTarget => {
+                Some("list the columns of a unique index instead")
+            }
             SemaError::MissingConflictTarget { key: None, .. } => {
                 Some("specify a conflict target, like `on conflict (column_name)`")
             }
@@ -1639,6 +1645,9 @@ impl SemaError {
             SemaError::ConflictWithRules { .. } => Some(
                 "`insert` with `on conflict` cannot be used with table that has `insert` or `update` rules",
             ),
+            SemaError::WholeRowConflictTarget => {
+                Some("whole row unique index inference specifications are not supported")
+            }
             SemaError::ValuesLengthMismatch => Some("`values` lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
                 Some("`insert` has more expressions than target columns")
@@ -1894,6 +1903,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::DeferrableConflictArbiter
             | SemaError::ConflictConstraintWithoutIndex
             | SemaError::ConflictWithRules { .. }
+            | SemaError::WholeRowConflictTarget
             | SemaError::DoSelectWithoutReturning { .. } => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
