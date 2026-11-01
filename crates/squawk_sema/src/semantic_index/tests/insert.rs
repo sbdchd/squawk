@@ -439,6 +439,58 @@ $$;
 }
 
 #[test]
+fn on_conflict_on_deferrable_constraint() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int,
+  c int,
+  constraint t_a unique (a) deferrable,
+  constraint t_b primary key (b) deferrable initially deferred,
+  constraint t_c unique (c) not deferrable
+);
+
+create table ex (
+  a int,
+  constraint ex_a exclude using btree (a with =) deferrable
+);
+
+insert into t values (1) on conflict on constraint t_a do nothing;
+
+insert into t values (1) on conflict on constraint t_b do update set a = 1;
+
+insert into t values (1) on conflict on constraint t_c do nothing;
+
+insert into ex values (1) on conflict on constraint ex_a do nothing;
+
+insert into ex values (1) on conflict on constraint ex_a do update set a = 1;
+
+create function f() returns void
+  language sql
+  as $$
+  insert into t values (1) on conflict on constraint t_a do nothing;
+$$;
+"), @"
+    error: `on conflict` does not support deferrable unique constraints/exclusion constraints as arbiters
+       ╭▸ 
+    16 │ insert into t values (1) on conflict on constraint t_a do nothing;
+       ╰╴                                                   ━━━
+    error: `on conflict` does not support deferrable unique constraints/exclusion constraints as arbiters
+       ╭▸ 
+    18 │ insert into t values (1) on conflict on constraint t_b do update set a = 1;
+       ╰╴                                                   ━━━
+    error: `on conflict` does not support deferrable unique constraints/exclusion constraints as arbiters
+       ╭▸ 
+    22 │ insert into ex values (1) on conflict on constraint ex_a do nothing;
+       ╰╴                                                    ━━━━
+    error: `on conflict do update` not supported with exclusion constraints
+       ╭▸ 
+    24 │ insert into ex values (1) on conflict on constraint ex_a do update set a = 1;
+       ╰╴                                                    ━━━━
+    ");
+}
+
+#[test]
 fn on_conflict_do_select_without_returning() {
     assert_snapshot!(check("
 create table t (a int primary key);

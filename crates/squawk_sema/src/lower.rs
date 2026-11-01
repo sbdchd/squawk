@@ -19747,20 +19747,25 @@ impl Lowerer {
         on_conflict: &ast::OnConflictClause,
         name_ref: &ast::ConstraintNameRef,
     ) {
-        if self.function.is_some()
-            || self.index.constraints[constraint].kind != ConstraintKind::Exclude
-        {
+        if self.function.is_some() {
             return;
         }
+        let Constraint { kind, index, .. } = self.index.constraints[constraint];
         let action = match on_conflict.conflict_action() {
-            Some(ast::ConflictAction::ConflictDoUpdateSet(_)) => ConflictAction::DoUpdate,
-            Some(ast::ConflictAction::ConflictDoSelect(_)) => ConflictAction::DoSelect,
-            Some(ast::ConflictAction::ConflictDoNothing(_)) | None => return,
+            Some(ast::ConflictAction::ConflictDoUpdateSet(_)) => Some(ConflictAction::DoUpdate),
+            Some(ast::ConflictAction::ConflictDoSelect(_)) => Some(ConflictAction::DoSelect),
+            Some(ast::ConflictAction::ConflictDoNothing(_)) | None => None,
         };
-        self.push_error(
-            name_ref.syntax(),
-            SemaError::ExclusionConflictArbiter { action },
-        );
+        let error = if let Some(action) = action
+            && kind == ConstraintKind::Exclude
+        {
+            SemaError::ExclusionConflictArbiter { action }
+        } else if index.is_some_and(|index| self.index.indexes[index].deferrable) {
+            SemaError::DeferrableConflictArbiter
+        } else {
+            return;
+        };
+        self.push_error(name_ref.syntax(), error);
     }
 
     fn check_do_select_returning(&mut self, on_conflict: &ast::OnConflictClause) {
