@@ -18751,15 +18751,14 @@ impl Lowerer {
                 let range = is_not_distinct_from.syntax().text_range();
                 self.add_expr_operator_ref(range, None, "=", left, right)
             }
-            ast::BinOp::And(_)
-            | ast::BinOp::AtTimeZone(_)
+            ast::BinOp::And(_) | ast::BinOp::Is(_) | ast::BinOp::IsNot(_) | ast::BinOp::Or(_) => {
+                self.builtin_type("bool")
+            }
+            ast::BinOp::AtTimeZone(_)
             | ast::BinOp::ColonColon(_)
             | ast::BinOp::ColonEq(_)
             | ast::BinOp::Escape(_)
             | ast::BinOp::FatArrow(_)
-            | ast::BinOp::Is(_)
-            | ast::BinOp::IsNot(_)
-            | ast::BinOp::Or(_)
             | ast::BinOp::Overlaps(_) => None,
         }
     }
@@ -18907,6 +18906,13 @@ impl Lowerer {
         }
     }
 
+    fn special_call_type(&mut self, call: &ast::CallExpr) -> Option<Ty> {
+        if call.exists_fn().is_some() {
+            return self.builtin_type("bool");
+        }
+        None
+    }
+
     fn nullif_type(&self, args: &[CallArg]) -> Option<Ty> {
         let [left, right] = args else {
             return None;
@@ -18987,7 +18993,7 @@ impl Lowerer {
             ast::PrefixOp::OperatorCall(operator_call) => {
                 self.lower_operator_call(operator_call, None, right)
             }
-            ast::PrefixOp::Not(_) => None,
+            ast::PrefixOp::Not(_) => self.builtin_type("bool"),
         }
     }
 
@@ -20496,6 +20502,9 @@ impl Lowerer {
                 if let Some(keyword) = call_function_like_keyword(call) {
                     return self.keyword_call_type(keyword, &args);
                 }
+                if let Some(ty) = self.special_call_type(call) {
+                    return Some(ty);
+                }
                 return match callee?.resolution {
                     Resolution::Function(function) => self.call_type(function, &args),
                     resolution => self.resolution_type(resolution),
@@ -20539,6 +20548,7 @@ impl Lowerer {
                         }
                     }
                 }
+                return self.builtin_type("bool");
             }
             ast::Expr::BinExpr(bin) => {
                 let op = bin.op();
@@ -20669,8 +20679,11 @@ impl Lowerer {
                     | ast::PostfixOp::IsNotJsonValue(_)
                     | ast::PostfixOp::IsNull(_)
                     | ast::PostfixOp::NotNull(_),
-                )
-                | None => self.lower_exprs(postfix.expr()),
+                ) => {
+                    self.lower_exprs(postfix.expr());
+                    return self.builtin_type("bool");
+                }
+                None => self.lower_exprs(postfix.expr()),
             },
             ast::Expr::PrefixExpr(prefix) => {
                 let expr = prefix.expr();
@@ -22513,6 +22526,9 @@ impl Lowerer {
         if let Some(keyword) = call_function_like_keyword(call) {
             let ty = self.keyword_call_type(keyword, &args);
             return self.expr_field_base(ty);
+        }
+        if let Some(ty) = self.special_call_type(call) {
+            return self.expr_field_base(Some(ty));
         }
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return self.expr_field_base(

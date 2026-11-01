@@ -396,6 +396,69 @@ select
 }
 
 #[test]
+fn boolean_expr_field_selection() {
+    assert_snapshot!(check("
+select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+select
+  (1 is null).x,
+  (1 isnull).x,
+  (1 notnull).x,
+  (true is true).x,
+  (true is not false).x;
+select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+"), @"
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    2 │ select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+      ╰╴                          ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    2 │ select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+      ╰╴                                                 ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    2 │ select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+      ╰╴                                                                            ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    4 │   (1 is null).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    5 │   (1 isnull).x,
+      ╰╴             ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    6 │   (1 notnull).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    7 │   (true is true).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    8 │   (true is not false).x;
+      ╰╴                      ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                  ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                                      ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                                                         ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                                                                          ━
+    ");
+}
+
+#[test]
 fn grouping_field_selection() {
     assert_snapshot!(check("
 create table t (a int, b int);
