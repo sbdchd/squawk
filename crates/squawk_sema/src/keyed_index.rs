@@ -8,8 +8,8 @@ use crate::interner::Name;
 use crate::ir::{
     AccessMethod, Cast, CastTypes, Database, EventTrigger, ForeignDataWrapper, GraphElement,
     GraphElementId, GraphLabel, GraphLabelId, GraphProperty, Language, MemberOwner,
-    OperatorFamilyMember, OperatorFamilyMemberId, Policy, Publication, Role, Rule, Schema, Server,
-    Subscription, TableId, Tablespace, Trigger,
+    OperatorFamilyMember, OperatorFamilyMemberId, Policy, Publication, Role, Rule, RuleEnabled,
+    RuleId, Schema, Server, Subscription, TableId, Tablespace, Trigger,
 };
 
 pub trait Keyed {
@@ -88,6 +88,13 @@ impl KeyedIndex<GraphElement> {
         let element = &mut self.arena[id];
         element.source = source;
         element.destination = destination;
+    }
+}
+
+impl KeyedIndex<Rule> {
+    pub(crate) fn set_enabled(&mut self, id: RuleId, enabled: RuleEnabled) -> Option<RuleEnabled> {
+        let rule = self.arena.get_local_mut(id)?;
+        Some(std::mem::replace(&mut rule.enabled, enabled))
     }
 }
 

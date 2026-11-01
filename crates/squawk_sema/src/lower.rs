@@ -35,9 +35,9 @@ use crate::{
         ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId, PreparedTransaction,
         PreparedTransactionId, Publication, PublicationId, Query, QueryId, QueryKind, RefId,
         Reference, ReferenceKind, Resolution, Role, RoleId, RoutineKind, Rule, RuleBehavior,
-        RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId,
-        SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star,
-        Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
+        RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope,
+        ScopeId, SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind,
+        Star, Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
         TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
         TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
         TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
@@ -1024,6 +1024,7 @@ enum Undo {
     DropConstraint(ConstraintId),
     DropTrigger(TriggerId),
     DropRule(RuleId),
+    RuleEnabled(RuleId, RuleEnabled),
     DropRole(RoleId),
     DropPolicy(PolicyId),
     DropAccessMethod(AccessMethodId),
@@ -3160,6 +3161,9 @@ impl Lowerer {
                 }
                 Undo::DropRule(rule) => {
                     self.dropped_rules.remove(&rule);
+                }
+                Undo::RuleEnabled(rule, enabled) => {
+                    self.index.rules.set_enabled(rule, enabled);
                 }
                 Undo::DropRole(role) => {
                     self.dropped_roles.remove(&role);
@@ -16062,25 +16066,25 @@ impl Lowerer {
                 }
                 ast::AlterTableAction::DisableRule(disable_rule) => {
                     if let Some(rule_ref) = disable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Disabled);
                     }
                     continue;
                 }
                 ast::AlterTableAction::EnableRule(enable_rule) => {
                     if let Some(rule_ref) = enable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Origin);
                     }
                     continue;
                 }
                 ast::AlterTableAction::EnableAlwaysRule(enable_rule) => {
                     if let Some(rule_ref) = enable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Always);
                     }
                     continue;
                 }
                 ast::AlterTableAction::EnableReplicaRule(enable_rule) => {
                     if let Some(rule_ref) = enable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Replica);
                     }
                     continue;
                 }
@@ -17289,6 +17293,7 @@ impl Lowerer {
                     mode,
                     has_actions,
                 },
+                RuleEnabled::Origin,
             );
         }
         self.depend_on_refs(refs, self.index.rules.range_from(start), Object::Rule);
@@ -17319,20 +17324,26 @@ impl Lowerer {
         name_node: &impl NameLike,
         table: TableId,
         behavior: RuleBehavior,
+        enabled: RuleEnabled,
     ) {
         let name = self.intern(&name_node.text());
+        let mut enabled = enabled;
         if let Some(existing) = self.find_rule(table, name) {
             match if_exists {
                 IfExists::Error | IfExists::Ignore => {
                     self.report_duplicate_rule(name_node.syntax(), name, table);
                 }
-                IfExists::Replace => self.drop_rule(existing),
+                IfExists::Replace => {
+                    enabled = self.index.rules[existing].enabled;
+                    self.drop_rule(existing);
+                }
             }
         }
         let id = self.index.rules.alloc(Rule {
             name,
             table,
             behavior,
+            enabled,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
@@ -17351,6 +17362,7 @@ impl Lowerer {
                 mode: RuleMode::Instead,
                 has_actions: true,
             },
+            enabled: RuleEnabled::Origin,
             ptr,
             name_ptr,
         });
@@ -17359,6 +17371,22 @@ impl Lowerer {
     fn report_duplicate_rule(&mut self, name_node: &SyntaxNode, name: Name, table: TableId) {
         let table = self.index.tables[table].name;
         self.push_error(name_node, SemaError::DuplicateRule { name, table });
+    }
+
+    fn set_rule_enabled(
+        &mut self,
+        table: Option<TableId>,
+        rule_ref: &ast::RuleRef,
+        enabled: RuleEnabled,
+    ) {
+        let Some(rule) = self.lower_rule_ref(table, rule_ref, IfMissing::Error) else {
+            return;
+        };
+        if let Some(previous) = self.index.rules.set_enabled(rule, enabled)
+            && self.in_transaction()
+        {
+            self.undo.push(Undo::RuleEnabled(rule, previous));
+        }
     }
 
     fn lower_rule_ref(
@@ -17419,7 +17447,10 @@ impl Lowerer {
             && let Some(name) = alter_rule.rule_rename_to().and_then(|rename| rename.rule())
         {
             let Rule {
-                table, behavior, ..
+                table,
+                behavior,
+                enabled,
+                ..
             } = self.index.rules[rule];
             if behavior.event == RuleEvent::Select {
                 self.push_error(name.syntax(), SemaError::RenameSelectRule);
@@ -17432,7 +17463,14 @@ impl Lowerer {
             }
             let moved = self.index.rules.next_idx();
             self.drop_rule(rule);
-            self.alloc_rule(IfExists::Error, alter_rule.syntax(), &name, table, behavior);
+            self.alloc_rule(
+                IfExists::Error,
+                alter_rule.syntax(),
+                &name,
+                table,
+                behavior,
+                enabled,
+            );
             self.record_moves(
                 Object::Rule(rule),
                 self.index.rules.range_from(moved),
@@ -19854,10 +19892,15 @@ impl Lowerer {
             let Rule {
                 name: rule,
                 behavior,
+                enabled,
                 ..
             } = self.index.rules[id];
             let event = match behavior.event {
                 RuleEvent::Insert => {
+                    match enabled {
+                        RuleEnabled::Origin | RuleEnabled::Always => {}
+                        RuleEnabled::Replica | RuleEnabled::Disabled => continue,
+                    }
                     if behavior.mode == RuleMode::Instead {
                         auto_updatable_view = false;
                     }

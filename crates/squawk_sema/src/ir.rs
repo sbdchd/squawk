@@ -180,11 +180,20 @@ pub(crate) struct RuleBehavior {
     pub(crate) has_actions: bool,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum RuleEnabled {
+    Origin,
+    Always,
+    Replica,
+    Disabled,
+}
+
 #[derive(Debug)]
 pub struct Rule {
     pub name: Name,
     pub table: TableId,
     pub(crate) behavior: RuleBehavior,
+    pub(crate) enabled: RuleEnabled,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     pub name_ptr: InIrFile<SyntaxNodePtr>,

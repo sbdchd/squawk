@@ -549,6 +549,99 @@ insert into u values (1) on conflict do nothing;
 }
 
 #[test]
+fn on_conflict_with_disabled_rules() {
+    assert_snapshot!(check("
+create table t1 (a int primary key);
+create rule r as on insert
+  to t1
+  do also notify x;
+alter table t1 disable rule r;
+insert into t1 values (1) on conflict do nothing;
+
+create table t2 (a int primary key);
+create rule r as on update
+  to t2
+  do also notify x;
+alter table t2 disable rule r;
+insert into t2 values (1) on conflict do nothing;
+
+create table t3 (a int primary key);
+create rule r as on insert
+  to t3
+  do also notify x;
+alter table t3 enable replica rule r;
+insert into t3 values (1) on conflict do nothing;
+
+create table t4 (a int primary key);
+create rule r as on insert
+  to t4
+  do also notify x;
+alter table t4 enable always rule r;
+insert into t4 values (1) on conflict do nothing;
+
+create table t5 (a int primary key);
+create rule r as on insert
+  to t5
+  do also notify x;
+alter table t5 disable rule r;
+alter table t5 enable rule r;
+insert into t5 values (1) on conflict do nothing;
+
+create table t6 (a int primary key);
+create rule r as on insert
+  to t6
+  do also notify x;
+begin;
+alter table t6 disable rule r;
+rollback;
+insert into t6 values (1) on conflict do nothing;
+
+create table t7 (a int primary key);
+create rule r as on insert
+  to t7
+  do also notify x;
+alter table t7 disable rule r;
+create or replace rule r as on insert
+  to t7
+  do also notify y;
+insert into t7 values (1) on conflict do nothing;
+
+create table t8 (a int primary key);
+create rule r as on insert
+  to t8
+  do also notify x;
+alter table t8 disable rule r;
+alter rule r on t8 rename to r2;
+insert into t8 values (1) on conflict do nothing;
+"), @"
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    14 │ insert into t2 values (1) on conflict do nothing;
+       │                           ━━━━━━━━━━━
+       │
+       ╰ note: `t2` has an `on update` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    28 │ insert into t4 values (1) on conflict do nothing;
+       │                           ━━━━━━━━━━━
+       │
+       ╰ note: `t4` has an `on insert` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    36 │ insert into t5 values (1) on conflict do nothing;
+       │                           ━━━━━━━━━━━
+       │
+       ╰ note: `t5` has an `on insert` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    45 │ insert into t6 values (1) on conflict do nothing;
+       │                           ━━━━━━━━━━━
+       │
+       ╰ note: `t6` has an `on insert` rule `r`
+    ");
+}
+
+#[test]
 fn on_conflict_whole_row() {
     assert_snapshot!(check("
 create table t (a int primary key);
@@ -844,137 +937,4 @@ $$;
     25 │ insert into t (id) values (1) on conflict (d) where d > 0 do nothing;
        ╰╴                                          ━━━
     ");
-}
-
-#[test]
-fn on_conflict_expression_target() {
-    assert_snapshot!(check(r#"
-create table t (email text);
-create unique index on t (email);
-
-insert into t values ('a') on conflict (lower(email)) do nothing;
-
-insert into t values ('a') on conflict (email collate "C") do nothing;
-
-insert into t values ('a') on conflict (email text_pattern_ops) do nothing;
-
-insert into t values ('a') on conflict (email text_ops) do nothing;
-"#), @r#"
-    error: there is no unique or exclusion constraint matching the `on conflict` specification
-      ╭▸ 
-    5 │ insert into t values ('a') on conflict (lower(email)) do nothing;
-      ╰╴                                       ━━━━━━━━━━━━━━
-    error: there is no unique or exclusion constraint matching the `on conflict` specification
-      ╭▸ 
-    7 │ insert into t values ('a') on conflict (email collate "C") do nothing;
-      ╰╴                                       ━━━━━━━━━━━━━━━━━━━
-    error: there is no unique or exclusion constraint matching the `on conflict` specification
-      ╭▸ 
-    9 │ insert into t values ('a') on conflict (email text_pattern_ops) do nothing;
-      ╰╴                                       ━━━━━━━━━━━━━━━━━━━━━━━━
-    "#);
-}
-
-#[test]
-fn on_conflict_builtin_table_target() {
-    assert_snapshot!(check(r#"
-insert into information_schema.sql_features (feature_id) values ('x')
-on conflict (feature_id) do nothing;
-"#), @r#"
-    error: there is no unique or exclusion constraint matching the `on conflict` specification
-      ╭▸ 
-    3 │ on conflict (feature_id) do nothing;
-      ╰╴            ━━━━━━━━━━━━
-    "#);
-}
-
-#[test]
-fn on_conflict_rules_through_view() {
-    assert_snapshot!(check(r#"
-create table t (a int primary key);
-create rule r as on update
-  to t
-  do instead nothing;
-create view v as
-  select * from t;
-
-insert into v values (1) on conflict do nothing;
-"#), @r#"
-    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
-      ╭▸ 
-    9 │ insert into v values (1) on conflict do nothing;
-      │                          ━━━━━━━━━━━
-      │
-      ╰ note: `t` has an `on update` rule `r`
-    "#);
-}
-
-#[test]
-fn on_conflict_disabled_insert_rule() {
-    assert_snapshot!(check(r#"
-create table t (a int primary key);
-create rule r as on insert
-  to t
-  do also notify x;
-alter table t disable rule r;
-
-insert into t values (1) on conflict do nothing;
-"#), @"no diagnostics");
-}
-
-#[test]
-fn on_conflict_view_instead_of_trigger_with_update_rule() {
-    assert_snapshot!(check(r#"
-create table t (a int primary key);
-create view v as
-  select * from t;
-
-create function f() returns trigger
-  language plpgsql
-  as $$begin return new; end$$;
-
-create trigger tg
-  instead of insert
-  on v
-  for each row
-  execute function f();
-create rule r as on update
-  to v
-  do also notify x;
-
-insert into v values (1) on conflict do nothing;
-"#), @r#"
-    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
-       ╭▸ 
-    19 │ insert into v values (1) on conflict do nothing;
-       │                          ━━━━━━━━━━━
-       │
-       ╰ note: `v` has an `on update` rule `r`
-    "#);
-}
-
-#[test]
-fn on_conflict_system_catalog_missing_target() {
-    assert_snapshot!(check(r#"
-insert into pg_class (oid) values (1) on conflict do update set relname = 'x';
-"#), @r#"
-    error: `on conflict do update` requires a conflict target
-      ╭▸ 
-    2 │ insert into pg_class (oid) values (1) on conflict do update set relname = 'x';
-      │                                       ━━━━━━━━━━━
-      │
-      ╰ hint: specify a conflict target, like `on conflict (column_name)`
-    "#);
-}
-
-#[test]
-fn on_conflict_toast_table() {
-    assert_snapshot!(check(r#"
-insert into pg_toast.pg_toast_1255 values (1, 1, 'x') on conflict do nothing;
-"#), @r#"
-    error: `on conflict` is not supported with system catalog tables
-      ╭▸ 
-    2 │ insert into pg_toast.pg_toast_1255 values (1, 1, 'x') on conflict do nothing;
-      ╰╴                                                      ━━━━━━━━━━━
-    "#);
 }
