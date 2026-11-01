@@ -29,19 +29,18 @@ use crate::{
         EnumLabelId, EventTrigger, EventTriggerId, Extension, ExtensionId, ForeignDataWrapper,
         ForeignDataWrapperId, Function, FunctionId, FunctionKind, GraphElement, GraphElementId,
         GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId, Index, IndexId,
-        IndexPredicate, Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId, MemberKind,
-        MemberOwner, Merge, Operand, Operands, Operator, OperatorClass, OperatorClassId,
-        OperatorFamily, OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId,
-        Param, ParamId, ParamMode, Policy, PolicyId, PredicateTest, PredicateTestKind,
-        PreparedStatement, PreparedStatementId, PreparedTransaction, PreparedTransactionId,
-        Publication, PublicationId, Query, QueryId, QueryKind, RefId, Reference, ReferenceKind,
-        Resolution, Role, RoleId, RoutineKind, Rule, RuleBehavior, RuleEvent, RuleId, RuleMode,
-        Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner,
-        Server, ServerId, Source, SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript,
-        Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
-        TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
-        TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
-        Window, WindowClauses, WindowId,
+        Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId, MemberKind, MemberOwner,
+        Merge, Operand, Operands, Operator, OperatorClass, OperatorClassId, OperatorFamily,
+        OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId, Param, ParamId,
+        ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId, PreparedTransaction,
+        PreparedTransactionId, Publication, PublicationId, Query, QueryId, QueryKind, RefId,
+        Reference, ReferenceKind, Resolution, Role, RoleId, RoutineKind, Rule, RuleBehavior,
+        RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId,
+        SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star,
+        Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
+        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
+        TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
+        TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
         ArgLabel, ConflictAction, ConflictRuleEvent, ConflictTargetKey, DropRelation, ErrorArg,
@@ -593,12 +592,6 @@ enum UniqueIndexMatch {
     Deferrable,
 }
 
-enum ConflictPredicate {
-    Absent,
-    Opaque,
-    Conjuncts(SmallVec<[PredicateTest; 2]>),
-}
-
 #[derive(Clone, Copy)]
 enum KeyMatch {
     Exact,
@@ -1074,7 +1067,6 @@ enum Undo {
     ConstraintKind(ConstraintId, ConstraintKind),
     IndexKey(IndexId, Option<IdxRange<Name>>),
     IndexColumns(IndexId, IdxRange<Name>),
-    IndexPredicate(IndexId, Option<IndexPredicate>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
@@ -2197,19 +2189,6 @@ impl Lowerer {
             if in_transaction {
                 self.undo.push(Undo::IndexColumns(id, previous));
             }
-            if let Some(IndexPredicate::Conjuncts(tests)) = self.index.indexes[id].predicate
-                && self
-                    .index
-                    .indexes
-                    .predicate_tests(tests)
-                    .any(|test| test.column == from)
-            {
-                let predicate = self.index.indexes.alloc_renamed_predicate(tests, from, to);
-                let previous = self.index.indexes.set_predicate(id, Some(predicate));
-                if in_transaction {
-                    self.undo.push(Undo::IndexPredicate(id, previous));
-                }
-            }
             if !self.index_key_contains(id, from) {
                 continue;
             }
@@ -2400,9 +2379,7 @@ impl Lowerer {
             && self.index.tables.is_local(view)
             && !self.dropped_tables.contains(&view)
             && self
-                .find_unique_index(view, &|_, index| {
-                    index.predicate.is_none() && index.key.is_some()
-                })
+                .find_unique_index(view, &|_, index| !index.partial && index.key.is_some())
                 .is_none()
         {
             let name = self.index.tables[view].name;
@@ -3323,9 +3300,6 @@ impl Lowerer {
                 }
                 Undo::IndexColumns(id, columns) => {
                     self.index.indexes.set_columns(id, columns);
-                }
-                Undo::IndexPredicate(id, predicate) => {
-                    self.index.indexes.set_predicate(id, predicate);
                 }
                 Undo::TypeColumns(ty, columns) => {
                     self.index
@@ -16873,16 +16847,7 @@ impl Lowerer {
             .partition_item_list()
             .and_then(|items| self.lower_index_key(&items));
         let unique = create_index.unique_token().is_some();
-        let predicate = create_index
-            .where_clause()
-            .and_then(|clause| clause.expr())
-            .map(|expr| {
-                let mut tests = smallvec![];
-                match self.lower_predicate_tests(&expr, &mut tests) {
-                    Some(()) => self.index.indexes.alloc_predicate(tests),
-                    None => IndexPredicate::Opaque,
-                }
-            });
+        let partial = create_index.where_clause().is_some();
         if unique
             && let Some(access_method) = access_method
             && let Some(access_method_ref) = create_index
@@ -16919,7 +16884,7 @@ impl Lowerer {
                     key,
                     columns,
                     unique,
-                    predicate,
+                    partial,
                 );
             }
             None => {
@@ -16944,7 +16909,7 @@ impl Lowerer {
                     key,
                     columns,
                     unique,
-                    predicate,
+                    partial,
                     deferrable: false,
                     ptr,
                     name_ptr: ptr,
@@ -19710,8 +19675,7 @@ impl Lowerer {
                     return;
                 }
                 let found = self.find_unique_index(table, &|id, index| {
-                    index.predicate.is_none()
-                        && self.index_key_matches(id, &columns, KeyMatch::Exact)
+                    !index.partial && self.index_key_matches(id, &columns, KeyMatch::Exact)
                 });
                 match found {
                     Some(UniqueIndexMatch::Immediate) => return,
@@ -19770,19 +19734,9 @@ impl Lowerer {
         if columns.is_empty() {
             return;
         }
-        let predicate = match on_index.where_clause().and_then(|clause| clause.expr()) {
-            None => ConflictPredicate::Absent,
-            Some(expr) => {
-                let mut tests = smallvec![];
-                match self.lower_predicate_tests(&expr, &mut tests) {
-                    Some(()) => ConflictPredicate::Conjuncts(tests),
-                    None => ConflictPredicate::Opaque,
-                }
-            }
-        };
+        let predicate = on_index.where_clause().is_some();
         let found = self.find_unique_index(table, &|id, index| {
-            self.index_predicate_implied(index.predicate, &predicate)
-                && self.index_key_matches(id, &columns, KeyMatch::Set)
+            (!index.partial || predicate) && self.index_key_matches(id, &columns, KeyMatch::Set)
         });
         let error = match found {
             Some(UniqueIndexMatch::Immediate) => return,
@@ -19990,7 +19944,7 @@ impl Lowerer {
             let index = &self.index.indexes[id];
             if !index.unique
                 || index.deferrable
-                || index.predicate.is_some()
+                || index.partial
                 || index.key.is_none()
                 || self.dropped_indexes.contains(&id)
             {
@@ -20006,117 +19960,6 @@ impl Lowerer {
         }
         let key = self.index.indexes.key(found?)?;
         Some(self.index.errors.names.alloc_many(key))
-    }
-
-    fn index_predicate_implied(
-        &self,
-        index_predicate: Option<IndexPredicate>,
-        predicate: &ConflictPredicate,
-    ) -> bool {
-        let Some(index_predicate) = index_predicate else {
-            return true;
-        };
-        match (index_predicate, predicate) {
-            (_, ConflictPredicate::Absent) => false,
-            (IndexPredicate::Opaque, _) | (_, ConflictPredicate::Opaque) => true,
-            (IndexPredicate::Conjuncts(index_tests), ConflictPredicate::Conjuncts(tests)) => self
-                .index
-                .indexes
-                .predicate_tests(index_tests)
-                .all(|index_test| tests.iter().any(|test| test.implies(index_test))),
-        }
-    }
-
-    fn lower_predicate_tests(
-        &mut self,
-        expr: &ast::Expr,
-        tests: &mut SmallVec<[PredicateTest; 2]>,
-    ) -> Option<()> {
-        let expr = expr.unparen();
-        if let ast::Expr::BinExpr(bin) = &expr
-            && let Some(ast::BinOp::And(_)) = bin.op()
-        {
-            self.lower_predicate_tests(&bin.lhs()?, tests)?;
-            return self.lower_predicate_tests(&bin.rhs()?, tests);
-        }
-        tests.push(self.lower_predicate_test(&expr)?);
-        Some(())
-    }
-
-    fn lower_predicate_test(&mut self, expr: &ast::Expr) -> Option<PredicateTest> {
-        let (operand, kind) = if let ast::Expr::BinExpr(bin) = expr
-            && let Some(ast::Expr::Literal(literal)) = bin.rhs()
-            && let Some(ast::LitKind::Null(_)) = literal.kind()
-        {
-            let kind = match bin.op()? {
-                ast::BinOp::Is(_) => PredicateTestKind::Null,
-                ast::BinOp::IsNot(_) => PredicateTestKind::NotNull,
-                ast::BinOp::And(_)
-                | ast::BinOp::AtTimeZone(_)
-                | ast::BinOp::Caret(_)
-                | ast::BinOp::ColonColon(_)
-                | ast::BinOp::ColonEq(_)
-                | ast::BinOp::CustomOp(_)
-                | ast::BinOp::Eq(_)
-                | ast::BinOp::Escape(_)
-                | ast::BinOp::FatArrow(_)
-                | ast::BinOp::Gteq(_)
-                | ast::BinOp::Ilike(_)
-                | ast::BinOp::In(_)
-                | ast::BinOp::IsDistinctFrom(_)
-                | ast::BinOp::IsNotDistinctFrom(_)
-                | ast::BinOp::LAngle(_)
-                | ast::BinOp::Like(_)
-                | ast::BinOp::Lteq(_)
-                | ast::BinOp::Minus(_)
-                | ast::BinOp::Neq(_)
-                | ast::BinOp::Neqb(_)
-                | ast::BinOp::NotIlike(_)
-                | ast::BinOp::NotIn(_)
-                | ast::BinOp::NotLike(_)
-                | ast::BinOp::NotSimilarTo(_)
-                | ast::BinOp::OperatorCall(_)
-                | ast::BinOp::Or(_)
-                | ast::BinOp::Overlaps(_)
-                | ast::BinOp::Percent(_)
-                | ast::BinOp::Plus(_)
-                | ast::BinOp::RAngle(_)
-                | ast::BinOp::SimilarTo(_)
-                | ast::BinOp::Slash(_)
-                | ast::BinOp::Star(_) => return None,
-            };
-            (bin.lhs()?, kind)
-        } else if let ast::Expr::PostfixExpr(postfix) = expr {
-            let kind = match postfix.op()? {
-                ast::PostfixOp::IsNull(_) => PredicateTestKind::Null,
-                ast::PostfixOp::NotNull(_) => PredicateTestKind::NotNull,
-                ast::PostfixOp::AtLocal(_)
-                | ast::PostfixOp::IsJson(_)
-                | ast::PostfixOp::IsJsonArray(_)
-                | ast::PostfixOp::IsJsonObject(_)
-                | ast::PostfixOp::IsJsonScalar(_)
-                | ast::PostfixOp::IsJsonValue(_)
-                | ast::PostfixOp::IsNormalized(_)
-                | ast::PostfixOp::IsNotJson(_)
-                | ast::PostfixOp::IsNotJsonArray(_)
-                | ast::PostfixOp::IsNotJsonObject(_)
-                | ast::PostfixOp::IsNotJsonScalar(_)
-                | ast::PostfixOp::IsNotJsonValue(_)
-                | ast::PostfixOp::IsNotNormalized(_) => return None,
-            };
-            (postfix.expr()?, kind)
-        } else if let ast::Expr::PrefixExpr(prefix) = expr
-            && let Some(ast::PrefixOp::Not(_)) = prefix.op()
-        {
-            (prefix.expr()?, PredicateTestKind::False)
-        } else {
-            (expr.clone(), PredicateTestKind::True)
-        };
-        let ast::Expr::NameRef(name_ref) = operand.unparen() else {
-            return None;
-        };
-        let column = self.name_ref_name(&name_ref)?;
-        Some(PredicateTest { column, kind })
     }
 
     fn keys_known(&self, table: TableId) -> bool {
@@ -23740,7 +23583,7 @@ impl Lowerer {
         key: Option<IdxRange<Name>>,
         columns: IdxRange<Name>,
         unique: bool,
-        predicate: Option<IndexPredicate>,
+        partial: bool,
     ) -> Option<IndexId> {
         let name = self.intern(&segment.text());
         if self.relation_exists(schema, name) {
@@ -23756,7 +23599,7 @@ impl Lowerer {
             key,
             columns,
             unique,
-            predicate,
+            partial,
             deferrable: false,
             ptr: self.ptr(node),
             name_ptr: self.ptr(segment.syntax()),
@@ -24210,7 +24053,7 @@ impl Lowerer {
             key,
             columns,
             unique,
-            predicate: None,
+            partial: false,
             deferrable,
             ptr: constraint.ptr,
             name_ptr: constraint.name_ptr,

@@ -306,84 +306,35 @@ insert into missing (a) values (1, 2);
 }
 
 #[test]
-fn on_conflict_partial_index_predicate() {
+fn on_conflict_partial_index() {
     assert_snapshot!(check("
-create table oc (
+create table t (
   email text,
   deleted_at timestamptz,
-  active bool,
   tenant int
 );
+create unique index on t (email) where deleted_at is null;
+create unique index on t (tenant);
+create unique index on t (tenant) where deleted_at is null;
 
-create unique index on oc (email) where deleted_at is null;
-create unique index on oc (tenant) where active;
-create unique index on oc (email, tenant) where tenant is not null;
-create unique index on oc (active) where lower(email) = 'a';
+insert into t values ('a') on conflict (email) do nothing;
 
-insert into oc
-values ('a')
-on conflict (email) where deleted_at is not null do nothing;
+insert into t values ('a') on conflict (email) do update set tenant = 1;
 
-insert into oc
+insert into t
 values ('a')
 on conflict (email) where deleted_at is null do nothing;
 
-insert into oc
-values ('a')
-on conflict (email) where (deleted_at isnull) and active do nothing;
-
-insert into oc values ('a') on conflict (email) where active do nothing;
-
-insert into oc values ('a') on conflict (tenant) where active do nothing;
-
-insert into oc values ('a') on conflict (tenant) where not active do nothing;
-
-insert into oc
-values ('a')
-on conflict (tenant) where active is not null do nothing;
-
-insert into oc
-values ('a')
-on conflict (email, tenant) where tenant > 0 do nothing;
-
-insert into oc
-values ('a')
-on conflict (email, tenant) where active and tenant notnull do nothing;
-
-insert into oc
-values ('a')
-on conflict (active) where tenant is null do nothing;
-
-alter table oc rename column deleted_at to removed_at;
-
-insert into oc
-values ('a')
-on conflict (email) where removed_at is null do nothing;
-
-insert into oc
-values ('a')
-on conflict (email) where removed_at is not null do nothing;
+insert into t values ('a') on conflict (tenant) do nothing;
 "), @"
     error: there is no unique or exclusion constraint matching the `on conflict` specification
        ╭▸ 
-    16 │ on conflict (email) where deleted_at is not null do nothing;
-       ╰╴            ━━━━━━━
+    11 │ insert into t values ('a') on conflict (email) do nothing;
+       ╰╴                                       ━━━━━━━
     error: there is no unique or exclusion constraint matching the `on conflict` specification
        ╭▸ 
-    26 │ insert into oc values ('a') on conflict (email) where active do nothing;
-       ╰╴                                        ━━━━━━━
-    error: there is no unique or exclusion constraint matching the `on conflict` specification
-       ╭▸ 
-    30 │ insert into oc values ('a') on conflict (tenant) where not active do nothing;
-       ╰╴                                        ━━━━━━━━
-    error: there is no unique or exclusion constraint matching the `on conflict` specification
-       ╭▸ 
-    34 │ on conflict (tenant) where active is not null do nothing;
-       ╰╴            ━━━━━━━━
-    error: there is no unique or exclusion constraint matching the `on conflict` specification
-       ╭▸ 
-    56 │ on conflict (email) where removed_at is not null do nothing;
-       ╰╴            ━━━━━━━
+    13 │ insert into t values ('a') on conflict (email) do update set tenant = 1;
+       ╰╴                                       ━━━━━━━
     ");
 }
 
@@ -893,4 +844,137 @@ $$;
     25 │ insert into t (id) values (1) on conflict (d) where d > 0 do nothing;
        ╰╴                                          ━━━
     ");
+}
+
+#[test]
+fn on_conflict_expression_target() {
+    assert_snapshot!(check(r#"
+create table t (email text);
+create unique index on t (email);
+
+insert into t values ('a') on conflict (lower(email)) do nothing;
+
+insert into t values ('a') on conflict (email collate "C") do nothing;
+
+insert into t values ('a') on conflict (email text_pattern_ops) do nothing;
+
+insert into t values ('a') on conflict (email text_ops) do nothing;
+"#), @r#"
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+      ╭▸ 
+    5 │ insert into t values ('a') on conflict (lower(email)) do nothing;
+      ╰╴                                       ━━━━━━━━━━━━━━
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+      ╭▸ 
+    7 │ insert into t values ('a') on conflict (email collate "C") do nothing;
+      ╰╴                                       ━━━━━━━━━━━━━━━━━━━
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+      ╭▸ 
+    9 │ insert into t values ('a') on conflict (email text_pattern_ops) do nothing;
+      ╰╴                                       ━━━━━━━━━━━━━━━━━━━━━━━━
+    "#);
+}
+
+#[test]
+fn on_conflict_builtin_table_target() {
+    assert_snapshot!(check(r#"
+insert into information_schema.sql_features (feature_id) values ('x')
+on conflict (feature_id) do nothing;
+"#), @r#"
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+      ╭▸ 
+    3 │ on conflict (feature_id) do nothing;
+      ╰╴            ━━━━━━━━━━━━
+    "#);
+}
+
+#[test]
+fn on_conflict_rules_through_view() {
+    assert_snapshot!(check(r#"
+create table t (a int primary key);
+create rule r as on update
+  to t
+  do instead nothing;
+create view v as
+  select * from t;
+
+insert into v values (1) on conflict do nothing;
+"#), @r#"
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+      ╭▸ 
+    9 │ insert into v values (1) on conflict do nothing;
+      │                          ━━━━━━━━━━━
+      │
+      ╰ note: `t` has an `on update` rule `r`
+    "#);
+}
+
+#[test]
+fn on_conflict_disabled_insert_rule() {
+    assert_snapshot!(check(r#"
+create table t (a int primary key);
+create rule r as on insert
+  to t
+  do also notify x;
+alter table t disable rule r;
+
+insert into t values (1) on conflict do nothing;
+"#), @"no diagnostics");
+}
+
+#[test]
+fn on_conflict_view_instead_of_trigger_with_update_rule() {
+    assert_snapshot!(check(r#"
+create table t (a int primary key);
+create view v as
+  select * from t;
+
+create function f() returns trigger
+  language plpgsql
+  as $$begin return new; end$$;
+
+create trigger tg
+  instead of insert
+  on v
+  for each row
+  execute function f();
+create rule r as on update
+  to v
+  do also notify x;
+
+insert into v values (1) on conflict do nothing;
+"#), @r#"
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    19 │ insert into v values (1) on conflict do nothing;
+       │                          ━━━━━━━━━━━
+       │
+       ╰ note: `v` has an `on update` rule `r`
+    "#);
+}
+
+#[test]
+fn on_conflict_system_catalog_missing_target() {
+    assert_snapshot!(check(r#"
+insert into pg_class (oid) values (1) on conflict do update set relname = 'x';
+"#), @r#"
+    error: `on conflict do update` requires a conflict target
+      ╭▸ 
+    2 │ insert into pg_class (oid) values (1) on conflict do update set relname = 'x';
+      │                                       ━━━━━━━━━━━
+      │
+      ╰ hint: specify a conflict target, like `on conflict (column_name)`
+    "#);
+}
+
+#[test]
+fn on_conflict_toast_table() {
+    assert_snapshot!(check(r#"
+insert into pg_toast.pg_toast_1255 values (1, 1, 'x') on conflict do nothing;
+"#), @r#"
+    error: `on conflict` is not supported with system catalog tables
+      ╭▸ 
+    2 │ insert into pg_toast.pg_toast_1255 values (1, 1, 'x') on conflict do nothing;
+      ╰╴                                                      ━━━━━━━━━━━
+    "#);
 }
