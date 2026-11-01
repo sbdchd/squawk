@@ -18897,8 +18897,27 @@ impl Lowerer {
             ast::FunctionLikeKeyword::Coalesce
             | ast::FunctionLikeKeyword::Greatest
             | ast::FunctionLikeKeyword::Least => self.common_args_type(args),
-            ast::FunctionLikeKeyword::Nullif => args.first().and_then(|arg| arg.ty.known()),
+            ast::FunctionLikeKeyword::Nullif => self.nullif_type(args),
             ast::FunctionLikeKeyword::Grouping | ast::FunctionLikeKeyword::MergeAction => None,
+        }
+    }
+
+    fn nullif_type(&self, args: &[CallArg]) -> Option<Ty> {
+        let [left, right] = args else {
+            return None;
+        };
+        if let ArgType::Known(ty) = left.ty {
+            return Some(ty);
+        }
+        let name = self.index.names.lookup("=")?;
+        let Resolution::Operator(operator) =
+            self.select_operator(None, name, Some(left.ty), Some(right.ty))
+        else {
+            return None;
+        };
+        match self.index.operators[operator].left {
+            Operand::Ty(ty) => Some(ty),
+            Operand::None | Operand::Unknown => None,
         }
     }
 

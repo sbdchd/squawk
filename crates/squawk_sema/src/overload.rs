@@ -18,15 +18,6 @@ pub(crate) enum ArgType {
     Untyped,
 }
 
-impl ArgType {
-    pub(crate) fn known(self) -> Option<Ty> {
-        match self {
-            ArgType::Known(ty) => Some(ty),
-            ArgType::UnknownLiteral | ArgType::Untyped => None,
-        }
-    }
-}
-
 #[derive(Debug, Clone, Copy, Default)]
 pub(crate) struct CallArg {
     pub(crate) name: Option<Name>,

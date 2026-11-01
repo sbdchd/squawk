@@ -345,3 +345,19 @@ select (case when true then 'a' end).x, (case when true then null end).*;
       ╰╴                                                                       ━
     ");
 }
+
+#[test]
+fn nullif_unknown_first_arg_uses_other_type() {
+    assert_snapshot!(check("
+select (nullif(null, 1)).x, (nullif('1', 1)).x;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    2 │ select (nullif(null, 1)).x, (nullif('1', 1)).x;
+      ╰╴                         ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    2 │ select (nullif(null, 1)).x, (nullif('1', 1)).x;
+      ╰╴                                             ━
+    ");
+}
