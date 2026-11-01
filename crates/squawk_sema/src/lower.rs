@@ -14069,6 +14069,9 @@ impl Lowerer {
             | SourceKind::ElementVariable
             | SourceKind::Other => None,
         });
+        if let Some(table) = table {
+            self.check_conflict_on_system_catalog(table, on_conflict);
+        }
         match on_conflict.conflict_target() {
             Some(ast::ConflictTarget::ConflictOnIndex(on_index)) => {
                 if let Some(table) = table {
@@ -19809,6 +19812,34 @@ impl Lowerer {
             return;
         };
         self.push_error(name_ref.syntax(), error);
+    }
+
+    fn check_conflict_on_system_catalog(
+        &mut self,
+        table: TableId,
+        on_conflict: &ast::OnConflictClause,
+    ) {
+        let Table { kind, schema, .. } = self.index.tables[table];
+        let is_table = match kind {
+            TableKind::Table => true,
+            TableKind::ForeignTable
+            | TableKind::View
+            | TableKind::MaterializedView
+            | TableKind::Sequence
+            | TableKind::PropertyGraph => false,
+        };
+        if !is_table || schema != self.pg_catalog || self.index.tables.is_local(table) {
+            return;
+        }
+        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
+        else {
+            return;
+        };
+        let range = TextRange::new(on.text_range().start(), conflict.text_range().end());
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::ConflictOnSystemCatalog,
+        );
     }
 
     fn check_whole_row_conflict_target(&mut self, target: Option<SourceId>, expr: &ast::Expr) {

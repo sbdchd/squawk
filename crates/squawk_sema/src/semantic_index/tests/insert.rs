@@ -651,6 +651,29 @@ insert into c values (1) on conflict (t) do nothing;
 }
 
 #[test]
+fn on_conflict_system_catalog() {
+    assert_snapshot!(check("
+insert into pg_class (oid) values (1) on conflict do nothing;
+
+insert into pg_catalog.pg_namespace (oid, nspname) values (1, 'x') on conflict (oid) do nothing;
+
+insert into information_schema.sql_features (feature_id) values ('x') on conflict do nothing;
+
+create table pg_catalog.mine (a int);
+insert into pg_catalog.mine values (1) on conflict do nothing;
+"), @"
+    error: `on conflict` is not supported with system catalog tables
+      ╭▸ 
+    2 │ insert into pg_class (oid) values (1) on conflict do nothing;
+      ╰╴                                      ━━━━━━━━━━━
+    error: `on conflict` is not supported with system catalog tables
+      ╭▸ 
+    4 │ insert into pg_catalog.pg_namespace (oid, nspname) values (1, 'x') on conflict (oid) do nothing;
+      ╰╴                                                                   ━━━━━━━━━━━
+    ");
+}
+
+#[test]
 fn on_conflict_do_select_without_returning() {
     assert_snapshot!(check("
 create table t (a int primary key);

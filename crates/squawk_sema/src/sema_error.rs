@@ -566,6 +566,7 @@ pub(crate) enum SemaError {
     DeferrableConflictArbiter,
     ConflictConstraintWithoutIndex,
     WholeRowConflictTarget,
+    ConflictOnSystemCatalog,
     ExclusionConflictArbiter {
         action: ConflictAction,
     },
@@ -1179,9 +1180,9 @@ impl SemaError {
             | SemaError::ExclusionConflictArbiter { .. }
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
-            SemaError::ConflictWithRules { .. } | SemaError::WholeRowConflictTarget => {
-                DiagnosticKind::FeatureNotSupported
-            }
+            SemaError::ConflictWithRules { .. }
+            | SemaError::WholeRowConflictTarget
+            | SemaError::ConflictOnSystemCatalog => DiagnosticKind::FeatureNotSupported,
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
@@ -1648,6 +1649,9 @@ impl SemaError {
             SemaError::WholeRowConflictTarget => {
                 Some("whole row unique index inference specifications are not supported")
             }
+            SemaError::ConflictOnSystemCatalog => {
+                Some("`on conflict` is not supported with system catalog tables")
+            }
             SemaError::ValuesLengthMismatch => Some("`values` lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
                 Some("`insert` has more expressions than target columns")
@@ -1904,6 +1908,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::ConflictConstraintWithoutIndex
             | SemaError::ConflictWithRules { .. }
             | SemaError::WholeRowConflictTarget
+            | SemaError::ConflictOnSystemCatalog
             | SemaError::DoSelectWithoutReturning { .. } => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
