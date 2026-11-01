@@ -41,6 +41,7 @@ pub(crate) enum CallMismatch {
     PositionalAndNamed { arg: usize },
     Missing(SmallVec<[MissingParam; 2]>),
     NotVariadic { arg: usize },
+    UnlabeledVariadic { arg: usize, fixable: bool },
     ArgType(ArgMismatch),
 }
 
@@ -397,7 +398,10 @@ impl<'a> Overloads<'a> {
                 return Some(CallMismatch::NotVariadic { arg: i });
             }
             if param.mode == ParamMode::Variadic && arg.name.is_some() && !arg.variadic {
-                return None;
+                let fixable = i + 1 == args.len()
+                    && param.ty.is_some()
+                    && self.arg_match(arg.ty, param.ty).is_some();
+                return Some(CallMismatch::UnlabeledVariadic { arg: i, fixable });
             }
             assigned[position] = true;
             let ty = match (param.mode, arg.name, arg.variadic) {

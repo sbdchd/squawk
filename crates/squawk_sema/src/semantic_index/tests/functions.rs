@@ -1196,13 +1196,37 @@ fn named_variadic_requires_label() {
 create function v(a int, variadic b int[]) returns int language sql return a;
 select v(a => 1, b => array[1]);
 select v(a => 1, variadic b => array[1]);
+select v(b => array[1], a => 1);
+select v(a => 1, b => 2);
+select v(a => 1, b => array['a']);
 "), @"
-    error: function `v(a => int4, b => int4[])` does not exist
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
       ╭▸ 
     3 │ select v(a => 1, b => array[1]);
-      │        ━
+      │                  ━━━━━━━━━━━━━
+      ╰╴
+    help: label the variadic array with `variadic`
+      ╭╴
+    3 │ select v(a => 1, variadic b => array[1]);
+      ╰╴                 ++++++++
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
+      ╭▸ 
+    5 │ select v(b => array[1], a => 1);
+      │          ━━━━━━━━━━━━━
       │
-      ╰ hint: consider adding explicit type casts
+      ╰ hint: pass an array labeled `variadic` as the last argument
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
+      ╭▸ 
+    6 │ select v(a => 1, b => 2);
+      │                  ━━━━━━
+      │
+      ╰ hint: pass an array labeled `variadic` as the last argument
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
+      ╭▸ 
+    7 │ select v(a => 1, b => array['a']);
+      │                  ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: pass an array labeled `variadic` as the last argument
     ");
 }
 

@@ -22331,6 +22331,23 @@ impl Lowerer {
                 },
                 target: call_arg(arg_list, args, arg).map(|arg| arg.syntax().clone()),
             }),
+            CallMismatch::UnlabeledVariadic { arg, fixable } => {
+                let target = call_arg(arg_list, args, arg).map(|arg| arg.syntax().clone());
+                let insert_at = target
+                    .as_ref()
+                    .filter(|_| fixable)
+                    .map(|node| self.node_range(node).start());
+                Some(CallMismatchError {
+                    error: SemaError::UnlabeledVariadic {
+                        kind,
+                        schema,
+                        name,
+                        param: args[arg].name?,
+                        insert_at,
+                    },
+                    target,
+                })
+            }
             CallMismatch::ArgType(ArgMismatch {
                 position,
                 found,

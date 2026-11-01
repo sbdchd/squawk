@@ -401,6 +401,13 @@ pub(crate) enum SemaError {
         name: Name,
         arg: ArgLabel,
     },
+    UnlabeledVariadic {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        param: Name,
+        insert_at: Option<TextSize>,
+    },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
         name: Name,
@@ -1054,7 +1061,8 @@ impl SemaError {
             SemaError::PositionalAfterNamed
             | SemaError::DuplicateArgumentName { .. }
             | SemaError::ArgumentPositionalAndNamed { .. }
-            | SemaError::NotVariadic { .. } => DiagnosticKind::InvalidArgument,
+            | SemaError::NotVariadic { .. }
+            | SemaError::UnlabeledVariadic { .. } => DiagnosticKind::InvalidArgument,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
@@ -1302,6 +1310,16 @@ impl SemaError {
                     edits: vec![Edit::delete(range)],
                 },
             },
+            SemaError::UnlabeledVariadic {
+                insert_at: Some(insert_at),
+                ..
+            } => Suggestion {
+                message: "label the variadic array with `variadic`".into(),
+                fix: Fix {
+                    title: "Insert `variadic`".into(),
+                    edits: vec![Edit::insert("variadic ", insert_at)],
+                },
+            },
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),
@@ -1413,6 +1431,9 @@ impl SemaError {
                 }
             },
             SemaError::ArgumentTypeMismatch { .. } => Some("consider adding explicit type casts"),
+            SemaError::UnlabeledVariadic {
+                insert_at: None, ..
+            } => Some("pass an array labeled `variadic` as the last argument"),
             SemaError::ProcedureCalledAsFunction {
                 select_range: None,
                 ..
@@ -2082,6 +2103,18 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "argument {} of `{}` is labeled `variadic` but its parameter is not variadic",
                 self.arg_label(arg),
+                self.qualified(schema, name)
+            ),
+            SemaError::UnlabeledVariadic {
+                kind: _,
+                schema,
+                name,
+                param,
+                insert_at: _,
+            } => write!(
+                f,
+                "variadic parameter `{}` of `{}` must be labeled `variadic` when passed by name",
+                n(param),
                 self.qualified(schema, name)
             ),
             SemaError::ProcedureCalledAsFunction {
