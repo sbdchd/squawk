@@ -6006,79 +6006,92 @@ create type spheroid (
 create operator && (
   leftarg = box2df,
   rightarg = box2df,
-  function = overlaps_2d
+  function = overlaps_2d,
+  commutator = &&
 );
 
 create operator && (
   leftarg = box2df,
   rightarg = geometry,
-  function = overlaps_2d
+  function = overlaps_2d,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geography,
   rightarg = geography,
-  function = geography_overlaps
+  function = geography_overlaps,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geography,
   rightarg = gidx,
-  function = overlaps_geog
+  function = overlaps_geog,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geometry,
   rightarg = box2df,
-  function = overlaps_2d
+  function = overlaps_2d,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_overlaps
+  function = geometry_overlaps,
+  commutator = &&
 );
 
 create operator && (
   leftarg = gidx,
   rightarg = geography,
-  function = overlaps_geog
+  function = overlaps_geog,
+  commutator = &&
 );
 
 create operator && (
   leftarg = gidx,
   rightarg = gidx,
-  function = overlaps_geog
+  function = overlaps_geog,
+  commutator = &&
 );
 
 create operator &&& (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_overlaps_nd
+  function = geometry_overlaps_nd,
+  commutator = &&&
 );
 
 create operator &&& (
   leftarg = geometry,
   rightarg = gidx,
-  function = overlaps_nd
+  function = overlaps_nd,
+  commutator = &&&
 );
 
 create operator &&& (
   leftarg = gidx,
   rightarg = geometry,
-  function = overlaps_nd
+  function = overlaps_nd,
+  commutator = &&&
 );
 
 create operator &&& (
   leftarg = gidx,
   rightarg = gidx,
-  function = overlaps_nd
+  function = overlaps_nd,
+  commutator = &&&
 );
 
 create operator &/& (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_overlaps_3d
+  function = geometry_overlaps_3d,
+  commutator = &/&
 );
 
 create operator &< (
@@ -6102,151 +6115,186 @@ create operator &> (
 create operator < (
   leftarg = geography,
   rightarg = geography,
-  function = geography_lt
+  function = geography_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_lt
+  function = geometry_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator <#> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_box
+  function = geometry_distance_box,
+  commutator = <#>
 );
 
 create operator <-> (
   leftarg = geography,
   rightarg = geography,
-  function = geography_distance_knn
+  function = geography_distance_knn,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_centroid
+  function = geometry_distance_centroid,
+  commutator = <->
 );
 
 create operator << (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_left
+  function = geometry_left,
+  commutator = >>
 );
 
 create operator <<->> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_centroid_nd
+  function = geometry_distance_centroid_nd,
+  commutator = <<->>
 );
 
 create operator <<@ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contained_3d
+  function = geometry_contained_3d,
+  commutator = @>>
 );
 
 create operator <<| (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_below
+  function = geometry_below,
+  commutator = |>>
 );
 
 create operator <= (
   leftarg = geography,
   rightarg = geography,
-  function = geography_le
+  function = geography_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <= (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_le
+  function = geometry_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_neq
+  function = geometry_neq,
+  commutator = <>,
+  negator = =
 );
 
 create operator = (
   leftarg = geography,
   rightarg = geography,
-  function = geography_eq
+  function = geography_eq,
+  commutator = =
 );
 
 create operator = (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_eq
+  function = geometry_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator > (
   leftarg = geography,
   rightarg = geography,
-  function = geography_gt
+  function = geography_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_gt
+  function = geometry_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator >= (
   leftarg = geography,
   rightarg = geography,
-  function = geography_ge
+  function = geography_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator >= (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_ge
+  function = geometry_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator >> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_right
+  function = geometry_right,
+  commutator = <<
 );
 
 create operator @ (
   leftarg = box2df,
   rightarg = box2df,
-  function = is_contained_2d
+  function = is_contained_2d,
+  commutator = ~
 );
 
 create operator @ (
   leftarg = box2df,
   rightarg = geometry,
-  function = is_contained_2d
+  function = is_contained_2d,
+  commutator = ~
 );
 
 create operator @ (
   leftarg = geometry,
   rightarg = box2df,
-  function = is_contained_2d
+  function = is_contained_2d,
+  commutator = ~
 );
 
 create operator @ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_within
+  function = geometry_within,
+  commutator = ~
 );
 
 create operator @>> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contains_3d
+  function = geometry_contains_3d,
+  commutator = <<@
 );
 
 create operator @@ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_within_nd
+  function = geometry_within_nd,
+  commutator = ~~
 );
 
 create operator |&> (
@@ -6258,37 +6306,43 @@ create operator |&> (
 create operator |=| (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_cpa
+  function = geometry_distance_cpa,
+  commutator = |=|
 );
 
 create operator |>> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_above
+  function = geometry_above,
+  commutator = <<|
 );
 
 create operator ~ (
   leftarg = box2df,
   rightarg = box2df,
-  function = contains_2d
+  function = contains_2d,
+  commutator = @
 );
 
 create operator ~ (
   leftarg = box2df,
   rightarg = geometry,
-  function = contains_2d
+  function = contains_2d,
+  commutator = @
 );
 
 create operator ~ (
   leftarg = geometry,
   rightarg = box2df,
-  function = contains_2d
+  function = contains_2d,
+  commutator = @
 );
 
 create operator ~ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contains
+  function = geometry_contains,
+  commutator = @
 );
 
 create operator ~= (
@@ -6300,19 +6354,22 @@ create operator ~= (
 create operator ~== (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_same_3d
+  function = geometry_same_3d,
+  commutator = ~==
 );
 
 create operator ~~ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contains_nd
+  function = geometry_contains_nd,
+  commutator = @@
 );
 
 create operator ~~= (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_same_nd
+  function = geometry_same_nd,
+  commutator = ~~=
 );
 
 create operator family brin_geography_inclusion_ops
@@ -6361,85 +6418,85 @@ create operator class brin_geography_inclusion_ops
   default for type geography
   using brin
   family brin_geography_inclusion_ops as
-  storage gidx;
+    storage gidx;
 
 create operator class brin_geometry_inclusion_ops_2d
   default for type geometry
   using brin
   family brin_geometry_inclusion_ops_2d as
-  storage box2df;
+    storage box2df;
 
 create operator class brin_geometry_inclusion_ops_3d
   for type geometry
   using brin
   family brin_geometry_inclusion_ops_3d as
-  storage gidx;
+    storage gidx;
 
 create operator class brin_geometry_inclusion_ops_4d
   for type geometry
   using brin
   family brin_geometry_inclusion_ops_4d as
-  storage gidx;
+    storage gidx;
 
 create operator class btree_geography_ops
   default for type geography
   using btree
   family btree_geography_ops as
-  storage geography;
+    storage geography;
 
 create operator class btree_geometry_ops
   default for type geometry
   using btree
   family btree_geometry_ops as
-  storage geometry;
+    storage geometry;
 
 create operator class gist_geography_ops
   default for type geography
   using gist
   family gist_geography_ops as
-  storage gidx;
+    storage gidx;
 
 create operator class gist_geometry_ops_2d
   default for type geometry
   using gist
   family gist_geometry_ops_2d as
-  storage box2df;
+    storage box2df;
 
 create operator class gist_geometry_ops_nd
   for type geometry
   using gist
   family gist_geometry_ops_nd as
-  storage gidx;
+    storage gidx;
 
 create operator class hash_geometry_ops
   default for type geometry
   using hash
   family hash_geometry_ops as
-  storage geometry;
+    storage geometry;
 
 create operator class spgist_geography_ops_nd
   default for type geography
   using spgist
   family spgist_geography_ops_nd as
-  storage geography;
+    storage geography;
 
 create operator class spgist_geometry_ops_2d
   default for type geometry
   using spgist
   family spgist_geometry_ops_2d as
-  storage geometry;
+    storage geometry;
 
 create operator class spgist_geometry_ops_3d
   for type geometry
   using spgist
   family spgist_geometry_ops_3d as
-  storage geometry;
+    storage geometry;
 
 create operator class spgist_geometry_ops_nd
   for type geometry
   using spgist
   family spgist_geometry_ops_nd as
-  storage geometry;
+    storage geometry;
 
 create aggregate st_3dextent(geometry) (
   sfunc = st_combinebbox,

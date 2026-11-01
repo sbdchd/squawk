@@ -36,9 +36,9 @@ create text search configuration c (
         3 │   copy = english
           │          ─────── 1. source
           │
-          ⸬  builtins.sql:43435:45
+          ⸬  builtins.sql:44368:45
           │
-    43435 │ create text search configuration pg_catalog.english (
+    44368 │ create text search configuration pg_catalog.english (
           ╰╴                                            ─────── 2. destination
     ");
 }

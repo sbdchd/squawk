@@ -702,6 +702,10 @@ struct OperatorQuery {
     right_type: String,
     func_schema: String,
     func_name: String,
+    commutator_schema: String,
+    commutator_name: String,
+    negator_schema: String,
+    negator_name: String,
     description: String,
     extension_name: String,
 }
@@ -718,12 +722,36 @@ select
     else pn.nspname || '.'
   end as func_schema,
   p.proname as func_name,
+  case
+    when com.oid is null or com_dep.objid is not null then ''
+    else com_n.nspname || '.'
+  end as commutator_schema,
+  coalesce(com.oprname, '') as commutator_name,
+  case
+    when neg.oid is null or neg_dep.objid is not null then ''
+    else neg_n.nspname || '.'
+  end as negator_schema,
+  coalesce(neg.oprname, '') as negator_name,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_operator o
   join pg_namespace n on n.oid = o.oprnamespace
   join pg_proc p on p.oid = o.oprcode
   join pg_namespace pn on pn.oid = p.pronamespace
+  left join pg_operator com on com.oid = o.oprcom
+  left join pg_namespace com_n on com_n.oid = com.oprnamespace
+  left join pg_depend com_dep on
+    com_dep.classid = 'pg_operator'::regclass
+      and com_dep.objid = com.oid
+      and com_dep.objsubid = 0
+      and com_dep.deptype = 'e'
+  left join pg_operator neg on neg.oid = o.oprnegate
+  left join pg_namespace neg_n on neg_n.oid = neg.oprnamespace
+  left join pg_depend neg_dep on
+    neg_dep.classid = 'pg_operator'::regclass
+      and neg_dep.objid = neg.oid
+      and neg_dep.objsubid = 0
+      and neg_dep.deptype = 'e'
   left join pg_description d on
     d.objoid = o.oid and d.classoid = 'pg_operator'::regclass
   left join pg_depend dep on
@@ -2351,7 +2379,30 @@ struct OperatorDef {
     right_type: String,
     function_schema: String,
     function_name: String,
+    commutator: Option<OperatorRef>,
+    negator: Option<OperatorRef>,
     description: String,
+}
+
+struct OperatorRef {
+    schema: String,
+    name: String,
+}
+
+impl OperatorRef {
+    fn new(schema: String, name: String) -> Option<OperatorRef> {
+        (!name.is_empty()).then_some(OperatorRef { schema, name })
+    }
+}
+
+impl std::fmt::Display for OperatorRef {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.schema.is_empty() {
+            write!(f, "{}", self.name)
+        } else {
+            write!(f, "operator({}{})", self.schema, self.name)
+        }
+    }
 }
 
 impl WriteSql for OperatorDef {
@@ -2366,12 +2417,18 @@ impl WriteSql for OperatorDef {
             }
         };
         writeln!(f, "{args}")?;
-        writeln!(
+        write!(
             f,
             "  function = {}{}",
             self.function_schema, self.function_name
         )?;
-        writeln!(f, ");")?;
+        if let Some(commutator) = &self.commutator {
+            write!(f, ",\n  commutator = {commutator}")?;
+        }
+        if let Some(negator) = &self.negator {
+            write!(f, ",\n  negator = {negator}")?;
+        }
+        writeln!(f, "\n);")?;
         writeln!(f)?;
 
         Ok(())
@@ -2909,6 +2966,8 @@ fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
                 name: row.name,
                 right_type: row.right_type,
                 schema: row.schema,
+                commutator: OperatorRef::new(row.commutator_schema, row.commutator_name),
+                negator: OperatorRef::new(row.negator_schema, row.negator_name),
             });
     }
 

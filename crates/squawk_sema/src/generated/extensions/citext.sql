@@ -322,157 +322,193 @@ create type citext (
 create operator !~ (
   leftarg = citext,
   rightarg = citext,
-  function = texticregexne
+  function = texticregexne,
+  negator = ~
 );
 
 create operator !~ (
   leftarg = citext,
   rightarg = text,
-  function = texticregexne
+  function = texticregexne,
+  negator = ~
 );
 
 create operator !~* (
   leftarg = citext,
   rightarg = citext,
-  function = texticregexne
+  function = texticregexne,
+  negator = ~*
 );
 
 create operator !~* (
   leftarg = citext,
   rightarg = text,
-  function = texticregexne
+  function = texticregexne,
+  negator = ~*
 );
 
 create operator !~~ (
   leftarg = citext,
   rightarg = citext,
-  function = texticnlike
+  function = texticnlike,
+  negator = ~~
 );
 
 create operator !~~ (
   leftarg = citext,
   rightarg = text,
-  function = texticnlike
+  function = texticnlike,
+  negator = ~~
 );
 
 create operator !~~* (
   leftarg = citext,
   rightarg = citext,
-  function = texticnlike
+  function = texticnlike,
+  negator = ~~*
 );
 
 create operator !~~* (
   leftarg = citext,
   rightarg = text,
-  function = texticnlike
+  function = texticnlike,
+  negator = ~~*
 );
 
 create operator < (
   leftarg = citext,
   rightarg = citext,
-  function = citext_lt
+  function = citext_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator <= (
   leftarg = citext,
   rightarg = citext,
-  function = citext_le
+  function = citext_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <> (
   leftarg = citext,
   rightarg = citext,
-  function = citext_ne
+  function = citext_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator = (
   leftarg = citext,
   rightarg = citext,
-  function = citext_eq
+  function = citext_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator > (
   leftarg = citext,
   rightarg = citext,
-  function = citext_gt
+  function = citext_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator >= (
   leftarg = citext,
   rightarg = citext,
-  function = citext_ge
+  function = citext_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator ~ (
   leftarg = citext,
   rightarg = citext,
-  function = texticregexeq
+  function = texticregexeq,
+  negator = !~
 );
 
 create operator ~ (
   leftarg = citext,
   rightarg = text,
-  function = texticregexeq
+  function = texticregexeq,
+  negator = !~
 );
 
 create operator ~* (
   leftarg = citext,
   rightarg = citext,
-  function = texticregexeq
+  function = texticregexeq,
+  negator = !~*
 );
 
 create operator ~* (
   leftarg = citext,
   rightarg = text,
-  function = texticregexeq
+  function = texticregexeq,
+  negator = !~*
 );
 
 create operator ~<=~ (
   leftarg = citext,
   rightarg = citext,
-  function = citext_pattern_le
+  function = citext_pattern_le,
+  commutator = ~>=~,
+  negator = ~>~
 );
 
 create operator ~<~ (
   leftarg = citext,
   rightarg = citext,
-  function = citext_pattern_lt
+  function = citext_pattern_lt,
+  commutator = ~>~,
+  negator = ~>=~
 );
 
 create operator ~>=~ (
   leftarg = citext,
   rightarg = citext,
-  function = citext_pattern_ge
+  function = citext_pattern_ge,
+  commutator = ~<=~,
+  negator = ~<~
 );
 
 create operator ~>~ (
   leftarg = citext,
   rightarg = citext,
-  function = citext_pattern_gt
+  function = citext_pattern_gt,
+  commutator = ~<~,
+  negator = ~<=~
 );
 
 create operator ~~ (
   leftarg = citext,
   rightarg = citext,
-  function = texticlike
+  function = texticlike,
+  negator = !~~
 );
 
 create operator ~~ (
   leftarg = citext,
   rightarg = text,
-  function = texticlike
+  function = texticlike,
+  negator = !~~
 );
 
 create operator ~~* (
   leftarg = citext,
   rightarg = citext,
-  function = texticlike
+  function = texticlike,
+  negator = !~~*
 );
 
 create operator ~~* (
   leftarg = citext,
   rightarg = text,
-  function = texticlike
+  function = texticlike,
+  negator = !~~*
 );
 
 create operator family citext_ops
@@ -488,19 +524,19 @@ create operator class citext_ops
   default for type citext
   using btree
   family citext_ops as
-  storage citext;
+    storage citext;
 
 create operator class citext_ops
   default for type citext
   using hash
   family citext_ops as
-  storage citext;
+    storage citext;
 
 create operator class citext_pattern_ops
   for type citext
   using btree
   family citext_pattern_ops as
-  storage citext;
+    storage citext;
 
 create aggregate max(citext) (
   sfunc = citext_larger,

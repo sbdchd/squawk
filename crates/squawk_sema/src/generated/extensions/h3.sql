@@ -669,65 +669,81 @@ create type h3index (
 create operator && (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_overlaps
+  function = h3index_overlaps,
+  commutator = &&
 );
 
 create operator < (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_lt
+  function = h3index_lt,
+  commutator = >,
+  negator = >=
 );
 
 -- Returns the distance in grid cells between the two indices (at the lowest resolution of the two).
 create operator <-> (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_distance
+  function = h3index_distance,
+  commutator = <->
 );
 
 create operator <= (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_le
+  function = h3index_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <> (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_ne
+  function = h3index_ne,
+  commutator = <>,
+  negator = =
 );
 
 -- Returns true if A is contained by B.
 create operator <@ (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_contained_by
+  function = h3index_contained_by,
+  commutator = @>
 );
 
 -- Returns true if two indexes are the same.
 create operator = (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_eq
+  function = h3index_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator > (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_gt
+  function = h3index_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator >= (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_ge
+  function = h3index_ge,
+  commutator = <=,
+  negator = <
 );
 
 -- Returns true if A contains B.
 create operator @> (
   leftarg = h3index,
   rightarg = h3index,
-  function = h3index_contains
+  function = h3index_contains,
+  commutator = <@
 );
 
 create operator family h3index_minmax_ops
@@ -746,25 +762,25 @@ create operator class h3index_minmax_ops
   default for type h3index
   using brin
   family h3index_minmax_ops as
-  storage h3index;
+    storage h3index;
 
 create operator class h3index_ops
   default for type h3index
   using btree
   family h3index_ops as
-  storage h3index;
+    storage h3index;
 
 create operator class h3index_ops
   default for type h3index
   using hash
   family h3index_ops as
-  storage h3index;
+    storage h3index;
 
 create operator class h3index_ops_experimental
   for type h3index
   using spgist
   family h3index_ops_experimental as
-  storage h3index;
+    storage h3index;
 
 create cast (bigint as h3index) with function bigint_to_h3index(bigint);
 

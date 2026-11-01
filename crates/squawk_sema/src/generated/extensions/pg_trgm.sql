@@ -237,61 +237,71 @@ create type gtrgm (
 create operator % (
   leftarg = text,
   rightarg = text,
-  function = similarity_op
+  function = similarity_op,
+  commutator = %
 );
 
 create operator %> (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_commutator_op
+  function = word_similarity_commutator_op,
+  commutator = <%
 );
 
 create operator %>> (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_commutator_op
+  function = strict_word_similarity_commutator_op,
+  commutator = <<%
 );
 
 create operator <% (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_op
+  function = word_similarity_op,
+  commutator = %>
 );
 
 create operator <-> (
   leftarg = text,
   rightarg = text,
-  function = similarity_dist
+  function = similarity_dist,
+  commutator = <->
 );
 
 create operator <->> (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_dist_commutator_op
+  function = word_similarity_dist_commutator_op,
+  commutator = <<->
 );
 
 create operator <->>> (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_dist_commutator_op
+  function = strict_word_similarity_dist_commutator_op,
+  commutator = <<<->
 );
 
 create operator <<% (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_op
+  function = strict_word_similarity_op,
+  commutator = %>>
 );
 
 create operator <<-> (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_dist_op
+  function = word_similarity_dist_op,
+  commutator = <->>
 );
 
 create operator <<<-> (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_dist_op
+  function = strict_word_similarity_dist_op,
+  commutator = <->>>
 );
 
 create operator family gin_trgm_ops
@@ -304,10 +314,10 @@ create operator class gin_trgm_ops
   for type text
   using gin
   family gin_trgm_ops as
-  storage integer;
+    storage integer;
 
 create operator class gist_trgm_ops
   for type text
   using gist
   family gist_trgm_ops as
-  storage gtrgm;
+    storage gtrgm;

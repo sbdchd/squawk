@@ -760,25 +760,29 @@ create type vector (
 create operator * (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_mul
+  function = halfvec_mul,
+  commutator = *
 );
 
 create operator * (
   leftarg = vector,
   rightarg = vector,
-  function = vector_mul
+  function = vector_mul,
+  commutator = *
 );
 
 create operator + (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_add
+  function = halfvec_add,
+  commutator = +
 );
 
 create operator + (
   leftarg = vector,
   rightarg = vector,
-  function = vector_add
+  function = vector_add,
+  commutator = +
 );
 
 create operator - (
@@ -796,193 +800,243 @@ create operator - (
 create operator < (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_lt
+  function = halfvec_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = sparsevec_lt
+  function = sparsevec_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = vector,
   rightarg = vector,
-  function = vector_lt
+  function = vector_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator <#> (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_negative_inner_product
+  function = halfvec_negative_inner_product,
+  commutator = <#>
 );
 
 create operator <#> (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = sparsevec_negative_inner_product
+  function = sparsevec_negative_inner_product,
+  commutator = <#>
 );
 
 create operator <#> (
   leftarg = vector,
   rightarg = vector,
-  function = vector_negative_inner_product
+  function = vector_negative_inner_product,
+  commutator = <#>
 );
 
 create operator <%> (
   leftarg = bit,
   rightarg = bit,
-  function = jaccard_distance
+  function = jaccard_distance,
+  commutator = <%>
 );
 
 create operator <+> (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = l1_distance
+  function = l1_distance,
+  commutator = <+>
 );
 
 create operator <+> (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = l1_distance
+  function = l1_distance,
+  commutator = <+>
 );
 
 create operator <+> (
   leftarg = vector,
   rightarg = vector,
-  function = l1_distance
+  function = l1_distance,
+  commutator = <+>
 );
 
 create operator <-> (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = l2_distance
+  function = l2_distance,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = l2_distance
+  function = l2_distance,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = vector,
   rightarg = vector,
-  function = l2_distance
+  function = l2_distance,
+  commutator = <->
 );
 
 create operator <= (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_le
+  function = halfvec_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <= (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = sparsevec_le
+  function = sparsevec_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <= (
   leftarg = vector,
   rightarg = vector,
-  function = vector_le
+  function = vector_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <=> (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = cosine_distance
+  function = cosine_distance,
+  commutator = <=>
 );
 
 create operator <=> (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = cosine_distance
+  function = cosine_distance,
+  commutator = <=>
 );
 
 create operator <=> (
   leftarg = vector,
   rightarg = vector,
-  function = cosine_distance
+  function = cosine_distance,
+  commutator = <=>
 );
 
 create operator <> (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_ne
+  function = halfvec_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = sparsevec_ne
+  function = sparsevec_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = vector,
   rightarg = vector,
-  function = vector_ne
+  function = vector_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <~> (
   leftarg = bit,
   rightarg = bit,
-  function = hamming_distance
+  function = hamming_distance,
+  commutator = <~>
 );
 
 create operator = (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_eq
+  function = halfvec_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator = (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = sparsevec_eq
+  function = sparsevec_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator = (
   leftarg = vector,
   rightarg = vector,
-  function = vector_eq
+  function = vector_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator > (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_gt
+  function = halfvec_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = sparsevec_gt
+  function = sparsevec_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = vector,
   rightarg = vector,
-  function = vector_gt
+  function = vector_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator >= (
   leftarg = halfvec,
   rightarg = halfvec,
-  function = halfvec_ge
+  function = halfvec_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator >= (
   leftarg = sparsevec,
   rightarg = sparsevec,
-  function = sparsevec_ge
+  function = sparsevec_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator >= (
   leftarg = vector,
   rightarg = vector,
-  function = vector_ge
+  function = vector_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator || (
@@ -1083,145 +1137,145 @@ create operator class bit_hamming_ops
   for type bit
   using hnsw
   family bit_hamming_ops as
-  storage bit;
+    storage bit;
 
 create operator class bit_hamming_ops
   for type bit
   using ivfflat
   family bit_hamming_ops as
-  storage bit;
+    storage bit;
 
 create operator class bit_jaccard_ops
   for type bit
   using hnsw
   family bit_jaccard_ops as
-  storage bit;
+    storage bit;
 
 create operator class halfvec_cosine_ops
   for type halfvec
   using hnsw
   family halfvec_cosine_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class halfvec_cosine_ops
   for type halfvec
   using ivfflat
   family halfvec_cosine_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class halfvec_ip_ops
   for type halfvec
   using hnsw
   family halfvec_ip_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class halfvec_ip_ops
   for type halfvec
   using ivfflat
   family halfvec_ip_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class halfvec_l1_ops
   for type halfvec
   using hnsw
   family halfvec_l1_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class halfvec_l2_ops
   for type halfvec
   using hnsw
   family halfvec_l2_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class halfvec_l2_ops
   for type halfvec
   using ivfflat
   family halfvec_l2_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class halfvec_ops
   default for type halfvec
   using btree
   family halfvec_ops as
-  storage halfvec;
+    storage halfvec;
 
 create operator class sparsevec_cosine_ops
   for type sparsevec
   using hnsw
   family sparsevec_cosine_ops as
-  storage sparsevec;
+    storage sparsevec;
 
 create operator class sparsevec_ip_ops
   for type sparsevec
   using hnsw
   family sparsevec_ip_ops as
-  storage sparsevec;
+    storage sparsevec;
 
 create operator class sparsevec_l1_ops
   for type sparsevec
   using hnsw
   family sparsevec_l1_ops as
-  storage sparsevec;
+    storage sparsevec;
 
 create operator class sparsevec_l2_ops
   for type sparsevec
   using hnsw
   family sparsevec_l2_ops as
-  storage sparsevec;
+    storage sparsevec;
 
 create operator class sparsevec_ops
   default for type sparsevec
   using btree
   family sparsevec_ops as
-  storage sparsevec;
+    storage sparsevec;
 
 create operator class vector_cosine_ops
   for type vector
   using hnsw
   family vector_cosine_ops as
-  storage vector;
+    storage vector;
 
 create operator class vector_cosine_ops
   for type vector
   using ivfflat
   family vector_cosine_ops as
-  storage vector;
+    storage vector;
 
 create operator class vector_ip_ops
   for type vector
   using hnsw
   family vector_ip_ops as
-  storage vector;
+    storage vector;
 
 create operator class vector_ip_ops
   for type vector
   using ivfflat
   family vector_ip_ops as
-  storage vector;
+    storage vector;
 
 create operator class vector_l1_ops
   for type vector
   using hnsw
   family vector_l1_ops as
-  storage vector;
+    storage vector;
 
 create operator class vector_l2_ops
   for type vector
   using hnsw
   family vector_l2_ops as
-  storage vector;
+    storage vector;
 
 create operator class vector_l2_ops
   default for type vector
   using ivfflat
   family vector_l2_ops as
-  storage vector;
+    storage vector;
 
 create operator class vector_ops
   default for type vector
   using btree
   family vector_ops as
-  storage vector;
+    storage vector;
 
 create aggregate avg(halfvec) (
   sfunc = halfvec_accum,

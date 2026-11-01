@@ -401,13 +401,17 @@ create type hstore (
 create operator #<# (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_lt
+  function = hstore_lt,
+  commutator = #>#,
+  negator = #>=#
 );
 
 create operator #<=# (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_le
+  function = hstore_le,
+  commutator = #>=#,
+  negator = #>#
 );
 
 create operator #= (
@@ -419,13 +423,17 @@ create operator #= (
 create operator #># (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_gt
+  function = hstore_gt,
+  commutator = #<#,
+  negator = #<=#
 );
 
 create operator #>=# (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_ge
+  function = hstore_ge,
+  commutator = #<=#,
+  negator = #<#
 );
 
 create operator %# (
@@ -471,19 +479,24 @@ create operator -> (
 create operator <> (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_ne
+  function = hstore_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <@ (
   leftarg = hstore,
   rightarg = hstore,
-  function = hs_contained
+  function = hs_contained,
+  commutator = @>
 );
 
 create operator = (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_eq
+  function = hstore_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator ? (
@@ -507,7 +520,8 @@ create operator ?| (
 create operator @> (
   leftarg = hstore,
   rightarg = hstore,
-  function = hs_contains
+  function = hs_contains,
+  commutator = <@
 );
 
 create operator || (
@@ -532,25 +546,25 @@ create operator class btree_hstore_ops
   default for type hstore
   using btree
   family btree_hstore_ops as
-  storage hstore;
+    storage hstore;
 
 create operator class gin_hstore_ops
   default for type hstore
   using gin
   family gin_hstore_ops as
-  storage text;
+    storage text;
 
 create operator class gist_hstore_ops
   default for type hstore
   using gist
   family gist_hstore_ops as
-  storage ghstore;
+    storage ghstore;
 
 create operator class hash_hstore_ops
   default for type hstore
   using hash
   family hash_hstore_ops as
-  storage hstore;
+    storage hstore;
 
 create cast (hstore as json) with function hstore_to_json(hstore);
 

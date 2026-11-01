@@ -1546,1009 +1546,1345 @@ create type upc (
 create operator < (
   leftarg = ean13,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ean13,
   rightarg = isbn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ean13,
   rightarg = isbn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ean13,
   rightarg = ismn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ean13,
   rightarg = ismn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ean13,
   rightarg = issn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ean13,
   rightarg = issn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ean13,
   rightarg = upc,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = isbn,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = isbn,
   rightarg = isbn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = isbn,
   rightarg = isbn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = isbn13,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = isbn13,
   rightarg = isbn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = isbn13,
   rightarg = isbn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ismn,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ismn,
   rightarg = ismn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ismn,
   rightarg = ismn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ismn13,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ismn13,
   rightarg = ismn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = ismn13,
   rightarg = ismn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = issn,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = issn,
   rightarg = issn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = issn,
   rightarg = issn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = issn13,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = issn13,
   rightarg = issn,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = issn13,
   rightarg = issn13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = upc,
   rightarg = ean13,
-  function = isnlt
+  function = isnlt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
-  leftarg = upc,
-  rightarg = upc,
-  function = isnlt
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = isbn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = isbn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = ismn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = ismn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = issn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = issn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ean13,
-  rightarg = upc,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = isbn,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = isbn,
-  rightarg = isbn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = isbn,
-  rightarg = isbn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = isbn13,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = isbn13,
-  rightarg = isbn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = isbn13,
-  rightarg = isbn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ismn,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ismn,
-  rightarg = ismn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ismn,
-  rightarg = ismn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ismn13,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ismn13,
-  rightarg = ismn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = ismn13,
-  rightarg = ismn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = issn,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = issn,
-  rightarg = issn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = issn,
-  rightarg = issn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = issn13,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = issn13,
-  rightarg = issn,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = issn13,
-  rightarg = issn13,
-  function = isnle
-);
-
-create operator <= (
-  leftarg = upc,
-  rightarg = ean13,
-  function = isnle
-);
-
-create operator <= (
   leftarg = upc,
   rightarg = upc,
-  function = isnle
+  function = isnlt,
+  commutator = >,
+  negator = >=
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = isbn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = isbn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = ismn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = ismn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = issn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = issn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ean13,
+  rightarg = upc,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = isbn,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = isbn,
+  rightarg = isbn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = isbn,
+  rightarg = isbn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = isbn13,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = isbn13,
+  rightarg = isbn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = isbn13,
+  rightarg = isbn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ismn,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ismn,
+  rightarg = ismn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ismn,
+  rightarg = ismn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ismn13,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ismn13,
+  rightarg = ismn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = ismn13,
+  rightarg = ismn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = issn,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = issn,
+  rightarg = issn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = issn,
+  rightarg = issn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = issn13,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = issn13,
+  rightarg = issn,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = issn13,
+  rightarg = issn13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = upc,
+  rightarg = ean13,
+  function = isnle,
+  commutator = >=,
+  negator = >
+);
+
+create operator <= (
+  leftarg = upc,
+  rightarg = upc,
+  function = isnle,
+  commutator = >=,
+  negator = >
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = isbn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = isbn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = ismn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = ismn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = issn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = issn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ean13,
   rightarg = upc,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = isbn,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = isbn,
   rightarg = isbn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = isbn,
   rightarg = isbn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = isbn13,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = isbn13,
   rightarg = isbn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = isbn13,
   rightarg = isbn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ismn,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ismn,
   rightarg = ismn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ismn,
   rightarg = ismn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ismn13,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ismn13,
   rightarg = ismn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = ismn13,
   rightarg = ismn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = issn,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = issn,
   rightarg = issn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = issn,
   rightarg = issn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = issn13,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = issn13,
   rightarg = issn,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = issn13,
   rightarg = issn13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = upc,
   rightarg = ean13,
-  function = isnne
+  function = isnne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
-  leftarg = upc,
-  rightarg = upc,
-  function = isnne
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = isbn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = isbn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = ismn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = ismn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = issn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = issn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ean13,
-  rightarg = upc,
-  function = isneq
-);
-
-create operator = (
-  leftarg = isbn,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = isbn,
-  rightarg = isbn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = isbn,
-  rightarg = isbn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = isbn13,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = isbn13,
-  rightarg = isbn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = isbn13,
-  rightarg = isbn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ismn,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ismn,
-  rightarg = ismn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ismn,
-  rightarg = ismn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ismn13,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ismn13,
-  rightarg = ismn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = ismn13,
-  rightarg = ismn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = issn,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = issn,
-  rightarg = issn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = issn,
-  rightarg = issn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = issn13,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = issn13,
-  rightarg = issn,
-  function = isneq
-);
-
-create operator = (
-  leftarg = issn13,
-  rightarg = issn13,
-  function = isneq
-);
-
-create operator = (
-  leftarg = upc,
-  rightarg = ean13,
-  function = isneq
-);
-
-create operator = (
   leftarg = upc,
   rightarg = upc,
-  function = isneq
+  function = isnne,
+  commutator = <>,
+  negator = =
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = isbn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = isbn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = ismn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = ismn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = issn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = issn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ean13,
+  rightarg = upc,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = isbn,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = isbn,
+  rightarg = isbn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = isbn,
+  rightarg = isbn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = isbn13,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = isbn13,
+  rightarg = isbn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = isbn13,
+  rightarg = isbn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ismn,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ismn,
+  rightarg = ismn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ismn,
+  rightarg = ismn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ismn13,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ismn13,
+  rightarg = ismn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = ismn13,
+  rightarg = ismn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = issn,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = issn,
+  rightarg = issn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = issn,
+  rightarg = issn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = issn13,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = issn13,
+  rightarg = issn,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = issn13,
+  rightarg = issn13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = upc,
+  rightarg = ean13,
+  function = isneq,
+  commutator = =,
+  negator = <>
+);
+
+create operator = (
+  leftarg = upc,
+  rightarg = upc,
+  function = isneq,
+  commutator = =,
+  negator = <>
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = isbn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = isbn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = ismn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = ismn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = issn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = issn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ean13,
   rightarg = upc,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = isbn,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = isbn,
   rightarg = isbn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = isbn,
   rightarg = isbn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = isbn13,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = isbn13,
   rightarg = isbn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = isbn13,
   rightarg = isbn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ismn,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ismn,
   rightarg = ismn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ismn,
   rightarg = ismn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ismn13,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ismn13,
   rightarg = ismn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = ismn13,
   rightarg = ismn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = issn,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = issn,
   rightarg = issn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = issn,
   rightarg = issn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = issn13,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = issn13,
   rightarg = issn,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = issn13,
   rightarg = issn13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = upc,
   rightarg = ean13,
-  function = isngt
+  function = isngt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
-  leftarg = upc,
-  rightarg = upc,
-  function = isngt
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = isbn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = isbn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = ismn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = ismn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = issn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = issn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ean13,
-  rightarg = upc,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = isbn,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = isbn,
-  rightarg = isbn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = isbn,
-  rightarg = isbn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = isbn13,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = isbn13,
-  rightarg = isbn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = isbn13,
-  rightarg = isbn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ismn,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ismn,
-  rightarg = ismn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ismn,
-  rightarg = ismn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ismn13,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ismn13,
-  rightarg = ismn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = ismn13,
-  rightarg = ismn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = issn,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = issn,
-  rightarg = issn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = issn,
-  rightarg = issn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = issn13,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = issn13,
-  rightarg = issn,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = issn13,
-  rightarg = issn13,
-  function = isnge
-);
-
-create operator >= (
-  leftarg = upc,
-  rightarg = ean13,
-  function = isnge
-);
-
-create operator >= (
   leftarg = upc,
   rightarg = upc,
-  function = isnge
+  function = isngt,
+  commutator = <,
+  negator = <=
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = isbn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = isbn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = ismn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = ismn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = issn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = issn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ean13,
+  rightarg = upc,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = isbn,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = isbn,
+  rightarg = isbn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = isbn,
+  rightarg = isbn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = isbn13,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = isbn13,
+  rightarg = isbn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = isbn13,
+  rightarg = isbn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ismn,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ismn,
+  rightarg = ismn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ismn,
+  rightarg = ismn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ismn13,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ismn13,
+  rightarg = ismn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = ismn13,
+  rightarg = ismn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = issn,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = issn,
+  rightarg = issn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = issn,
+  rightarg = issn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = issn13,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = issn13,
+  rightarg = issn,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = issn13,
+  rightarg = issn13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = upc,
+  rightarg = ean13,
+  function = isnge,
+  commutator = <=,
+  negator = <
+);
+
+create operator >= (
+  leftarg = upc,
+  rightarg = upc,
+  function = isnge,
+  commutator = <=,
+  negator = <
 );
 
 create operator family isn_ops
@@ -2561,97 +2897,97 @@ create operator class ean13_ops
   default for type ean13
   using btree
   family isn_ops as
-  storage ean13;
+    storage ean13;
 
 create operator class ean13_ops
   default for type ean13
   using hash
   family isn_ops as
-  storage ean13;
+    storage ean13;
 
 create operator class isbn13_ops
   default for type isbn13
   using btree
   family isn_ops as
-  storage isbn13;
+    storage isbn13;
 
 create operator class isbn13_ops
   default for type isbn13
   using hash
   family isn_ops as
-  storage isbn13;
+    storage isbn13;
 
 create operator class isbn_ops
   default for type isbn
   using btree
   family isn_ops as
-  storage isbn;
+    storage isbn;
 
 create operator class isbn_ops
   default for type isbn
   using hash
   family isn_ops as
-  storage isbn;
+    storage isbn;
 
 create operator class ismn13_ops
   default for type ismn13
   using btree
   family isn_ops as
-  storage ismn13;
+    storage ismn13;
 
 create operator class ismn13_ops
   default for type ismn13
   using hash
   family isn_ops as
-  storage ismn13;
+    storage ismn13;
 
 create operator class ismn_ops
   default for type ismn
   using btree
   family isn_ops as
-  storage ismn;
+    storage ismn;
 
 create operator class ismn_ops
   default for type ismn
   using hash
   family isn_ops as
-  storage ismn;
+    storage ismn;
 
 create operator class issn13_ops
   default for type issn13
   using btree
   family isn_ops as
-  storage issn13;
+    storage issn13;
 
 create operator class issn13_ops
   default for type issn13
   using hash
   family isn_ops as
-  storage issn13;
+    storage issn13;
 
 create operator class issn_ops
   default for type issn
   using btree
   family isn_ops as
-  storage issn;
+    storage issn;
 
 create operator class issn_ops
   default for type issn
   using hash
   family isn_ops as
-  storage issn;
+    storage issn;
 
 create operator class upc_ops
   default for type upc
   using btree
   family isn_ops as
-  storage upc;
+    storage upc;
 
 create operator class upc_ops
   default for type upc
   using hash
   family isn_ops as
-  storage upc;
+    storage upc;
 
 create cast (ean13 as isbn) with function isbn(ean13);
 

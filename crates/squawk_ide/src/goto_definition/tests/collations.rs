@@ -73,9 +73,9 @@ select 'a' collate "C"$0;
         2 │ select 'a' collate "C";
           │                    ─── 1. source
           │
-          ⸬  builtins.sql:38143:29
+          ⸬  builtins.sql:39076:29
           │
-    38143 │ create collation pg_catalog."C" (
+    39076 │ create collation pg_catalog."C" (
           ╰╴                            ─── 2. destination
     "#);
 }
@@ -91,9 +91,9 @@ select 'a' collate "default"$0;
         2 │ select 'a' collate "default";
           │                    ───────── 1. source
           │
-          ⸬  builtins.sql:38155:29
+          ⸬  builtins.sql:39088:29
           │
-    38155 │ create collation pg_catalog.default (
+    39088 │ create collation pg_catalog.default (
           ╰╴                            ─────── 2. destination
     "#);
 }

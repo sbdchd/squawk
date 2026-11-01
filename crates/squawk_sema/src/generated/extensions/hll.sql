@@ -362,25 +362,33 @@ create operator # (
 create operator <> (
   leftarg = hll,
   rightarg = hll,
-  function = hll_ne
+  function = hll_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <> (
   leftarg = hll_hashval,
   rightarg = hll_hashval,
-  function = hll_hashval_ne
+  function = hll_hashval_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator = (
   leftarg = hll,
   rightarg = hll,
-  function = hll_eq
+  function = hll_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator = (
   leftarg = hll_hashval,
   rightarg = hll_hashval,
-  function = hll_hashval_eq
+  function = hll_hashval_eq,
+  commutator = =,
+  negator = <>
 );
 
 create operator || (

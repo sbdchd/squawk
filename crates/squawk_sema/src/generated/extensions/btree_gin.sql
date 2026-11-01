@@ -859,172 +859,172 @@ create operator class bit_ops
   default for type bit
   using gin
   family bit_ops as
-  storage bit;
+    storage bit;
 
 create operator class bool_ops
   default for type boolean
   using gin
   family bool_ops as
-  storage boolean;
+    storage boolean;
 
 create operator class bpchar_ops
   default for type character
   using gin
   family bpchar_ops as
-  storage character;
+    storage character;
 
 create operator class bytea_ops
   default for type bytea
   using gin
   family bytea_ops as
-  storage bytea;
+    storage bytea;
 
 create operator class char_ops
   default for type "char"
   using gin
   family char_ops as
-  storage "char";
+    storage "char";
 
 create operator class cidr_ops
   default for type cidr
   using gin
   family cidr_ops as
-  storage cidr;
+    storage cidr;
 
 create operator class date_ops
   default for type date
   using gin
   family date_ops as
-  storage date;
+    storage date;
 
 create operator class enum_ops
   default for type anyenum
   using gin
   family enum_ops as
-  storage anyenum;
+    storage anyenum;
 
 create operator class float4_ops
   default for type real
   using gin
   family float4_ops as
-  storage real;
+    storage real;
 
 create operator class float8_ops
   default for type double precision
   using gin
   family float8_ops as
-  storage double precision;
+    storage double precision;
 
 create operator class inet_ops
   default for type inet
   using gin
   family inet_ops as
-  storage inet;
+    storage inet;
 
 create operator class int2_ops
   default for type smallint
   using gin
   family int2_ops as
-  storage smallint;
+    storage smallint;
 
 create operator class int4_ops
   default for type integer
   using gin
   family int4_ops as
-  storage integer;
+    storage integer;
 
 create operator class int8_ops
   default for type bigint
   using gin
   family int8_ops as
-  storage bigint;
+    storage bigint;
 
 create operator class interval_ops
   default for type interval
   using gin
   family interval_ops as
-  storage interval;
+    storage interval;
 
 create operator class macaddr8_ops
   default for type macaddr8
   using gin
   family macaddr8_ops as
-  storage macaddr8;
+    storage macaddr8;
 
 create operator class macaddr_ops
   default for type macaddr
   using gin
   family macaddr_ops as
-  storage macaddr;
+    storage macaddr;
 
 create operator class money_ops
   default for type money
   using gin
   family money_ops as
-  storage money;
+    storage money;
 
 create operator class name_ops
   default for type name
   using gin
   family name_ops as
-  storage name;
+    storage name;
 
 create operator class numeric_ops
   default for type numeric
   using gin
   family numeric_ops as
-  storage numeric;
+    storage numeric;
 
 create operator class oid_ops
   default for type oid
   using gin
   family oid_ops as
-  storage oid;
+    storage oid;
 
 create operator class text_ops
   default for type text
   using gin
   family text_ops as
-  storage text;
+    storage text;
 
 create operator class time_ops
   default for type time without time zone
   using gin
   family time_ops as
-  storage time without time zone;
+    storage time without time zone;
 
 create operator class timestamp_ops
   default for type timestamp without time zone
   using gin
   family timestamp_ops as
-  storage timestamp without time zone;
+    storage timestamp without time zone;
 
 create operator class timestamptz_ops
   default for type timestamp with time zone
   using gin
   family timestamptz_ops as
-  storage timestamp with time zone;
+    storage timestamp with time zone;
 
 create operator class timetz_ops
   default for type time with time zone
   using gin
   family timetz_ops as
-  storage time with time zone;
+    storage time with time zone;
 
 create operator class uuid_ops
   default for type uuid
   using gin
   family uuid_ops as
-  storage uuid;
+    storage uuid;
 
 create operator class varbit_ops
   default for type bit varying
   using gin
   family varbit_ops as
-  storage bit varying;
+    storage bit varying;
 
 create operator class varchar_ops
   default for type character varying
   using gin
   family varchar_ops as
-  storage character varying;
+    storage character varying;

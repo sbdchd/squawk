@@ -21,10 +21,10 @@ create operator class int4_ops
   default for type integer
   using bloom
   family int4_ops as
-  storage integer;
+    storage integer;
 
 create operator class text_ops
   default for type text
   using bloom
   family text_ops as
-  storage text;
+    storage text;

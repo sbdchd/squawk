@@ -237,9 +237,9 @@ select b like$0 'a%' from t;
         3 │ select b like 'a%' from t;
           │          ──── 1. source
           │
-          ⸬  builtins.sql:38094:28
+          ⸬  builtins.sql:39020:28
           │
-    38094 │ create operator pg_catalog.~~ (
+    39020 │ create operator pg_catalog.~~ (
           ╰╴                           ── 2. destination
     ");
 }
@@ -256,9 +256,9 @@ select i i$0n (1, 2.5) from t;
         3 │ select i in (1, 2.5) from t;
           │          ── 1. source
           │
-          ⸬  builtins.sql:36215:28
+          ⸬  builtins.sql:36792:28
           │
-    36215 │ create operator pg_catalog.= (
+    36792 │ create operator pg_catalog.= (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -275,9 +275,9 @@ select s like$0 any('{a,b}') from t;
         3 │ select s like any('{a,b}') from t;
           │          ──── 1. source
           │
-          ⸬  builtins.sql:38115:28
+          ⸬  builtins.sql:39044:28
           │
-    38115 │ create operator pg_catalog.~~ (
+    39044 │ create operator pg_catalog.~~ (
           ╰╴                           ── 2. destination
     ");
 }
@@ -321,9 +321,9 @@ create table t (
         4 │   exclude using gist (r with &&)
           │                              ── 1. source
           │
-          ⸬  builtins.sql:32931:28
+          ⸬  builtins.sql:32958:28
           │
-    32931 │ create operator pg_catalog.&& (
+    32958 │ create operator pg_catalog.&& (
           ╰╴                           ── 2. destination
     ");
 }

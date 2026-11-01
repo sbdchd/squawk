@@ -1619,73 +1619,85 @@ create type gbtreekey_var (
 create operator <-> (
   leftarg = bigint,
   rightarg = bigint,
-  function = int8_dist
+  function = int8_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = date,
   rightarg = date,
-  function = date_dist
+  function = date_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = double precision,
   rightarg = double precision,
-  function = float8_dist
+  function = float8_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = integer,
   rightarg = integer,
-  function = int4_dist
+  function = int4_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = interval,
   rightarg = interval,
-  function = interval_dist
+  function = interval_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = money,
   rightarg = money,
-  function = cash_dist
+  function = cash_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = oid,
   rightarg = oid,
-  function = oid_dist
+  function = oid_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = real,
   rightarg = real,
-  function = float4_dist
+  function = float4_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = smallint,
   rightarg = smallint,
-  function = int2_dist
+  function = int2_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = time without time zone,
   rightarg = time without time zone,
-  function = time_dist
+  function = time_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = timestamp with time zone,
   rightarg = timestamp with time zone,
-  function = tstz_dist
+  function = tstz_dist,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = timestamp without time zone,
   rightarg = timestamp without time zone,
-  function = ts_dist
+  function = ts_dist,
+  commutator = <->
 );
 
 create operator family gist_bit_ops
@@ -1770,154 +1782,154 @@ create operator class gist_bit_ops
   default for type bit
   using gist
   family gist_bit_ops as
-  storage gbtreekey_var;
+    storage gbtreekey_var;
 
 create operator class gist_bool_ops
   default for type boolean
   using gist
   family gist_bool_ops as
-  storage gbtreekey2;
+    storage gbtreekey2;
 
 create operator class gist_bpchar_ops
   default for type character
   using gist
   family gist_bpchar_ops as
-  storage gbtreekey_var;
+    storage gbtreekey_var;
 
 create operator class gist_bytea_ops
   default for type bytea
   using gist
   family gist_bytea_ops as
-  storage gbtreekey_var;
+    storage gbtreekey_var;
 
 create operator class gist_cash_ops
   default for type money
   using gist
   family gist_cash_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_cidr_ops
   default for type cidr
   using gist
   family gist_cidr_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_date_ops
   default for type date
   using gist
   family gist_date_ops as
-  storage gbtreekey8;
+    storage gbtreekey8;
 
 create operator class gist_enum_ops
   default for type anyenum
   using gist
   family gist_enum_ops as
-  storage gbtreekey8;
+    storage gbtreekey8;
 
 create operator class gist_float4_ops
   default for type real
   using gist
   family gist_float4_ops as
-  storage gbtreekey8;
+    storage gbtreekey8;
 
 create operator class gist_float8_ops
   default for type double precision
   using gist
   family gist_float8_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_inet_ops
   default for type inet
   using gist
   family gist_inet_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_int2_ops
   default for type smallint
   using gist
   family gist_int2_ops as
-  storage gbtreekey4;
+    storage gbtreekey4;
 
 create operator class gist_int4_ops
   default for type integer
   using gist
   family gist_int4_ops as
-  storage gbtreekey8;
+    storage gbtreekey8;
 
 create operator class gist_int8_ops
   default for type bigint
   using gist
   family gist_int8_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_interval_ops
   default for type interval
   using gist
   family gist_interval_ops as
-  storage gbtreekey32;
+    storage gbtreekey32;
 
 create operator class gist_macaddr8_ops
   default for type macaddr8
   using gist
   family gist_macaddr8_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_macaddr_ops
   default for type macaddr
   using gist
   family gist_macaddr_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_numeric_ops
   default for type numeric
   using gist
   family gist_numeric_ops as
-  storage gbtreekey_var;
+    storage gbtreekey_var;
 
 create operator class gist_oid_ops
   default for type oid
   using gist
   family gist_oid_ops as
-  storage gbtreekey8;
+    storage gbtreekey8;
 
 create operator class gist_text_ops
   default for type text
   using gist
   family gist_text_ops as
-  storage gbtreekey_var;
+    storage gbtreekey_var;
 
 create operator class gist_time_ops
   default for type time without time zone
   using gist
   family gist_time_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_timestamp_ops
   default for type timestamp without time zone
   using gist
   family gist_timestamp_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_timestamptz_ops
   default for type timestamp with time zone
   using gist
   family gist_timestamptz_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_timetz_ops
   default for type time with time zone
   using gist
   family gist_timetz_ops as
-  storage gbtreekey16;
+    storage gbtreekey16;
 
 create operator class gist_uuid_ops
   default for type uuid
   using gist
   family gist_uuid_ops as
-  storage gbtreekey32;
+    storage gbtreekey32;
 
 create operator class gist_vbit_ops
   default for type bit varying
   using gist
   family gist_vbit_ops as
-  storage gbtreekey_var;
+    storage gbtreekey_var;
