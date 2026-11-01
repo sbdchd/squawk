@@ -635,7 +635,54 @@ fn call_kind(kind: RoutineKind) -> FunctionKind {
 
 struct CallMismatchError {
     error: SemaError,
-    arg: Option<ast::Arg>,
+    target: Option<SyntaxNode>,
+}
+
+fn invalid_named_args(
+    args: &[CallArg],
+    arg_list: Option<&ast::ArgList>,
+) -> Option<CallMismatchError> {
+    let mut seen_named = false;
+    for (i, arg) in args.iter().enumerate() {
+        let Some(name) = arg.name else {
+            if seen_named {
+                return Some(CallMismatchError {
+                    error: SemaError::PositionalAfterNamed,
+                    target: call_arg(arg_list, args, i).map(|arg| arg.syntax().clone()),
+                });
+            }
+            continue;
+        };
+        seen_named = true;
+        if args[..i].iter().any(|other| other.name == Some(name)) {
+            return Some(CallMismatchError {
+                error: SemaError::DuplicateArgumentName { name },
+                target: call_arg_name(arg_list, args, i),
+            });
+        }
+    }
+    None
+}
+
+fn call_arg(arg_list: Option<&ast::ArgList>, args: &[CallArg], i: usize) -> Option<ast::Arg> {
+    arg_list
+        .filter(|list| list.args().count() == args.len())
+        .and_then(|list| list.args().nth(i))
+}
+
+fn call_arg_name(
+    arg_list: Option<&ast::ArgList>,
+    args: &[CallArg],
+    i: usize,
+) -> Option<SyntaxNode> {
+    let arg = call_arg(arg_list, args, i)?;
+    match arg.func_arg_expr() {
+        Some(ast::FuncArgExpr::NamedArg(named_arg)) => named_arg
+            .name()
+            .map(|name| name.syntax().clone())
+            .or_else(|| Some(arg.syntax().clone())),
+        Some(ast::FuncArgExpr::Expr(_)) | None => Some(arg.syntax().clone()),
+    }
 }
 
 struct FunctionSource {
@@ -19120,9 +19167,14 @@ impl Lowerer {
         arg_list: Option<&ast::ArgList>,
         node: &SyntaxNode,
     ) -> Resolution {
-        if !matches!(resolution, Resolution::Unresolved)
-            || args.iter().any(|arg| matches!(arg.ty, ArgType::Untyped))
-        {
+        if !matches!(resolution, Resolution::Unresolved) {
+            return resolution;
+        }
+        if let Some(CallMismatchError { error, target }) = invalid_named_args(args, arg_list) {
+            self.push_error(target.as_ref().unwrap_or(node), error);
+            return Resolution::Unknown;
+        }
+        if args.iter().any(|arg| matches!(arg.ty, ArgType::Untyped)) {
             return resolution;
         }
         let start = self.index.errors.args.next_idx();
@@ -19143,13 +19195,10 @@ impl Lowerer {
         }
         let misplaced_order_by = arg_list.is_some_and(Self::misplaced_order_by);
         if !misplaced_order_by
-            && let Some(CallMismatchError { error, arg }) =
+            && let Some(CallMismatchError { error, target }) =
                 self.call_mismatch(kind, schema, name, args, arg_list)
         {
-            match arg {
-                Some(arg) => self.push_error(arg.syntax(), error),
-                None => self.push_error(node, error),
-            }
+            self.push_error(target.as_ref().unwrap_or(node), error);
             return Resolution::Unknown;
         }
         let candidates = if misplaced_order_by {
@@ -22224,16 +22273,14 @@ impl Lowerer {
                     max,
                     supplied: args.len(),
                 },
-                arg: None,
+                target: None,
             }),
             CallMismatch::ArgType(ArgMismatch {
                 position,
                 found,
                 expected,
             }) => {
-                let arg = arg_list
-                    .filter(|list| list.args().count() == args.len())
-                    .and_then(|list| list.args().nth(position));
+                let target = call_arg(arg_list, args, position).map(|arg| arg.syntax().clone());
                 Some(CallMismatchError {
                     error: SemaError::ArgumentTypeMismatch {
                         kind,
@@ -22243,7 +22290,7 @@ impl Lowerer {
                         found: self.index.ty_name(found),
                         expected: self.index.ty_name(expected),
                     },
-                    arg,
+                    target,
                 })
             }
         }

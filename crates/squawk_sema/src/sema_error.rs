@@ -361,6 +361,10 @@ pub(crate) enum SemaError {
         max: usize,
         supplied: usize,
     },
+    PositionalAfterNamed,
+    DuplicateArgumentName {
+        name: Name,
+    },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
         name: Name,
@@ -1008,6 +1012,9 @@ impl SemaError {
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::ArgumentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
             SemaError::ArgumentCountMismatch { .. } => DiagnosticKind::ArgumentCountMismatch,
+            SemaError::PositionalAfterNamed | SemaError::DuplicateArgumentName { .. } => {
+                DiagnosticKind::InvalidArgument
+            }
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
@@ -1409,6 +1416,9 @@ impl SemaError {
     fn static_message(&self) -> Option<&'static str> {
         match *self {
             SemaError::CannotChangeDatabase => Some("current database cannot be changed"),
+            SemaError::PositionalAfterNamed => {
+                Some("positional argument cannot follow named argument")
+            }
             SemaError::NoConflictArbiter => Some(
                 "there is no unique or exclusion constraint matching the `on conflict` specification",
             ),
@@ -1585,6 +1595,7 @@ impl fmt::Display for ErrorMessage<'_> {
         let n = |name| self.names.resolve(name);
         match *self.error {
             SemaError::CannotChangeDatabase
+            | SemaError::PositionalAfterNamed
             | SemaError::ValuesLengthMismatch
             | SemaError::InsertMoreExpressionsThanTargets
             | SemaError::ViewTooManyColumnNames
@@ -1968,6 +1979,9 @@ impl fmt::Display for ErrorMessage<'_> {
                     if count == 1 { "" } else { "s" },
                     if supplied == 1 { "was" } else { "were" },
                 )
+            }
+            SemaError::DuplicateArgumentName { name } => {
+                write!(f, "argument name `{}` used more than once", n(name))
             }
             SemaError::ProcedureCalledAsFunction {
                 schema, name, args, ..

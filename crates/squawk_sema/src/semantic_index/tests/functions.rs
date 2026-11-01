@@ -1178,3 +1178,26 @@ call app.do_thig();
       ╰╴         ━━━━━━━
     ");
 }
+
+#[test]
+fn invalid_named_args() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+select foo(x => 1, 2);
+select foo(x => 1, x => 2);
+select nope(a => 1, 2);
+"), @"
+    error: positional argument cannot follow named argument
+      ╭▸ 
+    3 │ select foo(x => 1, 2);
+      ╰╴                   ━
+    error: argument name `x` used more than once
+      ╭▸ 
+    4 │ select foo(x => 1, x => 2);
+      ╰╴                   ━
+    error: positional argument cannot follow named argument
+      ╭▸ 
+    5 │ select nope(a => 1, 2);
+      ╰╴                    ━
+    ");
+}
