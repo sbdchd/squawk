@@ -18892,13 +18892,18 @@ impl Lowerer {
         common.finish()
     }
 
-    fn keyword_call_type(&self, keyword: ast::FunctionLikeKeyword, args: &[CallArg]) -> Option<Ty> {
+    fn keyword_call_type(
+        &mut self,
+        keyword: ast::FunctionLikeKeyword,
+        args: &[CallArg],
+    ) -> Option<Ty> {
         match keyword {
             ast::FunctionLikeKeyword::Coalesce
             | ast::FunctionLikeKeyword::Greatest
             | ast::FunctionLikeKeyword::Least => self.common_args_type(args),
             ast::FunctionLikeKeyword::Nullif => self.nullif_type(args),
-            ast::FunctionLikeKeyword::Grouping | ast::FunctionLikeKeyword::MergeAction => None,
+            ast::FunctionLikeKeyword::Grouping => self.builtin_type("int4"),
+            ast::FunctionLikeKeyword::MergeAction => None,
         }
     }
 
@@ -22451,7 +22456,8 @@ impl Lowerer {
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
         let LoweredCall { args, callee } = self.lower_call_with_args(call);
         if let Some(keyword) = call_function_like_keyword(call) {
-            return self.expr_field_base(self.keyword_call_type(keyword, &args));
+            let ty = self.keyword_call_type(keyword, &args);
+            return self.expr_field_base(ty);
         }
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return self.expr_field_base(

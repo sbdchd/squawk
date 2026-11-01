@@ -361,3 +361,16 @@ select (nullif(null, 1)).x, (nullif('1', 1)).x;
       ╰╴                                             ━
     ");
 }
+
+#[test]
+fn grouping_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (grouping(a)).x from t group by a;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (grouping(a)).x from t group by a;
+      ╰╴                     ━
+    ");
+}
