@@ -306,6 +306,88 @@ insert into missing (a) values (1, 2);
 }
 
 #[test]
+fn on_conflict_partial_index_predicate() {
+    assert_snapshot!(check("
+create table oc (
+  email text,
+  deleted_at timestamptz,
+  active bool,
+  tenant int
+);
+
+create unique index on oc (email) where deleted_at is null;
+create unique index on oc (tenant) where active;
+create unique index on oc (email, tenant) where tenant is not null;
+create unique index on oc (active) where lower(email) = 'a';
+
+insert into oc
+values ('a')
+on conflict (email) where deleted_at is not null do nothing;
+
+insert into oc
+values ('a')
+on conflict (email) where deleted_at is null do nothing;
+
+insert into oc
+values ('a')
+on conflict (email) where (deleted_at isnull) and active do nothing;
+
+insert into oc values ('a') on conflict (email) where active do nothing;
+
+insert into oc values ('a') on conflict (tenant) where active do nothing;
+
+insert into oc values ('a') on conflict (tenant) where not active do nothing;
+
+insert into oc
+values ('a')
+on conflict (tenant) where active is not null do nothing;
+
+insert into oc
+values ('a')
+on conflict (email, tenant) where tenant > 0 do nothing;
+
+insert into oc
+values ('a')
+on conflict (email, tenant) where active and tenant notnull do nothing;
+
+insert into oc
+values ('a')
+on conflict (active) where tenant is null do nothing;
+
+alter table oc rename column deleted_at to removed_at;
+
+insert into oc
+values ('a')
+on conflict (email) where removed_at is null do nothing;
+
+insert into oc
+values ('a')
+on conflict (email) where removed_at is not null do nothing;
+"), @"
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+       ╭▸ 
+    16 │ on conflict (email) where deleted_at is not null do nothing;
+       ╰╴            ━━━━━━━
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+       ╭▸ 
+    26 │ insert into oc values ('a') on conflict (email) where active do nothing;
+       ╰╴                                        ━━━━━━━
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+       ╭▸ 
+    30 │ insert into oc values ('a') on conflict (tenant) where not active do nothing;
+       ╰╴                                        ━━━━━━━━
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+       ╭▸ 
+    34 │ on conflict (tenant) where active is not null do nothing;
+       ╰╴            ━━━━━━━━
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+       ╭▸ 
+    56 │ on conflict (email) where removed_at is not null do nothing;
+       ╰╴            ━━━━━━━
+    ");
+}
+
+#[test]
 fn on_conflict_without_matching_arbiter() {
     assert_snapshot!(check("
 create table t (

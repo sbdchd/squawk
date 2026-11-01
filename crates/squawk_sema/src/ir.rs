@@ -114,10 +114,44 @@ pub struct Index {
     pub(crate) key: Option<IdxRange<Name>>,
     pub(crate) columns: IdxRange<Name>,
     pub(crate) unique: bool,
-    pub(crate) partial: bool,
+    pub(crate) predicate: Option<IndexPredicate>,
     pub(crate) deferrable: bool,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     pub name_ptr: InIrFile<SyntaxNodePtr>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum IndexPredicate {
+    Opaque,
+    Conjuncts(IdxRange<PredicateTest>),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct PredicateTest {
+    pub(crate) column: Name,
+    pub(crate) kind: PredicateTestKind,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum PredicateTestKind {
+    Null,
+    NotNull,
+    True,
+    False,
+}
+
+impl PredicateTest {
+    pub(crate) fn implies(self, other: PredicateTest) -> bool {
+        if self.column != other.column {
+            return false;
+        }
+        match (self.kind, other.kind) {
+            (PredicateTestKind::True | PredicateTestKind::False, PredicateTestKind::NotNull) => {
+                true
+            }
+            (kind, other) => kind == other,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

@@ -4,12 +4,13 @@ use squawk_syntax::SyntaxNodePtr;
 use crate::arena::{IdxRange, LayeredArena, LayeredMultimap};
 use crate::file::InIrFile;
 use crate::interner::{Name, QualifiedName};
-use crate::ir::{Index, IndexId, TableId};
+use crate::ir::{Index, IndexId, IndexPredicate, PredicateTest, TableId};
 
 #[derive(Debug, Default)]
 pub struct IndexIndex {
     arena: LayeredArena<Index>,
     keys: LayeredArena<Name>,
+    predicates: LayeredArena<PredicateTest>,
     by_name: LayeredMultimap<QualifiedName, IndexId>,
     by_schema: LayeredMultimap<Name, IndexId>,
     by_table: LayeredMultimap<TableId, IndexId>,
@@ -20,6 +21,7 @@ impl IndexIndex {
         IndexIndex {
             arena: LayeredArena::on_top_of(&base.arena),
             keys: LayeredArena::on_top_of(&base.keys),
+            predicates: LayeredArena::on_top_of(&base.predicates),
             by_name: LayeredMultimap::on_top_of(&base.by_name),
             by_schema: LayeredMultimap::on_top_of(&base.by_schema),
             by_table: LayeredMultimap::on_top_of(&base.by_table),
@@ -71,6 +73,43 @@ impl IndexIndex {
         key: Option<IdxRange<Name>>,
     ) -> Option<IdxRange<Name>> {
         std::mem::replace(&mut self.local_mut(id).key, key)
+    }
+
+    pub(crate) fn alloc_predicate(
+        &mut self,
+        tests: impl IntoIterator<Item = PredicateTest>,
+    ) -> IndexPredicate {
+        IndexPredicate::Conjuncts(self.predicates.alloc_many(tests))
+    }
+
+    pub(crate) fn alloc_renamed_predicate(
+        &mut self,
+        tests: IdxRange<PredicateTest>,
+        from: Name,
+        to: Name,
+    ) -> IndexPredicate {
+        IndexPredicate::Conjuncts(self.predicates.alloc_mapped_copies(tests, |test| {
+            if test.column == from {
+                PredicateTest { column: to, ..test }
+            } else {
+                test
+            }
+        }))
+    }
+
+    pub(crate) fn predicate_tests(
+        &self,
+        tests: IdxRange<PredicateTest>,
+    ) -> impl Iterator<Item = PredicateTest> + '_ {
+        tests.iter().map(|test| self.predicates[test])
+    }
+
+    pub(crate) fn set_predicate(
+        &mut self,
+        id: IndexId,
+        predicate: Option<IndexPredicate>,
+    ) -> Option<IndexPredicate> {
+        std::mem::replace(&mut self.local_mut(id).predicate, predicate)
     }
 
     pub(crate) fn columns(&self, id: IndexId) -> impl Iterator<Item = Name> + '_ {
@@ -161,6 +200,7 @@ impl IndexIndex {
     pub(crate) fn shrink_to_fit(&mut self) {
         self.arena.shrink_to_fit();
         self.keys.shrink_to_fit();
+        self.predicates.shrink_to_fit();
         self.by_name.shrink_to_fit();
         self.by_schema.shrink_to_fit();
         self.by_table.shrink_to_fit();
