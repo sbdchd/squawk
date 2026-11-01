@@ -50,7 +50,7 @@ use crate::{
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
-    overload::{ArgType, BuiltinTypes, CallArg, Overloads},
+    overload::{ArgType, BuiltinTypes, CallArg, CommonType, Overloads},
     postgres,
 };
 
@@ -86,6 +86,7 @@ impl Lowerer {
             transaction: None,
             savepoints: vec![],
             cursors: FxHashMap::default(),
+            scalar_sources: FxHashMap::default(),
             prepared_transactions: FxHashMap::default(),
             prepared_statements: FxHashMap::default(),
             channels: FxHashMap::default(),
@@ -385,6 +386,7 @@ pub(crate) struct Lowerer {
     transaction: Option<OpenTransaction>,
     savepoints: Vec<OpenSavepoint>,
     cursors: FxHashMap<Name, CursorId>,
+    scalar_sources: FxHashMap<SourceId, Ty>,
     prepared_transactions: FxHashMap<Name, PreparedTransactionId>,
     prepared_statements: FxHashMap<Name, PreparedStatementId>,
     channels: FxHashMap<Name, ChannelId>,
@@ -622,11 +624,28 @@ struct FunctionSource {
     callee: Option<Callee>,
     function: Option<FunctionId>,
     columns: Columns,
+    scalar: Option<Ty>,
+}
+
+struct FunctionColumns {
+    columns: Columns,
+    scalar: Option<Ty>,
 }
 
 struct LoweredCall {
     args: SmallVec<[CallArg; 4]>,
     callee: Option<Callee>,
+    ty: Option<Ty>,
+}
+
+impl LoweredCall {
+    fn typed(ty: Option<Ty>) -> LoweredCall {
+        LoweredCall {
+            args: smallvec![],
+            callee: None,
+            ty,
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -984,6 +1003,7 @@ enum Undo {
 
 enum FieldBase {
     Source(Option<SourceId>),
+    Scalar(Ty),
     Expr(Option<Ty>),
     Columns { columns: Columns, ty: Option<Ty> },
 }
@@ -14299,7 +14319,7 @@ impl Lowerer {
     }
 
     fn ty_columns(&self, ty: Ty) -> Option<&Columns> {
-        match ty {
+        match self.index.base_type(ty)? {
             Ty::Type(ty) => self.index.types[ty].columns.as_ref(),
             Ty::Table(table) => Some(&self.index.tables[table].columns),
             Ty::Cte(cte) => Some(&self.index.ctes[cte].columns),
@@ -14743,6 +14763,7 @@ impl Lowerer {
     }
 
     fn lower_from_item(&mut self, from_item: &ast::FromItem) {
+        let mut scalar = None;
         let RelationSource {
             mut name,
             kind,
@@ -14803,6 +14824,7 @@ impl Lowerer {
                     callee,
                     function,
                     columns,
+                    scalar: function_scalar,
                 } = match function_item.call_expr() {
                     Some(call) => self.lower_function_source(
                         &call,
@@ -14813,8 +14835,10 @@ impl Lowerer {
                         callee: None,
                         function: None,
                         columns: self.unknown_columns(),
+                        scalar: None,
                     },
                 };
+                scalar = function_scalar;
                 RelationSource {
                     name: callee.map(|callee| callee.name),
                     kind: function.map_or(SourceKind::Other, SourceKind::Function),
@@ -14878,11 +14902,18 @@ impl Lowerer {
                     columns,
                 }
             }
-            ast::FromItem::RowsFromItem(rows_from_item) => RelationSource {
-                name: None,
-                kind: SourceKind::Other,
-                columns: self.lower_rows_from_columns(rows_from_item),
-            },
+            ast::FromItem::RowsFromItem(rows_from_item) => {
+                let FunctionColumns {
+                    columns,
+                    scalar: rows_from_scalar,
+                } = self.lower_rows_from_columns(rows_from_item);
+                scalar = rows_from_scalar;
+                RelationSource {
+                    name: None,
+                    kind: SourceKind::Other,
+                    columns,
+                }
+            }
             ast::FromItem::XmlTableFromItem(xml_table_item) => {
                 let columns = match xml_table_item.xml_table() {
                     Some(xml_table) => {
@@ -14900,6 +14931,7 @@ impl Lowerer {
 
         if let Some(with_ordinality) = from_item.with_ordinality() {
             columns = self.with_ordinality_column(&columns, &with_ordinality);
+            scalar = None;
         }
 
         let mut alias_ptr = None;
@@ -14924,13 +14956,16 @@ impl Lowerer {
         }
 
         self.check_duplicate_source(name, kind, alias_ptr.is_some(), from_item);
-        self.push_source(Source {
+        let source = self.push_source(Source {
             name,
             kind,
             ptr: self.ptr(from_item.syntax()),
             alias_ptr,
             columns,
         });
+        if let Some(ty) = scalar {
+            self.scalar_sources.insert(source, ty);
+        }
     }
 
     fn check_duplicate_source(
@@ -15044,7 +15079,7 @@ impl Lowerer {
         self.push_source(source);
     }
 
-    fn push_source(&mut self, source: Source) {
+    fn push_source(&mut self, source: Source) -> SourceId {
         let alias_ptr = source.alias_ptr;
         let id = self.index.sources.alloc(source);
         if let Some(alias_ptr) = alias_ptr {
@@ -15052,6 +15087,7 @@ impl Lowerer {
         }
         let query = self.scope().query;
         self.index.queries[query].sources.push(id);
+        id
     }
 
     fn push_scope(&mut self, query: QueryId) {
@@ -15377,27 +15413,50 @@ impl Lowerer {
         }
     }
 
-    fn lower_rows_from_columns(&mut self, rows_from_item: &ast::RowsFromItem) -> Columns {
-        let mut items: SmallVec<[Columns; 4]> = smallvec![];
+    fn lower_rows_from_columns(&mut self, rows_from_item: &ast::RowsFromItem) -> FunctionColumns {
+        let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in rows_from_item.rows_from_args() {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
                 (Some(call), Some(list)) => {
                     self.with_from_function(|this| this.lower_call(&call));
-                    self.column_def_list_columns(&list)
+                    FunctionColumns {
+                        columns: self.column_def_list_columns(&list),
+                        scalar: None,
+                    }
                 }
-                (Some(call), None) => self.lower_function_source(&call, None, None).columns,
-                (None, Some(list)) => self.column_def_list_columns(&list),
-                (None, None) => self.unknown_columns(),
+                (Some(call), None) => {
+                    let FunctionSource {
+                        columns, scalar, ..
+                    } = self.lower_function_source(&call, None, None);
+                    FunctionColumns { columns, scalar }
+                }
+                (None, Some(list)) => FunctionColumns {
+                    columns: self.column_def_list_columns(&list),
+                    scalar: None,
+                },
+                (None, None) => FunctionColumns {
+                    columns: self.unknown_columns(),
+                    scalar: None,
+                },
             };
             items.push(columns);
         }
-        Columns {
+        self.combine_function_columns(&items)
+    }
+
+    fn combine_function_columns(&mut self, items: &[FunctionColumns]) -> FunctionColumns {
+        let scalar = match items {
+            [item] => item.scalar,
+            _ => None,
+        };
+        let columns = Columns {
             range: self
                 .index
                 .columns
-                .alloc_copies(items.iter().flat_map(|columns| columns.range)),
-            complete: items.iter().all(|columns| columns.complete),
-        }
+                .alloc_copies(items.iter().flat_map(|item| item.columns.range)),
+            complete: items.iter().all(|item| item.columns.complete),
+        };
+        FunctionColumns { columns, scalar }
     }
 
     fn lower_function_source(
@@ -15412,22 +15471,39 @@ impl Lowerer {
             }
             return self.lower_expanded_unnest(call, &name_ref);
         }
-        let LoweredCall { args, callee } =
+        let LoweredCall { args, callee, .. } =
             self.with_from_function(|this| this.lower_call_with_args(call));
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return FunctionSource {
                 callee,
                 function: None,
                 columns: self.unknown_columns(),
+                scalar: None,
             };
         };
-        let columns = self
-            .function_row_columns(function, &args)
-            .unwrap_or_else(|| self.scalar_function_columns(function, &args, call, scalar_alias));
+        let FunctionColumns { columns, scalar } =
+            self.function_columns(function, &args, call, scalar_alias);
         FunctionSource {
             callee,
             function: Some(function),
             columns,
+            scalar,
+        }
+    }
+
+    fn function_columns(
+        &mut self,
+        function: FunctionId,
+        args: &[CallArg],
+        call: &ast::CallExpr,
+        scalar_alias: Option<&ast::TableAlias>,
+    ) -> FunctionColumns {
+        match self.function_row_columns(function, args) {
+            Some(columns) => FunctionColumns {
+                columns,
+                scalar: None,
+            },
+            None => self.scalar_function_columns(function, args, call, scalar_alias),
         }
     }
 
@@ -15440,16 +15516,17 @@ impl Lowerer {
             self.with_from_function(|this| this.lower_call_args(call.arg_list()));
         let name = self.intern("unnest");
         let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
-        let mut items: SmallVec<[Columns; 4]> = smallvec![];
+        let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in &args {
             let arg = std::slice::from_ref(arg);
             let resolution =
                 self.find_routine(Some(self.pg_catalog), name, arg, FunctionKind::Function);
             let columns = match resolution {
-                Resolution::Function(function) => self
-                    .function_row_columns(function, arg)
-                    .unwrap_or_else(|| self.scalar_function_columns(function, arg, call, None)),
-                _ => self.unknown_columns(),
+                Resolution::Function(function) => self.function_columns(function, arg, call, None),
+                _ => FunctionColumns {
+                    columns: self.unknown_columns(),
+                    scalar: None,
+                },
             };
             resolutions.push(resolution);
             items.push(columns);
@@ -15466,17 +15543,12 @@ impl Lowerer {
             name_ref.syntax(),
             resolution,
         );
-        let columns = Columns {
-            range: self
-                .index
-                .columns
-                .alloc_copies(items.iter().flat_map(|columns| columns.range)),
-            complete: items.iter().all(|columns| columns.complete),
-        };
+        let FunctionColumns { columns, scalar } = self.combine_function_columns(&items);
         FunctionSource {
             callee: Some(Callee { name, resolution }),
             function: None,
             columns,
+            scalar,
         }
     }
 
@@ -15486,11 +15558,14 @@ impl Lowerer {
         args: &[CallArg],
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
-    ) -> Columns {
+    ) -> FunctionColumns {
         let record = self.builtin_type("record");
         let ret = self.index.functions[function].ret;
         if ret.is_none() || ret == record {
-            return self.unknown_columns();
+            return FunctionColumns {
+                columns: self.unknown_columns(),
+                scalar: None,
+            };
         }
         let (name, ptr) = match (scalar_alias, call.expr()) {
             (Some(alias), _) => (self.intern(&alias.text()), self.ptr(alias.syntax())),
@@ -15504,9 +15579,12 @@ impl Lowerer {
             ty,
             merge: None,
         }));
-        Columns {
-            range,
-            complete: true,
+        FunctionColumns {
+            columns: Columns {
+                range,
+                complete: true,
+            },
+            scalar: ty,
         }
     }
 
@@ -18684,15 +18762,14 @@ impl Lowerer {
                 let range = is_not_distinct_from.syntax().text_range();
                 self.add_expr_operator_ref(range, None, "=", left, right)
             }
-            ast::BinOp::And(_)
-            | ast::BinOp::AtTimeZone(_)
+            ast::BinOp::And(_) | ast::BinOp::Is(_) | ast::BinOp::IsNot(_) | ast::BinOp::Or(_) => {
+                self.builtin_type("bool")
+            }
+            ast::BinOp::AtTimeZone(_)
             | ast::BinOp::ColonColon(_)
             | ast::BinOp::ColonEq(_)
             | ast::BinOp::Escape(_)
             | ast::BinOp::FatArrow(_)
-            | ast::BinOp::Is(_)
-            | ast::BinOp::IsNot(_)
-            | ast::BinOp::Or(_)
             | ast::BinOp::Overlaps(_) => None,
         }
     }
@@ -18818,38 +18895,80 @@ impl Lowerer {
     }
 
     fn lower_in_list(&mut self, tuple: &ast::TupleExpr, left: ArgType) -> ArgType {
-        let mut common = match left {
-            ArgType::Known(ty) => Some(ty),
-            ArgType::UnknownLiteral | ArgType::Untyped => None,
-        };
-        let mut untyped = left == ArgType::Untyped;
-        let mut all_unknown = true;
+        let mut common = CommonType::new(left);
         for expr in tuple.exprs() {
-            let ty = self.lower_expr(&expr);
-            match expr_arg_type(Some(&expr), ty) {
-                ArgType::Known(ty) => {
-                    all_unknown = false;
-                    common = match common {
-                        Some(common) => self.overloads().select_common_type(common, ty),
-                        None if untyped => None,
-                        None => Some(ty),
-                    };
-                    untyped |= common.is_none();
-                }
-                ArgType::UnknownLiteral => {}
-                ArgType::Untyped => {
-                    all_unknown = false;
-                    untyped = true;
-                }
+            self.lower_common_expr(&mut common, &expr);
+        }
+        common.finish()
+    }
+
+    fn keyword_call_type(
+        &mut self,
+        call: &ast::CallExpr,
+        keyword: ast::FunctionLikeKeyword,
+        args: &[CallArg],
+    ) -> Option<Ty> {
+        match keyword {
+            ast::FunctionLikeKeyword::Coalesce
+            | ast::FunctionLikeKeyword::Greatest
+            | ast::FunctionLikeKeyword::Least => self.common_args_type(args),
+            ast::FunctionLikeKeyword::Nullif => self.nullif_type(args),
+            ast::FunctionLikeKeyword::Grouping => self.builtin_type("int4"),
+            ast::FunctionLikeKeyword::MergeAction => self.builtin_type("text"),
+            ast::FunctionLikeKeyword::XmlConcat => self.xmlconcat_type(call, args),
+        }
+    }
+
+    fn xmlconcat_type(&mut self, call: &ast::CallExpr, args: &[CallArg]) -> Option<Ty> {
+        let xml = self.builtin_type("xml")?;
+        for (arg, node) in args
+            .iter()
+            .zip(call.arg_list().into_iter().flat_map(|list| list.args()))
+        {
+            if let ArgType::Known(found) = arg.ty
+                && self.overloads().rejects_arg(arg.ty, xml)
+            {
+                let error = SemaError::KeywordArgType {
+                    keyword: "xmlconcat",
+                    expected: self.index.ty_name(xml),
+                    found: self.index.ty_name(found),
+                };
+                self.push_error(node.syntax(), error);
             }
         }
-        if untyped {
-            return ArgType::Untyped;
+        Some(xml)
+    }
+
+    fn nullif_type(&self, args: &[CallArg]) -> Option<Ty> {
+        let [left, right] = args else {
+            return None;
+        };
+        if let ArgType::Known(ty) = left.ty {
+            return Some(ty);
         }
-        if all_unknown {
-            return ArgType::UnknownLiteral;
+        let name = self.index.names.lookup("=")?;
+        let Resolution::Operator(operator) =
+            self.select_operator(None, name, Some(left.ty), Some(right.ty))
+        else {
+            return None;
+        };
+        match self.index.operators[operator].left {
+            Operand::Ty(ty) => Some(ty),
+            Operand::None | Operand::Unknown => None,
         }
-        common.map_or(ArgType::Untyped, ArgType::Known)
+    }
+
+    fn common_args_type(&self, args: &[CallArg]) -> Option<Ty> {
+        let mut common = CommonType::new(ArgType::UnknownLiteral);
+        for arg in args {
+            common.push(&self.overloads(), arg.ty);
+        }
+        common.resolve(&self.overloads())
+    }
+
+    fn lower_common_expr(&mut self, common: &mut CommonType, expr: &ast::Expr) {
+        let ty = self.lower_expr(expr);
+        common.push(&self.overloads(), expr_arg_type(Some(expr), ty));
     }
 
     fn lower_quantified_operand(&mut self, call: &ast::CallExpr, width: usize) -> Option<ArgType> {
@@ -18900,7 +19019,7 @@ impl Lowerer {
             ast::PrefixOp::OperatorCall(operator_call) => {
                 self.lower_operator_call(operator_call, None, right)
             }
-            ast::PrefixOp::Not(_) => None,
+            ast::PrefixOp::Not(_) => self.builtin_type("bool"),
         }
     }
 
@@ -20178,20 +20297,42 @@ impl Lowerer {
     }
 
     fn lower_field_star(&mut self, field_expr: &ast::FieldExpr, star: &SyntaxToken) -> FieldStar {
-        let (ty, columns) = match self.lower_field_base(field_expr) {
-            Some(FieldBase::Source(Some(source))) => (
-                self.index.source_type(source),
-                Some(self.index.sources[source].columns),
-            ),
-            Some(FieldBase::Expr(Some(ty))) => (Some(ty), self.ty_columns(ty).copied()),
-            Some(FieldBase::Columns { columns, ty }) => (ty, Some(columns)),
-            Some(FieldBase::Source(None) | FieldBase::Expr(None)) | None => (None, None),
-        };
-        if let Some(columns) = columns {
+        let base = self.lower_field_star_base(field_expr, star);
+        self.field_base_star(base.as_ref())
+    }
+
+    fn lower_field_star_base(
+        &mut self,
+        field_expr: &ast::FieldExpr,
+        star: &SyntaxToken,
+    ) -> Option<FieldBase> {
+        let base = self.lower_field_base(field_expr);
+        if let Some(FieldBase::Scalar(ty)) = base {
+            let range = InIrFile::new(self.file_id, star.text_range());
+            let error = SemaError::StarNotComposite {
+                ty: self.index.ty_name(ty),
+            };
+            self.push_error_at(range, error);
+        }
+        if let Some(columns) = self.field_base_star(base.as_ref()).columns {
             let start = self.index.star_columns.next_idx();
             self.index.star_columns.alloc_many(columns.range);
             self.add_star(star, start);
         }
+        base
+    }
+
+    fn field_base_star(&self, base: Option<&FieldBase>) -> FieldStar {
+        let (ty, columns) = match base {
+            Some(FieldBase::Source(Some(source))) => (
+                self.index.source_type(*source),
+                Some(self.index.sources[*source].columns),
+            ),
+            Some(FieldBase::Scalar(ty)) => (Some(*ty), None),
+            Some(FieldBase::Expr(Some(ty))) => (Some(*ty), self.ty_columns(*ty).copied()),
+            Some(FieldBase::Columns { columns, ty }) => (*ty, Some(*columns)),
+            Some(FieldBase::Source(None) | FieldBase::Expr(None)) | None => (None, None),
+        };
         FieldStar { ty, columns }
     }
 
@@ -20362,11 +20503,12 @@ impl Lowerer {
     fn lower_expr(&mut self, expr: &ast::Expr) -> Option<Ty> {
         match expr {
             ast::Expr::NameRef(name_ref) => {
-                if let Some(function) = name_ref
-                    .sql_value_function()
-                    .and_then(sql_value_function_name)
-                {
-                    return self.lower_system_call(function, &[], name_ref.syntax().text_range());
+                if let Some(function) = name_ref.sql_value_function() {
+                    if let Some(name) = sql_value_function_name(function) {
+                        let range = name_ref.syntax().text_range();
+                        return self.lower_system_call(name, &[], range);
+                    }
+                    return self.builtin_type(sql_value_function_type(function));
                 }
                 let name = self.name_ref_name(name_ref)?;
                 let resolution = self.add_name_ref(name, name_ref.syntax());
@@ -20383,7 +20525,13 @@ impl Lowerer {
                 return self.lower_field_expr(field_expr);
             }
             ast::Expr::CallExpr(call) => {
-                let LoweredCall { args, callee } = self.lower_call_with_args(call);
+                let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
+                if let Some(keyword) = call_function_like_keyword(call) {
+                    return self.keyword_call_type(call, keyword, &args);
+                }
+                if ty.is_some() {
+                    return ty;
+                }
                 return match callee?.resolution {
                     Resolution::Function(function) => self.call_type(function, &args),
                     resolution => self.resolution_type(resolution),
@@ -20427,6 +20575,7 @@ impl Lowerer {
                         }
                     }
                 }
+                return self.builtin_type("bool");
             }
             ast::Expr::BinExpr(bin) => {
                 let op = bin.op();
@@ -20473,14 +20622,21 @@ impl Lowerer {
             ast::Expr::CaseExpr(case) => {
                 self.lower_case_keywords(case);
                 self.lower_exprs(case.expr());
+                let mut common = CommonType::new(ArgType::UnknownLiteral);
                 for when in case
                     .when_clause_list()
                     .into_iter()
                     .flat_map(|list| list.when_clauses())
                 {
-                    self.lower_exprs([when.condition(), when.then()].into_iter().flatten());
+                    self.lower_exprs(when.condition());
+                    if let Some(then) = when.then() {
+                        self.lower_common_expr(&mut common, &then);
+                    }
                 }
-                self.lower_exprs(case.else_clause().and_then(|clause| clause.expr()));
+                if let Some(expr) = case.else_clause().and_then(|clause| clause.expr()) {
+                    self.lower_common_expr(&mut common, &expr);
+                }
+                return common.resolve(&self.overloads());
             }
             ast::Expr::CastExpr(cast) => {
                 self.lower_exprs(cast.expr());
@@ -20550,8 +20706,11 @@ impl Lowerer {
                     | ast::PostfixOp::IsNotJsonValue(_)
                     | ast::PostfixOp::IsNull(_)
                     | ast::PostfixOp::NotNull(_),
-                )
-                | None => self.lower_exprs(postfix.expr()),
+                ) => {
+                    self.lower_exprs(postfix.expr());
+                    return self.builtin_type("bool");
+                }
+                None => self.lower_exprs(postfix.expr()),
             },
             ast::Expr::PrefixExpr(prefix) => {
                 let expr = prefix.expr();
@@ -20851,6 +21010,12 @@ impl Lowerer {
     }
 
     fn lower_special_fn(&mut self, call: &ast::CallExpr) -> Option<LoweredCall> {
+        if let Some(ast::Expr::NameRef(name_ref)) = call.expr()
+            && let Some(function) = name_ref.sql_value_function()
+        {
+            let ty = self.builtin_type(sql_value_function_type(function));
+            return Some(LoweredCall::typed(ty));
+        }
         if let Some(graph_table) = call.graph_table_fn() {
             self.lower_graph_table(&graph_table);
         }
@@ -20868,6 +21033,7 @@ impl Lowerer {
         }
         if let Some(exists_fn) = call.exists_fn() {
             self.lower_opt_sublink(exists_fn.select_variant());
+            return Some(LoweredCall::typed(self.builtin_type("bool")));
         }
         if let Some(collation_for_fn) = call.collation_for_fn() {
             let arg = self.lower_positional_arg(collation_for_fn.expr());
@@ -20999,9 +21165,8 @@ impl Lowerer {
                     .and_then(|value| value.expr()),
             );
             self.lower_order_by(json_array_agg.order_by_clause());
-            if let Some(returning) = json_array_agg.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_array_agg.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_array) = call.json_array_fn() {
             for format in json_array.json_expr_formats() {
@@ -21010,9 +21175,8 @@ impl Lowerer {
             for format in json_array.json_select_formats() {
                 self.lower_opt_sublink(format.select_variant());
             }
-            if let Some(returning) = json_array.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_array.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_exists) = call.json_exists_fn() {
             self.lower_exprs(
@@ -21026,17 +21190,18 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
+            return Some(LoweredCall::typed(self.builtin_type("bool")));
         }
         if let Some(json_fn) = call.json_fn() {
             self.lower_exprs(json_fn.expr());
+            return Some(LoweredCall::typed(self.builtin_type("json")));
         }
         if let Some(json_object_agg) = call.json_object_agg_fn() {
             if let Some(key_value) = json_object_agg.json_key_value() {
                 self.lower_json_key_value(&key_value);
             }
-            if let Some(returning) = json_object_agg.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_object_agg.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_object) = call.json_object_fn() {
             for arg in json_object.func_arg_exprs() {
@@ -21045,9 +21210,8 @@ impl Lowerer {
             for key_value in json_object.json_key_values() {
                 self.lower_json_key_value(&key_value);
             }
-            if let Some(returning) = json_object.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_object.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_query) = call.json_query_fn() {
             self.lower_exprs(
@@ -21066,9 +21230,8 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
-            if let Some(returning) = json_query.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_query.json_returning_clause(), "jsonb");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_value) = call.json_value_fn() {
             self.lower_exprs(
@@ -21087,18 +21250,17 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
-            if let Some(returning) = json_value.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_value.json_returning_clause(), "text");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_scalar) = call.json_scalar_fn() {
             self.lower_exprs(json_scalar.expr());
+            return Some(LoweredCall::typed(self.builtin_type("json")));
         }
         if let Some(json_serialize) = call.json_serialize_fn() {
             self.lower_exprs(json_serialize.expr());
-            if let Some(returning) = json_serialize.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_serialize.json_returning_clause(), "text");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(xml_element) = call.xml_element_fn() {
             for attr in xml_element
@@ -21109,6 +21271,7 @@ impl Lowerer {
                 self.lower_exprs(attr.expr());
             }
             self.lower_exprs(xml_element.exprs());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_exists) = call.xml_exists_fn() {
             let passing = xml_exists.xml_row_passing_clause();
@@ -21134,28 +21297,36 @@ impl Lowerer {
             {
                 self.lower_exprs(tag.expr());
             }
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_parse) = call.xml_parse_fn() {
             self.lower_exprs(xml_parse.expr());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_pi) = call.xml_pi_fn() {
             self.lower_exprs(xml_pi.expr());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_root) = call.xml_root_fn() {
             self.lower_exprs(xml_root.expr());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_serialize) = call.xml_serialize_fn() {
             self.lower_exprs(xml_serialize.expr());
-            if let Some(ty) = xml_serialize.ty() {
-                self.lower_type(&ty);
-            }
+            let ty = xml_serialize.ty().and_then(|ty| self.lower_type(&ty));
+            return Some(LoweredCall::typed(ty));
         }
         None
     }
 
-    fn lower_json_returning(&mut self, returning: &ast::JsonReturningClause) {
-        if let Some(ty) = returning.ty() {
-            self.lower_type(&ty);
+    fn lower_json_returning(
+        &mut self,
+        returning: Option<ast::JsonReturningClause>,
+        default: &str,
+    ) -> Option<Ty> {
+        match returning {
+            Some(returning) => self.lower_type(&returning.ty()?),
+            None => self.builtin_type(default),
         }
     }
 
@@ -21446,6 +21617,7 @@ impl Lowerer {
         self.lower_special_fn(call).unwrap_or(LoweredCall {
             args,
             callee: target,
+            ty: None,
         })
     }
 
@@ -21682,7 +21854,7 @@ impl Lowerer {
             | ast::Expr::SliceExpr(_)
             | ast::Expr::TupleExpr(_) => return None,
         };
-        if schema.is_none() && name_ref.is_function_like_keyword() {
+        if schema.is_none() && name_ref.function_like_keyword().is_some() {
             return None;
         }
         let name = self.name_ref_name(&name_ref)?;
@@ -21912,6 +22084,7 @@ impl Lowerer {
         LoweredCall {
             args,
             callee: Some(callee),
+            ty: None,
         }
     }
 
@@ -22148,12 +22321,34 @@ impl Lowerer {
                 );
                 return None;
             }
+            FieldBase::Scalar(ty) => {
+                let field = field_expr.field()?;
+                let column = self.name_ref_name(&field)?;
+                let error = SemaError::ColumnNotationNotComposite {
+                    column,
+                    ty: self.index.ty_name(ty),
+                };
+                self.push_error(field.syntax(), error);
+                self.add_ref(
+                    column,
+                    ReferenceKind::Column,
+                    field.syntax(),
+                    Resolution::Unknown,
+                );
+                return None;
+            }
             FieldBase::Expr(ty) => {
                 let field = field_expr.field()?;
+                if self.is_record(ty) {
+                    return self.add_record_field_ref(None, &field);
+                }
                 return self.add_field_ref(ty, &field);
             }
-            FieldBase::Columns { columns, .. } => {
+            FieldBase::Columns { columns, ty } => {
                 let field = field_expr.field()?;
+                if self.is_record(ty) {
+                    return self.add_record_field_ref(Some(columns), &field);
+                }
                 return self.add_columns_field_ref(Some(columns), &field);
             }
         };
@@ -22220,6 +22415,39 @@ impl Lowerer {
         if let Some(call) = call_field_base(&base) {
             return Some(self.lower_call_field_base(&call));
         }
+        if let ast::Expr::TupleExpr(tuple) = base.unparen() {
+            return Some(self.lower_row_field_base(&tuple));
+        }
+        if let ast::Expr::ParenExpr(_) = base
+            && let ast::Expr::NameRef(name_ref) = base.unparen()
+            && name_ref.sql_value_function().is_none()
+        {
+            let name = self.name_ref_name(&name_ref)?;
+            return Some(match self.add_name_ref(name, name_ref.syntax()) {
+                Resolution::Source(source) => match self.scalar_sources.get(&source) {
+                    Some(ty) => FieldBase::Scalar(*ty),
+                    None => FieldBase::Source(Some(source)),
+                },
+                resolution => {
+                    self.check_default_column_ref(name_ref.syntax(), resolution);
+                    match resolution {
+                        Resolution::Column {
+                            source: Some(source),
+                            ..
+                        } if let Some(ty) = self.scalar_sources.get(&source) => {
+                            FieldBase::Scalar(*ty)
+                        }
+                        _ => self.expr_field_base(self.resolution_type(resolution)),
+                    }
+                }
+            });
+        }
+        if let ast::Expr::ParenExpr(_) = base
+            && let ast::Expr::FieldExpr(inner) = base.unparen()
+            && let Some(star) = inner.star_token()
+        {
+            return self.lower_field_star_base(&inner, &star);
+        }
         let qualifier = match &base {
             ast::Expr::NameRef(name_ref) => Some(name_ref.clone()),
             ast::Expr::FieldExpr(inner) => match inner.base() {
@@ -22261,21 +22489,97 @@ impl Lowerer {
         };
         Some(match qualifier {
             Some(qualifier) => FieldBase::Source(self.lower_qualifier(&qualifier)),
-            None => FieldBase::Expr(self.lower_expr(&base)),
+            None => {
+                let ty = self.lower_expr(&base);
+                let ty = if is_unknown_literal_expr(&base) {
+                    self.builtin_type("unknown")
+                } else {
+                    ty
+                };
+                self.expr_field_base(ty)
+            }
         })
     }
 
+    fn lower_row_field_base(&mut self, tuple: &ast::TupleExpr) -> FieldBase {
+        let mut columns = Vec::with_capacity(tuple.exprs().count());
+        for (index, expr) in tuple.exprs().enumerate() {
+            let ty = self.lower_expr(&expr);
+            columns.push(Column {
+                name: Some(self.intern(&format!("f{}", index + 1))),
+                ptr: self.ptr(expr.syntax()),
+                ty,
+                merge: None,
+            });
+        }
+        let range = self.index.columns.alloc_many(columns);
+        FieldBase::Columns {
+            columns: Columns {
+                range,
+                complete: true,
+            },
+            ty: self.builtin_type("record"),
+        }
+    }
+
+    fn is_record(&mut self, ty: Option<Ty>) -> bool {
+        ty.is_some() && ty == self.builtin_type("record")
+    }
+
+    fn add_record_field_ref(
+        &mut self,
+        columns: Option<Columns>,
+        field: &ast::NameRef,
+    ) -> Option<Ty> {
+        let column = self.name_ref_name(field)?;
+        if let Some(columns) = columns
+            && self.find_column_in(columns.range, column).is_some()
+        {
+            return self.add_columns_field_ref(Some(columns), field);
+        }
+        self.push_error(field.syntax(), SemaError::UnresolvedRecordColumn { column });
+        self.add_ref(
+            column,
+            ReferenceKind::Column,
+            field.syntax(),
+            Resolution::Unknown,
+        );
+        None
+    }
+
+    fn expr_field_base(&self, ty: Option<Ty>) -> FieldBase {
+        match ty {
+            Some(ty) if self.is_not_composite(ty) => FieldBase::Scalar(ty),
+            ty => FieldBase::Expr(ty),
+        }
+    }
+
+    fn is_not_composite(&self, ty: Ty) -> bool {
+        match self.index.base_type(ty) {
+            Some(Ty::Array(_)) => true,
+            Some(Ty::Type(id)) => self.index.types[id].is_not_composite(),
+            Some(Ty::Table(_) | Ty::Cte(_)) | None => false,
+        }
+    }
+
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
-        let LoweredCall { args, callee } = self.lower_call_with_args(call);
+        let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
+        if let Some(keyword) = call_function_like_keyword(call) {
+            let ty = self.keyword_call_type(call, keyword, &args);
+            return self.expr_field_base(ty);
+        }
+        if ty.is_some() {
+            return self.expr_field_base(ty);
+        }
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
-            return FieldBase::Expr(
+            return self.expr_field_base(
                 callee.and_then(|callee| self.resolution_type(callee.resolution)),
             );
         };
         let ty = self.call_type(function, &args);
         match self.index.functions[function].columns {
             Some(columns) => FieldBase::Columns { columns, ty },
-            None => FieldBase::Expr(ty),
+            None => self.expr_field_base(ty),
         }
     }
 
@@ -23667,6 +23971,27 @@ fn expr_arg_type(expr: Option<&ast::Expr>, ty: Option<Ty>) -> ArgType {
     }
 }
 
+fn call_function_like_keyword(call: &ast::CallExpr) -> Option<ast::FunctionLikeKeyword> {
+    match call.expr()? {
+        ast::Expr::NameRef(name_ref) => name_ref.function_like_keyword(),
+        ast::Expr::ArrayExpr(_)
+        | ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::CallExpr(_)
+        | ast::Expr::CaseExpr(_)
+        | ast::Expr::CastExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::FieldExpr(_)
+        | ast::Expr::IndexExpr(_)
+        | ast::Expr::Literal(_)
+        | ast::Expr::ParenExpr(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::PrefixExpr(_)
+        | ast::Expr::SliceExpr(_)
+        | ast::Expr::TupleExpr(_) => None,
+    }
+}
+
 fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
     let Some(literal) = expr.unparen().as_literal() else {
         return false;
@@ -23861,6 +24186,23 @@ fn sql_value_function_name(function: ast::SqlValueFunction) -> Option<&'static s
         | ast::SqlValueFunction::CurrentTime
         | ast::SqlValueFunction::Localtime
         | ast::SqlValueFunction::Localtimestamp => None,
+    }
+}
+
+fn sql_value_function_type(function: ast::SqlValueFunction) -> &'static str {
+    match function {
+        ast::SqlValueFunction::CurrentDate => "date",
+        ast::SqlValueFunction::CurrentTime => "timetz",
+        ast::SqlValueFunction::CurrentTimestamp => "timestamptz",
+        ast::SqlValueFunction::Localtime => "time",
+        ast::SqlValueFunction::Localtimestamp => "timestamp",
+        ast::SqlValueFunction::SystemUser => "text",
+        ast::SqlValueFunction::CurrentCatalog
+        | ast::SqlValueFunction::CurrentRole
+        | ast::SqlValueFunction::CurrentSchema
+        | ast::SqlValueFunction::CurrentUser
+        | ast::SqlValueFunction::SessionUser
+        | ast::SqlValueFunction::User => "name",
     }
 }
 

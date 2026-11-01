@@ -34,6 +34,62 @@ impl CallArg {
     }
 }
 
+pub(crate) struct CommonType {
+    common: Option<Ty>,
+    untyped: bool,
+    all_unknown: bool,
+}
+
+impl CommonType {
+    pub(crate) fn new(start: ArgType) -> CommonType {
+        CommonType {
+            common: match start {
+                ArgType::Known(ty) => Some(ty),
+                ArgType::UnknownLiteral | ArgType::Untyped => None,
+            },
+            untyped: start == ArgType::Untyped,
+            all_unknown: true,
+        }
+    }
+
+    pub(crate) fn push(&mut self, overloads: &Overloads<'_>, arg: ArgType) {
+        match arg {
+            ArgType::Known(ty) => {
+                self.all_unknown = false;
+                self.common = match self.common {
+                    Some(common) => overloads.select_common_type(common, ty),
+                    None if self.untyped => None,
+                    None => Some(ty),
+                };
+                self.untyped |= self.common.is_none();
+            }
+            ArgType::UnknownLiteral => {}
+            ArgType::Untyped => {
+                self.all_unknown = false;
+                self.untyped = true;
+            }
+        }
+    }
+
+    pub(crate) fn finish(self) -> ArgType {
+        if self.untyped {
+            return ArgType::Untyped;
+        }
+        if self.all_unknown {
+            return ArgType::UnknownLiteral;
+        }
+        self.common.map_or(ArgType::Untyped, ArgType::Known)
+    }
+
+    pub(crate) fn resolve(self, overloads: &Overloads<'_>) -> Option<Ty> {
+        match self.finish() {
+            ArgType::Known(ty) => Some(ty),
+            ArgType::UnknownLiteral => overloads.builtin_types.text.map(Ty::Type),
+            ArgType::Untyped => None,
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Match {
     Exact,
@@ -822,6 +878,10 @@ impl<'a> Overloads<'a> {
             "record" => Pseudo::Record,
             _ => return None,
         })
+    }
+
+    pub(crate) fn rejects_arg(&self, arg: ArgType, param: Ty) -> bool {
+        self.arg_match(arg, Some(param)).is_none()
     }
 
     pub(crate) fn is_string(&self, ty: ArgType) -> bool {

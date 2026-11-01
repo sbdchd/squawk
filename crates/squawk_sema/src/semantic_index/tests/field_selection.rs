@@ -72,14 +72,18 @@ from t;
       ╭▸ 
     6 │   (p).nope,
       ╰╴      ━━━━
-    error: column `x` does not exist
+    error: column notation `.x` applied to type `pair[]`, which is not a composite type
        ╭▸ 
     10 │   (ps[1:2]).x,
        ╰╴            ━
-    error: column `x` does not exist
+    error: column notation `.x` applied to type `pair[]`, which is not a composite type
        ╭▸ 
     16 │   (array[p]).x,
        ╰╴             ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+       ╭▸ 
+    17 │   (1 + 1).x,
+       ╰╴          ━
     error: function `f()` does not exist
        ╭▸ 
     18 │   (f()).x,
@@ -90,6 +94,10 @@ from t;
        │    ━
        │
        ╰ hint: consider adding explicit type casts
+    error: column notation `.y` applied to type `int4`, which is not a composite type
+       ╭▸ 
+    20 │   ((p).x).y
+       ╰╴          ━
     ");
 }
 
@@ -104,5 +112,559 @@ select x, y, nope from (select (p).* from t) s;
       ╭▸ 
     4 │ select x, y, nope from (select (p).* from t) s;
       ╰╴             ━━━━
+    ");
+}
+
+#[test]
+fn paren_source_uses_column_aliases() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (t).x, (t).* from t as t(x, y);
+select (t).a from t as t(x, y);
+"), @"
+    error: column `t.a` does not exist
+      ╭▸ 
+    4 │ select (t).a from t as t(x, y);
+      │            ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select (t).a from t as t(x, y);
+    4 + select (t).x from t as t(x, y);
+      ╰╴
+    ");
+}
+
+#[test]
+fn paren_star_source_uses_column_aliases() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (t.*).x, ((t.*)).* from t as t(x, y);
+select (t.*).a from t as t(x, y);
+"), @"
+    error: column `t.a` does not exist
+      ╭▸ 
+    4 │ select (t.*).a from t as t(x, y);
+      │              ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    4 - select (t.*).a from t as t(x, y);
+    4 + select (t.*).x from t as t(x, y);
+      ╰╴
+    ");
+}
+
+#[test]
+fn paren_scalar_function_source_is_not_composite() {
+    assert_snapshot!(check("
+select f.x, (f).x, (f).* from generate_series(1, 2) as f(x);
+select (f).f from generate_series(1, 2) as f;
+select (f).x from unnest(array[1]) as f(x);
+select (f).x from unnest(array[1], array[2]) as f(x, y);
+select (f).x from generate_series(1, 2) with ordinality as f(x, n);
+select (f).x from rows from (generate_series(1, 2)) as f(x);
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    2 │ select f.x, (f).x, (f).* from generate_series(1, 2) as f(x);
+      ╰╴                ━
+    error: type `int4` is not a composite type
+      ╭▸ 
+    2 │ select f.x, (f).x, (f).* from generate_series(1, 2) as f(x);
+      ╰╴                       ━
+    error: column notation `.f` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (f).f from generate_series(1, 2) as f;
+      ╰╴           ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    4 │ select (f).x from unnest(array[1]) as f(x);
+      ╰╴           ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    7 │ select (f).x from rows from (generate_series(1, 2)) as f(x);
+      ╰╴           ━
+    ");
+}
+
+#[test]
+fn record_field_selection_is_unchecked() {
+    assert_snapshot!(check("
+select (row(1, 2)).f1, ((1, 2)).f2;
+"), @"no diagnostics");
+}
+
+#[test]
+fn domain_over_composite_field_selection() {
+    assert_snapshot!(check("
+create type c as (x int);
+create domain d as c;
+create table u (dc d);
+select (dc).x, (dc).*, (dc).zz from u;
+"), @"
+    error: column `zz` does not exist
+      ╭▸ 
+    5 │ select (dc).x, (dc).*, (dc).zz from u;
+      ╰╴                            ━━
+    ");
+}
+
+#[test]
+fn array_field_selection_is_not_composite() {
+    assert_snapshot!(check("
+create table u (arr int[]);
+select (arr).zz, (arr).* from u;
+"), @"
+    error: column notation `.zz` applied to type `int4[]`, which is not a composite type
+      ╭▸ 
+    3 │ select (arr).zz, (arr).* from u;
+      ╰╴             ━━
+    error: type `int4[]` is not a composite type
+      ╭▸ 
+    3 │ select (arr).zz, (arr).* from u;
+      ╰╴                       ━
+    ");
+}
+
+#[test]
+fn cte_scalar_column_is_not_composite() {
+    assert_snapshot!(check("
+with t as (select 1 a)
+select (a).f, (a).* from t;
+"), @"
+    error: column notation `.f` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (a).f, (a).* from t;
+      ╰╴           ━
+    error: type `int4` is not a composite type
+      ╭▸ 
+    3 │ select (a).f, (a).* from t;
+      ╰╴                  ━
+    ");
+}
+
+#[test]
+fn unknown_field_selection_is_not_composite() {
+    assert_snapshot!(check("
+select (null).zz;
+"), @"
+    error: column notation `.zz` applied to type `unknown`, which is not a composite type
+      ╭▸ 
+    2 │ select (null).zz;
+      ╰╴              ━━
+    ");
+}
+
+#[test]
+fn untyped_composite_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+prepare p(t) as select ($1).zz;
+select (coalesce(t, t)).zz, (case when true then t end).zz from t;
+"), @"
+    error: column `zz` does not exist
+      ╭▸ 
+    3 │ prepare p(t) as select ($1).zz;
+      ╰╴                            ━━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (coalesce(t, t)).zz, (case when true then t end).zz from t;
+      ╰╴                        ━━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (coalesce(t, t)).zz, (case when true then t end).zz from t;
+      ╰╴                                                        ━━
+    ");
+}
+
+#[test]
+fn greatest_least_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (greatest(1, 2)).x, (least(1, 2)).x;
+select (greatest(t, t)).zz, (least(t, t)).zz from t;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (greatest(1, 2)).x, (least(1, 2)).x;
+      ╰╴                        ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (greatest(1, 2)).x, (least(1, 2)).x;
+      ╰╴                                         ━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (greatest(t, t)).zz, (least(t, t)).zz from t;
+      ╰╴                        ━━
+    error: column `zz` does not exist
+      ╭▸ 
+    4 │ select (greatest(t, t)).zz, (least(t, t)).zz from t;
+      ╰╴                                          ━━
+    ");
+}
+
+#[test]
+fn nullif_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (nullif(1, 2)).x, (nullif(t, t)).zz from t;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (nullif(1, 2)).x, (nullif(t, t)).zz from t;
+      ╰╴                      ━
+    error: column `zz` does not exist
+      ╭▸ 
+    3 │ select (nullif(1, 2)).x, (nullif(t, t)).zz from t;
+      ╰╴                                        ━━
+    ");
+}
+
+#[test]
+fn unknown_literal_branches_resolve_to_text() {
+    assert_snapshot!(check("
+select (coalesce('a', 'b')).x, (coalesce(null, null)).x;
+select (case when true then 'a' end).x, (case when true then null end).*;
+"), @"
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    2 │ select (coalesce('a', 'b')).x, (coalesce(null, null)).x;
+      ╰╴                            ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    2 │ select (coalesce('a', 'b')).x, (coalesce(null, null)).x;
+      ╰╴                                                      ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    3 │ select (case when true then 'a' end).x, (case when true then null end).*;
+      ╰╴                                     ━
+    error: type `text` is not a composite type
+      ╭▸ 
+    3 │ select (case when true then 'a' end).x, (case when true then null end).*;
+      ╰╴                                                                       ━
+    ");
+}
+
+#[test]
+fn nullif_unknown_first_arg_uses_other_type() {
+    assert_snapshot!(check("
+select (nullif(null, 1)).x, (nullif('1', 1)).x;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    2 │ select (nullif(null, 1)).x, (nullif('1', 1)).x;
+      ╰╴                         ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    2 │ select (nullif(null, 1)).x, (nullif('1', 1)).x;
+      ╰╴                                             ━
+    ");
+}
+
+#[test]
+fn row_field_selection() {
+    assert_snapshot!(check("
+create function f() returns record
+  language sql
+  as 'select 1, 2';
+create function g(out a int, out b int)
+  language sql
+  as 'select 1, 2';
+select
+  (row(1, 2)).f2,
+  ((1, 2)).f1,
+  (row(1)).x,
+  ((1, 2)).*,
+  (f()).x,
+  (g()).a,
+  (g()).zz;
+"), @"
+    error: could not identify column `x` in type `record`
+       ╭▸ 
+    11 │   (row(1)).x,
+       ╰╴           ━
+    error: could not identify column `x` in type `record`
+       ╭▸ 
+    13 │   (f()).x,
+       ╰╴        ━
+    error: could not identify column `zz` in type `record`
+       ╭▸ 
+    15 │   (g()).zz;
+       ╰╴        ━━
+    ");
+}
+
+#[test]
+fn boolean_expr_field_selection() {
+    assert_snapshot!(check("
+select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+select
+  (1 is null).x,
+  (1 isnull).x,
+  (1 notnull).x,
+  (true is true).x,
+  (true is not false).x;
+select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+"), @"
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    2 │ select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+      ╰╴                          ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    2 │ select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+      ╰╴                                                 ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    2 │ select (exists(select 1)).x, (1 between 0 and 2).x, (1 not between 0 and 2).x;
+      ╰╴                                                                            ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    4 │   (1 is null).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    5 │   (1 isnull).x,
+      ╰╴             ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    6 │   (1 notnull).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    7 │   (true is true).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    8 │   (true is not false).x;
+      ╰╴                      ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                  ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                                      ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                                                         ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+      ╭▸ 
+    9 │ select (not true).x, (true and false).x, (true or false).x, ('1' is json).x;
+      ╰╴                                                                          ━
+    ");
+}
+
+#[test]
+fn date_time_keyword_field_selection() {
+    assert_snapshot!(check("
+select
+  (current_date).x,
+  (current_time).x,
+  (current_time(1)).x,
+  (current_timestamp(3)).x;
+select
+  (localtime).x,
+  (localtime(1)).x,
+  (localtimestamp).x,
+  (localtimestamp(1)).x;
+"), @"
+    error: column notation `.x` applied to type `date`, which is not a composite type
+      ╭▸ 
+    3 │   (current_date).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `timetz`, which is not a composite type
+      ╭▸ 
+    4 │   (current_time).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `timetz`, which is not a composite type
+      ╭▸ 
+    5 │   (current_time(1)).x,
+      ╰╴                    ━
+    error: column notation `.x` applied to type `timestamptz`, which is not a composite type
+      ╭▸ 
+    6 │   (current_timestamp(3)).x;
+      ╰╴                         ━
+    error: column notation `.x` applied to type `time`, which is not a composite type
+      ╭▸ 
+    8 │   (localtime).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `time`, which is not a composite type
+      ╭▸ 
+    9 │   (localtime(1)).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `timestamp`, which is not a composite type
+       ╭▸ 
+    10 │   (localtimestamp).x,
+       ╰╴                   ━
+    error: column notation `.x` applied to type `timestamp`, which is not a composite type
+       ╭▸ 
+    11 │   (localtimestamp(1)).x;
+       ╰╴                      ━
+    ");
+}
+
+#[test]
+fn json_field_selection() {
+    assert_snapshot!(check("
+select
+  (json_object()).x,
+  (json_object(returning jsonb)).x,
+  (json_array()).x,
+  (json_array(returning jsonb)).x,
+  (json('1')).x,
+  (json_scalar(1)).x,
+  (json_serialize('1'::json)).x,
+  (json_serialize('1'::json returning bytea)).x;
+select
+  (json_query('1'::jsonb, '$')).x,
+  (json_query('1'::jsonb, '$' returning text)).x,
+  (json_value('1'::jsonb, '$')).x,
+  (json_value('1'::jsonb, '$' returning int)).x,
+  (json_exists('1'::jsonb, '$')).x;
+select (json_objectagg(k: v)).x, (json_arrayagg(v returning jsonb)).x
+from (values ('a', 1)) as t (k, v);
+"), @"
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    3 │   (json_object()).x,
+      ╰╴                  ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+      ╭▸ 
+    4 │   (json_object(returning jsonb)).x,
+      ╰╴                                 ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    5 │   (json_array()).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+      ╭▸ 
+    6 │   (json_array(returning jsonb)).x,
+      ╰╴                                ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    7 │   (json('1')).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    8 │   (json_scalar(1)).x,
+      ╰╴                   ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    9 │   (json_serialize('1'::json)).x,
+      ╰╴                              ━
+    error: column notation `.x` applied to type `bytea`, which is not a composite type
+       ╭▸ 
+    10 │   (json_serialize('1'::json returning bytea)).x;
+       ╰╴                                              ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+       ╭▸ 
+    12 │   (json_query('1'::jsonb, '$')).x,
+       ╰╴                                ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+       ╭▸ 
+    13 │   (json_query('1'::jsonb, '$' returning text)).x,
+       ╰╴                                               ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+       ╭▸ 
+    14 │   (json_value('1'::jsonb, '$')).x,
+       ╰╴                                ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+       ╭▸ 
+    15 │   (json_value('1'::jsonb, '$' returning int)).x,
+       ╰╴                                              ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+       ╭▸ 
+    16 │   (json_exists('1'::jsonb, '$')).x;
+       ╰╴                                 ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+       ╭▸ 
+    17 │ select (json_objectagg(k: v)).x, (json_arrayagg(v returning jsonb)).x
+       ╰╴                              ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+       ╭▸ 
+    17 │ select (json_objectagg(k: v)).x, (json_arrayagg(v returning jsonb)).x
+       ╰╴                                                                    ━
+    ");
+}
+
+#[test]
+fn xml_field_selection() {
+    assert_snapshot!(check("
+select
+  (xmlconcat('<a/>'::xml, '<b/>')).x,
+  (xmlelement(name a)).x,
+  (xmlforest(1 as a)).x,
+  (xmlparse(document '<a/>')).x,
+  (xmlpi(name a)).x,
+  (xmlroot('<a/>'::xml, version no value)).x,
+  (xmlserialize(document '<a/>'::xml as text)).x,
+  (xmlserialize(document '<a/>'::xml as varchar(10))).x;
+"), @"
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    3 │   (xmlconcat('<a/>'::xml, '<b/>')).x,
+      ╰╴                                   ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    4 │   (xmlelement(name a)).x,
+      ╰╴                       ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    5 │   (xmlforest(1 as a)).x,
+      ╰╴                      ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    6 │   (xmlparse(document '<a/>')).x,
+      ╰╴                              ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    7 │   (xmlpi(name a)).x,
+      ╰╴                  ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    8 │   (xmlroot('<a/>'::xml, version no value)).x,
+      ╰╴                                           ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    9 │   (xmlserialize(document '<a/>'::xml as text)).x,
+      ╰╴                                               ━
+    error: column notation `.x` applied to type `varchar`, which is not a composite type
+       ╭▸ 
+    10 │   (xmlserialize(document '<a/>'::xml as varchar(10))).x;
+       ╰╴                                                      ━
+    ");
+}
+
+#[test]
+fn grouping_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select (grouping(a)).x from t group by a;
+"), @"
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    3 │ select (grouping(a)).x from t group by a;
+      ╰╴                     ━
+    ");
+}
+
+#[test]
+fn merge_action_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+merge into t
+using t as s on t.a = s.a
+when matched then
+  delete
+returning (merge_action()).x;
+"), @"
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    7 │ returning (merge_action()).x;
+      ╰╴                           ━
     ");
 }

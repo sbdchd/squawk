@@ -109,6 +109,7 @@ pub enum DiagnosticKind {
     RenameSelectRule,
     NotIdentityColumn,
     WrongTypeKind,
+    TypeMismatch,
     WrongRelationKind,
     WrongRoutineKind,
     CannotChangeDatabase,

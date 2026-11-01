@@ -283,6 +283,7 @@ select
   JSON_OBJECTAGG(k: v) FILTER (WHERE v IS NOT NULL) OVER (PARTITION BY category ORDER BY k),
   JSON_ARRAYAGG(v) /* before filter */ FILTER /* before filter opening */ (/* before where */ WHERE /* before condition */ v > 0 /* before filter closing */) /* before over */ OVER /* before over opening */ (/* before partition */ PARTITION /* before by */ BY /* before partition expr */ category /* before order */ ORDER /* before order by */ BY /* before sort */ v /* before over closing */),
   JSON_ARRAY(),
+  JSON_ARRAY(RETURNING jsonb),
   JSON_ARRAY(1, 2 FORMAT JSON RETURNING jsonb),
   JSON_ARRAY(first_very_long_json_array_expression, second_very_long_json_array_expression, third_very_long_json_array_expression RETURNING a_very_long_json_array_return_type),
   JSON_ARRAY(SELECT a_very_long_json_select_expression_that_forces_the_json_select_format_node_to_wrap FORMAT JSON ABSENT ON NULL RETURNING a_very_long_json_select_return_type),

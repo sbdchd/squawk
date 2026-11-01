@@ -18269,18 +18269,31 @@ fn build_json_array_fn<'a>(ctx: &Ctx, json_array_fn: &ast::JsonArrayFn) -> Doc<'
             select.syntax().clone(),
         )
     });
-    if let Some(items) = build_comma_separated_docs(exprs.chain(selects)) {
+    let items = build_comma_separated_docs(exprs.chain(selects));
+    let mut has_content = items.is_some();
+    if let Some(items) = items {
         body = body.append(items);
     }
 
     if let Some(null_clause) = json_array_fn.json_null_clause() {
+        let separator = if has_content {
+            line_before(null_clause.syntax())
+        } else {
+            leading_comments(null_clause.syntax())
+        };
         body = body
-            .append(line_before(null_clause.syntax()))
+            .append(separator)
             .append(build_json_null_clause(null_clause));
+        has_content = true;
     }
     if let Some(returning) = json_array_fn.json_returning_clause() {
+        let separator = if has_content {
+            line_before(returning.syntax())
+        } else {
+            leading_comments(returning.syntax())
+        };
         body = body
-            .append(line_before(returning.syntax()))
+            .append(separator)
             .append(build_json_returning_clause(ctx, &returning));
     }
     doc.append(wrap_body(ctx, body, json_array_fn.r_paren_token().as_ref()))

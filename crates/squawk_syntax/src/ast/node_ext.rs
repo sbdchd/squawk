@@ -128,6 +128,17 @@ pub enum SqlValueFunction {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum FunctionLikeKeyword {
+    Coalesce,
+    Greatest,
+    Grouping,
+    Least,
+    MergeAction,
+    Nullif,
+    XmlConcat,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum RangeBoundKeyword {
     MinValue,
     MaxValue,
@@ -1249,18 +1260,18 @@ impl ast::NameRef {
         }
     }
 
-    pub fn is_function_like_keyword(&self) -> bool {
-        matches!(
-            self.first_token_kind(),
-            Some(
-                SyntaxKind::COALESCE_KW
-                    | SyntaxKind::GREATEST_KW
-                    | SyntaxKind::GROUPING_KW
-                    | SyntaxKind::LEAST_KW
-                    | SyntaxKind::MERGE_ACTION_KW
-                    | SyntaxKind::NULLIF_KW
-            )
-        )
+    pub fn function_like_keyword(&self) -> Option<FunctionLikeKeyword> {
+        let keyword = match self.first_token_kind()? {
+            SyntaxKind::COALESCE_KW => FunctionLikeKeyword::Coalesce,
+            SyntaxKind::GREATEST_KW => FunctionLikeKeyword::Greatest,
+            SyntaxKind::GROUPING_KW => FunctionLikeKeyword::Grouping,
+            SyntaxKind::LEAST_KW => FunctionLikeKeyword::Least,
+            SyntaxKind::MERGE_ACTION_KW => FunctionLikeKeyword::MergeAction,
+            SyntaxKind::NULLIF_KW => FunctionLikeKeyword::Nullif,
+            SyntaxKind::XMLCONCAT_KW => FunctionLikeKeyword::XmlConcat,
+            _ => return None,
+        };
+        Some(keyword)
     }
 }
 

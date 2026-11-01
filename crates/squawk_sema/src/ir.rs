@@ -641,6 +641,40 @@ pub struct Type {
     pub(crate) array_name: Option<Name>,
 }
 
+impl Type {
+    pub(crate) fn is_not_composite(&self) -> bool {
+        if self.columns.is_some() {
+            return false;
+        }
+        let kind = match self.kind {
+            TypeKind::Type | TypeKind::Enum | TypeKind::Range | TypeKind::Multirange => true,
+            TypeKind::Shell | TypeKind::Domain => false,
+        };
+        let category = match self.category {
+            Some(TypeCategory::Composite | TypeCategory::Pseudo) => false,
+            Some(
+                TypeCategory::Array
+                | TypeCategory::Bool
+                | TypeCategory::DateTime
+                | TypeCategory::Enum
+                | TypeCategory::Geometric
+                | TypeCategory::Network
+                | TypeCategory::Numeric
+                | TypeCategory::Range
+                | TypeCategory::String
+                | TypeCategory::Timespan
+                | TypeCategory::User
+                | TypeCategory::BitString
+                | TypeCategory::Unknown
+                | TypeCategory::Internal
+                | TypeCategory::Other(_),
+            )
+            | None => true,
+        };
+        kind && category
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FunctionKind {
     Function,

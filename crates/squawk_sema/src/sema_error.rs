@@ -308,6 +308,9 @@ pub(crate) enum SemaError {
         column: Name,
         relation: Name,
     },
+    UnresolvedRecordColumn {
+        column: Name,
+    },
     UnresolvedReference {
         kind: ReferenceKind,
         name: Name,
@@ -392,6 +395,13 @@ pub(crate) enum SemaError {
     },
     NotComposite {
         name: Name,
+    },
+    StarNotComposite {
+        ty: TyName,
+    },
+    ColumnNotationNotComposite {
+        column: Name,
+        ty: TyName,
     },
     WrongTypeKind {
         name: Name,
@@ -480,6 +490,11 @@ pub(crate) enum SemaError {
     },
     MissingArrayType {
         ty: TyName,
+    },
+    KeywordArgType {
+        keyword: &'static str,
+        expected: TyName,
+        found: TyName,
     },
     WindowOverride {
         name: Name,
@@ -965,9 +980,9 @@ impl SemaError {
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
             | SemaError::ParameterlessAggregate { .. } => DiagnosticKind::WrongRoutineKind,
-            SemaError::UnresolvedQualifiedColumn { .. } | SemaError::QualifiedSetTarget { .. } => {
-                DiagnosticKind::UnresolvedColumn
-            }
+            SemaError::UnresolvedQualifiedColumn { .. }
+            | SemaError::QualifiedSetTarget { .. }
+            | SemaError::UnresolvedRecordColumn { .. } => DiagnosticKind::UnresolvedColumn,
             SemaError::UnresolvedReference { kind, .. } => unresolved_kind(kind),
             SemaError::AmbiguousReference { kind, .. } => ambiguous_kind(kind),
             SemaError::NotLateral {
@@ -979,6 +994,8 @@ impl SemaError {
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
+            | SemaError::StarNotComposite { .. }
+            | SemaError::ColumnNotationNotComposite { .. }
             | SemaError::WrongTypeKind { .. }
             | SemaError::TableRowTypeAlteredAsType { .. } => DiagnosticKind::WrongTypeKind,
             SemaError::TypedTableAlter { .. } => DiagnosticKind::TypedTableAlter,
@@ -1015,6 +1032,7 @@ impl SemaError {
             SemaError::UniqueIndexNotSupported { .. } => DiagnosticKind::UniqueIndexNotSupported,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
+            SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
             SemaError::ConflictingNullability { .. } => DiagnosticKind::ConflictingNullability,
         }
@@ -1791,6 +1809,11 @@ impl fmt::Display for ErrorMessage<'_> {
             } => {
                 write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
             }
+            SemaError::UnresolvedRecordColumn { column } => write!(
+                f,
+                "could not identify column `{}` in type `record`",
+                n(column)
+            ),
             SemaError::QualifiedSetTarget { column, relation } => write!(
                 f,
                 "column `{}` of relation `{}` does not exist",
@@ -1863,7 +1886,7 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
                 f,
-                "cannot change data type of view column `{}` from `{}` to `{}`",
+                "cannot change type of view column `{}` from `{}` to `{}`",
                 n(column),
                 self.ty(from),
                 self.ty(to)
@@ -1923,6 +1946,15 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::NotEnum { name } => write!(f, "`{}` is not an enum", n(name)),
             SemaError::NotComposite { name } => write!(f, "`{}` is not a composite type", n(name)),
+            SemaError::StarNotComposite { ty } => {
+                write!(f, "type `{}` is not a composite type", self.ty(ty))
+            }
+            SemaError::ColumnNotationNotComposite { column, ty } => write!(
+                f,
+                "column notation `.{}` applied to type `{}`, which is not a composite type",
+                n(column),
+                self.ty(ty)
+            ),
             SemaError::WrongTypeKind { name, expected } => {
                 write!(f, "`{}` is not a {}", n(name), expected.label())
             }
@@ -2035,11 +2067,19 @@ impl fmt::Display for ErrorMessage<'_> {
                     clause.label()
                 )
             }
-            SemaError::MissingArrayType { ty } => write!(
+            SemaError::KeywordArgType {
+                keyword,
+                expected,
+                found,
+            } => write!(
                 f,
-                "could not find array type for data type `{}`",
-                self.ty(ty)
+                "argument of `{keyword}` must be type `{}`, not type `{}`",
+                self.ty(expected),
+                self.ty(found)
             ),
+            SemaError::MissingArrayType { ty } => {
+                write!(f, "could not find array type for type `{}`", self.ty(ty))
+            }
             SemaError::WindowOverride { name, clause } => write!(
                 f,
                 "cannot override {} clause of window `{}`",
