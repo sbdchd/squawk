@@ -166,12 +166,10 @@ select f(a => 1, b => x), g(y => 1), f(zz => 1);
     3 - select f(a => 1, b => x), g(y => 1), f(zz => 1);
     3 + select f(a => 1, b => x), f(y => 1), f(zz => 1);
       ╰╴
-    error: function `f(zz => int4)` does not exist
+    error: function `f` has no parameter named `zz`
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
-      │                                      ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴                                       ━━
     ");
 }
 
@@ -182,18 +180,14 @@ create function f(a int) returns int language sql return a;
 create function g(int) returns int language sql return $1;
 select f(z => 1), g(a => 1);
 "), @"
-    error: function `f(z => int4)` does not exist
+    error: function `f` has no parameter named `z`
       ╭▸ 
     4 │ select f(z => 1), g(a => 1);
-      │        ━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: function `g(a => int4)` does not exist
+      ╰╴         ━
+    error: function `g` has no parameter named `a`
       ╭▸ 
     4 │ select f(z => 1), g(a => 1);
-      │                   ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴                    ━
     ");
 }
 
@@ -789,12 +783,10 @@ call count(1);
 call nope();
 call p((select x from nope));
 "), @"
-    error: procedure `p(c => int4)` does not exist
+    error: procedure `p` has no parameter named `c`
       ╭▸ 
     7 │ call p(c => 1);
-      │      ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴       ━
     error: `f()` is not a procedure
       ╭▸ 
     8 │ call f();
@@ -996,12 +988,10 @@ call p('a'::text);
        │               ━━━━━━━━━
        │
        ╰ hint: consider adding explicit type casts
-    error: function `foo(y => int4)` does not exist
+    error: function `foo` has no parameter named `y`
        ╭▸ 
     11 │ select foo(y => 1);
-       │        ━━━
-       │
-       ╰ hint: consider adding explicit type casts
+       ╰╴           ━
     error: function `public.foo(variadic int4[])` does not exist
        ╭▸ 
     12 │ select public.foo(variadic array[1]);
@@ -1215,5 +1205,23 @@ select v(a => 1, variadic b => array[1]);
       │        ━
       │
       ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn unknown_arg_name() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+select foo(z => 1);
+select foo(1, z => 2);
+"), @"
+    error: function `foo` has no parameter named `z`
+      ╭▸ 
+    3 │ select foo(z => 1);
+      ╰╴           ━
+    error: function `foo` has no parameter named `z`
+      ╭▸ 
+    4 │ select foo(1, z => 2);
+      ╰╴              ━
     ");
 }

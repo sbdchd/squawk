@@ -365,6 +365,12 @@ pub(crate) enum SemaError {
     DuplicateArgumentName {
         name: Name,
     },
+    UnknownArgumentName {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg: Name,
+    },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
         name: Name,
@@ -1012,6 +1018,7 @@ impl SemaError {
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::ArgumentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
             SemaError::ArgumentCountMismatch { .. } => DiagnosticKind::ArgumentCountMismatch,
+            SemaError::UnknownArgumentName { .. } => DiagnosticKind::UnresolvedParam,
             SemaError::PositionalAfterNamed | SemaError::DuplicateArgumentName { .. } => {
                 DiagnosticKind::InvalidArgument
             }
@@ -1974,6 +1981,18 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::DuplicateArgumentName { name } => {
                 write!(f, "argument name `{}` used more than once", n(name))
             }
+            SemaError::UnknownArgumentName {
+                kind,
+                schema,
+                name,
+                arg,
+            } => write!(
+                f,
+                "{} `{}` has no parameter named `{}`",
+                kind.call_label(),
+                self.qualified(schema, name),
+                n(arg)
+            ),
             SemaError::ProcedureCalledAsFunction {
                 schema, name, args, ..
             } => write!(f, "`{}` is a procedure", self.signature(schema, name, args)),

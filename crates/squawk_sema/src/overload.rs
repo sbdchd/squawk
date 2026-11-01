@@ -37,6 +37,7 @@ impl CallArg {
 #[derive(Debug, Clone, Copy)]
 pub(crate) enum CallMismatch {
     ArgCount(ArgCount),
+    UnknownName { arg: usize },
     ArgType(ArgMismatch),
 }
 
@@ -345,7 +346,7 @@ impl<'a> Overloads<'a> {
     }
 
     pub(crate) fn mismatch(&self, function: &Function, args: &[CallArg]) -> Option<CallMismatch> {
-        if args.iter().any(|arg| arg.name.is_some() || arg.variadic) {
+        if args.iter().any(|arg| arg.variadic) {
             return None;
         }
         let inputs: SmallVec<[&Param; 8]> = self.inputs(function).collect();
@@ -354,17 +355,45 @@ impl<'a> Overloads<'a> {
         }
         let min = inputs.iter().filter(|param| !param.has_default).count();
         let max = inputs.len();
-        if args.len() < min || args.len() > max {
-            return Some(CallMismatch::ArgCount(ArgCount { min, max }));
+        let count = CallMismatch::ArgCount(ArgCount { min, max });
+        let named = args.iter().any(|arg| arg.name.is_some());
+        if !named && (args.len() < min || args.len() > max) {
+            return Some(count);
+        }
+        let mut assigned: SmallVec<[bool; 8]> = smallvec![false; inputs.len()];
+        let mut params: SmallVec<[Option<Ty>; 8]> = SmallVec::with_capacity(args.len());
+        let mut seen_named = false;
+        for (i, arg) in args.iter().enumerate() {
+            let position = match arg.name {
+                Some(name) => {
+                    seen_named = true;
+                    let Some(position) = inputs.iter().position(|param| param.name == Some(name))
+                    else {
+                        return Some(CallMismatch::UnknownName { arg: i });
+                    };
+                    if assigned[position] {
+                        return None;
+                    }
+                    position
+                }
+                None if seen_named => return None,
+                None if i < inputs.len() => i,
+                None => return Some(count),
+            };
+            assigned[position] = true;
+            params.push(inputs[position].ty);
+        }
+        if named {
+            return None;
         }
         args.iter()
-            .zip(&inputs)
+            .zip(&params)
             .enumerate()
             .find_map(|(position, (arg, param))| {
                 let ArgType::Known(found) = arg.ty else {
                     return None;
                 };
-                let expected = param.ty?;
+                let expected = (*param)?;
                 self.coerce(found, expected)
                     .is_none()
                     .then_some(CallMismatch::ArgType(ArgMismatch {
