@@ -635,6 +635,17 @@ struct FunctionColumns {
 struct LoweredCall {
     args: SmallVec<[CallArg; 4]>,
     callee: Option<Callee>,
+    ty: Option<Ty>,
+}
+
+impl LoweredCall {
+    fn typed(ty: Option<Ty>) -> LoweredCall {
+        LoweredCall {
+            args: smallvec![],
+            callee: None,
+            ty,
+        }
+    }
 }
 
 #[derive(Clone, Copy)]
@@ -15460,7 +15471,7 @@ impl Lowerer {
             }
             return self.lower_expanded_unnest(call, &name_ref);
         }
-        let LoweredCall { args, callee } =
+        let LoweredCall { args, callee, .. } =
             self.with_from_function(|this| this.lower_call_with_args(call));
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return FunctionSource {
@@ -18906,18 +18917,6 @@ impl Lowerer {
         }
     }
 
-    fn special_call_type(&mut self, call: &ast::CallExpr) -> Option<Ty> {
-        if call.exists_fn().is_some() {
-            return self.builtin_type("bool");
-        }
-        if let Some(ast::Expr::NameRef(name_ref)) = call.expr()
-            && let Some(function) = name_ref.sql_value_function()
-        {
-            return self.builtin_type(sql_value_function_type(function));
-        }
-        None
-    }
-
     fn nullif_type(&self, args: &[CallArg]) -> Option<Ty> {
         let [left, right] = args else {
             return None;
@@ -20504,12 +20503,12 @@ impl Lowerer {
                 return self.lower_field_expr(field_expr);
             }
             ast::Expr::CallExpr(call) => {
-                let LoweredCall { args, callee } = self.lower_call_with_args(call);
+                let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
                 if let Some(keyword) = call_function_like_keyword(call) {
                     return self.keyword_call_type(keyword, &args);
                 }
-                if let Some(ty) = self.special_call_type(call) {
-                    return Some(ty);
+                if ty.is_some() {
+                    return ty;
                 }
                 return match callee?.resolution {
                     Resolution::Function(function) => self.call_type(function, &args),
@@ -20989,6 +20988,12 @@ impl Lowerer {
     }
 
     fn lower_special_fn(&mut self, call: &ast::CallExpr) -> Option<LoweredCall> {
+        if let Some(ast::Expr::NameRef(name_ref)) = call.expr()
+            && let Some(function) = name_ref.sql_value_function()
+        {
+            let ty = self.builtin_type(sql_value_function_type(function));
+            return Some(LoweredCall::typed(ty));
+        }
         if let Some(graph_table) = call.graph_table_fn() {
             self.lower_graph_table(&graph_table);
         }
@@ -21006,6 +21011,7 @@ impl Lowerer {
         }
         if let Some(exists_fn) = call.exists_fn() {
             self.lower_opt_sublink(exists_fn.select_variant());
+            return Some(LoweredCall::typed(self.builtin_type("bool")));
         }
         if let Some(collation_for_fn) = call.collation_for_fn() {
             let arg = self.lower_positional_arg(collation_for_fn.expr());
@@ -21137,9 +21143,8 @@ impl Lowerer {
                     .and_then(|value| value.expr()),
             );
             self.lower_order_by(json_array_agg.order_by_clause());
-            if let Some(returning) = json_array_agg.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_array_agg.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_array) = call.json_array_fn() {
             for format in json_array.json_expr_formats() {
@@ -21148,9 +21153,8 @@ impl Lowerer {
             for format in json_array.json_select_formats() {
                 self.lower_opt_sublink(format.select_variant());
             }
-            if let Some(returning) = json_array.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_array.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_exists) = call.json_exists_fn() {
             self.lower_exprs(
@@ -21164,17 +21168,18 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
+            return Some(LoweredCall::typed(self.builtin_type("bool")));
         }
         if let Some(json_fn) = call.json_fn() {
             self.lower_exprs(json_fn.expr());
+            return Some(LoweredCall::typed(self.builtin_type("json")));
         }
         if let Some(json_object_agg) = call.json_object_agg_fn() {
             if let Some(key_value) = json_object_agg.json_key_value() {
                 self.lower_json_key_value(&key_value);
             }
-            if let Some(returning) = json_object_agg.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_object_agg.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_object) = call.json_object_fn() {
             for arg in json_object.func_arg_exprs() {
@@ -21183,9 +21188,8 @@ impl Lowerer {
             for key_value in json_object.json_key_values() {
                 self.lower_json_key_value(&key_value);
             }
-            if let Some(returning) = json_object.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_object.json_returning_clause(), "json");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_query) = call.json_query_fn() {
             self.lower_exprs(
@@ -21204,9 +21208,8 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
-            if let Some(returning) = json_query.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_query.json_returning_clause(), "jsonb");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_value) = call.json_value_fn() {
             self.lower_exprs(
@@ -21225,18 +21228,17 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
-            if let Some(returning) = json_value.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_value.json_returning_clause(), "text");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(json_scalar) = call.json_scalar_fn() {
             self.lower_exprs(json_scalar.expr());
+            return Some(LoweredCall::typed(self.builtin_type("json")));
         }
         if let Some(json_serialize) = call.json_serialize_fn() {
             self.lower_exprs(json_serialize.expr());
-            if let Some(returning) = json_serialize.json_returning_clause() {
-                self.lower_json_returning(&returning);
-            }
+            let ty = self.lower_json_returning(json_serialize.json_returning_clause(), "text");
+            return Some(LoweredCall::typed(ty));
         }
         if let Some(xml_element) = call.xml_element_fn() {
             for attr in xml_element
@@ -21291,9 +21293,14 @@ impl Lowerer {
         None
     }
 
-    fn lower_json_returning(&mut self, returning: &ast::JsonReturningClause) {
-        if let Some(ty) = returning.ty() {
-            self.lower_type(&ty);
+    fn lower_json_returning(
+        &mut self,
+        returning: Option<ast::JsonReturningClause>,
+        default: &str,
+    ) -> Option<Ty> {
+        match returning {
+            Some(returning) => self.lower_type(&returning.ty()?),
+            None => self.builtin_type(default),
         }
     }
 
@@ -21584,6 +21591,7 @@ impl Lowerer {
         self.lower_special_fn(call).unwrap_or(LoweredCall {
             args,
             callee: target,
+            ty: None,
         })
     }
 
@@ -22050,6 +22058,7 @@ impl Lowerer {
         LoweredCall {
             args,
             callee: Some(callee),
+            ty: None,
         }
     }
 
@@ -22528,13 +22537,13 @@ impl Lowerer {
     }
 
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
-        let LoweredCall { args, callee } = self.lower_call_with_args(call);
+        let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
         if let Some(keyword) = call_function_like_keyword(call) {
             let ty = self.keyword_call_type(keyword, &args);
             return self.expr_field_base(ty);
         }
-        if let Some(ty) = self.special_call_type(call) {
-            return self.expr_field_base(Some(ty));
+        if ty.is_some() {
+            return self.expr_field_base(ty);
         }
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return self.expr_field_base(

@@ -508,6 +508,90 @@ select
 }
 
 #[test]
+fn json_field_selection() {
+    assert_snapshot!(check("
+select
+  (json_object()).x,
+  (json_object(returning jsonb)).x,
+  (json_array()).x,
+  (json_array( returning jsonb)).x,
+  (json('1')).x,
+  (json_scalar(1)).x,
+  (json_serialize('1'::json)).x,
+  (json_serialize('1'::json returning bytea)).x;
+select
+  (json_query('1'::jsonb, '$')).x,
+  (json_query('1'::jsonb, '$' returning text)).x,
+  (json_value('1'::jsonb, '$')).x,
+  (json_value('1'::jsonb, '$' returning int)).x,
+  (json_exists('1'::jsonb, '$')).x;
+select (json_objectagg(k: v)).x, (json_arrayagg(v returning jsonb)).x
+from (values ('a', 1)) as t (k, v);
+"), @"
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    3 │   (json_object()).x,
+      ╰╴                  ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+      ╭▸ 
+    4 │   (json_object(returning jsonb)).x,
+      ╰╴                                 ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    5 │   (json_array()).x,
+      ╰╴                 ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+      ╭▸ 
+    6 │   (json_array( returning jsonb)).x,
+      ╰╴                                 ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    7 │   (json('1')).x,
+      ╰╴              ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+      ╭▸ 
+    8 │   (json_scalar(1)).x,
+      ╰╴                   ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    9 │   (json_serialize('1'::json)).x,
+      ╰╴                              ━
+    error: column notation `.x` applied to type `bytea`, which is not a composite type
+       ╭▸ 
+    10 │   (json_serialize('1'::json returning bytea)).x;
+       ╰╴                                              ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+       ╭▸ 
+    12 │   (json_query('1'::jsonb, '$')).x,
+       ╰╴                                ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+       ╭▸ 
+    13 │   (json_query('1'::jsonb, '$' returning text)).x,
+       ╰╴                                               ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+       ╭▸ 
+    14 │   (json_value('1'::jsonb, '$')).x,
+       ╰╴                                ━
+    error: column notation `.x` applied to type `int4`, which is not a composite type
+       ╭▸ 
+    15 │   (json_value('1'::jsonb, '$' returning int)).x,
+       ╰╴                                              ━
+    error: column notation `.x` applied to type `bool`, which is not a composite type
+       ╭▸ 
+    16 │   (json_exists('1'::jsonb, '$')).x;
+       ╰╴                                 ━
+    error: column notation `.x` applied to type `json`, which is not a composite type
+       ╭▸ 
+    17 │ select (json_objectagg(k: v)).x, (json_arrayagg(v returning jsonb)).x
+       ╰╴                              ━
+    error: column notation `.x` applied to type `jsonb`, which is not a composite type
+       ╭▸ 
+    17 │ select (json_objectagg(k: v)).x, (json_arrayagg(v returning jsonb)).x
+       ╰╴                                                                    ━
+    ");
+}
+
+#[test]
 fn grouping_field_selection() {
     assert_snapshot!(check("
 create table t (a int, b int);
