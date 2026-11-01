@@ -1201,3 +1201,19 @@ select nope(a => 1, 2);
       ╰╴                    ━
     ");
 }
+
+#[test]
+fn named_variadic_requires_label() {
+    assert_snapshot!(check("
+create function v(a int, variadic b int[]) returns int language sql return a;
+select v(a => 1, b => array[1]);
+select v(a => 1, variadic b => array[1]);
+"), @"
+    error: function `v(a => int4, b => int4[])` does not exist
+      ╭▸ 
+    3 │ select v(a => 1, b => array[1]);
+      │        ━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}

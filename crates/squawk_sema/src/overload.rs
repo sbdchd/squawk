@@ -497,6 +497,9 @@ impl<'a> Overloads<'a> {
             if arg.variadic && (param.mode != ParamMode::Variadic || assigned[position]) {
                 return None;
             }
+            if param.mode == ParamMode::Variadic && arg.name.is_some() && !arg.variadic {
+                return None;
+            }
             assigned[position] = true;
             let ty = match (param.mode, arg.name, arg.variadic) {
                 (ParamMode::Variadic, None, false) => {
