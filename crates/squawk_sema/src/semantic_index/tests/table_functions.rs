@@ -113,6 +113,7 @@ select unnest(array[1], array[2]);
     2 │ select unnest(array[1], array[2]);
       │        ━━━━━━
       │
+      ├ note: candidates are `unnest(anymultirange)`, `unnest(tsvector)`, `unnest(anyarray)`
       ╰ hint: consider adding explicit type casts
     ");
 }

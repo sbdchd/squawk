@@ -13,6 +13,7 @@ select lower('A'), lower(1, 2), lower(1, 2, 3);
     3 │ select lower('A'), lower(1, 2), lower(1, 2, 3);
       │                                 ━━━━━
       │
+      ├ note: candidates are `lower(anymultirange)`, `lower(anyrange)`, `lower(text)`, `lower(int4, int4)`
       ╰ hint: consider adding explicit type casts
     ");
 }
@@ -86,5 +87,41 @@ select xmlconcat(c, e, '<a/>', null), xmlconcat(a), xmlconcat(c, b) from t;
       ╭▸ 
     9 │ select xmlconcat(c, e, '<a/>', null), xmlconcat(a), xmlconcat(c, b) from t;
       ╰╴                                                                 ━
+    ");
+}
+
+#[test]
+fn unresolved_overload_candidates() {
+    assert_snapshot!(check("
+create function f(a int) returns int language sql return 1;
+create function f(a text, b int default 1) returns int language sql return 1;
+create function f2(a bool) returns int language sql return 1;
+create procedure p(a int) language sql as '';
+create procedure p(a text, out b int) language sql as '';
+select f(true);
+call p(true);
+select to_char(true, 'x');
+"), @"
+    error: function `f(bool)` does not exist
+      ╭▸ 
+    7 │ select f(true);
+      │        ━
+      │
+      ├ note: candidates are `f(int4)`, `f(text, int4)`
+      ╰ hint: consider adding explicit type casts
+    error: procedure `p(bool)` does not exist
+      ╭▸ 
+    8 │ call p(true);
+      │      ━
+      │
+      ├ note: candidates are `p(int4)`, `p(text, int4)`
+      ╰ hint: consider adding explicit type casts
+    error: function `to_char(bool, unknown)` does not exist
+      ╭▸ 
+    9 │ select to_char(true, 'x');
+      │        ━━━━━━━
+      │
+      ├ note: candidates are `to_char(interval, text)`, `to_char(numeric, text)`, `to_char(float4, text)`, `to_char(timestamptz, text)`, `to_char(timestamp, text)`, and 3 others
+      ╰ hint: consider adding explicit type casts
     ");
 }

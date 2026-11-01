@@ -88,10 +88,15 @@ fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
     }
 
     for error in semantic_diagnostics(db, file_id) {
-        let message = match error.hint {
-            Some(hint) => format!("{}\nhint: {hint}", error.message),
-            None => error.message.into_owned(),
-        };
+        let mut message = error.message.into_owned();
+        if let Some(note) = error.note {
+            message.push_str("\nnote: ");
+            message.push_str(&note);
+        }
+        if let Some(hint) = error.hint {
+            message.push_str("\nhint: ");
+            message.push_str(&hint);
+        }
 
         let data = error
             .suggestion

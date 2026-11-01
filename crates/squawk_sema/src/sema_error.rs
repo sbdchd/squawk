@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use std::fmt;
+use std::fmt::{self, Write};
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::interner::{Interner, Name};
@@ -78,6 +78,12 @@ pub(crate) enum LookupKind {
 pub(crate) enum ErrorArgs {
     List(IdxRange<ErrorArg>),
     Star,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorCandidates {
+    pub(crate) shown: IdxRange<ErrorArgs>,
+    pub(crate) total: usize,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -337,6 +343,7 @@ pub(crate) enum SemaError {
         lookup: LookupKind,
         similar: Option<Name>,
         misplaced_order_by: bool,
+        candidates: Option<ErrorCandidates>,
     },
     ArgumentTypeMismatch {
         kind: RoutineKind,
@@ -1453,6 +1460,46 @@ impl SemaError {
         }
     }
 
+    pub(crate) fn note(
+        &self,
+        names: &Interner,
+        args: &LayeredArena<ErrorArg>,
+        candidates: &LayeredArena<ErrorArgs>,
+    ) -> Option<Cow<'static, str>> {
+        let SemaError::UnresolvedRoutine {
+            schema,
+            name,
+            candidates: Some(ErrorCandidates { shown, total }),
+            ..
+        } = *self
+        else {
+            return None;
+        };
+        let message = ErrorMessage {
+            error: self,
+            names,
+            args,
+        };
+        let mut note = String::from("candidates are ");
+        for (i, candidate) in shown.iter().enumerate() {
+            if i > 0 {
+                note.push_str(", ");
+            }
+            write!(
+                note,
+                "`{}`",
+                message.signature(schema, name, candidates[candidate])
+            )
+            .unwrap();
+        }
+        let hidden = total - shown.len();
+        if hidden > 0 {
+            let s = if hidden == 1 { "" } else { "s" };
+            write!(note, ", and {hidden} other{s}").unwrap();
+        }
+        Some(Cow::Owned(note))
+    }
+
     pub(crate) fn message(
         &self,
         names: &Interner,
@@ -1876,6 +1923,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 lookup: _,
                 similar: _,
                 misplaced_order_by: _,
+                candidates: _,
             } => write!(
                 f,
                 "{} `{}` does not exist",

@@ -43,7 +43,7 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        DropRelation, ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName,
+        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, LookupKind, ObjectKind, OperandName,
         OperatorReplacement, SemaError, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
         ViewColumnRename, WindowClause,
     },
@@ -618,6 +618,17 @@ impl TypeLookup {
         match self {
             TypeLookup::Found(ty) => Some(ty),
             TypeLookup::Missing | TypeLookup::Unknown => None,
+        }
+    }
+}
+
+const MAX_CANDIDATES: usize = 5;
+
+fn call_kind(kind: RoutineKind) -> FunctionKind {
+    match kind {
+        RoutineKind::Procedure => FunctionKind::Procedure,
+        RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Routine => {
+            FunctionKind::Function
         }
     }
 }
@@ -9957,6 +9968,7 @@ impl Lowerer {
                                     lookup: LookupKind::Signature,
                                     similar,
                                     misplaced_order_by: false,
+                                    candidates: None,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -19140,7 +19152,12 @@ impl Lowerer {
             }
             return Resolution::Unknown;
         }
-        let similar = if misplaced_order_by {
+        let candidates = if misplaced_order_by {
+            None
+        } else {
+            self.routine_overloads(kind, schema, name)
+        };
+        let similar = if misplaced_order_by || candidates.is_some() {
             None
         } else {
             self.similar_function(schema, name, kind, LookupKind::Call)
@@ -19155,6 +19172,7 @@ impl Lowerer {
                 lookup: LookupKind::Call,
                 similar,
                 misplaced_order_by,
+                candidates,
             },
         );
         Resolution::Unknown
@@ -22133,6 +22151,54 @@ impl Lowerer {
             })
     }
 
+    fn routine_overloads(
+        &mut self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+    ) -> Option<ErrorCandidates> {
+        let mut functions = self.routine_candidates(schema, name, call_kind(kind));
+        let mut shown: SmallVec<[FunctionId; MAX_CANDIDATES]> =
+            functions.by_ref().take(MAX_CANDIDATES).collect();
+        let total = shown.len() + functions.count();
+        if total < 2 {
+            return None;
+        }
+        shown.sort_unstable();
+        let start = self.index.errors.candidates.next_idx();
+        for function in shown {
+            let args = self.candidate_args(function);
+            self.index.errors.candidates.alloc(args);
+        }
+        Some(ErrorCandidates {
+            shown: self.index.errors.candidates.range_from(start),
+            total,
+        })
+    }
+
+    fn candidate_args(&mut self, function: FunctionId) -> ErrorArgs {
+        let function = &self.index.functions[function];
+        let procedure = function.kind == FunctionKind::Procedure;
+        let params = function.params;
+        let start = self.index.errors.args.next_idx();
+        for param in params {
+            let param = &self.index.params[param];
+            if param.mode == ParamMode::Out && !procedure {
+                continue;
+            }
+            let variadic = param.mode == ParamMode::Variadic;
+            let ty = param.ty.map_or(OperandName::Unknown, |ty| {
+                OperandName::Ty(self.index.ty_name(ty))
+            });
+            self.index.errors.args.alloc(ErrorArg {
+                name: None,
+                ty,
+                variadic,
+            });
+        }
+        ErrorArgs::List(self.index.errors.args.range_from(start))
+    }
+
     fn call_mismatch(
         &self,
         kind: RoutineKind,
@@ -22141,13 +22207,7 @@ impl Lowerer {
         args: &[CallArg],
         arg_list: Option<&ast::ArgList>,
     ) -> Option<CallMismatchError> {
-        let kind_filter = match kind {
-            RoutineKind::Procedure => FunctionKind::Procedure,
-            RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Routine => {
-                FunctionKind::Function
-            }
-        };
-        let mut candidates = self.routine_candidates(schema, name, kind_filter);
+        let mut candidates = self.routine_candidates(schema, name, call_kind(kind));
         let (Some(function), None) = (candidates.next(), candidates.next()) else {
             return None;
         };

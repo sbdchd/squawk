@@ -32,6 +32,7 @@ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
        │                                            ━
        │
+       ├ note: candidates are `h(posint)`, `h(int4)`
        ╰ hint: consider adding explicit type casts
     ");
 }
