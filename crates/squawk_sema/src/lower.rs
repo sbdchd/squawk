@@ -44,9 +44,10 @@ use crate::{
         WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ConflictAction, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam,
-        LookupKind, ObjectKind, OperandName, OperatorReplacement, OutsideSearchPath, SemaError,
-        Similar, SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
+        ArgLabel, ConflictAction, ConflictTargetKey, DropRelation, ErrorArg, ErrorArgs,
+        ErrorCandidates, ErrorParam, LookupKind, ObjectKind, OperandName, OperatorReplacement,
+        OutsideSearchPath, SemaError, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
+        ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -14098,7 +14099,7 @@ impl Lowerer {
                     self.check_conflict_constraint(constraint, on_conflict, &name_ref);
                 }
             }
-            None => {}
+            None => self.check_missing_conflict_target(table, on_conflict),
         }
 
         let Some(action) = on_conflict.conflict_action() else {
@@ -19757,6 +19758,58 @@ impl Lowerer {
             name_ref.syntax(),
             SemaError::ExclusionConflictArbiter { action },
         );
+    }
+
+    fn check_missing_conflict_target(
+        &mut self,
+        table: Option<TableId>,
+        on_conflict: &ast::OnConflictClause,
+    ) {
+        let action = match on_conflict.conflict_action() {
+            Some(ast::ConflictAction::ConflictDoUpdateSet(_)) => ConflictAction::DoUpdate,
+            Some(ast::ConflictAction::ConflictDoSelect(_)) => ConflictAction::DoSelect,
+            Some(ast::ConflictAction::ConflictDoNothing(_)) | None => return,
+        };
+        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
+        else {
+            return;
+        };
+        let insert_at = conflict.text_range().end();
+        let key = table
+            .and_then(|table| self.conflict_target_key(table))
+            .map(|columns| ConflictTargetKey { columns, insert_at });
+        let range = TextRange::new(on.text_range().start(), insert_at);
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::MissingConflictTarget { action, key },
+        );
+    }
+
+    fn conflict_target_key(&mut self, table: TableId) -> Option<IdxRange<Name>> {
+        if self.function.is_some() || !self.keys_known(table) {
+            return None;
+        }
+        let mut found = None;
+        for id in self.index.indexes.on_table(table) {
+            let index = &self.index.indexes[id];
+            if !index.unique
+                || index.deferrable
+                || index.predicate.is_some()
+                || index.key.is_none()
+                || self.dropped_indexes.contains(&id)
+            {
+                continue;
+            }
+            if self.index.constraints.backed_by(id).any(|constraint| {
+                self.index.constraints[constraint].kind == ConstraintKind::PrimaryKey
+            }) {
+                found = Some(id);
+                break;
+            }
+            found.get_or_insert(id);
+        }
+        let key = self.index.indexes.key(found?)?;
+        Some(self.index.errors.names.alloc_many(key))
     }
 
     fn index_predicate_implied(

@@ -20,6 +20,12 @@ pub(crate) struct SimilarColumn {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ConflictTargetKey {
+    pub(crate) columns: IdxRange<Name>,
+    pub(crate) insert_at: TextSize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum SimilarType {
     Named(Name),
     Keyword(&'static str),
@@ -560,6 +566,10 @@ pub(crate) enum SemaError {
     DeferrableConflictArbiter,
     ExclusionConflictArbiter {
         action: ConflictAction,
+    },
+    MissingConflictTarget {
+        action: ConflictAction,
+        key: Option<ConflictTargetKey>,
     },
     RefreshConcurrentlyWithoutUniqueIndex {
         name: Name,
@@ -1140,7 +1150,8 @@ impl SemaError {
             }
             SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter
-            | SemaError::ExclusionConflictArbiter { .. } => DiagnosticKind::InvalidConflictArbiter,
+            | SemaError::ExclusionConflictArbiter { .. }
+            | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
@@ -1153,7 +1164,12 @@ impl SemaError {
         }
     }
 
-    pub(crate) fn suggestion(&self, range: TextRange, names: &Interner) -> Option<Suggestion> {
+    pub(crate) fn suggestion(
+        &self,
+        range: TextRange,
+        names: &Interner,
+        errors: &Errors,
+    ) -> Option<Suggestion> {
         let suggestion = match *self {
             SemaError::UnresolvedReference {
                 similar: Some(Similar::Column(similar)),
@@ -1317,6 +1333,26 @@ impl SemaError {
                     edits: vec![Edit::replace(keyword_range, kind.label())],
                 },
             },
+            SemaError::MissingConflictTarget {
+                key: Some(ConflictTargetKey { columns, insert_at }),
+                ..
+            } => {
+                let mut target = String::from("(");
+                for (i, column) in columns.iter().enumerate() {
+                    if i > 0 {
+                        target.push_str(", ");
+                    }
+                    target.push_str(&quote_ident(names.resolve(errors.names[column])));
+                }
+                target.push(')');
+                Suggestion {
+                    message: "specify the columns of a unique key".into(),
+                    fix: Fix {
+                        title: format!("Insert `{target}`").into(),
+                        edits: vec![Edit::insert(format!(" {target}"), insert_at)],
+                    },
+                }
+            }
             SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
                 message: "add an empty `over` clause to compute it over all rows".into(),
                 fix: Fix {
@@ -1434,6 +1470,9 @@ impl SemaError {
         match *self {
             SemaError::TypedTableAlter { .. } => {
                 Some("use `alter ... cascade` to alter the typed tables too")
+            }
+            SemaError::MissingConflictTarget { key: None, .. } => {
+                Some("specify a conflict target, like `on conflict (column_name)`")
             }
             SemaError::InsertMoreTargetsThanExpressions { row_hint } => row_hint.then_some(
                 "the insertion source is a row expression containing the same number of columns expected by the `insert`; consider removing the extra parentheses",
@@ -1800,6 +1839,9 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())
+            }
+            SemaError::MissingConflictTarget { action, .. } => {
+                write!(f, "{} requires a conflict target", action.label())
             }
             SemaError::ExclusionConflictArbiter { action } => write!(
                 f,

@@ -439,6 +439,103 @@ $$;
 }
 
 #[test]
+fn on_conflict_missing_target() {
+    assert_snapshot!(check(r#"
+create table t (
+  id int primary key,
+  b int
+);
+
+create table u (
+  a int,
+  "B c" int,
+  unique (a, "B c")
+);
+
+create table p (
+  a int unique,
+  b int
+);
+
+alter table p add primary key (b);
+
+create table n (
+  a int unique deferrable,
+  b int
+);
+
+create unique index on n (b) where b > 0;
+
+insert into t values (1) on conflict do update set b = 1;
+
+insert into u values (1) on conflict do update set a = 1;
+
+insert into p values (1) on conflict do update set a = 1;
+
+insert into n values (1) on conflict do update set a = 1;
+
+insert into t values (1) on conflict do select for update;
+
+insert into t values (1) on conflict do nothing;
+
+create function f() returns void
+  language sql
+  as $$
+  insert into t values (1) on conflict do update set b = 1;
+$$;
+"#), @r#"
+    error: `on conflict do update` requires a conflict target
+       ╭▸ 
+    27 │ insert into t values (1) on conflict do update set b = 1;
+       │                          ━━━━━━━━━━━
+       ╰╴
+    help: specify the columns of a unique key
+       ╭╴
+    27 │ insert into t values (1) on conflict (id) do update set b = 1;
+       ╰╴                                     ++++
+    error: `on conflict do update` requires a conflict target
+       ╭▸ 
+    29 │ insert into u values (1) on conflict do update set a = 1;
+       │                          ━━━━━━━━━━━
+       ╰╴
+    help: specify the columns of a unique key
+       ╭╴
+    29 │ insert into u values (1) on conflict (a, "B c") do update set a = 1;
+       ╰╴                                     ++++++++++
+    error: `on conflict do update` requires a conflict target
+       ╭▸ 
+    31 │ insert into p values (1) on conflict do update set a = 1;
+       │                          ━━━━━━━━━━━
+       ╰╴
+    help: specify the columns of a unique key
+       ╭╴
+    31 │ insert into p values (1) on conflict (b) do update set a = 1;
+       ╰╴                                     +++
+    error: `on conflict do update` requires a conflict target
+       ╭▸ 
+    33 │ insert into n values (1) on conflict do update set a = 1;
+       │                          ━━━━━━━━━━━
+       │
+       ╰ hint: specify a conflict target, like `on conflict (column_name)`
+    error: `on conflict do select` requires a conflict target
+       ╭▸ 
+    35 │ insert into t values (1) on conflict do select for update;
+       │                          ━━━━━━━━━━━
+       ╰╴
+    help: specify the columns of a unique key
+       ╭╴
+    35 │ insert into t values (1) on conflict (id) do select for update;
+       ╰╴                                     ++++
+    error: `on conflict do update` requires a conflict target
+       ╭▸ 
+    42 │   insert into t values (1) on conflict do update set b = 1;
+       │                            ━━━━━━━━━━━
+       │
+       ╰ hint: specify a conflict target, like `on conflict (column_name)`
+    "#);
+}
+
+#[test]
 fn on_conflict_without_matching_arbiter() {
     assert_snapshot!(check("
 create table t (
