@@ -89,6 +89,14 @@ impl CommonType {
         }
         self.common.map_or(ArgType::Untyped, ArgType::Known)
     }
+
+    pub(crate) fn resolve(self, overloads: &Overloads<'_>) -> Option<Ty> {
+        match self.finish() {
+            ArgType::Known(ty) => Some(ty),
+            ArgType::UnknownLiteral => overloads.builtin_types.text.map(Ty::Type),
+            ArgType::Untyped => None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

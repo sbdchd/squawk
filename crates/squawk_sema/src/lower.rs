@@ -18907,7 +18907,7 @@ impl Lowerer {
         for arg in args {
             common.push(&self.overloads(), arg.ty);
         }
-        common.finish().known()
+        common.resolve(&self.overloads())
     }
 
     fn lower_common_expr(&mut self, common: &mut CommonType, expr: &ast::Expr) {
@@ -20575,7 +20575,7 @@ impl Lowerer {
                 if let Some(expr) = case.else_clause().and_then(|clause| clause.expr()) {
                     self.lower_common_expr(&mut common, &expr);
                 }
-                return common.finish().known();
+                return common.resolve(&self.overloads());
             }
             ast::Expr::CastExpr(cast) => {
                 self.lower_exprs(cast.expr());

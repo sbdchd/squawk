@@ -320,3 +320,28 @@ select (nullif(1, 2)).x, (nullif(t, t)).zz from t;
       ╰╴                                        ━━
     ");
 }
+
+#[test]
+fn unknown_literal_branches_resolve_to_text() {
+    assert_snapshot!(check("
+select (coalesce('a', 'b')).x, (coalesce(null, null)).x;
+select (case when true then 'a' end).x, (case when true then null end).*;
+"), @"
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    2 │ select (coalesce('a', 'b')).x, (coalesce(null, null)).x;
+      ╰╴                            ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    2 │ select (coalesce('a', 'b')).x, (coalesce(null, null)).x;
+      ╰╴                                                      ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    3 │ select (case when true then 'a' end).x, (case when true then null end).*;
+      ╰╴                                     ━
+    error: type `text` is not a composite type
+      ╭▸ 
+    3 │ select (case when true then 'a' end).x, (case when true then null end).*;
+      ╰╴                                                                       ━
+    ");
+}
