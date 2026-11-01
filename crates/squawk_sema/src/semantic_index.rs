@@ -100,6 +100,7 @@ pub enum DiagnosticKind {
     MultiplePrimaryKeys,
     InvalidForeignKey,
     InvalidConflictArbiter,
+    MissingReturning,
     MissingUniqueIndex,
     UniqueIndexNotSupported,
     DuplicateFunction,
@@ -179,6 +180,7 @@ pub(crate) struct Errors {
     pub(crate) args: LayeredArena<ErrorArg>,
     pub(crate) candidates: LayeredArena<ErrorArgs>,
     pub(crate) params: LayeredArena<ErrorParam>,
+    pub(crate) names: LayeredArena<Name>,
 }
 
 impl Errors {
@@ -191,6 +193,7 @@ impl Errors {
         self.args.shrink_to_fit();
         self.candidates.shrink_to_fit();
         self.params.shrink_to_fit();
+        self.names.shrink_to_fit();
     }
 }
 
@@ -512,7 +515,9 @@ impl IndexData {
                 message: entry.error.message(&self.names, &self.errors),
                 hint: entry.error.hint().map(Cow::Borrowed),
                 note: entry.error.note(&self.names, &self.errors),
-                suggestion: entry.error.suggestion(entry.range.value, &self.names),
+                suggestion: entry
+                    .error
+                    .suggestion(entry.range.value, &self.names, &self.errors),
             })
             .collect();
         diagnostics.sort();

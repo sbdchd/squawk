@@ -181,12 +181,12 @@ update t for portion of valid_at (daterange('2020-01-01', nope3)) set b = 1;
 fn update_set_qualified_target() {
     assert_snapshot!(check("
 create type pair as (x int, y int);
-create table t(a int);
+create table t(a int unique);
 create table u(u pair);
 update t set t.a = 1;
 update t as x set x.a = 1, t.a = 2;
 update u set u.x = 1;
-insert into t values (1) on conflict do update set t.a = 2;
+insert into t values (1) on conflict (a) do update set t.a = 2;
 "), @"
     error: column `t` of relation `t` does not exist
       ╭▸ 
@@ -220,13 +220,13 @@ insert into t values (1) on conflict do update set t.a = 2;
       ╰╴
     error: column `t` of relation `t` does not exist
       ╭▸ 
-    8 │ insert into t values (1) on conflict do update set t.a = 2;
-      │                                                    ━━
+    8 │ insert into t values (1) on conflict (a) do update set t.a = 2;
+      │                                                        ━━
       ╰╴
     help: `set` target columns cannot be qualified with the relation name
       ╭╴
-    8 - insert into t values (1) on conflict do update set t.a = 2;
-    8 + insert into t values (1) on conflict do update set a = 2;
+    8 - insert into t values (1) on conflict (a) do update set t.a = 2;
+    8 + insert into t values (1) on conflict (a) do update set a = 2;
       ╰╴
     ");
 }
@@ -284,11 +284,11 @@ update t set a[1].x = 1, a[1].z = 2, a[1:2].x = 3, a[1][1:2].y = 4, a.x = 5;
 #[test]
 fn duplicate_assignment() {
     assert_snapshot!(check("
-create table t (a int[], b int);
+create table t (a int[], b int unique);
 update t set b = 1, b = 2;
 update t set (a, b) = (null, 1), b = 2;
 update t set a[1] = 1, a[2] = 2;
-insert into t values ('{1}', 2) on conflict do update set b = 1, b = 2;
+insert into t values ('{1}', 2) on conflict (b) do update set b = 1, b = 2;
 "), @"
     error: multiple assignments to same column `b`
       ╭▸ 
@@ -300,8 +300,8 @@ insert into t values ('{1}', 2) on conflict do update set b = 1, b = 2;
       ╰╴                                 ━
     error: multiple assignments to same column `b`
       ╭▸ 
-    6 │ insert into t values ('{1}', 2) on conflict do update set b = 1, b = 2;
-      ╰╴                                                                 ━
+    6 │ insert into t values ('{1}', 2) on conflict (b) do update set b = 1, b = 2;
+      ╰╴                                                                     ━
     ");
 }
 

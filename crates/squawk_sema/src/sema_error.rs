@@ -20,6 +20,12 @@ pub(crate) struct SimilarColumn {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ConflictTargetKey {
+    pub(crate) columns: IdxRange<Name>,
+    pub(crate) insert_at: TextSize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum SimilarType {
     Named(Name),
     Keyword(&'static str),
@@ -556,8 +562,28 @@ pub(crate) enum SemaError {
     DeferrableUniqueConstraintForReferencedTable {
         table: Name,
     },
-    NoConflictArbiter,
+    NoConflictArbiter {
+        foreign_table: bool,
+    },
     DeferrableConflictArbiter,
+    ConflictConstraintWithoutIndex,
+    WholeRowConflictTarget,
+    ConflictOnSystemCatalog,
+    ExclusionConflictArbiter {
+        action: ConflictAction,
+    },
+    MissingConflictTarget {
+        action: ConflictAction,
+        key: Option<ConflictTargetKey>,
+    },
+    DoSelectWithoutReturning {
+        returning_at: TextSize,
+    },
+    ConflictWithRules {
+        table: Name,
+        rule: Name,
+        event: ConflictRuleEvent,
+    },
     RefreshConcurrentlyWithoutUniqueIndex {
         name: Name,
     },
@@ -622,6 +648,36 @@ pub(crate) struct ViewColumnRename {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct DropRelation {
     pub(crate) keyword_range: Option<TextRange>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ConflictAction {
+    DoUpdate,
+    DoSelect,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ConflictRuleEvent {
+    Insert,
+    Update,
+}
+
+impl ConflictRuleEvent {
+    fn label(self) -> &'static str {
+        match self {
+            ConflictRuleEvent::Insert => "`on insert`",
+            ConflictRuleEvent::Update => "`on update`",
+        }
+    }
+}
+
+impl ConflictAction {
+    fn label(self) -> &'static str {
+        match self {
+            ConflictAction::DoUpdate => "`on conflict do update`",
+            ConflictAction::DoSelect => "`on conflict do select`",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1120,9 +1176,15 @@ impl SemaError {
             | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
                 DiagnosticKind::InvalidForeignKey
             }
-            SemaError::NoConflictArbiter | SemaError::DeferrableConflictArbiter => {
-                DiagnosticKind::InvalidConflictArbiter
-            }
+            SemaError::NoConflictArbiter { .. }
+            | SemaError::DeferrableConflictArbiter
+            | SemaError::ConflictConstraintWithoutIndex
+            | SemaError::ExclusionConflictArbiter { .. }
+            | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
+            SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
+            SemaError::ConflictWithRules { .. }
+            | SemaError::WholeRowConflictTarget
+            | SemaError::ConflictOnSystemCatalog => DiagnosticKind::FeatureNotSupported,
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
@@ -1135,7 +1197,12 @@ impl SemaError {
         }
     }
 
-    pub(crate) fn suggestion(&self, range: TextRange, names: &Interner) -> Option<Suggestion> {
+    pub(crate) fn suggestion(
+        &self,
+        range: TextRange,
+        names: &Interner,
+        errors: &Errors,
+    ) -> Option<Suggestion> {
         let suggestion = match *self {
             SemaError::UnresolvedReference {
                 similar: Some(Similar::Column(similar)),
@@ -1299,6 +1366,33 @@ impl SemaError {
                     edits: vec![Edit::replace(keyword_range, kind.label())],
                 },
             },
+            SemaError::MissingConflictTarget {
+                key: Some(ConflictTargetKey { columns, insert_at }),
+                ..
+            } => {
+                let mut target = String::from("(");
+                for (i, column) in columns.iter().enumerate() {
+                    if i > 0 {
+                        target.push_str(", ");
+                    }
+                    target.push_str(&quote_ident(names.resolve(errors.names[column])));
+                }
+                target.push(')');
+                Suggestion {
+                    message: "specify the columns of a unique key".into(),
+                    fix: Fix {
+                        title: format!("Insert `{target}`").into(),
+                        edits: vec![Edit::insert(format!(" {target}"), insert_at)],
+                    },
+                }
+            }
+            SemaError::DoSelectWithoutReturning { returning_at } => Suggestion {
+                message: "add a `returning` clause to return the conflicting rows".into(),
+                fix: Fix {
+                    title: "Insert `returning *`".into(),
+                    edits: vec![Edit::insert(" returning *", returning_at)],
+                },
+            },
             SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
                 message: "add an empty `over` clause to compute it over all rows".into(),
                 fix: Fix {
@@ -1417,6 +1511,15 @@ impl SemaError {
             SemaError::TypedTableAlter { .. } => {
                 Some("use `alter ... cascade` to alter the typed tables too")
             }
+            SemaError::ConflictConstraintWithoutIndex => Some(
+                "only primary key, unique, and exclusion constraints can be used as arbiters",
+            ),
+            SemaError::WholeRowConflictTarget => {
+                Some("list the columns of a unique index instead")
+            }
+            SemaError::MissingConflictTarget { key: None, .. } => {
+                Some("specify a conflict target, like `on conflict (column_name)`")
+            }
             SemaError::InsertMoreTargetsThanExpressions { row_hint } => row_hint.then_some(
                 "the insertion source is a row expression containing the same number of columns expected by the `insert`; consider removing the extra parentheses",
             ),
@@ -1530,12 +1633,27 @@ impl SemaError {
             SemaError::PositionalAfterNamed => {
                 Some("positional argument cannot follow named argument")
             }
-            SemaError::NoConflictArbiter => Some(
+            SemaError::NoConflictArbiter { .. } => Some(
                 "there is no unique or exclusion constraint matching the `on conflict` specification",
             ),
             SemaError::DeferrableConflictArbiter => Some(
                 "`on conflict` does not support deferrable unique constraints/exclusion constraints as arbiters",
             ),
+            SemaError::DoSelectWithoutReturning { .. } => {
+                Some("`on conflict do select` requires a `returning` clause")
+            }
+            SemaError::ConflictConstraintWithoutIndex => {
+                Some("constraint in `on conflict` clause has no associated index")
+            }
+            SemaError::ConflictWithRules { .. } => Some(
+                "`insert` with `on conflict` cannot be used with table that has `insert` or `update` rules",
+            ),
+            SemaError::WholeRowConflictTarget => {
+                Some("whole row unique index inference specifications are not supported")
+            }
+            SemaError::ConflictOnSystemCatalog => {
+                Some("`on conflict` is not supported with system catalog tables")
+            }
             SemaError::ValuesLengthMismatch => Some("`values` lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
                 Some("`insert` has more expressions than target columns")
@@ -1582,6 +1700,22 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::NoConflictArbiter {
+            foreign_table: true,
+        } = *self
+        {
+            return Some(Cow::Borrowed(
+                "foreign tables can't have unique or exclusion constraints",
+            ));
+        }
+        if let SemaError::ConflictWithRules { table, rule, event } = *self {
+            return Some(Cow::Owned(format!(
+                "`{}` has an {} rule `{}`",
+                names.resolve(table),
+                event.label(),
+                names.resolve(rule)
+            )));
+        }
         if let SemaError::UnresolvedRoutine {
             kind,
             name,
@@ -1779,10 +1913,23 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::UnnestColumnDefList
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
-            | SemaError::NoConflictArbiter
-            | SemaError::DeferrableConflictArbiter => {
+            | SemaError::NoConflictArbiter { .. }
+            | SemaError::DeferrableConflictArbiter
+            | SemaError::ConflictConstraintWithoutIndex
+            | SemaError::ConflictWithRules { .. }
+            | SemaError::WholeRowConflictTarget
+            | SemaError::ConflictOnSystemCatalog
+            | SemaError::DoSelectWithoutReturning { .. } => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
+            SemaError::MissingConflictTarget { action, .. } => {
+                write!(f, "{} requires a conflict target", action.label())
+            }
+            SemaError::ExclusionConflictArbiter { action } => write!(
+                f,
+                "{} not supported with exclusion constraints",
+                action.label()
+            ),
             SemaError::MisplacedAggregate { context } => write!(
                 f,
                 "aggregate functions are not allowed in {}",

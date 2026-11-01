@@ -34,18 +34,19 @@ use crate::{
         OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId, Param, ParamId,
         ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId, PreparedTransaction,
         PreparedTransactionId, Publication, PublicationId, Query, QueryId, QueryKind, RefId,
-        Reference, ReferenceKind, Resolution, Role, RoleId, RoutineKind, Rule, RuleEvent, RuleId,
-        Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner,
-        Server, ServerId, Source, SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript,
-        Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
-        TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
-        TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
-        Window, WindowClauses, WindowId,
+        Reference, ReferenceKind, Resolution, Role, RoleId, RoutineKind, Rule, RuleBehavior,
+        RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope,
+        ScopeId, SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind,
+        Star, Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
+        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
+        TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
+        TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind,
-        ObjectKind, OperandName, OperatorReplacement, OutsideSearchPath, SemaError, Similar,
-        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
+        ArgLabel, ConflictAction, ConflictRuleEvent, ConflictTargetKey, DropRelation, ErrorArg,
+        ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind, OperandName,
+        OperatorReplacement, OutsideSearchPath, SemaError, Similar, SimilarColumn, SimilarType,
+        TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -1023,6 +1024,7 @@ enum Undo {
     DropConstraint(ConstraintId),
     DropTrigger(TriggerId),
     DropRule(RuleId),
+    RuleEnabled(RuleId, RuleEnabled),
     DropRole(RoleId),
     DropPolicy(PolicyId),
     DropAccessMethod(AccessMethodId),
@@ -3159,6 +3161,9 @@ impl Lowerer {
                 }
                 Undo::DropRule(rule) => {
                     self.dropped_rules.remove(&rule);
+                }
+                Undo::RuleEnabled(rule, enabled) => {
+                    self.index.rules.set_enabled(rule, enabled);
                 }
                 Undo::DropRole(role) => {
                     self.dropped_roles.remove(&role);
@@ -13954,6 +13959,9 @@ impl Lowerer {
 
         if let Some(on_conflict) = insert.on_conflict_clause() {
             self.lower_on_conflict(id, target, &on_conflict);
+            if insert.returning_clause().is_none() {
+                self.check_do_select_returning(&on_conflict);
+            }
         }
         if let Some(returning_clause) = insert.returning_clause() {
             let columns = self.lower_returning(id, target, &returning_clause);
@@ -14039,6 +14047,9 @@ impl Lowerer {
             | SourceKind::ElementVariable
             | SourceKind::Other => None,
         });
+        if let Some(table) = table {
+            self.check_conflict_on_system_catalog(table, on_conflict);
+        }
         match on_conflict.conflict_target() {
             Some(ast::ConflictTarget::ConflictOnIndex(on_index)) => {
                 if let Some(table) = table {
@@ -14050,6 +14061,7 @@ impl Lowerer {
                     .flat_map(|list| list.conflict_index_items())
                 {
                     if let Some(expr) = item.expr() {
+                        self.check_whole_row_conflict_target(target, &expr);
                         self.lower_expr_in(ExprContext::IndexExpression, &expr);
                     }
                     if let Some(path) = item.op_class_ref().and_then(|op_class| op_class.path_ref())
@@ -14062,15 +14074,20 @@ impl Lowerer {
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
-                if let Some(name_ref) = on_constraint.constraint_name_ref() {
-                    self.lower_constraint_ref(
+                if let Some(name_ref) = on_constraint.constraint_name_ref()
+                    && let Some(constraint) = self.lower_constraint_ref(
                         table.map(ConstraintOwner::Table),
                         &name_ref,
                         IfMissing::Error,
-                    );
+                    )
+                {
+                    self.check_conflict_constraint(constraint, on_conflict, &name_ref);
                 }
             }
-            None => {}
+            None => self.check_missing_conflict_target(table, on_conflict),
+        }
+        if let Some(table) = table {
+            self.check_conflict_rules(table, on_conflict);
         }
 
         let Some(action) = on_conflict.conflict_action() else {
@@ -16049,25 +16066,25 @@ impl Lowerer {
                 }
                 ast::AlterTableAction::DisableRule(disable_rule) => {
                     if let Some(rule_ref) = disable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Disabled);
                     }
                     continue;
                 }
                 ast::AlterTableAction::EnableRule(enable_rule) => {
                     if let Some(rule_ref) = enable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Origin);
                     }
                     continue;
                 }
                 ast::AlterTableAction::EnableAlwaysRule(enable_rule) => {
                     if let Some(rule_ref) = enable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Always);
                     }
                     continue;
                 }
                 ast::AlterTableAction::EnableReplicaRule(enable_rule) => {
                     if let Some(rule_ref) = enable_rule.rule_ref() {
-                        self.lower_rule_ref(table, &rule_ref, IfMissing::Error);
+                        self.set_rule_enabled(table, &rule_ref, RuleEnabled::Replica);
                     }
                     continue;
                 }
@@ -17249,12 +17266,34 @@ impl Lowerer {
                 ast::RuleEventKind::Delete => RuleEvent::Delete,
             });
         if let (Some(table), Some(name), Some(event)) = (table, create_rule.rule(), event) {
+            let rule_do = create_rule.rule_do();
+            let instead = rule_do
+                .as_ref()
+                .is_some_and(|rule_do| rule_do.instead_token().is_some());
+            let conditional = create_rule
+                .rule_on()
+                .is_some_and(|rule_on| rule_on.where_clause().is_some());
+            let mode = match (instead, conditional) {
+                (false, _) => RuleMode::Also,
+                (true, false) => RuleMode::Instead,
+                (true, true) => RuleMode::ConditionalInstead,
+            };
+            let has_actions = match rule_do.and_then(|rule_do| rule_do.rule_action()) {
+                Some(ast::RuleAction::RuleStmt(_)) => true,
+                Some(ast::RuleAction::RuleStmtList(list)) => list.rule_stmts().next().is_some(),
+                Some(ast::RuleAction::Nothing(_)) | None => false,
+            };
             self.alloc_rule(
                 IfExists::from_or_replace(create_rule.or_replace().as_ref()),
                 create_rule.syntax(),
                 &name,
                 table,
-                event,
+                RuleBehavior {
+                    event,
+                    mode,
+                    has_actions,
+                },
+                RuleEnabled::Origin,
             );
         }
         self.depend_on_refs(refs, self.index.rules.range_from(start), Object::Rule);
@@ -17284,21 +17323,27 @@ impl Lowerer {
         node: &SyntaxNode,
         name_node: &impl NameLike,
         table: TableId,
-        event: RuleEvent,
+        behavior: RuleBehavior,
+        enabled: RuleEnabled,
     ) {
         let name = self.intern(&name_node.text());
+        let mut enabled = enabled;
         if let Some(existing) = self.find_rule(table, name) {
             match if_exists {
                 IfExists::Error | IfExists::Ignore => {
                     self.report_duplicate_rule(name_node.syntax(), name, table);
                 }
-                IfExists::Replace => self.drop_rule(existing),
+                IfExists::Replace => {
+                    enabled = self.index.rules[existing].enabled;
+                    self.drop_rule(existing);
+                }
             }
         }
         let id = self.index.rules.alloc(Rule {
             name,
             table,
-            event,
+            behavior,
+            enabled,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
@@ -17312,7 +17357,12 @@ impl Lowerer {
         self.index.rules.alloc(Rule {
             name,
             table,
-            event: RuleEvent::Select,
+            behavior: RuleBehavior {
+                event: RuleEvent::Select,
+                mode: RuleMode::Instead,
+                has_actions: true,
+            },
+            enabled: RuleEnabled::Origin,
             ptr,
             name_ptr,
         });
@@ -17321,6 +17371,22 @@ impl Lowerer {
     fn report_duplicate_rule(&mut self, name_node: &SyntaxNode, name: Name, table: TableId) {
         let table = self.index.tables[table].name;
         self.push_error(name_node, SemaError::DuplicateRule { name, table });
+    }
+
+    fn set_rule_enabled(
+        &mut self,
+        table: Option<TableId>,
+        rule_ref: &ast::RuleRef,
+        enabled: RuleEnabled,
+    ) {
+        let Some(rule) = self.lower_rule_ref(table, rule_ref, IfMissing::Error) else {
+            return;
+        };
+        if let Some(previous) = self.index.rules.set_enabled(rule, enabled)
+            && self.in_transaction()
+        {
+            self.undo.push(Undo::RuleEnabled(rule, previous));
+        }
     }
 
     fn lower_rule_ref(
@@ -17352,7 +17418,10 @@ impl Lowerer {
             return;
         };
         let Rule {
-            name, table, event, ..
+            name,
+            table,
+            behavior: RuleBehavior { event, .. },
+            ..
         } = self.index.rules[rule];
         let Table {
             kind, name: table, ..
@@ -17377,8 +17446,13 @@ impl Lowerer {
         if let Some(rule) = rule
             && let Some(name) = alter_rule.rule_rename_to().and_then(|rename| rename.rule())
         {
-            let Rule { table, event, .. } = self.index.rules[rule];
-            if event == RuleEvent::Select {
+            let Rule {
+                table,
+                behavior,
+                enabled,
+                ..
+            } = self.index.rules[rule];
+            if behavior.event == RuleEvent::Select {
                 self.push_error(name.syntax(), SemaError::RenameSelectRule);
                 return;
             }
@@ -17389,7 +17463,14 @@ impl Lowerer {
             }
             let moved = self.index.rules.next_idx();
             self.drop_rule(rule);
-            self.alloc_rule(IfExists::Error, alter_rule.syntax(), &name, table, event);
+            self.alloc_rule(
+                IfExists::Error,
+                alter_rule.syntax(),
+                &name,
+                table,
+                behavior,
+                enabled,
+            );
             self.record_moves(
                 Object::Rule(rule),
                 self.index.rules.range_from(moved),
@@ -19647,7 +19728,21 @@ impl Lowerer {
     }
 
     fn check_conflict_arbiter(&mut self, table: TableId, on_index: &ast::ConflictOnIndex) {
-        if self.function.is_some() || !self.keys_known(table) {
+        if self.function.is_some() {
+            return;
+        }
+        if self.index.tables[table].kind == TableKind::ForeignTable {
+            if let Some(list) = on_index.conflict_index_item_list() {
+                self.push_error(
+                    list.syntax(),
+                    SemaError::NoConflictArbiter {
+                        foreign_table: true,
+                    },
+                );
+            }
+            return;
+        }
+        if !self.keys_known(table) {
             return;
         }
         let table_columns = self.index.tables[table].columns;
@@ -19684,9 +19779,230 @@ impl Lowerer {
         let error = match found {
             Some(UniqueIndexMatch::Immediate) => return,
             Some(UniqueIndexMatch::Deferrable) => SemaError::DeferrableConflictArbiter,
-            None => SemaError::NoConflictArbiter,
+            None => SemaError::NoConflictArbiter {
+                foreign_table: false,
+            },
         };
         self.push_error(list.syntax(), error);
+    }
+
+    fn check_conflict_constraint(
+        &mut self,
+        constraint: ConstraintId,
+        on_conflict: &ast::OnConflictClause,
+        name_ref: &ast::ConstraintNameRef,
+    ) {
+        if self.function.is_some() {
+            return;
+        }
+        let Constraint { kind, index, .. } = self.index.constraints[constraint];
+        let action = match on_conflict.conflict_action() {
+            Some(ast::ConflictAction::ConflictDoUpdateSet(_)) => Some(ConflictAction::DoUpdate),
+            Some(ast::ConflictAction::ConflictDoSelect(_)) => Some(ConflictAction::DoSelect),
+            Some(ast::ConflictAction::ConflictDoNothing(_)) | None => None,
+        };
+        let has_index = match kind {
+            ConstraintKind::PrimaryKey | ConstraintKind::Unique | ConstraintKind::Exclude => true,
+            ConstraintKind::Check
+            | ConstraintKind::NotNull { .. }
+            | ConstraintKind::ForeignKey
+            | ConstraintKind::DomainNotNull => false,
+        };
+        let error = if !has_index {
+            SemaError::ConflictConstraintWithoutIndex
+        } else if let Some(action) = action
+            && kind == ConstraintKind::Exclude
+        {
+            SemaError::ExclusionConflictArbiter { action }
+        } else if index.is_some_and(|index| self.index.indexes[index].deferrable) {
+            SemaError::DeferrableConflictArbiter
+        } else {
+            return;
+        };
+        self.push_error(name_ref.syntax(), error);
+    }
+
+    fn check_conflict_on_system_catalog(
+        &mut self,
+        table: TableId,
+        on_conflict: &ast::OnConflictClause,
+    ) {
+        let Table { kind, schema, .. } = self.index.tables[table];
+        let is_table = match kind {
+            TableKind::Table => true,
+            TableKind::ForeignTable
+            | TableKind::View
+            | TableKind::MaterializedView
+            | TableKind::Sequence
+            | TableKind::PropertyGraph => false,
+        };
+        if !is_table || schema != self.pg_catalog || self.index.tables.is_local(table) {
+            return;
+        }
+        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
+        else {
+            return;
+        };
+        let range = TextRange::new(on.text_range().start(), conflict.text_range().end());
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::ConflictOnSystemCatalog,
+        );
+    }
+
+    fn check_whole_row_conflict_target(&mut self, target: Option<SourceId>, expr: &ast::Expr) {
+        let ast::Expr::NameRef(name_ref) = expr.unparen() else {
+            return;
+        };
+        if name_ref.sql_value_function().is_some() {
+            return;
+        }
+        let Some(target) = target else {
+            return;
+        };
+        if !self.index.sources[target].columns.complete {
+            return;
+        }
+        let Some(name) = self.name_ref_name(&name_ref) else {
+            return;
+        };
+        if self.resolve_name(name).resolution == Resolution::Source(target) {
+            self.push_error(name_ref.syntax(), SemaError::WholeRowConflictTarget);
+        }
+    }
+
+    fn check_conflict_rules(&mut self, table: TableId, on_conflict: &ast::OnConflictClause) {
+        if self.function.is_some() {
+            return;
+        }
+        let Table { kind, name, .. } = self.index.tables[table];
+        let mut auto_updatable_view = match kind {
+            TableKind::View => true,
+            TableKind::Table
+            | TableKind::ForeignTable
+            | TableKind::MaterializedView
+            | TableKind::Sequence
+            | TableKind::PropertyGraph => false,
+        };
+        let mut found = None;
+        for id in self.index.rules.get(table) {
+            if self.dropped_rules.contains(&id) {
+                continue;
+            }
+            let Rule {
+                name: rule,
+                behavior,
+                enabled,
+                ..
+            } = self.index.rules[id];
+            let event = match behavior.event {
+                RuleEvent::Insert => {
+                    match enabled {
+                        RuleEnabled::Origin | RuleEnabled::Always => {}
+                        RuleEnabled::Replica | RuleEnabled::Disabled => continue,
+                    }
+                    if behavior.mode == RuleMode::Instead {
+                        auto_updatable_view = false;
+                    }
+                    if !behavior.has_actions {
+                        continue;
+                    }
+                    ConflictRuleEvent::Insert
+                }
+                RuleEvent::Update => ConflictRuleEvent::Update,
+                RuleEvent::Select | RuleEvent::Delete => continue,
+            };
+            found.get_or_insert((rule, event));
+        }
+        if auto_updatable_view {
+            return;
+        }
+        let Some((rule, event)) = found else {
+            return;
+        };
+        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
+        else {
+            return;
+        };
+        let range = TextRange::new(on.text_range().start(), conflict.text_range().end());
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::ConflictWithRules {
+                table: name,
+                rule,
+                event,
+            },
+        );
+    }
+
+    fn check_do_select_returning(&mut self, on_conflict: &ast::OnConflictClause) {
+        let Some(ast::ConflictAction::ConflictDoSelect(do_select)) = on_conflict.conflict_action()
+        else {
+            return;
+        };
+        let (Some(do_token), Some(select)) = (do_select.do_token(), do_select.select_token())
+        else {
+            return;
+        };
+        let range = TextRange::new(do_token.text_range().start(), select.text_range().end());
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::DoSelectWithoutReturning {
+                returning_at: on_conflict.syntax().text_range().end(),
+            },
+        );
+    }
+
+    fn check_missing_conflict_target(
+        &mut self,
+        table: Option<TableId>,
+        on_conflict: &ast::OnConflictClause,
+    ) {
+        let action = match on_conflict.conflict_action() {
+            Some(ast::ConflictAction::ConflictDoUpdateSet(_)) => ConflictAction::DoUpdate,
+            Some(ast::ConflictAction::ConflictDoSelect(_)) => ConflictAction::DoSelect,
+            Some(ast::ConflictAction::ConflictDoNothing(_)) | None => return,
+        };
+        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
+        else {
+            return;
+        };
+        let insert_at = conflict.text_range().end();
+        let key = table
+            .and_then(|table| self.conflict_target_key(table))
+            .map(|columns| ConflictTargetKey { columns, insert_at });
+        let range = TextRange::new(on.text_range().start(), insert_at);
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::MissingConflictTarget { action, key },
+        );
+    }
+
+    fn conflict_target_key(&mut self, table: TableId) -> Option<IdxRange<Name>> {
+        if self.function.is_some() || !self.keys_known(table) {
+            return None;
+        }
+        let mut found = None;
+        for id in self.index.indexes.on_table(table) {
+            let index = &self.index.indexes[id];
+            if !index.unique
+                || index.deferrable
+                || index.partial
+                || index.key.is_none()
+                || self.dropped_indexes.contains(&id)
+            {
+                continue;
+            }
+            if self.index.constraints.backed_by(id).any(|constraint| {
+                self.index.constraints[constraint].kind == ConstraintKind::PrimaryKey
+            }) {
+                found = Some(id);
+                break;
+            }
+            found.get_or_insert(id);
+        }
+        let key = self.index.indexes.key(found?)?;
+        Some(self.index.errors.names.alloc_many(key))
     }
 
     fn keys_known(&self, table: TableId) -> bool {
