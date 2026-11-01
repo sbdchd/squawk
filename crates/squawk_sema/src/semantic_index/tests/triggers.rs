@@ -49,7 +49,7 @@ create trigger tr after insert on t
       ╭▸ 
     7 │   from missing_from
       ╰╴       ━━━━━━━━━━━━
-    error: function `f()` does not exist
+    error: function `f` takes 1 argument but 0 were supplied
       ╭▸ 
     8 │   for each row execute function f();
       ╰╴                                ━

@@ -50,7 +50,9 @@ use crate::{
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
-    overload::{ArgType, BuiltinTypes, CallArg, CommonType, Overloads},
+    overload::{
+        ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, CommonType, Overloads,
+    },
     postgres,
 };
 
@@ -618,6 +620,11 @@ impl TypeLookup {
             TypeLookup::Missing | TypeLookup::Unknown => None,
         }
     }
+}
+
+struct CallMismatchError {
+    error: SemaError,
+    arg: Option<ast::Arg>,
 }
 
 struct FunctionSource {
@@ -19123,6 +19130,16 @@ impl Lowerer {
             return Resolution::Unknown;
         }
         let misplaced_order_by = arg_list.is_some_and(Self::misplaced_order_by);
+        if !misplaced_order_by
+            && let Some(CallMismatchError { error, arg }) =
+                self.call_mismatch(kind, schema, name, args, arg_list)
+        {
+            match arg {
+                Some(arg) => self.push_error(arg.syntax(), error),
+                None => self.push_error(node, error),
+            }
+            return Resolution::Unknown;
+        }
         let similar = if misplaced_order_by {
             None
         } else {
@@ -22095,17 +22112,81 @@ impl Lowerer {
         args: &[CallArg],
         kind: FunctionKind,
     ) -> Resolution {
-        let candidates = self
-            .search_path(schema, Lookup::Function)
-            .flat_map(|schema| {
+        self.overloads()
+            .select(self.routine_candidates(schema, name, kind), args)
+    }
+
+    fn routine_candidates(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: FunctionKind,
+    ) -> impl Iterator<Item = FunctionId> {
+        self.search_path(schema, Lookup::Function)
+            .flat_map(move |schema| {
                 self.index.functions.named(schema, name).filter(move |id| {
                     let function = &self.index.functions[*id];
                     (function.kind == FunctionKind::Procedure) == (kind == FunctionKind::Procedure)
                         && self.visible(function.schema, function.ptr.file_id)
                         && !self.dropped_functions.contains(id)
                 })
-            });
-        self.overloads().select(candidates, args)
+            })
+    }
+
+    fn call_mismatch(
+        &self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+        arg_list: Option<&ast::ArgList>,
+    ) -> Option<CallMismatchError> {
+        let kind_filter = match kind {
+            RoutineKind::Procedure => FunctionKind::Procedure,
+            RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Routine => {
+                FunctionKind::Function
+            }
+        };
+        let mut candidates = self.routine_candidates(schema, name, kind_filter);
+        let (Some(function), None) = (candidates.next(), candidates.next()) else {
+            return None;
+        };
+        match self
+            .overloads()
+            .mismatch(&self.index.functions[function], args)?
+        {
+            CallMismatch::ArgCount(ArgCount { min, max }) => Some(CallMismatchError {
+                error: SemaError::ArgumentCountMismatch {
+                    kind,
+                    schema,
+                    name,
+                    min,
+                    max,
+                    supplied: args.len(),
+                },
+                arg: None,
+            }),
+            CallMismatch::ArgType(ArgMismatch {
+                position,
+                found,
+                expected,
+            }) => {
+                let arg = arg_list
+                    .filter(|list| list.args().count() == args.len())
+                    .and_then(|list| list.args().nth(position));
+                Some(CallMismatchError {
+                    error: SemaError::ArgumentTypeMismatch {
+                        kind,
+                        schema,
+                        name,
+                        position,
+                        found: self.index.ty_name(found),
+                        expected: self.index.ty_name(expected),
+                    },
+                    arg,
+                })
+            }
+        }
     }
 
     fn overloads(&self) -> Overloads<'_> {

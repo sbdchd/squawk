@@ -8,10 +8,10 @@ fn builtin_implicit_casts() {
 create function f(x bigint) returns int language sql return 1;
 select f(1), f(1.5);
 "), @"
-    error: function `f(numeric)` does not exist
+    error: argument 1 of `f` has type `numeric`, expected `int8`
       ╭▸ 
     3 │ select f(1), f(1.5);
-      │              ━
+      │                ━━━
       │
       ╰ hint: consider adding explicit type casts
     ");
@@ -34,22 +34,22 @@ select f(x) from t;
 drop cast (a as b);
 select f(x) from t;
 "), @"
-    error: function `f(a)` does not exist
+    error: argument 1 of `f` has type `a`, expected `b`
       ╭▸ 
     7 │ select f(x) from t;
-      │        ━
+      │          ━
       │
       ╰ hint: consider adding explicit type casts
-    error: function `f(a)` does not exist
+    error: argument 1 of `f` has type `a`, expected `b`
       ╭▸ 
     9 │ select f(x) from t;
-      │        ━
+      │          ━
       │
       ╰ hint: consider adding explicit type casts
-    error: function `f(a)` does not exist
+    error: argument 1 of `f` has type `a`, expected `b`
        ╭▸ 
     14 │ select f(x) from t;
-       │        ━
+       │          ━
        │
        ╰ hint: consider adding explicit type casts
     ");
@@ -75,16 +75,16 @@ select f(x) from t;
 rollback;
 select f(x) from t;
 "), @"
-    error: function `f(a)` does not exist
+    error: argument 1 of `f` has type `a`, expected `b`
        ╭▸ 
     11 │ select f(x) from t;
-       │        ━
+       │          ━
        │
        ╰ hint: consider adding explicit type casts
-    error: function `f(a)` does not exist
+    error: argument 1 of `f` has type `a`, expected `b`
        ╭▸ 
     15 │ select f(x) from t;
-       │        ━
+       │          ━
        │
        ╰ hint: consider adding explicit type casts
     ");

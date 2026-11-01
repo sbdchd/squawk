@@ -698,10 +698,10 @@ alter table t alter column a type int;
 rollback;
 select f(a) from t;
 "), @"
-    error: function `f(int4)` does not exist
+    error: argument 1 of `f` has type `int4`, expected `text`
       ╭▸ 
     4 │ select f(a) from t;
-      │        ━
+      │          ━
       │
       ╰ hint: consider adding explicit type casts
     ");

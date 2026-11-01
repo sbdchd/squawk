@@ -124,12 +124,10 @@ select old(1), cnt(*);
 create aggregate old (basetype = int, sfunc = add, stype = int);
 create aggregate old(int) (sfunc = add, stype = int);
 "#), @"
-    error: function `old(int4, int4)` does not exist
+    error: function `old` takes 1 argument but 2 were supplied
       ╭▸ 
     6 │ select old(1, 2);
-      │        ━━━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴       ━━━
     error: function `old(int4)` does not exist
       ╭▸ 
     9 │ select old(1), cnt(*);

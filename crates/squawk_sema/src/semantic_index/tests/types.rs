@@ -373,10 +373,10 @@ create table u (
 select '{a}'::_e, '{1}'::_int4, null::_t, f('{a}'::_e);
 select f('a'::e);
 "), @"
-    error: function `f(e)` does not exist
+    error: argument 1 of `f` has type `e`, expected `e[]`
        ╭▸ 
     14 │ select f('a'::e);
-       │        ━
+       │          ━━━━━━
        │
        ╰ hint: consider adding explicit type casts
     ");
@@ -437,10 +437,10 @@ create type _z as enum (
 rollback;
 select '{a}'::_z;
 "), @"
-    error: function `fx(_x)` does not exist
+    error: argument 1 of `fx` has type `_x`, expected `x[]`
        ╭▸ 
     13 │ select fx(null::_x);
-       │        ━━
+       │           ━━━━━━━━
        │
        ╰ hint: consider adding explicit type casts
     error: type `_y_1` does not exist

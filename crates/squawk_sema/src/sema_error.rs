@@ -338,6 +338,22 @@ pub(crate) enum SemaError {
         similar: Option<Name>,
         misplaced_order_by: bool,
     },
+    ArgumentTypeMismatch {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        position: usize,
+        found: TyName,
+        expected: TyName,
+    },
+    ArgumentCountMismatch {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        min: usize,
+        max: usize,
+        supplied: usize,
+    },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
         name: Name,
@@ -697,6 +713,13 @@ impl RoutineKind {
             RoutineKind::Routine => "routine",
         }
     }
+
+    fn call_label(self) -> &'static str {
+        match self {
+            RoutineKind::Routine => RoutineKind::Function.label(),
+            RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Procedure => self.label(),
+        }
+    }
 }
 
 impl ExprContext {
@@ -976,6 +999,8 @@ impl SemaError {
                 ambiguous: false, ..
             } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
+            SemaError::ArgumentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::ArgumentCountMismatch { .. } => DiagnosticKind::ArgumentCountMismatch,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
@@ -1333,6 +1358,7 @@ impl SemaError {
                     None
                 }
             },
+            SemaError::ArgumentTypeMismatch { .. } => Some("consider adding explicit type casts"),
             SemaError::ProcedureCalledAsFunction {
                 select_range: None,
                 ..
@@ -1460,6 +1486,15 @@ impl ErrorMessage<'_> {
         })
     }
 
+    fn qualified(&self, schema: Option<Name>, name: Name) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            if let Some(schema) = schema {
+                write!(f, "{}.", self.names.resolve(schema))?;
+            }
+            f.write_str(self.names.resolve(name))
+        })
+    }
+
     fn signature(
         &self,
         schema: Option<Name>,
@@ -1468,10 +1503,7 @@ impl ErrorMessage<'_> {
     ) -> impl fmt::Display + '_ {
         fmt::from_fn(move |f| {
             let n = |name| self.names.resolve(name);
-            if let Some(schema) = schema {
-                write!(f, "{}.", n(schema))?;
-            }
-            write!(f, "{}(", n(name))?;
+            write!(f, "{}(", self.qualified(schema, name))?;
             let args = match args {
                 ErrorArgs::List(args) => args,
                 ErrorArgs::Star => return f.write_str("*)"),
@@ -1844,17 +1876,49 @@ impl fmt::Display for ErrorMessage<'_> {
                 lookup: _,
                 similar: _,
                 misplaced_order_by: _,
+            } => write!(
+                f,
+                "{} `{}` does not exist",
+                kind.call_label(),
+                self.signature(schema, name, args)
+            ),
+            SemaError::ArgumentTypeMismatch {
+                kind: _,
+                schema,
+                name,
+                position,
+                found,
+                expected,
+            } => write!(
+                f,
+                "argument {} of `{}` has type `{}`, expected `{}`",
+                position + 1,
+                self.qualified(schema, name),
+                self.ty(found),
+                self.ty(expected)
+            ),
+            SemaError::ArgumentCountMismatch {
+                kind,
+                schema,
+                name,
+                min,
+                max,
+                supplied,
             } => {
-                let label = match kind {
-                    RoutineKind::Routine => RoutineKind::Function.label(),
-                    RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Procedure => {
-                        kind.label()
-                    }
+                let (bound, count) = if min == max {
+                    ("", min)
+                } else if supplied < min {
+                    ("at least ", min)
+                } else {
+                    ("at most ", max)
                 };
                 write!(
                     f,
-                    "{label} `{}` does not exist",
-                    self.signature(schema, name, args)
+                    "{} `{}` takes {bound}{count} argument{} but {supplied} {} supplied",
+                    kind.call_label(),
+                    self.qualified(schema, name),
+                    if count == 1 { "" } else { "s" },
+                    if supplied == 1 { "was" } else { "were" },
                 )
             }
             SemaError::ProcedureCalledAsFunction {

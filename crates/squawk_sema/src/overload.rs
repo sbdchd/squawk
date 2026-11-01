@@ -34,6 +34,25 @@ impl CallArg {
     }
 }
 
+#[derive(Debug, Clone, Copy)]
+pub(crate) enum CallMismatch {
+    ArgCount(ArgCount),
+    ArgType(ArgMismatch),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct ArgCount {
+    pub(crate) min: usize,
+    pub(crate) max: usize,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct ArgMismatch {
+    pub(crate) position: usize,
+    pub(crate) found: Ty,
+    pub(crate) expected: Ty,
+}
+
 pub(crate) struct CommonType {
     common: Option<Ty>,
     untyped: bool,
@@ -323,6 +342,37 @@ impl<'a> Overloads<'a> {
                 .all(|(arg, param)| self.arg_match(arg.ty, *param).is_some())
                 && self.solve(&params, args).is_some()
         })
+    }
+
+    pub(crate) fn mismatch(&self, function: &Function, args: &[CallArg]) -> Option<CallMismatch> {
+        if args.iter().any(|arg| arg.name.is_some() || arg.variadic) {
+            return None;
+        }
+        let inputs: SmallVec<[&Param; 8]> = self.inputs(function).collect();
+        if inputs.iter().any(|param| param.mode == ParamMode::Variadic) {
+            return None;
+        }
+        let min = inputs.iter().filter(|param| !param.has_default).count();
+        let max = inputs.len();
+        if args.len() < min || args.len() > max {
+            return Some(CallMismatch::ArgCount(ArgCount { min, max }));
+        }
+        args.iter()
+            .zip(&inputs)
+            .enumerate()
+            .find_map(|(position, (arg, param))| {
+                let ArgType::Known(found) = arg.ty else {
+                    return None;
+                };
+                let expected = param.ty?;
+                self.coerce(found, expected)
+                    .is_none()
+                    .then_some(CallMismatch::ArgType(ArgMismatch {
+                        position,
+                        found,
+                        expected,
+                    }))
+            })
     }
 
     pub(crate) fn missing_array_type(&self, function: &Function, args: &[CallArg]) -> Option<Ty> {

@@ -857,12 +857,10 @@ create procedure p(a int, out b int) language sql begin atomic select 1; end;
 call p(1, null);
 call p(1);
 "), @"
-    error: procedure `p(int4)` does not exist
+    error: procedure `p` takes 2 arguments but 1 was supplied
       ╭▸ 
     4 │ call p(1);
-      │      ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴     ━
     ");
 }
 
@@ -956,53 +954,74 @@ create aggregate k(a int, a int) (sfunc = sfn, stype = int);
 fn unresolved_function_arg_types() {
     assert_snapshot!(check("
 create function foo(x int) returns int as 'select 1' language sql;
+create function bar(a int, b int default 1) returns int as 'select 1' language sql;
 create procedure p(int) as 'select 1' language sql;
 select foo(1.5::float8);
 select foo(1, 'a');
+select foo();
+select bar();
+select bar(1, 2, 3);
+select bar(1, 'a'::text);
 select foo(y => 1);
 select public.foo(variadic array[1]);
 select nope();
 select lower(1);
 call p('a'::text);
 "), @"
-    error: function `foo(float8)` does not exist
+    error: argument 1 of `foo` has type `float8`, expected `int4`
       ╭▸ 
-    4 │ select foo(1.5::float8);
-      │        ━━━
+    5 │ select foo(1.5::float8);
+      │            ━━━━━━━━━━━
       │
       ╰ hint: consider adding explicit type casts
-    error: function `foo(int4, unknown)` does not exist
+    error: function `foo` takes 1 argument but 2 were supplied
       ╭▸ 
-    5 │ select foo(1, 'a');
-      │        ━━━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: function `foo(y => int4)` does not exist
+    6 │ select foo(1, 'a');
+      ╰╴       ━━━
+    error: function `foo` takes 1 argument but 0 were supplied
       ╭▸ 
-    6 │ select foo(y => 1);
-      │        ━━━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: function `public.foo(variadic int4[])` does not exist
+    7 │ select foo();
+      ╰╴       ━━━
+    error: function `bar` takes at least 1 argument but 0 were supplied
       ╭▸ 
-    7 │ select public.foo(variadic array[1]);
-      │               ━━━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: function `nope()` does not exist
+    8 │ select bar();
+      ╰╴       ━━━
+    error: function `bar` takes at most 2 arguments but 3 were supplied
       ╭▸ 
-    8 │ select nope();
-      ╰╴       ━━━━
-    error: function `lower(int4)` does not exist
-      ╭▸ 
-    9 │ select lower(1);
-      │        ━━━━━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: procedure `p(text)` does not exist
+    9 │ select bar(1, 2, 3);
+      ╰╴       ━━━
+    error: argument 2 of `bar` has type `text`, expected `int4`
        ╭▸ 
-    10 │ call p('a'::text);
-       │      ━
+    10 │ select bar(1, 'a'::text);
+       │               ━━━━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `foo(y => int4)` does not exist
+       ╭▸ 
+    11 │ select foo(y => 1);
+       │        ━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `public.foo(variadic int4[])` does not exist
+       ╭▸ 
+    12 │ select public.foo(variadic array[1]);
+       │               ━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `nope()` does not exist
+       ╭▸ 
+    13 │ select nope();
+       ╰╴       ━━━━
+    error: function `lower(int4)` does not exist
+       ╭▸ 
+    14 │ select lower(1);
+       │        ━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: argument 1 of `p` has type `text`, expected `int4`
+       ╭▸ 
+    15 │ call p('a'::text);
+       │        ━━━━━━━━━
        │
        ╰ hint: consider adding explicit type casts
     ");
@@ -1148,12 +1167,10 @@ create function app.do_thing2(int, int) returns int as 'select 1' language sql;
 select app.do_thing(1, 2);
 call app.do_thig();
 "), @"
-    error: function `app.do_thing(int4, int4)` does not exist
+    error: function `app.do_thing` takes 1 argument but 2 were supplied
       ╭▸ 
     5 │ select app.do_thing(1, 2);
-      │            ━━━━━━━━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴           ━━━━━━━━
     error: procedure `app.do_thig()` does not exist
       ╭▸ 
     6 │ call app.do_thig();
