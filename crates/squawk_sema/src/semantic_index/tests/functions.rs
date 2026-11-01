@@ -1341,3 +1341,50 @@ select foo(1, y => b) from t;
        ╰ hint: consider adding explicit type casts
     ");
 }
+
+#[test]
+fn variadic_call_mismatches() {
+    assert_snapshot!(check("
+create function v(a int, variadic b int[]) returns int language sql return a;
+create table t (x text);
+select v(1);
+select v(variadic array[1]);
+select v(1, 2, 'a'::text);
+select v(1, variadic array['a']);
+select v(a => 1, variadic b => array['a']);
+select v(1, 2, x) from t;
+"), @"
+    error: function `v` takes at least 2 arguments but 1 was supplied
+      ╭▸ 
+    4 │ select v(1);
+      ╰╴       ━
+    error: function `v` takes 2 arguments but 1 was supplied
+      ╭▸ 
+    5 │ select v(variadic array[1]);
+      ╰╴       ━
+    error: argument 3 of `v` has type `text`, expected `int4`
+      ╭▸ 
+    6 │ select v(1, 2, 'a'::text);
+      │                ━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument 2 of `v` has type `text[]`, expected `int4[]`
+      ╭▸ 
+    7 │ select v(1, variadic array['a']);
+      │             ━━━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `b` of `v` has type `text[]`, expected `int4[]`
+      ╭▸ 
+    8 │ select v(a => 1, variadic b => array['a']);
+      │                  ━━━━━━━━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument 3 of `v` has type `text`, expected `int4`
+      ╭▸ 
+    9 │ select v(1, 2, x) from t;
+      │                ━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}

@@ -354,15 +354,17 @@ impl<'a> Overloads<'a> {
     }
 
     pub(crate) fn mismatch(&self, function: &Function, args: &[CallArg]) -> Option<CallMismatch> {
-        if args.iter().any(|arg| arg.variadic) {
-            return None;
-        }
         let inputs: SmallVec<[&Param; 8]> = self.inputs(function).collect();
-        if inputs.iter().any(|param| param.mode == ParamMode::Variadic) {
-            return None;
-        }
+        let variadic = inputs
+            .last()
+            .is_some_and(|param| param.mode == ParamMode::Variadic);
+        let fixed = inputs.len() - usize::from(variadic);
         let min = inputs.iter().filter(|param| !param.has_default).count();
-        let max = inputs.len();
+        let max = if variadic && !args.iter().any(|arg| arg.variadic) {
+            usize::MAX
+        } else {
+            inputs.len()
+        };
         let count = CallMismatch::ArgCount(ArgCount { min, max });
         let named = args.iter().any(|arg| arg.name.is_some());
         if !named && (args.len() < min || args.len() > max) {
@@ -385,11 +387,27 @@ impl<'a> Overloads<'a> {
                     position
                 }
                 None if seen_named => return None,
-                None if i < inputs.len() => i,
+                None if i < fixed => i,
+                None if variadic => fixed,
                 None => return Some(count),
             };
+            let param = inputs[position];
+            if arg.variadic && param.mode != ParamMode::Variadic {
+                return None;
+            }
+            if param.mode == ParamMode::Variadic && arg.name.is_some() && !arg.variadic {
+                return None;
+            }
             assigned[position] = true;
-            params.push(inputs[position].ty);
+            let ty = match (param.mode, arg.name, arg.variadic) {
+                (ParamMode::Variadic, None, false) => {
+                    param.ty.and_then(|ty| self.variadic_element(ty))
+                }
+                (ParamMode::In | ParamMode::Out | ParamMode::InOut | ParamMode::Variadic, _, _) => {
+                    param.ty
+                }
+            };
+            params.push(ty);
         }
         let missing: SmallVec<[MissingParam; 2]> = inputs
             .iter()
