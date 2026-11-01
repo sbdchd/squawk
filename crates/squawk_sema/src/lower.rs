@@ -43,15 +43,16 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, LookupKind, ObjectKind, OperandName,
-        OperatorReplacement, SemaError, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
-        ViewColumnRename, WindowClause,
+        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind,
+        OperandName, OperatorReplacement, SemaError, Similar, SimilarColumn, SimilarType,
+        TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
     overload::{
-        ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, CommonType, Overloads,
+        ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, CommonType,
+        MissingParam, Overloads,
     },
     postgres,
 };
@@ -22249,16 +22250,19 @@ impl Lowerer {
     }
 
     fn call_mismatch(
-        &self,
+        &mut self,
         kind: RoutineKind,
         schema: Option<Name>,
         name: Name,
         args: &[CallArg],
         arg_list: Option<&ast::ArgList>,
     ) -> Option<CallMismatchError> {
-        let mut candidates = self.routine_candidates(schema, name, call_kind(kind));
-        let (Some(function), None) = (candidates.next(), candidates.next()) else {
-            return None;
+        let function = {
+            let mut candidates = self.routine_candidates(schema, name, call_kind(kind));
+            let (Some(function), None) = (candidates.next(), candidates.next()) else {
+                return None;
+            };
+            function
         };
         match self
             .overloads()
@@ -22293,6 +22297,24 @@ impl Lowerer {
                 },
                 target: call_arg_name(arg_list, args, arg),
             }),
+            CallMismatch::Missing(missing) => {
+                let start = self.index.errors.params.next_idx();
+                for MissingParam { name, position } in missing {
+                    self.index
+                        .errors
+                        .params
+                        .alloc(ErrorParam { name, position });
+                }
+                Some(CallMismatchError {
+                    error: SemaError::MissingArguments {
+                        kind,
+                        schema,
+                        name,
+                        missing: self.index.errors.params.range_from(start),
+                    },
+                    target: None,
+                })
+            }
             CallMismatch::ArgType(ArgMismatch {
                 position,
                 found,

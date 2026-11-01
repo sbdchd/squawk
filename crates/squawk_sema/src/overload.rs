@@ -34,11 +34,12 @@ impl CallArg {
     }
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub(crate) enum CallMismatch {
     ArgCount(ArgCount),
     UnknownName { arg: usize },
     PositionalAndNamed { arg: usize },
+    Missing(SmallVec<[MissingParam; 2]>),
     ArgType(ArgMismatch),
 }
 
@@ -46,6 +47,12 @@ pub(crate) enum CallMismatch {
 pub(crate) struct ArgCount {
     pub(crate) min: usize,
     pub(crate) max: usize,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct MissingParam {
+    pub(crate) name: Option<Name>,
+    pub(crate) position: usize,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -383,6 +390,19 @@ impl<'a> Overloads<'a> {
             };
             assigned[position] = true;
             params.push(inputs[position].ty);
+        }
+        let missing: SmallVec<[MissingParam; 2]> = inputs
+            .iter()
+            .zip(&assigned)
+            .enumerate()
+            .filter(|(_, (param, assigned))| !**assigned && !param.has_default)
+            .map(|(position, (param, _))| MissingParam {
+                name: param.name,
+                position,
+            })
+            .collect();
+        if !missing.is_empty() {
+            return Some(CallMismatch::Missing(missing));
         }
         if named {
             return None;

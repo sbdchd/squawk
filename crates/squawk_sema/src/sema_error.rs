@@ -81,6 +81,12 @@ pub(crate) enum ErrorArgs {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorParam {
+    pub(crate) name: Option<Name>,
+    pub(crate) position: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ErrorCandidates {
     pub(crate) shown: IdxRange<ErrorArgs>,
     pub(crate) total: usize,
@@ -376,6 +382,12 @@ pub(crate) enum SemaError {
         schema: Option<Name>,
         name: Name,
         arg: Name,
+    },
+    MissingArguments {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        missing: IdxRange<ErrorParam>,
     },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
@@ -1023,7 +1035,9 @@ impl SemaError {
             } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::ArgumentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
-            SemaError::ArgumentCountMismatch { .. } => DiagnosticKind::ArgumentCountMismatch,
+            SemaError::ArgumentCountMismatch { .. } | SemaError::MissingArguments { .. } => {
+                DiagnosticKind::ArgumentCountMismatch
+            }
             SemaError::UnknownArgumentName { .. } => DiagnosticKind::UnresolvedParam,
             SemaError::PositionalAfterNamed
             | SemaError::DuplicateArgumentName { .. }
@@ -2010,6 +2024,35 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(arg),
                 self.qualified(schema, name)
             ),
+            SemaError::MissingArguments {
+                kind,
+                schema,
+                name,
+                missing,
+            } => {
+                write!(
+                    f,
+                    "{} `{}` is missing required argument{} ",
+                    kind.call_label(),
+                    self.qualified(schema, name),
+                    if missing.len() == 1 { "" } else { "s" }
+                )?;
+                for (i, param) in missing.iter().enumerate() {
+                    if i > 0 {
+                        f.write_str(", ")?;
+                    }
+                    match self.errors.params[param] {
+                        ErrorParam {
+                            name: Some(name), ..
+                        } => write!(f, "`{}`", n(name))?,
+                        ErrorParam {
+                            name: None,
+                            position,
+                        } => write!(f, "`${}`", position + 1)?,
+                    }
+                }
+                Ok(())
+            }
             SemaError::ProcedureCalledAsFunction {
                 schema, name, args, ..
             } => write!(f, "`{}` is a procedure", self.signature(schema, name, args)),

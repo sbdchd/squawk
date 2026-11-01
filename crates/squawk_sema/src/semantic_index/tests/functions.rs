@@ -1243,3 +1243,43 @@ select foo(1, 2, y => 3);
       ╰╴                 ━
     ");
 }
+
+#[test]
+fn missing_required_args() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+create function w(int, b int) returns int language sql return 1;
+create function z(a int, b int, c int) returns int language sql return 1;
+select foo(y => 2);
+select w(b => 1);
+select z(b => 1);
+select z(1, c => 3);
+select z(1);
+select foo();
+"), @"
+    error: function `foo` is missing required argument `x`
+      ╭▸ 
+    5 │ select foo(y => 2);
+      ╰╴       ━━━
+    error: function `w` is missing required argument `$1`
+      ╭▸ 
+    6 │ select w(b => 1);
+      ╰╴       ━
+    error: function `z` is missing required arguments `a`, `c`
+      ╭▸ 
+    7 │ select z(b => 1);
+      ╰╴       ━
+    error: function `z` is missing required argument `b`
+      ╭▸ 
+    8 │ select z(1, c => 3);
+      ╰╴       ━
+    error: function `z` takes 3 arguments but 1 was supplied
+      ╭▸ 
+    9 │ select z(1);
+      ╰╴       ━
+    error: function `foo` takes at least 1 argument but 0 were supplied
+       ╭▸ 
+    10 │ select foo();
+       ╰╴       ━━━
+    ");
+}
