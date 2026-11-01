@@ -45,10 +45,11 @@ pub(crate) enum CallMismatch {
     ArgType(ArgMismatch),
 }
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone)]
 pub(crate) struct ArgCount {
     pub(crate) min: usize,
     pub(crate) max: usize,
+    pub(crate) missing: SmallVec<[MissingParam; 2]>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -367,10 +368,19 @@ impl<'a> Overloads<'a> {
         } else {
             inputs.len()
         };
-        let count = CallMismatch::ArgCount(ArgCount { min, max });
         let named = args.iter().any(|arg| arg.name.is_some());
         if !named && (args.len() < min || args.len() > max) {
-            return Some(count);
+            let missing = inputs
+                .iter()
+                .enumerate()
+                .skip(args.len())
+                .filter(|(_, param)| !param.has_default)
+                .map(|(position, param)| MissingParam {
+                    name: param.name,
+                    position,
+                })
+                .collect();
+            return Some(CallMismatch::ArgCount(ArgCount { min, max, missing }));
         }
         let mut assigned: SmallVec<[bool; 8]> = smallvec![false; inputs.len()];
         let mut params: SmallVec<[Option<Ty>; 8]> = SmallVec::with_capacity(args.len());
@@ -391,7 +401,13 @@ impl<'a> Overloads<'a> {
                 None if seen_named => return None,
                 None if i < fixed => i,
                 None if variadic => fixed,
-                None => return Some(count),
+                None => {
+                    return Some(CallMismatch::ArgCount(ArgCount {
+                        min,
+                        max,
+                        missing: smallvec![],
+                    }));
+                }
             };
             let param = inputs[position];
             if arg.variadic && param.mode != ParamMode::Variadic {

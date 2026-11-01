@@ -381,6 +381,7 @@ pub(crate) enum SemaError {
         min: usize,
         max: usize,
         supplied: usize,
+        missing: IdxRange<ErrorParam>,
     },
     PositionalAfterNamed,
     DuplicateArgumentName {
@@ -1604,6 +1605,16 @@ impl SemaError {
             };
             return Some(Cow::Owned(note));
         }
+        if let SemaError::ArgumentCountMismatch { missing, .. } = *self
+            && !missing.is_empty()
+        {
+            let message = ErrorMessage {
+                error: self,
+                names,
+                errors,
+            };
+            return Some(Cow::Owned(format!("missing {}", message.params(missing))));
+        }
         let SemaError::UnresolvedRoutine {
             schema,
             name,
@@ -1710,6 +1721,26 @@ impl ErrorMessage<'_> {
                 write!(f, "{}", self.operand(arg.ty))?;
             }
             f.write_str(")")
+        })
+    }
+
+    fn params(&self, params: IdxRange<ErrorParam>) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            for (i, param) in params.iter().enumerate() {
+                if i > 0 {
+                    f.write_str(", ")?;
+                }
+                match self.errors.params[param] {
+                    ErrorParam {
+                        name: Some(name), ..
+                    } => write!(f, "`{}`", self.names.resolve(name))?,
+                    ErrorParam {
+                        name: None,
+                        position,
+                    } => write!(f, "`${}`", position + 1)?,
+                }
+            }
+            Ok(())
         })
     }
 
@@ -2096,6 +2127,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 min,
                 max,
                 supplied,
+                missing: _,
             } => {
                 let (bound, count) = if min == max {
                     ("", min)
@@ -2152,21 +2184,7 @@ impl fmt::Display for ErrorMessage<'_> {
                     self.qualified(schema, name),
                     if missing.len() == 1 { "" } else { "s" }
                 )?;
-                for (i, param) in missing.iter().enumerate() {
-                    if i > 0 {
-                        f.write_str(", ")?;
-                    }
-                    match self.errors.params[param] {
-                        ErrorParam {
-                            name: Some(name), ..
-                        } => write!(f, "`{}`", n(name))?,
-                        ErrorParam {
-                            name: None,
-                            position,
-                        } => write!(f, "`${}`", position + 1)?,
-                    }
-                }
-                Ok(())
+                write!(f, "{}", self.params(missing))
             }
             SemaError::NotVariadic {
                 kind: _,

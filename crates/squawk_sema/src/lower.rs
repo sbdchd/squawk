@@ -22329,6 +22329,17 @@ impl Lowerer {
             })
     }
 
+    fn alloc_error_params(&mut self, missing: SmallVec<[MissingParam; 2]>) -> IdxRange<ErrorParam> {
+        let start = self.index.errors.params.next_idx();
+        for MissingParam { name, position } in missing {
+            self.index
+                .errors
+                .params
+                .alloc(ErrorParam { name, position });
+        }
+        self.index.errors.params.range_from(start)
+    }
+
     fn call_mismatch(
         &mut self,
         kind: RoutineKind,
@@ -22348,7 +22359,7 @@ impl Lowerer {
             .overloads()
             .mismatch(&self.index.functions[function], args)?
         {
-            CallMismatch::ArgCount(ArgCount { min, max }) => Some(CallMismatchError {
+            CallMismatch::ArgCount(ArgCount { min, max, missing }) => Some(CallMismatchError {
                 error: SemaError::ArgumentCountMismatch {
                     kind,
                     schema,
@@ -22356,6 +22367,7 @@ impl Lowerer {
                     min,
                     max,
                     supplied: args.len(),
+                    missing: self.alloc_error_params(missing),
                 },
                 target: None,
             }),
@@ -22377,24 +22389,15 @@ impl Lowerer {
                 },
                 target: call_arg_name(arg_list, args, arg),
             }),
-            CallMismatch::Missing(missing) => {
-                let start = self.index.errors.params.next_idx();
-                for MissingParam { name, position } in missing {
-                    self.index
-                        .errors
-                        .params
-                        .alloc(ErrorParam { name, position });
-                }
-                Some(CallMismatchError {
-                    error: SemaError::MissingArguments {
-                        kind,
-                        schema,
-                        name,
-                        missing: self.index.errors.params.range_from(start),
-                    },
-                    target: None,
-                })
-            }
+            CallMismatch::Missing(missing) => Some(CallMismatchError {
+                error: SemaError::MissingArguments {
+                    kind,
+                    schema,
+                    name,
+                    missing: self.alloc_error_params(missing),
+                },
+                target: None,
+            }),
             CallMismatch::NotVariadic { arg } => Some(CallMismatchError {
                 error: SemaError::NotVariadic {
                     kind,

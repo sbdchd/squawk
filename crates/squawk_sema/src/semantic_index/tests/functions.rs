@@ -858,7 +858,9 @@ call p(1);
     error: procedure `p` takes 2 arguments but 1 was supplied
       ╭▸ 
     4 │ call p(1);
-      ╰╴     ━
+      │      ━
+      │
+      ╰ note: missing `b`
     ");
 }
 
@@ -979,11 +981,15 @@ call p('a'::text);
     error: function `foo` takes 1 argument but 0 were supplied
       ╭▸ 
     7 │ select foo();
-      ╰╴       ━━━
+      │        ━━━
+      │
+      ╰ note: missing `x`
     error: function `bar` takes at least 1 argument but 0 were supplied
       ╭▸ 
     8 │ select bar();
-      ╰╴       ━━━
+      │        ━━━
+      │
+      ╰ note: missing `a`
     error: function `bar` takes at most 2 arguments but 3 were supplied
       ╭▸ 
     9 │ select bar(1, 2, 3);
@@ -1304,11 +1310,15 @@ select foo();
     error: function `z` takes 3 arguments but 1 was supplied
       ╭▸ 
     9 │ select z(1);
-      ╰╴       ━
+      │        ━
+      │
+      ╰ note: missing `b`, `c`
     error: function `foo` takes at least 1 argument but 0 were supplied
        ╭▸ 
     10 │ select foo();
-       ╰╴       ━━━
+       │        ━━━
+       │
+       ╰ note: missing `x`
     ");
 }
 
@@ -1385,11 +1395,15 @@ select v(1, 2, x) from t;
     error: function `v` takes at least 2 arguments but 1 was supplied
       ╭▸ 
     4 │ select v(1);
-      ╰╴       ━
+      │        ━
+      │
+      ╰ note: missing `b`
     error: function `v` takes 2 arguments but 1 was supplied
       ╭▸ 
     5 │ select v(variadic array[1]);
-      ╰╴       ━
+      │        ━
+      │
+      ╰ note: missing `b`
     error: argument 3 of `v` has type `text`, expected `int4`
       ╭▸ 
     6 │ select v(1, 2, 'a'::text);
@@ -1438,5 +1452,28 @@ select v(variadic a => 1);
       ╭▸ 
     6 │ select v(variadic a => 1);
       ╰╴         ━━━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn positional_count_names_missing() {
+    assert_snapshot!(check("
+create function d(a int, b int, c int default 1) returns int language sql return 1;
+create function u(int, int) returns int language sql return 1;
+select d();
+select u(1);
+"), @"
+    error: function `d` takes at least 2 arguments but 0 were supplied
+      ╭▸ 
+    4 │ select d();
+      │        ━
+      │
+      ╰ note: missing `a`, `b`
+    error: function `u` takes 2 arguments but 1 was supplied
+      ╭▸ 
+    5 │ select u(1);
+      │        ━
+      │
+      ╰ note: missing `$2`
     ");
 }

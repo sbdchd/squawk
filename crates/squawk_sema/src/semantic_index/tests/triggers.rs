@@ -52,7 +52,9 @@ create trigger tr after insert on t
     error: function `f` takes 1 argument but 0 were supplied
       ╭▸ 
     8 │   for each row execute function f();
-      ╰╴                                ━
+      │                                 ━
+      │
+      ╰ note: missing `$1`
     ");
 }
 
