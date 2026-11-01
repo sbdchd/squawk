@@ -625,6 +625,7 @@ select
       /* before sort */ v /* before over closing */
   ),
   json_array(),
+  json_array(returning jsonb),
   json_array(1, 2 format json returning jsonb),
   json_array(
     first_very_long_json_array_expression,

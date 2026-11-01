@@ -307,15 +307,15 @@ create function k(x anyelement, y anyarray) returns anyarray language sql return
 create table t (a int, c int[]);
 select f(c), f(variadic c), g(c), h(c), h(a), k(a, c) from t;
 "), @"
-    error: could not find array type for data type `int4[]`
+    error: could not find array type for type `int4[]`
       ╭▸ 
     7 │ select f(c), f(variadic c), g(c), h(c), h(a), k(a, c) from t;
       ╰╴       ━
-    error: could not find array type for data type `int4[]`
+    error: could not find array type for type `int4[]`
       ╭▸ 
     7 │ select f(c), f(variadic c), g(c), h(c), h(a), k(a, c) from t;
       ╰╴                            ━
-    error: could not find array type for data type `int4[]`
+    error: could not find array type for type `int4[]`
       ╭▸ 
     7 │ select f(c), f(variadic c), g(c), h(c), h(a), k(a, c) from t;
       ╰╴                                  ━

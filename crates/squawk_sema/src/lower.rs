@@ -18904,6 +18904,7 @@ impl Lowerer {
 
     fn keyword_call_type(
         &mut self,
+        call: &ast::CallExpr,
         keyword: ast::FunctionLikeKeyword,
         args: &[CallArg],
     ) -> Option<Ty> {
@@ -18914,8 +18915,28 @@ impl Lowerer {
             ast::FunctionLikeKeyword::Nullif => self.nullif_type(args),
             ast::FunctionLikeKeyword::Grouping => self.builtin_type("int4"),
             ast::FunctionLikeKeyword::MergeAction => self.builtin_type("text"),
-            ast::FunctionLikeKeyword::XmlConcat => self.builtin_type("xml"),
+            ast::FunctionLikeKeyword::XmlConcat => self.xmlconcat_type(call, args),
         }
+    }
+
+    fn xmlconcat_type(&mut self, call: &ast::CallExpr, args: &[CallArg]) -> Option<Ty> {
+        let xml = self.builtin_type("xml")?;
+        for (arg, node) in args
+            .iter()
+            .zip(call.arg_list().into_iter().flat_map(|list| list.args()))
+        {
+            if let ArgType::Known(found) = arg.ty
+                && self.overloads().rejects_arg(arg.ty, xml)
+            {
+                let error = SemaError::KeywordArgType {
+                    keyword: "xmlconcat",
+                    expected: self.index.ty_name(xml),
+                    found: self.index.ty_name(found),
+                };
+                self.push_error(node.syntax(), error);
+            }
+        }
+        Some(xml)
     }
 
     fn nullif_type(&self, args: &[CallArg]) -> Option<Ty> {
@@ -20506,7 +20527,7 @@ impl Lowerer {
             ast::Expr::CallExpr(call) => {
                 let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
                 if let Some(keyword) = call_function_like_keyword(call) {
-                    return self.keyword_call_type(keyword, &args);
+                    return self.keyword_call_type(call, keyword, &args);
                 }
                 if ty.is_some() {
                     return ty;
@@ -22544,7 +22565,7 @@ impl Lowerer {
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
         let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
         if let Some(keyword) = call_function_like_keyword(call) {
-            let ty = self.keyword_call_type(keyword, &args);
+            let ty = self.keyword_call_type(call, keyword, &args);
             return self.expr_field_base(ty);
         }
         if ty.is_some() {

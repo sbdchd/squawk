@@ -880,6 +880,10 @@ impl<'a> Overloads<'a> {
         })
     }
 
+    pub(crate) fn rejects_arg(&self, arg: ArgType, param: Ty) -> bool {
+        self.arg_match(arg, Some(param)).is_none()
+    }
+
     pub(crate) fn is_string(&self, ty: ArgType) -> bool {
         match ty {
             ArgType::Known(ty) => self.category(ty) == Some(Category::String),

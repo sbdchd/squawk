@@ -65,3 +65,26 @@ select k(f(x, '1')), f(x::int2, '1') from t;
       ╰╴                     ━
     ");
 }
+
+#[test]
+fn xmlconcat_args_must_be_xml() {
+    assert_snapshot!(check("
+create domain d as xml;
+create table t (
+  a int,
+  b text,
+  c xml,
+  e d
+);
+select xmlconcat(c, e, '<a/>', null), xmlconcat(a), xmlconcat(c, b) from t;
+"), @"
+    error: argument of `xmlconcat` must be type `xml`, not type `int4`
+      ╭▸ 
+    9 │ select xmlconcat(c, e, '<a/>', null), xmlconcat(a), xmlconcat(c, b) from t;
+      ╰╴                                                ━
+    error: argument of `xmlconcat` must be type `xml`, not type `text`
+      ╭▸ 
+    9 │ select xmlconcat(c, e, '<a/>', null), xmlconcat(a), xmlconcat(c, b) from t;
+      ╰╴                                                                 ━
+    ");
+}

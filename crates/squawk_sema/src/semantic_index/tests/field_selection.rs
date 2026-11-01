@@ -514,7 +514,7 @@ select
   (json_object()).x,
   (json_object(returning jsonb)).x,
   (json_array()).x,
-  (json_array( returning jsonb)).x,
+  (json_array(returning jsonb)).x,
   (json('1')).x,
   (json_scalar(1)).x,
   (json_serialize('1'::json)).x,
@@ -542,8 +542,8 @@ from (values ('a', 1)) as t (k, v);
       ╰╴                 ━
     error: column notation `.x` applied to type `jsonb`, which is not a composite type
       ╭▸ 
-    6 │   (json_array( returning jsonb)).x,
-      ╰╴                                 ━
+    6 │   (json_array(returning jsonb)).x,
+      ╰╴                                ━
     error: column notation `.x` applied to type `json`, which is not a composite type
       ╭▸ 
     7 │   (json('1')).x,

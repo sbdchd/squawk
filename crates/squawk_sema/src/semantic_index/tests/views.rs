@@ -460,7 +460,7 @@ select c from v;
       ╭╴
     6 + alter view v rename column b to c;
       ╰╴
-    error: cannot change data type of view column `a` from `int4` to `text`
+    error: cannot change type of view column `a` from `int4` to `text`
       ╭▸ 
     7 │ create or replace view v as select a::text, b from t;
       ╰╴                                   ━

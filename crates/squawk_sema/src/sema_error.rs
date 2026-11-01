@@ -491,6 +491,11 @@ pub(crate) enum SemaError {
     MissingArrayType {
         ty: TyName,
     },
+    KeywordArgType {
+        keyword: &'static str,
+        expected: TyName,
+        found: TyName,
+    },
     WindowOverride {
         name: Name,
         clause: WindowClause,
@@ -1027,6 +1032,7 @@ impl SemaError {
             SemaError::UniqueIndexNotSupported { .. } => DiagnosticKind::UniqueIndexNotSupported,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
+            SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
             SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
             SemaError::ConflictingNullability { .. } => DiagnosticKind::ConflictingNullability,
         }
@@ -1880,7 +1886,7 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
                 f,
-                "cannot change data type of view column `{}` from `{}` to `{}`",
+                "cannot change type of view column `{}` from `{}` to `{}`",
                 n(column),
                 self.ty(from),
                 self.ty(to)
@@ -2061,11 +2067,19 @@ impl fmt::Display for ErrorMessage<'_> {
                     clause.label()
                 )
             }
-            SemaError::MissingArrayType { ty } => write!(
+            SemaError::KeywordArgType {
+                keyword,
+                expected,
+                found,
+            } => write!(
                 f,
-                "could not find array type for data type `{}`",
-                self.ty(ty)
+                "argument of `{keyword}` must be type `{}`, not type `{}`",
+                self.ty(expected),
+                self.ty(found)
             ),
+            SemaError::MissingArrayType { ty } => {
+                write!(f, "could not find array type for type `{}`", self.ty(ty))
+            }
             SemaError::WindowOverride { name, clause } => write!(
                 f,
                 "cannot override {} clause of window `{}`",
