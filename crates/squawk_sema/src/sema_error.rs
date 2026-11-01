@@ -93,6 +93,12 @@ pub(crate) struct ErrorParam {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct OutsideSearchPath {
+    pub(crate) schema: Name,
+    pub(crate) others: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ErrorCandidates {
     pub(crate) shown: IdxRange<ErrorArgs>,
     pub(crate) total: usize,
@@ -357,6 +363,7 @@ pub(crate) enum SemaError {
         misplaced_order_by: bool,
         candidates: Option<ErrorCandidates>,
         unknown_names: bool,
+        outside_search_path: Option<OutsideSearchPath>,
     },
     ArgumentTypeMismatch {
         kind: RoutineKind,
@@ -1416,6 +1423,10 @@ impl SemaError {
             } => Some("`order by` must appear after all regular arguments of the aggregate"),
             SemaError::UnresolvedRoutine {
                 similar: Some(_), ..
+            }
+            | SemaError::UnresolvedRoutine {
+                outside_search_path: Some(_),
+                ..
             } => None,
             SemaError::UnresolvedRoutine {
                 kind,
@@ -1545,6 +1556,29 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::UnresolvedRoutine {
+            kind,
+            name,
+            outside_search_path: Some(OutsideSearchPath { schema, others }),
+            ..
+        } = *self
+        {
+            let label = kind.call_label();
+            let name = names.resolve(name);
+            let schema = names.resolve(schema);
+            let note = match others {
+                0 => format!(
+                    "a {label} named `{name}` exists in schema `{schema}`, which is not in the `search_path`"
+                ),
+                others => {
+                    let s = if others == 1 { "" } else { "s" };
+                    format!(
+                        "a {label} named `{name}` exists in schema `{schema}` and {others} other{s}, none of which are in the `search_path`"
+                    )
+                }
+            };
+            return Some(Cow::Owned(note));
+        }
         let SemaError::UnresolvedRoutine {
             schema,
             name,
@@ -2008,6 +2042,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 misplaced_order_by: _,
                 candidates: _,
                 unknown_names: _,
+                outside_search_path: _,
             } => write!(
                 f,
                 "{} `{}` does not exist",

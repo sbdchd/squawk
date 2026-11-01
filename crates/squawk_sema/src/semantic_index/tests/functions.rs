@@ -697,7 +697,9 @@ alter function s.f() set schema nope;
     error: function `f()` does not exist
       ╭▸ 
     5 │ select f();
-      ╰╴       ━
+      │        ━
+      │
+      ╰ note: a function named `f` exists in schema `s`, which is not in the `search_path`
     error: schema `nope` does not exist
       ╭▸ 
     7 │ alter function s.f() set schema nope;

@@ -497,3 +497,55 @@ commit;
 select $01;
 "), @"$user, public");
 }
+
+#[test]
+fn function_outside_search_path() {
+    assert_snapshot!(check("
+create schema app;
+create schema other;
+create function app.do_thing(int) returns int language sql return 1;
+create function app.twice() returns int language sql return 1;
+create function other.twice() returns int language sql return 1;
+create procedure app.run() language sql as '';
+select do_thing(1);
+select do_thing('a'::text);
+select twice();
+call run();
+select app.do_thnig(1);
+"), @"
+    error: function `do_thing(int4)` does not exist
+      ╭▸ 
+    8 │ select do_thing(1);
+      │        ━━━━━━━━
+      │
+      ╰ note: a function named `do_thing` exists in schema `app`, which is not in the `search_path`
+    error: function `do_thing(text)` does not exist
+      ╭▸ 
+    9 │ select do_thing('a'::text);
+      │        ━━━━━━━━
+      │
+      ╰ note: a function named `do_thing` exists in schema `app`, which is not in the `search_path`
+    error: function `twice()` does not exist
+       ╭▸ 
+    10 │ select twice();
+       │        ━━━━━
+       │
+       ╰ note: a function named `twice` exists in schema `app` and 1 other, none of which are in the `search_path`
+    error: procedure `run()` does not exist
+       ╭▸ 
+    11 │ call run();
+       │      ━━━
+       │
+       ╰ note: a procedure named `run` exists in schema `app`, which is not in the `search_path`
+    error: function `app.do_thnig(int4)` does not exist
+       ╭▸ 
+    12 │ select app.do_thnig(1);
+       │            ━━━━━━━━
+       ╰╴
+    help: a function with a similar name exists
+       ╭╴
+    12 - select app.do_thnig(1);
+    12 + select app.do_thing(1);
+       ╰╴
+    ");
+}

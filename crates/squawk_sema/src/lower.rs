@@ -44,8 +44,8 @@ use crate::{
     },
     sema_error::{
         ArgLabel, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind,
-        ObjectKind, OperandName, OperatorReplacement, SemaError, Similar, SimilarColumn,
-        SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
+        ObjectKind, OperandName, OperatorReplacement, OutsideSearchPath, SemaError, Similar,
+        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -10025,6 +10025,7 @@ impl Lowerer {
                                     misplaced_order_by: false,
                                     candidates: None,
                                     unknown_names: false,
+                                    outside_search_path: None,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -19215,7 +19216,13 @@ impl Lowerer {
         } else {
             self.routine_overloads(kind, schema, name)
         };
-        let similar = if misplaced_order_by || candidates.is_some() {
+        let outside_search_path = if schema.is_none() && candidates.is_none() {
+            self.outside_search_path(kind, name)
+        } else {
+            None
+        };
+        let similar = if misplaced_order_by || candidates.is_some() || outside_search_path.is_some()
+        {
             None
         } else {
             self.similar_function(schema, name, kind, LookupKind::Call)
@@ -19234,6 +19241,7 @@ impl Lowerer {
                 misplaced_order_by,
                 candidates,
                 unknown_names,
+                outside_search_path,
             },
         );
         Resolution::Unknown
@@ -22258,6 +22266,35 @@ impl Lowerer {
             });
         }
         ErrorArgs::List(self.index.errors.args.range_from(start))
+    }
+
+    fn outside_search_path(&self, kind: RoutineKind, name: Name) -> Option<OutsideSearchPath> {
+        let kind = call_kind(kind);
+        let mut schemas = self
+            .index
+            .schemas
+            .iter()
+            .filter(|(id, _)| !self.dropped_schemas.contains(id))
+            .map(|(_, schema)| schema.name)
+            .filter(|schema| {
+                *schema != self.pg_temp
+                    && !self
+                        .search_path(None, Lookup::Function)
+                        .any(|path| path == *schema)
+            })
+            .filter(|schema| {
+                self.index.functions.named(*schema, name).any(|id| {
+                    let function = &self.index.functions[id];
+                    (function.kind == FunctionKind::Procedure) == (kind == FunctionKind::Procedure)
+                        && self.visible(function.schema, function.ptr.file_id)
+                        && !self.dropped_functions.contains(&id)
+                })
+            });
+        let schema = schemas.next()?;
+        Some(OutsideSearchPath {
+            schema,
+            others: schemas.count(),
+        })
     }
 
     fn accepts_arg_names(
