@@ -564,6 +564,7 @@ pub(crate) enum SemaError {
     },
     NoConflictArbiter,
     DeferrableConflictArbiter,
+    ConflictConstraintWithoutIndex,
     ExclusionConflictArbiter {
         action: ConflictAction,
     },
@@ -1153,6 +1154,7 @@ impl SemaError {
             }
             SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter
+            | SemaError::ConflictConstraintWithoutIndex
             | SemaError::ExclusionConflictArbiter { .. }
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
@@ -1482,6 +1484,9 @@ impl SemaError {
             SemaError::TypedTableAlter { .. } => {
                 Some("use `alter ... cascade` to alter the typed tables too")
             }
+            SemaError::ConflictConstraintWithoutIndex => Some(
+                "only primary key, unique, and exclusion constraints can be used as arbiters",
+            ),
             SemaError::MissingConflictTarget { key: None, .. } => {
                 Some("specify a conflict target, like `on conflict (column_name)`")
             }
@@ -1606,6 +1611,9 @@ impl SemaError {
             ),
             SemaError::DoSelectWithoutReturning { .. } => {
                 Some("`on conflict do select` requires a `returning` clause")
+            }
+            SemaError::ConflictConstraintWithoutIndex => {
+                Some("constraint in `on conflict` clause has no associated index")
             }
             SemaError::ValuesLengthMismatch => Some("`values` lists must all be the same length"),
             SemaError::InsertMoreExpressionsThanTargets => {
@@ -1852,6 +1860,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter
             | SemaError::DeferrableConflictArbiter
+            | SemaError::ConflictConstraintWithoutIndex
             | SemaError::DoSelectWithoutReturning { .. } => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }

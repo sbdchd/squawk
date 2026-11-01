@@ -19756,7 +19756,16 @@ impl Lowerer {
             Some(ast::ConflictAction::ConflictDoSelect(_)) => Some(ConflictAction::DoSelect),
             Some(ast::ConflictAction::ConflictDoNothing(_)) | None => None,
         };
-        let error = if let Some(action) = action
+        let has_index = match kind {
+            ConstraintKind::PrimaryKey | ConstraintKind::Unique | ConstraintKind::Exclude => true,
+            ConstraintKind::Check
+            | ConstraintKind::NotNull { .. }
+            | ConstraintKind::ForeignKey
+            | ConstraintKind::DomainNotNull => false,
+        };
+        let error = if !has_index {
+            SemaError::ConflictConstraintWithoutIndex
+        } else if let Some(action) = action
             && kind == ConstraintKind::Exclude
         {
             SemaError::ExclusionConflictArbiter { action }

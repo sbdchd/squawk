@@ -491,6 +491,48 @@ $$;
 }
 
 #[test]
+fn on_conflict_on_constraint_without_index() {
+    assert_snapshot!(check("
+create table p (id int primary key);
+
+create table t (
+  a int primary key,
+  b int,
+  c int not null,
+  constraint t_b check (b > 0),
+  constraint t_fk foreign key (b) references p
+);
+
+insert into t values (1) on conflict on constraint t_b do nothing;
+
+insert into t values (1) on conflict on constraint t_fk do update set b = 1;
+
+insert into t values (1) on conflict on constraint t_c_not_null do nothing;
+
+insert into t values (1) on conflict on constraint t_pkey do nothing;
+"), @"
+    error: constraint in `on conflict` clause has no associated index
+       ╭▸ 
+    12 │ insert into t values (1) on conflict on constraint t_b do nothing;
+       │                                                    ━━━
+       │
+       ╰ hint: only primary key, unique, and exclusion constraints can be used as arbiters
+    error: constraint in `on conflict` clause has no associated index
+       ╭▸ 
+    14 │ insert into t values (1) on conflict on constraint t_fk do update set b = 1;
+       │                                                    ━━━━
+       │
+       ╰ hint: only primary key, unique, and exclusion constraints can be used as arbiters
+    error: constraint in `on conflict` clause has no associated index
+       ╭▸ 
+    16 │ insert into t values (1) on conflict on constraint t_c_not_null do nothing;
+       │                                                    ━━━━━━━━━━━━
+       │
+       ╰ hint: only primary key, unique, and exclusion constraints can be used as arbiters
+    ");
+}
+
+#[test]
 fn on_conflict_do_select_without_returning() {
     assert_snapshot!(check("
 create table t (a int primary key);
