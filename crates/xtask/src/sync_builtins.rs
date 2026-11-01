@@ -338,7 +338,7 @@ select
   json_agg(
     json_build_object(
       'name', a.attname,
-      'data_type', format_type(a.atttypid, a.atttypmod),
+      'ty', format_type(a.atttypid, a.atttypmod),
       'not_null', a.attnotnull,
       'default', coalesce(pg_get_expr(ad.adbin, ad.adrelid), ''),
       'identity', a.attidentity,
@@ -666,7 +666,7 @@ select
   json_agg(
     json_build_object(
       'name', a.attname,
-      'data_type', format_type(a.atttypid, a.atttypmod)
+      'ty', format_type(a.atttypid, a.atttypmod)
     ) order by a.attnum
   ) as columns
 from pg_type t
@@ -1029,7 +1029,7 @@ struct OperatorClassQuery {
     schema: String,
     name: String,
     is_default: i32,
-    data_type: String,
+    ty: String,
     access_method: String,
     family: String,
     storage_type: String,
@@ -1046,7 +1046,7 @@ select
   end as schema,
   quote_ident(c.opcname) as name,
   case when c.opcdefault then 1 else 0 end as is_default,
-  format_type(c.opcintype, null) as data_type,
+  format_type(c.opcintype, null) as ty,
   quote_ident(a.amname) as access_method,
   case
     when fn.oid = ext.extnamespace then ''
@@ -1480,7 +1480,7 @@ trait WriteSql {
 #[derive(Clone, Deserialize)]
 struct Column {
     name: String,
-    data_type: String,
+    ty: String,
     #[serde(default)]
     not_null: bool,
     #[serde(default)]
@@ -1606,7 +1606,7 @@ struct OperatorClassDef {
     schema: String,
     name: String,
     default: bool,
-    data_type: String,
+    ty: String,
     access_method: String,
     family: String,
     storage_type: String,
@@ -1625,7 +1625,7 @@ impl WriteSql for OperatorClassDef {
         writeln!(
             f,
             "for type {} using {} family {} as storage {};",
-            self.data_type, self.access_method, self.family, self.storage_type
+            self.ty, self.access_method, self.family, self.storage_type
         )?;
         writeln!(f)?;
         Ok(())
@@ -1978,7 +1978,7 @@ impl WriteSql for CompositeTypeDef {
             } else {
                 ""
             };
-            writeln!(f, "  {} {}{comma}", column.name, column.data_type)?;
+            writeln!(f, "  {} {}{comma}", column.name, column.ty)?;
         }
         writeln!(f, ");")?;
         writeln!(f)?;
@@ -1999,7 +1999,7 @@ impl WriteSql for TableDef {
         write_description(f, &self.description)?;
         writeln!(f, "create table {}{} (", self.schema, self.name)?;
         for (index, column) in self.columns.iter().enumerate() {
-            write!(f, "  {} {}", column.name, column.data_type)?;
+            write!(f, "  {} {}", column.name, column.ty)?;
             if !column.identity.is_empty() {
                 let mode = if column.identity == "a" {
                     "always"
@@ -2070,7 +2070,7 @@ impl WriteSql for ViewDef {
             } else {
                 ""
             };
-            writeln!(f, "    null::{}{comma}", column.data_type)?;
+            writeln!(f, "    null::{}{comma}", column.ty)?;
         }
         writeln!(f, ";")?;
         writeln!(f)?;
@@ -3031,7 +3031,7 @@ fn query_operator_classes(modules: &mut BTreeMap<String, Module>) -> Result<()> 
                 schema: row.schema,
                 name: row.name,
                 default: row.is_default == 1,
-                data_type: row.data_type,
+                ty: row.ty,
                 access_method: row.access_method,
                 family: row.family,
                 storage_type: row.storage_type,
