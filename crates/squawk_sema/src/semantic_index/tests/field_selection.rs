@@ -374,3 +374,20 @@ select (grouping(a)).x from t group by a;
       ╰╴                     ━
     ");
 }
+
+#[test]
+fn merge_action_field_selection() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+merge into t
+using t as s on t.a = s.a
+when matched then
+  delete
+returning (merge_action()).x;
+"), @"
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    7 │ returning (merge_action()).x;
+      ╰╴                           ━
+    ");
+}

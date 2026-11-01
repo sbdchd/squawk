@@ -18903,7 +18903,7 @@ impl Lowerer {
             | ast::FunctionLikeKeyword::Least => self.common_args_type(args),
             ast::FunctionLikeKeyword::Nullif => self.nullif_type(args),
             ast::FunctionLikeKeyword::Grouping => self.builtin_type("int4"),
-            ast::FunctionLikeKeyword::MergeAction => None,
+            ast::FunctionLikeKeyword::MergeAction => self.builtin_type("text"),
         }
     }
 
