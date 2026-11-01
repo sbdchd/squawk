@@ -558,6 +558,9 @@ pub(crate) enum SemaError {
     },
     NoConflictArbiter,
     DeferrableConflictArbiter,
+    ExclusionConflictArbiter {
+        action: ConflictAction,
+    },
     RefreshConcurrentlyWithoutUniqueIndex {
         name: Name,
     },
@@ -622,6 +625,21 @@ pub(crate) struct ViewColumnRename {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct DropRelation {
     pub(crate) keyword_range: Option<TextRange>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ConflictAction {
+    DoUpdate,
+    DoSelect,
+}
+
+impl ConflictAction {
+    fn label(self) -> &'static str {
+        match self {
+            ConflictAction::DoUpdate => "`on conflict do update`",
+            ConflictAction::DoSelect => "`on conflict do select`",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1120,9 +1138,9 @@ impl SemaError {
             | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
                 DiagnosticKind::InvalidForeignKey
             }
-            SemaError::NoConflictArbiter | SemaError::DeferrableConflictArbiter => {
-                DiagnosticKind::InvalidConflictArbiter
-            }
+            SemaError::NoConflictArbiter
+            | SemaError::DeferrableConflictArbiter
+            | SemaError::ExclusionConflictArbiter { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => {
                 DiagnosticKind::MissingUniqueIndex
             }
@@ -1783,6 +1801,11 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::DeferrableConflictArbiter => {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
+            SemaError::ExclusionConflictArbiter { action } => write!(
+                f,
+                "{} not supported with exclusion constraints",
+                action.label()
+            ),
             SemaError::MisplacedAggregate { context } => write!(
                 f,
                 "aggregate functions are not allowed in {}",

@@ -388,6 +388,57 @@ on conflict (email) where removed_at is not null do nothing;
 }
 
 #[test]
+fn on_conflict_exclusion_constraint() {
+    assert_snapshot!(check("
+create table ex (
+  a int,
+  b int unique,
+  exclude using btree (a with =)
+);
+
+alter table ex add constraint ex_b_excl exclude using btree (b with =);
+
+insert into ex
+values (1)
+on conflict on constraint ex_a_excl do update set a = 2;
+
+insert into ex
+values (1)
+on conflict on constraint ex_b_excl do update set a = 2;
+
+insert into ex
+values (1)
+on conflict on constraint ex_a_excl do select
+returning *;
+
+insert into ex values (1) on conflict on constraint ex_a_excl do nothing;
+
+insert into ex
+values (1)
+on conflict on constraint ex_b_key do update set a = 2;
+
+create function f() returns void
+  language sql
+  as $$
+  insert into ex values (1) on conflict on constraint ex_a_excl do update set a = 2;
+$$;
+"), @"
+    error: `on conflict do update` not supported with exclusion constraints
+       ╭▸ 
+    12 │ on conflict on constraint ex_a_excl do update set a = 2;
+       ╰╴                          ━━━━━━━━━
+    error: `on conflict do update` not supported with exclusion constraints
+       ╭▸ 
+    16 │ on conflict on constraint ex_b_excl do update set a = 2;
+       ╰╴                          ━━━━━━━━━
+    error: `on conflict do select` not supported with exclusion constraints
+       ╭▸ 
+    20 │ on conflict on constraint ex_a_excl do select
+       ╰╴                          ━━━━━━━━━
+    ");
+}
+
+#[test]
 fn on_conflict_without_matching_arbiter() {
     assert_snapshot!(check("
 create table t (

@@ -44,9 +44,9 @@ use crate::{
         WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind,
-        ObjectKind, OperandName, OperatorReplacement, OutsideSearchPath, SemaError, Similar,
-        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
+        ArgLabel, ConflictAction, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam,
+        LookupKind, ObjectKind, OperandName, OperatorReplacement, OutsideSearchPath, SemaError,
+        Similar, SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -14088,12 +14088,14 @@ impl Lowerer {
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
-                if let Some(name_ref) = on_constraint.constraint_name_ref() {
-                    self.lower_constraint_ref(
+                if let Some(name_ref) = on_constraint.constraint_name_ref()
+                    && let Some(constraint) = self.lower_constraint_ref(
                         table.map(ConstraintOwner::Table),
                         &name_ref,
                         IfMissing::Error,
-                    );
+                    )
+                {
+                    self.check_conflict_constraint(constraint, on_conflict, &name_ref);
                 }
             }
             None => {}
@@ -19733,6 +19735,28 @@ impl Lowerer {
             None => SemaError::NoConflictArbiter,
         };
         self.push_error(list.syntax(), error);
+    }
+
+    fn check_conflict_constraint(
+        &mut self,
+        constraint: ConstraintId,
+        on_conflict: &ast::OnConflictClause,
+        name_ref: &ast::ConstraintNameRef,
+    ) {
+        if self.function.is_some()
+            || self.index.constraints[constraint].kind != ConstraintKind::Exclude
+        {
+            return;
+        }
+        let action = match on_conflict.conflict_action() {
+            Some(ast::ConflictAction::ConflictDoUpdateSet(_)) => ConflictAction::DoUpdate,
+            Some(ast::ConflictAction::ConflictDoSelect(_)) => ConflictAction::DoSelect,
+            Some(ast::ConflictAction::ConflictDoNothing(_)) | None => return,
+        };
+        self.push_error(
+            name_ref.syntax(),
+            SemaError::ExclusionConflictArbiter { action },
+        );
     }
 
     fn index_predicate_implied(
