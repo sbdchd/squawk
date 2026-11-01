@@ -12,16 +12,16 @@ create function g(x anynonarray) returns int language sql return 1;
 create table t (a ints, b posint);
 select f(a), f(b), g(a), g(b) from t;
 "), @"
-    error: function `f(posint)` does not exist
+    error: argument 1 of `f` has type `posint`, expected `anyarray`
       ╭▸ 
     7 │ select f(a), f(b), g(a), g(b) from t;
-      │              ━
+      │                ━
       │
       ╰ hint: consider adding explicit type casts
-    error: function `g(ints)` does not exist
+    error: argument 1 of `g` has type `ints`, expected `anynonarray`
       ╭▸ 
     7 │ select f(a), f(b), g(a), g(b) from t;
-      │                    ━
+      │                      ━
       │
       ╰ hint: consider adding explicit type casts
     ");
@@ -160,10 +160,10 @@ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
       │                                              ━
       │
       ╰ hint: consider adding explicit type casts
-    error: function `h(int4[], int4[])` does not exist
+    error: argument 1 of `h` has type `int4[]`, expected `anycompatiblenonarray`
       ╭▸ 
     6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
-      │                                                                ━
+      │                                                                  ━
       │
       ╰ hint: consider adding explicit type casts
     ");
@@ -223,22 +223,22 @@ create table t (a int, b bigint, d int[]);
 select is_int(id(a)), is_ints(wrap(a)), is_int(first(d)), is_bigint(pick(a, b)),
   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
 "), @"
-    error: function `is_text(int4)` does not exist
+    error: argument 1 of `is_text` has type `int4`, expected `text`
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
-       │   ━━━━━━━
+       │           ━━━━━
        │
        ╰ hint: consider adding explicit type casts
-    error: function `is_text(int4)` does not exist
+    error: argument 1 of `is_text` has type `int4`, expected `text`
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
-       │                   ━━━━━━━
+       │                           ━━━━━━━━
        │
        ╰ hint: consider adding explicit type casts
-    error: function `is_int(int8)` does not exist
+    error: argument 1 of `is_int` has type `int8`, expected `int4`
        ╭▸ 
     12 │   is_text(id(a)), is_text(first(d)), is_int(pick(a, b)) from t;
-       │                                      ━━━━━━
+       │                                             ━━━━━━━━━━
        │
        ╰ hint: consider adding explicit type casts
     ");
@@ -253,10 +253,10 @@ create function is_text(x text) returns int language sql return 1;
 create table t (r int4range);
 select is_int(lower(r)), is_mr(multirange(r)), is_text(lower(r)) from t;
 "), @"
-    error: function `is_text(int4)` does not exist
+    error: argument 1 of `is_text` has type `int4`, expected `text`
       ╭▸ 
     6 │ select is_int(lower(r)), is_mr(multirange(r)), is_text(lower(r)) from t;
-      │                                                ━━━━━━━
+      │                                                        ━━━━━━━━
       │
       ╰ hint: consider adding explicit type casts
     ");
@@ -270,10 +270,10 @@ create function is_text(x text) returns int language sql return 1;
 create function is_int(x int) returns int language sql return 1;
 select is_text(pick('a', 'b')), is_int(pick('a', 'b'));
 "), @"
-    error: function `is_int(text)` does not exist
+    error: argument 1 of `is_int` has type `text`, expected `int4`
       ╭▸ 
     5 │ select is_text(pick('a', 'b')), is_int(pick('a', 'b'));
-      │                                 ━━━━━━
+      │                                        ━━━━━━━━━━━━━━
       │
       ╰ hint: consider adding explicit type casts
     ");
@@ -288,10 +288,10 @@ create function is_int(x int) returns int language sql return 1;
 create table t (a int);
 select is_ints(f(a, a)), is_int(f(a, a)) from t;
 "), @"
-    error: function `is_int(int4[])` does not exist
+    error: argument 1 of `is_int` has type `int4[]`, expected `int4`
       ╭▸ 
     6 │ select is_ints(f(a, a)), is_int(f(a, a)) from t;
-      │                          ━━━━━━
+      │                                 ━━━━━━━
       │
       ╰ hint: consider adding explicit type casts
     ");

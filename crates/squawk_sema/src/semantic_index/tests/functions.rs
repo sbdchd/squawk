@@ -166,12 +166,10 @@ select f(a => 1, b => x), g(y => 1), f(zz => 1);
     3 - select f(a => 1, b => x), g(y => 1), f(zz => 1);
     3 + select f(a => 1, b => x), f(y => 1), f(zz => 1);
       ╰╴
-    error: function `f(zz => int4)` does not exist
+    error: function `f` has no parameter named `zz`
       ╭▸ 
     3 │ select f(a => 1, b => x), g(y => 1), f(zz => 1);
-      │                                      ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴                                       ━━
     ");
 }
 
@@ -182,18 +180,14 @@ create function f(a int) returns int language sql return a;
 create function g(int) returns int language sql return $1;
 select f(z => 1), g(a => 1);
 "), @"
-    error: function `f(z => int4)` does not exist
+    error: function `f` has no parameter named `z`
       ╭▸ 
     4 │ select f(z => 1), g(a => 1);
-      │        ━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: function `g(a => int4)` does not exist
+      ╰╴         ━
+    error: function `g` has no parameter named `a`
       ╭▸ 
     4 │ select f(z => 1), g(a => 1);
-      │                   ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴                    ━
     ");
 }
 
@@ -703,7 +697,13 @@ alter function s.f() set schema nope;
     error: function `f()` does not exist
       ╭▸ 
     5 │ select f();
-      ╰╴       ━
+      │        ━
+      │
+      ╰ note: a function named `f` exists in schema `s`, which is not in the `search_path`
+    help: qualify the call with schema `s`
+      ╭╴
+    5 │ select s.f();
+      ╰╴       ++
     error: schema `nope` does not exist
       ╭▸ 
     7 │ alter function s.f() set schema nope;
@@ -789,12 +789,10 @@ call count(1);
 call nope();
 call p((select x from nope));
 "), @"
-    error: procedure `p(c => int4)` does not exist
+    error: procedure `p` has no parameter named `c`
       ╭▸ 
     7 │ call p(c => 1);
-      │      ━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴       ━
     error: `f()` is not a procedure
       ╭▸ 
     8 │ call f();
@@ -857,12 +855,12 @@ create procedure p(a int, out b int) language sql begin atomic select 1; end;
 call p(1, null);
 call p(1);
 "), @"
-    error: procedure `p(int4)` does not exist
+    error: procedure `p` takes 2 arguments but 1 was supplied
       ╭▸ 
     4 │ call p(1);
       │      ━
       │
-      ╰ hint: consider adding explicit type casts
+      ╰ note: missing `b`
     ");
 }
 
@@ -956,53 +954,75 @@ create aggregate k(a int, a int) (sfunc = sfn, stype = int);
 fn unresolved_function_arg_types() {
     assert_snapshot!(check("
 create function foo(x int) returns int as 'select 1' language sql;
+create function bar(a int, b int default 1) returns int as 'select 1' language sql;
 create procedure p(int) as 'select 1' language sql;
 select foo(1.5::float8);
 select foo(1, 'a');
+select foo();
+select bar();
+select bar(1, 2, 3);
+select bar(1, 'a'::text);
 select foo(y => 1);
 select public.foo(variadic array[1]);
 select nope();
 select lower(1);
 call p('a'::text);
 "), @"
-    error: function `foo(float8)` does not exist
+    error: argument 1 of `foo` has type `float8`, expected `int4`
       ╭▸ 
-    4 │ select foo(1.5::float8);
+    5 │ select foo(1.5::float8);
+      │            ━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: function `foo` takes 1 argument but 2 were supplied
+      ╭▸ 
+    6 │ select foo(1, 'a');
+      ╰╴       ━━━
+    error: function `foo` takes 1 argument but 0 were supplied
+      ╭▸ 
+    7 │ select foo();
       │        ━━━
       │
-      ╰ hint: consider adding explicit type casts
-    error: function `foo(int4, unknown)` does not exist
+      ╰ note: missing `x`
+    error: function `bar` takes at least 1 argument but 0 were supplied
       ╭▸ 
-    5 │ select foo(1, 'a');
+    8 │ select bar();
       │        ━━━
       │
-      ╰ hint: consider adding explicit type casts
-    error: function `foo(y => int4)` does not exist
+      ╰ note: missing `a`
+    error: function `bar` takes at most 2 arguments but 3 were supplied
       ╭▸ 
-    6 │ select foo(y => 1);
-      │        ━━━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: function `public.foo(variadic int4[])` does not exist
-      ╭▸ 
-    7 │ select public.foo(variadic array[1]);
-      │               ━━━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: function `nope()` does not exist
-      ╭▸ 
-    8 │ select nope();
-      ╰╴       ━━━━
-    error: function `lower(int4)` does not exist
-      ╭▸ 
-    9 │ select lower(1);
-      │        ━━━━━
-      │
-      ╰ hint: consider adding explicit type casts
-    error: procedure `p(text)` does not exist
+    9 │ select bar(1, 2, 3);
+      ╰╴       ━━━
+    error: argument 2 of `bar` has type `text`, expected `int4`
        ╭▸ 
-    10 │ call p('a'::text);
-       │      ━
+    10 │ select bar(1, 'a'::text);
+       │               ━━━━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `foo` has no parameter named `y`
+       ╭▸ 
+    11 │ select foo(y => 1);
+       ╰╴           ━
+    error: argument 1 of `public.foo` is labeled `variadic` but its parameter is not variadic
+       ╭▸ 
+    12 │ select public.foo(variadic array[1]);
+       ╰╴                  ━━━━━━━━━━━━━━━━━
+    error: function `nope()` does not exist
+       ╭▸ 
+    13 │ select nope();
+       ╰╴       ━━━━
+    error: function `lower(int4)` does not exist
+       ╭▸ 
+    14 │ select lower(1);
+       │        ━━━━━
+       │
+       ├ note: candidates are `lower(anymultirange)`, `lower(anyrange)`, `lower(text)`
+       ╰ hint: consider adding explicit type casts
+    error: argument 1 of `p` has type `text`, expected `int4`
+       ╭▸ 
+    15 │ call p('a'::text);
+       │        ━━━━━━━━━
        │
        ╰ hint: consider adding explicit type casts
     ");
@@ -1148,15 +1168,312 @@ create function app.do_thing2(int, int) returns int as 'select 1' language sql;
 select app.do_thing(1, 2);
 call app.do_thig();
 "), @"
-    error: function `app.do_thing(int4, int4)` does not exist
+    error: function `app.do_thing` takes 1 argument but 2 were supplied
       ╭▸ 
     5 │ select app.do_thing(1, 2);
-      │            ━━━━━━━━
-      │
-      ╰ hint: consider adding explicit type casts
+      ╰╴           ━━━━━━━━
     error: procedure `app.do_thig()` does not exist
       ╭▸ 
     6 │ call app.do_thig();
       ╰╴         ━━━━━━━
+    ");
+}
+
+#[test]
+fn invalid_named_args() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+select foo(x => 1, 2);
+select foo(x => 1, x => 2);
+select nope(a => 1, 2);
+"), @"
+    error: positional argument cannot follow named argument
+      ╭▸ 
+    3 │ select foo(x => 1, 2);
+      ╰╴                   ━
+    error: argument name `x` used more than once
+      ╭▸ 
+    4 │ select foo(x => 1, x => 2);
+      ╰╴                   ━
+    error: positional argument cannot follow named argument
+      ╭▸ 
+    5 │ select nope(a => 1, 2);
+      ╰╴                    ━
+    ");
+}
+
+#[test]
+fn named_variadic_requires_label() {
+    assert_snapshot!(check("
+create function v(a int, variadic b int[]) returns int language sql return a;
+select v(a => 1, b => array[1]);
+select v(a => 1, variadic b => array[1]);
+select v(b => array[1], a => 1);
+select v(a => 1, b => 2);
+select v(a => 1, b => array['a']);
+"), @"
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
+      ╭▸ 
+    3 │ select v(a => 1, b => array[1]);
+      │                  ━━━━━━━━━━━━━
+      ╰╴
+    help: label the variadic array with `variadic`
+      ╭╴
+    3 │ select v(a => 1, variadic b => array[1]);
+      ╰╴                 ++++++++
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
+      ╭▸ 
+    5 │ select v(b => array[1], a => 1);
+      │          ━━━━━━━━━━━━━
+      │
+      ╰ hint: pass an array labeled `variadic` as the last argument
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
+      ╭▸ 
+    6 │ select v(a => 1, b => 2);
+      │                  ━━━━━━
+      │
+      ╰ hint: pass an array labeled `variadic` as the last argument
+    error: variadic parameter `b` of `v` must be labeled `variadic` when passed by name
+      ╭▸ 
+    7 │ select v(a => 1, b => array['a']);
+      │                  ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: pass an array labeled `variadic` as the last argument
+    ");
+}
+
+#[test]
+fn unknown_arg_name() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+select foo(z => 1);
+select foo(1, z => 2);
+"), @"
+    error: function `foo` has no parameter named `z`
+      ╭▸ 
+    3 │ select foo(z => 1);
+      ╰╴           ━
+    error: function `foo` has no parameter named `z`
+      ╭▸ 
+    4 │ select foo(1, z => 2);
+      ╰╴              ━
+    ");
+}
+
+#[test]
+fn arg_positional_and_named() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+select foo(1, x => 2);
+select foo(1, 2, y => 3);
+"), @"
+    error: argument `x` of `foo` was specified both positionally and by name
+      ╭▸ 
+    3 │ select foo(1, x => 2);
+      ╰╴              ━
+    error: argument `y` of `foo` was specified both positionally and by name
+      ╭▸ 
+    4 │ select foo(1, 2, y => 3);
+      ╰╴                 ━
+    ");
+}
+
+#[test]
+fn missing_required_args() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+create function w(int, b int) returns int language sql return 1;
+create function z(a int, b int, c int) returns int language sql return 1;
+select foo(y => 2);
+select w(b => 1);
+select z(b => 1);
+select z(1, c => 3);
+select z(1);
+select foo();
+"), @"
+    error: function `foo` is missing required argument `x`
+      ╭▸ 
+    5 │ select foo(y => 2);
+      ╰╴       ━━━
+    error: function `w` is missing required argument `$1`
+      ╭▸ 
+    6 │ select w(b => 1);
+      ╰╴       ━
+    error: function `z` is missing required arguments `a`, `c`
+      ╭▸ 
+    7 │ select z(b => 1);
+      ╰╴       ━
+    error: function `z` is missing required argument `b`
+      ╭▸ 
+    8 │ select z(1, c => 3);
+      ╰╴       ━
+    error: function `z` takes 3 arguments but 1 was supplied
+      ╭▸ 
+    9 │ select z(1);
+      │        ━
+      │
+      ╰ note: missing `b`, `c`
+    error: function `foo` takes at least 1 argument but 0 were supplied
+       ╭▸ 
+    10 │ select foo();
+       │        ━━━
+       │
+       ╰ note: missing `x`
+    ");
+}
+
+#[test]
+fn named_arg_type_mismatch() {
+    assert_snapshot!(check("
+create function foo(x int, y int default 1) returns int language sql return x;
+create table t (a text, b bool);
+select foo(y => 'a'::text, x => 1);
+select foo(1, y => 'a'::text);
+select foo(x => true);
+select foo(x => now());
+select foo(x => array[1]);
+select foo(x => a) from t;
+select foo(1, y => b) from t;
+"), @"
+    error: argument `y` of `foo` has type `text`, expected `int4`
+      ╭▸ 
+    4 │ select foo(y => 'a'::text, x => 1);
+      │            ━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `y` of `foo` has type `text`, expected `int4`
+      ╭▸ 
+    5 │ select foo(1, y => 'a'::text);
+      │               ━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `bool`, expected `int4`
+      ╭▸ 
+    6 │ select foo(x => true);
+      │            ━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `timestamptz`, expected `int4`
+      ╭▸ 
+    7 │ select foo(x => now());
+      │            ━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `int4[]`, expected `int4`
+      ╭▸ 
+    8 │ select foo(x => array[1]);
+      │            ━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `x` of `foo` has type `text`, expected `int4`
+      ╭▸ 
+    9 │ select foo(x => a) from t;
+      │            ━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `y` of `foo` has type `bool`, expected `int4`
+       ╭▸ 
+    10 │ select foo(1, y => b) from t;
+       │               ━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn variadic_call_mismatches() {
+    assert_snapshot!(check("
+create function v(a int, variadic b int[]) returns int language sql return a;
+create table t (x text);
+select v(1);
+select v(variadic array[1]);
+select v(1, 2, 'a'::text);
+select v(1, variadic array['a']);
+select v(a => 1, variadic b => array['a']);
+select v(1, 2, x) from t;
+"), @"
+    error: function `v` takes at least 2 arguments but 1 was supplied
+      ╭▸ 
+    4 │ select v(1);
+      │        ━
+      │
+      ╰ note: missing `b`
+    error: function `v` takes 2 arguments but 1 was supplied
+      ╭▸ 
+    5 │ select v(variadic array[1]);
+      │        ━
+      │
+      ╰ note: missing `b`
+    error: argument 3 of `v` has type `text`, expected `int4`
+      ╭▸ 
+    6 │ select v(1, 2, 'a'::text);
+      │                ━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument 2 of `v` has type `text[]`, expected `int4[]`
+      ╭▸ 
+    7 │ select v(1, variadic array['a']);
+      │             ━━━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument `b` of `v` has type `text[]`, expected `int4[]`
+      ╭▸ 
+    8 │ select v(a => 1, variadic b => array['a']);
+      │                  ━━━━━━━━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    error: argument 3 of `v` has type `text`, expected `int4`
+      ╭▸ 
+    9 │ select v(1, 2, x) from t;
+      │                ━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn variadic_on_non_variadic_param() {
+    assert_snapshot!(check("
+create function foo(x int) returns int language sql return x;
+create function v(a int, variadic b int[]) returns int language sql return a;
+select foo(variadic array[1]);
+select foo(variadic x => array[1]);
+select v(variadic a => 1);
+"), @"
+    error: argument 1 of `foo` is labeled `variadic` but its parameter is not variadic
+      ╭▸ 
+    4 │ select foo(variadic array[1]);
+      ╰╴           ━━━━━━━━━━━━━━━━━
+    error: argument `x` of `foo` is labeled `variadic` but its parameter is not variadic
+      ╭▸ 
+    5 │ select foo(variadic x => array[1]);
+      ╰╴           ━━━━━━━━━━━━━━━━━━━━━━
+    error: argument `a` of `v` is labeled `variadic` but its parameter is not variadic
+      ╭▸ 
+    6 │ select v(variadic a => 1);
+      ╰╴         ━━━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn positional_count_names_missing() {
+    assert_snapshot!(check("
+create function d(a int, b int, c int default 1) returns int language sql return 1;
+create function u(int, int) returns int language sql return 1;
+select d();
+select u(1);
+"), @"
+    error: function `d` takes at least 2 arguments but 0 were supplied
+      ╭▸ 
+    4 │ select d();
+      │        ━
+      │
+      ╰ note: missing `a`, `b`
+    error: function `u` takes 2 arguments but 1 was supplied
+      ╭▸ 
+    5 │ select u(1);
+      │        ━
+      │
+      ╰ note: missing `$2`
     ");
 }

@@ -1,7 +1,7 @@
 use std::borrow::Cow;
-use std::fmt;
+use std::fmt::{self, Write};
 
-use crate::arena::{IdxRange, LayeredArena};
+use crate::arena::IdxRange;
 use crate::interner::{Interner, Name};
 use crate::ir::{
     AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
@@ -11,7 +11,7 @@ use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
-use crate::semantic_index::{DiagnosticKind, Suggestion};
+use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct SimilarColumn {
@@ -78,6 +78,31 @@ pub(crate) enum LookupKind {
 pub(crate) enum ErrorArgs {
     List(IdxRange<ErrorArg>),
     Star,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ArgLabel {
+    Position(usize),
+    Name(Name),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorParam {
+    pub(crate) name: Option<Name>,
+    pub(crate) position: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct OutsideSearchPath {
+    pub(crate) schema: Name,
+    pub(crate) others: usize,
+    pub(crate) qualify_at: Option<TextSize>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorCandidates {
+    pub(crate) shown: IdxRange<ErrorArgs>,
+    pub(crate) total: usize,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -337,6 +362,61 @@ pub(crate) enum SemaError {
         lookup: LookupKind,
         similar: Option<Name>,
         misplaced_order_by: bool,
+        candidates: Option<ErrorCandidates>,
+        unknown_names: bool,
+        outside_search_path: Option<OutsideSearchPath>,
+    },
+    ArgumentTypeMismatch {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg: ArgLabel,
+        found: TyName,
+        expected: TyName,
+    },
+    ArgumentCountMismatch {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        min: usize,
+        max: usize,
+        supplied: usize,
+        missing: IdxRange<ErrorParam>,
+    },
+    PositionalAfterNamed,
+    DuplicateArgumentName {
+        name: Name,
+    },
+    UnknownArgumentName {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg: Name,
+    },
+    ArgumentPositionalAndNamed {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg: Name,
+    },
+    MissingArguments {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        missing: IdxRange<ErrorParam>,
+    },
+    NotVariadic {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        arg: ArgLabel,
+    },
+    UnlabeledVariadic {
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        param: Name,
+        insert_at: Option<TextSize>,
     },
     ProcedureCalledAsFunction {
         schema: Option<Name>,
@@ -697,6 +777,13 @@ impl RoutineKind {
             RoutineKind::Routine => "routine",
         }
     }
+
+    fn call_label(self) -> &'static str {
+        match self {
+            RoutineKind::Routine => RoutineKind::Function.label(),
+            RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Procedure => self.label(),
+        }
+    }
 }
 
 impl ExprContext {
@@ -976,6 +1063,16 @@ impl SemaError {
                 ambiguous: false, ..
             } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
+            SemaError::ArgumentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::ArgumentCountMismatch { .. } | SemaError::MissingArguments { .. } => {
+                DiagnosticKind::ArgumentCountMismatch
+            }
+            SemaError::UnknownArgumentName { .. } => DiagnosticKind::UnresolvedParam,
+            SemaError::PositionalAfterNamed
+            | SemaError::DuplicateArgumentName { .. }
+            | SemaError::ArgumentPositionalAndNamed { .. }
+            | SemaError::NotVariadic { .. }
+            | SemaError::UnlabeledVariadic { .. } => DiagnosticKind::InvalidArgument,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
@@ -1223,6 +1320,40 @@ impl SemaError {
                     edits: vec![Edit::delete(range)],
                 },
             },
+            SemaError::UnlabeledVariadic {
+                insert_at: Some(insert_at),
+                ..
+            } => Suggestion {
+                message: "label the variadic array with `variadic`".into(),
+                fix: Fix {
+                    title: "Insert `variadic`".into(),
+                    edits: vec![Edit::insert("variadic ", insert_at)],
+                },
+            },
+            SemaError::UnresolvedRoutine {
+                name,
+                outside_search_path:
+                    Some(OutsideSearchPath {
+                        schema,
+                        qualify_at: Some(qualify_at),
+                        ..
+                    }),
+                ..
+            } => {
+                let schema = names.resolve(schema);
+                let quoted = quote_ident(schema);
+                Suggestion {
+                    message: format!("qualify the call with schema `{schema}`").into(),
+                    fix: Fix {
+                        title: format!(
+                            "Qualify as `{quoted}.{}`",
+                            quote_ident(names.resolve(name))
+                        )
+                        .into(),
+                        edits: vec![Edit::insert(format!("{quoted}."), qualify_at)],
+                    },
+                }
+            }
             SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),
@@ -1318,7 +1449,23 @@ impl SemaError {
             } => Some("`order by` must appear after all regular arguments of the aggregate"),
             SemaError::UnresolvedRoutine {
                 similar: Some(_), ..
+            }
+            | SemaError::UnresolvedRoutine {
+                outside_search_path: Some(_),
+                ..
             } => None,
+            SemaError::UnresolvedRoutine {
+                kind,
+                unknown_names: true,
+                ..
+            } => Some(match kind {
+                RoutineKind::Procedure => {
+                    "no procedure with that name accepts the given argument names"
+                }
+                RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Routine => {
+                    "no function with that name accepts the given argument names"
+                }
+            }),
             SemaError::UnresolvedRoutine {
                 args,
                 lookup,
@@ -1333,6 +1480,10 @@ impl SemaError {
                     None
                 }
             },
+            SemaError::ArgumentTypeMismatch { .. } => Some("consider adding explicit type casts"),
+            SemaError::UnlabeledVariadic {
+                insert_at: None, ..
+            } => Some("pass an array labeled `variadic` as the last argument"),
             SemaError::ProcedureCalledAsFunction {
                 select_range: None,
                 ..
@@ -1376,6 +1527,9 @@ impl SemaError {
     fn static_message(&self) -> Option<&'static str> {
         match *self {
             SemaError::CannotChangeDatabase => Some("current database cannot be changed"),
+            SemaError::PositionalAfterNamed => {
+                Some("positional argument cannot follow named argument")
+            }
             SemaError::NoConflictArbiter => Some(
                 "there is no unique or exclusion constraint matching the `on conflict` specification",
             ),
@@ -1427,18 +1581,82 @@ impl SemaError {
         }
     }
 
-    pub(crate) fn message(
-        &self,
-        names: &Interner,
-        args: &LayeredArena<ErrorArg>,
-    ) -> Cow<'static, str> {
+    pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::UnresolvedRoutine {
+            kind,
+            name,
+            outside_search_path: Some(OutsideSearchPath { schema, others, .. }),
+            ..
+        } = *self
+        {
+            let label = kind.call_label();
+            let name = names.resolve(name);
+            let schema = names.resolve(schema);
+            let note = match others {
+                0 => format!(
+                    "a {label} named `{name}` exists in schema `{schema}`, which is not in the `search_path`"
+                ),
+                others => {
+                    let s = if others == 1 { "" } else { "s" };
+                    format!(
+                        "a {label} named `{name}` exists in schema `{schema}` and {others} other{s}, none of which are in the `search_path`"
+                    )
+                }
+            };
+            return Some(Cow::Owned(note));
+        }
+        if let SemaError::ArgumentCountMismatch { missing, .. } = *self
+            && !missing.is_empty()
+        {
+            let message = ErrorMessage {
+                error: self,
+                names,
+                errors,
+            };
+            return Some(Cow::Owned(format!("missing {}", message.params(missing))));
+        }
+        let SemaError::UnresolvedRoutine {
+            schema,
+            name,
+            candidates: Some(ErrorCandidates { shown, total }),
+            ..
+        } = *self
+        else {
+            return None;
+        };
+        let message = ErrorMessage {
+            error: self,
+            names,
+            errors,
+        };
+        let mut note = String::from("candidates are ");
+        for (i, candidate) in shown.iter().enumerate() {
+            if i > 0 {
+                note.push_str(", ");
+            }
+            write!(
+                note,
+                "`{}`",
+                message.signature(schema, name, errors.candidates[candidate])
+            )
+            .unwrap();
+        }
+        let hidden = total - shown.len();
+        if hidden > 0 {
+            let s = if hidden == 1 { "" } else { "s" };
+            write!(note, ", and {hidden} other{s}").unwrap();
+        }
+        Some(Cow::Owned(note))
+    }
+
+    pub(crate) fn message(&self, names: &Interner, errors: &Errors) -> Cow<'static, str> {
         match self.static_message() {
             Some(message) => Cow::Borrowed(message),
             None => Cow::Owned(
                 ErrorMessage {
                     error: self,
                     names,
-                    args,
+                    errors,
                 }
                 .to_string(),
             ),
@@ -1449,7 +1667,7 @@ impl SemaError {
 struct ErrorMessage<'a> {
     error: &'a SemaError,
     names: &'a Interner,
-    args: &'a LayeredArena<ErrorArg>,
+    errors: &'a Errors,
 }
 
 impl ErrorMessage<'_> {
@@ -1457,6 +1675,22 @@ impl ErrorMessage<'_> {
         fmt::from_fn(move |f| {
             let suffix = if ty.array { "[]" } else { "" };
             write!(f, "{}{suffix}", self.names.resolve(ty.name))
+        })
+    }
+
+    fn arg_label(&self, arg: ArgLabel) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| match arg {
+            ArgLabel::Position(position) => write!(f, "{}", position + 1),
+            ArgLabel::Name(name) => write!(f, "`{}`", self.names.resolve(name)),
+        })
+    }
+
+    fn qualified(&self, schema: Option<Name>, name: Name) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            if let Some(schema) = schema {
+                write!(f, "{}.", self.names.resolve(schema))?;
+            }
+            f.write_str(self.names.resolve(name))
         })
     }
 
@@ -1468,16 +1702,13 @@ impl ErrorMessage<'_> {
     ) -> impl fmt::Display + '_ {
         fmt::from_fn(move |f| {
             let n = |name| self.names.resolve(name);
-            if let Some(schema) = schema {
-                write!(f, "{}.", n(schema))?;
-            }
-            write!(f, "{}(", n(name))?;
+            write!(f, "{}(", self.qualified(schema, name))?;
             let args = match args {
                 ErrorArgs::List(args) => args,
                 ErrorArgs::Star => return f.write_str("*)"),
             };
             for (i, arg) in args.iter().enumerate() {
-                let arg = self.args[arg];
+                let arg = self.errors.args[arg];
                 if i > 0 {
                     f.write_str(", ")?;
                 }
@@ -1490,6 +1721,26 @@ impl ErrorMessage<'_> {
                 write!(f, "{}", self.operand(arg.ty))?;
             }
             f.write_str(")")
+        })
+    }
+
+    fn params(&self, params: IdxRange<ErrorParam>) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            for (i, param) in params.iter().enumerate() {
+                if i > 0 {
+                    f.write_str(", ")?;
+                }
+                match self.errors.params[param] {
+                    ErrorParam {
+                        name: Some(name), ..
+                    } => write!(f, "`{}`", self.names.resolve(name))?,
+                    ErrorParam {
+                        name: None,
+                        position,
+                    } => write!(f, "`${}`", position + 1)?,
+                }
+            }
+            Ok(())
         })
     }
 
@@ -1506,6 +1757,7 @@ impl fmt::Display for ErrorMessage<'_> {
         let n = |name| self.names.resolve(name);
         match *self.error {
             SemaError::CannotChangeDatabase
+            | SemaError::PositionalAfterNamed
             | SemaError::ValuesLengthMismatch
             | SemaError::InsertMoreExpressionsThanTargets
             | SemaError::ViewTooManyColumnNames
@@ -1844,19 +2096,119 @@ impl fmt::Display for ErrorMessage<'_> {
                 lookup: _,
                 similar: _,
                 misplaced_order_by: _,
+                candidates: _,
+                unknown_names: _,
+                outside_search_path: _,
+            } => write!(
+                f,
+                "{} `{}` does not exist",
+                kind.call_label(),
+                self.signature(schema, name, args)
+            ),
+            SemaError::ArgumentTypeMismatch {
+                kind: _,
+                schema,
+                name,
+                arg,
+                found,
+                expected,
+            } => write!(
+                f,
+                "argument {} of `{}` has type `{}`, expected `{}`",
+                self.arg_label(arg),
+                self.qualified(schema, name),
+                self.ty(found),
+                self.ty(expected)
+            ),
+            SemaError::ArgumentCountMismatch {
+                kind,
+                schema,
+                name,
+                min,
+                max,
+                supplied,
+                missing: _,
             } => {
-                let label = match kind {
-                    RoutineKind::Routine => RoutineKind::Function.label(),
-                    RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Procedure => {
-                        kind.label()
-                    }
+                let (bound, count) = if min == max {
+                    ("", min)
+                } else if supplied < min {
+                    ("at least ", min)
+                } else {
+                    ("at most ", max)
                 };
                 write!(
                     f,
-                    "{label} `{}` does not exist",
-                    self.signature(schema, name, args)
+                    "{} `{}` takes {bound}{count} argument{} but {supplied} {} supplied",
+                    kind.call_label(),
+                    self.qualified(schema, name),
+                    if count == 1 { "" } else { "s" },
+                    if supplied == 1 { "was" } else { "were" },
                 )
             }
+            SemaError::DuplicateArgumentName { name } => {
+                write!(f, "argument name `{}` used more than once", n(name))
+            }
+            SemaError::UnknownArgumentName {
+                kind,
+                schema,
+                name,
+                arg,
+            } => write!(
+                f,
+                "{} `{}` has no parameter named `{}`",
+                kind.call_label(),
+                self.qualified(schema, name),
+                n(arg)
+            ),
+            SemaError::ArgumentPositionalAndNamed {
+                kind: _,
+                schema,
+                name,
+                arg,
+            } => write!(
+                f,
+                "argument `{}` of `{}` was specified both positionally and by name",
+                n(arg),
+                self.qualified(schema, name)
+            ),
+            SemaError::MissingArguments {
+                kind,
+                schema,
+                name,
+                missing,
+            } => {
+                write!(
+                    f,
+                    "{} `{}` is missing required argument{} ",
+                    kind.call_label(),
+                    self.qualified(schema, name),
+                    if missing.len() == 1 { "" } else { "s" }
+                )?;
+                write!(f, "{}", self.params(missing))
+            }
+            SemaError::NotVariadic {
+                kind: _,
+                schema,
+                name,
+                arg,
+            } => write!(
+                f,
+                "argument {} of `{}` is labeled `variadic` but its parameter is not variadic",
+                self.arg_label(arg),
+                self.qualified(schema, name)
+            ),
+            SemaError::UnlabeledVariadic {
+                kind: _,
+                schema,
+                name,
+                param,
+                insert_at: _,
+            } => write!(
+                f,
+                "variadic parameter `{}` of `{}` must be labeled `variadic` when passed by name",
+                n(param),
+                self.qualified(schema, name)
+            ),
             SemaError::ProcedureCalledAsFunction {
                 schema, name, args, ..
             } => write!(f, "`{}` is a procedure", self.signature(schema, name, args)),

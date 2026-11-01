@@ -184,7 +184,7 @@ mod test {
     fn rewrite_unnest_as_rows_from_not_applicable_variadic() {
         assert!(code_action_not_applicable(
             rewrite_unnest_as_rows_from,
-            "select * from unn$0est(variadic a, b);"
+            "select * from unn$0est(a, variadic b);"
         ));
     }
 

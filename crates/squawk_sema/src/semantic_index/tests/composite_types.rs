@@ -139,10 +139,10 @@ select g(a) from x;
 alter type t alter attribute a type text cascade;
 select g(a) from x;
 "), @"
-    error: function `g(text)` does not exist
+    error: argument 1 of `g` has type `text`, expected `int4`
       ╭▸ 
     7 │ select g(a) from x;
-      │        ━
+      │          ━
       │
       ╰ hint: consider adding explicit type casts
     ");
@@ -193,10 +193,10 @@ select g((null::t).a);
 alter type t alter attribute a set data type text;
 select g((null::t).a);
 "), @"
-    error: function `g(int4)` does not exist
+    error: argument 1 of `g` has type `int4`, expected `text`
       ╭▸ 
     4 │ select g((null::t).a);
-      │        ━
+      │          ━━━━━━━━━━━
       │
       ╰ hint: consider adding explicit type casts
     ");

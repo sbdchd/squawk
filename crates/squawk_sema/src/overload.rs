@@ -34,6 +34,37 @@ impl CallArg {
     }
 }
 
+#[derive(Debug, Clone)]
+pub(crate) enum CallMismatch {
+    ArgCount(ArgCount),
+    UnknownName { arg: usize },
+    PositionalAndNamed { arg: usize },
+    Missing(SmallVec<[MissingParam; 2]>),
+    NotVariadic { arg: usize },
+    UnlabeledVariadic { arg: usize, fixable: bool },
+    ArgType(ArgMismatch),
+}
+
+#[derive(Debug, Clone)]
+pub(crate) struct ArgCount {
+    pub(crate) min: usize,
+    pub(crate) max: usize,
+    pub(crate) missing: SmallVec<[MissingParam; 2]>,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct MissingParam {
+    pub(crate) name: Option<Name>,
+    pub(crate) position: usize,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub(crate) struct ArgMismatch {
+    pub(crate) position: usize,
+    pub(crate) found: Ty,
+    pub(crate) expected: Ty,
+}
+
 pub(crate) struct CommonType {
     common: Option<Ty>,
     untyped: bool,
@@ -325,6 +356,111 @@ impl<'a> Overloads<'a> {
         })
     }
 
+    pub(crate) fn mismatch(&self, function: &Function, args: &[CallArg]) -> Option<CallMismatch> {
+        let inputs: SmallVec<[&Param; 8]> = self.inputs(function).collect();
+        let variadic = inputs
+            .last()
+            .is_some_and(|param| param.mode == ParamMode::Variadic);
+        let fixed = inputs.len() - usize::from(variadic);
+        let min = inputs.iter().filter(|param| !param.has_default).count();
+        let max = if variadic && !args.iter().any(|arg| arg.variadic) {
+            usize::MAX
+        } else {
+            inputs.len()
+        };
+        let named = args.iter().any(|arg| arg.name.is_some());
+        if !named && (args.len() < min || args.len() > max) {
+            let missing = inputs
+                .iter()
+                .enumerate()
+                .skip(args.len())
+                .filter(|(_, param)| !param.has_default)
+                .map(|(position, param)| MissingParam {
+                    name: param.name,
+                    position,
+                })
+                .collect();
+            return Some(CallMismatch::ArgCount(ArgCount { min, max, missing }));
+        }
+        let mut assigned: SmallVec<[bool; 8]> = smallvec![false; inputs.len()];
+        let mut params: SmallVec<[Option<Ty>; 8]> = SmallVec::with_capacity(args.len());
+        let mut seen_named = false;
+        for (i, arg) in args.iter().enumerate() {
+            let position = match arg.name {
+                Some(name) => {
+                    seen_named = true;
+                    let Some(position) = inputs.iter().position(|param| param.name == Some(name))
+                    else {
+                        return Some(CallMismatch::UnknownName { arg: i });
+                    };
+                    if assigned[position] {
+                        return Some(CallMismatch::PositionalAndNamed { arg: i });
+                    }
+                    position
+                }
+                None if seen_named => return None,
+                None if i < fixed => i,
+                None if variadic => fixed,
+                None => {
+                    return Some(CallMismatch::ArgCount(ArgCount {
+                        min,
+                        max,
+                        missing: smallvec![],
+                    }));
+                }
+            };
+            let param = inputs[position];
+            if arg.variadic && param.mode != ParamMode::Variadic {
+                return Some(CallMismatch::NotVariadic { arg: i });
+            }
+            if param.mode == ParamMode::Variadic && arg.name.is_some() && !arg.variadic {
+                let fixable = i + 1 == args.len()
+                    && param.ty.is_some()
+                    && self.arg_match(arg.ty, param.ty).is_some();
+                return Some(CallMismatch::UnlabeledVariadic { arg: i, fixable });
+            }
+            assigned[position] = true;
+            let ty = match (param.mode, arg.name, arg.variadic) {
+                (ParamMode::Variadic, None, false) => {
+                    param.ty.and_then(|ty| self.variadic_element(ty))
+                }
+                (ParamMode::In | ParamMode::Out | ParamMode::InOut | ParamMode::Variadic, _, _) => {
+                    param.ty
+                }
+            };
+            params.push(ty);
+        }
+        let missing: SmallVec<[MissingParam; 2]> = inputs
+            .iter()
+            .zip(&assigned)
+            .enumerate()
+            .filter(|(_, (param, assigned))| !**assigned && !param.has_default)
+            .map(|(position, (param, _))| MissingParam {
+                name: param.name,
+                position,
+            })
+            .collect();
+        if !missing.is_empty() {
+            return Some(CallMismatch::Missing(missing));
+        }
+        args.iter()
+            .zip(&params)
+            .enumerate()
+            .find_map(|(position, (arg, param))| {
+                let ArgType::Known(found) = arg.ty else {
+                    return None;
+                };
+                let expected = (*param)?;
+                self.coerce(found, expected)
+                    .is_none()
+                    .then_some(CallMismatch::ArgType(ArgMismatch {
+                        position,
+                        found,
+                        expected,
+                    }))
+            })
+    }
+
     pub(crate) fn missing_array_type(&self, function: &Function, args: &[CallArg]) -> Option<Ty> {
         let params = self.bind(function, args)?;
         let solution = self.solve(&params, args)?;
@@ -445,6 +581,9 @@ impl<'a> Overloads<'a> {
             };
             let param = inputs[position];
             if arg.variadic && (param.mode != ParamMode::Variadic || assigned[position]) {
+                return None;
+            }
+            if param.mode == ParamMode::Variadic && arg.name.is_some() && !arg.variadic {
                 return None;
             }
             assigned[position] = true;

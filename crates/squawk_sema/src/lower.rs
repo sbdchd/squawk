@@ -43,14 +43,17 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        DropRelation, ErrorArg, ErrorArgs, LookupKind, ObjectKind, OperandName,
-        OperatorReplacement, SemaError, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
-        ViewColumnRename, WindowClause,
+        ArgLabel, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind,
+        ObjectKind, OperandName, OperatorReplacement, OutsideSearchPath, SemaError, Similar,
+        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
 use crate::{
-    overload::{ArgType, BuiltinTypes, CallArg, CommonType, Overloads},
+    overload::{
+        ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, CommonType,
+        MissingParam, Overloads,
+    },
     postgres,
 };
 
@@ -617,6 +620,76 @@ impl TypeLookup {
             TypeLookup::Found(ty) => Some(ty),
             TypeLookup::Missing | TypeLookup::Unknown => None,
         }
+    }
+}
+
+const MAX_CANDIDATES: usize = 5;
+
+fn call_kind(kind: RoutineKind) -> FunctionKind {
+    match kind {
+        RoutineKind::Procedure => FunctionKind::Procedure,
+        RoutineKind::Function | RoutineKind::Aggregate | RoutineKind::Routine => {
+            FunctionKind::Function
+        }
+    }
+}
+
+struct CallMismatchError {
+    error: SemaError,
+    target: Option<SyntaxNode>,
+}
+
+fn invalid_named_args(
+    args: &[CallArg],
+    arg_list: Option<&ast::ArgList>,
+) -> Option<CallMismatchError> {
+    let mut seen_named = false;
+    for (i, arg) in args.iter().enumerate() {
+        let Some(name) = arg.name else {
+            if seen_named {
+                return Some(CallMismatchError {
+                    error: SemaError::PositionalAfterNamed,
+                    target: call_arg(arg_list, args, i).map(|arg| arg.syntax().clone()),
+                });
+            }
+            continue;
+        };
+        seen_named = true;
+        if args[..i].iter().any(|other| other.name == Some(name)) {
+            return Some(CallMismatchError {
+                error: SemaError::DuplicateArgumentName { name },
+                target: call_arg_name(arg_list, args, i),
+            });
+        }
+    }
+    None
+}
+
+fn arg_label(args: &[CallArg], i: usize) -> ArgLabel {
+    match args[i].name {
+        Some(name) => ArgLabel::Name(name),
+        None => ArgLabel::Position(i),
+    }
+}
+
+fn call_arg(arg_list: Option<&ast::ArgList>, args: &[CallArg], i: usize) -> Option<ast::Arg> {
+    arg_list
+        .filter(|list| list.args().count() == args.len())
+        .and_then(|list| list.args().nth(i))
+}
+
+fn call_arg_name(
+    arg_list: Option<&ast::ArgList>,
+    args: &[CallArg],
+    i: usize,
+) -> Option<SyntaxNode> {
+    let arg = call_arg(arg_list, args, i)?;
+    match arg.func_arg_expr() {
+        Some(ast::FuncArgExpr::NamedArg(named_arg)) => named_arg
+            .name()
+            .map(|name| name.syntax().clone())
+            .or_else(|| Some(arg.syntax().clone())),
+        Some(ast::FuncArgExpr::Expr(_)) | None => Some(arg.syntax().clone()),
     }
 }
 
@@ -9950,6 +10023,9 @@ impl Lowerer {
                                     lookup: LookupKind::Signature,
                                     similar,
                                     misplaced_order_by: false,
+                                    candidates: None,
+                                    unknown_names: false,
+                                    outside_search_path: None,
                                 },
                             );
                             Some(Resolution::Unknown)
@@ -19101,9 +19177,14 @@ impl Lowerer {
         arg_list: Option<&ast::ArgList>,
         node: &SyntaxNode,
     ) -> Resolution {
-        if !matches!(resolution, Resolution::Unresolved)
-            || args.iter().any(|arg| matches!(arg.ty, ArgType::Untyped))
-        {
+        if !matches!(resolution, Resolution::Unresolved) {
+            return resolution;
+        }
+        if let Some(CallMismatchError { error, target }) = invalid_named_args(args, arg_list) {
+            self.push_error(target.as_ref().unwrap_or(node), error);
+            return Resolution::Unknown;
+        }
+        if args.iter().any(|arg| matches!(arg.ty, ArgType::Untyped)) {
             return resolution;
         }
         let start = self.index.errors.args.next_idx();
@@ -19123,11 +19204,31 @@ impl Lowerer {
             return Resolution::Unknown;
         }
         let misplaced_order_by = arg_list.is_some_and(Self::misplaced_order_by);
-        let similar = if misplaced_order_by {
+        if !misplaced_order_by
+            && let Some(CallMismatchError { error, target }) =
+                self.call_mismatch(kind, schema, name, args, arg_list)
+        {
+            self.push_error(target.as_ref().unwrap_or(node), error);
+            return Resolution::Unknown;
+        }
+        let candidates = if misplaced_order_by {
+            None
+        } else {
+            self.routine_overloads(kind, schema, name)
+        };
+        let outside_search_path = if schema.is_none() && candidates.is_none() {
+            self.outside_search_path(kind, name, args, node)
+        } else {
+            None
+        };
+        let similar = if misplaced_order_by || candidates.is_some() || outside_search_path.is_some()
+        {
             None
         } else {
             self.similar_function(schema, name, kind, LookupKind::Call)
         };
+        let unknown_names =
+            candidates.is_some() && !self.accepts_arg_names(kind, schema, name, args);
         self.push_error(
             node,
             SemaError::UnresolvedRoutine {
@@ -19138,6 +19239,9 @@ impl Lowerer {
                 lookup: LookupKind::Call,
                 similar,
                 misplaced_order_by,
+                candidates,
+                unknown_names,
+                outside_search_path,
             },
         );
         Resolution::Unknown
@@ -22095,17 +22199,250 @@ impl Lowerer {
         args: &[CallArg],
         kind: FunctionKind,
     ) -> Resolution {
-        let candidates = self
-            .search_path(schema, Lookup::Function)
-            .flat_map(|schema| {
+        self.overloads()
+            .select(self.routine_candidates(schema, name, kind), args)
+    }
+
+    fn routine_candidates(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: FunctionKind,
+    ) -> impl Iterator<Item = FunctionId> {
+        self.search_path(schema, Lookup::Function)
+            .flat_map(move |schema| {
                 self.index.functions.named(schema, name).filter(move |id| {
                     let function = &self.index.functions[*id];
                     (function.kind == FunctionKind::Procedure) == (kind == FunctionKind::Procedure)
                         && self.visible(function.schema, function.ptr.file_id)
                         && !self.dropped_functions.contains(id)
                 })
+            })
+    }
+
+    fn routine_overloads(
+        &mut self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+    ) -> Option<ErrorCandidates> {
+        let mut functions = self.routine_candidates(schema, name, call_kind(kind));
+        let mut shown: SmallVec<[FunctionId; MAX_CANDIDATES]> =
+            functions.by_ref().take(MAX_CANDIDATES).collect();
+        let total = shown.len() + functions.count();
+        if total < 2 {
+            return None;
+        }
+        shown.sort_unstable();
+        let start = self.index.errors.candidates.next_idx();
+        for function in shown {
+            let args = self.candidate_args(function);
+            self.index.errors.candidates.alloc(args);
+        }
+        Some(ErrorCandidates {
+            shown: self.index.errors.candidates.range_from(start),
+            total,
+        })
+    }
+
+    fn candidate_args(&mut self, function: FunctionId) -> ErrorArgs {
+        let function = &self.index.functions[function];
+        let procedure = function.kind == FunctionKind::Procedure;
+        let params = function.params;
+        let start = self.index.errors.args.next_idx();
+        for param in params {
+            let param = &self.index.params[param];
+            if param.mode == ParamMode::Out && !procedure {
+                continue;
+            }
+            let variadic = param.mode == ParamMode::Variadic;
+            let ty = param.ty.map_or(OperandName::Unknown, |ty| {
+                OperandName::Ty(self.index.ty_name(ty))
             });
-        self.overloads().select(candidates, args)
+            self.index.errors.args.alloc(ErrorArg {
+                name: None,
+                ty,
+                variadic,
+            });
+        }
+        ErrorArgs::List(self.index.errors.args.range_from(start))
+    }
+
+    fn outside_search_path(
+        &self,
+        kind: RoutineKind,
+        name: Name,
+        args: &[CallArg],
+        node: &SyntaxNode,
+    ) -> Option<OutsideSearchPath> {
+        let kind = call_kind(kind);
+        let mut schemas = self
+            .index
+            .schemas
+            .iter()
+            .filter(|(id, _)| !self.dropped_schemas.contains(id))
+            .map(|(_, schema)| schema.name)
+            .filter(|schema| {
+                *schema != self.pg_temp
+                    && !self
+                        .search_path(None, Lookup::Function)
+                        .any(|path| path == *schema)
+            })
+            .filter(|schema| {
+                self.index.functions.named(*schema, name).any(|id| {
+                    let function = &self.index.functions[id];
+                    (function.kind == FunctionKind::Procedure) == (kind == FunctionKind::Procedure)
+                        && self.visible(function.schema, function.ptr.file_id)
+                        && !self.dropped_functions.contains(&id)
+                })
+            });
+        let schema = schemas.next()?;
+        let others = schemas.count();
+        let qualify_at = (others == 0
+            && matches!(
+                self.find_routine(Some(schema), name, args, kind),
+                Resolution::Function(_)
+            ))
+        .then(|| self.node_range(node).start());
+        Some(OutsideSearchPath {
+            schema,
+            others,
+            qualify_at,
+        })
+    }
+
+    fn accepts_arg_names(
+        &self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+    ) -> bool {
+        self.routine_candidates(schema, name, call_kind(kind))
+            .any(|function| {
+                let params = self.index.functions[function].params;
+                args.iter().filter_map(|arg| arg.name).all(|arg| {
+                    params
+                        .iter()
+                        .any(|param| self.index.params[param].name == Some(arg))
+                })
+            })
+    }
+
+    fn alloc_error_params(&mut self, missing: SmallVec<[MissingParam; 2]>) -> IdxRange<ErrorParam> {
+        let start = self.index.errors.params.next_idx();
+        for MissingParam { name, position } in missing {
+            self.index
+                .errors
+                .params
+                .alloc(ErrorParam { name, position });
+        }
+        self.index.errors.params.range_from(start)
+    }
+
+    fn call_mismatch(
+        &mut self,
+        kind: RoutineKind,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+        arg_list: Option<&ast::ArgList>,
+    ) -> Option<CallMismatchError> {
+        let function = {
+            let mut candidates = self.routine_candidates(schema, name, call_kind(kind));
+            let (Some(function), None) = (candidates.next(), candidates.next()) else {
+                return None;
+            };
+            function
+        };
+        match self
+            .overloads()
+            .mismatch(&self.index.functions[function], args)?
+        {
+            CallMismatch::ArgCount(ArgCount { min, max, missing }) => Some(CallMismatchError {
+                error: SemaError::ArgumentCountMismatch {
+                    kind,
+                    schema,
+                    name,
+                    min,
+                    max,
+                    supplied: args.len(),
+                    missing: self.alloc_error_params(missing),
+                },
+                target: None,
+            }),
+            CallMismatch::UnknownName { arg } => Some(CallMismatchError {
+                error: SemaError::UnknownArgumentName {
+                    kind,
+                    schema,
+                    name,
+                    arg: args[arg].name?,
+                },
+                target: call_arg_name(arg_list, args, arg),
+            }),
+            CallMismatch::PositionalAndNamed { arg } => Some(CallMismatchError {
+                error: SemaError::ArgumentPositionalAndNamed {
+                    kind,
+                    schema,
+                    name,
+                    arg: args[arg].name?,
+                },
+                target: call_arg_name(arg_list, args, arg),
+            }),
+            CallMismatch::Missing(missing) => Some(CallMismatchError {
+                error: SemaError::MissingArguments {
+                    kind,
+                    schema,
+                    name,
+                    missing: self.alloc_error_params(missing),
+                },
+                target: None,
+            }),
+            CallMismatch::NotVariadic { arg } => Some(CallMismatchError {
+                error: SemaError::NotVariadic {
+                    kind,
+                    schema,
+                    name,
+                    arg: arg_label(args, arg),
+                },
+                target: call_arg(arg_list, args, arg).map(|arg| arg.syntax().clone()),
+            }),
+            CallMismatch::UnlabeledVariadic { arg, fixable } => {
+                let target = call_arg(arg_list, args, arg).map(|arg| arg.syntax().clone());
+                let insert_at = target
+                    .as_ref()
+                    .filter(|_| fixable)
+                    .map(|node| self.node_range(node).start());
+                Some(CallMismatchError {
+                    error: SemaError::UnlabeledVariadic {
+                        kind,
+                        schema,
+                        name,
+                        param: args[arg].name?,
+                        insert_at,
+                    },
+                    target,
+                })
+            }
+            CallMismatch::ArgType(ArgMismatch {
+                position,
+                found,
+                expected,
+            }) => {
+                let target = call_arg(arg_list, args, position).map(|arg| arg.syntax().clone());
+                Some(CallMismatchError {
+                    error: SemaError::ArgumentTypeMismatch {
+                        kind,
+                        schema,
+                        name,
+                        arg: arg_label(args, position),
+                        found: self.index.ty_name(found),
+                        expected: self.index.ty_name(expected),
+                    },
+                    target,
+                })
+            }
+        }
     }
 
     fn overloads(&self) -> Overloads<'_> {

@@ -27,7 +27,7 @@ use crate::qualified_index::{
     CollationIndex, ConversionIndex, FunctionIndex, OperatorClassIndex, OperatorFamilyIndex,
     OperatorIndex, TextSearchIndex,
 };
-use crate::sema_error::{ErrorArg, SemaError, TyName};
+use crate::sema_error::{ErrorArg, ErrorArgs, ErrorParam, SemaError, TyName};
 use crate::statistics_index::StatisticsIndex;
 use crate::table_index::TableIndex;
 use crate::type_index::TypeIndex;
@@ -88,6 +88,8 @@ pub enum DiagnosticKind {
     DuplicateType,
     DuplicateColumn,
     ColumnCountMismatch,
+    ArgumentCountMismatch,
+    InvalidArgument,
     GroupingError,
     WindowingError,
     DuplicateAssignment,
@@ -155,6 +157,7 @@ pub struct Diagnostic {
     pub kind: DiagnosticKind,
     pub message: Cow<'static, str>,
     pub hint: Option<Cow<'static, str>>,
+    pub note: Option<Cow<'static, str>>,
     pub suggestion: Option<Suggestion>,
 }
 
@@ -174,6 +177,8 @@ struct ErrorEntry {
 pub(crate) struct Errors {
     entries: Vec<ErrorEntry>,
     pub(crate) args: LayeredArena<ErrorArg>,
+    pub(crate) candidates: LayeredArena<ErrorArgs>,
+    pub(crate) params: LayeredArena<ErrorParam>,
 }
 
 impl Errors {
@@ -184,6 +189,8 @@ impl Errors {
     pub(crate) fn shrink_to_fit(&mut self) {
         self.entries.shrink_to_fit();
         self.args.shrink_to_fit();
+        self.candidates.shrink_to_fit();
+        self.params.shrink_to_fit();
     }
 }
 
@@ -502,8 +509,9 @@ impl IndexData {
             .map(|entry| Diagnostic {
                 kind: entry.error.kind(),
                 range: entry.range,
-                message: entry.error.message(&self.names, &self.errors.args),
+                message: entry.error.message(&self.names, &self.errors),
                 hint: entry.error.hint().map(Cow::Borrowed),
+                note: entry.error.note(&self.names, &self.errors),
                 suggestion: entry.error.suggestion(entry.range.value, &self.names),
             })
             .collect();

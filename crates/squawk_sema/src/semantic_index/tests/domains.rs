@@ -15,16 +15,16 @@ create function h(x int) returns int language sql return 2;
 create table t (a posint, b small, c int, d text);
 select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
 "), @"
-    error: function `g(posint)` does not exist
+    error: argument 1 of `g` has type `posint`, expected `text`
        ╭▸ 
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
-       │                    ━
+       │                      ━
        │
        ╰ hint: consider adding explicit type casts
-    error: function `g(small)` does not exist
+    error: argument 1 of `g` has type `small`, expected `text`
        ╭▸ 
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
-       │                          ━
+       │                            ━
        │
        ╰ hint: consider adding explicit type casts
     error: function `h(text)` does not exist
@@ -32,6 +32,7 @@ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
        │                                            ━
        │
+       ├ note: candidates are `h(posint)`, `h(int4)`
        ╰ hint: consider adding explicit type casts
     ");
 }
@@ -46,10 +47,10 @@ create function g(x dtext) returns int language sql return 1;
 create table t (a int, b varchar, c text);
 select f('x'), g(a), g(b), g(c) from t;
 "), @"
-    error: function `g(int4)` does not exist
+    error: argument 1 of `g` has type `int4`, expected `dtext`
       ╭▸ 
     7 │ select f('x'), g(a), g(b), g(c) from t;
-      │                ━
+      │                  ━
       │
       ╰ hint: consider adding explicit type casts
     ");

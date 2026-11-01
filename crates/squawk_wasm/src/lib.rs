@@ -359,7 +359,12 @@ impl SquawkDatabase {
                     ),
                     None => (None, None),
                 };
-                let messages = x.hint.into_iter().chain(suggestion_message).collect();
+                let messages = x
+                    .note
+                    .into_iter()
+                    .chain(x.hint)
+                    .chain(suggestion_message)
+                    .collect();
 
                 LintError {
                     severity: Severity::Error,
