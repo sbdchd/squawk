@@ -1,0 +1,277 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/call_variadic_arg.sql
+---
+SOURCE_FILE@0..329
+  COMMENT@0..5 "-- ok"
+  WHITESPACE@5..6 "\n"
+  SELECT@6..41
+    SELECT_CLAUSE@6..40
+      SELECT_KW@6..12 "select"
+      WHITESPACE@12..13 " "
+      TARGET_LIST@13..40
+        TARGET@13..40
+          CALL_EXPR@13..40
+            NAME_REF@13..19
+              IDENT@13..19 "concat"
+            ARG_LIST@19..40
+              L_PAREN@19..20 "("
+              ARG@20..39
+                VARIADIC_KW@20..28 "variadic"
+                WHITESPACE@28..29 " "
+                ARRAY_EXPR@29..39
+                  ARRAY_KW@29..34 "array"
+                  L_BRACK@34..35 "["
+                  LITERAL@35..38
+                    STRING@35..38 "'a'"
+                  R_BRACK@38..39 "]"
+              R_PAREN@39..40 ")"
+    SEMICOLON@40..41 ";"
+  WHITESPACE@41..42 "\n"
+  SELECT@42..82
+    SELECT_CLAUSE@42..81
+      SELECT_KW@42..48 "select"
+      WHITESPACE@48..49 " "
+      TARGET_LIST@49..81
+        TARGET@49..81
+          CALL_EXPR@49..81
+            NAME_REF@49..55
+              IDENT@49..55 "concat"
+            ARG_LIST@55..81
+              L_PAREN@55..56 "("
+              ARG@56..59
+                LITERAL@56..59
+                  STRING@56..59 "'a'"
+              COMMA@59..60 ","
+              WHITESPACE@60..61 " "
+              ARG@61..80
+                VARIADIC_KW@61..69 "variadic"
+                WHITESPACE@69..70 " "
+                ARRAY_EXPR@70..80
+                  ARRAY_KW@70..75 "array"
+                  L_BRACK@75..76 "["
+                  LITERAL@76..79
+                    STRING@76..79 "'b'"
+                  R_BRACK@79..80 "]"
+              R_PAREN@80..81 ")"
+    SEMICOLON@81..82 ";"
+  WHITESPACE@82..83 "\n"
+  SELECT@83..124
+    SELECT_CLAUSE@83..123
+      SELECT_KW@83..89 "select"
+      WHITESPACE@89..90 " "
+      TARGET_LIST@90..123
+        TARGET@90..123
+          CALL_EXPR@90..123
+            NAME_REF@90..91
+              IDENT@90..91 "f"
+            ARG_LIST@91..123
+              L_PAREN@91..92 "("
+              ARG@92..98
+                NAMED_ARG@92..98
+                  PARAM_NAME_REF@92..93
+                    IDENT@92..93 "a"
+                  WHITESPACE@93..94 " "
+                  FAT_ARROW@94..96 "=>"
+                  WHITESPACE@96..97 " "
+                  LITERAL@97..98
+                    INT_NUMBER@97..98 "1"
+              COMMA@98..99 ","
+              WHITESPACE@99..100 " "
+              ARG@100..122
+                VARIADIC_KW@100..108 "variadic"
+                WHITESPACE@108..109 " "
+                NAMED_ARG@109..122
+                  PARAM_NAME_REF@109..110
+                    IDENT@109..110 "b"
+                  WHITESPACE@110..111 " "
+                  FAT_ARROW@111..113 "=>"
+                  WHITESPACE@113..114 " "
+                  ARRAY_EXPR@114..122
+                    ARRAY_KW@114..119 "array"
+                    L_BRACK@119..120 "["
+                    LITERAL@120..121
+                      INT_NUMBER@120..121 "2"
+                    R_BRACK@121..122 "]"
+              R_PAREN@122..123 ")"
+    SEMICOLON@123..124 ";"
+  WHITESPACE@124..125 "\n"
+  SELECT@125..175
+    SELECT_CLAUSE@125..174
+      SELECT_KW@125..131 "select"
+      WHITESPACE@131..132 " "
+      TARGET_LIST@132..174
+        TARGET@132..174
+          CALL_EXPR@132..174
+            NAME_REF@132..142
+              IDENT@132..142 "string_agg"
+            ARG_LIST@142..174
+              L_PAREN@142..143 "("
+              ARG@143..173
+                VARIADIC_KW@143..151 "variadic"
+                WHITESPACE@151..152 " "
+                ARRAY_EXPR@152..162
+                  ARRAY_KW@152..157 "array"
+                  L_BRACK@157..158 "["
+                  LITERAL@158..161
+                    STRING@158..161 "'a'"
+                  R_BRACK@161..162 "]"
+                WHITESPACE@162..163 " "
+                ORDER_BY_CLAUSE@163..173
+                  ORDER_KW@163..168 "order"
+                  WHITESPACE@168..169 " "
+                  BY_KW@169..171 "by"
+                  WHITESPACE@171..172 " "
+                  SORT_BY_LIST@172..173
+                    SORT_BY@172..173
+                      LITERAL@172..173
+                        INT_NUMBER@172..173 "1"
+              R_PAREN@173..174 ")"
+    SEMICOLON@174..175 ";"
+  WHITESPACE@175..177 "\n\n"
+  COMMENT@177..183 "-- err"
+  WHITESPACE@183..184 "\n"
+  SELECT@184..208
+    SELECT_CLAUSE@184..207
+      SELECT_KW@184..190 "select"
+      WHITESPACE@190..191 " "
+      TARGET_LIST@191..207
+        TARGET@191..207
+          CALL_EXPR@191..207
+            NAME_REF@191..192
+              IDENT@191..192 "f"
+            ARG_LIST@192..207
+              L_PAREN@192..193 "("
+              ARG@193..203
+                VARIADIC_KW@193..201 "variadic"
+                WHITESPACE@201..202 " "
+                NAME_REF@202..203
+                  IDENT@202..203 "x"
+              COMMA@203..204 ","
+              WHITESPACE@204..205 " "
+              ARG@205..206
+                NAME_REF@205..206
+                  IDENT@205..206 "b"
+              R_PAREN@206..207 ")"
+    SEMICOLON@207..208 ";"
+  WHITESPACE@208..209 "\n"
+  SELECT@209..249
+    SELECT_CLAUSE@209..248
+      SELECT_KW@209..215 "select"
+      WHITESPACE@215..216 " "
+      TARGET_LIST@216..248
+        TARGET@216..248
+          CALL_EXPR@216..248
+            NAME_REF@216..222
+              IDENT@216..222 "concat"
+            ARG_LIST@222..248
+              L_PAREN@222..223 "("
+              ARG@223..242
+                VARIADIC_KW@223..231 "variadic"
+                WHITESPACE@231..232 " "
+                ARRAY_EXPR@232..242
+                  ARRAY_KW@232..237 "array"
+                  L_BRACK@237..238 "["
+                  LITERAL@238..241
+                    STRING@238..241 "'a'"
+                  R_BRACK@241..242 "]"
+              COMMA@242..243 ","
+              WHITESPACE@243..244 " "
+              ARG@244..247
+                LITERAL@244..247
+                  STRING@244..247 "'b'"
+              R_PAREN@247..248 ")"
+    SEMICOLON@248..249 ";"
+  WHITESPACE@249..250 "\n"
+  SELECT@250..291
+    SELECT_CLAUSE@250..290
+      SELECT_KW@250..256 "select"
+      WHITESPACE@256..257 " "
+      TARGET_LIST@257..290
+        TARGET@257..290
+          CALL_EXPR@257..290
+            NAME_REF@257..258
+              IDENT@257..258 "f"
+            ARG_LIST@258..290
+              L_PAREN@258..259 "("
+              ARG@259..281
+                VARIADIC_KW@259..267 "variadic"
+                WHITESPACE@267..268 " "
+                NAMED_ARG@268..281
+                  PARAM_NAME_REF@268..269
+                    IDENT@268..269 "a"
+                  WHITESPACE@269..270 " "
+                  FAT_ARROW@270..272 "=>"
+                  WHITESPACE@272..273 " "
+                  ARRAY_EXPR@273..281
+                    ARRAY_KW@273..278 "array"
+                    L_BRACK@278..279 "["
+                    LITERAL@279..280
+                      INT_NUMBER@279..280 "1"
+                    R_BRACK@280..281 "]"
+              COMMA@281..282 ","
+              WHITESPACE@282..283 " "
+              ARG@283..289
+                NAMED_ARG@283..289
+                  PARAM_NAME_REF@283..284
+                    IDENT@283..284 "b"
+                  WHITESPACE@284..285 " "
+                  FAT_ARROW@285..287 "=>"
+                  WHITESPACE@287..288 " "
+                  LITERAL@288..289
+                    INT_NUMBER@288..289 "2"
+              R_PAREN@289..290 ")"
+    SEMICOLON@290..291 ";"
+  WHITESPACE@291..292 "\n"
+  SELECT@292..328
+    SELECT_CLAUSE@292..327
+      SELECT_KW@292..298 "select"
+      WHITESPACE@298..299 " "
+      TARGET_LIST@299..327
+        TARGET@299..327
+          CALL_EXPR@299..327
+            NAME_REF@299..300
+              IDENT@299..300 "f"
+            ARG_LIST@300..327
+              L_PAREN@300..301 "("
+              ARG@301..311
+                VARIADIC_KW@301..309 "variadic"
+                WHITESPACE@309..310 " "
+                NAME_REF@310..311
+                  IDENT@310..311 "x"
+              COMMA@311..312 ","
+              WHITESPACE@312..313 " "
+              ARG@313..323
+                VARIADIC_KW@313..321 "variadic"
+                WHITESPACE@321..322 " "
+                NAME_REF@322..323
+                  IDENT@322..323 "y"
+              COMMA@323..324 ","
+              WHITESPACE@324..325 " "
+              ARG@325..326
+                NAME_REF@325..326
+                  IDENT@325..326 "z"
+              R_PAREN@326..327 ")"
+    SEMICOLON@327..328 ";"
+  WHITESPACE@328..329 "\n"
+
+error[syntax-error]: `variadic` argument must be last
+  ╭▸ 
+8 │ select f(variadic x, b);
+  ╰╴         ━━━━━━━━
+error[syntax-error]: `variadic` argument must be last
+  ╭▸ 
+9 │ select concat(variadic array['a'], 'b');
+  ╰╴              ━━━━━━━━
+error[syntax-error]: `variadic` argument must be last
+   ╭▸ 
+10 │ select f(variadic a => array[1], b => 2);
+   ╰╴         ━━━━━━━━
+error[syntax-error]: `variadic` argument must be last
+   ╭▸ 
+11 │ select f(variadic x, variadic y, z);
+   ╰╴         ━━━━━━━━
+error[syntax-error]: `variadic` argument must be last
+   ╭▸ 
+11 │ select f(variadic x, variadic y, z);
+   ╰╴                     ━━━━━━━━

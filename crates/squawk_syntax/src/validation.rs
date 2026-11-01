@@ -231,6 +231,9 @@ fn validate_table_name(table_name: &ast::TableName, acc: &mut Vec<SyntaxError>) 
 
 fn validate_call_expr(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
     validate_sub_type_fn(call_expr, acc);
+    if let Some(arg_list) = call_expr.arg_list() {
+        validate_variadic_arg_last(&arg_list, acc);
+    }
     let Some(name_ref) = call_expr.expr().and_then(|expr| expr.as_name_ref()) else {
         return;
     };
@@ -262,6 +265,20 @@ fn validate_call_expr(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
         _ => format!("`{}` is not a valid function name", token.text()),
     };
     acc.push(SyntaxError::new(message, token.text_range()));
+}
+
+fn validate_variadic_arg_last(arg_list: &ast::ArgList, acc: &mut Vec<SyntaxError>) {
+    let mut args = arg_list.args().peekable();
+    while let Some(arg) = args.next() {
+        if args.peek().is_some()
+            && let Some(variadic) = arg.variadic_token()
+        {
+            acc.push(SyntaxError::new(
+                "`variadic` argument must be last",
+                variadic.text_range(),
+            ));
+        }
+    }
 }
 
 fn validate_sub_type_fn(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {

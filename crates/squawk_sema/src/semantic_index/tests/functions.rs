@@ -1424,7 +1424,7 @@ create function foo(x int) returns int language sql return x;
 create function v(a int, variadic b int[]) returns int language sql return a;
 select foo(variadic array[1]);
 select foo(variadic x => array[1]);
-select v(variadic a => 1, b => 2);
+select v(variadic a => 1);
 "), @"
     error: argument 1 of `foo` is labeled `variadic` but its parameter is not variadic
       ╭▸ 
@@ -1436,7 +1436,7 @@ select v(variadic a => 1, b => 2);
       ╰╴           ━━━━━━━━━━━━━━━━━━━━━━
     error: argument `a` of `v` is labeled `variadic` but its parameter is not variadic
       ╭▸ 
-    6 │ select v(variadic a => 1, b => 2);
+    6 │ select v(variadic a => 1);
       ╰╴         ━━━━━━━━━━━━━━━
     ");
 }
