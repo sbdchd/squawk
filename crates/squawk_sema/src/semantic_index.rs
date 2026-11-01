@@ -507,11 +507,9 @@ impl IndexData {
             .map(|entry| Diagnostic {
                 kind: entry.error.kind(),
                 range: entry.range,
-                message: entry.error.message(&self.names, &self.errors.args),
+                message: entry.error.message(&self.names, &self.errors),
                 hint: entry.error.hint().map(Cow::Borrowed),
-                note: entry
-                    .error
-                    .note(&self.names, &self.errors.args, &self.errors.candidates),
+                note: entry.error.note(&self.names, &self.errors),
                 suggestion: entry.error.suggestion(entry.range.value, &self.names),
             })
             .collect();

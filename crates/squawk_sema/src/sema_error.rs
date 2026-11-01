@@ -1,7 +1,7 @@
 use std::borrow::Cow;
 use std::fmt::{self, Write};
 
-use crate::arena::{IdxRange, LayeredArena};
+use crate::arena::IdxRange;
 use crate::interner::{Interner, Name};
 use crate::ir::{
     AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
@@ -11,7 +11,7 @@ use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
-use crate::semantic_index::{DiagnosticKind, Suggestion};
+use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct SimilarColumn {
@@ -1470,12 +1470,7 @@ impl SemaError {
         }
     }
 
-    pub(crate) fn note(
-        &self,
-        names: &Interner,
-        args: &LayeredArena<ErrorArg>,
-        candidates: &LayeredArena<ErrorArgs>,
-    ) -> Option<Cow<'static, str>> {
+    pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
         let SemaError::UnresolvedRoutine {
             schema,
             name,
@@ -1488,7 +1483,7 @@ impl SemaError {
         let message = ErrorMessage {
             error: self,
             names,
-            args,
+            errors,
         };
         let mut note = String::from("candidates are ");
         for (i, candidate) in shown.iter().enumerate() {
@@ -1498,7 +1493,7 @@ impl SemaError {
             write!(
                 note,
                 "`{}`",
-                message.signature(schema, name, candidates[candidate])
+                message.signature(schema, name, errors.candidates[candidate])
             )
             .unwrap();
         }
@@ -1510,18 +1505,14 @@ impl SemaError {
         Some(Cow::Owned(note))
     }
 
-    pub(crate) fn message(
-        &self,
-        names: &Interner,
-        args: &LayeredArena<ErrorArg>,
-    ) -> Cow<'static, str> {
+    pub(crate) fn message(&self, names: &Interner, errors: &Errors) -> Cow<'static, str> {
         match self.static_message() {
             Some(message) => Cow::Borrowed(message),
             None => Cow::Owned(
                 ErrorMessage {
                     error: self,
                     names,
-                    args,
+                    errors,
                 }
                 .to_string(),
             ),
@@ -1532,7 +1523,7 @@ impl SemaError {
 struct ErrorMessage<'a> {
     error: &'a SemaError,
     names: &'a Interner,
-    args: &'a LayeredArena<ErrorArg>,
+    errors: &'a Errors,
 }
 
 impl ErrorMessage<'_> {
@@ -1566,7 +1557,7 @@ impl ErrorMessage<'_> {
                 ErrorArgs::Star => return f.write_str("*)"),
             };
             for (i, arg) in args.iter().enumerate() {
-                let arg = self.args[arg];
+                let arg = self.errors.args[arg];
                 if i > 0 {
                     f.write_str(", ")?;
                 }
