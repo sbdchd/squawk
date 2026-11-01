@@ -96,6 +96,7 @@ pub(crate) struct ErrorParam {
 pub(crate) struct OutsideSearchPath {
     pub(crate) schema: Name,
     pub(crate) others: usize,
+    pub(crate) qualify_at: Option<TextSize>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1329,6 +1330,30 @@ impl SemaError {
                 },
             },
             SemaError::UnresolvedRoutine {
+                name,
+                outside_search_path:
+                    Some(OutsideSearchPath {
+                        schema,
+                        qualify_at: Some(qualify_at),
+                        ..
+                    }),
+                ..
+            } => {
+                let schema = names.resolve(schema);
+                let quoted = quote_ident(schema);
+                Suggestion {
+                    message: format!("qualify the call with schema `{schema}`").into(),
+                    fix: Fix {
+                        title: format!(
+                            "Qualify as `{quoted}.{}`",
+                            quote_ident(names.resolve(name))
+                        )
+                        .into(),
+                        edits: vec![Edit::insert(format!("{quoted}."), qualify_at)],
+                    },
+                }
+            }
+            SemaError::UnresolvedRoutine {
                 kind,
                 similar: Some(similar),
                 misplaced_order_by: false,
@@ -1559,7 +1584,7 @@ impl SemaError {
         if let SemaError::UnresolvedRoutine {
             kind,
             name,
-            outside_search_path: Some(OutsideSearchPath { schema, others }),
+            outside_search_path: Some(OutsideSearchPath { schema, others, .. }),
             ..
         } = *self
         {

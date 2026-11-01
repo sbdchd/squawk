@@ -500,7 +500,7 @@ select $01;
 
 #[test]
 fn function_outside_search_path() {
-    assert_snapshot!(check("
+    assert_snapshot!(check(r#"
 create schema app;
 create schema other;
 create function app.do_thing(int) returns int language sql return 1;
@@ -512,13 +512,21 @@ select do_thing('a'::text);
 select twice();
 call run();
 select app.do_thnig(1);
-"), @"
+select do_thing(1, 2);
+create schema "My App";
+create function "My App".quoted(int) returns int language sql return 1;
+select quoted(1);
+"#), @r#"
     error: function `do_thing(int4)` does not exist
       ╭▸ 
     8 │ select do_thing(1);
       │        ━━━━━━━━
       │
       ╰ note: a function named `do_thing` exists in schema `app`, which is not in the `search_path`
+    help: qualify the call with schema `app`
+      ╭╴
+    8 │ select app.do_thing(1);
+      ╰╴       ++++
     error: function `do_thing(text)` does not exist
       ╭▸ 
     9 │ select do_thing('a'::text);
@@ -537,6 +545,10 @@ select app.do_thnig(1);
        │      ━━━
        │
        ╰ note: a procedure named `run` exists in schema `app`, which is not in the `search_path`
+    help: qualify the call with schema `app`
+       ╭╴
+    11 │ call app.run();
+       ╰╴     ++++
     error: function `app.do_thnig(int4)` does not exist
        ╭▸ 
     12 │ select app.do_thnig(1);
@@ -547,5 +559,21 @@ select app.do_thnig(1);
     12 - select app.do_thnig(1);
     12 + select app.do_thing(1);
        ╰╴
-    ");
+    error: function `do_thing(int4, int4)` does not exist
+       ╭▸ 
+    13 │ select do_thing(1, 2);
+       │        ━━━━━━━━
+       │
+       ╰ note: a function named `do_thing` exists in schema `app`, which is not in the `search_path`
+    error: function `quoted(int4)` does not exist
+       ╭▸ 
+    16 │ select quoted(1);
+       │        ━━━━━━
+       │
+       ╰ note: a function named `quoted` exists in schema `My App`, which is not in the `search_path`
+    help: qualify the call with schema `My App`
+       ╭╴
+    16 │ select "My App".quoted(1);
+       ╰╴       +++++++++
+    "#);
 }

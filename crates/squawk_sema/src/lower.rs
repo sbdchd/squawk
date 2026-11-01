@@ -19217,7 +19217,7 @@ impl Lowerer {
             self.routine_overloads(kind, schema, name)
         };
         let outside_search_path = if schema.is_none() && candidates.is_none() {
-            self.outside_search_path(kind, name)
+            self.outside_search_path(kind, name, args, node)
         } else {
             None
         };
@@ -22268,7 +22268,13 @@ impl Lowerer {
         ErrorArgs::List(self.index.errors.args.range_from(start))
     }
 
-    fn outside_search_path(&self, kind: RoutineKind, name: Name) -> Option<OutsideSearchPath> {
+    fn outside_search_path(
+        &self,
+        kind: RoutineKind,
+        name: Name,
+        args: &[CallArg],
+        node: &SyntaxNode,
+    ) -> Option<OutsideSearchPath> {
         let kind = call_kind(kind);
         let mut schemas = self
             .index
@@ -22291,9 +22297,17 @@ impl Lowerer {
                 })
             });
         let schema = schemas.next()?;
+        let others = schemas.count();
+        let qualify_at = (others == 0
+            && matches!(
+                self.find_routine(Some(schema), name, args, kind),
+                Resolution::Function(_)
+            ))
+        .then(|| self.node_range(node).start());
         Some(OutsideSearchPath {
             schema,
-            others: schemas.count(),
+            others,
+            qualify_at,
         })
     }
 

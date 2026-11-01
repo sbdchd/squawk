@@ -700,6 +700,10 @@ alter function s.f() set schema nope;
       │        ━
       │
       ╰ note: a function named `f` exists in schema `s`, which is not in the `search_path`
+    help: qualify the call with schema `s`
+      ╭╴
+    5 │ select s.f();
+      ╰╴       ++
     error: schema `nope` does not exist
       ╭▸ 
     7 │ alter function s.f() set schema nope;
