@@ -592,6 +592,54 @@ from (values ('a', 1)) as t (k, v);
 }
 
 #[test]
+fn xml_field_selection() {
+    assert_snapshot!(check("
+select
+  (xmlconcat('<a/>'::xml, '<b/>')).x,
+  (xmlelement(name a)).x,
+  (xmlforest(1 as a)).x,
+  (xmlparse(document '<a/>')).x,
+  (xmlpi(name a)).x,
+  (xmlroot('<a/>'::xml, version no value)).x,
+  (xmlserialize(document '<a/>'::xml as text)).x,
+  (xmlserialize(document '<a/>'::xml as varchar(10))).x;
+"), @"
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    3 │   (xmlconcat('<a/>'::xml, '<b/>')).x,
+      ╰╴                                   ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    4 │   (xmlelement(name a)).x,
+      ╰╴                       ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    5 │   (xmlforest(1 as a)).x,
+      ╰╴                      ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    6 │   (xmlparse(document '<a/>')).x,
+      ╰╴                              ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    7 │   (xmlpi(name a)).x,
+      ╰╴                  ━
+    error: column notation `.x` applied to type `xml`, which is not a composite type
+      ╭▸ 
+    8 │   (xmlroot('<a/>'::xml, version no value)).x,
+      ╰╴                                           ━
+    error: column notation `.x` applied to type `text`, which is not a composite type
+      ╭▸ 
+    9 │   (xmlserialize(document '<a/>'::xml as text)).x,
+      ╰╴                                               ━
+    error: column notation `.x` applied to type `varchar`, which is not a composite type
+       ╭▸ 
+    10 │   (xmlserialize(document '<a/>'::xml as varchar(10))).x;
+       ╰╴                                                      ━
+    ");
+}
+
+#[test]
 fn grouping_field_selection() {
     assert_snapshot!(check("
 create table t (a int, b int);

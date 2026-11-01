@@ -18914,6 +18914,7 @@ impl Lowerer {
             ast::FunctionLikeKeyword::Nullif => self.nullif_type(args),
             ast::FunctionLikeKeyword::Grouping => self.builtin_type("int4"),
             ast::FunctionLikeKeyword::MergeAction => self.builtin_type("text"),
+            ast::FunctionLikeKeyword::XmlConcat => self.builtin_type("xml"),
         }
     }
 
@@ -21249,6 +21250,7 @@ impl Lowerer {
                 self.lower_exprs(attr.expr());
             }
             self.lower_exprs(xml_element.exprs());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_exists) = call.xml_exists_fn() {
             let passing = xml_exists.xml_row_passing_clause();
@@ -21274,21 +21276,24 @@ impl Lowerer {
             {
                 self.lower_exprs(tag.expr());
             }
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_parse) = call.xml_parse_fn() {
             self.lower_exprs(xml_parse.expr());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_pi) = call.xml_pi_fn() {
             self.lower_exprs(xml_pi.expr());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_root) = call.xml_root_fn() {
             self.lower_exprs(xml_root.expr());
+            return Some(LoweredCall::typed(self.builtin_type("xml")));
         }
         if let Some(xml_serialize) = call.xml_serialize_fn() {
             self.lower_exprs(xml_serialize.expr());
-            if let Some(ty) = xml_serialize.ty() {
-                self.lower_type(&ty);
-            }
+            let ty = xml_serialize.ty().and_then(|ty| self.lower_type(&ty));
+            return Some(LoweredCall::typed(ty));
         }
         None
     }

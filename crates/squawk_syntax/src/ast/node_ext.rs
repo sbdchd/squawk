@@ -135,6 +135,7 @@ pub enum FunctionLikeKeyword {
     Least,
     MergeAction,
     Nullif,
+    XmlConcat,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1267,6 +1268,7 @@ impl ast::NameRef {
             SyntaxKind::LEAST_KW => FunctionLikeKeyword::Least,
             SyntaxKind::MERGE_ACTION_KW => FunctionLikeKeyword::MergeAction,
             SyntaxKind::NULLIF_KW => FunctionLikeKeyword::Nullif,
+            SyntaxKind::XMLCONCAT_KW => FunctionLikeKeyword::XmlConcat,
             _ => return None,
         };
         Some(keyword)
