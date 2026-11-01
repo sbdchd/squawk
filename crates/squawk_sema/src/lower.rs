@@ -22285,10 +22285,16 @@ impl Lowerer {
             }
             FieldBase::Expr(ty) => {
                 let field = field_expr.field()?;
+                if self.is_record(ty) {
+                    return self.add_record_field_ref(None, &field);
+                }
                 return self.add_field_ref(ty, &field);
             }
-            FieldBase::Columns { columns, .. } => {
+            FieldBase::Columns { columns, ty } => {
                 let field = field_expr.field()?;
+                if self.is_record(ty) {
+                    return self.add_record_field_ref(Some(columns), &field);
+                }
                 return self.add_columns_field_ref(Some(columns), &field);
             }
         };
@@ -22354,6 +22360,9 @@ impl Lowerer {
         let base = field_expr.base()?;
         if let Some(call) = call_field_base(&base) {
             return Some(self.lower_call_field_base(&call));
+        }
+        if let ast::Expr::TupleExpr(tuple) = base.unparen() {
+            return Some(self.lower_row_field_base(&tuple));
         }
         if let ast::Expr::ParenExpr(_) = base
             && let ast::Expr::NameRef(name_ref) = base.unparen()
@@ -22436,6 +22445,52 @@ impl Lowerer {
                 self.expr_field_base(ty)
             }
         })
+    }
+
+    fn lower_row_field_base(&mut self, tuple: &ast::TupleExpr) -> FieldBase {
+        let mut columns = Vec::with_capacity(tuple.exprs().count());
+        for (index, expr) in tuple.exprs().enumerate() {
+            let ty = self.lower_expr(&expr);
+            columns.push(Column {
+                name: Some(self.intern(&format!("f{}", index + 1))),
+                ptr: self.ptr(expr.syntax()),
+                ty,
+                merge: None,
+            });
+        }
+        let range = self.index.columns.alloc_many(columns);
+        FieldBase::Columns {
+            columns: Columns {
+                range,
+                complete: true,
+            },
+            ty: self.builtin_type("record"),
+        }
+    }
+
+    fn is_record(&mut self, ty: Option<Ty>) -> bool {
+        ty.is_some() && ty == self.builtin_type("record")
+    }
+
+    fn add_record_field_ref(
+        &mut self,
+        columns: Option<Columns>,
+        field: &ast::NameRef,
+    ) -> Option<Ty> {
+        let column = self.name_ref_name(field)?;
+        if let Some(columns) = columns
+            && self.find_column_in(columns.range, column).is_some()
+        {
+            return self.add_columns_field_ref(Some(columns), field);
+        }
+        self.push_error(field.syntax(), SemaError::UnresolvedRecordColumn { column });
+        self.add_ref(
+            column,
+            ReferenceKind::Column,
+            field.syntax(),
+            Resolution::Unknown,
+        );
+        None
     }
 
     fn expr_field_base(&self, ty: Option<Ty>) -> FieldBase {

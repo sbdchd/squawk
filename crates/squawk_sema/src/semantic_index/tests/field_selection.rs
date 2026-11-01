@@ -363,6 +363,39 @@ select (nullif(null, 1)).x, (nullif('1', 1)).x;
 }
 
 #[test]
+fn row_field_selection() {
+    assert_snapshot!(check("
+create function f() returns record
+  language sql
+  as 'select 1, 2';
+create function g(out a int, out b int)
+  language sql
+  as 'select 1, 2';
+select
+  (row(1, 2)).f2,
+  ((1, 2)).f1,
+  (row(1)).x,
+  ((1, 2)).*,
+  (f()).x,
+  (g()).a,
+  (g()).zz;
+"), @"
+    error: could not identify column `x` in type `record`
+       ╭▸ 
+    11 │   (row(1)).x,
+       ╰╴           ━
+    error: could not identify column `x` in type `record`
+       ╭▸ 
+    13 │   (f()).x,
+       ╰╴        ━
+    error: could not identify column `zz` in type `record`
+       ╭▸ 
+    15 │   (g()).zz;
+       ╰╴        ━━
+    ");
+}
+
+#[test]
 fn grouping_field_selection() {
     assert_snapshot!(check("
 create table t (a int, b int);

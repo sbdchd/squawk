@@ -308,6 +308,9 @@ pub(crate) enum SemaError {
         column: Name,
         relation: Name,
     },
+    UnresolvedRecordColumn {
+        column: Name,
+    },
     UnresolvedReference {
         kind: ReferenceKind,
         name: Name,
@@ -972,9 +975,9 @@ impl SemaError {
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
             | SemaError::ParameterlessAggregate { .. } => DiagnosticKind::WrongRoutineKind,
-            SemaError::UnresolvedQualifiedColumn { .. } | SemaError::QualifiedSetTarget { .. } => {
-                DiagnosticKind::UnresolvedColumn
-            }
+            SemaError::UnresolvedQualifiedColumn { .. }
+            | SemaError::QualifiedSetTarget { .. }
+            | SemaError::UnresolvedRecordColumn { .. } => DiagnosticKind::UnresolvedColumn,
             SemaError::UnresolvedReference { kind, .. } => unresolved_kind(kind),
             SemaError::AmbiguousReference { kind, .. } => ambiguous_kind(kind),
             SemaError::NotLateral {
@@ -1800,6 +1803,11 @@ impl fmt::Display for ErrorMessage<'_> {
             } => {
                 write!(f, "column `{}.{}` does not exist", n(qualifier), n(column))
             }
+            SemaError::UnresolvedRecordColumn { column } => write!(
+                f,
+                "could not identify column `{}` in type `record`",
+                n(column)
+            ),
             SemaError::QualifiedSetTarget { column, relation } => write!(
                 f,
                 "column `{}` of relation `{}` does not exist",
