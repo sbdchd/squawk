@@ -5,6 +5,7 @@ mod casts;
 mod collations;
 mod comments;
 mod composite_types;
+mod conditions;
 mod constraints;
 mod conversions;
 mod copy;

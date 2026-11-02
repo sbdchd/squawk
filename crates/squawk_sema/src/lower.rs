@@ -1309,22 +1309,56 @@ enum Condition {
     Where,
     Having,
     On,
+    Check,
+    Filter,
+    Policy,
+    TriggerWhen,
+    MergeWhen,
+    IndexPredicate,
+    CopyWhere,
+    PublicationWhere,
+    CaseWhen,
+    And,
+    Or,
+    Not,
 }
 
 impl Condition {
-    fn context(self) -> ExprContext {
+    fn context(self) -> Option<ExprContext> {
         match self {
-            Condition::Where => ExprContext::Where,
-            Condition::Having => ExprContext::Having,
-            Condition::On => ExprContext::JoinCondition,
+            Condition::Where => Some(ExprContext::Where),
+            Condition::Having => Some(ExprContext::Having),
+            Condition::On => Some(ExprContext::JoinCondition),
+            Condition::Check => Some(ExprContext::CheckConstraint),
+            Condition::Filter => Some(ExprContext::Filter),
+            Condition::Policy => Some(ExprContext::Policy),
+            Condition::TriggerWhen => Some(ExprContext::TriggerWhen),
+            Condition::MergeWhen => Some(ExprContext::MergeWhen),
+            Condition::IndexPredicate => Some(ExprContext::IndexPredicate),
+            Condition::CopyWhere => Some(ExprContext::CopyWhere),
+            Condition::PublicationWhere
+            | Condition::CaseWhen
+            | Condition::And
+            | Condition::Or
+            | Condition::Not => None,
         }
     }
 
     fn keyword(self) -> &'static str {
         match self {
-            Condition::Where => "where",
+            Condition::Where
+            | Condition::IndexPredicate
+            | Condition::CopyWhere
+            | Condition::PublicationWhere => "where",
             Condition::Having => "having",
             Condition::On => "on",
+            Condition::Check => "check",
+            Condition::Filter => "filter",
+            Condition::Policy => "policy",
+            Condition::TriggerWhen | Condition::MergeWhen | Condition::CaseWhen => "when",
+            Condition::And => "and",
+            Condition::Or => "or",
+            Condition::Not => "not",
         }
     }
 }
@@ -5040,10 +5074,10 @@ impl Lowerer {
         }
         self.with_table_scope(QueryKind::Policy, table, node, |this| {
             if let Some(expr) = using.and_then(|clause| clause.expr()) {
-                this.lower_expr_in(ExprContext::Policy, &expr);
+                this.lower_condition(Condition::Policy, &expr);
             }
             if let Some(expr) = with_check.and_then(|clause| clause.expr()) {
-                this.lower_expr_in(ExprContext::Policy, &expr);
+                this.lower_condition(Condition::Policy, &expr);
             }
         });
     }
@@ -6977,7 +7011,7 @@ impl Lowerer {
                         table,
                         table_object.syntax(),
                         |this| {
-                            this.lower_expr(&expr);
+                            this.lower_condition(Condition::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -6995,7 +7029,7 @@ impl Lowerer {
                         None,
                         schema_object.syntax(),
                         |this| {
-                            this.lower_expr(&expr);
+                            this.lower_condition(Condition::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -12440,7 +12474,7 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
             self.with_domain_scope(domain, check.syntax(), |this| {
-                this.lower_expr_in(ExprContext::CheckConstraint, &expr);
+                this.lower_condition(Condition::Check, &expr);
             });
         }
         let Some(domain) = domain else {
@@ -13926,7 +13960,7 @@ impl Lowerer {
                 self.push_hidden(hidden);
             }
             if let Some(expr) = condition.and_then(|condition| condition.expr()) {
-                self.lower_expr_in(ExprContext::MergeWhen, &expr);
+                self.lower_condition(Condition::MergeWhen, &expr);
             }
             if let Some(action) = action {
                 self.lower_merge_action(target, &action);
@@ -14133,7 +14167,7 @@ impl Lowerer {
                     }
                 }
                 if let Some(expr) = on_index.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_expr_in(ExprContext::IndexPredicate, &expr);
+                    self.lower_condition(Condition::IndexPredicate, &expr);
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
@@ -17062,7 +17096,7 @@ impl Lowerer {
             }
         }
         if let Some(expr) = create_index.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::IndexPredicate, &expr);
+            self.lower_condition(Condition::IndexPredicate, &expr);
         }
         self.scopes.pop();
         let columns = self.alloc_referenced_columns(refs);
@@ -17241,7 +17275,7 @@ impl Lowerer {
             .when_condition()
             .and_then(|condition| condition.expr())
         {
-            self.lower_expr_in(ExprContext::TriggerWhen, &expr);
+            self.lower_condition(Condition::TriggerWhen, &expr);
         }
         self.scopes.pop();
 
@@ -18445,7 +18479,7 @@ impl Lowerer {
         }
         if let Some(expr) = copy.where_clause().and_then(|clause| clause.expr()) {
             self.with_table_scope(QueryKind::Copy, table, copy.syntax(), |this| {
-                this.lower_expr_in(ExprContext::CopyWhere, &expr);
+                this.lower_condition(Condition::CopyWhere, &expr);
             });
         }
     }
@@ -18837,7 +18871,7 @@ impl Lowerer {
     fn lower_check_constraint(&mut self, table: Option<TableId>, check: &ast::CheckConstraint) {
         let start = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
-            self.lower_expr_in(ExprContext::CheckConstraint, &expr);
+            self.lower_condition(Condition::Check, &expr);
         }
         let Some(table) = table else {
             return;
@@ -19746,7 +19780,7 @@ impl Lowerer {
             .where_condition_clause()
             .and_then(|clause| clause.expr())
         {
-            self.lower_expr_in(ExprContext::IndexPredicate, &expr);
+            self.lower_condition(Condition::IndexPredicate, &expr);
         }
         let Some(table) = table else {
             return;
@@ -21272,6 +21306,21 @@ impl Lowerer {
                 if let (Some(op), Some(ast::Expr::TupleExpr(lhs)), Some(rhs)) = (&op, &lhs, &rhs) {
                     self.check_row_lengths(op, lhs, rhs);
                 }
+                let condition = if let Some(ast::BinOp::And(_)) = &op {
+                    Some(Condition::And)
+                } else if let Some(ast::BinOp::Or(_)) = &op {
+                    Some(Condition::Or)
+                } else {
+                    None
+                };
+                if let Some(condition) = condition {
+                    if let Some(lhs) = &lhs {
+                        self.check_condition(condition, lhs, lhs_ty);
+                    }
+                    if let Some(rhs) = &rhs {
+                        self.check_condition(condition, rhs, rhs_ty);
+                    }
+                }
                 let ty = op
                     .as_ref()
                     .and_then(|op| self.lower_bin_operator(op, left, right));
@@ -21288,14 +21337,21 @@ impl Lowerer {
             ast::Expr::CaseExpr(case) => {
                 let srf_calls = self.srf_calls.len();
                 self.lower_case_keywords(case);
-                self.lower_exprs(case.expr());
+                let operand = case.expr();
+                self.lower_exprs(operand.clone());
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
                 for when in case
                     .when_clause_list()
                     .into_iter()
                     .flat_map(|list| list.when_clauses())
                 {
-                    self.lower_exprs(when.condition());
+                    if let Some(condition) = when.condition() {
+                        if operand.is_some() {
+                            self.lower_expr(&condition);
+                        } else {
+                            self.lower_condition(Condition::CaseWhen, &condition);
+                        }
+                    }
                     if let Some(then) = when.then() {
                         self.lower_common_expr(&mut common, &then);
                     }
@@ -21393,6 +21449,9 @@ impl Lowerer {
                 let expr = prefix.expr();
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
+                if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
+                    self.check_condition(Condition::Not, expr, ty);
+                }
                 return self.lower_prefix_operator(&op, expr_arg_type(expr.as_ref(), ty));
             }
             ast::Expr::SliceExpr(slice) => {
@@ -22271,7 +22330,7 @@ impl Lowerer {
         self.check_set_returning_call(call, function, srf_calls);
         self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Filter, &expr);
+            self.lower_condition(Condition::Filter, &expr);
         }
         if call.over_clause().is_some()
             && let Some(arg_list) = call.arg_list()
@@ -22487,7 +22546,15 @@ impl Lowerer {
     }
 
     fn lower_condition(&mut self, condition: Condition, expr: &ast::Expr) {
-        if let Some(found) = self.lower_expr_in(condition.context(), expr)
+        let found = match condition.context() {
+            Some(context) => self.lower_expr_in(context, expr),
+            None => self.lower_expr(expr),
+        };
+        self.check_condition(condition, expr, found);
+    }
+
+    fn check_condition(&mut self, condition: Condition, expr: &ast::Expr, found: Option<Ty>) {
+        if let Some(found) = found
             && let Some(bool) = self.builtin_type("bool")
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
         {
