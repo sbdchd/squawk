@@ -130,9 +130,9 @@ select 1 +$0 2;
         2 │ select 1 + 2;
           │          ─ 1. source
           │
-          ⸬  builtins.sql:33520:28
+          ⸬  builtins.sql:33609:28
           │
-    33520 │ create operator pg_catalog.+ (
+    33609 │ create operator pg_catalog.+ (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -148,9 +148,9 @@ select 1 !$0= 2;
         2 │ select 1 != 2;
           │          ── 1. source
           │
-          ⸬  builtins.sql:35550:28
+          ⸬  builtins.sql:35971:28
           │
-    35550 │ create operator pg_catalog.<> (
+    35971 │ create operator pg_catalog.<> (
           ╰╴                           ── 2. destination
     ");
 }
@@ -189,9 +189,9 @@ select s like$0 'a%' from t;
         3 │ select s like 'a%' from t;
           │          ──── 1. source
           │
-          ⸬  builtins.sql:38115:28
+          ⸬  builtins.sql:39145:28
           │
-    38115 │ create operator pg_catalog.~~ (
+    39145 │ create operator pg_catalog.~~ (
           ╰╴                           ── 2. destination
     ");
 }
@@ -208,9 +208,9 @@ select s not il$0ike 'a%' from t;
         3 │ select s not ilike 'a%' from t;
           │          ───────── 1. source
           │
-          ⸬  builtins.sql:32681:28
+          ⸬  builtins.sql:32693:28
           │
-    32681 │ create operator pg_catalog.!~~* (
+    32693 │ create operator pg_catalog.!~~* (
           ╰╴                           ──── 2. destination
     ");
 }
@@ -246,9 +246,9 @@ select s simi$0lar to 'a%' from t;
         3 │ select s similar to 'a%' from t;
           │          ────────── 1. source
           │
-          ⸬  builtins.sql:37982:28
+          ⸬  builtins.sql:38984:28
           │
-    37982 │ create operator pg_catalog.~ (
+    38984 │ create operator pg_catalog.~ (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -284,9 +284,9 @@ select i i$0n (1, 2) from t;
         3 │ select i in (1, 2) from t;
           │          ── 1. source
           │
-          ⸬  builtins.sql:36138:28
+          ⸬  builtins.sql:36733:28
           │
-    36138 │ create operator pg_catalog.= (
+    36733 │ create operator pg_catalog.= (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -306,9 +306,9 @@ select i not i$0n (select b from t) from t;
         6 │ select i not in (select b from t) from t;
           │          ────── 1. source
           │
-          ⸬  builtins.sql:35543:28
+          ⸬  builtins.sql:35962:28
           │
-    35543 │ create operator pg_catalog.<> (
+    35962 │ create operator pg_catalog.<> (
           ╰╴                           ── 2. destination
     ");
 }
@@ -325,9 +325,9 @@ select s is dis$0tinct from 'a' from t;
         3 │ select s is distinct from 'a' from t;
           │          ──────────────── 1. source
           │
-          ⸬  builtins.sql:36299:28
+          ⸬  builtins.sql:36977:28
           │
-    36299 │ create operator pg_catalog.= (
+    36977 │ create operator pg_catalog.= (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -347,9 +347,9 @@ select i =$0 any(a) from t;
         6 │ select i = any(a) from t;
           │          ─ 1. source
           │
-          ⸬  builtins.sql:36131:28
+          ⸬  builtins.sql:36722:28
           │
-    36131 │ create operator pg_catalog.= (
+    36722 │ create operator pg_catalog.= (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -369,9 +369,9 @@ select i >$0 all(select n from t) from t;
         6 │ select i > all(select n from t) from t;
           │          ─ 1. source
           │
-          ⸬  builtins.sql:36635:28
+          ⸬  builtins.sql:37431:28
           │
-    36635 │ create operator pg_catalog.> (
+    37431 │ create operator pg_catalog.> (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -391,9 +391,9 @@ select s =$0 (select s from t limit 1) from t;
         6 │ select s = (select s from t limit 1) from t;
           │          ─ 1. source
           │
-          ⸬  builtins.sql:36299:28
+          ⸬  builtins.sql:36977:28
           │
-    36299 │ create operator pg_catalog.= (
+    36977 │ create operator pg_catalog.= (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -409,9 +409,9 @@ select -$01.5;
         2 │ select -1.5;
           │        ─ 1. source
           │
-          ⸬  builtins.sql:33726:28
+          ⸬  builtins.sql:33840:28
           │
-    33726 │ create operator pg_catalog.- (
+    33840 │ create operator pg_catalog.- (
           ╰╴                           ─ 2. destination
     ");
 }
@@ -547,9 +547,9 @@ drop operator pg_catalog.=$0 (int, int);
         2 │ drop operator pg_catalog.= (int, int);
           │                          ─ 1. source
           │
-          ⸬  builtins.sql:36138:28
+          ⸬  builtins.sql:36733:28
           │
-    36138 │ create operator pg_catalog.= (
+    36733 │ create operator pg_catalog.= (
           ╰╴                           ─ 2. destination
     ");
 }

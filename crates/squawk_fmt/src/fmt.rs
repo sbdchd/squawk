@@ -12592,11 +12592,11 @@ fn build_op_class_option<'a>(ctx: &Ctx, option: ast::OpClassOption) -> Doc<'a> {
             if let Some(params) = option.param_list() {
                 doc = doc
                     .append(space_before(params.syntax()))
-                    .append(build_function_param_list(ctx, &params));
+                    .append(build_function_param_list(ctx, &params).group());
             }
             if let Some(function) = option.function_sig() {
                 doc = doc
-                    .append(line_before(function.syntax()))
+                    .append(space_before(function.syntax()))
                     .append(build_function_sig(ctx, &function));
             }
             doc.group()

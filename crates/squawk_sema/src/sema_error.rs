@@ -240,6 +240,15 @@ pub(crate) enum SemaError {
     MisplacedWindow {
         context: ExprContext,
     },
+    MisplacedSetReturningFunction {
+        context: ExprContext,
+    },
+    SetReturningFunctionIn {
+        construct: SetReturningConstruct,
+    },
+    SetReturningFunctionNotTopLevel,
+    EmptyArrayType,
+    TablesampleSetArgument,
     MisplacedSubquery {
         context: ExprContext,
     },
@@ -616,12 +625,39 @@ pub(crate) enum SemaError {
         name: Name,
         kind: TriggerFunctionKind,
     },
+    OutParamResultType {
+        expected: TyName,
+        returns: Option<TextRange>,
+    },
     ConflictingNullability {
         column: Name,
         table: Name,
     },
     RowLengthMismatch,
     UnnestColumnDefList,
+    MissingColumnDefList,
+    UnexpectedColumnDefList {
+        reason: ColumnDefListReason,
+    },
+    RowsFromColumnDefList,
+    SetofColumn {
+        name: Name,
+    },
+    PseudoTypeColumn {
+        name: Name,
+        ty: TyName,
+    },
+    CollationNotSupported {
+        ty: TyName,
+    },
+    UnsupportedReturnType {
+        function: Name,
+        ty: TyName,
+    },
+    OrdinalityColumnDefList {
+        fix: Option<OrdinalityColumnDefListFix>,
+    },
+    DuplicateColumnDefList,
     TransitionRowVariable {
         row_range: TextRange,
     },
@@ -654,6 +690,14 @@ pub(crate) struct DropRelation {
 pub(crate) enum ConflictAction {
     DoUpdate,
     DoSelect,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum SetReturningConstruct {
+    Aggregate,
+    Window,
+    Case,
+    Coalesce,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -691,6 +735,35 @@ impl WindowClause {
         match self {
             WindowClause::PartitionBy => "`partition by`",
             WindowClause::OrderBy => "`order by`",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct OrdinalityColumnDefListFix {
+    pub(crate) call_range: TextRange,
+    pub(crate) alias: Option<Name>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ColumnDefListReason {
+    OutParams,
+    NamedComposite,
+    NotRecord,
+}
+
+impl ColumnDefListReason {
+    fn message(self) -> &'static str {
+        match self {
+            ColumnDefListReason::OutParams => {
+                "a column definition list is redundant for a function with OUT parameters"
+            }
+            ColumnDefListReason::NamedComposite => {
+                "a column definition list is redundant for a function returning a named composite type"
+            }
+            ColumnDefListReason::NotRecord => {
+                "a column definition list is only allowed for functions returning `record`"
+            }
         }
     }
 }
@@ -857,7 +930,7 @@ impl ExprContext {
             ExprContext::WindowGroups => "window `groups`",
             ExprContext::Limit => "`limit`",
             ExprContext::Offset => "`offset`",
-            ExprContext::Values => "`values`",
+            ExprContext::Values | ExprContext::ValuesSingle => "`values`",
             ExprContext::Returning => "`returning`",
             ExprContext::Insert => "`insert`",
             ExprContext::Update => "`update`",
@@ -908,6 +981,7 @@ impl ExprContext {
             | ExprContext::Limit
             | ExprContext::Offset
             | ExprContext::Values
+            | ExprContext::ValuesSingle
             | ExprContext::Returning
             | ExprContext::Insert
             | ExprContext::Update
@@ -1070,6 +1144,11 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
+            SemaError::MisplacedSetReturningFunction { .. }
+            | SemaError::SetReturningFunctionIn { .. }
+            | SemaError::SetReturningFunctionNotTopLevel => DiagnosticKind::FeatureNotSupported,
+            SemaError::TablesampleSetArgument => DiagnosticKind::TypeMismatch,
+            SemaError::EmptyArrayType => DiagnosticKind::IndeterminateType,
             SemaError::MisplacedSubquery { .. }
             | SemaError::DefaultColumnReference
             | SemaError::UnnestColumnDefList
@@ -1182,6 +1261,17 @@ impl SemaError {
             | SemaError::ExclusionConflictArbiter { .. }
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
+            SemaError::MissingColumnDefList => DiagnosticKind::MissingColumnDefList,
+            SemaError::UnexpectedColumnDefList { .. }
+            | SemaError::RowsFromColumnDefList
+            | SemaError::OrdinalityColumnDefList { .. }
+            | SemaError::DuplicateColumnDefList => DiagnosticKind::UnexpectedColumnDefList,
+            SemaError::SetofColumn { .. } | SemaError::PseudoTypeColumn { .. } => {
+                DiagnosticKind::InvalidTableDefinition
+            }
+            SemaError::CollationNotSupported { .. } | SemaError::UnsupportedReturnType { .. } => {
+                DiagnosticKind::TypeMismatch
+            }
             SemaError::ConflictWithRules { .. }
             | SemaError::WholeRowConflictTarget
             | SemaError::ConflictOnSystemCatalog => DiagnosticKind::FeatureNotSupported,
@@ -1192,7 +1282,9 @@ impl SemaError {
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
-            SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
+            SemaError::TriggerReturnType { .. } | SemaError::OutParamResultType { .. } => {
+                DiagnosticKind::WrongReturnType
+            }
             SemaError::ConflictingNullability { .. } => DiagnosticKind::ConflictingNullability,
         }
     }
@@ -1386,11 +1478,42 @@ impl SemaError {
                     },
                 }
             }
+            SemaError::OrdinalityColumnDefList {
+                fix: Some(OrdinalityColumnDefListFix { call_range, alias }),
+            } => {
+                let suffix = match alias {
+                    Some(alias) => {
+                        format!(") with ordinality as {}", quote_ident(names.resolve(alias)))
+                    }
+                    None => ") with ordinality".to_owned(),
+                };
+                Suggestion {
+                    message: "put the column definition list inside `rows from`".into(),
+                    fix: Fix {
+                        title: "Move the column definition list inside `rows from`".into(),
+                        edits: vec![
+                            Edit::insert("rows from (", call_range.start()),
+                            Edit::replace(TextRange::new(call_range.end(), range.start()), " as "),
+                            Edit::insert(suffix, range.end()),
+                        ],
+                    },
+                }
+            }
             SemaError::DoSelectWithoutReturning { returning_at } => Suggestion {
                 message: "add a `returning` clause to return the conflicting rows".into(),
                 fix: Fix {
                     title: "Insert `returning *`".into(),
                     edits: vec![Edit::insert(" returning *", returning_at)],
+                },
+            },
+            SemaError::OutParamResultType {
+                returns: Some(returns),
+                ..
+            } => Suggestion {
+                message: "the `out` parameters already determine the result type".into(),
+                fix: Fix {
+                    title: "Remove the `returns` clause".into(),
+                    edits: vec![Edit::delete(returns)],
                 },
             },
             SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
@@ -1508,6 +1631,12 @@ impl SemaError {
 
     pub(crate) fn hint(&self) -> Option<&'static str> {
         match *self {
+            SemaError::EmptyArrayType => Some(
+                "explicitly cast to the desired type, for example `array[]::integer[]`",
+            ),
+            SemaError::SetReturningFunctionIn { .. } => Some(
+                "you might be able to move the set-returning function into a `lateral` `from` item",
+            ),
             SemaError::TypedTableAlter { .. } => {
                 Some("use `alter ... cascade` to alter the typed tables too")
             }
@@ -1612,6 +1741,12 @@ impl SemaError {
             SemaError::UnnestColumnDefList => Some(
                 "use a separate `unnest` call for each array inside `rows from`, each with its own column definition list",
             ),
+            SemaError::RowsFromColumnDefList => Some(
+                "put a separate column definition list for each function inside `rows from`",
+            ),
+            SemaError::OrdinalityColumnDefList { fix: None } => {
+                Some("put the column definition list inside `rows from`")
+            }
             SemaError::UnresolvedOperator {
                 replacement: Some(_),
                 ..
@@ -1666,9 +1801,9 @@ impl SemaError {
                 Some("`create or replace constraint trigger` is not supported")
             }
             SemaError::RenameSelectRule => Some("renaming an `on select` rule is not allowed"),
-            SemaError::NestedAggregate => Some("aggregate function calls cannot be nested"),
+            SemaError::NestedAggregate => Some("aggregate calls cannot be nested"),
             SemaError::AggregateContainsWindow => {
-                Some("aggregate function calls cannot contain window function calls")
+                Some("aggregate calls cannot contain window function calls")
             }
             SemaError::NestedWindow => Some("window function calls cannot be nested"),
             SemaError::InsertMoreTargetsThanExpressions { .. } => {
@@ -1691,6 +1826,19 @@ impl SemaError {
             SemaError::UnnestColumnDefList => {
                 Some("`unnest` with multiple arguments cannot have a column definition list")
             }
+            SemaError::MissingColumnDefList => {
+                Some("a column definition list is required for functions returning `record`")
+            }
+            SemaError::UnexpectedColumnDefList { reason } => Some(reason.message()),
+            SemaError::RowsFromColumnDefList => {
+                Some("`rows from` with multiple functions cannot have a column definition list")
+            }
+            SemaError::OrdinalityColumnDefList { .. } => {
+                Some("`with ordinality` cannot be used with a column definition list")
+            }
+            SemaError::DuplicateColumnDefList => {
+                Some("multiple column definition lists are not allowed for the same function")
+            }
             SemaError::TransitionRowVariable { .. } => {
                 Some("row variable naming in the `referencing` clause is not supported")
             }
@@ -1700,6 +1848,11 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::PseudoTypeColumn { .. } = *self {
+            return Some(Cow::Borrowed(
+                "pseudo-types can only be used for function arguments and return types",
+            ));
+        }
         if let SemaError::NoConflictArbiter {
             foreign_table: true,
         } = *self
@@ -1911,6 +2064,11 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::SubqueryTooManyColumns
             | SemaError::SubqueryTooFewColumns
             | SemaError::UnnestColumnDefList
+            | SemaError::MissingColumnDefList
+            | SemaError::UnexpectedColumnDefList { .. }
+            | SemaError::RowsFromColumnDefList
+            | SemaError::OrdinalityColumnDefList { .. }
+            | SemaError::DuplicateColumnDefList
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter { .. }
@@ -1944,6 +2102,36 @@ impl fmt::Display for ErrorMessage<'_> {
                 };
                 write!(f, "window functions are not allowed in {label}")
             }
+            SemaError::MisplacedSetReturningFunction { context } => {
+                let label = match context {
+                    ExprContext::WindowRange
+                    | ExprContext::WindowRows
+                    | ExprContext::WindowGroups => ExprContext::WindowDefinition.label(),
+                    context => context.label(),
+                };
+                write!(f, "set-returning functions are not allowed in {label}")
+            }
+            SemaError::SetReturningFunctionIn { construct } => match construct {
+                SetReturningConstruct::Aggregate => {
+                    f.write_str("aggregate calls cannot contain set-returning function calls")
+                }
+                SetReturningConstruct::Window => {
+                    f.write_str("window function calls cannot contain set-returning function calls")
+                }
+                SetReturningConstruct::Case => {
+                    f.write_str("set-returning functions are not allowed in `case`")
+                }
+                SetReturningConstruct::Coalesce => {
+                    f.write_str("set-returning functions are not allowed in `coalesce`")
+                }
+            },
+            SemaError::SetReturningFunctionNotTopLevel => {
+                f.write_str("set-returning functions must appear at top level of `from`")
+            }
+            SemaError::TablesampleSetArgument => {
+                f.write_str("argument of `tablesample` must not return a set")
+            }
+            SemaError::EmptyArrayType => f.write_str("cannot determine type of empty array"),
             SemaError::MisplacedSubquery { context } => write!(
                 f,
                 "cannot use subquery in {}",
@@ -2383,6 +2571,26 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(from),
                 n(to)
             ),
+            SemaError::SetofColumn { name } => {
+                write!(f, "column `{}` cannot be declared `setof`", n(name))
+            }
+            SemaError::PseudoTypeColumn { name, ty } => {
+                write!(
+                    f,
+                    "column `{}` cannot have pseudo-type `{}`",
+                    n(name),
+                    self.ty(ty)
+                )
+            }
+            SemaError::CollationNotSupported { ty } => {
+                write!(f, "collations are not supported by type `{}`", self.ty(ty))
+            }
+            SemaError::UnsupportedReturnType { function, ty } => write!(
+                f,
+                "function `{}` in `from` has unsupported return type `{}`",
+                n(function),
+                self.ty(ty)
+            ),
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
                 f,
                 "cannot change type of view column `{}` from `{}` to `{}`",
@@ -2589,6 +2797,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "cannot copy window `{}` because it has a frame clause",
                 n(name)
+            ),
+            SemaError::OutParamResultType { expected, .. } => write!(
+                f,
+                "function result type must be `{}` because of `out` parameters",
+                self.ty(expected)
             ),
             SemaError::TriggerReturnType { name, kind } => write!(
                 f,

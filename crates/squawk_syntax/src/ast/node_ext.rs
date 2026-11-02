@@ -251,6 +251,30 @@ impl ast::Type {
             | ast::Type::TimestampType(_) => None,
         }
     }
+
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        match self {
+            ast::Type::ArrayType(ty) => ty.ty()?.setof_token(),
+            ast::Type::BitType(ty) => ty.setof_token(),
+            ast::Type::BitVaryingType(ty) => ty.setof_token(),
+            ast::Type::CharacterType(ty) => ty.setof_token(),
+            ast::Type::DoubleType(ty) => ty.setof_token(),
+            ast::Type::IntervalType(ty) => ty.setof_token(),
+            ast::Type::PathType(ty) => ty.setof_token(),
+            ast::Type::TimeType(ty) => ty.setof_token(),
+            ast::Type::TimestampType(ty) => ty.setof_token(),
+            ast::Type::VarcharType(ty) => ty.setof_token(),
+        }
+    }
+}
+
+impl ast::FuncType {
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        match self {
+            ast::FuncType::PercentType(ty) => ty.setof_token(),
+            ast::FuncType::Type(ty) => ty.setof_token(),
+        }
+    }
 }
 
 impl ast::FuncArgExpr {

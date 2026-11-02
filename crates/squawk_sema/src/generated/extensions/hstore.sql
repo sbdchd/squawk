@@ -401,13 +401,17 @@ create type hstore (
 create operator #<# (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_lt
+  function = hstore_lt,
+  commutator = #>#,
+  negator = #>=#
 );
 
 create operator #<=# (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_le
+  function = hstore_le,
+  commutator = #>=#,
+  negator = #>#
 );
 
 create operator #= (
@@ -419,13 +423,17 @@ create operator #= (
 create operator #># (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_gt
+  function = hstore_gt,
+  commutator = #<#,
+  negator = #<=#
 );
 
 create operator #>=# (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_ge
+  function = hstore_ge,
+  commutator = #<=#,
+  negator = #<#
 );
 
 create operator %# (
@@ -471,19 +479,26 @@ create operator -> (
 create operator <> (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_ne
+  function = hstore_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <@ (
   leftarg = hstore,
   rightarg = hstore,
-  function = hs_contained
+  function = hs_contained,
+  commutator = @>
 );
 
 create operator = (
   leftarg = hstore,
   rightarg = hstore,
-  function = hstore_eq
+  function = hstore_eq,
+  commutator = =,
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator ? (
@@ -507,7 +522,8 @@ create operator ?| (
 create operator @> (
   leftarg = hstore,
   rightarg = hstore,
-  function = hs_contains
+  function = hs_contains,
+  commutator = <@
 );
 
 create operator || (
@@ -532,25 +548,85 @@ create operator class btree_hstore_ops
   default for type hstore
   using btree
   family btree_hstore_ops as
-  storage hstore;
+    operator 1 #<# (hstore, hstore),
+    operator 2 #<=# (hstore, hstore),
+    operator 3 = (hstore, hstore),
+    operator 4 #>=# (hstore, hstore),
+    operator 5 #># (hstore, hstore),
+    function 1 (hstore, hstore) hstore_cmp(hstore, hstore),
+    storage hstore;
 
 create operator class gin_hstore_ops
   default for type hstore
   using gin
   family gin_hstore_ops as
-  storage text;
+    function 2 (hstore, hstore) gin_extract_hstore(hstore, internal),
+    function 3 (hstore, hstore) gin_extract_hstore_query(
+      hstore,
+      internal,
+      smallint,
+      internal,
+      internal
+    ),
+    storage text;
 
 create operator class gist_hstore_ops
   default for type hstore
   using gist
   family gist_hstore_ops as
-  storage ghstore;
+    function 1 (hstore, hstore) ghstore_consistent(
+      internal,
+      hstore,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (hstore, hstore) ghstore_union(internal, internal),
+    function 5 (hstore, hstore) ghstore_penalty(internal, internal, internal),
+    function 6 (hstore, hstore) ghstore_picksplit(internal, internal),
+    function 7 (hstore, hstore) ghstore_same(ghstore, ghstore, internal),
+    storage ghstore;
 
 create operator class hash_hstore_ops
   default for type hstore
   using hash
   family hash_hstore_ops as
-  storage hstore;
+    operator 1 = (hstore, hstore),
+    function 1 (hstore, hstore) hstore_hash(hstore),
+    storage hstore;
+
+alter operator family gin_hstore_ops
+  using gin
+  add
+    operator 7 @> (hstore, hstore),
+    operator 9 ? (hstore, text),
+    operator 10 ?| (hstore, text[]),
+    operator 11 ?& (hstore, text[]),
+    function 1 (hstore, hstore) pg_catalog.bttextcmp(text, text),
+    function 4 (hstore, hstore) gin_consistent_hstore(
+      internal,
+      smallint,
+      hstore,
+      integer,
+      internal,
+      internal
+    );
+
+alter operator family gist_hstore_ops
+  using gist
+  add
+    operator 7 @> (hstore, hstore),
+    operator 9 ? (hstore, text),
+    operator 10 ?| (hstore, text[]),
+    operator 11 ?& (hstore, text[]),
+    function 3 (hstore, hstore) ghstore_compress(internal),
+    function 4 (hstore, hstore) ghstore_decompress(internal),
+    function 10 (hstore, hstore) ghstore_options(internal);
+
+alter operator family hash_hstore_ops
+  using hash
+  add
+    function 2 (hstore, hstore) hstore_hash_extended(hstore, bigint);
 
 create cast (hstore as json) with function hstore_to_json(hstore);
 

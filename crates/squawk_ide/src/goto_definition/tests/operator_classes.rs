@@ -107,9 +107,9 @@ create index on t (a text_pattern_ops$0);
         3 │ create index on t (a text_pattern_ops);
           │                      ──────────────── 1. source
           │
-          ⸬  builtins.sql:40210:34
+          ⸬  builtins.sql:43532:34
           │
-    40210 │ create operator class pg_catalog.text_pattern_ops
+    43532 │ create operator class pg_catalog.text_pattern_ops
           ╰╴                                 ──────────────── 2. destination
     ");
 }
@@ -146,9 +146,9 @@ create operator class c
         4 │   using hash as
           │         ──── 1. source
           │
-          ⸬  builtins.sql:38204:22
+          ⸬  builtins.sql:39238:22
           │
-    38204 │ create access method hash
+    39238 │ create access method hash
           ╰╴                     ──── 2. destination
     ");
 }

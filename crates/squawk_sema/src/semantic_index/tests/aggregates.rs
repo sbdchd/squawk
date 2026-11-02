@@ -380,39 +380,39 @@ select 1 from t having sum(sum(1)) > 1;
 select sum(sum(sum(1))) from t;
 select sum(sum(1) + sum(2)) from t;
 "), @"
-    error: aggregate function calls cannot be nested
+    error: aggregate calls cannot be nested
       ╭▸ 
     3 │ select sum(sum(1)) from t;
       ╰╴           ━━━━━━
-    error: aggregate function calls cannot be nested
+    error: aggregate calls cannot be nested
       ╭▸ 
     4 │ select string_agg(a::text, ',' order by count(*)) from t;
       ╰╴                                        ━━━━━━━━
-    error: aggregate function calls cannot be nested
+    error: aggregate calls cannot be nested
       ╭▸ 
     5 │ select percentile_cont(0.5) within group (order by count(*)) from t;
       ╰╴                                                   ━━━━━━━━
-    error: aggregate function calls cannot contain window function calls
+    error: aggregate calls cannot contain window function calls
       ╭▸ 
     6 │ select sum(row_number() over ()) from t;
       ╰╴           ━━━━━━━━━━━━━━━━━━━━
-    error: aggregate function calls cannot contain window function calls
+    error: aggregate calls cannot contain window function calls
       ╭▸ 
     7 │ select max(sum(count(*)) over ()) from t;
       ╰╴           ━━━━━━━━━━━━━━━━━━━━━
-    error: aggregate function calls cannot be nested
+    error: aggregate calls cannot be nested
       ╭▸ 
     8 │ select sum(abs(sum(1))) from t;
       ╰╴               ━━━━━━
-    error: aggregate function calls cannot be nested
+    error: aggregate calls cannot be nested
       ╭▸ 
     9 │ select 1 from t having sum(sum(1)) > 1;
       ╰╴                           ━━━━━━
-    error: aggregate function calls cannot be nested
+    error: aggregate calls cannot be nested
        ╭▸ 
     10 │ select sum(sum(sum(1))) from t;
        ╰╴               ━━━━━━
-    error: aggregate function calls cannot be nested
+    error: aggregate calls cannot be nested
        ╭▸ 
     11 │ select sum(sum(1) + sum(2)) from t;
        ╰╴           ━━━━━━

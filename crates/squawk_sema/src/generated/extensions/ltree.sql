@@ -550,79 +550,100 @@ create type ltxtquery (
 create operator < (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_lt
+  function = ltree_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator <= (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_le
+  function = ltree_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <> (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_ne
+  function = ltree_ne,
+  commutator = <>,
+  negator = =
 );
 
 create operator <@ (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_risparent
+  function = ltree_risparent,
+  commutator = @>
 );
 
 create operator <@ (
   leftarg = ltree,
   rightarg = ltree[],
-  function = _ltree_r_isparent
+  function = _ltree_r_isparent,
+  commutator = @>
 );
 
 create operator <@ (
   leftarg = ltree[],
   rightarg = ltree,
-  function = _ltree_risparent
+  function = _ltree_risparent,
+  commutator = @>
 );
 
 create operator = (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_eq
+  function = ltree_eq,
+  commutator = =,
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator > (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_gt
+  function = ltree_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator >= (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_ge
+  function = ltree_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator ? (
   leftarg = lquery[],
   rightarg = ltree,
-  function = lt_q_rregex
+  function = lt_q_rregex,
+  commutator = ?
 );
 
 create operator ? (
   leftarg = lquery[],
   rightarg = ltree[],
-  function = _lt_q_rregex
+  function = _lt_q_rregex,
+  commutator = ?
 );
 
 create operator ? (
   leftarg = ltree,
   rightarg = lquery[],
-  function = lt_q_regex
+  function = lt_q_regex,
+  commutator = ?
 );
 
 create operator ? (
   leftarg = ltree[],
   rightarg = lquery[],
-  function = _lt_q_regex
+  function = _lt_q_regex,
+  commutator = ?
 );
 
 create operator ?<@ (
@@ -652,151 +673,176 @@ create operator ?~ (
 create operator @ (
   leftarg = ltree,
   rightarg = ltxtquery,
-  function = ltxtq_exec
+  function = ltxtq_exec,
+  commutator = @
 );
 
 create operator @ (
   leftarg = ltree[],
   rightarg = ltxtquery,
-  function = _ltxtq_exec
+  function = _ltxtq_exec,
+  commutator = @
 );
 
 create operator @ (
   leftarg = ltxtquery,
   rightarg = ltree,
-  function = ltxtq_rexec
+  function = ltxtq_rexec,
+  commutator = @
 );
 
 create operator @ (
   leftarg = ltxtquery,
   rightarg = ltree[],
-  function = _ltxtq_rexec
+  function = _ltxtq_rexec,
+  commutator = @
 );
 
 create operator @> (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_isparent
+  function = ltree_isparent,
+  commutator = <@
 );
 
 create operator @> (
   leftarg = ltree,
   rightarg = ltree[],
-  function = _ltree_r_risparent
+  function = _ltree_r_risparent,
+  commutator = <@
 );
 
 create operator @> (
   leftarg = ltree[],
   rightarg = ltree,
-  function = _ltree_isparent
+  function = _ltree_isparent,
+  commutator = <@
 );
 
 create operator ^<@ (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_risparent
+  function = ltree_risparent,
+  commutator = ^@>
 );
 
 create operator ^<@ (
   leftarg = ltree,
   rightarg = ltree[],
-  function = _ltree_r_isparent
+  function = _ltree_r_isparent,
+  commutator = ^@>
 );
 
 create operator ^<@ (
   leftarg = ltree[],
   rightarg = ltree,
-  function = _ltree_risparent
+  function = _ltree_risparent,
+  commutator = ^@>
 );
 
 create operator ^? (
   leftarg = lquery[],
   rightarg = ltree,
-  function = lt_q_rregex
+  function = lt_q_rregex,
+  commutator = ^?
 );
 
 create operator ^? (
   leftarg = lquery[],
   rightarg = ltree[],
-  function = _lt_q_rregex
+  function = _lt_q_rregex,
+  commutator = ^?
 );
 
 create operator ^? (
   leftarg = ltree,
   rightarg = lquery[],
-  function = lt_q_regex
+  function = lt_q_regex,
+  commutator = ^?
 );
 
 create operator ^? (
   leftarg = ltree[],
   rightarg = lquery[],
-  function = _lt_q_regex
+  function = _lt_q_regex,
+  commutator = ^?
 );
 
 create operator ^@ (
   leftarg = ltree,
   rightarg = ltxtquery,
-  function = ltxtq_exec
+  function = ltxtq_exec,
+  commutator = ^@
 );
 
 create operator ^@ (
   leftarg = ltree[],
   rightarg = ltxtquery,
-  function = _ltxtq_exec
+  function = _ltxtq_exec,
+  commutator = ^@
 );
 
 create operator ^@ (
   leftarg = ltxtquery,
   rightarg = ltree,
-  function = ltxtq_rexec
+  function = ltxtq_rexec,
+  commutator = ^@
 );
 
 create operator ^@ (
   leftarg = ltxtquery,
   rightarg = ltree[],
-  function = _ltxtq_rexec
+  function = _ltxtq_rexec,
+  commutator = ^@
 );
 
 create operator ^@> (
   leftarg = ltree,
   rightarg = ltree,
-  function = ltree_isparent
+  function = ltree_isparent,
+  commutator = ^<@
 );
 
 create operator ^@> (
   leftarg = ltree,
   rightarg = ltree[],
-  function = _ltree_r_risparent
+  function = _ltree_r_risparent,
+  commutator = ^<@
 );
 
 create operator ^@> (
   leftarg = ltree[],
   rightarg = ltree,
-  function = _ltree_isparent
+  function = _ltree_isparent,
+  commutator = ^<@
 );
 
 create operator ^~ (
   leftarg = lquery,
   rightarg = ltree,
-  function = ltq_rregex
+  function = ltq_rregex,
+  commutator = ^~
 );
 
 create operator ^~ (
   leftarg = lquery,
   rightarg = ltree[],
-  function = _ltq_rregex
+  function = _ltq_rregex,
+  commutator = ^~
 );
 
 create operator ^~ (
   leftarg = ltree,
   rightarg = lquery,
-  function = ltq_regex
+  function = ltq_regex,
+  commutator = ^~
 );
 
 create operator ^~ (
   leftarg = ltree[],
   rightarg = lquery,
-  function = _ltq_regex
+  function = _ltq_regex,
+  commutator = ^~
 );
 
 create operator || (
@@ -820,25 +866,29 @@ create operator || (
 create operator ~ (
   leftarg = lquery,
   rightarg = ltree,
-  function = ltq_rregex
+  function = ltq_rregex,
+  commutator = ~
 );
 
 create operator ~ (
   leftarg = lquery,
   rightarg = ltree[],
-  function = _ltq_rregex
+  function = _ltq_rregex,
+  commutator = ~
 );
 
 create operator ~ (
   leftarg = ltree,
   rightarg = lquery,
-  function = ltq_regex
+  function = ltq_regex,
+  commutator = ~
 );
 
 create operator ~ (
   leftarg = ltree[],
   rightarg = lquery,
-  function = _ltq_regex
+  function = _ltq_regex,
+  commutator = ~
 );
 
 create operator family gist__ltree_ops
@@ -857,22 +907,92 @@ create operator class gist__ltree_ops
   default for type ltree[]
   using gist
   family gist__ltree_ops as
-  storage ltree_gist;
+    function 1 (ltree[], ltree[]) _ltree_consistent(
+      internal,
+      ltree[],
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (ltree[], ltree[]) _ltree_union(internal, internal),
+    function 5 (ltree[], ltree[]) _ltree_penalty(internal, internal, internal),
+    function 6 (ltree[], ltree[]) _ltree_picksplit(internal, internal),
+    function 7 (ltree[], ltree[]) _ltree_same(ltree_gist, ltree_gist, internal),
+    storage ltree_gist;
 
 create operator class gist_ltree_ops
   default for type ltree
   using gist
   family gist_ltree_ops as
-  storage ltree_gist;
+    function 1 (ltree, ltree) ltree_consistent(
+      internal,
+      ltree,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (ltree, ltree) ltree_union(internal, internal),
+    function 5 (ltree, ltree) ltree_penalty(internal, internal, internal),
+    function 6 (ltree, ltree) ltree_picksplit(internal, internal),
+    function 7 (ltree, ltree) ltree_same(ltree_gist, ltree_gist, internal),
+    storage ltree_gist;
 
 create operator class hash_ltree_ops
   default for type ltree
   using hash
   family hash_ltree_ops as
-  storage ltree;
+    operator 1 = (ltree, ltree),
+    function 1 (ltree, ltree) hash_ltree(ltree),
+    storage ltree;
 
 create operator class ltree_ops
   default for type ltree
   using btree
   family ltree_ops as
-  storage ltree;
+    operator 1 < (ltree, ltree),
+    operator 2 <= (ltree, ltree),
+    operator 3 = (ltree, ltree),
+    operator 4 >= (ltree, ltree),
+    operator 5 > (ltree, ltree),
+    function 1 (ltree, ltree) ltree_cmp(ltree, ltree),
+    storage ltree;
+
+alter operator family gist__ltree_ops
+  using gist
+  add
+    operator 10 <@ (ltree[], ltree),
+    operator 11 @> (ltree, ltree[]),
+    operator 12 ~ (ltree[], lquery),
+    operator 13 ~ (lquery, ltree[]),
+    operator 14 @ (ltree[], ltxtquery),
+    operator 15 @ (ltxtquery, ltree[]),
+    operator 16 ? (ltree[], lquery[]),
+    operator 17 ? (lquery[], ltree[]),
+    function 3 (ltree[], ltree[]) _ltree_compress(internal),
+    function 4 (ltree[], ltree[]) ltree_decompress(internal),
+    function 10 (ltree[], ltree[]) _ltree_gist_options(internal);
+
+alter operator family gist_ltree_ops
+  using gist
+  add
+    operator 1 < (ltree, ltree),
+    operator 2 <= (ltree, ltree),
+    operator 3 = (ltree, ltree),
+    operator 4 >= (ltree, ltree),
+    operator 5 > (ltree, ltree),
+    operator 10 @> (ltree, ltree),
+    operator 11 <@ (ltree, ltree),
+    operator 12 ~ (ltree, lquery),
+    operator 13 ~ (lquery, ltree),
+    operator 14 @ (ltree, ltxtquery),
+    operator 15 @ (ltxtquery, ltree),
+    operator 16 ? (ltree, lquery[]),
+    operator 17 ? (lquery[], ltree),
+    function 3 (ltree, ltree) ltree_compress(internal),
+    function 4 (ltree, ltree) ltree_decompress(internal),
+    function 10 (ltree, ltree) ltree_gist_options(internal);
+
+alter operator family hash_ltree_ops
+  using hash
+  add
+    function 2 (ltree, ltree) hash_ltree_extended(ltree, bigint);

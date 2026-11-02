@@ -101,6 +101,8 @@ pub enum DiagnosticKind {
     InvalidForeignKey,
     InvalidConflictArbiter,
     MissingReturning,
+    MissingColumnDefList,
+    UnexpectedColumnDefList,
     MissingUniqueIndex,
     UniqueIndexNotSupported,
     DuplicateFunction,
@@ -143,6 +145,7 @@ pub enum DiagnosticKind {
     DuplicateOperator,
     DuplicateTransform,
     MissingArrayType,
+    IndeterminateType,
     MissingShellType,
     InvalidOrdinal,
     WrongReturnType,
@@ -320,6 +323,16 @@ impl IndexData {
             ty = self.types[id].base?;
         }
         Some(ty)
+    }
+
+    pub(crate) fn is_collatable(&self, ty: Ty) -> Option<bool> {
+        match self.base_type(ty)? {
+            Ty::Type(id) => Some(self.types[id].collatable),
+            Ty::Array(ElementTy::Type(id)) => self.is_collatable(Ty::Type(id)),
+            Ty::Array(ElementTy::Table(_) | ElementTy::Cte(_)) | Ty::Table(_) | Ty::Cte(_) => {
+                Some(false)
+            }
+        }
     }
 
     pub fn type_name(&self, ty: Ty) -> TypeName<'_> {

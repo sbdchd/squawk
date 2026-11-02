@@ -144,3 +144,245 @@ select x, y, unnest from t, unnest(ps, b);
 select x, y from t, unnest(ps);
 "), @"no diagnostics");
 }
+
+#[test]
+fn record_function_requires_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1, null::text';
+select * from f();
+select * from f() as t(id, name);
+select * from rows from (f());
+select * from f() as t(id int, name text);
+select * from rows from (f() as (id int, name text));
+select f();
+"), @"
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    3 │ select * from f();
+      ╰╴              ━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    4 │ select * from f() as t(id, name);
+      ╰╴              ━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    5 │ select * from rows from (f());
+      ╰╴                         ━━━
+    ");
+}
+
+#[test]
+fn record_function_with_known_columns() {
+    assert_snapshot!(check("
+create function f(out id int, out name text) language sql as 'select 1, null::text';
+create function g() returns table (id int) language sql as 'select 1';
+create function h() returns setof record language sql as 'select 1';
+select * from f();
+select * from g();
+select * from h() as t(id int);
+"), @"no diagnostics");
+}
+
+#[test]
+fn column_def_list_not_allowed() {
+    assert_snapshot!(check("
+create type pair as (a int, b text);
+create function out_params(out id int, out name text) language sql as 'select 1, null::text';
+create function returns_table() returns table (id int, name text) language sql as 'select 1, null::text';
+create function composite() returns pair language sql as 'select 1, null::text';
+create function scalar() returns int language sql as 'select 1';
+create function single_out(out id int) language sql as 'select 1';
+select * from out_params() as t(id int, name text);
+select * from returns_table() as t(id int, name text);
+select * from composite() as t(a int, b text);
+select * from scalar() as t(id int);
+select * from single_out() as t(id int);
+select * from rows from (scalar() as (id int), composite() as (a int, b text));
+"), @"
+    error: a column definition list is redundant for a function with OUT parameters
+      ╭▸ 
+    8 │ select * from out_params() as t(id int, name text);
+      ╰╴                               ━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is redundant for a function with OUT parameters
+      ╭▸ 
+    9 │ select * from returns_table() as t(id int, name text);
+      ╰╴                                  ━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is redundant for a function returning a named composite type
+       ╭▸ 
+    10 │ select * from composite() as t(a int, b text);
+       ╰╴                              ━━━━━━━━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    11 │ select * from scalar() as t(id int);
+       ╰╴                           ━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    12 │ select * from single_out() as t(id int);
+       ╰╴                               ━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    13 │ select * from rows from (scalar() as (id int), composite() as (a int, b text));
+       ╰╴                                     ━━━━━━━━
+    error: a column definition list is redundant for a function returning a named composite type
+       ╭▸ 
+    13 │ select * from rows from (scalar() as (id int), composite() as (a int, b text));
+       ╰╴                                                              ━━━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn rows_from_single_function_outer_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+create function s() returns int language sql as 'select 1';
+select x from rows from (f()) as r (x int);
+select x from rows from (s()) as r (x int);
+"), @"
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    5 │ select x from rows from (s()) as r (x int);
+      ╰╴                                   ━━━━━━━
+    ");
+}
+
+#[test]
+fn rows_from_multiple_functions_outer_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+create function g() returns record language sql as 'select 1';
+select * from rows from (f(), g()) as r (x int, y text);
+select * from rows from (unnest(array[1], array['a'])) as r (x int, y text);
+"), @"
+    error: `rows from` with multiple functions cannot have a column definition list
+      ╭▸ 
+    4 │ select * from rows from (f(), g()) as r (x int, y text);
+      │                                         ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: put a separate column definition list for each function inside `rows from`
+    error: `rows from` with multiple functions cannot have a column definition list
+      ╭▸ 
+    5 │ select * from rows from (unnest(array[1], array['a'])) as r (x int, y text);
+      │                                                             ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: put a separate column definition list for each function inside `rows from`
+    ");
+}
+
+#[test]
+fn rows_from_duplicate_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+select * from rows from (f() as (x int)) as r (x int);
+"), @"
+    error: multiple column definition lists are not allowed for the same function
+      ╭▸ 
+    3 │ select * from rows from (f() as (x int)) as r (x int);
+      ╰╴                                              ━━━━━━━
+    ");
+}
+
+#[test]
+fn with_ordinality_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+select * from f() with ordinality as r (x int);
+select * from rows from (f()) with ordinality as r (x int);
+select * from unnest(array[1], array['a']) with ordinality as u (x int, y text);
+select * from rows from (f() as (x int)) with ordinality as r;
+select * from generate_series(1, 2) with ordinality as r (x, n);
+"), @"
+    error: `with ordinality` cannot be used with a column definition list
+      ╭▸ 
+    3 │ select * from f() with ordinality as r (x int);
+      │                                        ━━━━━━━
+      ╰╴
+    help: put the column definition list inside `rows from`
+      ╭╴
+    3 - select * from f() with ordinality as r (x int);
+    3 + select * from rows from (f() as (x int)) with ordinality as r;
+      ╰╴
+    error: `with ordinality` cannot be used with a column definition list
+      ╭▸ 
+    4 │ select * from rows from (f()) with ordinality as r (x int);
+      │                                                    ━━━━━━━
+      │
+      ╰ hint: put the column definition list inside `rows from`
+    error: `unnest` with multiple arguments cannot have a column definition list
+      ╭▸ 
+    5 │ select * from unnest(array[1], array['a']) with ordinality as u (x int, y text);
+      │                                                                 ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: use a separate `unnest` call for each array inside `rows from`, each with its own column definition list
+    ");
+}
+
+#[test]
+fn column_def_list_invalid_columns() {
+    assert_snapshot!(check(r#"
+create function f() returns record language sql as 'select 1';
+create domain name_text as text;
+select * from f() as t(x setof int);
+select * from f() as t(x int, y text, x int);
+select * from f() as t(x trigger);
+select * from f() as t(x anyelement);
+select * from f() as t(x int collate "C");
+select * from f() as t(x int[] collate "C");
+select * from rows from (f() as (x int collate "C"));
+select * from f() as t(a text collate "C", b text[] collate "C", c name_text collate "C", r record, rs record[]);
+"#), @r#"
+    error: column `x` cannot be declared `setof`
+      ╭▸ 
+    4 │ select * from f() as t(x setof int);
+      ╰╴                       ━━━━━━━━━━━
+    error: column `x` specified more than once
+      ╭▸ 
+    5 │ select * from f() as t(x int, y text, x int);
+      ╰╴                                      ━
+    error: column `x` cannot have pseudo-type `trigger`
+      ╭▸ 
+    6 │ select * from f() as t(x trigger);
+      │                        ━━━━━━━━━
+      │
+      ╰ note: pseudo-types can only be used for function arguments and return types
+    error: column `x` cannot have pseudo-type `anyelement`
+      ╭▸ 
+    7 │ select * from f() as t(x anyelement);
+      │                        ━━━━━━━━━━━━
+      │
+      ╰ note: pseudo-types can only be used for function arguments and return types
+    error: collations are not supported by type `int4`
+      ╭▸ 
+    8 │ select * from f() as t(x int collate "C");
+      ╰╴                             ━━━━━━━━━━━
+    error: collations are not supported by type `int4[]`
+      ╭▸ 
+    9 │ select * from f() as t(x int[] collate "C");
+      ╰╴                               ━━━━━━━━━━━
+    error: collations are not supported by type `int4`
+       ╭▸ 
+    10 │ select * from rows from (f() as (x int collate "C"));
+       ╰╴                                       ━━━━━━━━━━━
+    "#);
+}
+
+#[test]
+fn unsupported_return_type_in_from() {
+    assert_snapshot!(check("
+create function trg() returns trigger language plpgsql as 'begin return null; end';
+create function v() returns void language sql as '';
+select * from trg();
+select * from rows from (trg());
+select * from v();
+select * from unnest(array[1]);
+select trg();
+"), @"
+    error: function `trg` in `from` has unsupported return type `trigger`
+      ╭▸ 
+    4 │ select * from trg();
+      ╰╴              ━━━━━
+    error: function `trg` in `from` has unsupported return type `trigger`
+      ╭▸ 
+    5 │ select * from rows from (trg());
+      ╰╴                         ━━━━━
+    ");
+}

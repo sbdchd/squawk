@@ -43,10 +43,11 @@ use crate::{
         TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ConflictAction, ConflictRuleEvent, ConflictTargetKey, DropRelation, ErrorArg,
-        ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind, OperandName,
-        OperatorReplacement, OutsideSearchPath, SemaError, Similar, SimilarColumn, SimilarType,
-        TriggerFunctionKind, ViewColumnRename, WindowClause,
+        ArgLabel, ColumnDefListReason, ConflictAction, ConflictRuleEvent, ConflictTargetKey,
+        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind,
+        OperandName, OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, SemaError,
+        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
+        ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -78,6 +79,8 @@ impl Lowerer {
             from_subqueries: vec![],
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
+            srf_calls: vec![],
+            array_cast: false,
             pending_foreign_keys: vec![],
             generated_refs: vec![],
             function: None,
@@ -378,6 +381,8 @@ pub(crate) struct Lowerer {
     from_subqueries: Vec<FromSubquery>,
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
+    srf_calls: Vec<SrfCall>,
+    array_cast: bool,
     pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
@@ -692,6 +697,13 @@ fn call_arg_name(
             .or_else(|| Some(arg.syntax().clone())),
         Some(ast::FuncArgExpr::Expr(_)) | None => Some(arg.syntax().clone()),
     }
+}
+
+#[derive(Clone, Copy)]
+enum ColumnDefs<'a> {
+    None,
+    List(&'a ast::ColumnDefList),
+    Rejected,
 }
 
 struct FunctionSource {
@@ -1307,6 +1319,7 @@ impl Lowerer {
     fn lower_stmt(&mut self, stmt: &ast::Stmt) {
         self.record_search_path(stmt.syntax().text_range().start());
         self.aggregate_calls.clear();
+        self.srf_calls.clear();
         match stmt {
             ast::Stmt::CreateTable(create_table) => self.lower_create_table(
                 create_table,
@@ -10393,6 +10406,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
+            returns_set,
             columns,
             ..
         } = self.index.functions[function];
@@ -10420,6 +10434,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
+            returns_set,
             columns,
         });
         self.index.set_param_function(params, id);
@@ -11188,6 +11203,7 @@ impl Lowerer {
         let mut generated_subscript = None;
         let mut category = None;
         let mut preferred = false;
+        let mut collatable = false;
         let mut kind = TypeKind::Type;
         match create_type.kind() {
             Some(ast::CreateTypeKind::CompositeType(composite)) => {
@@ -11310,6 +11326,7 @@ impl Lowerer {
                 generated_subscript = self.generated_subscript_results(create_type.syntax());
                 category = Some(options.category);
                 preferred = options.preferred;
+                collatable = options.collatable;
             }
             Some(ast::CreateTypeKind::EnumType(_)) => kind = TypeKind::Enum,
             None => kind = TypeKind::Shell,
@@ -11358,7 +11375,7 @@ impl Lowerer {
             subscript_results.result,
             subscript_results.slice,
         );
-        types.set_category(range, category, preferred);
+        types.set_category(range, category, preferred, collatable);
         if let Some(multirange_name) = multirange_name {
             self.alloc_multirange_type(range, multirange_name);
         }
@@ -11448,6 +11465,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                collatable: false,
                 array_name,
             },
             &self.index.columns,
@@ -12173,6 +12191,7 @@ impl Lowerer {
         let mut subscript = SubscriptOption::Unset;
         let mut category = TypeCategory::User;
         let mut preferred = false;
+        let mut collatable = false;
         for option in options {
             let Some(name) = attribute_name(&option) else {
                 continue;
@@ -12242,6 +12261,11 @@ impl Lowerer {
                         value.literal().and_then(|literal| literal.bool_value()) == Some(true)
                     });
                 }
+                "collatable" => {
+                    collatable = value.is_none_or(|value| {
+                        value.literal().and_then(|literal| literal.bool_value()) == Some(true)
+                    });
+                }
                 _ => {}
             }
         }
@@ -12250,6 +12274,7 @@ impl Lowerer {
             subscript,
             category,
             preferred,
+            collatable,
         }
     }
 
@@ -13627,6 +13652,19 @@ impl Lowerer {
             .row_list()
             .and_then(|list| list.rows().next())
             .map_or(0, |row| row.exprs().count());
+        let insert_source = values
+            .syntax()
+            .parent()
+            .is_some_and(|parent| ast::Insert::can_cast(parent.kind()));
+        let context = if insert_source
+            && values
+                .row_list()
+                .is_some_and(|list| list.rows().count() == 1)
+        {
+            ExprContext::ValuesSingle
+        } else {
+            ExprContext::Values
+        };
         let mut columns = Vec::with_capacity(first_len);
         for (row_index, row) in values
             .row_list()
@@ -13638,7 +13676,7 @@ impl Lowerer {
                 self.push_error(row.syntax(), SemaError::ValuesLengthMismatch);
             }
             for (column_index, expr) in row.exprs().enumerate() {
-                let ty = self.lower_expr_in(ExprContext::Values, &expr);
+                let ty = self.lower_expr_in(context, &expr);
                 if row_index == 0 {
                     let name = self.intern(&format!("column{}", column_index + 1));
                     columns.push(Column {
@@ -13902,7 +13940,7 @@ impl Lowerer {
                     .flat_map(|list| list.rows())
                     .flat_map(|row| row.exprs())
                 {
-                    self.lower_expr_in(ExprContext::Values, &expr);
+                    self.lower_expr_in(ExprContext::ValuesSingle, &expr);
                 }
             }
             ast::MergeAction::MergeUpdate(update) => {
@@ -14797,20 +14835,30 @@ impl Lowerer {
         }
     }
 
+    fn lower_tablesample_arg(&mut self, expr: &ast::Expr) {
+        let srf_calls = self.srf_calls.len();
+        self.lower_expr_in(ExprContext::FromFunction, expr);
+        let inner = self.contained_set_returning(srf_calls).next();
+        if let Some(inner) = inner {
+            self.push_error_ptr(inner.ptr, SemaError::TablesampleSetArgument);
+        }
+        self.srf_calls.truncate(srf_calls);
+    }
+
     fn lower_tablesample(&mut self, tablesample: &ast::TablesampleClause) {
         let Some(call) = tablesample.call_expr() else {
             return;
         };
         for arg in call.arg_list().iter().flat_map(|list| list.args()) {
             if let Some(expr) = arg.func_arg_expr().and_then(|expr| expr.expr()) {
-                self.lower_expr_in(ExprContext::FromFunction, &expr);
+                self.lower_tablesample_arg(&expr);
             }
         }
         if let Some(expr) = tablesample
             .repeatable_clause()
             .and_then(|repeatable| repeatable.expr())
         {
-            self.lower_expr_in(ExprContext::FromFunction, &expr);
+            self.lower_tablesample_arg(&expr);
         }
         let (schema, name_ref) = match call.expr() {
             Some(ast::Expr::NameRef(name_ref)) => (None, name_ref),
@@ -14909,7 +14957,7 @@ impl Lowerer {
                     .alias()
                     .filter(|_| alias_columns.is_none())
                     .and_then(|alias| alias.name());
-                let column_defs = match alias_columns {
+                let column_def_list = match alias_columns {
                     Some(ast::FromAliasColumns::ColumnDefList(list)) => Some(list),
                     Some(ast::FromAliasColumns::ColumnList(_)) | None => None,
                 };
@@ -14919,11 +14967,30 @@ impl Lowerer {
                     columns,
                     scalar: function_scalar,
                 } = match function_item.call_expr() {
-                    Some(call) => self.lower_function_source(
-                        &call,
-                        scalar_alias.as_ref(),
-                        column_defs.as_ref(),
-                    ),
+                    Some(call) => {
+                        let column_defs = match &column_def_list {
+                            Some(list)
+                                if from_item.with_ordinality().is_some()
+                                    && expanded_unnest(&call).is_none() =>
+                            {
+                                let fix = OrdinalityColumnDefListFix {
+                                    call_range: call.syntax().text_range(),
+                                    alias: from_item
+                                        .alias()
+                                        .and_then(|alias| alias.name())
+                                        .map(|name| self.intern(&name.text())),
+                                };
+                                self.push_error(
+                                    list.syntax(),
+                                    SemaError::OrdinalityColumnDefList { fix: Some(fix) },
+                                );
+                                ColumnDefs::Rejected
+                            }
+                            Some(list) => ColumnDefs::List(list),
+                            None => ColumnDefs::None,
+                        };
+                        self.lower_function_source(&call, scalar_alias.as_ref(), column_defs)
+                    }
                     None => FunctionSource {
                         callee: None,
                         function: None,
@@ -14999,7 +15066,7 @@ impl Lowerer {
                 let FunctionColumns {
                     columns,
                     scalar: rows_from_scalar,
-                } = self.lower_rows_from_columns(rows_from_item);
+                } = self.lower_rows_from_columns(rows_from_item, from_item);
                 scalar = rows_from_scalar;
                 RelationSource {
                     name: None,
@@ -15364,10 +15431,17 @@ impl Lowerer {
 
     fn column_def_list_columns(&mut self, list: &ast::ColumnDefList) -> Columns {
         let start = self.index.columns.next_idx();
+        let mut seen: SmallVec<[Name; 8]> = smallvec![];
         for column_def in list.column_defs() {
             let ty = column_def.ty().and_then(|ty| self.lower_type(&ty));
             if let Some(collate) = column_def.collate() {
                 self.lower_collate(&collate);
+                if let Some(ty) = ty
+                    && self.index.is_collatable(ty) == Some(false)
+                {
+                    let ty = self.index.ty_name(ty);
+                    self.push_error(collate.syntax(), SemaError::CollationNotSupported { ty });
+                }
             }
             let Some(column_name) = column_def.name() else {
                 continue;
@@ -15376,6 +15450,25 @@ impl Lowerer {
                 ty,
                 ..self.column_def(&column_name)
             };
+            if let Some(name) = column.name {
+                if column_def.ty().is_some_and(|ty| ty.setof_token().is_some()) {
+                    self.push_error(column_def.syntax(), SemaError::SetofColumn { name });
+                } else if let Some(ty) = ty
+                    && self.is_pseudo_column_type(ty)
+                {
+                    let ty = self.index.ty_name(ty);
+                    self.push_error(
+                        column_def.syntax(),
+                        SemaError::PseudoTypeColumn { name, ty },
+                    );
+                }
+                if seen.contains(&name) {
+                    let error = SemaError::ColumnSpecifiedMoreThanOnce { name };
+                    self.push_error(column_name.syntax(), error);
+                } else {
+                    seen.push(name);
+                }
+            }
             self.alloc_column_def(column);
         }
         Columns {
@@ -15506,12 +15599,48 @@ impl Lowerer {
         }
     }
 
-    fn lower_rows_from_columns(&mut self, rows_from_item: &ast::RowsFromItem) -> FunctionColumns {
+    fn lower_rows_from_columns(
+        &mut self,
+        rows_from_item: &ast::RowsFromItem,
+        from_item: &ast::FromItem,
+    ) -> FunctionColumns {
+        let outer_list = match from_item.alias().and_then(|alias| alias.columns()) {
+            Some(ast::FromAliasColumns::ColumnDefList(list)) => Some(list),
+            Some(ast::FromAliasColumns::ColumnList(_)) | None => None,
+        };
+        let outer_column_defs = match &outer_list {
+            Some(list) if !single_rows_from_function(rows_from_item) => {
+                self.push_error(list.syntax(), SemaError::RowsFromColumnDefList);
+                ColumnDefs::Rejected
+            }
+            Some(list) if from_item.with_ordinality().is_some() => {
+                self.push_error(
+                    list.syntax(),
+                    SemaError::OrdinalityColumnDefList { fix: None },
+                );
+                ColumnDefs::Rejected
+            }
+            Some(list) => ColumnDefs::List(list),
+            None => ColumnDefs::None,
+        };
         let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in rows_from_item.rows_from_args() {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
                 (Some(call), Some(list)) => {
-                    self.with_from_function(|this| this.lower_call(&call));
+                    if let ColumnDefs::List(outer) = outer_column_defs {
+                        self.push_error(outer.syntax(), SemaError::DuplicateColumnDefList);
+                    }
+                    let srf_calls = self.srf_calls.len();
+                    let LoweredCall { args, callee, .. } =
+                        self.with_from_function(|this| this.lower_call_with_args(&call));
+                    self.check_from_set_returning(srf_calls, Some(&call));
+                    if let Some(Callee {
+                        resolution: Resolution::Function(function),
+                        ..
+                    }) = callee
+                    {
+                        self.check_column_def_list(function, &args, &list);
+                    }
                     FunctionColumns {
                         columns: self.column_def_list_columns(&list),
                         scalar: None,
@@ -15520,7 +15649,7 @@ impl Lowerer {
                 (Some(call), None) => {
                     let FunctionSource {
                         columns, scalar, ..
-                    } = self.lower_function_source(&call, None, None);
+                    } = self.lower_function_source(&call, None, outer_column_defs);
                     FunctionColumns { columns, scalar }
                 }
                 (None, Some(list)) => FunctionColumns {
@@ -15556,16 +15685,18 @@ impl Lowerer {
         &mut self,
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
-        column_defs: Option<&ast::ColumnDefList>,
+        column_defs: ColumnDefs<'_>,
     ) -> FunctionSource {
         if let Some(name_ref) = expanded_unnest(call) {
-            if let Some(column_defs) = column_defs {
-                self.push_error(column_defs.syntax(), SemaError::UnnestColumnDefList);
+            if let ColumnDefs::List(list) = column_defs {
+                self.push_error(list.syntax(), SemaError::UnnestColumnDefList);
             }
             return self.lower_expanded_unnest(call, &name_ref);
         }
+        let srf_calls = self.srf_calls.len();
         let LoweredCall { args, callee, .. } =
             self.with_from_function(|this| this.lower_call_with_args(call));
+        self.check_from_set_returning(srf_calls, Some(call));
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return FunctionSource {
                 callee,
@@ -15574,6 +15705,28 @@ impl Lowerer {
                 scalar: None,
             };
         };
+        if let Some(ty) = self.unsupported_return_type(function, &args) {
+            let error = SemaError::UnsupportedReturnType {
+                function: self.index.functions[function].name,
+                ty: self.index.ty_name(ty),
+            };
+            self.push_error(call.syntax(), error);
+            return FunctionSource {
+                callee,
+                function: Some(function),
+                columns: self.unknown_columns(),
+                scalar: None,
+            };
+        }
+        match column_defs {
+            ColumnDefs::List(list) => self.check_column_def_list(function, &args, list),
+            ColumnDefs::None => {
+                if self.returns_anonymous_record(function) {
+                    self.push_error(call.syntax(), SemaError::MissingColumnDefList);
+                }
+            }
+            ColumnDefs::Rejected => {}
+        }
         let FunctionColumns { columns, scalar } =
             self.function_columns(function, &args, call, scalar_alias);
         FunctionSource {
@@ -15605,8 +15758,10 @@ impl Lowerer {
         call: &ast::CallExpr,
         name_ref: &ast::NameRef,
     ) -> FunctionSource {
+        let srf_calls = self.srf_calls.len();
         let CallArgs { args, .. } =
             self.with_from_function(|this| this.lower_call_args(call.arg_list()));
+        self.check_from_set_returning(srf_calls, None);
         let name = self.intern("unnest");
         let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
         let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
@@ -15679,6 +15834,64 @@ impl Lowerer {
             },
             scalar: ty,
         }
+    }
+
+    fn check_column_def_list(
+        &mut self,
+        function: FunctionId,
+        args: &[CallArg],
+        list: &ast::ColumnDefList,
+    ) {
+        if let Some(reason) = self.column_def_list_reason(function, args) {
+            self.push_error(list.syntax(), SemaError::UnexpectedColumnDefList { reason });
+        }
+    }
+
+    fn column_def_list_reason(
+        &mut self,
+        function: FunctionId,
+        args: &[CallArg],
+    ) -> Option<ColumnDefListReason> {
+        let record = self.builtin_type("record");
+        if self.index.functions[function].columns.is_some()
+            && self.index.functions[function].ret == record
+        {
+            return Some(ColumnDefListReason::OutParams);
+        }
+        let ty = self.call_type(function, args)?;
+        if Some(ty) == record {
+            return None;
+        }
+        Some(match self.ty_columns(ty) {
+            Some(_) => ColumnDefListReason::NamedComposite,
+            None => ColumnDefListReason::NotRecord,
+        })
+    }
+
+    fn is_pseudo_column_type(&mut self, ty: Ty) -> bool {
+        let record = self.builtin_type("record");
+        Some(ty) != record
+            && matches!(ty, Ty::Type(id) if self.index.types[id].category == Some(TypeCategory::Pseudo))
+    }
+
+    fn unsupported_return_type(&mut self, function: FunctionId, args: &[CallArg]) -> Option<Ty> {
+        let ty = self.call_type(function, args)?;
+        let Ty::Type(id) = ty else {
+            return None;
+        };
+        if self.index.types[id].category != Some(TypeCategory::Pseudo) {
+            return None;
+        }
+        let supported = ["record", "void", "cstring"]
+            .into_iter()
+            .any(|name| self.builtin_type(name) == Some(ty));
+        (!supported).then_some(ty)
+    }
+
+    fn returns_anonymous_record(&mut self, function: FunctionId) -> bool {
+        let record = self.builtin_type("record");
+        let function = &self.index.functions[function];
+        function.columns.is_none() && function.ret.is_some() && function.ret == record
     }
 
     fn function_row_columns(&self, function: FunctionId, args: &[CallArg]) -> Option<Columns> {
@@ -20964,9 +21177,17 @@ impl Lowerer {
                 return self.literal_type(literal);
             }
             ast::Expr::ArrayExpr(array) => {
+                let array_cast = std::mem::take(&mut self.array_cast);
+                if !array_cast && array.select_variant().is_none() && array.exprs().next().is_none()
+                {
+                    self.push_error(array.syntax(), SemaError::EmptyArrayType);
+                }
                 let mut element = None;
                 for expr in array.exprs() {
+                    self.array_cast =
+                        array_cast && matches!(expr.unparen(), ast::Expr::ArrayExpr(_));
                     let ty = self.lower_expr(&expr);
+                    self.array_cast = false;
                     element = element.or(ty);
                 }
                 if let Some(query) = array.select_variant() {
@@ -21040,6 +21261,7 @@ impl Lowerer {
                 return ty;
             }
             ast::Expr::CaseExpr(case) => {
+                let srf_calls = self.srf_calls.len();
                 self.lower_case_keywords(case);
                 self.lower_exprs(case.expr());
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
@@ -21056,12 +21278,22 @@ impl Lowerer {
                 if let Some(expr) = case.else_clause().and_then(|clause| clause.expr()) {
                     self.lower_common_expr(&mut common, &expr);
                 }
+                self.check_contained_set_returning(srf_calls, SetReturningConstruct::Case);
                 return common.resolve(&self.overloads());
             }
             ast::Expr::CastExpr(cast) => {
-                self.lower_exprs(cast.expr());
+                let ty = cast.ty().and_then(|ty| self.lower_type(&ty));
+                if let Some(expr) = cast.expr() {
+                    self.array_cast = matches!(expr.unparen(), ast::Expr::ArrayExpr(_))
+                        && ty.is_none_or(|ty| {
+                            self.index
+                                .base_type(ty)
+                                .is_none_or(|ty| matches!(ty, Ty::Array(_)))
+                        });
+                    self.lower_expr(&expr);
+                    self.array_cast = false;
+                }
                 self.lower_exprs(cast.literal().map(ast::Expr::Literal));
-                let ty = self.lower_type(&cast.ty()?);
                 let literal = cast
                     .literal()
                     .or_else(|| cast.expr().and_then(|expr| expr.as_literal()));
@@ -21874,6 +22106,7 @@ impl Lowerer {
     fn lower_call_with_args(&mut self, call: &ast::CallExpr) -> LoweredCall {
         let refs = self.index.references.next_idx();
         let aggregate_calls = self.aggregate_calls.len();
+        let srf_calls = self.srf_calls.len();
         let callee = call.expr();
         let row_source = self.row_source_arg(call);
         let CallArgs {
@@ -22010,6 +22243,7 @@ impl Lowerer {
             self.lower_sequence_arg(&arg);
         }
         self.lower_named_args(function, named_args);
+        self.check_set_returning_call(call, function, srf_calls);
         self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
             self.lower_expr_in(ExprContext::Filter, &expr);
@@ -22039,6 +22273,75 @@ impl Lowerer {
             callee: target,
             ty: None,
         })
+    }
+
+    fn check_set_returning_call(
+        &mut self,
+        call: &ast::CallExpr,
+        function: Option<FunctionId>,
+        srf_calls: usize,
+    ) {
+        let construct = if call.over_clause().is_some() {
+            Some(SetReturningConstruct::Window)
+        } else if function
+            .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
+        {
+            Some(SetReturningConstruct::Aggregate)
+        } else if call_function_like_keyword(call) == Some(ast::FunctionLikeKeyword::Coalesce) {
+            Some(SetReturningConstruct::Coalesce)
+        } else {
+            None
+        };
+        if let Some(construct) = construct {
+            self.check_contained_set_returning(srf_calls, construct);
+        }
+        if !function.is_some_and(|function| self.index.functions[function].returns_set) {
+            return;
+        }
+        let context = self.expr_context;
+        if context.allows_set_returning() {
+            let ptr = self.ptr(call.syntax());
+            let depth = self.scopes.len();
+            self.srf_calls.push(SrfCall { depth, ptr });
+        } else {
+            self.push_error(
+                call.syntax(),
+                SemaError::MisplacedSetReturningFunction { context },
+            );
+        }
+    }
+
+    fn contained_set_returning(&self, start: usize) -> impl Iterator<Item = SrfCall> + '_ {
+        let depth = self.scopes.len();
+        self.srf_calls[start..]
+            .iter()
+            .copied()
+            .filter(move |call| call.depth == depth)
+    }
+
+    fn check_contained_set_returning(&mut self, start: usize, construct: SetReturningConstruct) {
+        let inner = match construct {
+            SetReturningConstruct::Aggregate => self.contained_set_returning(start).next(),
+            SetReturningConstruct::Window
+            | SetReturningConstruct::Case
+            | SetReturningConstruct::Coalesce => self.contained_set_returning(start).last(),
+        };
+        if let Some(inner) = inner {
+            self.push_error_ptr(inner.ptr, SemaError::SetReturningFunctionIn { construct });
+            self.srf_calls.truncate(start);
+        }
+    }
+
+    fn check_from_set_returning(&mut self, start: usize, top: Option<&ast::CallExpr>) {
+        let top = top.map(|call| self.ptr(call.syntax()));
+        let inner = self
+            .contained_set_returning(start)
+            .filter(|call| Some(call.ptr) != top)
+            .last();
+        if let Some(inner) = inner {
+            self.push_error_ptr(inner.ptr, SemaError::SetReturningFunctionNotTopLevel);
+        }
+        self.srf_calls.truncate(start);
     }
 
     fn check_aggregate_call(
@@ -23798,6 +24101,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                collatable: false,
                 array_name,
             },
             &self.index.columns,
@@ -23854,6 +24158,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                collatable: false,
                 array_name,
             },
             &self.index.columns,
@@ -23877,7 +24182,7 @@ impl Lowerer {
             params,
             direct_args,
         }: FunctionParams,
-        ret_type: Option<&ast::RetType>,
+        ret_clause: Option<&ast::RetType>,
     ) -> Option<FunctionId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
@@ -23885,9 +24190,9 @@ impl Lowerer {
 
         let mut ret = None;
         let mut table_columns = None;
-        if let Some(ret_type) = ret_type {
-            ret = self.lower_func_type(ret_type.func_type());
-            if let Some(list) = ret_type.return_table_arg_list() {
+        if let Some(ret_clause) = ret_clause {
+            ret = self.lower_func_type(ret_clause.func_type());
+            if let Some(list) = ret_clause.return_table_arg_list() {
                 let start = self.index.columns.next_idx();
                 for arg in list.args() {
                     let ty = self.lower_func_type(arg.func_type());
@@ -23926,6 +24231,14 @@ impl Lowerer {
             Some(columns) => Some(columns),
             None => self.out_param_columns(params),
         };
+        if kind != FunctionKind::Procedure
+            && table_columns.is_none()
+            && let Some(declared) = ret
+            && let Some(columns) = columns
+            && let Some(ret_clause) = ret_clause
+        {
+            self.check_out_param_result_type(ret_clause, declared, columns);
+        }
         if ret.is_none()
             && kind != FunctionKind::Procedure
             && let Some(columns) = columns
@@ -23936,6 +24249,12 @@ impl Lowerer {
             };
         }
 
+        let returns_set = ret_clause.is_some_and(|ret_clause| {
+            ret_clause.return_table_arg_list().is_some()
+                || ret_clause
+                    .func_type()
+                    .is_some_and(|func_type| func_type.setof_token().is_some())
+        });
         let id = self.index.functions.alloc(Function {
             kind,
             window: false,
@@ -23946,6 +24265,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
+            returns_set,
             columns,
         });
         self.index.set_param_function(params, id);
@@ -23959,6 +24279,43 @@ impl Lowerer {
         self.record_comment(node, Item::Function(id));
         self.add_item(segment.syntax(), Item::Function(id));
         Some(id)
+    }
+
+    fn check_out_param_result_type(
+        &mut self,
+        ret_clause: &ast::RetType,
+        declared: Ty,
+        columns: Columns,
+    ) {
+        let expected = match columns.range.len() {
+            1 => self.index.columns[columns.range.start()].ty,
+            _ => self.builtin_type("record"),
+        };
+        let Some(expected) = expected else {
+            return;
+        };
+        let Some(func_type) = ret_clause.func_type() else {
+            return;
+        };
+        if expected == declared {
+            return;
+        }
+        let returns = func_type.setof_token().is_none().then(|| {
+            let range = ret_clause.syntax().text_range();
+            match ret_clause.syntax().prev_sibling_or_token() {
+                Some(prev) if prev.kind() == SyntaxKind::WHITESPACE => {
+                    TextRange::new(prev.text_range().start(), range.end())
+                }
+                _ => range,
+            }
+        });
+        self.push_error(
+            func_type.syntax(),
+            SemaError::OutParamResultType {
+                expected: self.index.ty_name(expected),
+                returns,
+            },
+        );
     }
 
     fn alloc_params(&mut self, param_list: Option<ast::ParamList>) -> FunctionParams {
@@ -24484,6 +24841,7 @@ pub(crate) enum ExprContext {
     Limit,
     Offset,
     Values,
+    ValuesSingle,
     Returning,
     Insert,
     Update,
@@ -24516,6 +24874,44 @@ impl ExprContext {
     fn allows_windows(self) -> bool {
         self == ExprContext::Unrestricted
     }
+
+    fn allows_set_returning(self) -> bool {
+        match self {
+            ExprContext::Unrestricted
+            | ExprContext::GroupBy
+            | ExprContext::WindowDefinition
+            | ExprContext::ValuesSingle
+            | ExprContext::Insert
+            | ExprContext::FromFunction => true,
+            ExprContext::Where
+            | ExprContext::JoinCondition
+            | ExprContext::Having
+            | ExprContext::Filter
+            | ExprContext::WindowRange
+            | ExprContext::WindowRows
+            | ExprContext::WindowGroups
+            | ExprContext::Limit
+            | ExprContext::Offset
+            | ExprContext::Values
+            | ExprContext::Returning
+            | ExprContext::Update
+            | ExprContext::MergeWhen
+            | ExprContext::CheckConstraint
+            | ExprContext::Default
+            | ExprContext::GeneratedColumn
+            | ExprContext::IndexExpression
+            | ExprContext::IndexPredicate
+            | ExprContext::StatisticsExpression
+            | ExprContext::PartitionKey
+            | ExprContext::PartitionBound
+            | ExprContext::Policy
+            | ExprContext::TriggerWhen
+            | ExprContext::CallArgument
+            | ExprContext::Transform
+            | ExprContext::CopyWhere
+            | ExprContext::ExecuteParameter => false,
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -24527,6 +24923,12 @@ enum AggregateCallKind {
 #[derive(Clone, Copy)]
 struct AggregateCall {
     kind: AggregateCallKind,
+    depth: usize,
+    ptr: InIrFile<SyntaxNodePtr>,
+}
+
+#[derive(Clone, Copy)]
+struct SrfCall {
     depth: usize,
     ptr: InIrFile<SyntaxNodePtr>,
 }
@@ -24561,6 +24963,7 @@ struct BaseTypeOptions {
     subscript: SubscriptOption,
     category: TypeCategory,
     preferred: bool,
+    collatable: bool,
 }
 
 fn params_conflict(a: ParamMode, b: ParamMode) -> bool {
@@ -24659,6 +25062,19 @@ fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
                 | ast::LitKind::Null(_)
         )
     )
+}
+
+fn single_rows_from_function(rows_from_item: &ast::RowsFromItem) -> bool {
+    let mut args = rows_from_item.rows_from_args();
+    match (args.next(), args.next()) {
+        (Some(arg), None) => {
+            arg.column_def_list().is_some()
+                || arg
+                    .call_expr()
+                    .is_none_or(|call| expanded_unnest(&call).is_none())
+        }
+        (Some(_), Some(_)) | (None, _) => false,
+    }
 }
 
 fn expanded_unnest(call: &ast::CallExpr) -> Option<ast::NameRef> {

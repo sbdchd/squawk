@@ -237,61 +237,71 @@ create type gtrgm (
 create operator % (
   leftarg = text,
   rightarg = text,
-  function = similarity_op
+  function = similarity_op,
+  commutator = %
 );
 
 create operator %> (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_commutator_op
+  function = word_similarity_commutator_op,
+  commutator = <%
 );
 
 create operator %>> (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_commutator_op
+  function = strict_word_similarity_commutator_op,
+  commutator = <<%
 );
 
 create operator <% (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_op
+  function = word_similarity_op,
+  commutator = %>
 );
 
 create operator <-> (
   leftarg = text,
   rightarg = text,
-  function = similarity_dist
+  function = similarity_dist,
+  commutator = <->
 );
 
 create operator <->> (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_dist_commutator_op
+  function = word_similarity_dist_commutator_op,
+  commutator = <<->
 );
 
 create operator <->>> (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_dist_commutator_op
+  function = strict_word_similarity_dist_commutator_op,
+  commutator = <<<->
 );
 
 create operator <<% (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_op
+  function = strict_word_similarity_op,
+  commutator = %>>
 );
 
 create operator <<-> (
   leftarg = text,
   rightarg = text,
-  function = word_similarity_dist_op
+  function = word_similarity_dist_op,
+  commutator = <->>
 );
 
 create operator <<<-> (
   leftarg = text,
   rightarg = text,
-  function = strict_word_similarity_dist_op
+  function = strict_word_similarity_dist_op,
+  commutator = <->>>
 );
 
 create operator family gin_trgm_ops
@@ -304,10 +314,88 @@ create operator class gin_trgm_ops
   for type text
   using gin
   family gin_trgm_ops as
-  storage integer;
+    function 2 (text, text) gin_extract_value_trgm(text, internal),
+    function 3 (text, text) gin_extract_query_trgm(
+      text,
+      internal,
+      smallint,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    storage integer;
 
 create operator class gist_trgm_ops
   for type text
   using gist
   family gist_trgm_ops as
-  storage gtrgm;
+    function 1 (text, text) gtrgm_consistent(
+      internal,
+      text,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (text, text) gtrgm_union(internal, internal),
+    function 5 (text, text) gtrgm_penalty(internal, internal, internal),
+    function 6 (text, text) gtrgm_picksplit(internal, internal),
+    function 7 (text, text) gtrgm_same(gtrgm, gtrgm, internal),
+    storage gtrgm;
+
+alter operator family gin_trgm_ops
+  using gin
+  add
+    operator 1 % (text, text),
+    operator 3 pg_catalog.~~ (text, text),
+    operator 4 pg_catalog.~~* (text, text),
+    operator 5 pg_catalog.~ (text, text),
+    operator 6 pg_catalog.~* (text, text),
+    operator 7 %> (text, text),
+    operator 9 %>> (text, text),
+    operator 11 pg_catalog.= (text, text),
+    function 1 (text, text) pg_catalog.btint4cmp(integer, integer),
+    function 4 (text, text) gin_trgm_consistent(
+      internal,
+      smallint,
+      text,
+      integer,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (text, text) gin_trgm_triconsistent(
+      internal,
+      smallint,
+      text,
+      integer,
+      internal,
+      internal,
+      internal
+    );
+
+alter operator family gist_trgm_ops
+  using gist
+  add
+    operator 1 % (text, text),
+    operator 2 <-> (text, text) for order by pg_catalog.float_ops,
+    operator 3 pg_catalog.~~ (text, text),
+    operator 4 pg_catalog.~~* (text, text),
+    operator 5 pg_catalog.~ (text, text),
+    operator 6 pg_catalog.~* (text, text),
+    operator 7 %> (text, text),
+    operator 8 <->> (text, text) for order by pg_catalog.float_ops,
+    operator 9 %>> (text, text),
+    operator 10 <->>> (text, text) for order by pg_catalog.float_ops,
+    operator 11 pg_catalog.= (text, text),
+    function 3 (text, text) gtrgm_compress(internal),
+    function 4 (text, text) gtrgm_decompress(internal),
+    function 8 (text, text) gtrgm_distance(
+      internal,
+      text,
+      smallint,
+      oid,
+      internal
+    ),
+    function 10 (text, text) gtrgm_options(internal);

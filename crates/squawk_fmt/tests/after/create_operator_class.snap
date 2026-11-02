@@ -21,8 +21,7 @@ create operator class extraordinarily_long_schema_name.extraordinarily_long_inte
     function 1 (
       extraordinarily_long_schema_name.extraordinarily_long_integer_type,
       extraordinarily_long_schema_name.extraordinarily_long_integer_type
-    )
-    extraordinarily_long_schema_name.extraordinarily_long_comparison_function(
+    ) extraordinarily_long_schema_name.extraordinarily_long_comparison_function(
       extraordinarily_long_schema_name.extraordinarily_long_integer_type,
       extraordinarily_long_schema_name.extraordinarily_long_integer_type
     ),
@@ -41,8 +40,7 @@ create /* operator */ operator /* class */ class /* schema */ app /* dot */ . /*
     /* function */ function /* function number */ 1 /* params */ (
       /* first param */ integer /* param comma */,
       /* second param */ integer /* params close */
-    )
-    /* function signature */ app.compare_integers(
+    ) /* function signature */ app.compare_integers(
       /* signature arg */ integer,
       integer
     ) /* second comma */,

@@ -6006,79 +6006,92 @@ create type spheroid (
 create operator && (
   leftarg = box2df,
   rightarg = box2df,
-  function = overlaps_2d
+  function = overlaps_2d,
+  commutator = &&
 );
 
 create operator && (
   leftarg = box2df,
   rightarg = geometry,
-  function = overlaps_2d
+  function = overlaps_2d,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geography,
   rightarg = geography,
-  function = geography_overlaps
+  function = geography_overlaps,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geography,
   rightarg = gidx,
-  function = overlaps_geog
+  function = overlaps_geog,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geometry,
   rightarg = box2df,
-  function = overlaps_2d
+  function = overlaps_2d,
+  commutator = &&
 );
 
 create operator && (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_overlaps
+  function = geometry_overlaps,
+  commutator = &&
 );
 
 create operator && (
   leftarg = gidx,
   rightarg = geography,
-  function = overlaps_geog
+  function = overlaps_geog,
+  commutator = &&
 );
 
 create operator && (
   leftarg = gidx,
   rightarg = gidx,
-  function = overlaps_geog
+  function = overlaps_geog,
+  commutator = &&
 );
 
 create operator &&& (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_overlaps_nd
+  function = geometry_overlaps_nd,
+  commutator = &&&
 );
 
 create operator &&& (
   leftarg = geometry,
   rightarg = gidx,
-  function = overlaps_nd
+  function = overlaps_nd,
+  commutator = &&&
 );
 
 create operator &&& (
   leftarg = gidx,
   rightarg = geometry,
-  function = overlaps_nd
+  function = overlaps_nd,
+  commutator = &&&
 );
 
 create operator &&& (
   leftarg = gidx,
   rightarg = gidx,
-  function = overlaps_nd
+  function = overlaps_nd,
+  commutator = &&&
 );
 
 create operator &/& (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_overlaps_3d
+  function = geometry_overlaps_3d,
+  commutator = &/&
 );
 
 create operator &< (
@@ -6102,151 +6115,188 @@ create operator &> (
 create operator < (
   leftarg = geography,
   rightarg = geography,
-  function = geography_lt
+  function = geography_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator < (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_lt
+  function = geometry_lt,
+  commutator = >,
+  negator = >=
 );
 
 create operator <#> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_box
+  function = geometry_distance_box,
+  commutator = <#>
 );
 
 create operator <-> (
   leftarg = geography,
   rightarg = geography,
-  function = geography_distance_knn
+  function = geography_distance_knn,
+  commutator = <->
 );
 
 create operator <-> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_centroid
+  function = geometry_distance_centroid,
+  commutator = <->
 );
 
 create operator << (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_left
+  function = geometry_left,
+  commutator = >>
 );
 
 create operator <<->> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_centroid_nd
+  function = geometry_distance_centroid_nd,
+  commutator = <<->>
 );
 
 create operator <<@ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contained_3d
+  function = geometry_contained_3d,
+  commutator = @>>
 );
 
 create operator <<| (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_below
+  function = geometry_below,
+  commutator = |>>
 );
 
 create operator <= (
   leftarg = geography,
   rightarg = geography,
-  function = geography_le
+  function = geography_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <= (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_le
+  function = geometry_le,
+  commutator = >=,
+  negator = >
 );
 
 create operator <> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_neq
+  function = geometry_neq,
+  commutator = <>,
+  negator = =
 );
 
 create operator = (
   leftarg = geography,
   rightarg = geography,
-  function = geography_eq
+  function = geography_eq,
+  commutator = =
 );
 
 create operator = (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_eq
+  function = geometry_eq,
+  commutator = =,
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator > (
   leftarg = geography,
   rightarg = geography,
-  function = geography_gt
+  function = geography_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator > (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_gt
+  function = geometry_gt,
+  commutator = <,
+  negator = <=
 );
 
 create operator >= (
   leftarg = geography,
   rightarg = geography,
-  function = geography_ge
+  function = geography_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator >= (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_ge
+  function = geometry_ge,
+  commutator = <=,
+  negator = <
 );
 
 create operator >> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_right
+  function = geometry_right,
+  commutator = <<
 );
 
 create operator @ (
   leftarg = box2df,
   rightarg = box2df,
-  function = is_contained_2d
+  function = is_contained_2d,
+  commutator = ~
 );
 
 create operator @ (
   leftarg = box2df,
   rightarg = geometry,
-  function = is_contained_2d
+  function = is_contained_2d,
+  commutator = ~
 );
 
 create operator @ (
   leftarg = geometry,
   rightarg = box2df,
-  function = is_contained_2d
+  function = is_contained_2d,
+  commutator = ~
 );
 
 create operator @ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_within
+  function = geometry_within,
+  commutator = ~
 );
 
 create operator @>> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contains_3d
+  function = geometry_contains_3d,
+  commutator = <<@
 );
 
 create operator @@ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_within_nd
+  function = geometry_within_nd,
+  commutator = ~~
 );
 
 create operator |&> (
@@ -6258,37 +6308,43 @@ create operator |&> (
 create operator |=| (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_distance_cpa
+  function = geometry_distance_cpa,
+  commutator = |=|
 );
 
 create operator |>> (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_above
+  function = geometry_above,
+  commutator = <<|
 );
 
 create operator ~ (
   leftarg = box2df,
   rightarg = box2df,
-  function = contains_2d
+  function = contains_2d,
+  commutator = @
 );
 
 create operator ~ (
   leftarg = box2df,
   rightarg = geometry,
-  function = contains_2d
+  function = contains_2d,
+  commutator = @
 );
 
 create operator ~ (
   leftarg = geometry,
   rightarg = box2df,
-  function = contains_2d
+  function = contains_2d,
+  commutator = @
 );
 
 create operator ~ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contains
+  function = geometry_contains,
+  commutator = @
 );
 
 create operator ~= (
@@ -6300,19 +6356,22 @@ create operator ~= (
 create operator ~== (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_same_3d
+  function = geometry_same_3d,
+  commutator = ~==
 );
 
 create operator ~~ (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_contains_nd
+  function = geometry_contains_nd,
+  commutator = @@
 );
 
 create operator ~~= (
   leftarg = geometry,
   rightarg = geometry,
-  function = geometry_same_nd
+  function = geometry_same_nd,
+  commutator = ~~=
 );
 
 create operator family brin_geography_inclusion_ops
@@ -6361,85 +6420,349 @@ create operator class brin_geography_inclusion_ops
   default for type geography
   using brin
   family brin_geography_inclusion_ops as
-  storage gidx;
+    operator 3 && (geography, geography),
+    operator 3 && (geography, gidx),
+    operator 3 && (gidx, geography),
+    operator 3 && (gidx, gidx),
+    function 1 (geography, geography) pg_catalog.brin_inclusion_opcinfo(
+      internal
+    ),
+    function 2 (geography, geography) geog_brin_inclusion_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (geography, geography) pg_catalog.brin_inclusion_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (geography, geography) pg_catalog.brin_inclusion_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 11 (geography, geography) geog_brin_inclusion_merge(
+      internal,
+      internal
+    ),
+    storage gidx;
 
 create operator class brin_geometry_inclusion_ops_2d
   default for type geometry
   using brin
   family brin_geometry_inclusion_ops_2d as
-  storage box2df;
+    operator 3 && (box2df, box2df),
+    operator 3 && (box2df, geometry),
+    operator 3 && (geometry, box2df),
+    operator 3 && (geometry, geometry),
+    operator 7 ~ (box2df, box2df),
+    operator 7 ~ (box2df, geometry),
+    operator 7 ~ (geometry, box2df),
+    operator 7 ~ (geometry, geometry),
+    operator 8 @ (box2df, box2df),
+    operator 8 @ (box2df, geometry),
+    operator 8 @ (geometry, box2df),
+    operator 8 @ (geometry, geometry),
+    function 1 (geometry, geometry) pg_catalog.brin_inclusion_opcinfo(internal),
+    function 2 (geometry, geometry) geom2d_brin_inclusion_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (geometry, geometry) pg_catalog.brin_inclusion_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (geometry, geometry) pg_catalog.brin_inclusion_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 11 (geometry, geometry) geom2d_brin_inclusion_merge(
+      internal,
+      internal
+    ),
+    storage box2df;
 
 create operator class brin_geometry_inclusion_ops_3d
   for type geometry
   using brin
   family brin_geometry_inclusion_ops_3d as
-  storage gidx;
+    operator 3 &&& (geometry, geometry),
+    operator 3 &&& (geometry, gidx),
+    operator 3 &&& (gidx, geometry),
+    operator 3 &&& (gidx, gidx),
+    function 1 (geometry, geometry) pg_catalog.brin_inclusion_opcinfo(internal),
+    function 2 (geometry, geometry) geom3d_brin_inclusion_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (geometry, geometry) pg_catalog.brin_inclusion_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (geometry, geometry) pg_catalog.brin_inclusion_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 11 (geometry, geometry) geom3d_brin_inclusion_merge(
+      internal,
+      internal
+    ),
+    storage gidx;
 
 create operator class brin_geometry_inclusion_ops_4d
   for type geometry
   using brin
   family brin_geometry_inclusion_ops_4d as
-  storage gidx;
+    operator 3 &&& (geometry, geometry),
+    operator 3 &&& (geometry, gidx),
+    operator 3 &&& (gidx, geometry),
+    operator 3 &&& (gidx, gidx),
+    function 1 (geometry, geometry) pg_catalog.brin_inclusion_opcinfo(internal),
+    function 2 (geometry, geometry) geom4d_brin_inclusion_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (geometry, geometry) pg_catalog.brin_inclusion_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (geometry, geometry) pg_catalog.brin_inclusion_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 11 (geometry, geometry) geom4d_brin_inclusion_merge(
+      internal,
+      internal
+    ),
+    storage gidx;
 
 create operator class btree_geography_ops
   default for type geography
   using btree
   family btree_geography_ops as
-  storage geography;
+    operator 1 < (geography, geography),
+    operator 2 <= (geography, geography),
+    operator 3 = (geography, geography),
+    operator 4 >= (geography, geography),
+    operator 5 > (geography, geography),
+    function 1 (geography, geography) geography_cmp(geography, geography),
+    storage geography;
 
 create operator class btree_geometry_ops
   default for type geometry
   using btree
   family btree_geometry_ops as
-  storage geometry;
+    operator 1 < (geometry, geometry),
+    operator 2 <= (geometry, geometry),
+    operator 3 = (geometry, geometry),
+    operator 4 >= (geometry, geometry),
+    operator 5 > (geometry, geometry),
+    function 1 (geometry, geometry) geometry_cmp(geometry, geometry),
+    storage geometry;
 
 create operator class gist_geography_ops
   default for type geography
   using gist
   family gist_geography_ops as
-  storage gidx;
+    function 1 (geography, geography) geography_gist_consistent(
+      internal,
+      geography,
+      integer
+    ),
+    function 2 (geography, geography) geography_gist_union(bytea, internal),
+    function 5 (geography, geography) geography_gist_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (geography, geography) geography_gist_picksplit(
+      internal,
+      internal
+    ),
+    function 7 (geography, geography) geography_gist_same(
+      box2d,
+      box2d,
+      internal
+    ),
+    storage gidx;
 
 create operator class gist_geometry_ops_2d
   default for type geometry
   using gist
   family gist_geometry_ops_2d as
-  storage box2df;
+    function 1 (geometry, geometry) geometry_gist_consistent_2d(
+      internal,
+      geometry,
+      integer
+    ),
+    function 2 (geometry, geometry) geometry_gist_union_2d(bytea, internal),
+    function 5 (geometry, geometry) geometry_gist_penalty_2d(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (geometry, geometry) geometry_gist_picksplit_2d(
+      internal,
+      internal
+    ),
+    function 7 (geometry, geometry) geometry_gist_same_2d(
+      geometry,
+      geometry,
+      internal
+    ),
+    storage box2df;
 
 create operator class gist_geometry_ops_nd
   for type geometry
   using gist
   family gist_geometry_ops_nd as
-  storage gidx;
+    function 1 (geometry, geometry) geometry_gist_consistent_nd(
+      internal,
+      geometry,
+      integer
+    ),
+    function 2 (geometry, geometry) geometry_gist_union_nd(bytea, internal),
+    function 5 (geometry, geometry) geometry_gist_penalty_nd(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (geometry, geometry) geometry_gist_picksplit_nd(
+      internal,
+      internal
+    ),
+    function 7 (geometry, geometry) geometry_gist_same_nd(
+      geometry,
+      geometry,
+      internal
+    ),
+    storage gidx;
 
 create operator class hash_geometry_ops
   default for type geometry
   using hash
   family hash_geometry_ops as
-  storage geometry;
+    operator 1 = (geometry, geometry),
+    function 1 (geometry, geometry) geometry_hash(geometry),
+    storage geometry;
 
 create operator class spgist_geography_ops_nd
   default for type geography
   using spgist
   family spgist_geography_ops_nd as
-  storage geography;
+    function 1 (geography, geography) geography_spgist_config_nd(
+      internal,
+      internal
+    ),
+    function 2 (geography, geography) geography_spgist_choose_nd(
+      internal,
+      internal
+    ),
+    function 3 (geography, geography) geography_spgist_picksplit_nd(
+      internal,
+      internal
+    ),
+    function 4 (geography, geography) geography_spgist_inner_consistent_nd(
+      internal,
+      internal
+    ),
+    function 5 (geography, geography) geography_spgist_leaf_consistent_nd(
+      internal,
+      internal
+    ),
+    storage geography;
 
 create operator class spgist_geometry_ops_2d
   default for type geometry
   using spgist
   family spgist_geometry_ops_2d as
-  storage geometry;
+    function 1 (geometry, geometry) geometry_spgist_config_2d(
+      internal,
+      internal
+    ),
+    function 2 (geometry, geometry) geometry_spgist_choose_2d(
+      internal,
+      internal
+    ),
+    function 3 (geometry, geometry) geometry_spgist_picksplit_2d(
+      internal,
+      internal
+    ),
+    function 4 (geometry, geometry) geometry_spgist_inner_consistent_2d(
+      internal,
+      internal
+    ),
+    function 5 (geometry, geometry) geometry_spgist_leaf_consistent_2d(
+      internal,
+      internal
+    ),
+    storage geometry;
 
 create operator class spgist_geometry_ops_3d
   for type geometry
   using spgist
   family spgist_geometry_ops_3d as
-  storage geometry;
+    function 1 (geometry, geometry) geometry_spgist_config_3d(
+      internal,
+      internal
+    ),
+    function 2 (geometry, geometry) geometry_spgist_choose_3d(
+      internal,
+      internal
+    ),
+    function 3 (geometry, geometry) geometry_spgist_picksplit_3d(
+      internal,
+      internal
+    ),
+    function 4 (geometry, geometry) geometry_spgist_inner_consistent_3d(
+      internal,
+      internal
+    ),
+    function 5 (geometry, geometry) geometry_spgist_leaf_consistent_3d(
+      internal,
+      internal
+    ),
+    storage geometry;
 
 create operator class spgist_geometry_ops_nd
   for type geometry
   using spgist
   family spgist_geometry_ops_nd as
-  storage geometry;
+    function 1 (geometry, geometry) geometry_spgist_config_nd(
+      internal,
+      internal
+    ),
+    function 2 (geometry, geometry) geometry_spgist_choose_nd(
+      internal,
+      internal
+    ),
+    function 3 (geometry, geometry) geometry_spgist_picksplit_nd(
+      internal,
+      internal
+    ),
+    function 4 (geometry, geometry) geometry_spgist_inner_consistent_nd(
+      internal,
+      internal
+    ),
+    function 5 (geometry, geometry) geometry_spgist_leaf_consistent_nd(
+      internal,
+      internal
+    ),
+    storage geometry;
 
 create aggregate st_3dextent(geometry) (
   sfunc = st_combinebbox,
@@ -6623,6 +6946,108 @@ create aggregate st_union(geometry, gridsize double precision) (
   deserialfunc = pgis_geometry_union_parallel_deserialfn,
   parallel = safe
 );
+
+alter operator family btree_geometry_ops
+  using btree
+  add
+    function 2 (geometry, geometry) geometry_sortsupport(internal);
+
+alter operator family gist_geography_ops
+  using gist
+  add
+    operator 3 && (geography, geography),
+    operator 13 <-> (geography, geography) for order by pg_catalog.float_ops,
+    function 3 (geography, geography) geography_gist_compress(internal),
+    function 4 (geography, geography) geography_gist_decompress(internal),
+    function 8 (geography, geography) geography_gist_distance(
+      internal,
+      geography,
+      integer
+    );
+
+alter operator family gist_geometry_ops_2d
+  using gist
+  add
+    operator 1 << (geometry, geometry),
+    operator 2 &< (geometry, geometry),
+    operator 3 && (geometry, geometry),
+    operator 4 &> (geometry, geometry),
+    operator 5 >> (geometry, geometry),
+    operator 6 ~= (geometry, geometry),
+    operator 7 ~ (geometry, geometry),
+    operator 8 @ (geometry, geometry),
+    operator 9 &<| (geometry, geometry),
+    operator 10 <<| (geometry, geometry),
+    operator 11 |>> (geometry, geometry),
+    operator 12 |&> (geometry, geometry),
+    operator 13 <-> (geometry, geometry) for order by pg_catalog.float_ops,
+    operator 14 <#> (geometry, geometry) for order by pg_catalog.float_ops,
+    function 3 (geometry, geometry) geometry_gist_compress_2d(internal),
+    function 4 (geometry, geometry) geometry_gist_decompress_2d(internal),
+    function 8 (geometry, geometry) geometry_gist_distance_2d(
+      internal,
+      geometry,
+      integer
+    ),
+    function 11 (geometry, geometry) geometry_gist_sortsupport_2d(internal);
+
+alter operator family gist_geometry_ops_nd
+  using gist
+  add
+    operator 3 &&& (geometry, geometry),
+    operator 6 ~~= (geometry, geometry),
+    operator 7 ~~ (geometry, geometry),
+    operator 8 @@ (geometry, geometry),
+    operator 13 <<->> (geometry, geometry) for order by pg_catalog.float_ops,
+    operator 20 |=| (geometry, geometry) for order by pg_catalog.float_ops,
+    function 3 (geometry, geometry) geometry_gist_compress_nd(internal),
+    function 4 (geometry, geometry) geometry_gist_decompress_nd(internal),
+    function 8 (geometry, geometry) geometry_gist_distance_nd(
+      internal,
+      geometry,
+      integer
+    );
+
+alter operator family spgist_geography_ops_nd
+  using spgist
+  add
+    operator 3 && (geography, geography),
+    function 6 (geography, geography) geography_spgist_compress_nd(internal);
+
+alter operator family spgist_geometry_ops_2d
+  using spgist
+  add
+    operator 1 << (geometry, geometry),
+    operator 2 &< (geometry, geometry),
+    operator 3 && (geometry, geometry),
+    operator 4 &> (geometry, geometry),
+    operator 5 >> (geometry, geometry),
+    operator 6 ~= (geometry, geometry),
+    operator 7 ~ (geometry, geometry),
+    operator 8 @ (geometry, geometry),
+    operator 9 &<| (geometry, geometry),
+    operator 10 <<| (geometry, geometry),
+    operator 11 |>> (geometry, geometry),
+    operator 12 |&> (geometry, geometry),
+    function 6 (geometry, geometry) geometry_spgist_compress_2d(internal);
+
+alter operator family spgist_geometry_ops_3d
+  using spgist
+  add
+    operator 3 &/& (geometry, geometry),
+    operator 6 ~== (geometry, geometry),
+    operator 7 @>> (geometry, geometry),
+    operator 8 <<@ (geometry, geometry),
+    function 6 (geometry, geometry) geometry_spgist_compress_3d(internal);
+
+alter operator family spgist_geometry_ops_nd
+  using spgist
+  add
+    operator 3 &&& (geometry, geometry),
+    operator 6 ~~= (geometry, geometry),
+    operator 7 ~~ (geometry, geometry),
+    operator 8 @@ (geometry, geometry),
+    function 6 (geometry, geometry) geometry_spgist_compress_nd(internal);
 
 create cast (box2d as box3d) with function box3d(box2d) as implicit;
 

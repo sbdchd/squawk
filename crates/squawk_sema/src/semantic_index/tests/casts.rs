@@ -164,3 +164,107 @@ drop cast (d as text);
        ╰╴          ━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn empty_array_without_cast() {
+    assert_snapshot!(check("
+create table t (a int[]);
+create domain ia as int[];
+create function f(int[]) returns int[]
+  language sql
+  as 'select $1';
+
+select array[];
+insert into t values (array[]);
+update t set a = array[];
+select a = array[] from t;
+select coalesce(a, array[]) from t;
+select array_length(array[], 1);
+select array[array[]];
+select array[array[1], array[]];
+select array[]::text;
+select array[f(array[])]::int[][];
+create table d (a int[] default array[]);
+
+select array[]::int[];
+select cast(array[] as int[]);
+select (array[])::int[];
+select array[array[]]::int[];
+select array[(array[])]::int[];
+select array[]::ia;
+select array[]::unknown_type[];
+select array(select 1);
+select '{}'::int[];
+"), @"
+    error: cannot determine type of empty array
+      ╭▸ 
+    8 │ select array[];
+      │        ━━━━━━━
+      │
+      ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+      ╭▸ 
+    9 │ insert into t values (array[]);
+      │                       ━━━━━━━
+      │
+      ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    10 │ update t set a = array[];
+       │                  ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    11 │ select a = array[] from t;
+       │            ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    12 │ select coalesce(a, array[]) from t;
+       │                    ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    13 │ select array_length(array[], 1);
+       │                     ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    14 │ select array[array[]];
+       │              ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    15 │ select array[array[1], array[]];
+       │                        ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    16 │ select array[]::text;
+       │        ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    17 │ select array[f(array[])]::int[][];
+       │                ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: cannot determine type of empty array
+       ╭▸ 
+    18 │ create table d (a int[] default array[]);
+       │                                 ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    error: type `unknown_type` does not exist
+       ╭▸ 
+    26 │ select array[]::unknown_type[];
+       ╰╴                ━━━━━━━━━━━━
+    ");
+}
