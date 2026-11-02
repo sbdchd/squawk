@@ -706,6 +706,8 @@ struct OperatorQuery {
     commutator_name: String,
     negator_schema: String,
     negator_name: String,
+    hashes: i32,
+    merges: i32,
     description: String,
     extension_name: String,
 }
@@ -732,6 +734,8 @@ select
     else neg_n.nspname || '.'
   end as negator_schema,
   coalesce(neg.oprname, '') as negator_name,
+  case when o.oprcanhash then 1 else 0 end as hashes,
+  case when o.oprcanmerge then 1 else 0 end as merges,
   coalesce(d.description, '') as description,
   coalesce(ext.extname, 'builtins') as extension_name
 from pg_operator o
@@ -2663,6 +2667,8 @@ struct OperatorDef {
     function_name: String,
     commutator: Option<OperatorRef>,
     negator: Option<OperatorRef>,
+    hashes: bool,
+    merges: bool,
     description: String,
 }
 
@@ -2709,6 +2715,12 @@ impl WriteSql for OperatorDef {
         }
         if let Some(negator) = &self.negator {
             write!(f, ",\n  negator = {negator}")?;
+        }
+        if self.hashes {
+            write!(f, ",\n  hashes")?;
+        }
+        if self.merges {
+            write!(f, ",\n  merges")?;
         }
         writeln!(f, "\n);")?;
         writeln!(f)?;
@@ -3255,6 +3267,8 @@ fn query_operators(modules: &mut BTreeMap<String, Module>) -> Result<()> {
                 schema: row.schema,
                 commutator: OperatorRef::new(row.commutator_schema, row.commutator_name),
                 negator: OperatorRef::new(row.negator_schema, row.negator_name),
+                hashes: row.hashes == 1,
+                merges: row.merges == 1,
             });
     }
 

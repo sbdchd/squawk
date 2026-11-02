@@ -380,7 +380,8 @@ create operator = (
   rightarg = hll,
   function = hll_eq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  merges
 );
 
 create operator = (
@@ -388,7 +389,8 @@ create operator = (
   rightarg = hll_hashval,
   function = hll_hashval_eq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  merges
 );
 
 create operator || (

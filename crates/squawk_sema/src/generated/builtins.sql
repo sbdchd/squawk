@@ -33406,7 +33406,8 @@ create operator pg_catalog.*= (
   rightarg = record,
   function = pg_catalog.record_image_eq,
   commutator = operator(pg_catalog.*=),
-  negator = operator(pg_catalog.*<>)
+  negator = operator(pg_catalog.*<>),
+  merges
 );
 
 -- greater than
@@ -36483,7 +36484,9 @@ create operator pg_catalog.= (
   rightarg = "char",
   function = pg_catalog.chareq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36491,7 +36494,8 @@ create operator pg_catalog.= (
   leftarg = aclitem,
   rightarg = aclitem,
   function = pg_catalog.aclitemeq,
-  commutator = operator(pg_catalog.=)
+  commutator = operator(pg_catalog.=),
+  hashes
 );
 
 -- equal
@@ -36500,7 +36504,9 @@ create operator pg_catalog.= (
   rightarg = anyarray,
   function = pg_catalog.array_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36509,7 +36515,9 @@ create operator pg_catalog.= (
   rightarg = anyenum,
   function = pg_catalog.enum_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36518,7 +36526,9 @@ create operator pg_catalog.= (
   rightarg = anymultirange,
   function = pg_catalog.multirange_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36527,7 +36537,9 @@ create operator pg_catalog.= (
   rightarg = anyrange,
   function = pg_catalog.range_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36536,7 +36548,9 @@ create operator pg_catalog.= (
   rightarg = bigint,
   function = pg_catalog.int8eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36545,7 +36559,9 @@ create operator pg_catalog.= (
   rightarg = integer,
   function = pg_catalog.int84eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36554,7 +36570,9 @@ create operator pg_catalog.= (
   rightarg = smallint,
   function = pg_catalog.int82eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36563,7 +36581,8 @@ create operator pg_catalog.= (
   rightarg = bit,
   function = pg_catalog.biteq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36572,7 +36591,8 @@ create operator pg_catalog.= (
   rightarg = bit varying,
   function = pg_catalog.varbiteq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36581,7 +36601,9 @@ create operator pg_catalog.= (
   rightarg = boolean,
   function = pg_catalog.booleq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal by area
@@ -36598,7 +36620,9 @@ create operator pg_catalog.= (
   rightarg = bytea,
   function = pg_catalog.byteaeq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36607,7 +36631,9 @@ create operator pg_catalog.= (
   rightarg = character,
   function = pg_catalog.bpchareq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36615,7 +36641,8 @@ create operator pg_catalog.= (
   leftarg = cid,
   rightarg = cid,
   function = pg_catalog.cideq,
-  commutator = operator(pg_catalog.=)
+  commutator = operator(pg_catalog.=),
+  hashes
 );
 
 -- equal by area
@@ -36633,7 +36660,9 @@ create operator pg_catalog.= (
   rightarg = date,
   function = pg_catalog.date_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36642,7 +36671,8 @@ create operator pg_catalog.= (
   rightarg = timestamp with time zone,
   function = pg_catalog.date_eq_timestamptz,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36651,7 +36681,8 @@ create operator pg_catalog.= (
   rightarg = timestamp without time zone,
   function = pg_catalog.date_eq_timestamp,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36660,7 +36691,9 @@ create operator pg_catalog.= (
   rightarg = double precision,
   function = pg_catalog.float8eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36669,7 +36702,9 @@ create operator pg_catalog.= (
   rightarg = real,
   function = pg_catalog.float84eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36678,7 +36713,9 @@ create operator pg_catalog.= (
   rightarg = inet,
   function = pg_catalog.network_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36687,7 +36724,9 @@ create operator pg_catalog.= (
   rightarg = bigint,
   function = pg_catalog.int48eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36696,7 +36735,9 @@ create operator pg_catalog.= (
   rightarg = integer,
   function = pg_catalog.int4eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36705,7 +36746,9 @@ create operator pg_catalog.= (
   rightarg = smallint,
   function = pg_catalog.int42eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36714,7 +36757,9 @@ create operator pg_catalog.= (
   rightarg = interval,
   function = pg_catalog.interval_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36723,7 +36768,9 @@ create operator pg_catalog.= (
   rightarg = jsonb,
   function = pg_catalog.jsonb_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36749,7 +36796,9 @@ create operator pg_catalog.= (
   rightarg = macaddr,
   function = pg_catalog.macaddr_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36758,7 +36807,9 @@ create operator pg_catalog.= (
   rightarg = macaddr8,
   function = pg_catalog.macaddr8_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36767,7 +36818,8 @@ create operator pg_catalog.= (
   rightarg = money,
   function = pg_catalog.cash_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36776,7 +36828,9 @@ create operator pg_catalog.= (
   rightarg = name,
   function = pg_catalog.nameeq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36785,7 +36839,9 @@ create operator pg_catalog.= (
   rightarg = text,
   function = pg_catalog.nameeqtext,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36794,7 +36850,9 @@ create operator pg_catalog.= (
   rightarg = numeric,
   function = pg_catalog.numeric_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36803,7 +36861,9 @@ create operator pg_catalog.= (
   rightarg = oid,
   function = pg_catalog.oideq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36812,7 +36872,9 @@ create operator pg_catalog.= (
   rightarg = oidvector,
   function = pg_catalog.oidvectoreq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36829,7 +36891,9 @@ create operator pg_catalog.= (
   rightarg = pg_lsn,
   function = pg_catalog.pg_lsn_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36838,7 +36902,9 @@ create operator pg_catalog.= (
   rightarg = double precision,
   function = pg_catalog.float48eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36847,7 +36913,9 @@ create operator pg_catalog.= (
   rightarg = real,
   function = pg_catalog.float4eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36856,7 +36924,9 @@ create operator pg_catalog.= (
   rightarg = record,
   function = pg_catalog.record_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36865,7 +36935,9 @@ create operator pg_catalog.= (
   rightarg = bigint,
   function = pg_catalog.int28eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36874,7 +36946,9 @@ create operator pg_catalog.= (
   rightarg = integer,
   function = pg_catalog.int24eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36883,7 +36957,9 @@ create operator pg_catalog.= (
   rightarg = smallint,
   function = pg_catalog.int2eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36892,7 +36968,9 @@ create operator pg_catalog.= (
   rightarg = name,
   function = pg_catalog.texteqname,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36901,7 +36979,9 @@ create operator pg_catalog.= (
   rightarg = text,
   function = pg_catalog.texteq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36910,7 +36990,9 @@ create operator pg_catalog.= (
   rightarg = tid,
   function = pg_catalog.tideq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36919,7 +37001,9 @@ create operator pg_catalog.= (
   rightarg = time with time zone,
   function = pg_catalog.timetz_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36928,7 +37012,9 @@ create operator pg_catalog.= (
   rightarg = time without time zone,
   function = pg_catalog.time_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36937,7 +37023,8 @@ create operator pg_catalog.= (
   rightarg = date,
   function = pg_catalog.timestamptz_eq_date,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36946,7 +37033,9 @@ create operator pg_catalog.= (
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamptz_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36955,7 +37044,8 @@ create operator pg_catalog.= (
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamptz_eq_timestamp,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36964,7 +37054,8 @@ create operator pg_catalog.= (
   rightarg = date,
   function = pg_catalog.timestamp_eq_date,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36973,7 +37064,8 @@ create operator pg_catalog.= (
   rightarg = timestamp with time zone,
   function = pg_catalog.timestamp_eq_timestamptz,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -36982,7 +37074,9 @@ create operator pg_catalog.= (
   rightarg = timestamp without time zone,
   function = pg_catalog.timestamp_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -36991,7 +37085,8 @@ create operator pg_catalog.= (
   rightarg = tsquery,
   function = pg_catalog.tsquery_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -37000,7 +37095,8 @@ create operator pg_catalog.= (
   rightarg = tsvector,
   function = pg_catalog.tsvector_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  merges
 );
 
 -- equal
@@ -37009,7 +37105,9 @@ create operator pg_catalog.= (
   rightarg = uuid,
   function = pg_catalog.uuid_eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- equal
@@ -37026,7 +37124,8 @@ create operator pg_catalog.= (
   rightarg = xid,
   function = pg_catalog.xideq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes
 );
 
 -- equal
@@ -37035,7 +37134,9 @@ create operator pg_catalog.= (
   rightarg = xid8,
   function = pg_catalog.xid8eq,
   commutator = operator(pg_catalog.=),
-  negator = operator(pg_catalog.<>)
+  negator = operator(pg_catalog.<>),
+  hashes,
+  merges
 );
 
 -- greater than

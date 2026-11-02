@@ -6213,7 +6213,9 @@ create operator = (
   rightarg = geometry,
   function = geometry_eq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator > (

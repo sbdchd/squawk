@@ -404,7 +404,9 @@ create operator = (
   rightarg = citext,
   function = citext_eq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator > (

@@ -2220,7 +2220,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2228,7 +2230,9 @@ create operator = (
   rightarg = isbn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2236,7 +2240,9 @@ create operator = (
   rightarg = isbn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2244,7 +2250,9 @@ create operator = (
   rightarg = ismn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2252,7 +2260,9 @@ create operator = (
   rightarg = ismn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2260,7 +2270,9 @@ create operator = (
   rightarg = issn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2268,7 +2280,9 @@ create operator = (
   rightarg = issn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2276,7 +2290,9 @@ create operator = (
   rightarg = upc,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2284,7 +2300,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2292,7 +2310,9 @@ create operator = (
   rightarg = isbn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2300,7 +2320,9 @@ create operator = (
   rightarg = isbn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2308,7 +2330,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2316,7 +2340,9 @@ create operator = (
   rightarg = isbn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2324,7 +2350,9 @@ create operator = (
   rightarg = isbn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2332,7 +2360,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2340,7 +2370,9 @@ create operator = (
   rightarg = ismn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2348,7 +2380,9 @@ create operator = (
   rightarg = ismn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2356,7 +2390,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2364,7 +2400,9 @@ create operator = (
   rightarg = ismn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2372,7 +2410,9 @@ create operator = (
   rightarg = ismn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2380,7 +2420,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2388,7 +2430,9 @@ create operator = (
   rightarg = issn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2396,7 +2440,9 @@ create operator = (
   rightarg = issn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2404,7 +2450,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2412,7 +2460,9 @@ create operator = (
   rightarg = issn,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2420,7 +2470,9 @@ create operator = (
   rightarg = issn13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2428,7 +2480,9 @@ create operator = (
   rightarg = ean13,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator = (
@@ -2436,7 +2490,9 @@ create operator = (
   rightarg = upc,
   function = isneq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator > (

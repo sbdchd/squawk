@@ -597,7 +597,9 @@ create operator = (
   rightarg = ltree,
   function = ltree_eq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator > (

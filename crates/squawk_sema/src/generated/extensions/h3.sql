@@ -819,7 +819,9 @@ create operator = (
   rightarg = h3index,
   function = h3index_eq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  hashes,
+  merges
 );
 
 create operator > (

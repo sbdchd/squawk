@@ -82,9 +82,9 @@ create index
         4 │   on t using btree (x);
           │              ───── 1. source
           │
-          ⸬  builtins.sql:39122:22
+          ⸬  builtins.sql:39223:22
           │
-    39122 │ create access method btree
+    39223 │ create access method btree
           ╰╴                     ───── 2. destination
     ");
 }
@@ -121,9 +121,9 @@ alter table t set access method heap$0;
         3 │ alter table t set access method heap;
           │                                 ──── 1. source
           │
-          ⸬  builtins.sql:39142:22
+          ⸬  builtins.sql:39243:22
           │
-    39142 │ create access method heap
+    39243 │ create access method heap
           ╰╴                     ──── 2. destination
     ");
 }

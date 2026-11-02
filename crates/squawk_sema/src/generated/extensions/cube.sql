@@ -344,7 +344,8 @@ create operator = (
   rightarg = cube,
   function = cube_eq,
   commutator = =,
-  negator = <>
+  negator = <>,
+  merges
 );
 
 create operator > (
