@@ -398,11 +398,7 @@ create operator class gist_cube_ops
   default for type cube
   using gist
   family gist_cube_ops as
-    function 1 (
-      cube,
-      cube
-    )
-    g_cube_consistent(
+    function 1 (cube, cube) g_cube_consistent(
       internal,
       cube,
       smallint,
@@ -426,11 +422,7 @@ alter operator family gist_cube_ops
     operator 16 <#> (cube, cube) for order by pg_catalog.float_ops,
     operator 17 <-> (cube, cube) for order by pg_catalog.float_ops,
     operator 18 <=> (cube, cube) for order by pg_catalog.float_ops,
-    function 8 (
-      cube,
-      cube
-    )
-    g_cube_distance(
+    function 8 (cube, cube) g_cube_distance(
       internal,
       cube,
       smallint,

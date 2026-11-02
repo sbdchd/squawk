@@ -1782,11 +1782,7 @@ create operator class gist_bit_ops
   default for type bit
   using gist
   family gist_bit_ops as
-    function 1 (
-      bit,
-      bit
-    )
-    gbt_bit_consistent(
+    function 1 (bit, bit) gbt_bit_consistent(
       internal,
       bit,
       smallint,
@@ -1803,11 +1799,7 @@ create operator class gist_bool_ops
   default for type boolean
   using gist
   family gist_bool_ops as
-    function 1 (
-      boolean,
-      boolean
-    )
-    gbt_bool_consistent(
+    function 1 (boolean, boolean) gbt_bool_consistent(
       internal,
       boolean,
       smallint,
@@ -1815,21 +1807,13 @@ create operator class gist_bool_ops
       internal
     ),
     function 2 (boolean, boolean) gbt_bool_union(internal, internal),
-    function 5 (
-      boolean,
-      boolean
-    )
-    gbt_bool_penalty(
+    function 5 (boolean, boolean) gbt_bool_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (boolean, boolean) gbt_bool_picksplit(internal, internal),
-    function 7 (
-      boolean,
-      boolean
-    )
-    gbt_bool_same(
+    function 7 (boolean, boolean) gbt_bool_same(
       gbtreekey2,
       gbtreekey2,
       internal
@@ -1840,11 +1824,7 @@ create operator class gist_bpchar_ops
   default for type character
   using gist
   family gist_bpchar_ops as
-    function 1 (
-      character,
-      character
-    )
-    gbt_bpchar_consistent(
+    function 1 (character, character) gbt_bpchar_consistent(
       internal,
       character,
       smallint,
@@ -1852,21 +1832,13 @@ create operator class gist_bpchar_ops
       internal
     ),
     function 2 (character, character) gbt_text_union(internal, internal),
-    function 5 (
-      character,
-      character
-    )
-    gbt_text_penalty(
+    function 5 (character, character) gbt_text_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (character, character) gbt_text_picksplit(internal, internal),
-    function 7 (
-      character,
-      character
-    )
-    gbt_text_same(
+    function 7 (character, character) gbt_text_same(
       gbtreekey_var,
       gbtreekey_var,
       internal
@@ -1877,11 +1849,7 @@ create operator class gist_bytea_ops
   default for type bytea
   using gist
   family gist_bytea_ops as
-    function 1 (
-      bytea,
-      bytea
-    )
-    gbt_bytea_consistent(
+    function 1 (bytea, bytea) gbt_bytea_consistent(
       internal,
       bytea,
       smallint,
@@ -1891,11 +1859,7 @@ create operator class gist_bytea_ops
     function 2 (bytea, bytea) gbt_bytea_union(internal, internal),
     function 5 (bytea, bytea) gbt_bytea_penalty(internal, internal, internal),
     function 6 (bytea, bytea) gbt_bytea_picksplit(internal, internal),
-    function 7 (
-      bytea,
-      bytea
-    )
-    gbt_bytea_same(
+    function 7 (bytea, bytea) gbt_bytea_same(
       gbtreekey_var,
       gbtreekey_var,
       internal
@@ -1906,11 +1870,7 @@ create operator class gist_cash_ops
   default for type money
   using gist
   family gist_cash_ops as
-    function 1 (
-      money,
-      money
-    )
-    gbt_cash_consistent(
+    function 1 (money, money) gbt_cash_consistent(
       internal,
       money,
       smallint,
@@ -1927,11 +1887,7 @@ create operator class gist_cidr_ops
   default for type cidr
   using gist
   family gist_cidr_ops as
-    function 1 (
-      cidr,
-      cidr
-    )
-    gbt_inet_consistent(
+    function 1 (cidr, cidr) gbt_inet_consistent(
       internal,
       inet,
       smallint,
@@ -1948,11 +1904,7 @@ create operator class gist_date_ops
   default for type date
   using gist
   family gist_date_ops as
-    function 1 (
-      date,
-      date
-    )
-    gbt_date_consistent(
+    function 1 (date, date) gbt_date_consistent(
       internal,
       date,
       smallint,
@@ -1969,11 +1921,7 @@ create operator class gist_enum_ops
   default for type anyenum
   using gist
   family gist_enum_ops as
-    function 1 (
-      anyenum,
-      anyenum
-    )
-    gbt_enum_consistent(
+    function 1 (anyenum, anyenum) gbt_enum_consistent(
       internal,
       anyenum,
       smallint,
@@ -1981,21 +1929,13 @@ create operator class gist_enum_ops
       internal
     ),
     function 2 (anyenum, anyenum) gbt_enum_union(internal, internal),
-    function 5 (
-      anyenum,
-      anyenum
-    )
-    gbt_enum_penalty(
+    function 5 (anyenum, anyenum) gbt_enum_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (anyenum, anyenum) gbt_enum_picksplit(internal, internal),
-    function 7 (
-      anyenum,
-      anyenum
-    )
-    gbt_enum_same(
+    function 7 (anyenum, anyenum) gbt_enum_same(
       gbtreekey8,
       gbtreekey8,
       internal
@@ -2006,11 +1946,7 @@ create operator class gist_float4_ops
   default for type real
   using gist
   family gist_float4_ops as
-    function 1 (
-      real,
-      real
-    )
-    gbt_float4_consistent(
+    function 1 (real, real) gbt_float4_consistent(
       internal,
       real,
       smallint,
@@ -2027,47 +1963,27 @@ create operator class gist_float8_ops
   default for type double precision
   using gist
   family gist_float8_ops as
-    function 1 (
-      double precision,
-      double precision
-    )
-    gbt_float8_consistent(
+    function 1 (double precision, double precision) gbt_float8_consistent(
       internal,
       double precision,
       smallint,
       oid,
       internal
     ),
-    function 2 (
-      double precision,
-      double precision
-    )
-    gbt_float8_union(
+    function 2 (double precision, double precision) gbt_float8_union(
       internal,
       internal
     ),
-    function 5 (
-      double precision,
-      double precision
-    )
-    gbt_float8_penalty(
+    function 5 (double precision, double precision) gbt_float8_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      double precision,
-      double precision
-    )
-    gbt_float8_picksplit(
+    function 6 (double precision, double precision) gbt_float8_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      double precision,
-      double precision
-    )
-    gbt_float8_same(
+    function 7 (double precision, double precision) gbt_float8_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2078,11 +1994,7 @@ create operator class gist_inet_ops
   default for type inet
   using gist
   family gist_inet_ops as
-    function 1 (
-      inet,
-      inet
-    )
-    gbt_inet_consistent(
+    function 1 (inet, inet) gbt_inet_consistent(
       internal,
       inet,
       smallint,
@@ -2099,11 +2011,7 @@ create operator class gist_int2_ops
   default for type smallint
   using gist
   family gist_int2_ops as
-    function 1 (
-      smallint,
-      smallint
-    )
-    gbt_int2_consistent(
+    function 1 (smallint, smallint) gbt_int2_consistent(
       internal,
       smallint,
       smallint,
@@ -2111,21 +2019,13 @@ create operator class gist_int2_ops
       internal
     ),
     function 2 (smallint, smallint) gbt_int2_union(internal, internal),
-    function 5 (
-      smallint,
-      smallint
-    )
-    gbt_int2_penalty(
+    function 5 (smallint, smallint) gbt_int2_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (smallint, smallint) gbt_int2_picksplit(internal, internal),
-    function 7 (
-      smallint,
-      smallint
-    )
-    gbt_int2_same(
+    function 7 (smallint, smallint) gbt_int2_same(
       gbtreekey4,
       gbtreekey4,
       internal
@@ -2136,11 +2036,7 @@ create operator class gist_int4_ops
   default for type integer
   using gist
   family gist_int4_ops as
-    function 1 (
-      integer,
-      integer
-    )
-    gbt_int4_consistent(
+    function 1 (integer, integer) gbt_int4_consistent(
       internal,
       integer,
       smallint,
@@ -2148,21 +2044,13 @@ create operator class gist_int4_ops
       internal
     ),
     function 2 (integer, integer) gbt_int4_union(internal, internal),
-    function 5 (
-      integer,
-      integer
-    )
-    gbt_int4_penalty(
+    function 5 (integer, integer) gbt_int4_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (integer, integer) gbt_int4_picksplit(internal, internal),
-    function 7 (
-      integer,
-      integer
-    )
-    gbt_int4_same(
+    function 7 (integer, integer) gbt_int4_same(
       gbtreekey8,
       gbtreekey8,
       internal
@@ -2173,11 +2061,7 @@ create operator class gist_int8_ops
   default for type bigint
   using gist
   family gist_int8_ops as
-    function 1 (
-      bigint,
-      bigint
-    )
-    gbt_int8_consistent(
+    function 1 (bigint, bigint) gbt_int8_consistent(
       internal,
       bigint,
       smallint,
@@ -2187,11 +2071,7 @@ create operator class gist_int8_ops
     function 2 (bigint, bigint) gbt_int8_union(internal, internal),
     function 5 (bigint, bigint) gbt_int8_penalty(internal, internal, internal),
     function 6 (bigint, bigint) gbt_int8_picksplit(internal, internal),
-    function 7 (
-      bigint,
-      bigint
-    )
-    gbt_int8_same(
+    function 7 (bigint, bigint) gbt_int8_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2202,11 +2082,7 @@ create operator class gist_interval_ops
   default for type interval
   using gist
   family gist_interval_ops as
-    function 1 (
-      interval,
-      interval
-    )
-    gbt_intv_consistent(
+    function 1 (interval, interval) gbt_intv_consistent(
       internal,
       interval,
       smallint,
@@ -2214,21 +2090,13 @@ create operator class gist_interval_ops
       internal
     ),
     function 2 (interval, interval) gbt_intv_union(internal, internal),
-    function 5 (
-      interval,
-      interval
-    )
-    gbt_intv_penalty(
+    function 5 (interval, interval) gbt_intv_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (interval, interval) gbt_intv_picksplit(internal, internal),
-    function 7 (
-      interval,
-      interval
-    )
-    gbt_intv_same(
+    function 7 (interval, interval) gbt_intv_same(
       gbtreekey32,
       gbtreekey32,
       internal
@@ -2239,11 +2107,7 @@ create operator class gist_macaddr8_ops
   default for type macaddr8
   using gist
   family gist_macaddr8_ops as
-    function 1 (
-      macaddr8,
-      macaddr8
-    )
-    gbt_macad8_consistent(
+    function 1 (macaddr8, macaddr8) gbt_macad8_consistent(
       internal,
       macaddr8,
       smallint,
@@ -2251,21 +2115,13 @@ create operator class gist_macaddr8_ops
       internal
     ),
     function 2 (macaddr8, macaddr8) gbt_macad8_union(internal, internal),
-    function 5 (
-      macaddr8,
-      macaddr8
-    )
-    gbt_macad8_penalty(
+    function 5 (macaddr8, macaddr8) gbt_macad8_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (macaddr8, macaddr8) gbt_macad8_picksplit(internal, internal),
-    function 7 (
-      macaddr8,
-      macaddr8
-    )
-    gbt_macad8_same(
+    function 7 (macaddr8, macaddr8) gbt_macad8_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2276,11 +2132,7 @@ create operator class gist_macaddr_ops
   default for type macaddr
   using gist
   family gist_macaddr_ops as
-    function 1 (
-      macaddr,
-      macaddr
-    )
-    gbt_macad_consistent(
+    function 1 (macaddr, macaddr) gbt_macad_consistent(
       internal,
       macaddr,
       smallint,
@@ -2288,21 +2140,13 @@ create operator class gist_macaddr_ops
       internal
     ),
     function 2 (macaddr, macaddr) gbt_macad_union(internal, internal),
-    function 5 (
-      macaddr,
-      macaddr
-    )
-    gbt_macad_penalty(
+    function 5 (macaddr, macaddr) gbt_macad_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (macaddr, macaddr) gbt_macad_picksplit(internal, internal),
-    function 7 (
-      macaddr,
-      macaddr
-    )
-    gbt_macad_same(
+    function 7 (macaddr, macaddr) gbt_macad_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2313,11 +2157,7 @@ create operator class gist_numeric_ops
   default for type numeric
   using gist
   family gist_numeric_ops as
-    function 1 (
-      numeric,
-      numeric
-    )
-    gbt_numeric_consistent(
+    function 1 (numeric, numeric) gbt_numeric_consistent(
       internal,
       numeric,
       smallint,
@@ -2325,21 +2165,13 @@ create operator class gist_numeric_ops
       internal
     ),
     function 2 (numeric, numeric) gbt_numeric_union(internal, internal),
-    function 5 (
-      numeric,
-      numeric
-    )
-    gbt_numeric_penalty(
+    function 5 (numeric, numeric) gbt_numeric_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (numeric, numeric) gbt_numeric_picksplit(internal, internal),
-    function 7 (
-      numeric,
-      numeric
-    )
-    gbt_numeric_same(
+    function 7 (numeric, numeric) gbt_numeric_same(
       gbtreekey_var,
       gbtreekey_var,
       internal
@@ -2350,11 +2182,7 @@ create operator class gist_oid_ops
   default for type oid
   using gist
   family gist_oid_ops as
-    function 1 (
-      oid,
-      oid
-    )
-    gbt_oid_consistent(
+    function 1 (oid, oid) gbt_oid_consistent(
       internal,
       oid,
       smallint,
@@ -2371,11 +2199,7 @@ create operator class gist_text_ops
   default for type text
   using gist
   family gist_text_ops as
-    function 1 (
-      text,
-      text
-    )
-    gbt_text_consistent(
+    function 1 (text, text) gbt_text_consistent(
       internal,
       text,
       smallint,
@@ -2385,11 +2209,7 @@ create operator class gist_text_ops
     function 2 (text, text) gbt_text_union(internal, internal),
     function 5 (text, text) gbt_text_penalty(internal, internal, internal),
     function 6 (text, text) gbt_text_picksplit(internal, internal),
-    function 7 (
-      text,
-      text
-    )
-    gbt_text_same(
+    function 7 (text, text) gbt_text_same(
       gbtreekey_var,
       gbtreekey_var,
       internal
@@ -2403,27 +2223,21 @@ create operator class gist_time_ops
     function 1 (
       time without time zone,
       time without time zone
-    )
-    gbt_time_consistent(
+    ) gbt_time_consistent(
       internal,
       time without time zone,
       smallint,
       oid,
       internal
     ),
-    function 2 (
-      time without time zone,
-      time without time zone
-    )
-    gbt_time_union(
+    function 2 (time without time zone, time without time zone) gbt_time_union(
       internal,
       internal
     ),
     function 5 (
       time without time zone,
       time without time zone
-    )
-    gbt_time_penalty(
+    ) gbt_time_penalty(
       internal,
       internal,
       internal
@@ -2431,16 +2245,11 @@ create operator class gist_time_ops
     function 6 (
       time without time zone,
       time without time zone
-    )
-    gbt_time_picksplit(
+    ) gbt_time_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      time without time zone,
-      time without time zone
-    )
-    gbt_time_same(
+    function 7 (time without time zone, time without time zone) gbt_time_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2454,8 +2263,7 @@ create operator class gist_timestamp_ops
     function 1 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_consistent(
+    ) gbt_ts_consistent(
       internal,
       timestamp without time zone,
       smallint,
@@ -2465,16 +2273,14 @@ create operator class gist_timestamp_ops
     function 2 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_union(
+    ) gbt_ts_union(
       internal,
       internal
     ),
     function 5 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_penalty(
+    ) gbt_ts_penalty(
       internal,
       internal,
       internal
@@ -2482,16 +2288,14 @@ create operator class gist_timestamp_ops
     function 6 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_picksplit(
+    ) gbt_ts_picksplit(
       internal,
       internal
     ),
     function 7 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_same(
+    ) gbt_ts_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2505,8 +2309,7 @@ create operator class gist_timestamptz_ops
     function 1 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_tstz_consistent(
+    ) gbt_tstz_consistent(
       internal,
       timestamp with time zone,
       smallint,
@@ -2516,16 +2319,14 @@ create operator class gist_timestamptz_ops
     function 2 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_ts_union(
+    ) gbt_ts_union(
       internal,
       internal
     ),
     function 5 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_ts_penalty(
+    ) gbt_ts_penalty(
       internal,
       internal,
       internal
@@ -2533,16 +2334,11 @@ create operator class gist_timestamptz_ops
     function 6 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_ts_picksplit(
+    ) gbt_ts_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      timestamp with time zone,
-      timestamp with time zone
-    )
-    gbt_ts_same(
+    function 7 (timestamp with time zone, timestamp with time zone) gbt_ts_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2553,47 +2349,27 @@ create operator class gist_timetz_ops
   default for type time with time zone
   using gist
   family gist_timetz_ops as
-    function 1 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_timetz_consistent(
+    function 1 (time with time zone, time with time zone) gbt_timetz_consistent(
       internal,
       time with time zone,
       smallint,
       oid,
       internal
     ),
-    function 2 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_time_union(
+    function 2 (time with time zone, time with time zone) gbt_time_union(
       internal,
       internal
     ),
-    function 5 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_time_penalty(
+    function 5 (time with time zone, time with time zone) gbt_time_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_time_picksplit(
+    function 6 (time with time zone, time with time zone) gbt_time_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_time_same(
+    function 7 (time with time zone, time with time zone) gbt_time_same(
       gbtreekey16,
       gbtreekey16,
       internal
@@ -2604,11 +2380,7 @@ create operator class gist_uuid_ops
   default for type uuid
   using gist
   family gist_uuid_ops as
-    function 1 (
-      uuid,
-      uuid
-    )
-    gbt_uuid_consistent(
+    function 1 (uuid, uuid) gbt_uuid_consistent(
       internal,
       uuid,
       smallint,
@@ -2625,11 +2397,7 @@ create operator class gist_vbit_ops
   default for type bit varying
   using gist
   family gist_vbit_ops as
-    function 1 (
-      bit varying,
-      bit varying
-    )
-    gbt_bit_consistent(
+    function 1 (bit varying, bit varying) gbt_bit_consistent(
       internal,
       bit,
       smallint,
@@ -2637,21 +2405,13 @@ create operator class gist_vbit_ops
       internal
     ),
     function 2 (bit varying, bit varying) gbt_bit_union(internal, internal),
-    function 5 (
-      bit varying,
-      bit varying
-    )
-    gbt_bit_penalty(
+    function 5 (bit varying, bit varying) gbt_bit_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (bit varying, bit varying) gbt_bit_picksplit(internal, internal),
-    function 7 (
-      bit varying,
-      bit varying
-    )
-    gbt_bit_same(
+    function 7 (bit varying, bit varying) gbt_bit_same(
       gbtreekey_var,
       gbtreekey_var,
       internal
@@ -2730,11 +2490,7 @@ alter operator family gist_cash_ops
     operator 15 <-> (money, money) for order by pg_catalog.money_ops,
     function 3 (money, money) gbt_cash_compress(internal),
     function 4 (money, money) gbt_decompress(internal),
-    function 8 (
-      money,
-      money
-    )
-    gbt_cash_distance(
+    function 8 (money, money) gbt_cash_distance(
       internal,
       money,
       smallint,
@@ -2771,11 +2527,7 @@ alter operator family gist_date_ops
     operator 15 <-> (date, date) for order by pg_catalog.integer_ops,
     function 3 (date, date) gbt_date_compress(internal),
     function 4 (date, date) gbt_decompress(internal),
-    function 8 (
-      date,
-      date
-    )
-    gbt_date_distance(
+    function 8 (date, date) gbt_date_distance(
       internal,
       date,
       smallint,
@@ -2813,11 +2565,7 @@ alter operator family gist_float4_ops
     operator 15 <-> (real, real) for order by pg_catalog.float_ops,
     function 3 (real, real) gbt_float4_compress(internal),
     function 4 (real, real) gbt_decompress(internal),
-    function 8 (
-      real,
-      real
-    )
-    gbt_float4_distance(
+    function 8 (real, real) gbt_float4_distance(
       internal,
       real,
       smallint,
@@ -2839,19 +2587,11 @@ alter operator family gist_float8_ops
     operator 6 pg_catalog.<> (double precision, double precision),
     operator 15 <-> (double precision, double precision)
     for order by pg_catalog.float_ops,
-    function 3 (
-      double precision,
-      double precision
-    )
-    gbt_float8_compress(
+    function 3 (double precision, double precision) gbt_float8_compress(
       internal
     ),
     function 4 (double precision, double precision) gbt_decompress(internal),
-    function 8 (
-      double precision,
-      double precision
-    )
-    gbt_float8_distance(
+    function 8 (double precision, double precision) gbt_float8_distance(
       internal,
       double precision,
       smallint,
@@ -2859,11 +2599,7 @@ alter operator family gist_float8_ops
       internal
     ),
     function 9 (double precision, double precision) gbt_float8_fetch(internal),
-    function 11 (
-      double precision,
-      double precision
-    )
-    gbt_float8_sortsupport(
+    function 11 (double precision, double precision) gbt_float8_sortsupport(
       internal
     ),
     function 12 ("any", "any") gist_translate_cmptype_btree(integer);
@@ -2894,11 +2630,7 @@ alter operator family gist_int2_ops
     operator 15 <-> (smallint, smallint) for order by pg_catalog.integer_ops,
     function 3 (smallint, smallint) gbt_int2_compress(internal),
     function 4 (smallint, smallint) gbt_decompress(internal),
-    function 8 (
-      smallint,
-      smallint
-    )
-    gbt_int2_distance(
+    function 8 (smallint, smallint) gbt_int2_distance(
       internal,
       smallint,
       smallint,
@@ -2921,11 +2653,7 @@ alter operator family gist_int4_ops
     operator 15 <-> (integer, integer) for order by pg_catalog.integer_ops,
     function 3 (integer, integer) gbt_int4_compress(internal),
     function 4 (integer, integer) gbt_decompress(internal),
-    function 8 (
-      integer,
-      integer
-    )
-    gbt_int4_distance(
+    function 8 (integer, integer) gbt_int4_distance(
       internal,
       integer,
       smallint,
@@ -2948,11 +2676,7 @@ alter operator family gist_int8_ops
     operator 15 <-> (bigint, bigint) for order by pg_catalog.integer_ops,
     function 3 (bigint, bigint) gbt_int8_compress(internal),
     function 4 (bigint, bigint) gbt_decompress(internal),
-    function 8 (
-      bigint,
-      bigint
-    )
-    gbt_int8_distance(
+    function 8 (bigint, bigint) gbt_int8_distance(
       internal,
       bigint,
       smallint,
@@ -2975,11 +2699,7 @@ alter operator family gist_interval_ops
     operator 15 <-> (interval, interval) for order by pg_catalog.interval_ops,
     function 3 (interval, interval) gbt_intv_compress(internal),
     function 4 (interval, interval) gbt_intv_decompress(internal),
-    function 8 (
-      interval,
-      interval
-    )
-    gbt_intv_distance(
+    function 8 (interval, interval) gbt_intv_distance(
       internal,
       interval,
       smallint,
@@ -3047,11 +2767,7 @@ alter operator family gist_oid_ops
     operator 15 <-> (oid, oid) for order by pg_catalog.oid_ops,
     function 3 (oid, oid) gbt_oid_compress(internal),
     function 4 (oid, oid) gbt_decompress(internal),
-    function 8 (
-      oid,
-      oid
-    )
-    gbt_oid_distance(
+    function 8 (oid, oid) gbt_oid_distance(
       internal,
       oid,
       smallint,
@@ -3091,40 +2807,29 @@ alter operator family gist_time_ops
     function 3 (
       time without time zone,
       time without time zone
-    )
-    gbt_time_compress(
+    ) gbt_time_compress(
       internal
     ),
-    function 4 (
-      time without time zone,
-      time without time zone
-    )
-    gbt_decompress(
+    function 4 (time without time zone, time without time zone) gbt_decompress(
       internal
     ),
     function 8 (
       time without time zone,
       time without time zone
-    )
-    gbt_time_distance(
+    ) gbt_time_distance(
       internal,
       time without time zone,
       smallint,
       oid,
       internal
     ),
-    function 9 (
-      time without time zone,
-      time without time zone
-    )
-    gbt_time_fetch(
+    function 9 (time without time zone, time without time zone) gbt_time_fetch(
       internal
     ),
     function 11 (
       time without time zone,
       time without time zone
-    )
-    gbt_time_sortsupport(
+    ) gbt_time_sortsupport(
       internal
     ),
     function 12 ("any", "any") gist_translate_cmptype_btree(integer);
@@ -3161,22 +2866,19 @@ alter operator family gist_timestamp_ops
     function 3 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_compress(
+    ) gbt_ts_compress(
       internal
     ),
     function 4 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_decompress(
+    ) gbt_decompress(
       internal
     ),
     function 8 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_distance(
+    ) gbt_ts_distance(
       internal,
       timestamp without time zone,
       smallint,
@@ -3186,15 +2888,13 @@ alter operator family gist_timestamp_ops
     function 9 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_fetch(
+    ) gbt_ts_fetch(
       internal
     ),
     function 11 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    gbt_ts_sortsupport(
+    ) gbt_ts_sortsupport(
       internal
     ),
     function 12 ("any", "any") gist_translate_cmptype_btree(integer);
@@ -3231,22 +2931,19 @@ alter operator family gist_timestamptz_ops
     function 3 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_tstz_compress(
+    ) gbt_tstz_compress(
       internal
     ),
     function 4 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_decompress(
+    ) gbt_decompress(
       internal
     ),
     function 8 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_tstz_distance(
+    ) gbt_tstz_distance(
       internal,
       timestamp with time zone,
       smallint,
@@ -3256,15 +2953,13 @@ alter operator family gist_timestamptz_ops
     function 9 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_ts_fetch(
+    ) gbt_ts_fetch(
       internal
     ),
     function 11 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    gbt_ts_sortsupport(
+    ) gbt_ts_sortsupport(
       internal
     ),
     function 12 ("any", "any") gist_translate_cmptype_btree(integer);
@@ -3278,25 +2973,13 @@ alter operator family gist_timetz_ops
     operator 4 pg_catalog.>= (time with time zone, time with time zone),
     operator 5 pg_catalog.> (time with time zone, time with time zone),
     operator 6 pg_catalog.<> (time with time zone, time with time zone),
-    function 3 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_timetz_compress(
+    function 3 (time with time zone, time with time zone) gbt_timetz_compress(
       internal
     ),
-    function 4 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_decompress(
+    function 4 (time with time zone, time with time zone) gbt_decompress(
       internal
     ),
-    function 11 (
-      time with time zone,
-      time with time zone
-    )
-    gbt_time_sortsupport(
+    function 11 (time with time zone, time with time zone) gbt_time_sortsupport(
       internal
     ),
     function 12 ("any", "any") gist_translate_cmptype_btree(integer);

@@ -40360,11 +40360,7 @@ create operator class pg_catalog.aclitem_ops
   family pg_catalog.aclitem_ops as
     operator 1 pg_catalog.= (aclitem, aclitem),
     function 1 (aclitem, aclitem) pg_catalog.hash_aclitem(aclitem),
-    function 2 (
-      aclitem,
-      aclitem
-    )
-    pg_catalog.hash_aclitem_extended(
+    function 2 (aclitem, aclitem) pg_catalog.hash_aclitem_extended(
       aclitem,
       bigint
     ),
@@ -40390,20 +40386,12 @@ create operator class pg_catalog.array_ops
     operator 2 pg_catalog.@> (anyarray, anyarray),
     operator 3 pg_catalog.<@ (anyarray, anyarray),
     operator 4 pg_catalog.= (anyarray, anyarray),
-    function 2 (
-      anyarray,
-      anyarray
-    )
-    pg_catalog.ginarrayextract(
+    function 2 (anyarray, anyarray) pg_catalog.ginarrayextract(
       anyarray,
       internal,
       internal
     ),
-    function 3 (
-      anyarray,
-      anyarray
-    )
-    pg_catalog.ginqueryarrayextract(
+    function 3 (anyarray, anyarray) pg_catalog.ginqueryarrayextract(
       anyarray,
       internal,
       smallint,
@@ -40412,11 +40400,7 @@ create operator class pg_catalog.array_ops
       internal,
       internal
     ),
-    function 4 (
-      anyarray,
-      anyarray
-    )
-    pg_catalog.ginarrayconsistent(
+    function 4 (anyarray, anyarray) pg_catalog.ginarrayconsistent(
       internal,
       smallint,
       anyarray,
@@ -40426,11 +40410,7 @@ create operator class pg_catalog.array_ops
       internal,
       internal
     ),
-    function 6 (
-      anyarray,
-      anyarray
-    )
-    pg_catalog.ginarraytriconsistent(
+    function 6 (anyarray, anyarray) pg_catalog.ginarraytriconsistent(
       internal,
       smallint,
       anyarray,
@@ -40447,11 +40427,7 @@ create operator class pg_catalog.array_ops
   family pg_catalog.array_ops as
     operator 1 pg_catalog.= (anyarray, anyarray),
     function 1 (anyarray, anyarray) pg_catalog.hash_array(anyarray),
-    function 2 (
-      anyarray,
-      anyarray
-    )
-    pg_catalog.hash_array_extended(
+    function 2 (anyarray, anyarray) pg_catalog.hash_array_extended(
       anyarray,
       bigint
     ),
@@ -40467,30 +40443,18 @@ create operator class pg_catalog.bit_minmax_ops
     operator 4 pg_catalog.>= (bit, bit),
     operator 5 pg_catalog.> (bit, bit),
     function 1 (bit, bit) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      bit,
-      bit
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (bit, bit) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      bit,
-      bit
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (bit, bit) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      bit,
-      bit
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (bit, bit) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -40550,30 +40514,18 @@ create operator class pg_catalog.box_inclusion_ops
     operator 11 pg_catalog.|>> (box, box),
     operator 12 pg_catalog.|&> (box, box),
     function 1 (box, box) pg_catalog.brin_inclusion_opcinfo(internal),
-    function 2 (
-      box,
-      box
-    )
-    pg_catalog.brin_inclusion_add_value(
+    function 2 (box, box) pg_catalog.brin_inclusion_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      box,
-      box
-    )
-    pg_catalog.brin_inclusion_consistent(
+    function 3 (box, box) pg_catalog.brin_inclusion_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      box,
-      box
-    )
-    pg_catalog.brin_inclusion_union(
+    function 4 (box, box) pg_catalog.brin_inclusion_union(
       internal,
       internal,
       internal
@@ -40598,11 +40550,7 @@ create operator class pg_catalog.box_ops
     operator 10 pg_catalog.<<| (box, box),
     operator 11 pg_catalog.|>> (box, box),
     operator 12 pg_catalog.|&> (box, box),
-    function 1 (
-      box,
-      box
-    )
-    pg_catalog.gist_box_consistent(
+    function 1 (box, box) pg_catalog.gist_box_consistent(
       internal,
       box,
       smallint,
@@ -40610,22 +40558,14 @@ create operator class pg_catalog.box_ops
       internal
     ),
     function 2 (box, box) pg_catalog.gist_box_union(internal, internal),
-    function 5 (
-      box,
-      box
-    )
-    pg_catalog.gist_box_penalty(
+    function 5 (box, box) pg_catalog.gist_box_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (box, box) pg_catalog.gist_box_picksplit(internal, internal),
     function 7 (box, box) pg_catalog.gist_box_same(box, box, internal),
-    function 8 (
-      box,
-      box
-    )
-    pg_catalog.gist_box_distance(
+    function 8 (box, box) pg_catalog.gist_box_distance(
       internal,
       box,
       smallint,
@@ -40653,19 +40593,11 @@ create operator class pg_catalog.box_ops
     function 1 (box, box) pg_catalog.spg_box_quad_config(internal, internal),
     function 2 (box, box) pg_catalog.spg_box_quad_choose(internal, internal),
     function 3 (box, box) pg_catalog.spg_box_quad_picksplit(internal, internal),
-    function 4 (
-      box,
-      box
-    )
-    pg_catalog.spg_box_quad_inner_consistent(
+    function 4 (box, box) pg_catalog.spg_box_quad_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      box,
-      box
-    )
-    pg_catalog.spg_box_quad_leaf_consistent(
+    function 5 (box, box) pg_catalog.spg_box_quad_leaf_consistent(
       internal,
       internal
     ),
@@ -40677,31 +40609,19 @@ create operator class pg_catalog.bpchar_bloom_ops
   family pg_catalog.bpchar_bloom_ops as
     operator 1 pg_catalog.= (character, character),
     function 1 (character, character) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      character,
-      character
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (character, character) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      character,
-      character
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (character, character) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      character,
-      character
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (character, character) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -40720,30 +40640,18 @@ create operator class pg_catalog.bpchar_minmax_ops
     operator 4 pg_catalog.>= (character, character),
     operator 5 pg_catalog.> (character, character),
     function 1 (character, character) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      character,
-      character
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (character, character) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      character,
-      character
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (character, character) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      character,
-      character
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (character, character) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -40759,11 +40667,7 @@ create operator class pg_catalog.bpchar_ops
     operator 3 pg_catalog.= (character, character),
     operator 4 pg_catalog.>= (character, character),
     operator 5 pg_catalog.> (character, character),
-    function 1 (
-      character,
-      character
-    )
-    pg_catalog.bpcharcmp(
+    function 1 (character, character) pg_catalog.bpcharcmp(
       character,
       character
     ),
@@ -40777,11 +40681,7 @@ create operator class pg_catalog.bpchar_ops
   family pg_catalog.bpchar_ops as
     operator 1 pg_catalog.= (character, character),
     function 1 (character, character) pg_catalog.hashbpchar(character),
-    function 2 (
-      character,
-      character
-    )
-    pg_catalog.hashbpcharextended(
+    function 2 (character, character) pg_catalog.hashbpcharextended(
       character,
       bigint
     ),
@@ -40796,19 +40696,11 @@ create operator class pg_catalog.bpchar_pattern_ops
     operator 3 pg_catalog.= (character, character),
     operator 4 pg_catalog.~>=~ (character, character),
     operator 5 pg_catalog.~>~ (character, character),
-    function 1 (
-      character,
-      character
-    )
-    pg_catalog.btbpchar_pattern_cmp(
+    function 1 (character, character) pg_catalog.btbpchar_pattern_cmp(
       character,
       character
     ),
-    function 2 (
-      character,
-      character
-    )
-    pg_catalog.btbpchar_pattern_sortsupport(
+    function 2 (character, character) pg_catalog.btbpchar_pattern_sortsupport(
       internal
     ),
     function 4 (character, character) pg_catalog.btequalimage(oid),
@@ -40820,11 +40712,7 @@ create operator class pg_catalog.bpchar_pattern_ops
   family pg_catalog.bpchar_pattern_ops as
     operator 1 pg_catalog.= (character, character),
     function 1 (character, character) pg_catalog.hashbpchar(character),
-    function 2 (
-      character,
-      character
-    )
-    pg_catalog.hashbpcharextended(
+    function 2 (character, character) pg_catalog.hashbpcharextended(
       character,
       bigint
     ),
@@ -40836,31 +40724,19 @@ create operator class pg_catalog.bytea_bloom_ops
   family pg_catalog.bytea_bloom_ops as
     operator 1 pg_catalog.= (bytea, bytea),
     function 1 (bytea, bytea) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      bytea,
-      bytea
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (bytea, bytea) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      bytea,
-      bytea
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (bytea, bytea) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      bytea,
-      bytea
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (bytea, bytea) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -40879,30 +40755,18 @@ create operator class pg_catalog.bytea_minmax_ops
     operator 4 pg_catalog.>= (bytea, bytea),
     operator 5 pg_catalog.> (bytea, bytea),
     function 1 (bytea, bytea) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      bytea,
-      bytea
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (bytea, bytea) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      bytea,
-      bytea
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (bytea, bytea) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      bytea,
-      bytea
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (bytea, bytea) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -40938,31 +40802,19 @@ create operator class pg_catalog.char_bloom_ops
   family pg_catalog.char_bloom_ops as
     operator 1 pg_catalog.= ("char", "char"),
     function 1 ("char", "char") pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      "char",
-      "char"
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 ("char", "char") pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      "char",
-      "char"
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 ("char", "char") pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      "char",
-      "char"
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 ("char", "char") pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -40981,30 +40833,18 @@ create operator class pg_catalog.char_minmax_ops
     operator 4 pg_catalog.>= ("char", "char"),
     operator 5 pg_catalog.> ("char", "char"),
     function 1 ("char", "char") pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      "char",
-      "char"
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 ("char", "char") pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      "char",
-      "char"
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 ("char", "char") pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      "char",
-      "char"
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 ("char", "char") pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -41071,11 +40911,7 @@ create operator class pg_catalog.circle_ops
     operator 10 pg_catalog.<<| (circle, circle),
     operator 11 pg_catalog.|>> (circle, circle),
     operator 12 pg_catalog.|&> (circle, circle),
-    function 1 (
-      circle,
-      circle
-    )
-    pg_catalog.gist_circle_consistent(
+    function 1 (circle, circle) pg_catalog.gist_circle_consistent(
       internal,
       circle,
       smallint,
@@ -41084,29 +40920,17 @@ create operator class pg_catalog.circle_ops
     ),
     function 2 (circle, circle) pg_catalog.gist_box_union(internal, internal),
     function 3 (circle, circle) pg_catalog.gist_circle_compress(internal),
-    function 5 (
-      circle,
-      circle
-    )
-    pg_catalog.gist_box_penalty(
+    function 5 (circle, circle) pg_catalog.gist_box_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      circle,
-      circle
-    )
-    pg_catalog.gist_box_picksplit(
+    function 6 (circle, circle) pg_catalog.gist_box_picksplit(
       internal,
       internal
     ),
     function 7 (circle, circle) pg_catalog.gist_box_same(box, box, internal),
-    function 8 (
-      circle,
-      circle
-    )
-    pg_catalog.gist_circle_distance(
+    function 8 (circle, circle) pg_catalog.gist_circle_distance(
       internal,
       circle,
       smallint,
@@ -41121,31 +40945,19 @@ create operator class pg_catalog.date_bloom_ops
   family pg_catalog.datetime_bloom_ops as
     operator 1 pg_catalog.= (date, date),
     function 1 (date, date) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      date,
-      date
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (date, date) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      date,
-      date
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (date, date) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      date,
-      date
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (date, date) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -41164,41 +40976,25 @@ create operator class pg_catalog.date_minmax_multi_ops
     operator 4 pg_catalog.>= (date, date),
     operator 5 pg_catalog.> (date, date),
     function 1 (date, date) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      date,
-      date
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (date, date) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      date,
-      date
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (date, date) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      date,
-      date
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (date, date) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (date, date) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      date,
-      date
-    )
-    pg_catalog.brin_minmax_multi_distance_date(
+    function 11 (date, date) pg_catalog.brin_minmax_multi_distance_date(
       internal,
       internal
     ),
@@ -41214,30 +41010,18 @@ create operator class pg_catalog.date_minmax_ops
     operator 4 pg_catalog.>= (date, date),
     operator 5 pg_catalog.> (date, date),
     function 1 (date, date) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      date,
-      date
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (date, date) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      date,
-      date
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (date, date) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      date,
-      date
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (date, date) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -41296,31 +41080,19 @@ create operator class pg_catalog.float4_bloom_ops
   family pg_catalog.float_bloom_ops as
     operator 1 pg_catalog.= (real, real),
     function 1 (real, real) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      real,
-      real
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (real, real) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      real,
-      real
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (real, real) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      real,
-      real
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (real, real) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -41339,41 +41111,25 @@ create operator class pg_catalog.float4_minmax_multi_ops
     operator 4 pg_catalog.>= (real, real),
     operator 5 pg_catalog.> (real, real),
     function 1 (real, real) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      real,
-      real
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (real, real) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      real,
-      real
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (real, real) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      real,
-      real
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (real, real) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (real, real) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      real,
-      real
-    )
-    pg_catalog.brin_minmax_multi_distance_float4(
+    function 11 (real, real) pg_catalog.brin_minmax_multi_distance_float4(
       internal,
       internal
     ),
@@ -41389,30 +41145,18 @@ create operator class pg_catalog.float4_minmax_ops
     operator 4 pg_catalog.>= (real, real),
     operator 5 pg_catalog.> (real, real),
     function 1 (real, real) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      real,
-      real
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (real, real) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      real,
-      real
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (real, real) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      real,
-      real
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (real, real) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -41449,15 +41193,13 @@ create operator class pg_catalog.float8_bloom_ops
     function 1 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_bloom_opcinfo(
+    ) pg_catalog.brin_bloom_opcinfo(
       internal
     ),
     function 2 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_bloom_add_value(
+    ) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
@@ -41466,18 +41208,13 @@ create operator class pg_catalog.float8_bloom_ops
     function 3 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_bloom_consistent(
+    ) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      double precision,
-      double precision
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (double precision, double precision) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -41485,15 +41222,10 @@ create operator class pg_catalog.float8_bloom_ops
     function 5 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_bloom_options(
+    ) pg_catalog.brin_bloom_options(
       internal
     ),
-    function 11 (
-      double precision,
-      double precision
-    )
-    pg_catalog.hashfloat8(
+    function 11 (double precision, double precision) pg_catalog.hashfloat8(
       double precision
     ),
     storage double precision;
@@ -41510,15 +41242,13 @@ create operator class pg_catalog.float8_minmax_multi_ops
     function 1 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    ) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
     function 2 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    ) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
@@ -41527,8 +41257,7 @@ create operator class pg_catalog.float8_minmax_multi_ops
     function 3 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    ) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
@@ -41537,8 +41266,7 @@ create operator class pg_catalog.float8_minmax_multi_ops
     function 4 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_multi_union(
+    ) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
@@ -41546,15 +41274,13 @@ create operator class pg_catalog.float8_minmax_multi_ops
     function 5 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_multi_options(
+    ) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_multi_distance_float8(
+    ) pg_catalog.brin_minmax_multi_distance_float8(
       internal,
       internal
     ),
@@ -41572,15 +41298,13 @@ create operator class pg_catalog.float8_minmax_ops
     function 1 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_opcinfo(
+    ) pg_catalog.brin_minmax_opcinfo(
       internal
     ),
     function 2 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_add_value(
+    ) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
@@ -41589,8 +41313,7 @@ create operator class pg_catalog.float8_minmax_ops
     function 3 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_consistent(
+    ) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
@@ -41598,8 +41321,7 @@ create operator class pg_catalog.float8_minmax_ops
     function 4 (
       double precision,
       double precision
-    )
-    pg_catalog.brin_minmax_union(
+    ) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -41615,26 +41337,17 @@ create operator class pg_catalog.float8_ops
     operator 3 pg_catalog.= (double precision, double precision),
     operator 4 pg_catalog.>= (double precision, double precision),
     operator 5 pg_catalog.> (double precision, double precision),
-    function 1 (
-      double precision,
-      double precision
-    )
-    pg_catalog.btfloat8cmp(
+    function 1 (double precision, double precision) pg_catalog.btfloat8cmp(
       double precision,
       double precision
     ),
     function 2 (
       double precision,
       double precision
-    )
-    pg_catalog.btfloat8sortsupport(
+    ) pg_catalog.btfloat8sortsupport(
       internal
     ),
-    function 3 (
-      double precision,
-      double precision
-    )
-    pg_catalog.in_range(
+    function 3 (double precision, double precision) pg_catalog.in_range(
       double precision,
       double precision,
       double precision,
@@ -41648,18 +41361,13 @@ create operator class pg_catalog.float8_ops
   using hash
   family pg_catalog.float_ops as
     operator 1 pg_catalog.= (double precision, double precision),
-    function 1 (
-      double precision,
-      double precision
-    )
-    pg_catalog.hashfloat8(
+    function 1 (double precision, double precision) pg_catalog.hashfloat8(
       double precision
     ),
     function 2 (
       double precision,
       double precision
-    )
-    pg_catalog.hashfloat8extended(
+    ) pg_catalog.hashfloat8extended(
       double precision,
       bigint
     ),
@@ -41671,31 +41379,19 @@ create operator class pg_catalog.inet_bloom_ops
   family pg_catalog.network_bloom_ops as
     operator 1 pg_catalog.= (inet, inet),
     function 1 (inet, inet) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (inet, inet) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (inet, inet) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (inet, inet) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -41715,30 +41411,18 @@ create operator class pg_catalog.inet_inclusion_ops
     operator 24 pg_catalog.>> (inet, inet),
     operator 26 pg_catalog.<< (inet, inet),
     function 1 (inet, inet) pg_catalog.brin_inclusion_opcinfo(internal),
-    function 2 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_inclusion_add_value(
+    function 2 (inet, inet) pg_catalog.brin_inclusion_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_inclusion_consistent(
+    function 3 (inet, inet) pg_catalog.brin_inclusion_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_inclusion_union(
+    function 4 (inet, inet) pg_catalog.brin_inclusion_union(
       internal,
       internal,
       internal
@@ -41758,41 +41442,25 @@ create operator class pg_catalog.inet_minmax_multi_ops
     operator 4 pg_catalog.>= (inet, inet),
     operator 5 pg_catalog.> (inet, inet),
     function 1 (inet, inet) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (inet, inet) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (inet, inet) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (inet, inet) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (inet, inet) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_minmax_multi_distance_inet(
+    function 11 (inet, inet) pg_catalog.brin_minmax_multi_distance_inet(
       internal,
       internal
     ),
@@ -41808,30 +41476,18 @@ create operator class pg_catalog.inet_minmax_ops
     operator 4 pg_catalog.>= (inet, inet),
     operator 5 pg_catalog.> (inet, inet),
     function 1 (inet, inet) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (inet, inet) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (inet, inet) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      inet,
-      inet
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (inet, inet) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -41867,11 +41523,7 @@ create operator class pg_catalog.inet_ops
     operator 25 pg_catalog.<<= (inet, inet),
     operator 26 pg_catalog.>> (inet, inet),
     operator 27 pg_catalog.>>= (inet, inet),
-    function 1 (
-      inet,
-      inet
-    )
-    pg_catalog.inet_gist_consistent(
+    function 1 (inet, inet) pg_catalog.inet_gist_consistent(
       internal,
       inet,
       smallint,
@@ -41880,11 +41532,7 @@ create operator class pg_catalog.inet_ops
     ),
     function 2 (inet, inet) pg_catalog.inet_gist_union(internal, internal),
     function 3 (inet, inet) pg_catalog.inet_gist_compress(internal),
-    function 5 (
-      inet,
-      inet
-    )
-    pg_catalog.inet_gist_penalty(
+    function 5 (inet, inet) pg_catalog.inet_gist_penalty(
       internal,
       internal,
       internal
@@ -41921,19 +41569,11 @@ create operator class pg_catalog.inet_ops
     function 1 (inet, inet) pg_catalog.inet_spg_config(internal, internal),
     function 2 (inet, inet) pg_catalog.inet_spg_choose(internal, internal),
     function 3 (inet, inet) pg_catalog.inet_spg_picksplit(internal, internal),
-    function 4 (
-      inet,
-      inet
-    )
-    pg_catalog.inet_spg_inner_consistent(
+    function 4 (inet, inet) pg_catalog.inet_spg_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      inet,
-      inet
-    )
-    pg_catalog.inet_spg_leaf_consistent(
+    function 5 (inet, inet) pg_catalog.inet_spg_leaf_consistent(
       internal,
       internal
     ),
@@ -41945,31 +41585,19 @@ create operator class pg_catalog.int2_bloom_ops
   family pg_catalog.integer_bloom_ops as
     operator 1 pg_catalog.= (smallint, smallint),
     function 1 (smallint, smallint) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (smallint, smallint) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (smallint, smallint) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (smallint, smallint) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -41987,54 +41615,30 @@ create operator class pg_catalog.int2_minmax_multi_ops
     operator 3 pg_catalog.= (smallint, smallint),
     operator 4 pg_catalog.>= (smallint, smallint),
     operator 5 pg_catalog.> (smallint, smallint),
-    function 1 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    function 1 (smallint, smallint) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
-    function 2 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (smallint, smallint) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (smallint, smallint) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (smallint, smallint) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
-    function 5 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_multi_options(
+    function 5 (smallint, smallint) pg_catalog.brin_minmax_multi_options(
       internal
     ),
-    function 11 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_multi_distance_int2(
+    function 11 (smallint, smallint) pg_catalog.brin_minmax_multi_distance_int2(
       internal,
       internal
     ),
@@ -42050,30 +41654,18 @@ create operator class pg_catalog.int2_minmax_ops
     operator 4 pg_catalog.>= (smallint, smallint),
     operator 5 pg_catalog.> (smallint, smallint),
     function 1 (smallint, smallint) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (smallint, smallint) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (smallint, smallint) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      smallint,
-      smallint
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (smallint, smallint) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -42091,11 +41683,7 @@ create operator class pg_catalog.int2_ops
     operator 5 pg_catalog.> (smallint, smallint),
     function 1 (smallint, smallint) pg_catalog.btint2cmp(smallint, smallint),
     function 2 (smallint, smallint) pg_catalog.btint2sortsupport(internal),
-    function 3 (
-      smallint,
-      smallint
-    )
-    pg_catalog.in_range(
+    function 3 (smallint, smallint) pg_catalog.in_range(
       smallint,
       smallint,
       smallint,
@@ -42112,11 +41700,7 @@ create operator class pg_catalog.int2_ops
   family pg_catalog.integer_ops as
     operator 1 pg_catalog.= (smallint, smallint),
     function 1 (smallint, smallint) pg_catalog.hashint2(smallint),
-    function 2 (
-      smallint,
-      smallint
-    )
-    pg_catalog.hashint2extended(
+    function 2 (smallint, smallint) pg_catalog.hashint2extended(
       smallint,
       bigint
     ),
@@ -42128,31 +41712,19 @@ create operator class pg_catalog.int4_bloom_ops
   family pg_catalog.integer_bloom_ops as
     operator 1 pg_catalog.= (integer, integer),
     function 1 (integer, integer) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (integer, integer) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (integer, integer) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (integer, integer) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -42170,54 +41742,30 @@ create operator class pg_catalog.int4_minmax_multi_ops
     operator 3 pg_catalog.= (integer, integer),
     operator 4 pg_catalog.>= (integer, integer),
     operator 5 pg_catalog.> (integer, integer),
-    function 1 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    function 1 (integer, integer) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
-    function 2 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (integer, integer) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (integer, integer) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (integer, integer) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
-    function 5 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_multi_options(
+    function 5 (integer, integer) pg_catalog.brin_minmax_multi_options(
       internal
     ),
-    function 11 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_multi_distance_int4(
+    function 11 (integer, integer) pg_catalog.brin_minmax_multi_distance_int4(
       internal,
       internal
     ),
@@ -42233,30 +41781,18 @@ create operator class pg_catalog.int4_minmax_ops
     operator 4 pg_catalog.>= (integer, integer),
     operator 5 pg_catalog.> (integer, integer),
     function 1 (integer, integer) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (integer, integer) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (integer, integer) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      integer,
-      integer
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (integer, integer) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -42274,11 +41810,7 @@ create operator class pg_catalog.int4_ops
     operator 5 pg_catalog.> (integer, integer),
     function 1 (integer, integer) pg_catalog.btint4cmp(integer, integer),
     function 2 (integer, integer) pg_catalog.btint4sortsupport(internal),
-    function 3 (
-      integer,
-      integer
-    )
-    pg_catalog.in_range(
+    function 3 (integer, integer) pg_catalog.in_range(
       integer,
       integer,
       integer,
@@ -42304,31 +41836,19 @@ create operator class pg_catalog.int8_bloom_ops
   family pg_catalog.integer_bloom_ops as
     operator 1 pg_catalog.= (bigint, bigint),
     function 1 (bigint, bigint) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (bigint, bigint) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (bigint, bigint) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (bigint, bigint) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -42347,41 +41867,25 @@ create operator class pg_catalog.int8_minmax_multi_ops
     operator 4 pg_catalog.>= (bigint, bigint),
     operator 5 pg_catalog.> (bigint, bigint),
     function 1 (bigint, bigint) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (bigint, bigint) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (bigint, bigint) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (bigint, bigint) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (bigint, bigint) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_minmax_multi_distance_int8(
+    function 11 (bigint, bigint) pg_catalog.brin_minmax_multi_distance_int8(
       internal,
       internal
     ),
@@ -42397,30 +41901,18 @@ create operator class pg_catalog.int8_minmax_ops
     operator 4 pg_catalog.>= (bigint, bigint),
     operator 5 pg_catalog.> (bigint, bigint),
     function 1 (bigint, bigint) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (bigint, bigint) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (bigint, bigint) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      bigint,
-      bigint
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (bigint, bigint) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -42438,11 +41930,7 @@ create operator class pg_catalog.int8_ops
     operator 5 pg_catalog.> (bigint, bigint),
     function 1 (bigint, bigint) pg_catalog.btint8cmp(bigint, bigint),
     function 2 (bigint, bigint) pg_catalog.btint8sortsupport(internal),
-    function 3 (
-      bigint,
-      bigint
-    )
-    pg_catalog.in_range(
+    function 3 (bigint, bigint) pg_catalog.in_range(
       bigint,
       bigint,
       bigint,
@@ -42468,31 +41956,19 @@ create operator class pg_catalog.interval_bloom_ops
   family pg_catalog.interval_bloom_ops as
     operator 1 pg_catalog.= (interval, interval),
     function 1 (interval, interval) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (interval, interval) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (interval, interval) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (interval, interval) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -42510,54 +41986,33 @@ create operator class pg_catalog.interval_minmax_multi_ops
     operator 3 pg_catalog.= (interval, interval),
     operator 4 pg_catalog.>= (interval, interval),
     operator 5 pg_catalog.> (interval, interval),
-    function 1 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    function 1 (interval, interval) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
-    function 2 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (interval, interval) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (interval, interval) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (interval, interval) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
-    function 5 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_multi_options(
+    function 5 (interval, interval) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       interval,
       interval
-    )
-    pg_catalog.brin_minmax_multi_distance_interval(
+    ) pg_catalog.brin_minmax_multi_distance_interval(
       internal,
       internal
     ),
@@ -42573,30 +42028,18 @@ create operator class pg_catalog.interval_minmax_ops
     operator 4 pg_catalog.>= (interval, interval),
     operator 5 pg_catalog.> (interval, interval),
     function 1 (interval, interval) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (interval, interval) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (interval, interval) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      interval,
-      interval
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (interval, interval) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -42613,11 +42056,7 @@ create operator class pg_catalog.interval_ops
     operator 4 pg_catalog.>= (interval, interval),
     operator 5 pg_catalog.> (interval, interval),
     function 1 (interval, interval) pg_catalog.interval_cmp(interval, interval),
-    function 3 (
-      interval,
-      interval
-    )
-    pg_catalog.in_range(
+    function 3 (interval, interval) pg_catalog.in_range(
       interval,
       interval,
       interval,
@@ -42632,11 +42071,7 @@ create operator class pg_catalog.interval_ops
   family pg_catalog.interval_ops as
     operator 1 pg_catalog.= (interval, interval),
     function 1 (interval, interval) pg_catalog.interval_hash(interval),
-    function 2 (
-      interval,
-      interval
-    )
-    pg_catalog.interval_hash_extended(
+    function 2 (interval, interval) pg_catalog.interval_hash_extended(
       interval,
       bigint
     ),
@@ -42660,20 +42095,12 @@ create operator class pg_catalog.jsonb_ops
   family pg_catalog.jsonb_ops as
     operator 7 pg_catalog.@> (jsonb, jsonb),
     function 1 (jsonb, jsonb) pg_catalog.gin_compare_jsonb(text, text),
-    function 2 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_extract_jsonb(
+    function 2 (jsonb, jsonb) pg_catalog.gin_extract_jsonb(
       jsonb,
       internal,
       internal
     ),
-    function 3 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_extract_jsonb_query(
+    function 3 (jsonb, jsonb) pg_catalog.gin_extract_jsonb_query(
       jsonb,
       internal,
       smallint,
@@ -42682,11 +42109,7 @@ create operator class pg_catalog.jsonb_ops
       internal,
       internal
     ),
-    function 4 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_consistent_jsonb(
+    function 4 (jsonb, jsonb) pg_catalog.gin_consistent_jsonb(
       internal,
       smallint,
       jsonb,
@@ -42696,11 +42119,7 @@ create operator class pg_catalog.jsonb_ops
       internal,
       internal
     ),
-    function 6 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_triconsistent_jsonb(
+    function 6 (jsonb, jsonb) pg_catalog.gin_triconsistent_jsonb(
       internal,
       smallint,
       jsonb,
@@ -42726,20 +42145,12 @@ create operator class pg_catalog.jsonb_path_ops
   family pg_catalog.jsonb_path_ops as
     operator 7 pg_catalog.@> (jsonb, jsonb),
     function 1 (jsonb, jsonb) pg_catalog.btint4cmp(integer, integer),
-    function 2 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_extract_jsonb_path(
+    function 2 (jsonb, jsonb) pg_catalog.gin_extract_jsonb_path(
       jsonb,
       internal,
       internal
     ),
-    function 3 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_extract_jsonb_query_path(
+    function 3 (jsonb, jsonb) pg_catalog.gin_extract_jsonb_query_path(
       jsonb,
       internal,
       smallint,
@@ -42748,11 +42159,7 @@ create operator class pg_catalog.jsonb_path_ops
       internal,
       internal
     ),
-    function 4 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_consistent_jsonb_path(
+    function 4 (jsonb, jsonb) pg_catalog.gin_consistent_jsonb_path(
       internal,
       smallint,
       jsonb,
@@ -42762,11 +42169,7 @@ create operator class pg_catalog.jsonb_path_ops
       internal,
       internal
     ),
-    function 6 (
-      jsonb,
-      jsonb
-    )
-    pg_catalog.gin_triconsistent_jsonb_path(
+    function 6 (jsonb, jsonb) pg_catalog.gin_triconsistent_jsonb_path(
       internal,
       smallint,
       jsonb,
@@ -42792,19 +42195,11 @@ create operator class pg_catalog.kd_point_ops
     function 1 (point, point) pg_catalog.spg_kd_config(internal, internal),
     function 2 (point, point) pg_catalog.spg_kd_choose(internal, internal),
     function 3 (point, point) pg_catalog.spg_kd_picksplit(internal, internal),
-    function 4 (
-      point,
-      point
-    )
-    pg_catalog.spg_kd_inner_consistent(
+    function 4 (point, point) pg_catalog.spg_kd_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      point,
-      point
-    )
-    pg_catalog.spg_quad_leaf_consistent(
+    function 5 (point, point) pg_catalog.spg_quad_leaf_consistent(
       internal,
       internal
     ),
@@ -42816,31 +42211,19 @@ create operator class pg_catalog.macaddr8_bloom_ops
   family pg_catalog.macaddr8_bloom_ops as
     operator 1 pg_catalog.= (macaddr8, macaddr8),
     function 1 (macaddr8, macaddr8) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (macaddr8, macaddr8) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (macaddr8, macaddr8) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (macaddr8, macaddr8) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -42858,54 +42241,33 @@ create operator class pg_catalog.macaddr8_minmax_multi_ops
     operator 3 pg_catalog.= (macaddr8, macaddr8),
     operator 4 pg_catalog.>= (macaddr8, macaddr8),
     operator 5 pg_catalog.> (macaddr8, macaddr8),
-    function 1 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    function 1 (macaddr8, macaddr8) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
-    function 2 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (macaddr8, macaddr8) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (macaddr8, macaddr8) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (macaddr8, macaddr8) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
-    function 5 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_multi_options(
+    function 5 (macaddr8, macaddr8) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       macaddr8,
       macaddr8
-    )
-    pg_catalog.brin_minmax_multi_distance_macaddr8(
+    ) pg_catalog.brin_minmax_multi_distance_macaddr8(
       internal,
       internal
     ),
@@ -42921,30 +42283,18 @@ create operator class pg_catalog.macaddr8_minmax_ops
     operator 4 pg_catalog.>= (macaddr8, macaddr8),
     operator 5 pg_catalog.> (macaddr8, macaddr8),
     function 1 (macaddr8, macaddr8) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (macaddr8, macaddr8) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (macaddr8, macaddr8) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (macaddr8, macaddr8) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -42970,11 +42320,7 @@ create operator class pg_catalog.macaddr8_ops
   family pg_catalog.macaddr8_ops as
     operator 1 pg_catalog.= (macaddr8, macaddr8),
     function 1 (macaddr8, macaddr8) pg_catalog.hashmacaddr8(macaddr8),
-    function 2 (
-      macaddr8,
-      macaddr8
-    )
-    pg_catalog.hashmacaddr8extended(
+    function 2 (macaddr8, macaddr8) pg_catalog.hashmacaddr8extended(
       macaddr8,
       bigint
     ),
@@ -42986,31 +42332,19 @@ create operator class pg_catalog.macaddr_bloom_ops
   family pg_catalog.macaddr_bloom_ops as
     operator 1 pg_catalog.= (macaddr, macaddr),
     function 1 (macaddr, macaddr) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (macaddr, macaddr) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (macaddr, macaddr) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (macaddr, macaddr) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -43028,54 +42362,33 @@ create operator class pg_catalog.macaddr_minmax_multi_ops
     operator 3 pg_catalog.= (macaddr, macaddr),
     operator 4 pg_catalog.>= (macaddr, macaddr),
     operator 5 pg_catalog.> (macaddr, macaddr),
-    function 1 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    function 1 (macaddr, macaddr) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
-    function 2 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (macaddr, macaddr) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (macaddr, macaddr) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (macaddr, macaddr) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
-    function 5 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_multi_options(
+    function 5 (macaddr, macaddr) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       macaddr,
       macaddr
-    )
-    pg_catalog.brin_minmax_multi_distance_macaddr(
+    ) pg_catalog.brin_minmax_multi_distance_macaddr(
       internal,
       internal
     ),
@@ -43091,30 +42404,18 @@ create operator class pg_catalog.macaddr_minmax_ops
     operator 4 pg_catalog.>= (macaddr, macaddr),
     operator 5 pg_catalog.> (macaddr, macaddr),
     function 1 (macaddr, macaddr) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (macaddr, macaddr) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (macaddr, macaddr) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (macaddr, macaddr) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -43141,11 +42442,7 @@ create operator class pg_catalog.macaddr_ops
   family pg_catalog.macaddr_ops as
     operator 1 pg_catalog.= (macaddr, macaddr),
     function 1 (macaddr, macaddr) pg_catalog.hashmacaddr(macaddr),
-    function 2 (
-      macaddr,
-      macaddr
-    )
-    pg_catalog.hashmacaddrextended(
+    function 2 (macaddr, macaddr) pg_catalog.hashmacaddrextended(
       macaddr,
       bigint
     ),
@@ -43173,11 +42470,7 @@ create operator class pg_catalog.multirange_ops
     operator 3 pg_catalog.= (anymultirange, anymultirange),
     operator 4 pg_catalog.>= (anymultirange, anymultirange),
     operator 5 pg_catalog.> (anymultirange, anymultirange),
-    function 1 (
-      anymultirange,
-      anymultirange
-    )
-    pg_catalog.multirange_cmp(
+    function 1 (anymultirange, anymultirange) pg_catalog.multirange_cmp(
       anymultirange,
       anymultirange
     ),
@@ -43199,51 +42492,33 @@ create operator class pg_catalog.multirange_ops
     function 1 (
       anymultirange,
       anymultirange
-    )
-    pg_catalog.multirange_gist_consistent(
+    ) pg_catalog.multirange_gist_consistent(
       internal,
       anymultirange,
       smallint,
       oid,
       internal
     ),
-    function 2 (
-      anymultirange,
-      anymultirange
-    )
-    pg_catalog.range_gist_union(
+    function 2 (anymultirange, anymultirange) pg_catalog.range_gist_union(
       internal,
       internal
     ),
     function 3 (
       anymultirange,
       anymultirange
-    )
-    pg_catalog.multirange_gist_compress(
+    ) pg_catalog.multirange_gist_compress(
       internal
     ),
-    function 5 (
-      anymultirange,
-      anymultirange
-    )
-    pg_catalog.range_gist_penalty(
+    function 5 (anymultirange, anymultirange) pg_catalog.range_gist_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      anymultirange,
-      anymultirange
-    )
-    pg_catalog.range_gist_picksplit(
+    function 6 (anymultirange, anymultirange) pg_catalog.range_gist_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      anymultirange,
-      anymultirange
-    )
-    pg_catalog.range_gist_same(
+    function 7 (anymultirange, anymultirange) pg_catalog.range_gist_same(
       anyrange,
       anyrange,
       internal
@@ -43255,18 +42530,13 @@ create operator class pg_catalog.multirange_ops
   using hash
   family pg_catalog.multirange_ops as
     operator 1 pg_catalog.= (anymultirange, anymultirange),
-    function 1 (
-      anymultirange,
-      anymultirange
-    )
-    pg_catalog.hash_multirange(
+    function 1 (anymultirange, anymultirange) pg_catalog.hash_multirange(
       anymultirange
     ),
     function 2 (
       anymultirange,
       anymultirange
-    )
-    pg_catalog.hash_multirange_extended(
+    ) pg_catalog.hash_multirange_extended(
       anymultirange,
       bigint
     ),
@@ -43278,31 +42548,19 @@ create operator class pg_catalog.name_bloom_ops
   family pg_catalog.name_bloom_ops as
     operator 1 pg_catalog.= (name, name),
     function 1 (name, name) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      name,
-      name
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (name, name) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      name,
-      name
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (name, name) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      name,
-      name
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (name, name) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -43321,30 +42579,18 @@ create operator class pg_catalog.name_minmax_ops
     operator 4 pg_catalog.>= (name, name),
     operator 5 pg_catalog.> (name, name),
     function 1 (name, name) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      name,
-      name
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (name, name) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      name,
-      name
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (name, name) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      name,
-      name
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (name, name) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -43380,31 +42626,19 @@ create operator class pg_catalog.numeric_bloom_ops
   family pg_catalog.numeric_bloom_ops as
     operator 1 pg_catalog.= (numeric, numeric),
     function 1 (numeric, numeric) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (numeric, numeric) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (numeric, numeric) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (numeric, numeric) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -43422,54 +42656,33 @@ create operator class pg_catalog.numeric_minmax_multi_ops
     operator 3 pg_catalog.= (numeric, numeric),
     operator 4 pg_catalog.>= (numeric, numeric),
     operator 5 pg_catalog.> (numeric, numeric),
-    function 1 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    function 1 (numeric, numeric) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
-    function 2 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (numeric, numeric) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (numeric, numeric) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (numeric, numeric) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
-    function 5 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_multi_options(
+    function 5 (numeric, numeric) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       numeric,
       numeric
-    )
-    pg_catalog.brin_minmax_multi_distance_numeric(
+    ) pg_catalog.brin_minmax_multi_distance_numeric(
       internal,
       internal
     ),
@@ -43485,30 +42698,18 @@ create operator class pg_catalog.numeric_minmax_ops
     operator 4 pg_catalog.>= (numeric, numeric),
     operator 5 pg_catalog.> (numeric, numeric),
     function 1 (numeric, numeric) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (numeric, numeric) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (numeric, numeric) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      numeric,
-      numeric
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (numeric, numeric) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -43526,11 +42727,7 @@ create operator class pg_catalog.numeric_ops
     operator 5 pg_catalog.> (numeric, numeric),
     function 1 (numeric, numeric) pg_catalog.numeric_cmp(numeric, numeric),
     function 2 (numeric, numeric) pg_catalog.numeric_sortsupport(internal),
-    function 3 (
-      numeric,
-      numeric
-    )
-    pg_catalog.in_range(
+    function 3 (numeric, numeric) pg_catalog.in_range(
       numeric,
       numeric,
       numeric,
@@ -43545,11 +42742,7 @@ create operator class pg_catalog.numeric_ops
   family pg_catalog.numeric_ops as
     operator 1 pg_catalog.= (numeric, numeric),
     function 1 (numeric, numeric) pg_catalog.hash_numeric(numeric),
-    function 2 (
-      numeric,
-      numeric
-    )
-    pg_catalog.hash_numeric_extended(
+    function 2 (numeric, numeric) pg_catalog.hash_numeric_extended(
       numeric,
       bigint
     ),
@@ -43561,31 +42754,19 @@ create operator class pg_catalog.oid_bloom_ops
   family pg_catalog.oid_bloom_ops as
     operator 1 pg_catalog.= (oid, oid),
     function 1 (oid, oid) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (oid, oid) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (oid, oid) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (oid, oid) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -43604,41 +42785,25 @@ create operator class pg_catalog.oid_minmax_multi_ops
     operator 4 pg_catalog.>= (oid, oid),
     operator 5 pg_catalog.> (oid, oid),
     function 1 (oid, oid) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (oid, oid) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (oid, oid) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (oid, oid) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (oid, oid) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_minmax_multi_distance_int4(
+    function 11 (oid, oid) pg_catalog.brin_minmax_multi_distance_int4(
       internal,
       internal
     ),
@@ -43654,30 +42819,18 @@ create operator class pg_catalog.oid_minmax_ops
     operator 4 pg_catalog.>= (oid, oid),
     operator 5 pg_catalog.> (oid, oid),
     function 1 (oid, oid) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (oid, oid) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (oid, oid) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      oid,
-      oid
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (oid, oid) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -43717,11 +42870,7 @@ create operator class pg_catalog.oidvector_ops
     operator 3 pg_catalog.= (oidvector, oidvector),
     operator 4 pg_catalog.>= (oidvector, oidvector),
     operator 5 pg_catalog.> (oidvector, oidvector),
-    function 1 (
-      oidvector,
-      oidvector
-    )
-    pg_catalog.btoidvectorcmp(
+    function 1 (oidvector, oidvector) pg_catalog.btoidvectorcmp(
       oidvector,
       oidvector
     ),
@@ -43734,11 +42883,7 @@ create operator class pg_catalog.oidvector_ops
   family pg_catalog.oidvector_ops as
     operator 1 pg_catalog.= (oidvector, oidvector),
     function 1 (oidvector, oidvector) pg_catalog.hashoidvector(oidvector),
-    function 2 (
-      oidvector,
-      oidvector
-    )
-    pg_catalog.hashoidvectorextended(
+    function 2 (oidvector, oidvector) pg_catalog.hashoidvectorextended(
       oidvector,
       bigint
     ),
@@ -43750,31 +42895,19 @@ create operator class pg_catalog.pg_lsn_bloom_ops
   family pg_catalog.pg_lsn_bloom_ops as
     operator 1 pg_catalog.= (pg_lsn, pg_lsn),
     function 1 (pg_lsn, pg_lsn) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (pg_lsn, pg_lsn) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (pg_lsn, pg_lsn) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (pg_lsn, pg_lsn) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -43793,41 +42926,25 @@ create operator class pg_catalog.pg_lsn_minmax_multi_ops
     operator 4 pg_catalog.>= (pg_lsn, pg_lsn),
     operator 5 pg_catalog.> (pg_lsn, pg_lsn),
     function 1 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_minmax_multi_distance_pg_lsn(
+    function 11 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_distance_pg_lsn(
       internal,
       internal
     ),
@@ -43843,30 +42960,18 @@ create operator class pg_catalog.pg_lsn_minmax_ops
     operator 4 pg_catalog.>= (pg_lsn, pg_lsn),
     operator 5 pg_catalog.> (pg_lsn, pg_lsn),
     function 1 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      pg_lsn,
-      pg_lsn
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -43907,11 +43012,7 @@ create operator class pg_catalog.point_ops
     operator 15 pg_catalog.<-> (point, point) for order by pg_catalog.float_ops,
     operator 29 pg_catalog.<^ (point, point),
     operator 30 pg_catalog.>^ (point, point),
-    function 1 (
-      point,
-      point
-    )
-    pg_catalog.gist_point_consistent(
+    function 1 (point, point) pg_catalog.gist_point_consistent(
       internal,
       point,
       smallint,
@@ -43920,22 +43021,14 @@ create operator class pg_catalog.point_ops
     ),
     function 2 (point, point) pg_catalog.gist_box_union(internal, internal),
     function 3 (point, point) pg_catalog.gist_point_compress(internal),
-    function 5 (
-      point,
-      point
-    )
-    pg_catalog.gist_box_penalty(
+    function 5 (point, point) pg_catalog.gist_box_penalty(
       internal,
       internal,
       internal
     ),
     function 6 (point, point) pg_catalog.gist_box_picksplit(internal, internal),
     function 7 (point, point) pg_catalog.gist_box_same(box, box, internal),
-    function 8 (
-      point,
-      point
-    )
-    pg_catalog.gist_point_distance(
+    function 8 (point, point) pg_catalog.gist_point_distance(
       internal,
       point,
       smallint,
@@ -43962,11 +43055,7 @@ create operator class pg_catalog.poly_ops
     operator 10 pg_catalog.<<| (polygon, polygon),
     operator 11 pg_catalog.|>> (polygon, polygon),
     operator 12 pg_catalog.|&> (polygon, polygon),
-    function 1 (
-      polygon,
-      polygon
-    )
-    pg_catalog.gist_poly_consistent(
+    function 1 (polygon, polygon) pg_catalog.gist_poly_consistent(
       internal,
       polygon,
       smallint,
@@ -43975,29 +43064,17 @@ create operator class pg_catalog.poly_ops
     ),
     function 2 (polygon, polygon) pg_catalog.gist_box_union(internal, internal),
     function 3 (polygon, polygon) pg_catalog.gist_poly_compress(internal),
-    function 5 (
-      polygon,
-      polygon
-    )
-    pg_catalog.gist_box_penalty(
+    function 5 (polygon, polygon) pg_catalog.gist_box_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      polygon,
-      polygon
-    )
-    pg_catalog.gist_box_picksplit(
+    function 6 (polygon, polygon) pg_catalog.gist_box_picksplit(
       internal,
       internal
     ),
     function 7 (polygon, polygon) pg_catalog.gist_box_same(box, box, internal),
-    function 8 (
-      polygon,
-      polygon
-    )
-    pg_catalog.gist_poly_distance(
+    function 8 (polygon, polygon) pg_catalog.gist_poly_distance(
       internal,
       polygon,
       smallint,
@@ -44022,43 +43099,23 @@ create operator class pg_catalog.poly_ops
     operator 10 pg_catalog.<<| (polygon, polygon),
     operator 11 pg_catalog.|>> (polygon, polygon),
     operator 12 pg_catalog.|&> (polygon, polygon),
-    function 1 (
-      polygon,
-      polygon
-    )
-    pg_catalog.spg_bbox_quad_config(
+    function 1 (polygon, polygon) pg_catalog.spg_bbox_quad_config(
       internal,
       internal
     ),
-    function 2 (
-      polygon,
-      polygon
-    )
-    pg_catalog.spg_box_quad_choose(
+    function 2 (polygon, polygon) pg_catalog.spg_box_quad_choose(
       internal,
       internal
     ),
-    function 3 (
-      polygon,
-      polygon
-    )
-    pg_catalog.spg_box_quad_picksplit(
+    function 3 (polygon, polygon) pg_catalog.spg_box_quad_picksplit(
       internal,
       internal
     ),
-    function 4 (
-      polygon,
-      polygon
-    )
-    pg_catalog.spg_box_quad_inner_consistent(
+    function 4 (polygon, polygon) pg_catalog.spg_box_quad_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      polygon,
-      polygon
-    )
-    pg_catalog.spg_box_quad_leaf_consistent(
+    function 5 (polygon, polygon) pg_catalog.spg_box_quad_leaf_consistent(
       internal,
       internal
     ),
@@ -44080,19 +43137,11 @@ create operator class pg_catalog.quad_point_ops
     function 1 (point, point) pg_catalog.spg_quad_config(internal, internal),
     function 2 (point, point) pg_catalog.spg_quad_choose(internal, internal),
     function 3 (point, point) pg_catalog.spg_quad_picksplit(internal, internal),
-    function 4 (
-      point,
-      point
-    )
-    pg_catalog.spg_quad_inner_consistent(
+    function 4 (point, point) pg_catalog.spg_quad_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      point,
-      point
-    )
-    pg_catalog.spg_quad_leaf_consistent(
+    function 5 (point, point) pg_catalog.spg_quad_leaf_consistent(
       internal,
       internal
     ),
@@ -44116,40 +43165,24 @@ create operator class pg_catalog.range_inclusion_ops
     operator 22 pg_catalog.> (anyrange, anyrange),
     operator 23 pg_catalog.>= (anyrange, anyrange),
     function 1 (anyrange, anyrange) pg_catalog.brin_inclusion_opcinfo(internal),
-    function 2 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.brin_inclusion_add_value(
+    function 2 (anyrange, anyrange) pg_catalog.brin_inclusion_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.brin_inclusion_consistent(
+    function 3 (anyrange, anyrange) pg_catalog.brin_inclusion_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.brin_inclusion_union(
+    function 4 (anyrange, anyrange) pg_catalog.brin_inclusion_union(
       internal,
       internal,
       internal
     ),
     function 11 (anyrange, anyrange) pg_catalog.range_merge(anyrange, anyrange),
-    function 13 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.range_contains(
+    function 13 (anyrange, anyrange) pg_catalog.range_contains(
       anyrange,
       anyrange
     ),
@@ -44182,47 +43215,27 @@ create operator class pg_catalog.range_ops
     operator 7 pg_catalog.@> (anyrange, anyrange),
     operator 8 pg_catalog.<@ (anyrange, anyrange),
     operator 18 pg_catalog.= (anyrange, anyrange),
-    function 1 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.range_gist_consistent(
+    function 1 (anyrange, anyrange) pg_catalog.range_gist_consistent(
       internal,
       anyrange,
       smallint,
       oid,
       internal
     ),
-    function 2 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.range_gist_union(
+    function 2 (anyrange, anyrange) pg_catalog.range_gist_union(
       internal,
       internal
     ),
-    function 5 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.range_gist_penalty(
+    function 5 (anyrange, anyrange) pg_catalog.range_gist_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.range_gist_picksplit(
+    function 6 (anyrange, anyrange) pg_catalog.range_gist_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.range_gist_same(
+    function 7 (anyrange, anyrange) pg_catalog.range_gist_same(
       anyrange,
       anyrange,
       internal
@@ -44236,11 +43249,7 @@ create operator class pg_catalog.range_ops
   family pg_catalog.range_ops as
     operator 1 pg_catalog.= (anyrange, anyrange),
     function 1 (anyrange, anyrange) pg_catalog.hash_range(anyrange),
-    function 2 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.hash_range_extended(
+    function 2 (anyrange, anyrange) pg_catalog.hash_range_extended(
       anyrange,
       bigint
     ),
@@ -44259,43 +43268,23 @@ create operator class pg_catalog.range_ops
     operator 7 pg_catalog.@> (anyrange, anyrange),
     operator 8 pg_catalog.<@ (anyrange, anyrange),
     operator 18 pg_catalog.= (anyrange, anyrange),
-    function 1 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.spg_range_quad_config(
+    function 1 (anyrange, anyrange) pg_catalog.spg_range_quad_config(
       internal,
       internal
     ),
-    function 2 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.spg_range_quad_choose(
+    function 2 (anyrange, anyrange) pg_catalog.spg_range_quad_choose(
       internal,
       internal
     ),
-    function 3 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.spg_range_quad_picksplit(
+    function 3 (anyrange, anyrange) pg_catalog.spg_range_quad_picksplit(
       internal,
       internal
     ),
-    function 4 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.spg_range_quad_inner_consistent(
+    function 4 (anyrange, anyrange) pg_catalog.spg_range_quad_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      anyrange,
-      anyrange
-    )
-    pg_catalog.spg_range_quad_leaf_consistent(
+    function 5 (anyrange, anyrange) pg_catalog.spg_range_quad_leaf_consistent(
       internal,
       internal
     ),
@@ -44340,31 +43329,19 @@ create operator class pg_catalog.text_bloom_ops
   family pg_catalog.text_bloom_ops as
     operator 1 pg_catalog.= (text, text),
     function 1 (text, text) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      text,
-      text
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (text, text) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      text,
-      text
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (text, text) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      text,
-      text
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (text, text) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -44383,30 +43360,18 @@ create operator class pg_catalog.text_minmax_ops
     operator 4 pg_catalog.>= (text, text),
     operator 5 pg_catalog.> (text, text),
     function 1 (text, text) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      text,
-      text
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (text, text) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      text,
-      text
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (text, text) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      text,
-      text
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (text, text) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -44453,19 +43418,11 @@ create operator class pg_catalog.text_ops
     function 1 (text, text) pg_catalog.spg_text_config(internal, internal),
     function 2 (text, text) pg_catalog.spg_text_choose(internal, internal),
     function 3 (text, text) pg_catalog.spg_text_picksplit(internal, internal),
-    function 4 (
-      text,
-      text
-    )
-    pg_catalog.spg_text_inner_consistent(
+    function 4 (text, text) pg_catalog.spg_text_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      text,
-      text
-    )
-    pg_catalog.spg_text_leaf_consistent(
+    function 5 (text, text) pg_catalog.spg_text_leaf_consistent(
       internal,
       internal
     ),
@@ -44500,31 +43457,19 @@ create operator class pg_catalog.tid_bloom_ops
   family pg_catalog.tid_bloom_ops as
     operator 1 pg_catalog.= (tid, tid),
     function 1 (tid, tid) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (tid, tid) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (tid, tid) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (tid, tid) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -44543,41 +43488,25 @@ create operator class pg_catalog.tid_minmax_multi_ops
     operator 4 pg_catalog.>= (tid, tid),
     operator 5 pg_catalog.> (tid, tid),
     function 1 (tid, tid) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (tid, tid) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (tid, tid) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (tid, tid) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (tid, tid) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_minmax_multi_distance_tid(
+    function 11 (tid, tid) pg_catalog.brin_minmax_multi_distance_tid(
       internal,
       internal
     ),
@@ -44593,30 +43522,18 @@ create operator class pg_catalog.tid_minmax_ops
     operator 4 pg_catalog.>= (tid, tid),
     operator 5 pg_catalog.> (tid, tid),
     function 1 (tid, tid) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (tid, tid) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (tid, tid) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      tid,
-      tid
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (tid, tid) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -44653,15 +43570,13 @@ create operator class pg_catalog.time_bloom_ops
     function 1 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_bloom_opcinfo(
+    ) pg_catalog.brin_bloom_opcinfo(
       internal
     ),
     function 2 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_bloom_add_value(
+    ) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
@@ -44670,8 +43585,7 @@ create operator class pg_catalog.time_bloom_ops
     function 3 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_bloom_consistent(
+    ) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
@@ -44680,8 +43594,7 @@ create operator class pg_catalog.time_bloom_ops
     function 4 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_bloom_union(
+    ) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -44689,15 +43602,13 @@ create operator class pg_catalog.time_bloom_ops
     function 5 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_bloom_options(
+    ) pg_catalog.brin_bloom_options(
       internal
     ),
     function 11 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.time_hash(
+    ) pg_catalog.time_hash(
       time without time zone
     ),
     storage time without time zone;
@@ -44714,15 +43625,13 @@ create operator class pg_catalog.time_minmax_multi_ops
     function 1 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    ) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
     function 2 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    ) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
@@ -44731,8 +43640,7 @@ create operator class pg_catalog.time_minmax_multi_ops
     function 3 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    ) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
@@ -44741,8 +43649,7 @@ create operator class pg_catalog.time_minmax_multi_ops
     function 4 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_multi_union(
+    ) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
@@ -44750,15 +43657,13 @@ create operator class pg_catalog.time_minmax_multi_ops
     function 5 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_multi_options(
+    ) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_multi_distance_time(
+    ) pg_catalog.brin_minmax_multi_distance_time(
       internal,
       internal
     ),
@@ -44776,15 +43681,13 @@ create operator class pg_catalog.time_minmax_ops
     function 1 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_opcinfo(
+    ) pg_catalog.brin_minmax_opcinfo(
       internal
     ),
     function 2 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_add_value(
+    ) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
@@ -44793,8 +43696,7 @@ create operator class pg_catalog.time_minmax_ops
     function 3 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_consistent(
+    ) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
@@ -44802,8 +43704,7 @@ create operator class pg_catalog.time_minmax_ops
     function 4 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.brin_minmax_union(
+    ) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -44822,16 +43723,14 @@ create operator class pg_catalog.time_ops
     function 1 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.time_cmp(
+    ) pg_catalog.time_cmp(
       time without time zone,
       time without time zone
     ),
     function 4 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.btequalimage(
+    ) pg_catalog.btequalimage(
       oid
     ),
     storage time without time zone;
@@ -44844,15 +43743,13 @@ create operator class pg_catalog.time_ops
     function 1 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.time_hash(
+    ) pg_catalog.time_hash(
       time without time zone
     ),
     function 2 (
       time without time zone,
       time without time zone
-    )
-    pg_catalog.time_hash_extended(
+    ) pg_catalog.time_hash_extended(
       time without time zone,
       bigint
     ),
@@ -44869,15 +43766,13 @@ create operator class pg_catalog.timestamp_bloom_ops
     function 1 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_bloom_opcinfo(
+    ) pg_catalog.brin_bloom_opcinfo(
       internal
     ),
     function 2 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_bloom_add_value(
+    ) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
@@ -44886,8 +43781,7 @@ create operator class pg_catalog.timestamp_bloom_ops
     function 3 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_bloom_consistent(
+    ) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
@@ -44896,8 +43790,7 @@ create operator class pg_catalog.timestamp_bloom_ops
     function 4 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_bloom_union(
+    ) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -44905,15 +43798,13 @@ create operator class pg_catalog.timestamp_bloom_ops
     function 5 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_bloom_options(
+    ) pg_catalog.brin_bloom_options(
       internal
     ),
     function 11 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.timestamp_hash(
+    ) pg_catalog.timestamp_hash(
       timestamp without time zone
     ),
     storage timestamp without time zone;
@@ -44945,15 +43836,13 @@ create operator class pg_catalog.timestamp_minmax_multi_ops
     function 1 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    ) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
     function 2 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    ) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
@@ -44962,8 +43851,7 @@ create operator class pg_catalog.timestamp_minmax_multi_ops
     function 3 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    ) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
@@ -44972,8 +43860,7 @@ create operator class pg_catalog.timestamp_minmax_multi_ops
     function 4 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_multi_union(
+    ) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
@@ -44981,15 +43868,13 @@ create operator class pg_catalog.timestamp_minmax_multi_ops
     function 5 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_multi_options(
+    ) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_multi_distance_timestamp(
+    ) pg_catalog.brin_minmax_multi_distance_timestamp(
       internal,
       internal
     ),
@@ -45022,15 +43907,13 @@ create operator class pg_catalog.timestamp_minmax_ops
     function 1 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_opcinfo(
+    ) pg_catalog.brin_minmax_opcinfo(
       internal
     ),
     function 2 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_add_value(
+    ) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
@@ -45039,8 +43922,7 @@ create operator class pg_catalog.timestamp_minmax_ops
     function 3 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_consistent(
+    ) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
@@ -45048,8 +43930,7 @@ create operator class pg_catalog.timestamp_minmax_ops
     function 4 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.brin_minmax_union(
+    ) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -45083,30 +43964,26 @@ create operator class pg_catalog.timestamp_ops
     function 1 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.timestamp_cmp(
+    ) pg_catalog.timestamp_cmp(
       timestamp without time zone,
       timestamp without time zone
     ),
     function 2 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.timestamp_sortsupport(
+    ) pg_catalog.timestamp_sortsupport(
       internal
     ),
     function 4 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.btequalimage(
+    ) pg_catalog.btequalimage(
       oid
     ),
     function 6 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.timestamp_skipsupport(
+    ) pg_catalog.timestamp_skipsupport(
       internal
     ),
     storage timestamp without time zone;
@@ -45122,15 +43999,13 @@ create operator class pg_catalog.timestamp_ops
     function 1 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.timestamp_hash(
+    ) pg_catalog.timestamp_hash(
       timestamp without time zone
     ),
     function 2 (
       timestamp without time zone,
       timestamp without time zone
-    )
-    pg_catalog.timestamp_hash_extended(
+    ) pg_catalog.timestamp_hash_extended(
       timestamp without time zone,
       bigint
     ),
@@ -45147,15 +44022,13 @@ create operator class pg_catalog.timestamptz_bloom_ops
     function 1 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_bloom_opcinfo(
+    ) pg_catalog.brin_bloom_opcinfo(
       internal
     ),
     function 2 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_bloom_add_value(
+    ) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
@@ -45164,8 +44037,7 @@ create operator class pg_catalog.timestamptz_bloom_ops
     function 3 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_bloom_consistent(
+    ) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
@@ -45174,8 +44046,7 @@ create operator class pg_catalog.timestamptz_bloom_ops
     function 4 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_bloom_union(
+    ) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -45183,15 +44054,13 @@ create operator class pg_catalog.timestamptz_bloom_ops
     function 5 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_bloom_options(
+    ) pg_catalog.brin_bloom_options(
       internal
     ),
     function 11 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.timestamp_hash(
+    ) pg_catalog.timestamp_hash(
       timestamp without time zone
     ),
     storage timestamp with time zone;
@@ -45223,15 +44092,13 @@ create operator class pg_catalog.timestamptz_minmax_multi_ops
     function 1 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    ) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
     function 2 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    ) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
@@ -45240,8 +44107,7 @@ create operator class pg_catalog.timestamptz_minmax_multi_ops
     function 3 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    ) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
@@ -45250,8 +44116,7 @@ create operator class pg_catalog.timestamptz_minmax_multi_ops
     function 4 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_multi_union(
+    ) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
@@ -45259,15 +44124,13 @@ create operator class pg_catalog.timestamptz_minmax_multi_ops
     function 5 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_multi_options(
+    ) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_multi_distance_timestamp(
+    ) pg_catalog.brin_minmax_multi_distance_timestamp(
       internal,
       internal
     ),
@@ -45300,15 +44163,13 @@ create operator class pg_catalog.timestamptz_minmax_ops
     function 1 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_opcinfo(
+    ) pg_catalog.brin_minmax_opcinfo(
       internal
     ),
     function 2 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_add_value(
+    ) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
@@ -45317,8 +44178,7 @@ create operator class pg_catalog.timestamptz_minmax_ops
     function 3 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_consistent(
+    ) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
@@ -45326,8 +44186,7 @@ create operator class pg_catalog.timestamptz_minmax_ops
     function 4 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.brin_minmax_union(
+    ) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -45361,30 +44220,26 @@ create operator class pg_catalog.timestamptz_ops
     function 1 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.timestamptz_cmp(
+    ) pg_catalog.timestamptz_cmp(
       timestamp with time zone,
       timestamp with time zone
     ),
     function 2 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.timestamp_sortsupport(
+    ) pg_catalog.timestamp_sortsupport(
       internal
     ),
     function 4 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.btequalimage(
+    ) pg_catalog.btequalimage(
       oid
     ),
     function 6 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.timestamp_skipsupport(
+    ) pg_catalog.timestamp_skipsupport(
       internal
     ),
     storage timestamp with time zone;
@@ -45400,15 +44255,13 @@ create operator class pg_catalog.timestamptz_ops
     function 1 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.timestamptz_hash(
+    ) pg_catalog.timestamptz_hash(
       timestamp with time zone
     ),
     function 2 (
       timestamp with time zone,
       timestamp with time zone
-    )
-    pg_catalog.timestamptz_hash_extended(
+    ) pg_catalog.timestamptz_hash_extended(
       timestamp with time zone,
       bigint
     ),
@@ -45422,15 +44275,13 @@ create operator class pg_catalog.timetz_bloom_ops
     function 1 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_bloom_opcinfo(
+    ) pg_catalog.brin_bloom_opcinfo(
       internal
     ),
     function 2 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_bloom_add_value(
+    ) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
@@ -45439,8 +44290,7 @@ create operator class pg_catalog.timetz_bloom_ops
     function 3 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_bloom_consistent(
+    ) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
@@ -45449,8 +44299,7 @@ create operator class pg_catalog.timetz_bloom_ops
     function 4 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_bloom_union(
+    ) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -45458,15 +44307,13 @@ create operator class pg_catalog.timetz_bloom_ops
     function 5 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_bloom_options(
+    ) pg_catalog.brin_bloom_options(
       internal
     ),
     function 11 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.timetz_hash(
+    ) pg_catalog.timetz_hash(
       time with time zone
     ),
     storage time with time zone;
@@ -45483,15 +44330,13 @@ create operator class pg_catalog.timetz_minmax_multi_ops
     function 1 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_multi_opcinfo(
+    ) pg_catalog.brin_minmax_multi_opcinfo(
       internal
     ),
     function 2 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    ) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
@@ -45500,8 +44345,7 @@ create operator class pg_catalog.timetz_minmax_multi_ops
     function 3 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    ) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
@@ -45510,8 +44354,7 @@ create operator class pg_catalog.timetz_minmax_multi_ops
     function 4 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_multi_union(
+    ) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
@@ -45519,15 +44362,13 @@ create operator class pg_catalog.timetz_minmax_multi_ops
     function 5 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_multi_options(
+    ) pg_catalog.brin_minmax_multi_options(
       internal
     ),
     function 11 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_multi_distance_timetz(
+    ) pg_catalog.brin_minmax_multi_distance_timetz(
       internal,
       internal
     ),
@@ -45545,15 +44386,13 @@ create operator class pg_catalog.timetz_minmax_ops
     function 1 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_opcinfo(
+    ) pg_catalog.brin_minmax_opcinfo(
       internal
     ),
     function 2 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_add_value(
+    ) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
@@ -45562,8 +44401,7 @@ create operator class pg_catalog.timetz_minmax_ops
     function 3 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_consistent(
+    ) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
@@ -45571,8 +44409,7 @@ create operator class pg_catalog.timetz_minmax_ops
     function 4 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.brin_minmax_union(
+    ) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -45588,19 +44425,14 @@ create operator class pg_catalog.timetz_ops
     operator 3 pg_catalog.= (time with time zone, time with time zone),
     operator 4 pg_catalog.>= (time with time zone, time with time zone),
     operator 5 pg_catalog.> (time with time zone, time with time zone),
-    function 1 (
-      time with time zone,
-      time with time zone
-    )
-    pg_catalog.timetz_cmp(
+    function 1 (time with time zone, time with time zone) pg_catalog.timetz_cmp(
       time with time zone,
       time with time zone
     ),
     function 4 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.btequalimage(
+    ) pg_catalog.btequalimage(
       oid
     ),
     storage time with time zone;
@@ -45613,15 +44445,13 @@ create operator class pg_catalog.timetz_ops
     function 1 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.timetz_hash(
+    ) pg_catalog.timetz_hash(
       time with time zone
     ),
     function 2 (
       time with time zone,
       time with time zone
-    )
-    pg_catalog.timetz_hash_extended(
+    ) pg_catalog.timetz_hash_extended(
       time with time zone,
       bigint
     ),
@@ -45645,11 +44475,7 @@ create operator class pg_catalog.tsquery_ops
   family pg_catalog.tsquery_ops as
     operator 7 pg_catalog.@> (tsquery, tsquery),
     operator 8 pg_catalog.<@ (tsquery, tsquery),
-    function 1 (
-      tsquery,
-      tsquery
-    )
-    pg_catalog.gtsquery_consistent(
+    function 1 (tsquery, tsquery) pg_catalog.gtsquery_consistent(
       internal,
       tsquery,
       smallint,
@@ -45658,28 +44484,16 @@ create operator class pg_catalog.tsquery_ops
     ),
     function 2 (tsquery, tsquery) pg_catalog.gtsquery_union(internal, internal),
     function 3 (tsquery, tsquery) pg_catalog.gtsquery_compress(internal),
-    function 5 (
-      tsquery,
-      tsquery
-    )
-    pg_catalog.gtsquery_penalty(
+    function 5 (tsquery, tsquery) pg_catalog.gtsquery_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      tsquery,
-      tsquery
-    )
-    pg_catalog.gtsquery_picksplit(
+    function 6 (tsquery, tsquery) pg_catalog.gtsquery_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      tsquery,
-      tsquery
-    )
-    pg_catalog.gtsquery_same(
+    function 7 (tsquery, tsquery) pg_catalog.gtsquery_same(
       bigint,
       bigint,
       internal
@@ -45703,20 +44517,12 @@ create operator class pg_catalog.tsvector_ops
   using gin
   family pg_catalog.tsvector_ops as
     function 1 (tsvector, tsvector) pg_catalog.gin_cmp_tslexeme(text, text),
-    function 2 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gin_extract_tsvector(
+    function 2 (tsvector, tsvector) pg_catalog.gin_extract_tsvector(
       tsvector,
       internal,
       internal
     ),
-    function 3 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gin_extract_tsquery(
+    function 3 (tsvector, tsvector) pg_catalog.gin_extract_tsquery(
       tsvector,
       internal,
       smallint,
@@ -45725,11 +44531,7 @@ create operator class pg_catalog.tsvector_ops
       internal,
       internal
     ),
-    function 4 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gin_tsquery_consistent(
+    function 4 (tsvector, tsvector) pg_catalog.gin_tsquery_consistent(
       internal,
       smallint,
       tsvector,
@@ -45739,21 +44541,13 @@ create operator class pg_catalog.tsvector_ops
       internal,
       internal
     ),
-    function 5 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gin_cmp_prefix(
+    function 5 (tsvector, tsvector) pg_catalog.gin_cmp_prefix(
       text,
       text,
       smallint,
       internal
     ),
-    function 6 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gin_tsquery_triconsistent(
+    function 6 (tsvector, tsvector) pg_catalog.gin_tsquery_triconsistent(
       internal,
       smallint,
       tsvector,
@@ -45768,49 +44562,29 @@ create operator class pg_catalog.tsvector_ops
   default for type tsvector
   using gist
   family pg_catalog.tsvector_ops as
-    function 1 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gtsvector_consistent(
+    function 1 (tsvector, tsvector) pg_catalog.gtsvector_consistent(
       internal,
       tsvector,
       smallint,
       oid,
       internal
     ),
-    function 2 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gtsvector_union(
+    function 2 (tsvector, tsvector) pg_catalog.gtsvector_union(
       internal,
       internal
     ),
     function 3 (tsvector, tsvector) pg_catalog.gtsvector_compress(internal),
     function 4 (tsvector, tsvector) pg_catalog.gtsvector_decompress(internal),
-    function 5 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gtsvector_penalty(
+    function 5 (tsvector, tsvector) pg_catalog.gtsvector_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gtsvector_picksplit(
+    function 6 (tsvector, tsvector) pg_catalog.gtsvector_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      tsvector,
-      tsvector
-    )
-    pg_catalog.gtsvector_same(
+    function 7 (tsvector, tsvector) pg_catalog.gtsvector_same(
       gtsvector,
       gtsvector,
       internal
@@ -45824,31 +44598,19 @@ create operator class pg_catalog.uuid_bloom_ops
   family pg_catalog.uuid_bloom_ops as
     operator 1 pg_catalog.= (uuid, uuid),
     function 1 (uuid, uuid) pg_catalog.brin_bloom_opcinfo(internal),
-    function 2 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_bloom_add_value(
+    function 2 (uuid, uuid) pg_catalog.brin_bloom_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_bloom_consistent(
+    function 3 (uuid, uuid) pg_catalog.brin_bloom_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_bloom_union(
+    function 4 (uuid, uuid) pg_catalog.brin_bloom_union(
       internal,
       internal,
       internal
@@ -45867,41 +44629,25 @@ create operator class pg_catalog.uuid_minmax_multi_ops
     operator 4 pg_catalog.>= (uuid, uuid),
     operator 5 pg_catalog.> (uuid, uuid),
     function 1 (uuid, uuid) pg_catalog.brin_minmax_multi_opcinfo(internal),
-    function 2 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_minmax_multi_add_value(
+    function 2 (uuid, uuid) pg_catalog.brin_minmax_multi_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_minmax_multi_consistent(
+    function 3 (uuid, uuid) pg_catalog.brin_minmax_multi_consistent(
       internal,
       internal,
       internal,
       integer
     ),
-    function 4 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_minmax_multi_union(
+    function 4 (uuid, uuid) pg_catalog.brin_minmax_multi_union(
       internal,
       internal,
       internal
     ),
     function 5 (uuid, uuid) pg_catalog.brin_minmax_multi_options(internal),
-    function 11 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_minmax_multi_distance_uuid(
+    function 11 (uuid, uuid) pg_catalog.brin_minmax_multi_distance_uuid(
       internal,
       internal
     ),
@@ -45917,30 +44663,18 @@ create operator class pg_catalog.uuid_minmax_ops
     operator 4 pg_catalog.>= (uuid, uuid),
     operator 5 pg_catalog.> (uuid, uuid),
     function 1 (uuid, uuid) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (uuid, uuid) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (uuid, uuid) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      uuid,
-      uuid
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (uuid, uuid) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -45980,37 +44714,21 @@ create operator class pg_catalog.varbit_minmax_ops
     operator 3 pg_catalog.= (bit varying, bit varying),
     operator 4 pg_catalog.>= (bit varying, bit varying),
     operator 5 pg_catalog.> (bit varying, bit varying),
-    function 1 (
-      bit varying,
-      bit varying
-    )
-    pg_catalog.brin_minmax_opcinfo(
+    function 1 (bit varying, bit varying) pg_catalog.brin_minmax_opcinfo(
       internal
     ),
-    function 2 (
-      bit varying,
-      bit varying
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (bit varying, bit varying) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      bit varying,
-      bit varying
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (bit varying, bit varying) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      bit varying,
-      bit varying
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (bit varying, bit varying) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -46026,11 +44744,7 @@ create operator class pg_catalog.varbit_ops
     operator 3 pg_catalog.= (bit varying, bit varying),
     operator 4 pg_catalog.>= (bit varying, bit varying),
     operator 5 pg_catalog.> (bit varying, bit varying),
-    function 1 (
-      bit varying,
-      bit varying
-    )
-    pg_catalog.varbitcmp(
+    function 1 (bit varying, bit varying) pg_catalog.varbitcmp(
       bit varying,
       bit varying
     ),
@@ -48069,11 +46783,7 @@ alter operator family pg_catalog.box_ops
   using gist
   add
     operator 15 pg_catalog.<-> (box, point) for order by pg_catalog.float_ops,
-    function 12 (
-      "any",
-      "any"
-    )
-    pg_catalog.gist_translate_cmptype_common(
+    function 12 ("any", "any") pg_catalog.gist_translate_cmptype_common(
       integer
     );
 
@@ -48087,11 +46797,7 @@ alter operator family pg_catalog.circle_ops
   add
     operator 15 pg_catalog.<-> (circle, point)
     for order by pg_catalog.float_ops,
-    function 12 (
-      "any",
-      "any"
-    )
-    pg_catalog.gist_translate_cmptype_common(
+    function 12 ("any", "any") pg_catalog.gist_translate_cmptype_common(
       integer
     );
 
@@ -48286,81 +46992,57 @@ alter operator family pg_catalog.datetime_ops
       timestamp without time zone,
       timestamp with time zone
     ),
-    function 1 (
-      date,
-      timestamp with time zone
-    )
-    pg_catalog.date_cmp_timestamptz(
+    function 1 (date, timestamp with time zone) pg_catalog.date_cmp_timestamptz(
       date,
       timestamp with time zone
     ),
     function 1 (
       date,
       timestamp without time zone
-    )
-    pg_catalog.date_cmp_timestamp(
+    ) pg_catalog.date_cmp_timestamp(
       date,
       timestamp without time zone
     ),
-    function 1 (
-      timestamp with time zone,
-      date
-    )
-    pg_catalog.timestamptz_cmp_date(
+    function 1 (timestamp with time zone, date) pg_catalog.timestamptz_cmp_date(
       timestamp with time zone,
       date
     ),
     function 1 (
       timestamp with time zone,
       timestamp without time zone
-    )
-    pg_catalog.timestamptz_cmp_timestamp(
+    ) pg_catalog.timestamptz_cmp_timestamp(
       timestamp with time zone,
       timestamp without time zone
     ),
     function 1 (
       timestamp without time zone,
       date
-    )
-    pg_catalog.timestamp_cmp_date(
+    ) pg_catalog.timestamp_cmp_date(
       timestamp without time zone,
       date
     ),
     function 1 (
       timestamp without time zone,
       timestamp with time zone
-    )
-    pg_catalog.timestamp_cmp_timestamptz(
+    ) pg_catalog.timestamp_cmp_timestamptz(
       timestamp without time zone,
       timestamp with time zone
     ),
-    function 3 (
-      date,
-      interval
-    )
-    pg_catalog.in_range(
+    function 3 (date, interval) pg_catalog.in_range(
       date,
       date,
       interval,
       boolean,
       boolean
     ),
-    function 3 (
-      timestamp with time zone,
-      interval
-    )
-    pg_catalog.in_range(
+    function 3 (timestamp with time zone, interval) pg_catalog.in_range(
       timestamp with time zone,
       timestamp with time zone,
       interval,
       boolean,
       boolean
     ),
-    function 3 (
-      timestamp without time zone,
-      interval
-    )
-    pg_catalog.in_range(
+    function 3 (timestamp without time zone, interval) pg_catalog.in_range(
       timestamp without time zone,
       timestamp without time zone,
       interval,
@@ -48409,27 +47091,15 @@ alter operator family pg_catalog.float_ops
     operator 4 pg_catalog.>= (real, double precision),
     operator 5 pg_catalog.> (double precision, real),
     operator 5 pg_catalog.> (real, double precision),
-    function 1 (
-      double precision,
-      real
-    )
-    pg_catalog.btfloat84cmp(
+    function 1 (double precision, real) pg_catalog.btfloat84cmp(
       double precision,
       real
     ),
-    function 1 (
-      real,
-      double precision
-    )
-    pg_catalog.btfloat48cmp(
+    function 1 (real, double precision) pg_catalog.btfloat48cmp(
       real,
       double precision
     ),
-    function 3 (
-      real,
-      double precision
-    )
-    pg_catalog.in_range(
+    function 3 (real, double precision) pg_catalog.in_range(
       real,
       real,
       double precision,
@@ -48550,44 +47220,28 @@ alter operator family pg_catalog.integer_ops
     function 1 (integer, smallint) pg_catalog.btint42cmp(integer, smallint),
     function 1 (smallint, bigint) pg_catalog.btint28cmp(smallint, bigint),
     function 1 (smallint, integer) pg_catalog.btint24cmp(smallint, integer),
-    function 3 (
-      integer,
-      bigint
-    )
-    pg_catalog.in_range(
+    function 3 (integer, bigint) pg_catalog.in_range(
       integer,
       integer,
       bigint,
       boolean,
       boolean
     ),
-    function 3 (
-      integer,
-      smallint
-    )
-    pg_catalog.in_range(
+    function 3 (integer, smallint) pg_catalog.in_range(
       integer,
       integer,
       smallint,
       boolean,
       boolean
     ),
-    function 3 (
-      smallint,
-      bigint
-    )
-    pg_catalog.in_range(
+    function 3 (smallint, bigint) pg_catalog.in_range(
       smallint,
       smallint,
       bigint,
       boolean,
       boolean
     ),
-    function 3 (
-      smallint,
-      integer
-    )
-    pg_catalog.in_range(
+    function 3 (smallint, integer) pg_catalog.in_range(
       smallint,
       smallint,
       integer,
@@ -48637,22 +47291,14 @@ alter operator family pg_catalog.multirange_ops
     operator 7 pg_catalog.@> (anymultirange, anyrange),
     operator 8 pg_catalog.<@ (anymultirange, anyrange),
     operator 16 pg_catalog.@> (anymultirange, anyelement),
-    function 12 (
-      "any",
-      "any"
-    )
-    pg_catalog.gist_translate_cmptype_common(
+    function 12 ("any", "any") pg_catalog.gist_translate_cmptype_common(
       integer
     );
 
 alter operator family pg_catalog.network_ops
   using gist
   add
-    function 12 (
-      "any",
-      "any"
-    )
-    pg_catalog.gist_translate_cmptype_common(
+    function 12 ("any", "any") pg_catalog.gist_translate_cmptype_common(
       integer
     );
 
@@ -48668,11 +47314,7 @@ alter operator family pg_catalog.poly_ops
   add
     operator 15 pg_catalog.<-> (polygon, point)
     for order by pg_catalog.float_ops,
-    function 12 (
-      "any",
-      "any"
-    )
-    pg_catalog.gist_translate_cmptype_common(
+    function 12 ("any", "any") pg_catalog.gist_translate_cmptype_common(
       integer
     );
 
@@ -48704,11 +47346,7 @@ alter operator family pg_catalog.range_ops
     operator 7 pg_catalog.@> (anyrange, anymultirange),
     operator 8 pg_catalog.<@ (anyrange, anymultirange),
     operator 16 pg_catalog.@> (anyrange, anyelement),
-    function 12 (
-      "any",
-      "any"
-    )
-    pg_catalog.gist_translate_cmptype_common(
+    function 12 ("any", "any") pg_catalog.gist_translate_cmptype_common(
       integer
     );
 
@@ -48742,11 +47380,7 @@ alter operator family pg_catalog.text_ops
 alter operator family pg_catalog.time_ops
   using btree
   add
-    function 3 (
-      time without time zone,
-      interval
-    )
-    pg_catalog.in_range(
+    function 3 (time without time zone, interval) pg_catalog.in_range(
       time without time zone,
       time without time zone,
       interval,
@@ -48757,11 +47391,7 @@ alter operator family pg_catalog.time_ops
 alter operator family pg_catalog.timetz_ops
   using btree
   add
-    function 3 (
-      time with time zone,
-      interval
-    )
-    pg_catalog.in_range(
+    function 3 (time with time zone, interval) pg_catalog.in_range(
       time with time zone,
       time with time zone,
       interval,

@@ -6422,46 +6422,26 @@ create operator class brin_geography_inclusion_ops
     operator 3 && (geography, gidx),
     operator 3 && (gidx, geography),
     operator 3 && (gidx, gidx),
-    function 1 (
-      geography,
-      geography
-    )
-    pg_catalog.brin_inclusion_opcinfo(
+    function 1 (geography, geography) pg_catalog.brin_inclusion_opcinfo(
       internal
     ),
-    function 2 (
-      geography,
-      geography
-    )
-    geog_brin_inclusion_add_value(
+    function 2 (geography, geography) geog_brin_inclusion_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      geography,
-      geography
-    )
-    pg_catalog.brin_inclusion_consistent(
+    function 3 (geography, geography) pg_catalog.brin_inclusion_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      geography,
-      geography
-    )
-    pg_catalog.brin_inclusion_union(
+    function 4 (geography, geography) pg_catalog.brin_inclusion_union(
       internal,
       internal,
       internal
     ),
-    function 11 (
-      geography,
-      geography
-    )
-    geog_brin_inclusion_merge(
+    function 11 (geography, geography) geog_brin_inclusion_merge(
       internal,
       internal
     ),
@@ -6484,39 +6464,23 @@ create operator class brin_geometry_inclusion_ops_2d
     operator 8 @ (geometry, box2df),
     operator 8 @ (geometry, geometry),
     function 1 (geometry, geometry) pg_catalog.brin_inclusion_opcinfo(internal),
-    function 2 (
-      geometry,
-      geometry
-    )
-    geom2d_brin_inclusion_add_value(
+    function 2 (geometry, geometry) geom2d_brin_inclusion_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      geometry,
-      geometry
-    )
-    pg_catalog.brin_inclusion_consistent(
+    function 3 (geometry, geometry) pg_catalog.brin_inclusion_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      geometry,
-      geometry
-    )
-    pg_catalog.brin_inclusion_union(
+    function 4 (geometry, geometry) pg_catalog.brin_inclusion_union(
       internal,
       internal,
       internal
     ),
-    function 11 (
-      geometry,
-      geometry
-    )
-    geom2d_brin_inclusion_merge(
+    function 11 (geometry, geometry) geom2d_brin_inclusion_merge(
       internal,
       internal
     ),
@@ -6531,39 +6495,23 @@ create operator class brin_geometry_inclusion_ops_3d
     operator 3 &&& (gidx, geometry),
     operator 3 &&& (gidx, gidx),
     function 1 (geometry, geometry) pg_catalog.brin_inclusion_opcinfo(internal),
-    function 2 (
-      geometry,
-      geometry
-    )
-    geom3d_brin_inclusion_add_value(
+    function 2 (geometry, geometry) geom3d_brin_inclusion_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      geometry,
-      geometry
-    )
-    pg_catalog.brin_inclusion_consistent(
+    function 3 (geometry, geometry) pg_catalog.brin_inclusion_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      geometry,
-      geometry
-    )
-    pg_catalog.brin_inclusion_union(
+    function 4 (geometry, geometry) pg_catalog.brin_inclusion_union(
       internal,
       internal,
       internal
     ),
-    function 11 (
-      geometry,
-      geometry
-    )
-    geom3d_brin_inclusion_merge(
+    function 11 (geometry, geometry) geom3d_brin_inclusion_merge(
       internal,
       internal
     ),
@@ -6578,39 +6526,23 @@ create operator class brin_geometry_inclusion_ops_4d
     operator 3 &&& (gidx, geometry),
     operator 3 &&& (gidx, gidx),
     function 1 (geometry, geometry) pg_catalog.brin_inclusion_opcinfo(internal),
-    function 2 (
-      geometry,
-      geometry
-    )
-    geom4d_brin_inclusion_add_value(
+    function 2 (geometry, geometry) geom4d_brin_inclusion_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      geometry,
-      geometry
-    )
-    pg_catalog.brin_inclusion_consistent(
+    function 3 (geometry, geometry) pg_catalog.brin_inclusion_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      geometry,
-      geometry
-    )
-    pg_catalog.brin_inclusion_union(
+    function 4 (geometry, geometry) pg_catalog.brin_inclusion_union(
       internal,
       internal,
       internal
     ),
-    function 11 (
-      geometry,
-      geometry
-    )
-    geom4d_brin_inclusion_merge(
+    function 11 (geometry, geometry) geom4d_brin_inclusion_merge(
       internal,
       internal
     ),
@@ -6644,38 +6576,22 @@ create operator class gist_geography_ops
   default for type geography
   using gist
   family gist_geography_ops as
-    function 1 (
-      geography,
-      geography
-    )
-    geography_gist_consistent(
+    function 1 (geography, geography) geography_gist_consistent(
       internal,
       geography,
       integer
     ),
     function 2 (geography, geography) geography_gist_union(bytea, internal),
-    function 5 (
-      geography,
-      geography
-    )
-    geography_gist_penalty(
+    function 5 (geography, geography) geography_gist_penalty(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      geography,
-      geography
-    )
-    geography_gist_picksplit(
+    function 6 (geography, geography) geography_gist_picksplit(
       internal,
       internal
     ),
-    function 7 (
-      geography,
-      geography
-    )
-    geography_gist_same(
+    function 7 (geography, geography) geography_gist_same(
       box2d,
       box2d,
       internal
@@ -6686,38 +6602,22 @@ create operator class gist_geometry_ops_2d
   default for type geometry
   using gist
   family gist_geometry_ops_2d as
-    function 1 (
-      geometry,
-      geometry
-    )
-    geometry_gist_consistent_2d(
+    function 1 (geometry, geometry) geometry_gist_consistent_2d(
       internal,
       geometry,
       integer
     ),
     function 2 (geometry, geometry) geometry_gist_union_2d(bytea, internal),
-    function 5 (
-      geometry,
-      geometry
-    )
-    geometry_gist_penalty_2d(
+    function 5 (geometry, geometry) geometry_gist_penalty_2d(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      geometry,
-      geometry
-    )
-    geometry_gist_picksplit_2d(
+    function 6 (geometry, geometry) geometry_gist_picksplit_2d(
       internal,
       internal
     ),
-    function 7 (
-      geometry,
-      geometry
-    )
-    geometry_gist_same_2d(
+    function 7 (geometry, geometry) geometry_gist_same_2d(
       geometry,
       geometry,
       internal
@@ -6728,38 +6628,22 @@ create operator class gist_geometry_ops_nd
   for type geometry
   using gist
   family gist_geometry_ops_nd as
-    function 1 (
-      geometry,
-      geometry
-    )
-    geometry_gist_consistent_nd(
+    function 1 (geometry, geometry) geometry_gist_consistent_nd(
       internal,
       geometry,
       integer
     ),
     function 2 (geometry, geometry) geometry_gist_union_nd(bytea, internal),
-    function 5 (
-      geometry,
-      geometry
-    )
-    geometry_gist_penalty_nd(
+    function 5 (geometry, geometry) geometry_gist_penalty_nd(
       internal,
       internal,
       internal
     ),
-    function 6 (
-      geometry,
-      geometry
-    )
-    geometry_gist_picksplit_nd(
+    function 6 (geometry, geometry) geometry_gist_picksplit_nd(
       internal,
       internal
     ),
-    function 7 (
-      geometry,
-      geometry
-    )
-    geometry_gist_same_nd(
+    function 7 (geometry, geometry) geometry_gist_same_nd(
       geometry,
       geometry,
       internal
@@ -6778,43 +6662,23 @@ create operator class spgist_geography_ops_nd
   default for type geography
   using spgist
   family spgist_geography_ops_nd as
-    function 1 (
-      geography,
-      geography
-    )
-    geography_spgist_config_nd(
+    function 1 (geography, geography) geography_spgist_config_nd(
       internal,
       internal
     ),
-    function 2 (
-      geography,
-      geography
-    )
-    geography_spgist_choose_nd(
+    function 2 (geography, geography) geography_spgist_choose_nd(
       internal,
       internal
     ),
-    function 3 (
-      geography,
-      geography
-    )
-    geography_spgist_picksplit_nd(
+    function 3 (geography, geography) geography_spgist_picksplit_nd(
       internal,
       internal
     ),
-    function 4 (
-      geography,
-      geography
-    )
-    geography_spgist_inner_consistent_nd(
+    function 4 (geography, geography) geography_spgist_inner_consistent_nd(
       internal,
       internal
     ),
-    function 5 (
-      geography,
-      geography
-    )
-    geography_spgist_leaf_consistent_nd(
+    function 5 (geography, geography) geography_spgist_leaf_consistent_nd(
       internal,
       internal
     ),
@@ -6824,43 +6688,23 @@ create operator class spgist_geometry_ops_2d
   default for type geometry
   using spgist
   family spgist_geometry_ops_2d as
-    function 1 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_config_2d(
+    function 1 (geometry, geometry) geometry_spgist_config_2d(
       internal,
       internal
     ),
-    function 2 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_choose_2d(
+    function 2 (geometry, geometry) geometry_spgist_choose_2d(
       internal,
       internal
     ),
-    function 3 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_picksplit_2d(
+    function 3 (geometry, geometry) geometry_spgist_picksplit_2d(
       internal,
       internal
     ),
-    function 4 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_inner_consistent_2d(
+    function 4 (geometry, geometry) geometry_spgist_inner_consistent_2d(
       internal,
       internal
     ),
-    function 5 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_leaf_consistent_2d(
+    function 5 (geometry, geometry) geometry_spgist_leaf_consistent_2d(
       internal,
       internal
     ),
@@ -6870,43 +6714,23 @@ create operator class spgist_geometry_ops_3d
   for type geometry
   using spgist
   family spgist_geometry_ops_3d as
-    function 1 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_config_3d(
+    function 1 (geometry, geometry) geometry_spgist_config_3d(
       internal,
       internal
     ),
-    function 2 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_choose_3d(
+    function 2 (geometry, geometry) geometry_spgist_choose_3d(
       internal,
       internal
     ),
-    function 3 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_picksplit_3d(
+    function 3 (geometry, geometry) geometry_spgist_picksplit_3d(
       internal,
       internal
     ),
-    function 4 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_inner_consistent_3d(
+    function 4 (geometry, geometry) geometry_spgist_inner_consistent_3d(
       internal,
       internal
     ),
-    function 5 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_leaf_consistent_3d(
+    function 5 (geometry, geometry) geometry_spgist_leaf_consistent_3d(
       internal,
       internal
     ),
@@ -6916,43 +6740,23 @@ create operator class spgist_geometry_ops_nd
   for type geometry
   using spgist
   family spgist_geometry_ops_nd as
-    function 1 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_config_nd(
+    function 1 (geometry, geometry) geometry_spgist_config_nd(
       internal,
       internal
     ),
-    function 2 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_choose_nd(
+    function 2 (geometry, geometry) geometry_spgist_choose_nd(
       internal,
       internal
     ),
-    function 3 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_picksplit_nd(
+    function 3 (geometry, geometry) geometry_spgist_picksplit_nd(
       internal,
       internal
     ),
-    function 4 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_inner_consistent_nd(
+    function 4 (geometry, geometry) geometry_spgist_inner_consistent_nd(
       internal,
       internal
     ),
-    function 5 (
-      geometry,
-      geometry
-    )
-    geometry_spgist_leaf_consistent_nd(
+    function 5 (geometry, geometry) geometry_spgist_leaf_consistent_nd(
       internal,
       internal
     ),
@@ -7153,11 +6957,7 @@ alter operator family gist_geography_ops
     operator 13 <-> (geography, geography) for order by pg_catalog.float_ops,
     function 3 (geography, geography) geography_gist_compress(internal),
     function 4 (geography, geography) geography_gist_decompress(internal),
-    function 8 (
-      geography,
-      geography
-    )
-    geography_gist_distance(
+    function 8 (geography, geography) geography_gist_distance(
       internal,
       geography,
       integer
@@ -7182,11 +6982,7 @@ alter operator family gist_geometry_ops_2d
     operator 14 <#> (geometry, geometry) for order by pg_catalog.float_ops,
     function 3 (geometry, geometry) geometry_gist_compress_2d(internal),
     function 4 (geometry, geometry) geometry_gist_decompress_2d(internal),
-    function 8 (
-      geometry,
-      geometry
-    )
-    geometry_gist_distance_2d(
+    function 8 (geometry, geometry) geometry_gist_distance_2d(
       internal,
       geometry,
       integer
@@ -7204,11 +7000,7 @@ alter operator family gist_geometry_ops_nd
     operator 20 |=| (geometry, geometry) for order by pg_catalog.float_ops,
     function 3 (geometry, geometry) geometry_gist_compress_nd(internal),
     function 4 (geometry, geometry) geometry_gist_decompress_nd(internal),
-    function 8 (
-      geometry,
-      geometry
-    )
-    geometry_gist_distance_nd(
+    function 8 (geometry, geometry) geometry_gist_distance_nd(
       internal,
       geometry,
       integer

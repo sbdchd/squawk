@@ -865,11 +865,7 @@ create operator class h3index_gist_ops_experimental
   for type h3index
   using gist
   family h3index_gist_ops_experimental as
-    function 1 (
-      h3index,
-      h3index
-    )
-    h3index_gist_consistent(
+    function 1 (h3index, h3index) h3index_gist_consistent(
       internal,
       h3index,
       smallint,
@@ -877,11 +873,7 @@ create operator class h3index_gist_ops_experimental
       internal
     ),
     function 2 (h3index, h3index) h3index_gist_union(internal, internal),
-    function 5 (
-      h3index,
-      h3index
-    )
-    h3index_gist_penalty(
+    function 5 (h3index, h3index) h3index_gist_penalty(
       internal,
       internal,
       internal
@@ -900,30 +892,18 @@ create operator class h3index_minmax_ops
     operator 4 >= (h3index, h3index),
     operator 5 > (h3index, h3index),
     function 1 (h3index, h3index) pg_catalog.brin_minmax_opcinfo(internal),
-    function 2 (
-      h3index,
-      h3index
-    )
-    pg_catalog.brin_minmax_add_value(
+    function 2 (h3index, h3index) pg_catalog.brin_minmax_add_value(
       internal,
       internal,
       internal,
       internal
     ),
-    function 3 (
-      h3index,
-      h3index
-    )
-    pg_catalog.brin_minmax_consistent(
+    function 3 (h3index, h3index) pg_catalog.brin_minmax_consistent(
       internal,
       internal,
       internal
     ),
-    function 4 (
-      h3index,
-      h3index
-    )
-    pg_catalog.brin_minmax_union(
+    function 4 (h3index, h3index) pg_catalog.brin_minmax_union(
       internal,
       internal,
       internal
@@ -957,19 +937,11 @@ create operator class h3index_ops_experimental
     function 1 (h3index, h3index) h3index_spgist_config(internal, internal),
     function 2 (h3index, h3index) h3index_spgist_choose(internal, internal),
     function 3 (h3index, h3index) h3index_spgist_picksplit(internal, internal),
-    function 4 (
-      h3index,
-      h3index
-    )
-    h3index_spgist_inner_consistent(
+    function 4 (h3index, h3index) h3index_spgist_inner_consistent(
       internal,
       internal
     ),
-    function 5 (
-      h3index,
-      h3index
-    )
-    h3index_spgist_leaf_consistent(
+    function 5 (h3index, h3index) h3index_spgist_leaf_consistent(
       internal,
       internal
     ),
@@ -983,11 +955,7 @@ alter operator family h3index_gist_ops_experimental
     operator 7 @> (h3index, h3index),
     operator 8 <@ (h3index, h3index),
     operator 15 <-> (h3index, h3index) for order by pg_catalog.integer_ops,
-    function 8 (
-      h3index,
-      h3index
-    )
-    h3index_gist_distance(
+    function 8 (h3index, h3index) h3index_gist_distance(
       internal,
       h3index,
       smallint,

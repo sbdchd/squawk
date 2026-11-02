@@ -315,11 +315,7 @@ create operator class gin_trgm_ops
   using gin
   family gin_trgm_ops as
     function 2 (text, text) gin_extract_value_trgm(text, internal),
-    function 3 (
-      text,
-      text
-    )
-    gin_extract_query_trgm(
+    function 3 (text, text) gin_extract_query_trgm(
       text,
       internal,
       smallint,
@@ -334,11 +330,7 @@ create operator class gist_trgm_ops
   for type text
   using gist
   family gist_trgm_ops as
-    function 1 (
-      text,
-      text
-    )
-    gtrgm_consistent(
+    function 1 (text, text) gtrgm_consistent(
       internal,
       text,
       smallint,
@@ -363,11 +355,7 @@ alter operator family gin_trgm_ops
     operator 9 %>> (text, text),
     operator 11 pg_catalog.= (text, text),
     function 1 (text, text) pg_catalog.btint4cmp(integer, integer),
-    function 4 (
-      text,
-      text
-    )
-    gin_trgm_consistent(
+    function 4 (text, text) gin_trgm_consistent(
       internal,
       smallint,
       text,
@@ -377,11 +365,7 @@ alter operator family gin_trgm_ops
       internal,
       internal
     ),
-    function 6 (
-      text,
-      text
-    )
-    gin_trgm_triconsistent(
+    function 6 (text, text) gin_trgm_triconsistent(
       internal,
       smallint,
       text,
@@ -407,11 +391,7 @@ alter operator family gist_trgm_ops
     operator 11 pg_catalog.= (text, text),
     function 3 (text, text) gtrgm_compress(internal),
     function 4 (text, text) gtrgm_decompress(internal),
-    function 8 (
-      text,
-      text
-    )
-    gtrgm_distance(
+    function 8 (text, text) gtrgm_distance(
       internal,
       text,
       smallint,

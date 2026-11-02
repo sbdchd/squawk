@@ -13,8 +13,7 @@ alter /* operator */ operator /* family */ family /* name */ public.integer_fami
     /* function option */ function /* support */ 1 /* argument types */ (
       integer,
       integer
-    )
-    /* function */ public.compare_integer_values(
+    ) /* function */ public.compare_integer_values(
       integer,
       integer
     ) /* option comma */,

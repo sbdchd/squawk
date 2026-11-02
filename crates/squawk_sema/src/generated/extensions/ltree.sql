@@ -905,11 +905,7 @@ create operator class gist__ltree_ops
   default for type ltree[]
   using gist
   family gist__ltree_ops as
-    function 1 (
-      ltree[],
-      ltree[]
-    )
-    _ltree_consistent(
+    function 1 (ltree[], ltree[]) _ltree_consistent(
       internal,
       ltree[],
       smallint,
@@ -926,11 +922,7 @@ create operator class gist_ltree_ops
   default for type ltree
   using gist
   family gist_ltree_ops as
-    function 1 (
-      ltree,
-      ltree
-    )
-    ltree_consistent(
+    function 1 (ltree, ltree) ltree_consistent(
       internal,
       ltree,
       smallint,

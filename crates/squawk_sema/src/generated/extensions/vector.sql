@@ -1166,11 +1166,7 @@ create operator class halfvec_cosine_ops
   using hnsw
   family halfvec_cosine_ops as
     operator 1 <=> (halfvec, halfvec) for order by pg_catalog.float_ops,
-    function 1 (
-      halfvec,
-      halfvec
-    )
-    halfvec_negative_inner_product(
+    function 1 (halfvec, halfvec) halfvec_negative_inner_product(
       halfvec,
       halfvec
     ),
@@ -1183,11 +1179,7 @@ create operator class halfvec_cosine_ops
   using ivfflat
   family halfvec_cosine_ops as
     operator 1 <=> (halfvec, halfvec) for order by pg_catalog.float_ops,
-    function 1 (
-      halfvec,
-      halfvec
-    )
-    halfvec_negative_inner_product(
+    function 1 (halfvec, halfvec) halfvec_negative_inner_product(
       halfvec,
       halfvec
     ),
@@ -1202,11 +1194,7 @@ create operator class halfvec_ip_ops
   using hnsw
   family halfvec_ip_ops as
     operator 1 <#> (halfvec, halfvec) for order by pg_catalog.float_ops,
-    function 1 (
-      halfvec,
-      halfvec
-    )
-    halfvec_negative_inner_product(
+    function 1 (halfvec, halfvec) halfvec_negative_inner_product(
       halfvec,
       halfvec
     ),
@@ -1218,11 +1206,7 @@ create operator class halfvec_ip_ops
   using ivfflat
   family halfvec_ip_ops as
     operator 1 <#> (halfvec, halfvec) for order by pg_catalog.float_ops,
-    function 1 (
-      halfvec,
-      halfvec
-    )
-    halfvec_negative_inner_product(
+    function 1 (halfvec, halfvec) halfvec_negative_inner_product(
       halfvec,
       halfvec
     ),
@@ -1276,11 +1260,7 @@ create operator class sparsevec_cosine_ops
   using hnsw
   family sparsevec_cosine_ops as
     operator 1 <=> (sparsevec, sparsevec) for order by pg_catalog.float_ops,
-    function 1 (
-      sparsevec,
-      sparsevec
-    )
-    sparsevec_negative_inner_product(
+    function 1 (sparsevec, sparsevec) sparsevec_negative_inner_product(
       sparsevec,
       sparsevec
     ),
@@ -1293,11 +1273,7 @@ create operator class sparsevec_ip_ops
   using hnsw
   family sparsevec_ip_ops as
     operator 1 <#> (sparsevec, sparsevec) for order by pg_catalog.float_ops,
-    function 1 (
-      sparsevec,
-      sparsevec
-    )
-    sparsevec_negative_inner_product(
+    function 1 (sparsevec, sparsevec) sparsevec_negative_inner_product(
       sparsevec,
       sparsevec
     ),
@@ -1318,11 +1294,7 @@ create operator class sparsevec_l2_ops
   using hnsw
   family sparsevec_l2_ops as
     operator 1 <-> (sparsevec, sparsevec) for order by pg_catalog.float_ops,
-    function 1 (
-      sparsevec,
-      sparsevec
-    )
-    sparsevec_l2_squared_distance(
+    function 1 (sparsevec, sparsevec) sparsevec_l2_squared_distance(
       sparsevec,
       sparsevec
     ),

@@ -559,11 +559,7 @@ create operator class gin_hstore_ops
   using gin
   family gin_hstore_ops as
     function 2 (hstore, hstore) gin_extract_hstore(hstore, internal),
-    function 3 (
-      hstore,
-      hstore
-    )
-    gin_extract_hstore_query(
+    function 3 (hstore, hstore) gin_extract_hstore_query(
       hstore,
       internal,
       smallint,
@@ -576,11 +572,7 @@ create operator class gist_hstore_ops
   default for type hstore
   using gist
   family gist_hstore_ops as
-    function 1 (
-      hstore,
-      hstore
-    )
-    ghstore_consistent(
+    function 1 (hstore, hstore) ghstore_consistent(
       internal,
       hstore,
       smallint,
@@ -609,11 +601,7 @@ alter operator family gin_hstore_ops
     operator 10 ?| (hstore, text[]),
     operator 11 ?& (hstore, text[]),
     function 1 (hstore, hstore) pg_catalog.bttextcmp(text, text),
-    function 4 (
-      hstore,
-      hstore
-    )
-    gin_consistent_hstore(
+    function 4 (hstore, hstore) gin_consistent_hstore(
       internal,
       smallint,
       hstore,
