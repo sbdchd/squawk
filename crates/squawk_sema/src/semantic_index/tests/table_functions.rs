@@ -244,3 +244,74 @@ select x from rows from (s()) as r (x int);
       ╰╴                                   ━━━━━━━
     ");
 }
+
+#[test]
+fn rows_from_multiple_functions_outer_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+create function g() returns record language sql as 'select 1';
+select * from rows from (f(), g()) as r (x int, y text);
+select * from rows from (unnest(array[1], array['a'])) as r (x int, y text);
+"), @"
+    error: `rows from` with multiple functions cannot have a column definition list
+      ╭▸ 
+    4 │ select * from rows from (f(), g()) as r (x int, y text);
+      │                                         ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: put a separate column definition list for each function inside `rows from`
+    error: `rows from` with multiple functions cannot have a column definition list
+      ╭▸ 
+    5 │ select * from rows from (unnest(array[1], array['a'])) as r (x int, y text);
+      │                                                             ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: put a separate column definition list for each function inside `rows from`
+    ");
+}
+
+#[test]
+fn rows_from_duplicate_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+select * from rows from (f() as (x int)) as r (x int);
+"), @"
+    error: multiple column definition lists are not allowed for the same function
+      ╭▸ 
+    3 │ select * from rows from (f() as (x int)) as r (x int);
+      ╰╴                                              ━━━━━━━
+    ");
+}
+
+#[test]
+fn with_ordinality_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+select * from f() with ordinality as r (x int);
+select * from rows from (f()) with ordinality as r (x int);
+select * from unnest(array[1], array['a']) with ordinality as u (x int, y text);
+select * from rows from (f() as (x int)) with ordinality as r;
+select * from generate_series(1, 2) with ordinality as r (x, n);
+"), @"
+    error: `with ordinality` cannot be used with a column definition list
+      ╭▸ 
+    3 │ select * from f() with ordinality as r (x int);
+      │                                        ━━━━━━━
+      ╰╴
+    help: put the column definition list inside `rows from`
+      ╭╴
+    3 - select * from f() with ordinality as r (x int);
+    3 + select * from rows from (f() as (x int)) with ordinality as r;
+      ╰╴
+    error: `with ordinality` cannot be used with a column definition list
+      ╭▸ 
+    4 │ select * from rows from (f()) with ordinality as r (x int);
+      │                                                    ━━━━━━━
+      │
+      ╰ hint: put the column definition list inside `rows from`
+    error: `unnest` with multiple arguments cannot have a column definition list
+      ╭▸ 
+    5 │ select * from unnest(array[1], array['a']) with ordinality as u (x int, y text);
+      │                                                                 ━━━━━━━━━━━━━━━
+      │
+      ╰ hint: use a separate `unnest` call for each array inside `rows from`, each with its own column definition list
+    ");
+}

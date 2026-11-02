@@ -45,8 +45,9 @@ use crate::{
     sema_error::{
         ArgLabel, ColumnDefListReason, ConflictAction, ConflictRuleEvent, ConflictTargetKey,
         DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind,
-        OperandName, OperatorReplacement, OutsideSearchPath, SemaError, SetReturningConstruct,
-        Similar, SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
+        OperandName, OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, SemaError,
+        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
+        ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -696,6 +697,13 @@ fn call_arg_name(
             .or_else(|| Some(arg.syntax().clone())),
         Some(ast::FuncArgExpr::Expr(_)) | None => Some(arg.syntax().clone()),
     }
+}
+
+#[derive(Clone, Copy)]
+enum ColumnDefs<'a> {
+    None,
+    List(&'a ast::ColumnDefList),
+    Rejected,
 }
 
 struct FunctionSource {
@@ -14939,7 +14947,7 @@ impl Lowerer {
                     .alias()
                     .filter(|_| alias_columns.is_none())
                     .and_then(|alias| alias.name());
-                let column_defs = match alias_columns {
+                let column_def_list = match alias_columns {
                     Some(ast::FromAliasColumns::ColumnDefList(list)) => Some(list),
                     Some(ast::FromAliasColumns::ColumnList(_)) | None => None,
                 };
@@ -14949,11 +14957,30 @@ impl Lowerer {
                     columns,
                     scalar: function_scalar,
                 } = match function_item.call_expr() {
-                    Some(call) => self.lower_function_source(
-                        &call,
-                        scalar_alias.as_ref(),
-                        column_defs.as_ref(),
-                    ),
+                    Some(call) => {
+                        let column_defs = match &column_def_list {
+                            Some(list)
+                                if from_item.with_ordinality().is_some()
+                                    && expanded_unnest(&call).is_none() =>
+                            {
+                                let fix = OrdinalityColumnDefListFix {
+                                    call_range: call.syntax().text_range(),
+                                    alias: from_item
+                                        .alias()
+                                        .and_then(|alias| alias.name())
+                                        .map(|name| self.intern(&name.text())),
+                                };
+                                self.push_error(
+                                    list.syntax(),
+                                    SemaError::OrdinalityColumnDefList { fix: Some(fix) },
+                                );
+                                ColumnDefs::Rejected
+                            }
+                            Some(list) => ColumnDefs::List(list),
+                            None => ColumnDefs::None,
+                        };
+                        self.lower_function_source(&call, scalar_alias.as_ref(), column_defs)
+                    }
                     None => FunctionSource {
                         callee: None,
                         function: None,
@@ -15541,21 +15568,32 @@ impl Lowerer {
         rows_from_item: &ast::RowsFromItem,
         from_item: &ast::FromItem,
     ) -> FunctionColumns {
-        let outer_column_defs = match from_item.alias().and_then(|alias| alias.columns()) {
-            Some(ast::FromAliasColumns::ColumnDefList(list))
-                if rows_from_item.rows_from_args().nth(1).is_none() =>
-            {
-                Some(list)
+        let outer_list = match from_item.alias().and_then(|alias| alias.columns()) {
+            Some(ast::FromAliasColumns::ColumnDefList(list)) => Some(list),
+            Some(ast::FromAliasColumns::ColumnList(_)) | None => None,
+        };
+        let outer_column_defs = match &outer_list {
+            Some(list) if !single_rows_from_function(rows_from_item) => {
+                self.push_error(list.syntax(), SemaError::RowsFromColumnDefList);
+                ColumnDefs::Rejected
             }
-            Some(
-                ast::FromAliasColumns::ColumnDefList(_) | ast::FromAliasColumns::ColumnList(_),
-            )
-            | None => None,
+            Some(list) if from_item.with_ordinality().is_some() => {
+                self.push_error(
+                    list.syntax(),
+                    SemaError::OrdinalityColumnDefList { fix: None },
+                );
+                ColumnDefs::Rejected
+            }
+            Some(list) => ColumnDefs::List(list),
+            None => ColumnDefs::None,
         };
         let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in rows_from_item.rows_from_args() {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
                 (Some(call), Some(list)) => {
+                    if let ColumnDefs::List(outer) = outer_column_defs {
+                        self.push_error(outer.syntax(), SemaError::DuplicateColumnDefList);
+                    }
                     let srf_calls = self.srf_calls.len();
                     let LoweredCall { args, callee, .. } =
                         self.with_from_function(|this| this.lower_call_with_args(&call));
@@ -15575,7 +15613,7 @@ impl Lowerer {
                 (Some(call), None) => {
                     let FunctionSource {
                         columns, scalar, ..
-                    } = self.lower_function_source(&call, None, outer_column_defs.as_ref());
+                    } = self.lower_function_source(&call, None, outer_column_defs);
                     FunctionColumns { columns, scalar }
                 }
                 (None, Some(list)) => FunctionColumns {
@@ -15611,11 +15649,11 @@ impl Lowerer {
         &mut self,
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
-        column_defs: Option<&ast::ColumnDefList>,
+        column_defs: ColumnDefs<'_>,
     ) -> FunctionSource {
         if let Some(name_ref) = expanded_unnest(call) {
-            if let Some(column_defs) = column_defs {
-                self.push_error(column_defs.syntax(), SemaError::UnnestColumnDefList);
+            if let ColumnDefs::List(list) = column_defs {
+                self.push_error(list.syntax(), SemaError::UnnestColumnDefList);
             }
             return self.lower_expanded_unnest(call, &name_ref);
         }
@@ -15632,12 +15670,13 @@ impl Lowerer {
             };
         };
         match column_defs {
-            Some(list) => self.check_column_def_list(function, &args, list),
-            None => {
+            ColumnDefs::List(list) => self.check_column_def_list(function, &args, list),
+            ColumnDefs::None => {
                 if self.returns_anonymous_record(function) {
                     self.push_error(call.syntax(), SemaError::MissingColumnDefList);
                 }
             }
+            ColumnDefs::Rejected => {}
         }
         let FunctionColumns { columns, scalar } =
             self.function_columns(function, &args, call, scalar_alias);
@@ -24951,6 +24990,19 @@ fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
                 | ast::LitKind::Null(_)
         )
     )
+}
+
+fn single_rows_from_function(rows_from_item: &ast::RowsFromItem) -> bool {
+    let mut args = rows_from_item.rows_from_args();
+    match (args.next(), args.next()) {
+        (Some(arg), None) => {
+            arg.column_def_list().is_some()
+                || arg
+                    .call_expr()
+                    .is_none_or(|call| expanded_unnest(&call).is_none())
+        }
+        (Some(_), Some(_)) | (None, _) => false,
+    }
 }
 
 fn expanded_unnest(call: &ast::CallExpr) -> Option<ast::NameRef> {

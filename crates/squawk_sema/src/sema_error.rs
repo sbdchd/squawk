@@ -639,6 +639,11 @@ pub(crate) enum SemaError {
     UnexpectedColumnDefList {
         reason: ColumnDefListReason,
     },
+    RowsFromColumnDefList,
+    OrdinalityColumnDefList {
+        fix: Option<OrdinalityColumnDefListFix>,
+    },
+    DuplicateColumnDefList,
     TransitionRowVariable {
         row_range: TextRange,
     },
@@ -718,6 +723,12 @@ impl WindowClause {
             WindowClause::OrderBy => "`order by`",
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct OrdinalityColumnDefListFix {
+    pub(crate) call_range: TextRange,
+    pub(crate) alias: Option<Name>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1237,7 +1248,10 @@ impl SemaError {
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
             SemaError::MissingColumnDefList => DiagnosticKind::MissingColumnDefList,
-            SemaError::UnexpectedColumnDefList { .. } => DiagnosticKind::UnexpectedColumnDefList,
+            SemaError::UnexpectedColumnDefList { .. }
+            | SemaError::RowsFromColumnDefList
+            | SemaError::OrdinalityColumnDefList { .. }
+            | SemaError::DuplicateColumnDefList => DiagnosticKind::UnexpectedColumnDefList,
             SemaError::ConflictWithRules { .. }
             | SemaError::WholeRowConflictTarget
             | SemaError::ConflictOnSystemCatalog => DiagnosticKind::FeatureNotSupported,
@@ -1441,6 +1455,27 @@ impl SemaError {
                     fix: Fix {
                         title: format!("Insert `{target}`").into(),
                         edits: vec![Edit::insert(format!(" {target}"), insert_at)],
+                    },
+                }
+            }
+            SemaError::OrdinalityColumnDefList {
+                fix: Some(OrdinalityColumnDefListFix { call_range, alias }),
+            } => {
+                let suffix = match alias {
+                    Some(alias) => {
+                        format!(") with ordinality as {}", quote_ident(names.resolve(alias)))
+                    }
+                    None => ") with ordinality".to_owned(),
+                };
+                Suggestion {
+                    message: "put the column definition list inside `rows from`".into(),
+                    fix: Fix {
+                        title: "Move the column definition list inside `rows from`".into(),
+                        edits: vec![
+                            Edit::insert("rows from (", call_range.start()),
+                            Edit::replace(TextRange::new(call_range.end(), range.start()), " as "),
+                            Edit::insert(suffix, range.end()),
+                        ],
                     },
                 }
             }
@@ -1686,6 +1721,12 @@ impl SemaError {
             SemaError::UnnestColumnDefList => Some(
                 "use a separate `unnest` call for each array inside `rows from`, each with its own column definition list",
             ),
+            SemaError::RowsFromColumnDefList => Some(
+                "put a separate column definition list for each function inside `rows from`",
+            ),
+            SemaError::OrdinalityColumnDefList { fix: None } => {
+                Some("put the column definition list inside `rows from`")
+            }
             SemaError::UnresolvedOperator {
                 replacement: Some(_),
                 ..
@@ -1769,6 +1810,15 @@ impl SemaError {
                 Some("a column definition list is required for functions returning `record`")
             }
             SemaError::UnexpectedColumnDefList { reason } => Some(reason.message()),
+            SemaError::RowsFromColumnDefList => {
+                Some("`rows from` with multiple functions cannot have a column definition list")
+            }
+            SemaError::OrdinalityColumnDefList { .. } => {
+                Some("`with ordinality` cannot be used with a column definition list")
+            }
+            SemaError::DuplicateColumnDefList => {
+                Some("multiple column definition lists are not allowed for the same function")
+            }
             SemaError::TransitionRowVariable { .. } => {
                 Some("row variable naming in the `referencing` clause is not supported")
             }
@@ -1991,6 +2041,9 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::UnnestColumnDefList
             | SemaError::MissingColumnDefList
             | SemaError::UnexpectedColumnDefList { .. }
+            | SemaError::RowsFromColumnDefList
+            | SemaError::OrdinalityColumnDefList { .. }
+            | SemaError::DuplicateColumnDefList
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter { .. }
