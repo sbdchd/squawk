@@ -15608,6 +15608,9 @@ impl Lowerer {
                 scalar: None,
             };
         };
+        if column_defs.is_none() && self.returns_anonymous_record(function) {
+            self.push_error(call.syntax(), SemaError::MissingColumnDefList);
+        }
         let FunctionColumns { columns, scalar } =
             self.function_columns(function, &args, call, scalar_alias);
         FunctionSource {
@@ -15715,6 +15718,12 @@ impl Lowerer {
             },
             scalar: ty,
         }
+    }
+
+    fn returns_anonymous_record(&mut self, function: FunctionId) -> bool {
+        let record = self.builtin_type("record");
+        let function = &self.index.functions[function];
+        function.columns.is_none() && function.ret.is_some() && function.ret == record
     }
 
     fn function_row_columns(&self, function: FunctionId, args: &[CallArg]) -> Option<Columns> {

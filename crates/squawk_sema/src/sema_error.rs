@@ -635,6 +635,7 @@ pub(crate) enum SemaError {
     },
     RowLengthMismatch,
     UnnestColumnDefList,
+    MissingColumnDefList,
     TransitionRowVariable {
         row_range: TextRange,
     },
@@ -1209,6 +1210,7 @@ impl SemaError {
             | SemaError::ExclusionConflictArbiter { .. }
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
+            SemaError::MissingColumnDefList => DiagnosticKind::MissingColumnDefList,
             SemaError::ConflictWithRules { .. }
             | SemaError::WholeRowConflictTarget
             | SemaError::ConflictOnSystemCatalog => DiagnosticKind::FeatureNotSupported,
@@ -1736,6 +1738,9 @@ impl SemaError {
             SemaError::UnnestColumnDefList => {
                 Some("`unnest` with multiple arguments cannot have a column definition list")
             }
+            SemaError::MissingColumnDefList => {
+                Some("a column definition list is required for functions returning `record`")
+            }
             SemaError::TransitionRowVariable { .. } => {
                 Some("row variable naming in the `referencing` clause is not supported")
             }
@@ -1956,6 +1961,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::SubqueryTooManyColumns
             | SemaError::SubqueryTooFewColumns
             | SemaError::UnnestColumnDefList
+            | SemaError::MissingColumnDefList
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter { .. }

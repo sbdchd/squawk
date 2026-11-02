@@ -144,3 +144,41 @@ select x, y, unnest from t, unnest(ps, b);
 select x, y from t, unnest(ps);
 "), @"no diagnostics");
 }
+
+#[test]
+fn record_function_requires_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1, null::text';
+select * from f();
+select * from f() as t(id, name);
+select * from rows from (f());
+select * from f() as t(id int, name text);
+select * from rows from (f() as (id int, name text));
+select f();
+"), @"
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    3 │ select * from f();
+      ╰╴              ━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    4 │ select * from f() as t(id, name);
+      ╰╴              ━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    5 │ select * from rows from (f());
+      ╰╴                         ━━━
+    ");
+}
+
+#[test]
+fn record_function_with_known_columns() {
+    assert_snapshot!(check("
+create function f(out id int, out name text) language sql as 'select 1, null::text';
+create function g() returns table (id int) language sql as 'select 1';
+create function h() returns setof record language sql as 'select 1';
+select * from f();
+select * from g();
+select * from h() as t(id int);
+"), @"no diagnostics");
+}
