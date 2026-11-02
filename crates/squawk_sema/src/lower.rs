@@ -43,11 +43,11 @@ use crate::{
         TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ColumnDefListReason, ConflictAction, ConflictRuleEvent, ConflictTargetKey,
-        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind,
-        OperandName, OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, SemaError,
-        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
-        ViewColumnRename, WindowClause,
+        ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
+        ConflictTargetKey, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam,
+        LookupKind, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
+        OutsideSearchPath, SemaError, SetReturningConstruct, Similar, SimilarColumn, SimilarType,
+        TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -1321,7 +1321,6 @@ enum Condition {
     And,
     Or,
     Not,
-    Using,
     GraphWhere,
 }
 
@@ -1343,7 +1342,6 @@ impl Condition {
             | Condition::And
             | Condition::Or
             | Condition::Not
-            | Condition::Using
             | Condition::GraphWhere => None,
         }
     }
@@ -1364,8 +1362,37 @@ impl Condition {
             Condition::And => "and",
             Condition::Or => "or",
             Condition::Not => "not",
-            Condition::Using => "using",
         }
+    }
+}
+
+enum InList {
+    Single(ast::Expr),
+    Tuple(ast::TupleExpr),
+}
+
+impl InList {
+    fn new(rhs: &ast::Expr) -> Option<InList> {
+        if let ast::Expr::TupleExpr(tuple) = rhs {
+            return Some(InList::Tuple(tuple.clone()));
+        }
+        if let ast::Expr::ParenExpr(paren) = rhs
+            && paren.select_variant().is_none()
+            && let Some(expr) = paren.expr()
+        {
+            return Some(InList::Single(expr));
+        }
+        None
+    }
+
+    fn exprs(&self) -> impl Iterator<Item = ast::Expr> + '_ {
+        let (single, tuple) = match self {
+            InList::Single(expr) => (Some(expr.clone()), None),
+            InList::Tuple(tuple) => (None, Some(tuple)),
+        };
+        single
+            .into_iter()
+            .chain(tuple.into_iter().flat_map(ast::TupleExpr::exprs))
     }
 }
 
@@ -19329,6 +19356,45 @@ impl Lowerer {
         }
     }
 
+    fn lower_in_comparison(
+        &mut self,
+        op: &ast::BinOp,
+        lhs: &ast::Expr,
+        rhs: &ast::Expr,
+        list: &InList,
+    ) -> Option<Ty> {
+        let lhs_ty = self.lower_expr(lhs);
+        let left = expr_arg_type(Some(lhs), lhs_ty);
+        let mut common = CommonType::new(left);
+        let mut elements: SmallVec<[ArgType; 4]> = SmallVec::new();
+        for expr in list.exprs() {
+            let ty = self.lower_expr(&expr);
+            let arg = expr_arg_type(Some(&expr), ty);
+            common.push(&self.overloads(), arg);
+            elements.push(arg);
+        }
+        let common = common.finish();
+        self.lower_enum_comparison(lhs_ty, rhs);
+        if let ArgType::Known(ty) = common {
+            self.lower_enum_comparison(Some(ty), lhs);
+        }
+        if elements.len() > 1 && common != ArgType::Untyped {
+            return self.lower_bin_operator(op, left, common);
+        }
+        let comparison = if let ast::BinOp::NotIn(_) = op {
+            Comparison::NotIn
+        } else {
+            Comparison::In
+        };
+        for (expr, right) in list.exprs().zip(elements) {
+            let found = self.lower_bin_operator(op, left, right);
+            if let (ArgType::Known(left), ArgType::Known(right)) = (left, right) {
+                self.check_comparison(comparison, expr.syntax(), left, right, found);
+            }
+        }
+        self.builtin_type("bool")
+    }
+
     fn lower_in_list(&mut self, tuple: &ast::TupleExpr, left: ArgType) -> ArgType {
         let mut common = CommonType::new(left);
         for expr in tuple.exprs() {
@@ -20822,13 +20888,14 @@ impl Lowerer {
         let Some(name) = self.index.names.lookup("=") else {
             return;
         };
-        let left = Some(ArgType::Known(left));
-        let right = Some(ArgType::Known(right));
-        let Resolution::Operator(operator) = self.select_operator(None, name, left, right) else {
+        let left_arg = Some(ArgType::Known(left));
+        let right_arg = Some(ArgType::Known(right));
+        let Resolution::Operator(operator) = self.select_operator(None, name, left_arg, right_arg)
+        else {
             return;
         };
-        let found = self.operator_result_type(operator, left, right);
-        self.check_condition(Condition::Using, node, found);
+        let found = self.operator_result_type(operator, left_arg, right_arg);
+        self.check_comparison(Comparison::Using, node, left, right, found);
     }
 
     fn merge_inputs_column(&mut self, MergeInputs { left, right }: MergeInputs) -> ColumnId {
@@ -21329,6 +21396,14 @@ impl Lowerer {
                 }
                 if let Some(ast::BinOp::Overlaps(overlaps)) = &op {
                     return self.lower_overlaps(bin, overlaps);
+                }
+                if let Some(op @ (ast::BinOp::In(_) | ast::BinOp::NotIn(_))) = &op
+                    && let Some(lhs) = bin.lhs()
+                    && !matches!(lhs, ast::Expr::TupleExpr(_))
+                    && let Some(rhs) = bin.rhs()
+                    && let Some(list) = InList::new(&rhs)
+                {
+                    return self.lower_in_comparison(op, &lhs, &rhs, &list);
                 }
                 let lhs = bin.lhs();
                 let rhs = bin.rhs();
@@ -22590,6 +22665,28 @@ impl Lowerer {
             None => self.lower_expr(expr),
         };
         self.check_condition(condition, expr.syntax(), found);
+    }
+
+    fn check_comparison(
+        &mut self,
+        comparison: Comparison,
+        node: &SyntaxNode,
+        left: Ty,
+        right: Ty,
+        found: Option<Ty>,
+    ) {
+        if let Some(found) = found
+            && let Some(bool) = self.builtin_type("bool")
+            && self.overloads().rejects_arg(ArgType::Known(found), bool)
+        {
+            let error = SemaError::NonBoolComparison {
+                comparison,
+                left: self.index.ty_name(left),
+                right: self.index.ty_name(right),
+                found: self.index.ty_name(found),
+            };
+            self.push_error(node, error);
+        }
     }
 
     fn check_condition(&mut self, condition: Condition, node: &SyntaxNode, found: Option<Ty>) {

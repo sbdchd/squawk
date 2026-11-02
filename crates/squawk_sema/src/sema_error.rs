@@ -611,6 +611,12 @@ pub(crate) enum SemaError {
         expected: TyName,
         found: TyName,
     },
+    NonBoolComparison {
+        comparison: Comparison,
+        left: TyName,
+        right: TyName,
+        found: TyName,
+    },
     WindowOverride {
         name: Name,
         clause: WindowClause,
@@ -684,6 +690,30 @@ pub(crate) struct ViewColumnRename {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct DropRelation {
     pub(crate) keyword_range: Option<TextRange>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Comparison {
+    In,
+    NotIn,
+    Using,
+}
+
+impl Comparison {
+    fn operator(self) -> &'static str {
+        match self {
+            Comparison::In | Comparison::Using => "=",
+            Comparison::NotIn => "<>",
+        }
+    }
+
+    fn note(self) -> &'static str {
+        match self {
+            Comparison::In => "`in` compares each element using `=`",
+            Comparison::NotIn => "`not in` compares each element using `<>`",
+            Comparison::Using => "`using` compares the joined columns using `=`",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1282,6 +1312,7 @@ impl SemaError {
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::NonBoolComparison { .. } => DiagnosticKind::TypeMismatch,
             SemaError::TriggerReturnType { .. } | SemaError::OutParamResultType { .. } => {
                 DiagnosticKind::WrongReturnType
             }
@@ -1848,6 +1879,9 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::NonBoolComparison { comparison, .. } = *self {
+            return Some(Cow::Borrowed(comparison.note()));
+        }
         if let SemaError::PseudoTypeColumn { .. } = *self {
             return Some(Cow::Borrowed(
                 "pseudo-types can only be used for function arguments and return types",
@@ -2782,6 +2816,19 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "argument of `{keyword}` must be type `{}`, not type `{}`",
                 self.ty(expected),
+                self.ty(found)
+            ),
+            SemaError::NonBoolComparison {
+                comparison,
+                left,
+                right,
+                found,
+            } => write!(
+                f,
+                "operator `{} {} {}` must return type `bool`, not type `{}`",
+                self.ty(left),
+                comparison.operator(),
+                self.ty(right),
                 self.ty(found)
             ),
             SemaError::MissingArrayType { ty } => {

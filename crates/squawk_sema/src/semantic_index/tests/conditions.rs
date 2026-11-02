@@ -235,6 +235,65 @@ copy t from '/tmp/t' where a;
 }
 
 #[test]
+fn in_list() {
+    assert_snapshot!(check("
+create function eqi(int, text) returns int
+  language sql
+  return 1;
+create operator = (
+  leftarg = int,
+  rightarg = text,
+  function = eqi
+);
+create operator <> (
+  leftarg = int,
+  rightarg = text,
+  function = eqi
+);
+create table t (
+  a int,
+  b text
+);
+select 1 from t where a in (1, 2) and a in ('1', '2') and a in (1, 2.5);
+select 1 from t where a in ('x'::text);
+select 1 from t where a not in ('x'::text, 'y'::text);
+select 1 from t where a in (b);
+select 1 from t where a in (1, now());
+"), @"
+    error: operator `int4 = text` must return type `bool`, not type `int4`
+       ╭▸ 
+    20 │ select 1 from t where a in ('x'::text);
+       │                             ━━━━━━━━━
+       │
+       ╰ note: `in` compares each element using `=`
+    error: operator `int4 <> text` must return type `bool`, not type `int4`
+       ╭▸ 
+    21 │ select 1 from t where a not in ('x'::text, 'y'::text);
+       │                                 ━━━━━━━━━
+       │
+       ╰ note: `not in` compares each element using `<>`
+    error: operator `int4 <> text` must return type `bool`, not type `int4`
+       ╭▸ 
+    21 │ select 1 from t where a not in ('x'::text, 'y'::text);
+       │                                            ━━━━━━━━━
+       │
+       ╰ note: `not in` compares each element using `<>`
+    error: operator `int4 = text` must return type `bool`, not type `int4`
+       ╭▸ 
+    22 │ select 1 from t where a in (b);
+       │                             ━
+       │
+       ╰ note: `in` compares each element using `=`
+    error: operator does not exist: `int4 = timestamptz`
+       ╭▸ 
+    23 │ select 1 from t where a in (1, now());
+       │                         ━━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
 fn join_using() {
     assert_snapshot!(check("
 create function eqi(int, text) returns int
@@ -249,10 +308,12 @@ create table t (a int);
 create table p (a text);
 select 1 from t join p using (a);
 "), @"
-    error: argument of `using` must be type `bool`, not type `int4`
+    error: operator `int4 = text` must return type `bool`, not type `int4`
        ╭▸ 
     12 │ select 1 from t join p using (a);
-       ╰╴                              ━
+       │                               ━
+       │
+       ╰ note: `using` compares the joined columns using `=`
     ");
 }
 
