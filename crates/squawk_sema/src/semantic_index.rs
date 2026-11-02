@@ -102,6 +102,7 @@ pub enum DiagnosticKind {
     InvalidConflictArbiter,
     MissingReturning,
     MissingColumnDefList,
+    UnexpectedColumnDefList,
     MissingUniqueIndex,
     UniqueIndexNotSupported,
     DuplicateFunction,

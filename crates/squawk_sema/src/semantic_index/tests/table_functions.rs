@@ -182,3 +182,50 @@ select * from g();
 select * from h() as t(id int);
 "), @"no diagnostics");
 }
+
+#[test]
+fn column_def_list_not_allowed() {
+    assert_snapshot!(check("
+create type pair as (a int, b text);
+create function out_params(out id int, out name text) language sql as 'select 1, null::text';
+create function returns_table() returns table (id int, name text) language sql as 'select 1, null::text';
+create function composite() returns pair language sql as 'select 1, null::text';
+create function scalar() returns int language sql as 'select 1';
+create function single_out(out id int) language sql as 'select 1';
+select * from out_params() as t(id int, name text);
+select * from returns_table() as t(id int, name text);
+select * from composite() as t(a int, b text);
+select * from scalar() as t(id int);
+select * from single_out() as t(id int);
+select * from rows from (scalar() as (id int), composite() as (a int, b text));
+"), @"
+    error: a column definition list is redundant for a function with OUT parameters
+      ╭▸ 
+    8 │ select * from out_params() as t(id int, name text);
+      ╰╴                               ━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is redundant for a function with OUT parameters
+      ╭▸ 
+    9 │ select * from returns_table() as t(id int, name text);
+      ╰╴                                  ━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is redundant for a function returning a named composite type
+       ╭▸ 
+    10 │ select * from composite() as t(a int, b text);
+       ╰╴                              ━━━━━━━━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    11 │ select * from scalar() as t(id int);
+       ╰╴                           ━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    12 │ select * from single_out() as t(id int);
+       ╰╴                               ━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    13 │ select * from rows from (scalar() as (id int), composite() as (a int, b text));
+       ╰╴                                     ━━━━━━━━
+    error: a column definition list is redundant for a function returning a named composite type
+       ╭▸ 
+    13 │ select * from rows from (scalar() as (id int), composite() as (a int, b text));
+       ╰╴                                                              ━━━━━━━━━━━━━━━
+    ");
+}

@@ -43,10 +43,10 @@ use crate::{
         TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ConflictAction, ConflictRuleEvent, ConflictTargetKey, DropRelation, ErrorArg,
-        ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind, OperandName,
-        OperatorReplacement, OutsideSearchPath, SemaError, SetReturningConstruct, Similar,
-        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
+        ArgLabel, ColumnDefListReason, ConflictAction, ConflictRuleEvent, ConflictTargetKey,
+        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind,
+        OperandName, OperatorReplacement, OutsideSearchPath, SemaError, SetReturningConstruct,
+        Similar, SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -15542,8 +15542,16 @@ impl Lowerer {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
                 (Some(call), Some(list)) => {
                     let srf_calls = self.srf_calls.len();
-                    self.with_from_function(|this| this.lower_call(&call));
+                    let LoweredCall { args, callee, .. } =
+                        self.with_from_function(|this| this.lower_call_with_args(&call));
                     self.check_from_set_returning(srf_calls, Some(&call));
+                    if let Some(Callee {
+                        resolution: Resolution::Function(function),
+                        ..
+                    }) = callee
+                    {
+                        self.check_column_def_list(function, &args, &list);
+                    }
                     FunctionColumns {
                         columns: self.column_def_list_columns(&list),
                         scalar: None,
@@ -15608,8 +15616,13 @@ impl Lowerer {
                 scalar: None,
             };
         };
-        if column_defs.is_none() && self.returns_anonymous_record(function) {
-            self.push_error(call.syntax(), SemaError::MissingColumnDefList);
+        match column_defs {
+            Some(list) => self.check_column_def_list(function, &args, list),
+            None => {
+                if self.returns_anonymous_record(function) {
+                    self.push_error(call.syntax(), SemaError::MissingColumnDefList);
+                }
+            }
         }
         let FunctionColumns { columns, scalar } =
             self.function_columns(function, &args, call, scalar_alias);
@@ -15718,6 +15731,38 @@ impl Lowerer {
             },
             scalar: ty,
         }
+    }
+
+    fn check_column_def_list(
+        &mut self,
+        function: FunctionId,
+        args: &[CallArg],
+        list: &ast::ColumnDefList,
+    ) {
+        if let Some(reason) = self.column_def_list_reason(function, args) {
+            self.push_error(list.syntax(), SemaError::UnexpectedColumnDefList { reason });
+        }
+    }
+
+    fn column_def_list_reason(
+        &mut self,
+        function: FunctionId,
+        args: &[CallArg],
+    ) -> Option<ColumnDefListReason> {
+        let record = self.builtin_type("record");
+        if self.index.functions[function].columns.is_some()
+            && self.index.functions[function].ret == record
+        {
+            return Some(ColumnDefListReason::OutParams);
+        }
+        let ty = self.call_type(function, args)?;
+        if Some(ty) == record {
+            return None;
+        }
+        Some(match self.ty_columns(ty) {
+            Some(_) => ColumnDefListReason::NamedComposite,
+            None => ColumnDefListReason::NotRecord,
+        })
     }
 
     fn returns_anonymous_record(&mut self, function: FunctionId) -> bool {

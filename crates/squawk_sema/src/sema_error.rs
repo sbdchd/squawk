@@ -636,6 +636,9 @@ pub(crate) enum SemaError {
     RowLengthMismatch,
     UnnestColumnDefList,
     MissingColumnDefList,
+    UnexpectedColumnDefList {
+        reason: ColumnDefListReason,
+    },
     TransitionRowVariable {
         row_range: TextRange,
     },
@@ -713,6 +716,29 @@ impl WindowClause {
         match self {
             WindowClause::PartitionBy => "`partition by`",
             WindowClause::OrderBy => "`order by`",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ColumnDefListReason {
+    OutParams,
+    NamedComposite,
+    NotRecord,
+}
+
+impl ColumnDefListReason {
+    fn message(self) -> &'static str {
+        match self {
+            ColumnDefListReason::OutParams => {
+                "a column definition list is redundant for a function with OUT parameters"
+            }
+            ColumnDefListReason::NamedComposite => {
+                "a column definition list is redundant for a function returning a named composite type"
+            }
+            ColumnDefListReason::NotRecord => {
+                "a column definition list is only allowed for functions returning `record`"
+            }
         }
     }
 }
@@ -1211,6 +1237,7 @@ impl SemaError {
             | SemaError::MissingConflictTarget { .. } => DiagnosticKind::InvalidConflictArbiter,
             SemaError::DoSelectWithoutReturning { .. } => DiagnosticKind::MissingReturning,
             SemaError::MissingColumnDefList => DiagnosticKind::MissingColumnDefList,
+            SemaError::UnexpectedColumnDefList { .. } => DiagnosticKind::UnexpectedColumnDefList,
             SemaError::ConflictWithRules { .. }
             | SemaError::WholeRowConflictTarget
             | SemaError::ConflictOnSystemCatalog => DiagnosticKind::FeatureNotSupported,
@@ -1741,6 +1768,7 @@ impl SemaError {
             SemaError::MissingColumnDefList => {
                 Some("a column definition list is required for functions returning `record`")
             }
+            SemaError::UnexpectedColumnDefList { reason } => Some(reason.message()),
             SemaError::TransitionRowVariable { .. } => {
                 Some("row variable naming in the `referencing` clause is not supported")
             }
@@ -1962,6 +1990,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::SubqueryTooFewColumns
             | SemaError::UnnestColumnDefList
             | SemaError::MissingColumnDefList
+            | SemaError::UnexpectedColumnDefList { .. }
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
             | SemaError::NoConflictArbiter { .. }
