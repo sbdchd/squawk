@@ -196,10 +196,12 @@ impl TypeIndex {
         id: TypeId,
         category: Option<TypeCategory>,
         preferred: bool,
+        collatable: bool,
     ) {
         let ty = self.local_mut(id);
         ty.category = category;
         ty.preferred = preferred;
+        ty.collatable = collatable;
     }
 
     pub(crate) fn set_subscript(

@@ -325,6 +325,16 @@ impl IndexData {
         Some(ty)
     }
 
+    pub(crate) fn is_collatable(&self, ty: Ty) -> Option<bool> {
+        match self.base_type(ty)? {
+            Ty::Type(id) => Some(self.types[id].collatable),
+            Ty::Array(ElementTy::Type(id)) => self.is_collatable(Ty::Type(id)),
+            Ty::Array(ElementTy::Table(_) | ElementTy::Cte(_)) | Ty::Table(_) | Ty::Cte(_) => {
+                Some(false)
+            }
+        }
+    }
+
     pub fn type_name(&self, ty: Ty) -> TypeName<'_> {
         TypeName { index: self, ty }
     }

@@ -661,6 +661,7 @@ pub struct Type {
     pub(crate) slice_result: Option<Ty>,
     pub(crate) category: Option<TypeCategory>,
     pub(crate) preferred: bool,
+    pub(crate) collatable: bool,
     pub(crate) array_name: Option<Name>,
 }
 

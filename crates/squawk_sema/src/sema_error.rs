@@ -640,6 +640,20 @@ pub(crate) enum SemaError {
         reason: ColumnDefListReason,
     },
     RowsFromColumnDefList,
+    SetofColumn {
+        name: Name,
+    },
+    PseudoTypeColumn {
+        name: Name,
+        ty: TyName,
+    },
+    CollationNotSupported {
+        ty: TyName,
+    },
+    UnsupportedReturnType {
+        function: Name,
+        ty: TyName,
+    },
     OrdinalityColumnDefList {
         fix: Option<OrdinalityColumnDefListFix>,
     },
@@ -1252,6 +1266,12 @@ impl SemaError {
             | SemaError::RowsFromColumnDefList
             | SemaError::OrdinalityColumnDefList { .. }
             | SemaError::DuplicateColumnDefList => DiagnosticKind::UnexpectedColumnDefList,
+            SemaError::SetofColumn { .. } | SemaError::PseudoTypeColumn { .. } => {
+                DiagnosticKind::InvalidTableDefinition
+            }
+            SemaError::CollationNotSupported { .. } | SemaError::UnsupportedReturnType { .. } => {
+                DiagnosticKind::TypeMismatch
+            }
             SemaError::ConflictWithRules { .. }
             | SemaError::WholeRowConflictTarget
             | SemaError::ConflictOnSystemCatalog => DiagnosticKind::FeatureNotSupported,
@@ -1828,6 +1848,11 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::PseudoTypeColumn { .. } = *self {
+            return Some(Cow::Borrowed(
+                "pseudo-types can only be used for function arguments and return types",
+            ));
+        }
         if let SemaError::NoConflictArbiter {
             foreign_table: true,
         } = *self
@@ -2545,6 +2570,26 @@ impl fmt::Display for ErrorMessage<'_> {
                 "cannot change name of view column `{}` to `{}`",
                 n(from),
                 n(to)
+            ),
+            SemaError::SetofColumn { name } => {
+                write!(f, "column `{}` cannot be declared `setof`", n(name))
+            }
+            SemaError::PseudoTypeColumn { name, ty } => {
+                write!(
+                    f,
+                    "column `{}` cannot have pseudo-type `{}`",
+                    n(name),
+                    self.ty(ty)
+                )
+            }
+            SemaError::CollationNotSupported { ty } => {
+                write!(f, "collations are not supported by type `{}`", self.ty(ty))
+            }
+            SemaError::UnsupportedReturnType { function, ty } => write!(
+                f,
+                "function `{}` in `from` has unsupported return type `{}`",
+                n(function),
+                self.ty(ty)
             ),
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
                 f,

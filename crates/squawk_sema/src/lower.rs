@@ -11203,6 +11203,7 @@ impl Lowerer {
         let mut generated_subscript = None;
         let mut category = None;
         let mut preferred = false;
+        let mut collatable = false;
         let mut kind = TypeKind::Type;
         match create_type.kind() {
             Some(ast::CreateTypeKind::CompositeType(composite)) => {
@@ -11325,6 +11326,7 @@ impl Lowerer {
                 generated_subscript = self.generated_subscript_results(create_type.syntax());
                 category = Some(options.category);
                 preferred = options.preferred;
+                collatable = options.collatable;
             }
             Some(ast::CreateTypeKind::EnumType(_)) => kind = TypeKind::Enum,
             None => kind = TypeKind::Shell,
@@ -11373,7 +11375,7 @@ impl Lowerer {
             subscript_results.result,
             subscript_results.slice,
         );
-        types.set_category(range, category, preferred);
+        types.set_category(range, category, preferred, collatable);
         if let Some(multirange_name) = multirange_name {
             self.alloc_multirange_type(range, multirange_name);
         }
@@ -11463,6 +11465,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                collatable: false,
                 array_name,
             },
             &self.index.columns,
@@ -12188,6 +12191,7 @@ impl Lowerer {
         let mut subscript = SubscriptOption::Unset;
         let mut category = TypeCategory::User;
         let mut preferred = false;
+        let mut collatable = false;
         for option in options {
             let Some(name) = attribute_name(&option) else {
                 continue;
@@ -12257,6 +12261,11 @@ impl Lowerer {
                         value.literal().and_then(|literal| literal.bool_value()) == Some(true)
                     });
                 }
+                "collatable" => {
+                    collatable = value.is_none_or(|value| {
+                        value.literal().and_then(|literal| literal.bool_value()) == Some(true)
+                    });
+                }
                 _ => {}
             }
         }
@@ -12265,6 +12274,7 @@ impl Lowerer {
             subscript,
             category,
             preferred,
+            collatable,
         }
     }
 
@@ -15421,10 +15431,17 @@ impl Lowerer {
 
     fn column_def_list_columns(&mut self, list: &ast::ColumnDefList) -> Columns {
         let start = self.index.columns.next_idx();
+        let mut seen: SmallVec<[Name; 8]> = smallvec![];
         for column_def in list.column_defs() {
             let ty = column_def.ty().and_then(|ty| self.lower_type(&ty));
             if let Some(collate) = column_def.collate() {
                 self.lower_collate(&collate);
+                if let Some(ty) = ty
+                    && self.index.is_collatable(ty) == Some(false)
+                {
+                    let ty = self.index.ty_name(ty);
+                    self.push_error(collate.syntax(), SemaError::CollationNotSupported { ty });
+                }
             }
             let Some(column_name) = column_def.name() else {
                 continue;
@@ -15433,6 +15450,25 @@ impl Lowerer {
                 ty,
                 ..self.column_def(&column_name)
             };
+            if let Some(name) = column.name {
+                if column_def.ty().is_some_and(|ty| ty.setof_token().is_some()) {
+                    self.push_error(column_def.syntax(), SemaError::SetofColumn { name });
+                } else if let Some(ty) = ty
+                    && self.is_pseudo_column_type(ty)
+                {
+                    let ty = self.index.ty_name(ty);
+                    self.push_error(
+                        column_def.syntax(),
+                        SemaError::PseudoTypeColumn { name, ty },
+                    );
+                }
+                if seen.contains(&name) {
+                    let error = SemaError::ColumnSpecifiedMoreThanOnce { name };
+                    self.push_error(column_name.syntax(), error);
+                } else {
+                    seen.push(name);
+                }
+            }
             self.alloc_column_def(column);
         }
         Columns {
@@ -15669,6 +15705,19 @@ impl Lowerer {
                 scalar: None,
             };
         };
+        if let Some(ty) = self.unsupported_return_type(function, &args) {
+            let error = SemaError::UnsupportedReturnType {
+                function: self.index.functions[function].name,
+                ty: self.index.ty_name(ty),
+            };
+            self.push_error(call.syntax(), error);
+            return FunctionSource {
+                callee,
+                function: Some(function),
+                columns: self.unknown_columns(),
+                scalar: None,
+            };
+        }
         match column_defs {
             ColumnDefs::List(list) => self.check_column_def_list(function, &args, list),
             ColumnDefs::None => {
@@ -15817,6 +15866,26 @@ impl Lowerer {
             Some(_) => ColumnDefListReason::NamedComposite,
             None => ColumnDefListReason::NotRecord,
         })
+    }
+
+    fn is_pseudo_column_type(&mut self, ty: Ty) -> bool {
+        let record = self.builtin_type("record");
+        Some(ty) != record
+            && matches!(ty, Ty::Type(id) if self.index.types[id].category == Some(TypeCategory::Pseudo))
+    }
+
+    fn unsupported_return_type(&mut self, function: FunctionId, args: &[CallArg]) -> Option<Ty> {
+        let ty = self.call_type(function, args)?;
+        let Ty::Type(id) = ty else {
+            return None;
+        };
+        if self.index.types[id].category != Some(TypeCategory::Pseudo) {
+            return None;
+        }
+        let supported = ["record", "void", "cstring"]
+            .into_iter()
+            .any(|name| self.builtin_type(name) == Some(ty));
+        (!supported).then_some(ty)
     }
 
     fn returns_anonymous_record(&mut self, function: FunctionId) -> bool {
@@ -24032,6 +24101,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                collatable: false,
                 array_name,
             },
             &self.index.columns,
@@ -24088,6 +24158,7 @@ impl Lowerer {
                 slice_result: None,
                 category: None,
                 preferred: false,
+                collatable: false,
                 array_name,
             },
             &self.index.columns,
@@ -24892,6 +24963,7 @@ struct BaseTypeOptions {
     subscript: SubscriptOption,
     category: TypeCategory,
     preferred: bool,
+    collatable: bool,
 }
 
 fn params_conflict(a: ParamMode, b: ParamMode) -> bool {
