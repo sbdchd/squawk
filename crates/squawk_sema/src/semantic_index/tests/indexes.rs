@@ -392,3 +392,97 @@ drop index r_expr;
        ╰╴           ━━━━━━
     ");
 }
+
+#[test]
+fn no_default_operator_class() {
+    assert_snapshot!(check("
+create domain dj as json;
+create type comp as (
+  a int
+);
+create type mood as enum (
+  'a'
+);
+create table t (
+  j json,
+  x xml,
+  p point,
+  s text,
+  b jsonb,
+  v tsvector,
+  ai int[],
+  c comp,
+  m mood,
+  d dj,
+  i int
+);
+create table k1 (j json primary key);
+create table k2 (x xml unique);
+create table k3 (d dj primary key);
+create table k4 (
+  ai int[] primary key,
+  c comp unique,
+  m mood unique
+);
+create index on t (p);
+create index on t using gin (s);
+create index on t using gin (b);
+create index on t using gist (v);
+create index on t ((j -> 'a'));
+create index on t using hash (j);
+create index on t (i) include (j);
+create index on t (s text_pattern_ops);
+alter table t add primary key (x);
+create extension btree_gin;
+create index on t using gin (s);
+"), @"
+    error: data type `json` has no default operator class for access method `btree`
+       ╭▸ 
+    22 │ create table k1 (j json primary key);
+       │                         ━━━━━━━━━━━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `xml` has no default operator class for access method `btree`
+       ╭▸ 
+    23 │ create table k2 (x xml unique);
+       │                        ━━━━━━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `dj` has no default operator class for access method `btree`
+       ╭▸ 
+    24 │ create table k3 (d dj primary key);
+       │                       ━━━━━━━━━━━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `point` has no default operator class for access method `btree`
+       ╭▸ 
+    30 │ create index on t (p);
+       │                    ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `text` has no default operator class for access method `gin`
+       ╭▸ 
+    31 │ create index on t using gin (s);
+       │                              ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `json` has no default operator class for access method `btree`
+       ╭▸ 
+    34 │ create index on t ((j -> 'a'));
+       │                    ━━━━━━━━━━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `json` has no default operator class for access method `hash`
+       ╭▸ 
+    35 │ create index on t using hash (j);
+       │                               ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `xml` has no default operator class for access method `btree`
+       ╭▸ 
+    38 │ alter table t add primary key (x);
+       │                   ━━━━━━━━━━━━━━━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    ");
+}

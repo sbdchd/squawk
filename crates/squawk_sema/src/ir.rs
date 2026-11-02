@@ -310,6 +310,9 @@ pub struct OperatorClass {
     pub schema: Name,
     pub name: Name,
     pub access_method: Option<AccessMethodId>,
+    pub(crate) ty: Option<Ty>,
+    pub(crate) default: bool,
+    pub(crate) family: Option<OperatorFamilyId>,
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     pub name_ptr: InIrFile<SyntaxNodePtr>,
 }
@@ -507,6 +510,7 @@ pub(crate) struct Cast {
     pub(crate) source: Ty,
     pub(crate) target: Ty,
     pub(crate) context: CastContext,
+    pub(crate) binary: bool,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::CreateCast>>,
 }

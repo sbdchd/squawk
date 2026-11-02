@@ -81,6 +81,7 @@ impl Lowerer {
             aggregate_calls: vec![],
             srf_calls: vec![],
             array_cast: false,
+            foreign_keys: vec![],
             pending_foreign_keys: vec![],
             generated_refs: vec![],
             function: None,
@@ -383,6 +384,7 @@ pub(crate) struct Lowerer {
     aggregate_calls: Vec<AggregateCall>,
     srf_calls: Vec<SrfCall>,
     array_cast: bool,
+    foreign_keys: Vec<ForeignKey>,
     pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
@@ -585,10 +587,48 @@ struct RelationSource {
     columns: Columns,
 }
 
-struct PendingForeignKey {
+enum DefaultClass {
+    Found(OperatorClassId),
+    Missing,
+    Unknown,
+}
+
+#[derive(Default)]
+struct DefaultMatches {
+    first: Option<OperatorClassId>,
+    count: usize,
+}
+
+impl DefaultMatches {
+    fn push(&mut self, class: OperatorClassId) {
+        self.first.get_or_insert(class);
+        self.count += 1;
+    }
+}
+
+#[derive(Clone, Copy)]
+struct ClassInput {
+    ty: Option<Ty>,
+    default: bool,
+    family: Option<OperatorFamilyId>,
+}
+
+struct ForeignKey {
     table: TableId,
     columns: Option<SmallVec<[Name; 4]>>,
     ptr: InIrFile<SyntaxNodePtr>,
+    referencing: Referencing,
+}
+
+struct PendingForeignKey {
+    foreign_key: usize,
+    alter: Option<InIrFile<SyntaxNodePtr>>,
+}
+
+struct Referencing {
+    table: TableId,
+    columns: SmallVec<[Name; 4]>,
+    constraint: ConstraintId,
 }
 
 #[derive(Clone, Copy)]
@@ -5753,11 +5793,20 @@ impl Lowerer {
             .operator_family_clause()
             .and_then(|clause| clause.op_family_ref())
             .and_then(|family| family.path_ref());
-        if let Some(path) = &family_ref {
-            self.lower_operator_family_ref(path, access_method, IfMissing::Error);
-        }
-        let class =
-            self.alloc_create_operator_class(create_class, access_method, family_ref.is_some());
+        let family = family_ref
+            .as_ref()
+            .and_then(|path| self.lower_operator_family_ref(path, access_method, IfMissing::Error));
+        let input = ClassInput {
+            ty,
+            default: create_class.default_token().is_some(),
+            family,
+        };
+        let class = self.alloc_create_operator_class(
+            create_class,
+            access_method,
+            family_ref.is_some(),
+            input,
+        );
         if let Some(options) = create_class.operator_class_option_list() {
             self.lower_operator_class_options(&options, ty, class.map(MemberOwner::Class));
         }
@@ -5768,23 +5817,24 @@ impl Lowerer {
         create_class: &ast::CreateOperatorClass,
         access_method: Option<AccessMethodId>,
         has_family: bool,
+        mut input: ClassInput,
     ) -> Option<OperatorClassId> {
         let path = create_class.op_class_name()?.path()?;
         let segment = path.segment()?;
         let schema = self.creation_schema(&path);
         let name = self.intern(&segment.text());
-        if !has_family
-            && self
-                .find_operator_family_in(schema, name, access_method)
-                .is_none()
-        {
-            self.alloc_operator_family(
-                create_class.syntax(),
-                segment.syntax(),
-                schema,
-                name,
-                access_method,
-            );
+        if !has_family {
+            let family = match self.find_operator_family_in(schema, name, access_method) {
+                Some(family) => family,
+                None => self.alloc_operator_family(
+                    create_class.syntax(),
+                    segment.syntax(),
+                    schema,
+                    name,
+                    access_method,
+                ),
+            };
+            input.family = Some(family);
         }
         if self.has_operator_class(schema, name, access_method) {
             self.report_duplicate_for_access_method(
@@ -5800,6 +5850,7 @@ impl Lowerer {
             schema,
             name,
             access_method,
+            input,
         ))
     }
 
@@ -5993,6 +6044,9 @@ impl Lowerer {
                     let OperatorClass {
                         schema,
                         access_method,
+                        ty,
+                        default,
+                        family,
                         ..
                     } = self.index.operator_classes[class];
                     let name = self.intern(&segment.text());
@@ -6012,6 +6066,11 @@ impl Lowerer {
                         schema,
                         name,
                         access_method,
+                        ClassInput {
+                            ty,
+                            default,
+                            family,
+                        },
                     );
                     self.copy_comment(Item::OperatorClass(class), Item::OperatorClass(id));
                     self.move_operator_family_members(
@@ -6032,6 +6091,9 @@ impl Lowerer {
                         name,
                         access_method,
                         name_ptr,
+                        ty,
+                        default,
+                        family,
                         ..
                     } = self.index.operator_classes[class];
                     if self.has_operator_class(schema, name, access_method) {
@@ -6048,6 +6110,9 @@ impl Lowerer {
                         schema,
                         name,
                         access_method,
+                        ty,
+                        default,
+                        family,
                         ptr: self.ptr(alter_class.syntax()),
                         name_ptr,
                     });
@@ -6105,11 +6170,19 @@ impl Lowerer {
         schema: Name,
         name: Name,
         access_method: Option<AccessMethodId>,
+        ClassInput {
+            ty,
+            default,
+            family,
+        }: ClassInput,
     ) -> OperatorClassId {
         let id = self.index.operator_classes.alloc(OperatorClass {
             schema,
             name,
             access_method,
+            ty,
+            default,
+            family,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node),
         });
@@ -9877,7 +9950,9 @@ impl Lowerer {
         let types = create_cast
             .cast_sig()
             .and_then(|cast_sig| self.lower_cast_sig(&cast_sig, IfMissing::Error));
-        match create_cast.cast_method() {
+        let cast_method = create_cast.cast_method();
+        let binary = matches!(cast_method, Some(ast::CastMethod::WithoutFunction(_)));
+        match cast_method {
             Some(ast::CastMethod::WithFunction(with_function)) => {
                 if let Some(function_sig) = with_function.function_sig() {
                     self.lower_function_sig(&function_sig);
@@ -9897,6 +9972,7 @@ impl Lowerer {
             source: types.source,
             target: types.target,
             context,
+            binary,
             ptr: InIrFile::new(self.file_id, AstPtr::new(create_cast)),
         });
         self.depend_on_refs(refs, self.index.casts.range_from(start), Object::Cast);
@@ -16784,6 +16860,7 @@ impl Lowerer {
                 {
                     self.set_table_column_type(table, column, ty);
                     self.set_inherited_column_type(table, column, ty);
+                    self.revalidate_foreign_keys(table, column, alter_column.syntax());
                 }
             }
             Some(ast::AlterColumnOption::SetDefault(set_default)) => {
@@ -17114,17 +17191,29 @@ impl Lowerer {
         });
         let table = table.flatten();
         self.set_visible((0..self.scope_sources_len()).into());
-        for list in create_index.partition_item_list().into_iter().chain(
-            create_index
-                .index_include_clause()
-                .and_then(|include| include.partition_item_list()),
-        ) {
+        let include = create_index
+            .index_include_clause()
+            .and_then(|include| include.partition_item_list());
+        for (list, is_key) in create_index
+            .partition_item_list()
+            .map(|list| (list, true))
+            .into_iter()
+            .chain(include.map(|list| (list, false)))
+        {
             for item in list.partition_items() {
-                if let Some(path) = item.op_class_ref().and_then(|op_class| op_class.path_ref()) {
+                let op_class = item.op_class_ref();
+                if let Some(path) = op_class.as_ref().and_then(|op_class| op_class.path_ref()) {
                     self.lower_operator_class_ref(&path, access_method, IfMissing::Error);
                 }
                 if let Some(expr) = item.expr() {
-                    self.lower_expr_in(ExprContext::IndexExpression, &expr);
+                    let ty = self.lower_expr_in(ExprContext::IndexExpression, &expr);
+                    if is_key
+                        && op_class.is_none()
+                        && let Some(ty) = ty
+                        && let Some(access_method) = access_method
+                    {
+                        self.check_default_operator_class(access_method, ty, expr.syntax());
+                    }
                 }
             }
         }
@@ -19051,6 +19140,9 @@ impl Lowerer {
                 SemaError::MultiplePrimaryKeys { table },
             );
         }
+        if index.is_none() {
+            self.check_key_operator_classes(table, &columns[..key_len], primary_key.syntax());
+        }
         let name = primary_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
@@ -19121,6 +19213,9 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
+        if index.is_none() {
+            self.check_key_operator_classes(table, &columns[..key_len], unique.syntax());
+        }
         let name = unique
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
@@ -19919,23 +20014,6 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        if let Some(referenced) = referenced
-            && let Some(table_name_ref) = table_name_ref
-        {
-            match to_columns {
-                Some(list) if list.period_column().is_some() => {}
-                Some(list) => self.pending_foreign_keys.push(PendingForeignKey {
-                    table: referenced,
-                    columns: Some(referenced_columns),
-                    ptr: self.ptr(list.syntax()),
-                }),
-                None => self.pending_foreign_keys.push(PendingForeignKey {
-                    table: referenced,
-                    columns: None,
-                    ptr: self.ptr(table_name_ref.syntax()),
-                }),
-            }
-        }
         let name = match foreign_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name())
@@ -19961,6 +20039,30 @@ impl Lowerer {
             name,
             None,
         );
+        if let Some(referenced) = referenced
+            && let Some(table_name_ref) = table_name_ref
+        {
+            let referencing = Referencing {
+                table,
+                columns,
+                constraint,
+            };
+            match to_columns {
+                Some(list) if list.period_column().is_some() => {}
+                Some(list) => self.add_foreign_key(ForeignKey {
+                    table: referenced,
+                    columns: Some(referenced_columns),
+                    ptr: self.ptr(list.syntax()),
+                    referencing,
+                }),
+                None => self.add_foreign_key(ForeignKey {
+                    table: referenced,
+                    columns: None,
+                    ptr: self.ptr(table_name_ref.syntax()),
+                    referencing,
+                }),
+            }
+        }
         self.depend_on_refs(refs, IdxRange::single(constraint), Object::Constraint);
     }
 
@@ -19984,18 +20086,6 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        if let Some(referenced) = referenced
-            && let Some(node) = column_ref
-                .as_ref()
-                .map(|column_ref| column_ref.syntax())
-                .or_else(|| table_name_ref.as_ref().map(|name| name.syntax()))
-        {
-            self.pending_foreign_keys.push(PendingForeignKey {
-                table: referenced,
-                columns: referenced_column.map(|column| smallvec![column]),
-                ptr: self.ptr(node),
-            });
-        }
         let name = match references
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name())
@@ -20017,6 +20107,23 @@ impl Lowerer {
             name,
             None,
         );
+        if let Some(referenced) = referenced
+            && let Some(node) = column_ref
+                .as_ref()
+                .map(|column_ref| column_ref.syntax())
+                .or_else(|| table_name_ref.as_ref().map(|name| name.syntax()))
+        {
+            self.add_foreign_key(ForeignKey {
+                table: referenced,
+                columns: referenced_column.map(|column| smallvec![column]),
+                ptr: self.ptr(node),
+                referencing: Referencing {
+                    table,
+                    columns: column.into_iter().collect(),
+                    constraint,
+                },
+            });
+        }
         self.depend_on_refs(refs, IdxRange::single(constraint), Object::Constraint);
     }
 
@@ -20038,19 +20145,85 @@ impl Lowerer {
         columns
     }
 
+    fn add_foreign_key(&mut self, foreign_key: ForeignKey) {
+        self.pending_foreign_keys.push(PendingForeignKey {
+            foreign_key: self.foreign_keys.len(),
+            alter: None,
+        });
+        self.foreign_keys.push(foreign_key);
+    }
+
+    fn revalidate_foreign_keys(&mut self, table: TableId, column: Name, node: &SyntaxNode) {
+        let alter = Some(self.ptr(node));
+        let in_primary_key = self
+            .inherited_primary_key(table)
+            .and_then(|constraint| self.index.constraints[constraint].index)
+            .and_then(|index| self.index.indexes.key(index))
+            .is_some_and(|mut key| key.any(|name| name == column));
+        for (index, foreign_key) in self.foreign_keys.iter().enumerate() {
+            let referencing = foreign_key.referencing.table == table
+                && foreign_key.referencing.columns.contains(&column);
+            let referenced = foreign_key.table == table
+                && foreign_key
+                    .columns
+                    .as_ref()
+                    .map_or(in_primary_key, |columns| columns.contains(&column));
+            if referencing || referenced {
+                self.pending_foreign_keys.push(PendingForeignKey {
+                    foreign_key: index,
+                    alter,
+                });
+            }
+        }
+    }
+
     fn check_foreign_keys(&mut self) {
         let mut pending = std::mem::take(&mut self.pending_foreign_keys);
-        for foreign_key in pending.drain(..) {
-            self.check_foreign_key(foreign_key);
+        let foreign_keys = std::mem::take(&mut self.foreign_keys);
+        for PendingForeignKey { foreign_key, alter } in pending.drain(..) {
+            let foreign_key = &foreign_keys[foreign_key];
+            match alter {
+                Some(alter) => self.revalidate_foreign_key(foreign_key, alter),
+                None => self.check_foreign_key(foreign_key),
+            }
         }
+        self.foreign_keys = foreign_keys;
         self.pending_foreign_keys = pending;
     }
 
-    fn check_foreign_key(&mut self, foreign_key: PendingForeignKey) {
-        let PendingForeignKey {
+    fn revalidate_foreign_key(&mut self, foreign_key: &ForeignKey, alter: InIrFile<SyntaxNodePtr>) {
+        let &ForeignKey {
             table,
-            columns,
+            ref columns,
+            ref referencing,
+            ..
+        } = foreign_key;
+        let mismatch = match columns {
+            Some(columns) => {
+                self.foreign_key_type_mismatch(referencing, table, columns.iter().copied())
+            }
+            None => {
+                let Some(key) = self
+                    .inherited_primary_key(table)
+                    .and_then(|constraint| self.index.constraints[constraint].index)
+                    .and_then(|index| self.index.indexes.key(index))
+                else {
+                    return;
+                };
+                self.foreign_key_type_mismatch(referencing, table, key)
+            }
+        };
+        if let Some(error) = mismatch {
+            self.push_error_ptr(alter, error);
+        }
+    }
+
+    fn check_foreign_key(&mut self, foreign_key: &ForeignKey) {
+        let &ForeignKey {
+            table,
+            ref columns,
             ptr,
+            ref referencing,
         } = foreign_key;
         if !self.keys_known(table) {
             return;
@@ -20064,13 +20237,21 @@ impl Lowerer {
             None => match self.inherited_primary_key(table) {
                 None => SemaError::NoPrimaryKeyForReferencedTable { table: name },
                 Some(constraint) => {
-                    if self.index.constraints[constraint]
-                        .index
-                        .is_none_or(|index| !self.index.indexes[index].deferrable)
-                    {
+                    let Some(index) = self.index.constraints[constraint].index else {
+                        return;
+                    };
+                    if self.index.indexes[index].deferrable {
+                        SemaError::DeferrablePrimaryKeyForReferencedTable { table: name }
+                    } else {
+                        let Some(key) = self.index.indexes.key(index) else {
+                            return;
+                        };
+                        let mismatch = self.foreign_key_type_mismatch(referencing, table, key);
+                        if let Some(error) = mismatch {
+                            self.report_foreign_key_type_mismatch(referencing, error);
+                        }
                         return;
                     }
-                    SemaError::DeferrablePrimaryKeyForReferencedTable { table: name }
                 }
             },
             Some(columns) => {
@@ -20082,10 +20263,20 @@ impl Lowerer {
                     return;
                 }
                 let found = self.find_unique_index(table, &|id, index| {
-                    !index.partial && self.index_key_matches(id, &columns, KeyMatch::Exact)
+                    !index.partial && self.index_key_matches(id, columns, KeyMatch::Exact)
                 });
                 match found {
-                    Some(UniqueIndexMatch::Immediate) => return,
+                    Some(UniqueIndexMatch::Immediate) => {
+                        let mismatch = self.foreign_key_type_mismatch(
+                            referencing,
+                            table,
+                            columns.iter().copied(),
+                        );
+                        if let Some(error) = mismatch {
+                            self.report_foreign_key_type_mismatch(referencing, error);
+                        }
+                        return;
+                    }
                     Some(UniqueIndexMatch::Deferrable) => {
                         SemaError::DeferrableUniqueConstraintForReferencedTable { table: name }
                     }
@@ -20094,6 +20285,195 @@ impl Lowerer {
             }
         };
         self.push_error_ptr(ptr, error);
+    }
+
+    fn report_foreign_key_type_mismatch(&mut self, referencing: &Referencing, error: SemaError) {
+        let ptr = self.index.constraints[referencing.constraint].ptr;
+        self.push_error_ptr(ptr, error);
+    }
+
+    fn foreign_key_type_mismatch(
+        &self,
+        referencing: &Referencing,
+        table: TableId,
+        referenced_columns: impl Iterator<Item = Name>,
+    ) -> Option<SemaError> {
+        let Referencing {
+            table: referencing_table,
+            columns,
+            constraint,
+        } = referencing;
+        if self.dropped_constraints.contains(constraint) {
+            return None;
+        }
+        let referencing_range = self.index.tables[*referencing_table].columns.range;
+        let referenced_range = self.index.tables[table].columns.range;
+        for (column, referenced_column) in columns.iter().copied().zip(referenced_columns) {
+            let (Some(ty), Some(referenced_ty)) = (
+                self.find_column_in(referencing_range, column)
+                    .and_then(|id| self.index.columns[id].ty),
+                self.find_column_in(referenced_range, referenced_column)
+                    .and_then(|id| self.index.columns[id].ty),
+            ) else {
+                continue;
+            };
+            if !self.foreign_key_types_compatible(ty, referenced_ty) {
+                return Some(SemaError::ForeignKeyTypeMismatch {
+                    constraint: self.index.constraints[*constraint].name,
+                    column,
+                    referenced_column,
+                    ty: self.index.ty_name(ty),
+                    referenced_ty: self.index.ty_name(referenced_ty),
+                });
+            }
+        }
+        None
+    }
+
+    fn foreign_key_types_compatible(&self, ty: Ty, referenced_ty: Ty) -> bool {
+        let (Some(ty), Some(referenced_ty)) = (
+            self.index.base_type(ty),
+            self.index.base_type(referenced_ty),
+        ) else {
+            return true;
+        };
+        if ty == referenced_ty {
+            return true;
+        }
+        let Some(btree) = self.btree() else {
+            return true;
+        };
+        let class = match self.default_operator_class(btree, referenced_ty) {
+            DefaultClass::Found(class) => class,
+            DefaultClass::Missing | DefaultClass::Unknown => return true,
+        };
+        let OperatorClass {
+            ty: Some(input),
+            family,
+            ..
+        } = self.index.operator_classes[class]
+        else {
+            return true;
+        };
+        if self.overloads().is_pseudo(input) {
+            return false;
+        }
+        if let Some(family) = family
+            && self.family_has_equality(family, input, ty)
+            && self.family_has_equality(family, ty, ty)
+        {
+            return true;
+        }
+        let overloads = self.overloads();
+        !overloads.rejects_arg(ArgType::Known(referenced_ty), input)
+            && !overloads.rejects_arg(ArgType::Known(ty), input)
+    }
+
+    fn check_default_operator_class(
+        &mut self,
+        access_method: AccessMethodId,
+        ty: Ty,
+        node: &SyntaxNode,
+    ) {
+        if self.index.access_methods[access_method].kind != AccessMethodKind::Index {
+            return;
+        }
+        match self.default_operator_class(access_method, ty) {
+            DefaultClass::Missing => {
+                let error = SemaError::NoDefaultOperatorClass {
+                    ty: self.index.ty_name(ty),
+                    access_method: self.index.access_methods[access_method].name,
+                };
+                self.push_error(node, error);
+            }
+            DefaultClass::Found(_) | DefaultClass::Unknown => {}
+        }
+    }
+
+    fn check_key_operator_classes(&mut self, table: TableId, columns: &[Name], node: &SyntaxNode) {
+        let Some(btree) = self.btree() else {
+            return;
+        };
+        let range = self.index.tables[table].columns.range;
+        for column in columns {
+            if let Some(ty) = self
+                .find_column_in(range, *column)
+                .and_then(|id| self.index.columns[id].ty)
+            {
+                self.check_default_operator_class(btree, ty, node);
+            }
+        }
+    }
+
+    fn btree(&self) -> Option<AccessMethodId> {
+        self.index
+            .names
+            .lookup("btree")
+            .and_then(|name| self.find_access_method(name))
+    }
+
+    fn default_operator_class(&self, access_method: AccessMethodId, ty: Ty) -> DefaultClass {
+        let Some(ty) = self.index.base_type(ty) else {
+            return DefaultClass::Unknown;
+        };
+        let overloads = self.overloads();
+        let mut exact = DefaultMatches::default();
+        let mut preferred = DefaultMatches::default();
+        let mut compatible = DefaultMatches::default();
+        for (id, class) in self.index.operator_classes.iter() {
+            if !class.default
+                || class.access_method != Some(access_method)
+                || self.dropped_operator_classes.contains(&id)
+            {
+                continue;
+            }
+            let Some(input) = class.ty else {
+                continue;
+            };
+            if input == ty {
+                exact.push(id);
+            } else if exact.count == 0 && overloads.binary_coercible(ty, input) {
+                if overloads.is_preferred_in_category(input, ty) {
+                    preferred.push(id);
+                } else {
+                    compatible.push(id);
+                }
+            }
+        }
+        for matches in [exact, preferred, compatible] {
+            match matches.count {
+                0 => {}
+                1 => {
+                    if let Some(class) = matches.first {
+                        return DefaultClass::Found(class);
+                    }
+                }
+                _ => return DefaultClass::Unknown,
+            }
+        }
+        DefaultClass::Missing
+    }
+
+    fn family_has_equality(&self, family: OperatorFamilyId, left: Ty, right: Ty) -> bool {
+        let classes = self
+            .index
+            .operator_classes
+            .iter()
+            .filter(|(id, class)| {
+                class.family == Some(family) && !self.dropped_operator_classes.contains(id)
+            })
+            .map(|(id, _)| MemberOwner::Class(id));
+        std::iter::once(MemberOwner::Family(family))
+            .chain(classes)
+            .any(|owner| {
+                self.index.operator_family_members.get(owner).any(|id| {
+                    let member = &self.index.operator_family_members[id];
+                    member.kind == MemberKind::Operator
+                        && member.number == Some(3)
+                        && member.operands.left == Operand::Ty(left)
+                        && member.operands.right == Operand::Ty(right)
+                })
+            })
     }
 
     fn check_conflict_arbiter(&mut self, table: TableId, on_index: &ast::ConflictOnIndex) {

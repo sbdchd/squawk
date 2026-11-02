@@ -611,6 +611,17 @@ pub(crate) enum SemaError {
         expected: TyName,
         found: TyName,
     },
+    NoDefaultOperatorClass {
+        ty: TyName,
+        access_method: Name,
+    },
+    ForeignKeyTypeMismatch {
+        constraint: Name,
+        column: Name,
+        referenced_column: Name,
+        ty: TyName,
+        referenced_ty: TyName,
+    },
     NonBoolComparison {
         comparison: Comparison,
         left: TyName,
@@ -1282,9 +1293,8 @@ impl SemaError {
             SemaError::NoPrimaryKeyForReferencedTable { .. }
             | SemaError::NoUniqueConstraintForReferencedTable { .. }
             | SemaError::DeferrablePrimaryKeyForReferencedTable { .. }
-            | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
-                DiagnosticKind::InvalidForeignKey
-            }
+            | SemaError::DeferrableUniqueConstraintForReferencedTable { .. }
+            | SemaError::ForeignKeyTypeMismatch { .. } => DiagnosticKind::InvalidForeignKey,
             SemaError::NoConflictArbiter { .. }
             | SemaError::DeferrableConflictArbiter
             | SemaError::ConflictConstraintWithoutIndex
@@ -1311,6 +1321,7 @@ impl SemaError {
             SemaError::UniqueIndexNotSupported { .. } => DiagnosticKind::UniqueIndexNotSupported,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
+            SemaError::NoDefaultOperatorClass { .. } => DiagnosticKind::MissingDefaultOperatorClass,
             SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
             SemaError::NonBoolComparison { .. } => DiagnosticKind::TypeMismatch,
             SemaError::TriggerReturnType { .. } | SemaError::OutParamResultType { .. } => {
@@ -1662,6 +1673,9 @@ impl SemaError {
 
     pub(crate) fn hint(&self) -> Option<&'static str> {
         match *self {
+            SemaError::NoDefaultOperatorClass { .. } => Some(
+                "specify an operator class for the index or define a default operator class for the data type",
+            ),
             SemaError::EmptyArrayType => Some(
                 "explicitly cast to the desired type, for example `array[]::integer[]`",
             ),
@@ -1925,6 +1939,27 @@ impl SemaError {
                 }
             };
             return Some(Cow::Owned(note));
+        }
+        if let SemaError::ForeignKeyTypeMismatch {
+            column,
+            referenced_column,
+            ty,
+            referenced_ty,
+            ..
+        } = *self
+        {
+            let message = ErrorMessage {
+                error: self,
+                names,
+                errors,
+            };
+            return Some(Cow::Owned(format!(
+                "key columns `{}` and `{}` are of incompatible types: `{}` and `{}`",
+                names.resolve(column),
+                names.resolve(referenced_column),
+                message.ty(ty),
+                message.ty(referenced_ty)
+            )));
         }
         if let SemaError::ArgumentCountMismatch { missing, .. } = *self
             && !missing.is_empty()
@@ -2817,6 +2852,17 @@ impl fmt::Display for ErrorMessage<'_> {
                 "argument of `{keyword}` must be type `{}`, not type `{}`",
                 self.ty(expected),
                 self.ty(found)
+            ),
+            SemaError::NoDefaultOperatorClass { ty, access_method } => write!(
+                f,
+                "data type `{}` has no default operator class for access method `{}`",
+                self.ty(ty),
+                n(access_method)
+            ),
+            SemaError::ForeignKeyTypeMismatch { constraint, .. } => write!(
+                f,
+                "foreign key constraint `{}` cannot be implemented",
+                n(constraint)
             ),
             SemaError::NonBoolComparison {
                 comparison,

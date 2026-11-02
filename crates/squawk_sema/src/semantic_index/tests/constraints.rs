@@ -817,3 +817,196 @@ create table ok3 (a int references pe (a));
        ╰╴                              ━━
     ");
 }
+
+#[test]
+fn foreign_key_type_mismatch() {
+    assert_snapshot!(check("
+create domain dom as text;
+create table p (
+  i int unique,
+  b bigint unique,
+  n numeric unique,
+  t text unique,
+  d date unique,
+  ts timestamp unique,
+  u uuid unique,
+  c char(3) unique
+);
+create table ok (
+  a bigint references p (i),
+  b int references p (b),
+  g int references p (n),
+  h varchar references p (t),
+  m timestamp references p (d),
+  o date references p (ts),
+  r text references p (c),
+  s dom references p (t)
+);
+create table bad (
+  e numeric references p (i),
+  f float8 references p (i),
+  f4 float4 references p (n),
+  k int references p (t),
+  l text references p (i),
+  q text references p (u)
+);
+create table p2 (
+  a int,
+  b text,
+  primary key (a, b)
+);
+create table c2 (
+  x bigint,
+  y int,
+  foreign key (x, y) references p2
+);
+"), @"
+    error: foreign key constraint `bad_e_fkey` cannot be implemented
+       ╭▸ 
+    24 │   e numeric references p (i),
+       │             ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `e` and `i` are of incompatible types: `numeric` and `int4`
+    error: foreign key constraint `bad_f_fkey` cannot be implemented
+       ╭▸ 
+    25 │   f float8 references p (i),
+       │            ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `f` and `i` are of incompatible types: `float8` and `int4`
+    error: foreign key constraint `bad_f4_fkey` cannot be implemented
+       ╭▸ 
+    26 │   f4 float4 references p (n),
+       │             ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `f4` and `n` are of incompatible types: `float4` and `numeric`
+    error: foreign key constraint `bad_k_fkey` cannot be implemented
+       ╭▸ 
+    27 │   k int references p (t),
+       │         ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `k` and `t` are of incompatible types: `int4` and `text`
+    error: foreign key constraint `bad_l_fkey` cannot be implemented
+       ╭▸ 
+    28 │   l text references p (i),
+       │          ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `l` and `i` are of incompatible types: `text` and `int4`
+    error: foreign key constraint `bad_q_fkey` cannot be implemented
+       ╭▸ 
+    29 │   q text references p (u)
+       │          ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `q` and `u` are of incompatible types: `text` and `uuid`
+    error: foreign key constraint `c2_x_y_fkey` cannot be implemented
+       ╭▸ 
+    39 │   foreign key (x, y) references p2
+       │   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `y` and `b` are of incompatible types: `int4` and `text`
+    ");
+}
+
+#[test]
+fn foreign_key_type_mismatch_default_class() {
+    assert_snapshot!(check("
+create type e1 as enum (
+  'a'
+);
+create type e2 as enum (
+  'a'
+);
+create table p (
+  v varchar unique,
+  ai int[] unique,
+  en e1 unique,
+  r int4range unique,
+  ip inet unique,
+  nm name unique
+);
+create table ok (
+  a text references p (v),
+  b varchar references p (v),
+  c int[] references p (ai),
+  d e1 references p (en),
+  e int4range references p (r),
+  f cidr references p (ip),
+  g text references p (nm),
+  h varchar references p (nm)
+);
+create table bad (
+  a int references p (v),
+  b int8[] references p (ai),
+  c text[] references p (ai),
+  d e2 references p (en),
+  e int8range references p (r)
+);
+"), @"
+    error: foreign key constraint `bad_a_fkey` cannot be implemented
+       ╭▸ 
+    27 │   a int references p (v),
+       │         ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `a` and `v` are of incompatible types: `int4` and `varchar`
+    error: foreign key constraint `bad_b_fkey` cannot be implemented
+       ╭▸ 
+    28 │   b int8[] references p (ai),
+       │            ━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `b` and `ai` are of incompatible types: `int8[]` and `int4[]`
+    error: foreign key constraint `bad_c_fkey` cannot be implemented
+       ╭▸ 
+    29 │   c text[] references p (ai),
+       │            ━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `c` and `ai` are of incompatible types: `text[]` and `int4[]`
+    error: foreign key constraint `bad_d_fkey` cannot be implemented
+       ╭▸ 
+    30 │   d e2 references p (en),
+       │        ━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `d` and `en` are of incompatible types: `e2` and `e1`
+    error: foreign key constraint `bad_e_fkey` cannot be implemented
+       ╭▸ 
+    31 │   e int8range references p (r)
+       │               ━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `e` and `r` are of incompatible types: `int8range` and `int4range`
+    ");
+}
+
+#[test]
+fn foreign_key_type_mismatch_after_alter() {
+    assert_snapshot!(check("
+create table p1 (
+  id int primary key,
+  n int
+);
+create table c1 (
+  pid int references p1,
+  other int
+);
+alter table c1 alter pid type text using pid::text;
+create table p2 (id int primary key);
+create table c2 (pid int references p2);
+alter table c2 alter pid type bigint;
+alter table p2 alter id type bigint;
+create table p3 (id int primary key);
+create table c3 (pid int references p3 (id));
+alter table p3 alter id type text using id::text;
+alter table c1 alter other type text;
+alter table p1 alter n type text;
+"), @"
+    error: foreign key constraint `c1_pid_fkey` cannot be implemented
+       ╭▸ 
+    10 │ alter table c1 alter pid type text using pid::text;
+       │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `pid` and `id` are of incompatible types: `text` and `int4`
+    error: foreign key constraint `c3_pid_fkey` cannot be implemented
+       ╭▸ 
+    17 │ alter table p3 alter id type text using id::text;
+       │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `pid` and `id` are of incompatible types: `int4` and `text`
+    ");
+}
