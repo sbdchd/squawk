@@ -1321,6 +1321,8 @@ enum Condition {
     And,
     Or,
     Not,
+    Using,
+    GraphWhere,
 }
 
 impl Condition {
@@ -1340,7 +1342,9 @@ impl Condition {
             | Condition::CaseWhen
             | Condition::And
             | Condition::Or
-            | Condition::Not => None,
+            | Condition::Not
+            | Condition::Using
+            | Condition::GraphWhere => None,
         }
     }
 
@@ -1349,7 +1353,8 @@ impl Condition {
             Condition::Where
             | Condition::IndexPredicate
             | Condition::CopyWhere
-            | Condition::PublicationWhere => "where",
+            | Condition::PublicationWhere
+            | Condition::GraphWhere => "where",
             Condition::Having => "having",
             Condition::On => "on",
             Condition::Check => "check",
@@ -1359,6 +1364,7 @@ impl Condition {
             Condition::And => "and",
             Condition::Or => "or",
             Condition::Not => "not",
+            Condition::Using => "using",
         }
     }
 }
@@ -7836,12 +7842,12 @@ impl Lowerer {
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
             visit_path_primaries(&pattern, &mut |primary| {
                 if let Some(expr) = primary.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_expr(&expr);
+                    self.lower_condition(Condition::GraphWhere, &expr);
                 }
             });
         }
         if let Some(expr) = graph_table.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr(&expr);
+            self.lower_condition(Condition::GraphWhere, &expr);
         }
         let columns = match graph_table.expr_as_column_name_list() {
             Some(list) => self.lower_graph_table_columns(&list),
@@ -19508,6 +19514,15 @@ impl Lowerer {
         let Resolution::Operator(operator) = resolution else {
             return None;
         };
+        self.operator_result_type(operator, left, right)
+    }
+
+    fn operator_result_type(
+        &mut self,
+        operator: OperatorId,
+        left: Option<ArgType>,
+        right: Option<ArgType>,
+    ) -> Option<Ty> {
         let function = self.index.operators[operator].function?;
         let args: SmallVec<[CallArg; 2]> = [left, right]
             .into_iter()
@@ -20683,6 +20698,9 @@ impl Lowerer {
         {
             let name = self.intern(&column_ref.text());
             let MergedColumn { resolution, inputs } = self.merge_column(name, start, mid, kind);
+            if let Some(inputs) = inputs {
+                self.check_using_operator(inputs, column_ref.syntax());
+            }
             let input_resolution = match inputs {
                 Some(inputs) => Resolution::Column {
                     source: None,
@@ -20790,6 +20808,27 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn check_using_operator(
+        &mut self,
+        MergeInputs { left, right }: MergeInputs,
+        node: &SyntaxNode,
+    ) {
+        let (Some(left), Some(right)) = (self.index.columns[left].ty, self.index.columns[right].ty)
+        else {
+            return;
+        };
+        let Some(name) = self.index.names.lookup("=") else {
+            return;
+        };
+        let left = Some(ArgType::Known(left));
+        let right = Some(ArgType::Known(right));
+        let Resolution::Operator(operator) = self.select_operator(None, name, left, right) else {
+            return;
+        };
+        let found = self.operator_result_type(operator, left, right);
+        self.check_condition(Condition::Using, node, found);
     }
 
     fn merge_inputs_column(&mut self, MergeInputs { left, right }: MergeInputs) -> ColumnId {
@@ -21315,10 +21354,10 @@ impl Lowerer {
                 };
                 if let Some(condition) = condition {
                     if let Some(lhs) = &lhs {
-                        self.check_condition(condition, lhs, lhs_ty);
+                        self.check_condition(condition, lhs.syntax(), lhs_ty);
                     }
                     if let Some(rhs) = &rhs {
-                        self.check_condition(condition, rhs, rhs_ty);
+                        self.check_condition(condition, rhs.syntax(), rhs_ty);
                     }
                 }
                 let ty = op
@@ -21450,7 +21489,7 @@ impl Lowerer {
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
-                    self.check_condition(Condition::Not, expr, ty);
+                    self.check_condition(Condition::Not, expr.syntax(), ty);
                 }
                 return self.lower_prefix_operator(&op, expr_arg_type(expr.as_ref(), ty));
             }
@@ -22550,10 +22589,10 @@ impl Lowerer {
             Some(context) => self.lower_expr_in(context, expr),
             None => self.lower_expr(expr),
         };
-        self.check_condition(condition, expr, found);
+        self.check_condition(condition, expr.syntax(), found);
     }
 
-    fn check_condition(&mut self, condition: Condition, expr: &ast::Expr, found: Option<Ty>) {
+    fn check_condition(&mut self, condition: Condition, node: &SyntaxNode, found: Option<Ty>) {
         if let Some(found) = found
             && let Some(bool) = self.builtin_type("bool")
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
@@ -22563,7 +22602,7 @@ impl Lowerer {
                 expected: self.index.ty_name(bool),
                 found: self.index.ty_name(found),
             };
-            self.push_error(expr.syntax(), error);
+            self.push_error(node, error);
         }
     }
 

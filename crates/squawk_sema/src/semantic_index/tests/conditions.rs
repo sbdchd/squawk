@@ -233,3 +233,59 @@ copy t from '/tmp/t' where a;
       ╰╴                           ━
     ");
 }
+
+#[test]
+fn join_using() {
+    assert_snapshot!(check("
+create function eqi(int, text) returns int
+  language sql
+  return 1;
+create operator = (
+  leftarg = int,
+  rightarg = text,
+  function = eqi
+);
+create table t (a int);
+create table p (a text);
+select 1 from t join p using (a);
+"), @"
+    error: argument of `using` must be type `bool`, not type `int4`
+       ╭▸ 
+    12 │ select 1 from t join p using (a);
+       ╰╴                              ━
+    ");
+}
+
+#[test]
+fn graph_table() {
+    assert_snapshot!(check("
+create table person (
+  id int,
+  name text
+);
+create table knows (
+  src int,
+  dst int
+);
+create property graph g
+  vertex tables (person)
+  edge tables (knows source person destination person);
+select *
+from graph_table(
+  g
+  match
+    (a is person where a.id)-[e is knows]->(b)
+  where b.name
+  columns (a.name as n)
+);
+"), @"
+    error: argument of `where` must be type `bool`, not type `int4`
+       ╭▸ 
+    17 │     (a is person where a.id)-[e is knows]->(b)
+       ╰╴                       ━━━━
+    error: argument of `where` must be type `bool`, not type `text`
+       ╭▸ 
+    18 │   where b.name
+       ╰╴        ━━━━━━
+    ");
+}
