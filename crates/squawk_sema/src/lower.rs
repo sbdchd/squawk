@@ -43,11 +43,11 @@ use crate::{
         TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ColumnDefListReason, ConflictAction, ConflictRuleEvent, ConflictTargetKey,
-        DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind,
-        OperandName, OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, SemaError,
-        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
-        ViewColumnRename, WindowClause,
+        ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
+        ConflictTargetKey, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam,
+        LookupKind, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
+        OutsideSearchPath, SemaError, SetReturningConstruct, Similar, SimilarColumn, SimilarType,
+        TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -81,6 +81,7 @@ impl Lowerer {
             aggregate_calls: vec![],
             srf_calls: vec![],
             array_cast: false,
+            foreign_keys: vec![],
             pending_foreign_keys: vec![],
             generated_refs: vec![],
             function: None,
@@ -383,6 +384,7 @@ pub(crate) struct Lowerer {
     aggregate_calls: Vec<AggregateCall>,
     srf_calls: Vec<SrfCall>,
     array_cast: bool,
+    foreign_keys: Vec<ForeignKey>,
     pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
@@ -585,10 +587,48 @@ struct RelationSource {
     columns: Columns,
 }
 
-struct PendingForeignKey {
+enum DefaultClass {
+    Found(OperatorClassId),
+    Missing,
+    Unknown,
+}
+
+#[derive(Default)]
+struct DefaultMatches {
+    first: Option<OperatorClassId>,
+    count: usize,
+}
+
+impl DefaultMatches {
+    fn push(&mut self, class: OperatorClassId) {
+        self.first.get_or_insert(class);
+        self.count += 1;
+    }
+}
+
+#[derive(Clone, Copy)]
+struct ClassInput {
+    ty: Option<Ty>,
+    default: bool,
+    family: Option<OperatorFamilyId>,
+}
+
+struct ForeignKey {
     table: TableId,
     columns: Option<SmallVec<[Name; 4]>>,
     ptr: InIrFile<SyntaxNodePtr>,
+    referencing: Referencing,
+}
+
+struct PendingForeignKey {
+    foreign_key: usize,
+    alter: Option<InIrFile<SyntaxNodePtr>>,
+}
+
+struct Referencing {
+    table: TableId,
+    columns: SmallVec<[Name; 4]>,
+    constraint: ConstraintId,
 }
 
 #[derive(Clone, Copy)]
@@ -1302,6 +1342,98 @@ pub(crate) enum OutputClause {
     OrderBy,
     GroupBy,
     DistinctOn,
+}
+
+#[derive(Clone, Copy)]
+enum Condition {
+    Where,
+    Having,
+    On,
+    Check,
+    Filter,
+    Policy,
+    TriggerWhen,
+    MergeWhen,
+    IndexPredicate,
+    CopyWhere,
+    PublicationWhere,
+    CaseWhen,
+    And,
+    Or,
+    Not,
+    GraphWhere,
+}
+
+impl Condition {
+    fn context(self) -> Option<ExprContext> {
+        match self {
+            Condition::Where => Some(ExprContext::Where),
+            Condition::Having => Some(ExprContext::Having),
+            Condition::On => Some(ExprContext::JoinCondition),
+            Condition::Check => Some(ExprContext::CheckConstraint),
+            Condition::Filter => Some(ExprContext::Filter),
+            Condition::Policy => Some(ExprContext::Policy),
+            Condition::TriggerWhen => Some(ExprContext::TriggerWhen),
+            Condition::MergeWhen => Some(ExprContext::MergeWhen),
+            Condition::IndexPredicate => Some(ExprContext::IndexPredicate),
+            Condition::CopyWhere => Some(ExprContext::CopyWhere),
+            Condition::PublicationWhere
+            | Condition::CaseWhen
+            | Condition::And
+            | Condition::Or
+            | Condition::Not
+            | Condition::GraphWhere => None,
+        }
+    }
+
+    fn keyword(self) -> &'static str {
+        match self {
+            Condition::Where
+            | Condition::IndexPredicate
+            | Condition::CopyWhere
+            | Condition::PublicationWhere
+            | Condition::GraphWhere => "where",
+            Condition::Having => "having",
+            Condition::On => "on",
+            Condition::Check => "check",
+            Condition::Filter => "filter",
+            Condition::Policy => "policy",
+            Condition::TriggerWhen | Condition::MergeWhen | Condition::CaseWhen => "when",
+            Condition::And => "and",
+            Condition::Or => "or",
+            Condition::Not => "not",
+        }
+    }
+}
+
+enum InList {
+    Single(ast::Expr),
+    Tuple(ast::TupleExpr),
+}
+
+impl InList {
+    fn new(rhs: &ast::Expr) -> Option<InList> {
+        if let ast::Expr::TupleExpr(tuple) = rhs {
+            return Some(InList::Tuple(tuple.clone()));
+        }
+        if let ast::Expr::ParenExpr(paren) = rhs
+            && paren.select_variant().is_none()
+            && let Some(expr) = paren.expr()
+        {
+            return Some(InList::Single(expr));
+        }
+        None
+    }
+
+    fn exprs(&self) -> impl Iterator<Item = ast::Expr> + '_ {
+        let (single, tuple) = match self {
+            InList::Single(expr) => (Some(expr.clone()), None),
+            InList::Tuple(tuple) => (None, Some(tuple)),
+        };
+        single
+            .into_iter()
+            .chain(tuple.into_iter().flat_map(ast::TupleExpr::exprs))
+    }
 }
 
 struct SelectParts {
@@ -5015,10 +5147,10 @@ impl Lowerer {
         }
         self.with_table_scope(QueryKind::Policy, table, node, |this| {
             if let Some(expr) = using.and_then(|clause| clause.expr()) {
-                this.lower_expr_in(ExprContext::Policy, &expr);
+                this.lower_condition(Condition::Policy, &expr);
             }
             if let Some(expr) = with_check.and_then(|clause| clause.expr()) {
-                this.lower_expr_in(ExprContext::Policy, &expr);
+                this.lower_condition(Condition::Policy, &expr);
             }
         });
     }
@@ -5661,11 +5793,20 @@ impl Lowerer {
             .operator_family_clause()
             .and_then(|clause| clause.op_family_ref())
             .and_then(|family| family.path_ref());
-        if let Some(path) = &family_ref {
-            self.lower_operator_family_ref(path, access_method, IfMissing::Error);
-        }
-        let class =
-            self.alloc_create_operator_class(create_class, access_method, family_ref.is_some());
+        let family = family_ref
+            .as_ref()
+            .and_then(|path| self.lower_operator_family_ref(path, access_method, IfMissing::Error));
+        let input = ClassInput {
+            ty,
+            default: create_class.default_token().is_some(),
+            family,
+        };
+        let class = self.alloc_create_operator_class(
+            create_class,
+            access_method,
+            family_ref.is_some(),
+            input,
+        );
         if let Some(options) = create_class.operator_class_option_list() {
             self.lower_operator_class_options(&options, ty, class.map(MemberOwner::Class));
         }
@@ -5676,23 +5817,24 @@ impl Lowerer {
         create_class: &ast::CreateOperatorClass,
         access_method: Option<AccessMethodId>,
         has_family: bool,
+        mut input: ClassInput,
     ) -> Option<OperatorClassId> {
         let path = create_class.op_class_name()?.path()?;
         let segment = path.segment()?;
         let schema = self.creation_schema(&path);
         let name = self.intern(&segment.text());
-        if !has_family
-            && self
-                .find_operator_family_in(schema, name, access_method)
-                .is_none()
-        {
-            self.alloc_operator_family(
-                create_class.syntax(),
-                segment.syntax(),
-                schema,
-                name,
-                access_method,
-            );
+        if !has_family {
+            let family = match self.find_operator_family_in(schema, name, access_method) {
+                Some(family) => family,
+                None => self.alloc_operator_family(
+                    create_class.syntax(),
+                    segment.syntax(),
+                    schema,
+                    name,
+                    access_method,
+                ),
+            };
+            input.family = Some(family);
         }
         if self.has_operator_class(schema, name, access_method) {
             self.report_duplicate_for_access_method(
@@ -5708,6 +5850,7 @@ impl Lowerer {
             schema,
             name,
             access_method,
+            input,
         ))
     }
 
@@ -5901,6 +6044,9 @@ impl Lowerer {
                     let OperatorClass {
                         schema,
                         access_method,
+                        ty,
+                        default,
+                        family,
                         ..
                     } = self.index.operator_classes[class];
                     let name = self.intern(&segment.text());
@@ -5920,6 +6066,11 @@ impl Lowerer {
                         schema,
                         name,
                         access_method,
+                        ClassInput {
+                            ty,
+                            default,
+                            family,
+                        },
                     );
                     self.copy_comment(Item::OperatorClass(class), Item::OperatorClass(id));
                     self.move_operator_family_members(
@@ -5940,6 +6091,9 @@ impl Lowerer {
                         name,
                         access_method,
                         name_ptr,
+                        ty,
+                        default,
+                        family,
                         ..
                     } = self.index.operator_classes[class];
                     if self.has_operator_class(schema, name, access_method) {
@@ -5956,6 +6110,9 @@ impl Lowerer {
                         schema,
                         name,
                         access_method,
+                        ty,
+                        default,
+                        family,
                         ptr: self.ptr(alter_class.syntax()),
                         name_ptr,
                     });
@@ -6013,11 +6170,19 @@ impl Lowerer {
         schema: Name,
         name: Name,
         access_method: Option<AccessMethodId>,
+        ClassInput {
+            ty,
+            default,
+            family,
+        }: ClassInput,
     ) -> OperatorClassId {
         let id = self.index.operator_classes.alloc(OperatorClass {
             schema,
             name,
             access_method,
+            ty,
+            default,
+            family,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node),
         });
@@ -6952,7 +7117,7 @@ impl Lowerer {
                         table,
                         table_object.syntax(),
                         |this| {
-                            this.lower_expr(&expr);
+                            this.lower_condition(Condition::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -6970,7 +7135,7 @@ impl Lowerer {
                         None,
                         schema_object.syntax(),
                         |this| {
-                            this.lower_expr(&expr);
+                            this.lower_condition(Condition::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -7777,12 +7942,12 @@ impl Lowerer {
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
             visit_path_primaries(&pattern, &mut |primary| {
                 if let Some(expr) = primary.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_expr(&expr);
+                    self.lower_condition(Condition::GraphWhere, &expr);
                 }
             });
         }
         if let Some(expr) = graph_table.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr(&expr);
+            self.lower_condition(Condition::GraphWhere, &expr);
         }
         let columns = match graph_table.expr_as_column_name_list() {
             Some(list) => self.lower_graph_table_columns(&list),
@@ -9785,7 +9950,9 @@ impl Lowerer {
         let types = create_cast
             .cast_sig()
             .and_then(|cast_sig| self.lower_cast_sig(&cast_sig, IfMissing::Error));
-        match create_cast.cast_method() {
+        let cast_method = create_cast.cast_method();
+        let binary = matches!(cast_method, Some(ast::CastMethod::WithoutFunction(_)));
+        match cast_method {
             Some(ast::CastMethod::WithFunction(with_function)) => {
                 if let Some(function_sig) = with_function.function_sig() {
                     self.lower_function_sig(&function_sig);
@@ -9805,6 +9972,7 @@ impl Lowerer {
             source: types.source,
             target: types.target,
             context,
+            binary,
             ptr: InIrFile::new(self.file_id, AstPtr::new(create_cast)),
         });
         self.depend_on_refs(refs, self.index.casts.range_from(start), Object::Cast);
@@ -12415,7 +12583,7 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
             self.with_domain_scope(domain, check.syntax(), |this| {
-                this.lower_expr_in(ExprContext::CheckConstraint, &expr);
+                this.lower_condition(Condition::Check, &expr);
             });
         }
         let Some(domain) = domain else {
@@ -13560,7 +13728,7 @@ impl Lowerer {
         }
 
         if let Some(expr) = parts.where_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Where, &expr);
+            self.lower_condition(Condition::Where, &expr);
         }
         if let Some(list) = parts
             .group_by_clause
@@ -13573,7 +13741,7 @@ impl Lowerer {
             });
         }
         if let Some(expr) = parts.having_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Having, &expr);
+            self.lower_condition(Condition::Having, &expr);
         }
         for clause in parts.tail_clauses {
             self.lower_tail_clause(clause, &columns);
@@ -13763,7 +13931,7 @@ impl Lowerer {
         match delete.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_expr_in(ExprContext::Where, &expr);
+                    self.lower_condition(Condition::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -13822,7 +13990,7 @@ impl Lowerer {
         match update.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_expr_in(ExprContext::Where, &expr);
+                    self.lower_condition(Condition::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -13878,7 +14046,7 @@ impl Lowerer {
             .and_then(|using_on| using_on.on_clause())
             .and_then(|on_clause| on_clause.expr())
         {
-            self.lower_expr_in(ExprContext::JoinCondition, &expr);
+            self.lower_condition(Condition::On, &expr);
         }
 
         for when_clause in merge.merge_when_clauses() {
@@ -13901,7 +14069,7 @@ impl Lowerer {
                 self.push_hidden(hidden);
             }
             if let Some(expr) = condition.and_then(|condition| condition.expr()) {
-                self.lower_expr_in(ExprContext::MergeWhen, &expr);
+                self.lower_condition(Condition::MergeWhen, &expr);
             }
             if let Some(action) = action {
                 self.lower_merge_action(target, &action);
@@ -14108,7 +14276,7 @@ impl Lowerer {
                     }
                 }
                 if let Some(expr) = on_index.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_expr_in(ExprContext::IndexPredicate, &expr);
+                    self.lower_condition(Condition::IndexPredicate, &expr);
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
@@ -14164,7 +14332,7 @@ impl Lowerer {
             }
         };
         if let Some(expr) = where_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Where, &expr);
+            self.lower_condition(Condition::Where, &expr);
         }
         self.index.queries[query].sources.truncate(len);
         self.set_visible((0..len).into());
@@ -16692,6 +16860,7 @@ impl Lowerer {
                 {
                     self.set_table_column_type(table, column, ty);
                     self.set_inherited_column_type(table, column, ty);
+                    self.revalidate_foreign_keys(table, column, alter_column.syntax());
                 }
             }
             Some(ast::AlterColumnOption::SetDefault(set_default)) => {
@@ -17022,22 +17191,34 @@ impl Lowerer {
         });
         let table = table.flatten();
         self.set_visible((0..self.scope_sources_len()).into());
-        for list in create_index.partition_item_list().into_iter().chain(
-            create_index
-                .index_include_clause()
-                .and_then(|include| include.partition_item_list()),
-        ) {
+        let include = create_index
+            .index_include_clause()
+            .and_then(|include| include.partition_item_list());
+        for (list, is_key) in create_index
+            .partition_item_list()
+            .map(|list| (list, true))
+            .into_iter()
+            .chain(include.map(|list| (list, false)))
+        {
             for item in list.partition_items() {
-                if let Some(path) = item.op_class_ref().and_then(|op_class| op_class.path_ref()) {
+                let op_class = item.op_class_ref();
+                if let Some(path) = op_class.as_ref().and_then(|op_class| op_class.path_ref()) {
                     self.lower_operator_class_ref(&path, access_method, IfMissing::Error);
                 }
                 if let Some(expr) = item.expr() {
-                    self.lower_expr_in(ExprContext::IndexExpression, &expr);
+                    let ty = self.lower_expr_in(ExprContext::IndexExpression, &expr);
+                    if is_key
+                        && op_class.is_none()
+                        && let Some(ty) = ty
+                        && let Some(access_method) = access_method
+                    {
+                        self.check_default_operator_class(access_method, ty, expr.syntax());
+                    }
                 }
             }
         }
         if let Some(expr) = create_index.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::IndexPredicate, &expr);
+            self.lower_condition(Condition::IndexPredicate, &expr);
         }
         self.scopes.pop();
         let columns = self.alloc_referenced_columns(refs);
@@ -17216,7 +17397,7 @@ impl Lowerer {
             .when_condition()
             .and_then(|condition| condition.expr())
         {
-            self.lower_expr_in(ExprContext::TriggerWhen, &expr);
+            self.lower_condition(Condition::TriggerWhen, &expr);
         }
         self.scopes.pop();
 
@@ -17440,7 +17621,7 @@ impl Lowerer {
             }
             self.set_visible((0..2).into());
             if let Some(expr) = rule_on.where_clause().and_then(|clause| clause.expr()) {
-                self.lower_expr_in(ExprContext::Where, &expr);
+                self.lower_condition(Condition::Where, &expr);
             }
             for (index, name) in names.into_iter().enumerate() {
                 let target = self.index.queries[query].sources[index];
@@ -18420,7 +18601,7 @@ impl Lowerer {
         }
         if let Some(expr) = copy.where_clause().and_then(|clause| clause.expr()) {
             self.with_table_scope(QueryKind::Copy, table, copy.syntax(), |this| {
-                this.lower_expr_in(ExprContext::CopyWhere, &expr);
+                this.lower_condition(Condition::CopyWhere, &expr);
             });
         }
     }
@@ -18812,7 +18993,7 @@ impl Lowerer {
     fn lower_check_constraint(&mut self, table: Option<TableId>, check: &ast::CheckConstraint) {
         let start = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
-            self.lower_expr_in(ExprContext::CheckConstraint, &expr);
+            self.lower_condition(Condition::Check, &expr);
         }
         let Some(table) = table else {
             return;
@@ -18959,6 +19140,9 @@ impl Lowerer {
                 SemaError::MultiplePrimaryKeys { table },
             );
         }
+        if index.is_none() {
+            self.check_key_operator_classes(table, &columns[..key_len], primary_key.syntax());
+        }
         let name = primary_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
@@ -19029,6 +19213,9 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
+        if index.is_none() {
+            self.check_key_operator_classes(table, &columns[..key_len], unique.syntax());
+        }
         let name = unique
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
@@ -19264,6 +19451,49 @@ impl Lowerer {
         }
     }
 
+    fn lower_in_comparison(
+        &mut self,
+        comparison: Comparison,
+        op_range: TextRange,
+        lhs: &ast::Expr,
+        rhs: &ast::Expr,
+        list: &InList,
+    ) -> Option<Ty> {
+        let operator = comparison.operator();
+        let lhs_ty = self.lower_expr(lhs);
+        let left = expr_arg_type(Some(lhs), lhs_ty);
+        let mut common = CommonType::new(left);
+        let mut elements: SmallVec<[ArgType; 4]> = SmallVec::new();
+        for expr in list.exprs() {
+            let ty = self.lower_expr(&expr);
+            let arg = expr_arg_type(Some(&expr), ty);
+            common.push(&self.overloads(), arg);
+            elements.push(arg);
+        }
+        let common = common.finish();
+        self.lower_enum_comparison(lhs_ty, rhs);
+        if let ArgType::Known(ty) = common {
+            self.lower_enum_comparison(Some(ty), lhs);
+        }
+        if elements.len() > 1 && common != ArgType::Untyped {
+            return self.add_expr_operator_ref(op_range, None, operator, Some(left), Some(common));
+        }
+        for (expr, right) in list.exprs().zip(elements) {
+            let found = self.add_expr_operator_ref_at(
+                op_range,
+                expr.syntax().text_range(),
+                None,
+                operator,
+                Some(left),
+                Some(right),
+            );
+            if let (ArgType::Known(left), ArgType::Known(right)) = (left, right) {
+                self.check_comparison(comparison, expr.syntax(), left, right, found);
+            }
+        }
+        self.builtin_type("bool")
+    }
+
     fn lower_in_list(&mut self, tuple: &ast::TupleExpr, left: ArgType) -> ArgType {
         let mut common = CommonType::new(left);
         for expr in tuple.exprs() {
@@ -19426,6 +19656,18 @@ impl Lowerer {
         left: Option<ArgType>,
         right: Option<ArgType>,
     ) -> Option<Ty> {
+        self.add_expr_operator_ref_at(range, range, schema, text, left, right)
+    }
+
+    fn add_expr_operator_ref_at(
+        &mut self,
+        range: TextRange,
+        error_range: TextRange,
+        schema: Option<Name>,
+        text: &str,
+        left: Option<ArgType>,
+        right: Option<ArgType>,
+    ) -> Option<Ty> {
         let name = self.intern(text);
         let mut resolution = self.select_operator(schema, name, left, right);
         if matches!(resolution, Resolution::Unresolved | Resolution::Ambiguous)
@@ -19442,13 +19684,22 @@ impl Lowerer {
                 ambiguous: matches!(resolution, Resolution::Ambiguous),
                 replacement: self.operator_replacement(schema, text, left, right),
             };
-            self.push_error_at(InIrFile::new(self.file_id, range), error);
+            self.push_error_at(InIrFile::new(self.file_id, error_range), error);
             resolution = Resolution::Unknown;
         }
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
         let Resolution::Operator(operator) = resolution else {
             return None;
         };
+        self.operator_result_type(operator, left, right)
+    }
+
+    fn operator_result_type(
+        &mut self,
+        operator: OperatorId,
+        left: Option<ArgType>,
+        right: Option<ArgType>,
+    ) -> Option<Ty> {
         let function = self.index.operators[operator].function?;
         let args: SmallVec<[CallArg; 2]> = [left, right]
             .into_iter()
@@ -19721,7 +19972,7 @@ impl Lowerer {
             .where_condition_clause()
             .and_then(|clause| clause.expr())
         {
-            self.lower_expr_in(ExprContext::IndexPredicate, &expr);
+            self.lower_condition(Condition::IndexPredicate, &expr);
         }
         let Some(table) = table else {
             return;
@@ -19763,23 +20014,6 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        if let Some(referenced) = referenced
-            && let Some(table_name_ref) = table_name_ref
-        {
-            match to_columns {
-                Some(list) if list.period_column().is_some() => {}
-                Some(list) => self.pending_foreign_keys.push(PendingForeignKey {
-                    table: referenced,
-                    columns: Some(referenced_columns),
-                    ptr: self.ptr(list.syntax()),
-                }),
-                None => self.pending_foreign_keys.push(PendingForeignKey {
-                    table: referenced,
-                    columns: None,
-                    ptr: self.ptr(table_name_ref.syntax()),
-                }),
-            }
-        }
         let name = match foreign_key
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name())
@@ -19805,6 +20039,30 @@ impl Lowerer {
             name,
             None,
         );
+        if let Some(referenced) = referenced
+            && let Some(table_name_ref) = table_name_ref
+        {
+            let referencing = Referencing {
+                table,
+                columns,
+                constraint,
+            };
+            match to_columns {
+                Some(list) if list.period_column().is_some() => {}
+                Some(list) => self.add_foreign_key(ForeignKey {
+                    table: referenced,
+                    columns: Some(referenced_columns),
+                    ptr: self.ptr(list.syntax()),
+                    referencing,
+                }),
+                None => self.add_foreign_key(ForeignKey {
+                    table: referenced,
+                    columns: None,
+                    ptr: self.ptr(table_name_ref.syntax()),
+                    referencing,
+                }),
+            }
+        }
         self.depend_on_refs(refs, IdxRange::single(constraint), Object::Constraint);
     }
 
@@ -19828,18 +20086,6 @@ impl Lowerer {
         let Some(table) = table else {
             return;
         };
-        if let Some(referenced) = referenced
-            && let Some(node) = column_ref
-                .as_ref()
-                .map(|column_ref| column_ref.syntax())
-                .or_else(|| table_name_ref.as_ref().map(|name| name.syntax()))
-        {
-            self.pending_foreign_keys.push(PendingForeignKey {
-                table: referenced,
-                columns: referenced_column.map(|column| smallvec![column]),
-                ptr: self.ptr(node),
-            });
-        }
         let name = match references
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name())
@@ -19861,6 +20107,23 @@ impl Lowerer {
             name,
             None,
         );
+        if let Some(referenced) = referenced
+            && let Some(node) = column_ref
+                .as_ref()
+                .map(|column_ref| column_ref.syntax())
+                .or_else(|| table_name_ref.as_ref().map(|name| name.syntax()))
+        {
+            self.add_foreign_key(ForeignKey {
+                table: referenced,
+                columns: referenced_column.map(|column| smallvec![column]),
+                ptr: self.ptr(node),
+                referencing: Referencing {
+                    table,
+                    columns: column.into_iter().collect(),
+                    constraint,
+                },
+            });
+        }
         self.depend_on_refs(refs, IdxRange::single(constraint), Object::Constraint);
     }
 
@@ -19882,19 +20145,85 @@ impl Lowerer {
         columns
     }
 
+    fn add_foreign_key(&mut self, foreign_key: ForeignKey) {
+        self.pending_foreign_keys.push(PendingForeignKey {
+            foreign_key: self.foreign_keys.len(),
+            alter: None,
+        });
+        self.foreign_keys.push(foreign_key);
+    }
+
+    fn revalidate_foreign_keys(&mut self, table: TableId, column: Name, node: &SyntaxNode) {
+        let alter = Some(self.ptr(node));
+        let in_primary_key = self
+            .inherited_primary_key(table)
+            .and_then(|constraint| self.index.constraints[constraint].index)
+            .and_then(|index| self.index.indexes.key(index))
+            .is_some_and(|mut key| key.any(|name| name == column));
+        for (index, foreign_key) in self.foreign_keys.iter().enumerate() {
+            let referencing = foreign_key.referencing.table == table
+                && foreign_key.referencing.columns.contains(&column);
+            let referenced = foreign_key.table == table
+                && foreign_key
+                    .columns
+                    .as_ref()
+                    .map_or(in_primary_key, |columns| columns.contains(&column));
+            if referencing || referenced {
+                self.pending_foreign_keys.push(PendingForeignKey {
+                    foreign_key: index,
+                    alter,
+                });
+            }
+        }
+    }
+
     fn check_foreign_keys(&mut self) {
         let mut pending = std::mem::take(&mut self.pending_foreign_keys);
-        for foreign_key in pending.drain(..) {
-            self.check_foreign_key(foreign_key);
+        let foreign_keys = std::mem::take(&mut self.foreign_keys);
+        for PendingForeignKey { foreign_key, alter } in pending.drain(..) {
+            let foreign_key = &foreign_keys[foreign_key];
+            match alter {
+                Some(alter) => self.revalidate_foreign_key(foreign_key, alter),
+                None => self.check_foreign_key(foreign_key),
+            }
         }
+        self.foreign_keys = foreign_keys;
         self.pending_foreign_keys = pending;
     }
 
-    fn check_foreign_key(&mut self, foreign_key: PendingForeignKey) {
-        let PendingForeignKey {
+    fn revalidate_foreign_key(&mut self, foreign_key: &ForeignKey, alter: InIrFile<SyntaxNodePtr>) {
+        let &ForeignKey {
             table,
-            columns,
+            ref columns,
+            ref referencing,
+            ..
+        } = foreign_key;
+        let mismatch = match columns {
+            Some(columns) => {
+                self.foreign_key_type_mismatch(referencing, table, columns.iter().copied())
+            }
+            None => {
+                let Some(key) = self
+                    .inherited_primary_key(table)
+                    .and_then(|constraint| self.index.constraints[constraint].index)
+                    .and_then(|index| self.index.indexes.key(index))
+                else {
+                    return;
+                };
+                self.foreign_key_type_mismatch(referencing, table, key)
+            }
+        };
+        if let Some(error) = mismatch {
+            self.push_error_ptr(alter, error);
+        }
+    }
+
+    fn check_foreign_key(&mut self, foreign_key: &ForeignKey) {
+        let &ForeignKey {
+            table,
+            ref columns,
             ptr,
+            ref referencing,
         } = foreign_key;
         if !self.keys_known(table) {
             return;
@@ -19908,13 +20237,21 @@ impl Lowerer {
             None => match self.inherited_primary_key(table) {
                 None => SemaError::NoPrimaryKeyForReferencedTable { table: name },
                 Some(constraint) => {
-                    if self.index.constraints[constraint]
-                        .index
-                        .is_none_or(|index| !self.index.indexes[index].deferrable)
-                    {
+                    let Some(index) = self.index.constraints[constraint].index else {
+                        return;
+                    };
+                    if self.index.indexes[index].deferrable {
+                        SemaError::DeferrablePrimaryKeyForReferencedTable { table: name }
+                    } else {
+                        let Some(key) = self.index.indexes.key(index) else {
+                            return;
+                        };
+                        let mismatch = self.foreign_key_type_mismatch(referencing, table, key);
+                        if let Some(error) = mismatch {
+                            self.report_foreign_key_type_mismatch(referencing, error);
+                        }
                         return;
                     }
-                    SemaError::DeferrablePrimaryKeyForReferencedTable { table: name }
                 }
             },
             Some(columns) => {
@@ -19926,10 +20263,20 @@ impl Lowerer {
                     return;
                 }
                 let found = self.find_unique_index(table, &|id, index| {
-                    !index.partial && self.index_key_matches(id, &columns, KeyMatch::Exact)
+                    !index.partial && self.index_key_matches(id, columns, KeyMatch::Exact)
                 });
                 match found {
-                    Some(UniqueIndexMatch::Immediate) => return,
+                    Some(UniqueIndexMatch::Immediate) => {
+                        let mismatch = self.foreign_key_type_mismatch(
+                            referencing,
+                            table,
+                            columns.iter().copied(),
+                        );
+                        if let Some(error) = mismatch {
+                            self.report_foreign_key_type_mismatch(referencing, error);
+                        }
+                        return;
+                    }
                     Some(UniqueIndexMatch::Deferrable) => {
                         SemaError::DeferrableUniqueConstraintForReferencedTable { table: name }
                     }
@@ -19938,6 +20285,195 @@ impl Lowerer {
             }
         };
         self.push_error_ptr(ptr, error);
+    }
+
+    fn report_foreign_key_type_mismatch(&mut self, referencing: &Referencing, error: SemaError) {
+        let ptr = self.index.constraints[referencing.constraint].ptr;
+        self.push_error_ptr(ptr, error);
+    }
+
+    fn foreign_key_type_mismatch(
+        &self,
+        referencing: &Referencing,
+        table: TableId,
+        referenced_columns: impl Iterator<Item = Name>,
+    ) -> Option<SemaError> {
+        let Referencing {
+            table: referencing_table,
+            columns,
+            constraint,
+        } = referencing;
+        if self.dropped_constraints.contains(constraint) {
+            return None;
+        }
+        let referencing_range = self.index.tables[*referencing_table].columns.range;
+        let referenced_range = self.index.tables[table].columns.range;
+        for (column, referenced_column) in columns.iter().copied().zip(referenced_columns) {
+            let (Some(ty), Some(referenced_ty)) = (
+                self.find_column_in(referencing_range, column)
+                    .and_then(|id| self.index.columns[id].ty),
+                self.find_column_in(referenced_range, referenced_column)
+                    .and_then(|id| self.index.columns[id].ty),
+            ) else {
+                continue;
+            };
+            if !self.foreign_key_types_compatible(ty, referenced_ty) {
+                return Some(SemaError::ForeignKeyTypeMismatch {
+                    constraint: self.index.constraints[*constraint].name,
+                    column,
+                    referenced_column,
+                    ty: self.index.ty_name(ty),
+                    referenced_ty: self.index.ty_name(referenced_ty),
+                });
+            }
+        }
+        None
+    }
+
+    fn foreign_key_types_compatible(&self, ty: Ty, referenced_ty: Ty) -> bool {
+        let (Some(ty), Some(referenced_ty)) = (
+            self.index.base_type(ty),
+            self.index.base_type(referenced_ty),
+        ) else {
+            return true;
+        };
+        if ty == referenced_ty {
+            return true;
+        }
+        let Some(btree) = self.btree() else {
+            return true;
+        };
+        let class = match self.default_operator_class(btree, referenced_ty) {
+            DefaultClass::Found(class) => class,
+            DefaultClass::Missing | DefaultClass::Unknown => return true,
+        };
+        let OperatorClass {
+            ty: Some(input),
+            family,
+            ..
+        } = self.index.operator_classes[class]
+        else {
+            return true;
+        };
+        if self.overloads().is_pseudo(input) {
+            return false;
+        }
+        if let Some(family) = family
+            && self.family_has_equality(family, input, ty)
+            && self.family_has_equality(family, ty, ty)
+        {
+            return true;
+        }
+        let overloads = self.overloads();
+        !overloads.rejects_arg(ArgType::Known(referenced_ty), input)
+            && !overloads.rejects_arg(ArgType::Known(ty), input)
+    }
+
+    fn check_default_operator_class(
+        &mut self,
+        access_method: AccessMethodId,
+        ty: Ty,
+        node: &SyntaxNode,
+    ) {
+        if self.index.access_methods[access_method].kind != AccessMethodKind::Index {
+            return;
+        }
+        match self.default_operator_class(access_method, ty) {
+            DefaultClass::Missing => {
+                let error = SemaError::NoDefaultOperatorClass {
+                    ty: self.index.ty_name(ty),
+                    access_method: self.index.access_methods[access_method].name,
+                };
+                self.push_error(node, error);
+            }
+            DefaultClass::Found(_) | DefaultClass::Unknown => {}
+        }
+    }
+
+    fn check_key_operator_classes(&mut self, table: TableId, columns: &[Name], node: &SyntaxNode) {
+        let Some(btree) = self.btree() else {
+            return;
+        };
+        let range = self.index.tables[table].columns.range;
+        for column in columns {
+            if let Some(ty) = self
+                .find_column_in(range, *column)
+                .and_then(|id| self.index.columns[id].ty)
+            {
+                self.check_default_operator_class(btree, ty, node);
+            }
+        }
+    }
+
+    fn btree(&self) -> Option<AccessMethodId> {
+        self.index
+            .names
+            .lookup("btree")
+            .and_then(|name| self.find_access_method(name))
+    }
+
+    fn default_operator_class(&self, access_method: AccessMethodId, ty: Ty) -> DefaultClass {
+        let Some(ty) = self.index.base_type(ty) else {
+            return DefaultClass::Unknown;
+        };
+        let overloads = self.overloads();
+        let mut exact = DefaultMatches::default();
+        let mut preferred = DefaultMatches::default();
+        let mut compatible = DefaultMatches::default();
+        for (id, class) in self.index.operator_classes.iter() {
+            if !class.default
+                || class.access_method != Some(access_method)
+                || self.dropped_operator_classes.contains(&id)
+            {
+                continue;
+            }
+            let Some(input) = class.ty else {
+                continue;
+            };
+            if input == ty {
+                exact.push(id);
+            } else if exact.count == 0 && overloads.binary_coercible(ty, input) {
+                if overloads.is_preferred_in_category(input, ty) {
+                    preferred.push(id);
+                } else {
+                    compatible.push(id);
+                }
+            }
+        }
+        for matches in [exact, preferred, compatible] {
+            match matches.count {
+                0 => {}
+                1 => {
+                    if let Some(class) = matches.first {
+                        return DefaultClass::Found(class);
+                    }
+                }
+                _ => return DefaultClass::Unknown,
+            }
+        }
+        DefaultClass::Missing
+    }
+
+    fn family_has_equality(&self, family: OperatorFamilyId, left: Ty, right: Ty) -> bool {
+        let classes = self
+            .index
+            .operator_classes
+            .iter()
+            .filter(|(id, class)| {
+                class.family == Some(family) && !self.dropped_operator_classes.contains(id)
+            })
+            .map(|(id, _)| MemberOwner::Class(id));
+        std::iter::once(MemberOwner::Family(family))
+            .chain(classes)
+            .any(|owner| {
+                self.index.operator_family_members.get(owner).any(|id| {
+                    let member = &self.index.operator_family_members[id];
+                    member.kind == MemberKind::Operator
+                        && member.number == Some(3)
+                        && member.operands.left == Operand::Ty(left)
+                        && member.operands.right == Operand::Ty(right)
+                })
+            })
     }
 
     fn check_conflict_arbiter(&mut self, table: TableId, on_index: &ast::ConflictOnIndex) {
@@ -20598,7 +21134,7 @@ impl Lowerer {
         self.with_visible_sources(visible, |this| match condition {
             ast::JoinCondition::OnClause(on_clause) => {
                 if let Some(expr) = on_clause.expr() {
-                    this.lower_expr(&expr);
+                    this.lower_condition(Condition::On, &expr);
                 }
             }
             ast::JoinCondition::JoinUsingClause(using_clause) => {
@@ -20624,6 +21160,9 @@ impl Lowerer {
         {
             let name = self.intern(&column_ref.text());
             let MergedColumn { resolution, inputs } = self.merge_column(name, start, mid, kind);
+            if let Some(inputs) = inputs {
+                self.check_using_operator(inputs, column_ref.syntax());
+            }
             let input_resolution = match inputs {
                 Some(inputs) => Resolution::Column {
                     source: None,
@@ -20731,6 +21270,28 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn check_using_operator(
+        &mut self,
+        MergeInputs { left, right }: MergeInputs,
+        node: &SyntaxNode,
+    ) {
+        let (Some(left), Some(right)) = (self.index.columns[left].ty, self.index.columns[right].ty)
+        else {
+            return;
+        };
+        let Some(name) = self.index.names.lookup("=") else {
+            return;
+        };
+        let left_arg = Some(ArgType::Known(left));
+        let right_arg = Some(ArgType::Known(right));
+        let Resolution::Operator(operator) = self.select_operator(None, name, left_arg, right_arg)
+        else {
+            return;
+        };
+        let found = self.operator_result_type(operator, left_arg, right_arg);
+        self.check_comparison(Comparison::Using, node, left, right, found);
     }
 
     fn merge_inputs_column(&mut self, MergeInputs { left, right }: MergeInputs) -> ColumnId {
@@ -21232,6 +21793,21 @@ impl Lowerer {
                 if let Some(ast::BinOp::Overlaps(overlaps)) = &op {
                     return self.lower_overlaps(bin, overlaps);
                 }
+                let in_op = if let Some(ast::BinOp::In(token)) = &op {
+                    Some((Comparison::In, token.text_range()))
+                } else if let Some(ast::BinOp::NotIn(not_in)) = &op {
+                    Some((Comparison::NotIn, not_in.syntax().text_range()))
+                } else {
+                    None
+                };
+                if let Some((comparison, op_range)) = in_op
+                    && let Some(lhs) = bin.lhs()
+                    && !matches!(lhs, ast::Expr::TupleExpr(_))
+                    && let Some(rhs) = bin.rhs()
+                    && let Some(list) = InList::new(&rhs)
+                {
+                    return self.lower_in_comparison(comparison, op_range, &lhs, &rhs, &list);
+                }
                 let lhs = bin.lhs();
                 let rhs = bin.rhs();
                 let lhs_ty = lhs.as_ref().and_then(|lhs| self.lower_expr(lhs));
@@ -21246,6 +21822,21 @@ impl Lowerer {
                 };
                 if let (Some(op), Some(ast::Expr::TupleExpr(lhs)), Some(rhs)) = (&op, &lhs, &rhs) {
                     self.check_row_lengths(op, lhs, rhs);
+                }
+                let condition = if let Some(ast::BinOp::And(_)) = &op {
+                    Some(Condition::And)
+                } else if let Some(ast::BinOp::Or(_)) = &op {
+                    Some(Condition::Or)
+                } else {
+                    None
+                };
+                if let Some(condition) = condition {
+                    if let Some(lhs) = &lhs {
+                        self.check_condition(condition, lhs.syntax(), lhs_ty);
+                    }
+                    if let Some(rhs) = &rhs {
+                        self.check_condition(condition, rhs.syntax(), rhs_ty);
+                    }
                 }
                 let ty = op
                     .as_ref()
@@ -21263,14 +21854,21 @@ impl Lowerer {
             ast::Expr::CaseExpr(case) => {
                 let srf_calls = self.srf_calls.len();
                 self.lower_case_keywords(case);
-                self.lower_exprs(case.expr());
+                let operand = case.expr();
+                self.lower_exprs(operand.clone());
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
                 for when in case
                     .when_clause_list()
                     .into_iter()
                     .flat_map(|list| list.when_clauses())
                 {
-                    self.lower_exprs(when.condition());
+                    if let Some(condition) = when.condition() {
+                        if operand.is_some() {
+                            self.lower_expr(&condition);
+                        } else {
+                            self.lower_condition(Condition::CaseWhen, &condition);
+                        }
+                    }
                     if let Some(then) = when.then() {
                         self.lower_common_expr(&mut common, &then);
                     }
@@ -21368,6 +21966,9 @@ impl Lowerer {
                 let expr = prefix.expr();
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
+                if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
+                    self.check_condition(Condition::Not, expr.syntax(), ty);
+                }
                 return self.lower_prefix_operator(&op, expr_arg_type(expr.as_ref(), ty));
             }
             ast::Expr::SliceExpr(slice) => {
@@ -22246,7 +22847,7 @@ impl Lowerer {
         self.check_set_returning_call(call, function, srf_calls);
         self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Filter, &expr);
+            self.lower_condition(Condition::Filter, &expr);
         }
         if call.over_clause().is_some()
             && let Some(arg_list) = call.arg_list()
@@ -22459,6 +23060,50 @@ impl Lowerer {
 
     fn lower_expr_in(&mut self, context: ExprContext, expr: &ast::Expr) -> Option<Ty> {
         self.with_expr_context(context, |this| this.lower_expr(expr))
+    }
+
+    fn lower_condition(&mut self, condition: Condition, expr: &ast::Expr) {
+        let found = match condition.context() {
+            Some(context) => self.lower_expr_in(context, expr),
+            None => self.lower_expr(expr),
+        };
+        self.check_condition(condition, expr.syntax(), found);
+    }
+
+    fn check_comparison(
+        &mut self,
+        comparison: Comparison,
+        node: &SyntaxNode,
+        left: Ty,
+        right: Ty,
+        found: Option<Ty>,
+    ) {
+        if let Some(found) = found
+            && let Some(bool) = self.builtin_type("bool")
+            && self.overloads().rejects_arg(ArgType::Known(found), bool)
+        {
+            let error = SemaError::NonBoolComparison {
+                comparison,
+                left: self.index.ty_name(left),
+                right: self.index.ty_name(right),
+                found: self.index.ty_name(found),
+            };
+            self.push_error(node, error);
+        }
+    }
+
+    fn check_condition(&mut self, condition: Condition, node: &SyntaxNode, found: Option<Ty>) {
+        if let Some(found) = found
+            && let Some(bool) = self.builtin_type("bool")
+            && self.overloads().rejects_arg(ArgType::Known(found), bool)
+        {
+            let error = SemaError::KeywordArgType {
+                keyword: condition.keyword(),
+                expected: self.index.ty_name(bool),
+                found: self.index.ty_name(found),
+            };
+            self.push_error(node, error);
+        }
     }
 
     fn lower_call_args(&mut self, arg_list: Option<ast::ArgList>) -> CallArgs {

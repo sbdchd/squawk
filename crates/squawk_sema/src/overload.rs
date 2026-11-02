@@ -1019,6 +1019,34 @@ impl<'a> Overloads<'a> {
         })
     }
 
+    pub(crate) fn binary_coercible(&self, source: Ty, target: Ty) -> bool {
+        let Some(source) = self.index.base_type(source) else {
+            return false;
+        };
+        if source == target {
+            return true;
+        }
+        if self.pseudo(target).is_some() {
+            return self.coerce(source, target) == Some(Match::Polymorphic);
+        }
+        self.index
+            .casts
+            .get(CastTypes { source, target })
+            .find(|cast| !self.dropped_casts.contains(cast))
+            .is_some_and(|cast| {
+                let cast = &self.index.casts[cast];
+                cast.context == CastContext::Implicit && cast.binary
+            })
+    }
+
+    pub(crate) fn is_pseudo(&self, ty: Ty) -> bool {
+        self.pseudo(ty).is_some()
+    }
+
+    pub(crate) fn is_preferred_in_category(&self, ty: Ty, category_of: Ty) -> bool {
+        self.is_preferred(ty) && self.category(ty) == self.category(category_of)
+    }
+
     pub(crate) fn rejects_arg(&self, arg: ArgType, param: Ty) -> bool {
         self.arg_match(arg, Some(param)).is_none()
     }

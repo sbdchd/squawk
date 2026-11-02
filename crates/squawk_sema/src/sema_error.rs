@@ -611,6 +611,23 @@ pub(crate) enum SemaError {
         expected: TyName,
         found: TyName,
     },
+    NoDefaultOperatorClass {
+        ty: TyName,
+        access_method: Name,
+    },
+    ForeignKeyTypeMismatch {
+        constraint: Name,
+        column: Name,
+        referenced_column: Name,
+        ty: TyName,
+        referenced_ty: TyName,
+    },
+    NonBoolComparison {
+        comparison: Comparison,
+        left: TyName,
+        right: TyName,
+        found: TyName,
+    },
     WindowOverride {
         name: Name,
         clause: WindowClause,
@@ -684,6 +701,30 @@ pub(crate) struct ViewColumnRename {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct DropRelation {
     pub(crate) keyword_range: Option<TextRange>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Comparison {
+    In,
+    NotIn,
+    Using,
+}
+
+impl Comparison {
+    pub(crate) fn operator(self) -> &'static str {
+        match self {
+            Comparison::In | Comparison::Using => "=",
+            Comparison::NotIn => "<>",
+        }
+    }
+
+    fn note(self) -> &'static str {
+        match self {
+            Comparison::In => "`in` compares each element using `=`",
+            Comparison::NotIn => "`not in` compares each element using `<>`",
+            Comparison::Using => "`using` compares the joined columns using `=`",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1252,9 +1293,8 @@ impl SemaError {
             SemaError::NoPrimaryKeyForReferencedTable { .. }
             | SemaError::NoUniqueConstraintForReferencedTable { .. }
             | SemaError::DeferrablePrimaryKeyForReferencedTable { .. }
-            | SemaError::DeferrableUniqueConstraintForReferencedTable { .. } => {
-                DiagnosticKind::InvalidForeignKey
-            }
+            | SemaError::DeferrableUniqueConstraintForReferencedTable { .. }
+            | SemaError::ForeignKeyTypeMismatch { .. } => DiagnosticKind::InvalidForeignKey,
             SemaError::NoConflictArbiter { .. }
             | SemaError::DeferrableConflictArbiter
             | SemaError::ConflictConstraintWithoutIndex
@@ -1281,7 +1321,9 @@ impl SemaError {
             SemaError::UniqueIndexNotSupported { .. } => DiagnosticKind::UniqueIndexNotSupported,
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
+            SemaError::NoDefaultOperatorClass { .. } => DiagnosticKind::MissingDefaultOperatorClass,
             SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::NonBoolComparison { .. } => DiagnosticKind::TypeMismatch,
             SemaError::TriggerReturnType { .. } | SemaError::OutParamResultType { .. } => {
                 DiagnosticKind::WrongReturnType
             }
@@ -1631,6 +1673,9 @@ impl SemaError {
 
     pub(crate) fn hint(&self) -> Option<&'static str> {
         match *self {
+            SemaError::NoDefaultOperatorClass { .. } => Some(
+                "specify an operator class for the index or define a default operator class for the data type",
+            ),
             SemaError::EmptyArrayType => Some(
                 "explicitly cast to the desired type, for example `array[]::integer[]`",
             ),
@@ -1848,6 +1893,9 @@ impl SemaError {
     }
 
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
+        if let SemaError::NonBoolComparison { comparison, .. } = *self {
+            return Some(Cow::Borrowed(comparison.note()));
+        }
         if let SemaError::PseudoTypeColumn { .. } = *self {
             return Some(Cow::Borrowed(
                 "pseudo-types can only be used for function arguments and return types",
@@ -1891,6 +1939,27 @@ impl SemaError {
                 }
             };
             return Some(Cow::Owned(note));
+        }
+        if let SemaError::ForeignKeyTypeMismatch {
+            column,
+            referenced_column,
+            ty,
+            referenced_ty,
+            ..
+        } = *self
+        {
+            let message = ErrorMessage {
+                error: self,
+                names,
+                errors,
+            };
+            return Some(Cow::Owned(format!(
+                "key columns `{}` and `{}` are of incompatible types: `{}` and `{}`",
+                names.resolve(column),
+                names.resolve(referenced_column),
+                message.ty(ty),
+                message.ty(referenced_ty)
+            )));
         }
         if let SemaError::ArgumentCountMismatch { missing, .. } = *self
             && !missing.is_empty()
@@ -2782,6 +2851,30 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "argument of `{keyword}` must be type `{}`, not type `{}`",
                 self.ty(expected),
+                self.ty(found)
+            ),
+            SemaError::NoDefaultOperatorClass { ty, access_method } => write!(
+                f,
+                "data type `{}` has no default operator class for access method `{}`",
+                self.ty(ty),
+                n(access_method)
+            ),
+            SemaError::ForeignKeyTypeMismatch { constraint, .. } => write!(
+                f,
+                "foreign key constraint `{}` cannot be implemented",
+                n(constraint)
+            ),
+            SemaError::NonBoolComparison {
+                comparison,
+                left,
+                right,
+                found,
+            } => write!(
+                f,
+                "operator `{} {} {}` must return type `bool`, not type `{}`",
+                self.ty(left),
+                comparison.operator(),
+                self.ty(right),
                 self.ty(found)
             ),
             SemaError::MissingArrayType { ty } => {

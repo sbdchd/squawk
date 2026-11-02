@@ -60,6 +60,10 @@ impl<T: Qualified> QualifiedIndex<T> {
         self.by_schema.get(schema)
     }
 
+    pub(crate) fn iter(&self) -> impl DoubleEndedIterator<Item = (Idx<T>, &T)> {
+        self.arena.iter()
+    }
+
     pub(crate) fn next_idx(&self) -> Idx<T> {
         self.arena.next_idx()
     }
