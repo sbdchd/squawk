@@ -700,7 +700,7 @@ pub(crate) enum Comparison {
 }
 
 impl Comparison {
-    fn operator(self) -> &'static str {
+    pub(crate) fn operator(self) -> &'static str {
         match self {
             Comparison::In | Comparison::Using => "=",
             Comparison::NotIn => "<>",

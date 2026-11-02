@@ -19358,11 +19358,13 @@ impl Lowerer {
 
     fn lower_in_comparison(
         &mut self,
-        op: &ast::BinOp,
+        comparison: Comparison,
+        op_range: TextRange,
         lhs: &ast::Expr,
         rhs: &ast::Expr,
         list: &InList,
     ) -> Option<Ty> {
+        let operator = comparison.operator();
         let lhs_ty = self.lower_expr(lhs);
         let left = expr_arg_type(Some(lhs), lhs_ty);
         let mut common = CommonType::new(left);
@@ -19379,15 +19381,17 @@ impl Lowerer {
             self.lower_enum_comparison(Some(ty), lhs);
         }
         if elements.len() > 1 && common != ArgType::Untyped {
-            return self.lower_bin_operator(op, left, common);
+            return self.add_expr_operator_ref(op_range, None, operator, Some(left), Some(common));
         }
-        let comparison = if let ast::BinOp::NotIn(_) = op {
-            Comparison::NotIn
-        } else {
-            Comparison::In
-        };
         for (expr, right) in list.exprs().zip(elements) {
-            let found = self.lower_bin_operator(op, left, right);
+            let found = self.add_expr_operator_ref_at(
+                op_range,
+                expr.syntax().text_range(),
+                None,
+                operator,
+                Some(left),
+                Some(right),
+            );
             if let (ArgType::Known(left), ArgType::Known(right)) = (left, right) {
                 self.check_comparison(comparison, expr.syntax(), left, right, found);
             }
@@ -19557,6 +19561,18 @@ impl Lowerer {
         left: Option<ArgType>,
         right: Option<ArgType>,
     ) -> Option<Ty> {
+        self.add_expr_operator_ref_at(range, range, schema, text, left, right)
+    }
+
+    fn add_expr_operator_ref_at(
+        &mut self,
+        range: TextRange,
+        error_range: TextRange,
+        schema: Option<Name>,
+        text: &str,
+        left: Option<ArgType>,
+        right: Option<ArgType>,
+    ) -> Option<Ty> {
         let name = self.intern(text);
         let mut resolution = self.select_operator(schema, name, left, right);
         if matches!(resolution, Resolution::Unresolved | Resolution::Ambiguous)
@@ -19573,7 +19589,7 @@ impl Lowerer {
                 ambiguous: matches!(resolution, Resolution::Ambiguous),
                 replacement: self.operator_replacement(schema, text, left, right),
             };
-            self.push_error_at(InIrFile::new(self.file_id, range), error);
+            self.push_error_at(InIrFile::new(self.file_id, error_range), error);
             resolution = Resolution::Unknown;
         }
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
@@ -21397,13 +21413,20 @@ impl Lowerer {
                 if let Some(ast::BinOp::Overlaps(overlaps)) = &op {
                     return self.lower_overlaps(bin, overlaps);
                 }
-                if let Some(op @ (ast::BinOp::In(_) | ast::BinOp::NotIn(_))) = &op
+                let in_op = if let Some(ast::BinOp::In(token)) = &op {
+                    Some((Comparison::In, token.text_range()))
+                } else if let Some(ast::BinOp::NotIn(not_in)) = &op {
+                    Some((Comparison::NotIn, not_in.syntax().text_range()))
+                } else {
+                    None
+                };
+                if let Some((comparison, op_range)) = in_op
                     && let Some(lhs) = bin.lhs()
                     && !matches!(lhs, ast::Expr::TupleExpr(_))
                     && let Some(rhs) = bin.rhs()
                     && let Some(list) = InList::new(&rhs)
                 {
-                    return self.lower_in_comparison(op, &lhs, &rhs, &list);
+                    return self.lower_in_comparison(comparison, op_range, &lhs, &rhs, &list);
                 }
                 let lhs = bin.lhs();
                 let rhs = bin.rhs();

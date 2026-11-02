@@ -287,7 +287,7 @@ select 1 from t where a in (1, now());
     error: operator does not exist: `int4 = timestamptz`
        ╭▸ 
     23 │ select 1 from t where a in (1, now());
-       │                         ━━
+       │                                ━━━━━
        │
        ╰ hint: consider adding explicit type casts
     ");

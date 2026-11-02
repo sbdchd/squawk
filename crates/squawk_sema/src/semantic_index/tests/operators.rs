@@ -305,7 +305,7 @@ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i i
     error: operator does not exist: `int4 = text`
       ╭▸ 
     4 │ select i like 'a%', i similar to 'a', i not ilike 'a', m is distinct from 1, i in (s), s not in (select i from t) from t;
-      │                                                                                ━━
+      │                                                                                    ━
       │
       ╰ hint: consider adding explicit type casts
     error: operator does not exist: `text <> int4`
