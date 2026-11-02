@@ -1054,6 +1054,7 @@ order by n.nspname, f.opfname, a.amname, f.oid;
 
 #[derive(Deserialize)]
 struct OperatorClassQuery {
+    oid: i64,
     schema: String,
     name: String,
     is_default: i32,
@@ -1068,6 +1069,7 @@ struct OperatorClassQuery {
 impl Query for OperatorClassQuery {
     const QUERY: &'static str = r"
 select
+  c.oid::bigint as oid,
   case
     when ext.extname is null then quote_ident(n.nspname) || '.'
     else ''
@@ -1104,6 +1106,210 @@ where
   and n.nspname not like 'pg_toast%'
   and (n.nspname != 'public' or ext.extname is not null)
 order by n.nspname, c.opcname, a.amname, c.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct OperatorMemberQuery {
+    family_oid: i64,
+    class_oid: i64,
+    family: String,
+    access_method: String,
+    number: i32,
+    operator: String,
+    left_type: String,
+    right_type: String,
+    sort_family: String,
+    extension_name: String,
+}
+
+impl Query for OperatorMemberQuery {
+    const QUERY: &'static str = r"
+select
+  o.amopfamily::bigint as family_oid,
+  owner.oid::bigint as class_oid,
+  case
+    when f_dep.objid is null then quote_ident(fn.nspname) || '.'
+    else ''
+  end || quote_ident(f.opfname) as family,
+  quote_ident(a.amname) as access_method,
+  o.amopstrategy as number,
+  case when op_dep.objid is null then opn.nspname || '.' else '' end
+    || op.oprname as operator,
+  format_type(o.amoplefttype, null) as left_type,
+  format_type(o.amoprighttype, null) as right_type,
+  case
+    when sf.oid is null then ''
+    when sf_dep.objid is null then
+      quote_ident(sfn.nspname) || '.' || quote_ident(sf.opfname)
+    else quote_ident(sf.opfname)
+  end as sort_family,
+  coalesce(f_ext.extname, op_ext.extname, 'builtins') as extension_name
+from pg_amop o
+  join pg_opfamily f on f.oid = o.amopfamily
+  join pg_namespace fn on fn.oid = f.opfnamespace
+  join pg_am a on a.oid = o.amopmethod
+  join pg_operator op on op.oid = o.amopopr
+  join pg_namespace opn on opn.oid = op.oprnamespace
+  left join pg_opfamily sf on sf.oid = o.amopsortfamily
+  left join pg_namespace sfn on sfn.oid = sf.opfnamespace
+  left join pg_depend f_dep on
+    f_dep.classid = 'pg_opfamily'::regclass
+      and f_dep.objid = f.oid
+      and f_dep.objsubid = 0
+      and f_dep.deptype = 'e'
+  left join pg_extension f_ext on f_ext.oid = f_dep.refobjid
+  left join pg_depend op_dep on
+    op_dep.classid = 'pg_operator'::regclass
+      and op_dep.objid = op.oid
+      and op_dep.objsubid = 0
+      and op_dep.deptype = 'e'
+  left join pg_extension op_ext on op_ext.oid = op_dep.refobjid
+  left join pg_depend sf_dep on
+    sf_dep.classid = 'pg_opfamily'::regclass
+      and sf_dep.objid = sf.oid
+      and sf_dep.objsubid = 0
+      and sf_dep.deptype = 'e'
+  cross join lateral (
+    select coalesce(
+      (
+        select d.refobjid
+        from pg_depend d
+        where
+          d.classid = 'pg_amop'::regclass
+          and d.objid = o.oid
+          and d.refclassid = 'pg_opclass'::regclass
+          and d.deptype = 'i'
+      ),
+      case
+        when not exists(
+          select
+          from pg_depend d
+          where d.classid = 'pg_amop'::regclass and d.objid = o.oid
+        ) then
+          (
+            select c.oid
+            from pg_opclass c
+            where
+              c.opcfamily = o.amopfamily
+              and c.opcintype = o.amoplefttype
+              and c.opcintype = o.amoprighttype
+            order by c.opcdefault desc, c.oid
+            limit 1
+          )
+      end,
+      0
+    ) as oid
+  ) owner
+where
+  fn.nspname not like 'pg_temp%'
+  and fn.nspname not like 'pg_toast%'
+  and (fn.nspname != 'public' or f_ext.extname is not null)
+order by
+  fn.nspname,
+  f.opfname,
+  a.amname,
+  o.amopstrategy,
+  format_type(o.amoplefttype, null),
+  format_type(o.amoprighttype, null),
+  o.oid;
+";
+}
+
+#[derive(Deserialize)]
+struct FunctionMemberQuery {
+    family_oid: i64,
+    class_oid: i64,
+    family: String,
+    access_method: String,
+    number: i32,
+    left_type: String,
+    right_type: String,
+    function: String,
+    args: String,
+    extension_name: String,
+}
+
+impl Query for FunctionMemberQuery {
+    const QUERY: &'static str = r"
+select
+  pr.amprocfamily::bigint as family_oid,
+  owner.oid::bigint as class_oid,
+  case
+    when f_dep.objid is null then quote_ident(fn.nspname) || '.'
+    else ''
+  end || quote_ident(f.opfname) as family,
+  quote_ident(a.amname) as access_method,
+  pr.amprocnum as number,
+  format_type(pr.amproclefttype, null) as left_type,
+  format_type(pr.amprocrighttype, null) as right_type,
+  case
+    when p_dep.objid is null then quote_ident(pn.nspname) || '.'
+    else ''
+  end || quote_ident(p.proname) as function,
+  oidvectortypes(p.proargtypes) as args,
+  coalesce(f_ext.extname, p_ext.extname, 'builtins') as extension_name
+from pg_amproc pr
+  join pg_opfamily f on f.oid = pr.amprocfamily
+  join pg_namespace fn on fn.oid = f.opfnamespace
+  join pg_am a on a.oid = f.opfmethod
+  join pg_proc p on p.oid = pr.amproc
+  join pg_namespace pn on pn.oid = p.pronamespace
+  left join pg_depend f_dep on
+    f_dep.classid = 'pg_opfamily'::regclass
+      and f_dep.objid = f.oid
+      and f_dep.objsubid = 0
+      and f_dep.deptype = 'e'
+  left join pg_extension f_ext on f_ext.oid = f_dep.refobjid
+  left join pg_depend p_dep on
+    p_dep.classid = 'pg_proc'::regclass
+      and p_dep.objid = p.oid
+      and p_dep.objsubid = 0
+      and p_dep.deptype = 'e'
+  left join pg_extension p_ext on p_ext.oid = p_dep.refobjid
+  cross join lateral (
+    select coalesce(
+      (
+        select d.refobjid
+        from pg_depend d
+        where
+          d.classid = 'pg_amproc'::regclass
+          and d.objid = pr.oid
+          and d.refclassid = 'pg_opclass'::regclass
+          and d.deptype = 'i'
+      ),
+      case
+        when not exists(
+          select
+          from pg_depend d
+          where d.classid = 'pg_amproc'::regclass and d.objid = pr.oid
+        ) then
+          (
+            select c.oid
+            from pg_opclass c
+            where
+              c.opcfamily = pr.amprocfamily
+              and c.opcintype = pr.amproclefttype
+              and c.opcintype = pr.amprocrighttype
+            order by c.opcdefault desc, c.oid
+            limit 1
+          )
+      end,
+      0
+    ) as oid
+  ) owner
+where
+  fn.nspname not like 'pg_temp%'
+  and fn.nspname not like 'pg_toast%'
+  and (fn.nspname != 'public' or f_ext.extname is not null)
+order by
+  fn.nspname,
+  f.opfname,
+  a.amname,
+  pr.amprocnum,
+  format_type(pr.amproclefttype, null),
+  format_type(pr.amprocrighttype, null),
+  pr.oid;
 ";
 }
 
@@ -1638,7 +1844,81 @@ struct OperatorClassDef {
     access_method: String,
     family: String,
     storage_type: String,
+    members: Vec<OperatorClassMember>,
     description: String,
+}
+
+enum OperatorClassMember {
+    Operator {
+        number: i32,
+        operator: String,
+        left_type: String,
+        right_type: String,
+        sort_family: String,
+    },
+    Function {
+        number: i32,
+        left_type: String,
+        right_type: String,
+        function: String,
+        args: String,
+    },
+}
+
+impl std::fmt::Display for OperatorClassMember {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            OperatorClassMember::Operator {
+                number,
+                operator,
+                left_type,
+                right_type,
+                sort_family,
+            } => {
+                write!(
+                    f,
+                    "operator {number} {operator} ({left_type}, {right_type})"
+                )?;
+                if !sort_family.is_empty() {
+                    write!(f, " for order by {sort_family}")?;
+                }
+                Ok(())
+            }
+            OperatorClassMember::Function {
+                number,
+                left_type,
+                right_type,
+                function,
+                args,
+            } => write!(
+                f,
+                "function {number} ({left_type}, {right_type}) {function}({args})"
+            ),
+        }
+    }
+}
+
+struct OperatorFamilyMembersDef {
+    family: String,
+    access_method: String,
+    members: Vec<OperatorClassMember>,
+}
+
+impl WriteSql for OperatorFamilyMembersDef {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        write!(
+            f,
+            "alter operator family {} using {} add",
+            self.family, self.access_method
+        )?;
+        for (i, member) in self.members.iter().enumerate() {
+            let separator = if i == 0 { "" } else { "," };
+            write!(f, "{separator}\n  {member}")?;
+        }
+        writeln!(f, ";")?;
+        writeln!(f)?;
+        Ok(())
+    }
 }
 
 impl WriteSql for OperatorClassDef {
@@ -1648,13 +1928,15 @@ impl WriteSql for OperatorClassDef {
         if self.default {
             write!(f, "default ")?;
         }
-        // TODO: emit the class's OPERATOR and FUNCTION members (pg_amop/pg_amproc), and the
-        // loose family members as `alter operator family ... add`, split using pg_depend.
-        writeln!(
+        write!(
             f,
-            "for type {} using {} family {} as storage {};",
-            self.ty, self.access_method, self.family, self.storage_type
+            "for type {} using {} family {} as",
+            self.ty, self.access_method, self.family
         )?;
+        for member in &self.members {
+            write!(f, "\n  {member},")?;
+        }
+        writeln!(f, "\n  storage {};", self.storage_type)?;
         writeln!(f)?;
         Ok(())
     }
@@ -2544,6 +2826,7 @@ struct Module {
     conversions: Vec<ConversionDef>,
     operator_families: Vec<OperatorFamilyDef>,
     operator_classes: Vec<OperatorClassDef>,
+    operator_family_members: Vec<OperatorFamilyMembersDef>,
     text_search_parsers: Vec<TextSearchParserDef>,
     text_search_templates: Vec<TextSearchTemplateDef>,
     text_search_dictionaries: Vec<TextSearchDictionaryDef>,
@@ -2662,6 +2945,10 @@ impl Module {
             .filter(|function| matches!(function, FunctionDef::Aggregate(_)))
         {
             function.write_sql(f)?;
+        }
+
+        for members in &self.operator_family_members {
+            members.write_sql(f)?;
         }
 
         for cast in &self.casts {
@@ -3081,22 +3368,127 @@ fn query_operator_families(modules: &mut BTreeMap<String, Module>) -> Result<()>
 }
 
 fn query_operator_classes(modules: &mut BTreeMap<String, Module>) -> Result<()> {
+    let mut classes = BTreeMap::new();
     for row in OperatorClassQuery::run()? {
-        modules
-            .entry(module_name(row.extension_name))
-            .or_default()
-            .operator_classes
-            .push(OperatorClassDef {
-                schema: row.schema,
-                name: row.name,
-                default: row.is_default == 1,
-                ty: row.ty,
-                access_method: row.access_method,
-                family: row.family,
-                storage_type: row.storage_type,
-                description: row.description,
-            });
+        let module_name = module_name(row.extension_name);
+        let module = modules.entry(module_name.clone()).or_default();
+        classes.insert(
+            row.oid,
+            MemberTarget {
+                module: module_name,
+                index: module.operator_classes.len(),
+            },
+        );
+        module.operator_classes.push(OperatorClassDef {
+            schema: row.schema,
+            name: row.name,
+            default: row.is_default == 1,
+            ty: row.ty,
+            access_method: row.access_method,
+            family: row.family,
+            storage_type: row.storage_type,
+            members: vec![],
+            description: row.description,
+        });
     }
+
+    let mut families = BTreeMap::new();
+    for row in OperatorMemberQuery::run()? {
+        let member = OperatorClassMember::Operator {
+            number: row.number,
+            operator: row.operator,
+            left_type: row.left_type,
+            right_type: row.right_type,
+            sort_family: row.sort_family,
+        };
+        let target = MemberRow {
+            family_oid: row.family_oid,
+            class_oid: row.class_oid,
+            family: row.family,
+            access_method: row.access_method,
+            extension_name: row.extension_name,
+        };
+        add_member(modules, &classes, &mut families, target, member)?;
+    }
+    for row in FunctionMemberQuery::run()? {
+        let member = OperatorClassMember::Function {
+            number: row.number,
+            left_type: row.left_type,
+            right_type: row.right_type,
+            function: row.function,
+            args: row.args,
+        };
+        let target = MemberRow {
+            family_oid: row.family_oid,
+            class_oid: row.class_oid,
+            family: row.family,
+            access_method: row.access_method,
+            extension_name: row.extension_name,
+        };
+        add_member(modules, &classes, &mut families, target, member)?;
+    }
+    for module in modules.values_mut() {
+        module
+            .operator_family_members
+            .sort_by(|a, b| (&a.family, &a.access_method).cmp(&(&b.family, &b.access_method)));
+    }
+    Ok(())
+}
+
+struct MemberTarget {
+    module: String,
+    index: usize,
+}
+
+struct MemberRow {
+    family_oid: i64,
+    class_oid: i64,
+    family: String,
+    access_method: String,
+    extension_name: String,
+}
+
+fn add_member(
+    modules: &mut BTreeMap<String, Module>,
+    classes: &BTreeMap<i64, MemberTarget>,
+    families: &mut BTreeMap<i64, MemberTarget>,
+    row: MemberRow,
+    member: OperatorClassMember,
+) -> Result<()> {
+    if row.class_oid != 0 {
+        let target = classes
+            .get(&row.class_oid)
+            .with_context(|| format!("operator class {} not found", row.class_oid))?;
+        let module = modules
+            .get_mut(&target.module)
+            .context("operator class module not found")?;
+        module.operator_classes[target.index].members.push(member);
+        return Ok(());
+    }
+    let target = match families.get(&row.family_oid) {
+        Some(target) => target,
+        None => {
+            let module_name = module_name(row.extension_name);
+            let module = modules.entry(module_name.clone()).or_default();
+            module
+                .operator_family_members
+                .push(OperatorFamilyMembersDef {
+                    family: row.family,
+                    access_method: row.access_method,
+                    members: vec![],
+                });
+            families.entry(row.family_oid).or_insert(MemberTarget {
+                module: module_name,
+                index: module.operator_family_members.len() - 1,
+            })
+        }
+    };
+    let module = modules
+        .get_mut(&target.module)
+        .context("operator family module not found")?;
+    module.operator_family_members[target.index]
+        .members
+        .push(member);
     Ok(())
 }
 

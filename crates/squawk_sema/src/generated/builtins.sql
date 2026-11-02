@@ -40358,156 +40358,689 @@ create operator class pg_catalog.aclitem_ops
   default for type aclitem
   using hash
   family pg_catalog.aclitem_ops as
+    operator 1 pg_catalog.= (aclitem, aclitem),
+    function 1 (aclitem, aclitem) pg_catalog.hash_aclitem(aclitem),
+    function 2 (
+      aclitem,
+      aclitem
+    )
+    pg_catalog.hash_aclitem_extended(
+      aclitem,
+      bigint
+    ),
     storage aclitem;
 
 create operator class pg_catalog.array_ops
   default for type anyarray
   using btree
   family pg_catalog.array_ops as
+    operator 1 pg_catalog.< (anyarray, anyarray),
+    operator 2 pg_catalog.<= (anyarray, anyarray),
+    operator 3 pg_catalog.= (anyarray, anyarray),
+    operator 4 pg_catalog.>= (anyarray, anyarray),
+    operator 5 pg_catalog.> (anyarray, anyarray),
+    function 1 (anyarray, anyarray) pg_catalog.btarraycmp(anyarray, anyarray),
     storage anyarray;
 
 create operator class pg_catalog.array_ops
   default for type anyarray
   using gin
   family pg_catalog.array_ops as
+    operator 1 pg_catalog.&& (anyarray, anyarray),
+    operator 2 pg_catalog.@> (anyarray, anyarray),
+    operator 3 pg_catalog.<@ (anyarray, anyarray),
+    operator 4 pg_catalog.= (anyarray, anyarray),
+    function 2 (
+      anyarray,
+      anyarray
+    )
+    pg_catalog.ginarrayextract(
+      anyarray,
+      internal,
+      internal
+    ),
+    function 3 (
+      anyarray,
+      anyarray
+    )
+    pg_catalog.ginqueryarrayextract(
+      anyarray,
+      internal,
+      smallint,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      anyarray,
+      anyarray
+    )
+    pg_catalog.ginarrayconsistent(
+      internal,
+      smallint,
+      anyarray,
+      integer,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      anyarray,
+      anyarray
+    )
+    pg_catalog.ginarraytriconsistent(
+      internal,
+      smallint,
+      anyarray,
+      integer,
+      internal,
+      internal,
+      internal
+    ),
     storage anyelement;
 
 create operator class pg_catalog.array_ops
   default for type anyarray
   using hash
   family pg_catalog.array_ops as
+    operator 1 pg_catalog.= (anyarray, anyarray),
+    function 1 (anyarray, anyarray) pg_catalog.hash_array(anyarray),
+    function 2 (
+      anyarray,
+      anyarray
+    )
+    pg_catalog.hash_array_extended(
+      anyarray,
+      bigint
+    ),
     storage anyarray;
 
 create operator class pg_catalog.bit_minmax_ops
   default for type bit
   using brin
   family pg_catalog.bit_minmax_ops as
+    operator 1 pg_catalog.< (bit, bit),
+    operator 2 pg_catalog.<= (bit, bit),
+    operator 3 pg_catalog.= (bit, bit),
+    operator 4 pg_catalog.>= (bit, bit),
+    operator 5 pg_catalog.> (bit, bit),
+    function 1 (bit, bit) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      bit,
+      bit
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      bit,
+      bit
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      bit,
+      bit
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage bit;
 
 create operator class pg_catalog.bit_ops
   default for type bit
   using btree
   family pg_catalog.bit_ops as
+    operator 1 pg_catalog.< (bit, bit),
+    operator 2 pg_catalog.<= (bit, bit),
+    operator 3 pg_catalog.= (bit, bit),
+    operator 4 pg_catalog.>= (bit, bit),
+    operator 5 pg_catalog.> (bit, bit),
+    function 1 (bit, bit) pg_catalog.bitcmp(bit, bit),
+    function 4 (bit, bit) pg_catalog.btequalimage(oid),
     storage bit;
 
 create operator class pg_catalog.bool_ops
   default for type boolean
   using btree
   family pg_catalog.bool_ops as
+    operator 1 pg_catalog.< (boolean, boolean),
+    operator 2 pg_catalog.<= (boolean, boolean),
+    operator 3 pg_catalog.= (boolean, boolean),
+    operator 4 pg_catalog.>= (boolean, boolean),
+    operator 5 pg_catalog.> (boolean, boolean),
+    function 1 (boolean, boolean) pg_catalog.btboolcmp(boolean, boolean),
+    function 4 (boolean, boolean) pg_catalog.btequalimage(oid),
+    function 6 (boolean, boolean) pg_catalog.btboolskipsupport(internal),
     storage boolean;
 
 create operator class pg_catalog.bool_ops
   default for type boolean
   using hash
   family pg_catalog.bool_ops as
+    operator 1 pg_catalog.= (boolean, boolean),
+    function 1 (boolean, boolean) pg_catalog.hashbool(boolean),
+    function 2 (boolean, boolean) pg_catalog.hashboolextended(boolean, bigint),
     storage boolean;
 
 create operator class pg_catalog.box_inclusion_ops
   default for type box
   using brin
   family pg_catalog.box_inclusion_ops as
+    operator 1 pg_catalog.<< (box, box),
+    operator 2 pg_catalog.&< (box, box),
+    operator 3 pg_catalog.&& (box, box),
+    operator 4 pg_catalog.&> (box, box),
+    operator 5 pg_catalog.>> (box, box),
+    operator 6 pg_catalog.~= (box, box),
+    operator 7 pg_catalog.@> (box, box),
+    operator 8 pg_catalog.<@ (box, box),
+    operator 9 pg_catalog.&<| (box, box),
+    operator 10 pg_catalog.<<| (box, box),
+    operator 11 pg_catalog.|>> (box, box),
+    operator 12 pg_catalog.|&> (box, box),
+    function 1 (box, box) pg_catalog.brin_inclusion_opcinfo(internal),
+    function 2 (
+      box,
+      box
+    )
+    pg_catalog.brin_inclusion_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      box,
+      box
+    )
+    pg_catalog.brin_inclusion_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      box,
+      box
+    )
+    pg_catalog.brin_inclusion_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 11 (box, box) pg_catalog.bound_box(box, box),
+    function 13 (box, box) pg_catalog.box_contain(box, box),
     storage box;
 
 create operator class pg_catalog.box_ops
   default for type box
   using gist
   family pg_catalog.box_ops as
+    operator 1 pg_catalog.<< (box, box),
+    operator 2 pg_catalog.&< (box, box),
+    operator 3 pg_catalog.&& (box, box),
+    operator 4 pg_catalog.&> (box, box),
+    operator 5 pg_catalog.>> (box, box),
+    operator 6 pg_catalog.~= (box, box),
+    operator 7 pg_catalog.@> (box, box),
+    operator 8 pg_catalog.<@ (box, box),
+    operator 9 pg_catalog.&<| (box, box),
+    operator 10 pg_catalog.<<| (box, box),
+    operator 11 pg_catalog.|>> (box, box),
+    operator 12 pg_catalog.|&> (box, box),
+    function 1 (
+      box,
+      box
+    )
+    pg_catalog.gist_box_consistent(
+      internal,
+      box,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (box, box) pg_catalog.gist_box_union(internal, internal),
+    function 5 (
+      box,
+      box
+    )
+    pg_catalog.gist_box_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (box, box) pg_catalog.gist_box_picksplit(internal, internal),
+    function 7 (box, box) pg_catalog.gist_box_same(box, box, internal),
+    function 8 (
+      box,
+      box
+    )
+    pg_catalog.gist_box_distance(
+      internal,
+      box,
+      smallint,
+      oid,
+      internal
+    ),
     storage box;
 
 create operator class pg_catalog.box_ops
   default for type box
   using spgist
   family pg_catalog.box_ops as
+    operator 1 pg_catalog.<< (box, box),
+    operator 2 pg_catalog.&< (box, box),
+    operator 3 pg_catalog.&& (box, box),
+    operator 4 pg_catalog.&> (box, box),
+    operator 5 pg_catalog.>> (box, box),
+    operator 6 pg_catalog.~= (box, box),
+    operator 7 pg_catalog.@> (box, box),
+    operator 8 pg_catalog.<@ (box, box),
+    operator 9 pg_catalog.&<| (box, box),
+    operator 10 pg_catalog.<<| (box, box),
+    operator 11 pg_catalog.|>> (box, box),
+    operator 12 pg_catalog.|&> (box, box),
+    function 1 (box, box) pg_catalog.spg_box_quad_config(internal, internal),
+    function 2 (box, box) pg_catalog.spg_box_quad_choose(internal, internal),
+    function 3 (box, box) pg_catalog.spg_box_quad_picksplit(internal, internal),
+    function 4 (
+      box,
+      box
+    )
+    pg_catalog.spg_box_quad_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      box,
+      box
+    )
+    pg_catalog.spg_box_quad_leaf_consistent(
+      internal,
+      internal
+    ),
     storage box;
 
 create operator class pg_catalog.bpchar_bloom_ops
   for type character
   using brin
   family pg_catalog.bpchar_bloom_ops as
+    operator 1 pg_catalog.= (character, character),
+    function 1 (character, character) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      character,
+      character
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      character,
+      character
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      character,
+      character
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (character, character) pg_catalog.brin_bloom_options(internal),
+    function 11 (character, character) pg_catalog.hashbpchar(character),
     storage character;
 
 create operator class pg_catalog.bpchar_minmax_ops
   default for type character
   using brin
   family pg_catalog.bpchar_minmax_ops as
+    operator 1 pg_catalog.< (character, character),
+    operator 2 pg_catalog.<= (character, character),
+    operator 3 pg_catalog.= (character, character),
+    operator 4 pg_catalog.>= (character, character),
+    operator 5 pg_catalog.> (character, character),
+    function 1 (character, character) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      character,
+      character
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      character,
+      character
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      character,
+      character
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage character;
 
 create operator class pg_catalog.bpchar_ops
   default for type character
   using btree
   family pg_catalog.bpchar_ops as
+    operator 1 pg_catalog.< (character, character),
+    operator 2 pg_catalog.<= (character, character),
+    operator 3 pg_catalog.= (character, character),
+    operator 4 pg_catalog.>= (character, character),
+    operator 5 pg_catalog.> (character, character),
+    function 1 (
+      character,
+      character
+    )
+    pg_catalog.bpcharcmp(
+      character,
+      character
+    ),
+    function 2 (character, character) pg_catalog.bpchar_sortsupport(internal),
+    function 4 (character, character) pg_catalog.btvarstrequalimage(oid),
     storage character;
 
 create operator class pg_catalog.bpchar_ops
   default for type character
   using hash
   family pg_catalog.bpchar_ops as
+    operator 1 pg_catalog.= (character, character),
+    function 1 (character, character) pg_catalog.hashbpchar(character),
+    function 2 (
+      character,
+      character
+    )
+    pg_catalog.hashbpcharextended(
+      character,
+      bigint
+    ),
     storage character;
 
 create operator class pg_catalog.bpchar_pattern_ops
   for type character
   using btree
   family pg_catalog.bpchar_pattern_ops as
+    operator 1 pg_catalog.~<~ (character, character),
+    operator 2 pg_catalog.~<=~ (character, character),
+    operator 3 pg_catalog.= (character, character),
+    operator 4 pg_catalog.~>=~ (character, character),
+    operator 5 pg_catalog.~>~ (character, character),
+    function 1 (
+      character,
+      character
+    )
+    pg_catalog.btbpchar_pattern_cmp(
+      character,
+      character
+    ),
+    function 2 (
+      character,
+      character
+    )
+    pg_catalog.btbpchar_pattern_sortsupport(
+      internal
+    ),
+    function 4 (character, character) pg_catalog.btequalimage(oid),
     storage character;
 
 create operator class pg_catalog.bpchar_pattern_ops
   for type character
   using hash
   family pg_catalog.bpchar_pattern_ops as
+    operator 1 pg_catalog.= (character, character),
+    function 1 (character, character) pg_catalog.hashbpchar(character),
+    function 2 (
+      character,
+      character
+    )
+    pg_catalog.hashbpcharextended(
+      character,
+      bigint
+    ),
     storage character;
 
 create operator class pg_catalog.bytea_bloom_ops
   for type bytea
   using brin
   family pg_catalog.bytea_bloom_ops as
+    operator 1 pg_catalog.= (bytea, bytea),
+    function 1 (bytea, bytea) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      bytea,
+      bytea
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      bytea,
+      bytea
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      bytea,
+      bytea
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (bytea, bytea) pg_catalog.brin_bloom_options(internal),
+    function 11 (bytea, bytea) pg_catalog.hashbytea(bytea),
     storage bytea;
 
 create operator class pg_catalog.bytea_minmax_ops
   default for type bytea
   using brin
   family pg_catalog.bytea_minmax_ops as
+    operator 1 pg_catalog.< (bytea, bytea),
+    operator 2 pg_catalog.<= (bytea, bytea),
+    operator 3 pg_catalog.= (bytea, bytea),
+    operator 4 pg_catalog.>= (bytea, bytea),
+    operator 5 pg_catalog.> (bytea, bytea),
+    function 1 (bytea, bytea) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      bytea,
+      bytea
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      bytea,
+      bytea
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      bytea,
+      bytea
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage bytea;
 
 create operator class pg_catalog.bytea_ops
   default for type bytea
   using btree
   family pg_catalog.bytea_ops as
+    operator 1 pg_catalog.< (bytea, bytea),
+    operator 2 pg_catalog.<= (bytea, bytea),
+    operator 3 pg_catalog.= (bytea, bytea),
+    operator 4 pg_catalog.>= (bytea, bytea),
+    operator 5 pg_catalog.> (bytea, bytea),
+    function 1 (bytea, bytea) pg_catalog.byteacmp(bytea, bytea),
+    function 2 (bytea, bytea) pg_catalog.bytea_sortsupport(internal),
+    function 4 (bytea, bytea) pg_catalog.btequalimage(oid),
     storage bytea;
 
 create operator class pg_catalog.bytea_ops
   default for type bytea
   using hash
   family pg_catalog.bytea_ops as
+    operator 1 pg_catalog.= (bytea, bytea),
+    function 1 (bytea, bytea) pg_catalog.hashbytea(bytea),
+    function 2 (bytea, bytea) pg_catalog.hashbyteaextended(bytea, bigint),
     storage bytea;
 
 create operator class pg_catalog.char_bloom_ops
   for type "char"
   using brin
   family pg_catalog.char_bloom_ops as
+    operator 1 pg_catalog.= ("char", "char"),
+    function 1 ("char", "char") pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      "char",
+      "char"
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      "char",
+      "char"
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      "char",
+      "char"
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 ("char", "char") pg_catalog.brin_bloom_options(internal),
+    function 11 ("char", "char") pg_catalog.hashchar("char"),
     storage "char";
 
 create operator class pg_catalog.char_minmax_ops
   default for type "char"
   using brin
   family pg_catalog.char_minmax_ops as
+    operator 1 pg_catalog.< ("char", "char"),
+    operator 2 pg_catalog.<= ("char", "char"),
+    operator 3 pg_catalog.= ("char", "char"),
+    operator 4 pg_catalog.>= ("char", "char"),
+    operator 5 pg_catalog.> ("char", "char"),
+    function 1 ("char", "char") pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      "char",
+      "char"
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      "char",
+      "char"
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      "char",
+      "char"
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage "char";
 
 create operator class pg_catalog.char_ops
   default for type "char"
   using btree
   family pg_catalog.char_ops as
+    operator 1 pg_catalog.< ("char", "char"),
+    operator 2 pg_catalog.<= ("char", "char"),
+    operator 3 pg_catalog.= ("char", "char"),
+    operator 4 pg_catalog.>= ("char", "char"),
+    operator 5 pg_catalog.> ("char", "char"),
+    function 1 ("char", "char") pg_catalog.btcharcmp("char", "char"),
+    function 4 ("char", "char") pg_catalog.btequalimage(oid),
+    function 6 ("char", "char") pg_catalog.btcharskipsupport(internal),
     storage "char";
 
 create operator class pg_catalog.char_ops
   default for type "char"
   using hash
   family pg_catalog.char_ops as
+    operator 1 pg_catalog.= ("char", "char"),
+    function 1 ("char", "char") pg_catalog.hashchar("char"),
+    function 2 ("char", "char") pg_catalog.hashcharextended("char", bigint),
     storage "char";
 
 create operator class pg_catalog.cid_ops
   default for type cid
   using hash
   family pg_catalog.cid_ops as
+    operator 1 pg_catalog.= (cid, cid),
+    function 1 (cid, cid) pg_catalog.hashcid(cid),
+    function 2 (cid, cid) pg_catalog.hashcidextended(cid, bigint),
     storage cid;
 
 create operator class pg_catalog.cidr_ops
@@ -40526,852 +41059,4982 @@ create operator class pg_catalog.circle_ops
   default for type circle
   using gist
   family pg_catalog.circle_ops as
+    operator 1 pg_catalog.<< (circle, circle),
+    operator 2 pg_catalog.&< (circle, circle),
+    operator 3 pg_catalog.&& (circle, circle),
+    operator 4 pg_catalog.&> (circle, circle),
+    operator 5 pg_catalog.>> (circle, circle),
+    operator 6 pg_catalog.~= (circle, circle),
+    operator 7 pg_catalog.@> (circle, circle),
+    operator 8 pg_catalog.<@ (circle, circle),
+    operator 9 pg_catalog.&<| (circle, circle),
+    operator 10 pg_catalog.<<| (circle, circle),
+    operator 11 pg_catalog.|>> (circle, circle),
+    operator 12 pg_catalog.|&> (circle, circle),
+    function 1 (
+      circle,
+      circle
+    )
+    pg_catalog.gist_circle_consistent(
+      internal,
+      circle,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (circle, circle) pg_catalog.gist_box_union(internal, internal),
+    function 3 (circle, circle) pg_catalog.gist_circle_compress(internal),
+    function 5 (
+      circle,
+      circle
+    )
+    pg_catalog.gist_box_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      circle,
+      circle
+    )
+    pg_catalog.gist_box_picksplit(
+      internal,
+      internal
+    ),
+    function 7 (circle, circle) pg_catalog.gist_box_same(box, box, internal),
+    function 8 (
+      circle,
+      circle
+    )
+    pg_catalog.gist_circle_distance(
+      internal,
+      circle,
+      smallint,
+      oid,
+      internal
+    ),
     storage box;
 
 create operator class pg_catalog.date_bloom_ops
   for type date
   using brin
   family pg_catalog.datetime_bloom_ops as
+    operator 1 pg_catalog.= (date, date),
+    function 1 (date, date) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      date,
+      date
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      date,
+      date
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      date,
+      date
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (date, date) pg_catalog.brin_bloom_options(internal),
+    function 11 (date, date) pg_catalog.hashint4(integer),
     storage date;
 
 create operator class pg_catalog.date_minmax_multi_ops
   for type date
   using brin
   family pg_catalog.datetime_minmax_multi_ops as
+    operator 1 pg_catalog.< (date, date),
+    operator 2 pg_catalog.<= (date, date),
+    operator 3 pg_catalog.= (date, date),
+    operator 4 pg_catalog.>= (date, date),
+    operator 5 pg_catalog.> (date, date),
+    function 1 (date, date) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      date,
+      date
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      date,
+      date
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      date,
+      date
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (date, date) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      date,
+      date
+    )
+    pg_catalog.brin_minmax_multi_distance_date(
+      internal,
+      internal
+    ),
     storage date;
 
 create operator class pg_catalog.date_minmax_ops
   default for type date
   using brin
   family pg_catalog.datetime_minmax_ops as
+    operator 1 pg_catalog.< (date, date),
+    operator 2 pg_catalog.<= (date, date),
+    operator 3 pg_catalog.= (date, date),
+    operator 4 pg_catalog.>= (date, date),
+    operator 5 pg_catalog.> (date, date),
+    function 1 (date, date) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      date,
+      date
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      date,
+      date
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      date,
+      date
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage date;
 
 create operator class pg_catalog.date_ops
   default for type date
   using btree
   family pg_catalog.datetime_ops as
+    operator 1 pg_catalog.< (date, date),
+    operator 2 pg_catalog.<= (date, date),
+    operator 3 pg_catalog.= (date, date),
+    operator 4 pg_catalog.>= (date, date),
+    operator 5 pg_catalog.> (date, date),
+    function 1 (date, date) pg_catalog.date_cmp(date, date),
+    function 2 (date, date) pg_catalog.date_sortsupport(internal),
+    function 4 (date, date) pg_catalog.btequalimage(oid),
+    function 6 (date, date) pg_catalog.date_skipsupport(internal),
     storage date;
 
 create operator class pg_catalog.date_ops
   default for type date
   using hash
   family pg_catalog.date_ops as
+    operator 1 pg_catalog.= (date, date),
+    function 1 (date, date) pg_catalog.hashdate(date),
+    function 2 (date, date) pg_catalog.hashdateextended(date, bigint),
     storage date;
 
 create operator class pg_catalog.enum_ops
   default for type anyenum
   using btree
   family pg_catalog.enum_ops as
+    operator 1 pg_catalog.< (anyenum, anyenum),
+    operator 2 pg_catalog.<= (anyenum, anyenum),
+    operator 3 pg_catalog.= (anyenum, anyenum),
+    operator 4 pg_catalog.>= (anyenum, anyenum),
+    operator 5 pg_catalog.> (anyenum, anyenum),
+    function 1 (anyenum, anyenum) pg_catalog.enum_cmp(anyenum, anyenum),
+    function 4 (anyenum, anyenum) pg_catalog.btequalimage(oid),
     storage anyenum;
 
 create operator class pg_catalog.enum_ops
   default for type anyenum
   using hash
   family pg_catalog.enum_ops as
+    operator 1 pg_catalog.= (anyenum, anyenum),
+    function 1 (anyenum, anyenum) pg_catalog.hashenum(anyenum),
+    function 2 (anyenum, anyenum) pg_catalog.hashenumextended(anyenum, bigint),
     storage anyenum;
 
 create operator class pg_catalog.float4_bloom_ops
   for type real
   using brin
   family pg_catalog.float_bloom_ops as
+    operator 1 pg_catalog.= (real, real),
+    function 1 (real, real) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      real,
+      real
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      real,
+      real
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      real,
+      real
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (real, real) pg_catalog.brin_bloom_options(internal),
+    function 11 (real, real) pg_catalog.hashfloat4(real),
     storage real;
 
 create operator class pg_catalog.float4_minmax_multi_ops
   for type real
   using brin
   family pg_catalog.float_minmax_multi_ops as
+    operator 1 pg_catalog.< (real, real),
+    operator 2 pg_catalog.<= (real, real),
+    operator 3 pg_catalog.= (real, real),
+    operator 4 pg_catalog.>= (real, real),
+    operator 5 pg_catalog.> (real, real),
+    function 1 (real, real) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      real,
+      real
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      real,
+      real
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      real,
+      real
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (real, real) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      real,
+      real
+    )
+    pg_catalog.brin_minmax_multi_distance_float4(
+      internal,
+      internal
+    ),
     storage real;
 
 create operator class pg_catalog.float4_minmax_ops
   default for type real
   using brin
   family pg_catalog.float_minmax_ops as
+    operator 1 pg_catalog.< (real, real),
+    operator 2 pg_catalog.<= (real, real),
+    operator 3 pg_catalog.= (real, real),
+    operator 4 pg_catalog.>= (real, real),
+    operator 5 pg_catalog.> (real, real),
+    function 1 (real, real) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      real,
+      real
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      real,
+      real
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      real,
+      real
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage real;
 
 create operator class pg_catalog.float4_ops
   default for type real
   using btree
   family pg_catalog.float_ops as
+    operator 1 pg_catalog.< (real, real),
+    operator 2 pg_catalog.<= (real, real),
+    operator 3 pg_catalog.= (real, real),
+    operator 4 pg_catalog.>= (real, real),
+    operator 5 pg_catalog.> (real, real),
+    function 1 (real, real) pg_catalog.btfloat4cmp(real, real),
+    function 2 (real, real) pg_catalog.btfloat4sortsupport(internal),
     storage real;
 
 create operator class pg_catalog.float4_ops
   default for type real
   using hash
   family pg_catalog.float_ops as
+    operator 1 pg_catalog.= (real, real),
+    function 1 (real, real) pg_catalog.hashfloat4(real),
+    function 2 (real, real) pg_catalog.hashfloat4extended(real, bigint),
     storage real;
 
 create operator class pg_catalog.float8_bloom_ops
   for type double precision
   using brin
   family pg_catalog.float_bloom_ops as
+    operator 1 pg_catalog.= (double precision, double precision),
+    function 1 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_bloom_opcinfo(
+      internal
+    ),
+    function 2 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_bloom_options(
+      internal
+    ),
+    function 11 (
+      double precision,
+      double precision
+    )
+    pg_catalog.hashfloat8(
+      double precision
+    ),
     storage double precision;
 
 create operator class pg_catalog.float8_minmax_multi_ops
   for type double precision
   using brin
   family pg_catalog.float_minmax_multi_ops as
+    operator 1 pg_catalog.< (double precision, double precision),
+    operator 2 pg_catalog.<= (double precision, double precision),
+    operator 3 pg_catalog.= (double precision, double precision),
+    operator 4 pg_catalog.>= (double precision, double precision),
+    operator 5 pg_catalog.> (double precision, double precision),
+    function 1 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_multi_distance_float8(
+      internal,
+      internal
+    ),
     storage double precision;
 
 create operator class pg_catalog.float8_minmax_ops
   default for type double precision
   using brin
   family pg_catalog.float_minmax_ops as
+    operator 1 pg_catalog.< (double precision, double precision),
+    operator 2 pg_catalog.<= (double precision, double precision),
+    operator 3 pg_catalog.= (double precision, double precision),
+    operator 4 pg_catalog.>= (double precision, double precision),
+    operator 5 pg_catalog.> (double precision, double precision),
+    function 1 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_opcinfo(
+      internal
+    ),
+    function 2 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      double precision,
+      double precision
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage double precision;
 
 create operator class pg_catalog.float8_ops
   default for type double precision
   using btree
   family pg_catalog.float_ops as
+    operator 1 pg_catalog.< (double precision, double precision),
+    operator 2 pg_catalog.<= (double precision, double precision),
+    operator 3 pg_catalog.= (double precision, double precision),
+    operator 4 pg_catalog.>= (double precision, double precision),
+    operator 5 pg_catalog.> (double precision, double precision),
+    function 1 (
+      double precision,
+      double precision
+    )
+    pg_catalog.btfloat8cmp(
+      double precision,
+      double precision
+    ),
+    function 2 (
+      double precision,
+      double precision
+    )
+    pg_catalog.btfloat8sortsupport(
+      internal
+    ),
+    function 3 (
+      double precision,
+      double precision
+    )
+    pg_catalog.in_range(
+      double precision,
+      double precision,
+      double precision,
+      boolean,
+      boolean
+    ),
     storage double precision;
 
 create operator class pg_catalog.float8_ops
   default for type double precision
   using hash
   family pg_catalog.float_ops as
+    operator 1 pg_catalog.= (double precision, double precision),
+    function 1 (
+      double precision,
+      double precision
+    )
+    pg_catalog.hashfloat8(
+      double precision
+    ),
+    function 2 (
+      double precision,
+      double precision
+    )
+    pg_catalog.hashfloat8extended(
+      double precision,
+      bigint
+    ),
     storage double precision;
 
 create operator class pg_catalog.inet_bloom_ops
   for type inet
   using brin
   family pg_catalog.network_bloom_ops as
+    operator 1 pg_catalog.= (inet, inet),
+    function 1 (inet, inet) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (inet, inet) pg_catalog.brin_bloom_options(internal),
+    function 11 (inet, inet) pg_catalog.hashinet(inet),
     storage inet;
 
 create operator class pg_catalog.inet_inclusion_ops
   default for type inet
   using brin
   family pg_catalog.network_inclusion_ops as
+    operator 3 pg_catalog.&& (inet, inet),
+    operator 7 pg_catalog.>>= (inet, inet),
+    operator 8 pg_catalog.<<= (inet, inet),
+    operator 18 pg_catalog.= (inet, inet),
+    operator 24 pg_catalog.>> (inet, inet),
+    operator 26 pg_catalog.<< (inet, inet),
+    function 1 (inet, inet) pg_catalog.brin_inclusion_opcinfo(internal),
+    function 2 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_inclusion_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_inclusion_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_inclusion_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 11 (inet, inet) pg_catalog.inet_merge(inet, inet),
+    function 12 (inet, inet) pg_catalog.inet_same_family(inet, inet),
+    function 13 (inet, inet) pg_catalog.network_supeq(inet, inet),
     storage inet;
 
 create operator class pg_catalog.inet_minmax_multi_ops
   for type inet
   using brin
   family pg_catalog.network_minmax_multi_ops as
+    operator 1 pg_catalog.< (inet, inet),
+    operator 2 pg_catalog.<= (inet, inet),
+    operator 3 pg_catalog.= (inet, inet),
+    operator 4 pg_catalog.>= (inet, inet),
+    operator 5 pg_catalog.> (inet, inet),
+    function 1 (inet, inet) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (inet, inet) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_minmax_multi_distance_inet(
+      internal,
+      internal
+    ),
     storage inet;
 
 create operator class pg_catalog.inet_minmax_ops
   for type inet
   using brin
   family pg_catalog.network_minmax_ops as
+    operator 1 pg_catalog.< (inet, inet),
+    operator 2 pg_catalog.<= (inet, inet),
+    operator 3 pg_catalog.= (inet, inet),
+    operator 4 pg_catalog.>= (inet, inet),
+    operator 5 pg_catalog.> (inet, inet),
+    function 1 (inet, inet) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      inet,
+      inet
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage inet;
 
 create operator class pg_catalog.inet_ops
   default for type inet
   using btree
   family pg_catalog.network_ops as
+    operator 1 pg_catalog.< (inet, inet),
+    operator 2 pg_catalog.<= (inet, inet),
+    operator 3 pg_catalog.= (inet, inet),
+    operator 4 pg_catalog.>= (inet, inet),
+    operator 5 pg_catalog.> (inet, inet),
+    function 1 (inet, inet) pg_catalog.network_cmp(inet, inet),
+    function 2 (inet, inet) pg_catalog.network_sortsupport(internal),
+    function 4 (inet, inet) pg_catalog.btequalimage(oid),
     storage inet;
 
 create operator class pg_catalog.inet_ops
   for type inet
   using gist
   family pg_catalog.network_ops as
+    operator 3 pg_catalog.&& (inet, inet),
+    operator 18 pg_catalog.= (inet, inet),
+    operator 19 pg_catalog.<> (inet, inet),
+    operator 20 pg_catalog.< (inet, inet),
+    operator 21 pg_catalog.<= (inet, inet),
+    operator 22 pg_catalog.> (inet, inet),
+    operator 23 pg_catalog.>= (inet, inet),
+    operator 24 pg_catalog.<< (inet, inet),
+    operator 25 pg_catalog.<<= (inet, inet),
+    operator 26 pg_catalog.>> (inet, inet),
+    operator 27 pg_catalog.>>= (inet, inet),
+    function 1 (
+      inet,
+      inet
+    )
+    pg_catalog.inet_gist_consistent(
+      internal,
+      inet,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (inet, inet) pg_catalog.inet_gist_union(internal, internal),
+    function 3 (inet, inet) pg_catalog.inet_gist_compress(internal),
+    function 5 (
+      inet,
+      inet
+    )
+    pg_catalog.inet_gist_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (inet, inet) pg_catalog.inet_gist_picksplit(internal, internal),
+    function 7 (inet, inet) pg_catalog.inet_gist_same(inet, inet, internal),
+    function 9 (inet, inet) pg_catalog.inet_gist_fetch(internal),
     storage inet;
 
 create operator class pg_catalog.inet_ops
   default for type inet
   using hash
   family pg_catalog.network_ops as
+    operator 1 pg_catalog.= (inet, inet),
+    function 1 (inet, inet) pg_catalog.hashinet(inet),
+    function 2 (inet, inet) pg_catalog.hashinetextended(inet, bigint),
     storage inet;
 
 create operator class pg_catalog.inet_ops
   default for type inet
   using spgist
   family pg_catalog.network_ops as
+    operator 3 pg_catalog.&& (inet, inet),
+    operator 18 pg_catalog.= (inet, inet),
+    operator 19 pg_catalog.<> (inet, inet),
+    operator 20 pg_catalog.< (inet, inet),
+    operator 21 pg_catalog.<= (inet, inet),
+    operator 22 pg_catalog.> (inet, inet),
+    operator 23 pg_catalog.>= (inet, inet),
+    operator 24 pg_catalog.<< (inet, inet),
+    operator 25 pg_catalog.<<= (inet, inet),
+    operator 26 pg_catalog.>> (inet, inet),
+    operator 27 pg_catalog.>>= (inet, inet),
+    function 1 (inet, inet) pg_catalog.inet_spg_config(internal, internal),
+    function 2 (inet, inet) pg_catalog.inet_spg_choose(internal, internal),
+    function 3 (inet, inet) pg_catalog.inet_spg_picksplit(internal, internal),
+    function 4 (
+      inet,
+      inet
+    )
+    pg_catalog.inet_spg_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      inet,
+      inet
+    )
+    pg_catalog.inet_spg_leaf_consistent(
+      internal,
+      internal
+    ),
     storage inet;
 
 create operator class pg_catalog.int2_bloom_ops
   for type smallint
   using brin
   family pg_catalog.integer_bloom_ops as
+    operator 1 pg_catalog.= (smallint, smallint),
+    function 1 (smallint, smallint) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (smallint, smallint) pg_catalog.brin_bloom_options(internal),
+    function 11 (smallint, smallint) pg_catalog.hashint2(smallint),
     storage smallint;
 
 create operator class pg_catalog.int2_minmax_multi_ops
   for type smallint
   using brin
   family pg_catalog.integer_minmax_multi_ops as
+    operator 1 pg_catalog.< (smallint, smallint),
+    operator 2 pg_catalog.<= (smallint, smallint),
+    operator 3 pg_catalog.= (smallint, smallint),
+    operator 4 pg_catalog.>= (smallint, smallint),
+    operator 5 pg_catalog.> (smallint, smallint),
+    function 1 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_multi_distance_int2(
+      internal,
+      internal
+    ),
     storage smallint;
 
 create operator class pg_catalog.int2_minmax_ops
   default for type smallint
   using brin
   family pg_catalog.integer_minmax_ops as
+    operator 1 pg_catalog.< (smallint, smallint),
+    operator 2 pg_catalog.<= (smallint, smallint),
+    operator 3 pg_catalog.= (smallint, smallint),
+    operator 4 pg_catalog.>= (smallint, smallint),
+    operator 5 pg_catalog.> (smallint, smallint),
+    function 1 (smallint, smallint) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      smallint,
+      smallint
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage smallint;
 
 create operator class pg_catalog.int2_ops
   default for type smallint
   using btree
   family pg_catalog.integer_ops as
+    operator 1 pg_catalog.< (smallint, smallint),
+    operator 2 pg_catalog.<= (smallint, smallint),
+    operator 3 pg_catalog.= (smallint, smallint),
+    operator 4 pg_catalog.>= (smallint, smallint),
+    operator 5 pg_catalog.> (smallint, smallint),
+    function 1 (smallint, smallint) pg_catalog.btint2cmp(smallint, smallint),
+    function 2 (smallint, smallint) pg_catalog.btint2sortsupport(internal),
+    function 3 (
+      smallint,
+      smallint
+    )
+    pg_catalog.in_range(
+      smallint,
+      smallint,
+      smallint,
+      boolean,
+      boolean
+    ),
+    function 4 (smallint, smallint) pg_catalog.btequalimage(oid),
+    function 6 (smallint, smallint) pg_catalog.btint2skipsupport(internal),
     storage smallint;
 
 create operator class pg_catalog.int2_ops
   default for type smallint
   using hash
   family pg_catalog.integer_ops as
+    operator 1 pg_catalog.= (smallint, smallint),
+    function 1 (smallint, smallint) pg_catalog.hashint2(smallint),
+    function 2 (
+      smallint,
+      smallint
+    )
+    pg_catalog.hashint2extended(
+      smallint,
+      bigint
+    ),
     storage smallint;
 
 create operator class pg_catalog.int4_bloom_ops
   for type integer
   using brin
   family pg_catalog.integer_bloom_ops as
+    operator 1 pg_catalog.= (integer, integer),
+    function 1 (integer, integer) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (integer, integer) pg_catalog.brin_bloom_options(internal),
+    function 11 (integer, integer) pg_catalog.hashint4(integer),
     storage integer;
 
 create operator class pg_catalog.int4_minmax_multi_ops
   for type integer
   using brin
   family pg_catalog.integer_minmax_multi_ops as
+    operator 1 pg_catalog.< (integer, integer),
+    operator 2 pg_catalog.<= (integer, integer),
+    operator 3 pg_catalog.= (integer, integer),
+    operator 4 pg_catalog.>= (integer, integer),
+    operator 5 pg_catalog.> (integer, integer),
+    function 1 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_multi_distance_int4(
+      internal,
+      internal
+    ),
     storage integer;
 
 create operator class pg_catalog.int4_minmax_ops
   default for type integer
   using brin
   family pg_catalog.integer_minmax_ops as
+    operator 1 pg_catalog.< (integer, integer),
+    operator 2 pg_catalog.<= (integer, integer),
+    operator 3 pg_catalog.= (integer, integer),
+    operator 4 pg_catalog.>= (integer, integer),
+    operator 5 pg_catalog.> (integer, integer),
+    function 1 (integer, integer) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      integer,
+      integer
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage integer;
 
 create operator class pg_catalog.int4_ops
   default for type integer
   using btree
   family pg_catalog.integer_ops as
+    operator 1 pg_catalog.< (integer, integer),
+    operator 2 pg_catalog.<= (integer, integer),
+    operator 3 pg_catalog.= (integer, integer),
+    operator 4 pg_catalog.>= (integer, integer),
+    operator 5 pg_catalog.> (integer, integer),
+    function 1 (integer, integer) pg_catalog.btint4cmp(integer, integer),
+    function 2 (integer, integer) pg_catalog.btint4sortsupport(internal),
+    function 3 (
+      integer,
+      integer
+    )
+    pg_catalog.in_range(
+      integer,
+      integer,
+      integer,
+      boolean,
+      boolean
+    ),
+    function 4 (integer, integer) pg_catalog.btequalimage(oid),
+    function 6 (integer, integer) pg_catalog.btint4skipsupport(internal),
     storage integer;
 
 create operator class pg_catalog.int4_ops
   default for type integer
   using hash
   family pg_catalog.integer_ops as
+    operator 1 pg_catalog.= (integer, integer),
+    function 1 (integer, integer) pg_catalog.hashint4(integer),
+    function 2 (integer, integer) pg_catalog.hashint4extended(integer, bigint),
     storage integer;
 
 create operator class pg_catalog.int8_bloom_ops
   for type bigint
   using brin
   family pg_catalog.integer_bloom_ops as
+    operator 1 pg_catalog.= (bigint, bigint),
+    function 1 (bigint, bigint) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (bigint, bigint) pg_catalog.brin_bloom_options(internal),
+    function 11 (bigint, bigint) pg_catalog.hashint8(bigint),
     storage bigint;
 
 create operator class pg_catalog.int8_minmax_multi_ops
   for type bigint
   using brin
   family pg_catalog.integer_minmax_multi_ops as
+    operator 1 pg_catalog.< (bigint, bigint),
+    operator 2 pg_catalog.<= (bigint, bigint),
+    operator 3 pg_catalog.= (bigint, bigint),
+    operator 4 pg_catalog.>= (bigint, bigint),
+    operator 5 pg_catalog.> (bigint, bigint),
+    function 1 (bigint, bigint) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (bigint, bigint) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_minmax_multi_distance_int8(
+      internal,
+      internal
+    ),
     storage bigint;
 
 create operator class pg_catalog.int8_minmax_ops
   default for type bigint
   using brin
   family pg_catalog.integer_minmax_ops as
+    operator 1 pg_catalog.< (bigint, bigint),
+    operator 2 pg_catalog.<= (bigint, bigint),
+    operator 3 pg_catalog.= (bigint, bigint),
+    operator 4 pg_catalog.>= (bigint, bigint),
+    operator 5 pg_catalog.> (bigint, bigint),
+    function 1 (bigint, bigint) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      bigint,
+      bigint
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage bigint;
 
 create operator class pg_catalog.int8_ops
   default for type bigint
   using btree
   family pg_catalog.integer_ops as
+    operator 1 pg_catalog.< (bigint, bigint),
+    operator 2 pg_catalog.<= (bigint, bigint),
+    operator 3 pg_catalog.= (bigint, bigint),
+    operator 4 pg_catalog.>= (bigint, bigint),
+    operator 5 pg_catalog.> (bigint, bigint),
+    function 1 (bigint, bigint) pg_catalog.btint8cmp(bigint, bigint),
+    function 2 (bigint, bigint) pg_catalog.btint8sortsupport(internal),
+    function 3 (
+      bigint,
+      bigint
+    )
+    pg_catalog.in_range(
+      bigint,
+      bigint,
+      bigint,
+      boolean,
+      boolean
+    ),
+    function 4 (bigint, bigint) pg_catalog.btequalimage(oid),
+    function 6 (bigint, bigint) pg_catalog.btint8skipsupport(internal),
     storage bigint;
 
 create operator class pg_catalog.int8_ops
   default for type bigint
   using hash
   family pg_catalog.integer_ops as
+    operator 1 pg_catalog.= (bigint, bigint),
+    function 1 (bigint, bigint) pg_catalog.hashint8(bigint),
+    function 2 (bigint, bigint) pg_catalog.hashint8extended(bigint, bigint),
     storage bigint;
 
 create operator class pg_catalog.interval_bloom_ops
   for type interval
   using brin
   family pg_catalog.interval_bloom_ops as
+    operator 1 pg_catalog.= (interval, interval),
+    function 1 (interval, interval) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (interval, interval) pg_catalog.brin_bloom_options(internal),
+    function 11 (interval, interval) pg_catalog.interval_hash(interval),
     storage interval;
 
 create operator class pg_catalog.interval_minmax_multi_ops
   for type interval
   using brin
   family pg_catalog.interval_minmax_multi_ops as
+    operator 1 pg_catalog.< (interval, interval),
+    operator 2 pg_catalog.<= (interval, interval),
+    operator 3 pg_catalog.= (interval, interval),
+    operator 4 pg_catalog.>= (interval, interval),
+    operator 5 pg_catalog.> (interval, interval),
+    function 1 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_multi_distance_interval(
+      internal,
+      internal
+    ),
     storage interval;
 
 create operator class pg_catalog.interval_minmax_ops
   default for type interval
   using brin
   family pg_catalog.interval_minmax_ops as
+    operator 1 pg_catalog.< (interval, interval),
+    operator 2 pg_catalog.<= (interval, interval),
+    operator 3 pg_catalog.= (interval, interval),
+    operator 4 pg_catalog.>= (interval, interval),
+    operator 5 pg_catalog.> (interval, interval),
+    function 1 (interval, interval) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      interval,
+      interval
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage interval;
 
 create operator class pg_catalog.interval_ops
   default for type interval
   using btree
   family pg_catalog.interval_ops as
+    operator 1 pg_catalog.< (interval, interval),
+    operator 2 pg_catalog.<= (interval, interval),
+    operator 3 pg_catalog.= (interval, interval),
+    operator 4 pg_catalog.>= (interval, interval),
+    operator 5 pg_catalog.> (interval, interval),
+    function 1 (interval, interval) pg_catalog.interval_cmp(interval, interval),
+    function 3 (
+      interval,
+      interval
+    )
+    pg_catalog.in_range(
+      interval,
+      interval,
+      interval,
+      boolean,
+      boolean
+    ),
     storage interval;
 
 create operator class pg_catalog.interval_ops
   default for type interval
   using hash
   family pg_catalog.interval_ops as
+    operator 1 pg_catalog.= (interval, interval),
+    function 1 (interval, interval) pg_catalog.interval_hash(interval),
+    function 2 (
+      interval,
+      interval
+    )
+    pg_catalog.interval_hash_extended(
+      interval,
+      bigint
+    ),
     storage interval;
 
 create operator class pg_catalog.jsonb_ops
   default for type jsonb
   using btree
   family pg_catalog.jsonb_ops as
+    operator 1 pg_catalog.< (jsonb, jsonb),
+    operator 2 pg_catalog.<= (jsonb, jsonb),
+    operator 3 pg_catalog.= (jsonb, jsonb),
+    operator 4 pg_catalog.>= (jsonb, jsonb),
+    operator 5 pg_catalog.> (jsonb, jsonb),
+    function 1 (jsonb, jsonb) pg_catalog.jsonb_cmp(jsonb, jsonb),
     storage jsonb;
 
 create operator class pg_catalog.jsonb_ops
   default for type jsonb
   using gin
   family pg_catalog.jsonb_ops as
+    operator 7 pg_catalog.@> (jsonb, jsonb),
+    function 1 (jsonb, jsonb) pg_catalog.gin_compare_jsonb(text, text),
+    function 2 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_extract_jsonb(
+      jsonb,
+      internal,
+      internal
+    ),
+    function 3 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_extract_jsonb_query(
+      jsonb,
+      internal,
+      smallint,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_consistent_jsonb(
+      internal,
+      smallint,
+      jsonb,
+      integer,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_triconsistent_jsonb(
+      internal,
+      smallint,
+      jsonb,
+      integer,
+      internal,
+      internal,
+      internal
+    ),
     storage text;
 
 create operator class pg_catalog.jsonb_ops
   default for type jsonb
   using hash
   family pg_catalog.jsonb_ops as
+    operator 1 pg_catalog.= (jsonb, jsonb),
+    function 1 (jsonb, jsonb) pg_catalog.jsonb_hash(jsonb),
+    function 2 (jsonb, jsonb) pg_catalog.jsonb_hash_extended(jsonb, bigint),
     storage jsonb;
 
 create operator class pg_catalog.jsonb_path_ops
   for type jsonb
   using gin
   family pg_catalog.jsonb_path_ops as
+    operator 7 pg_catalog.@> (jsonb, jsonb),
+    function 1 (jsonb, jsonb) pg_catalog.btint4cmp(integer, integer),
+    function 2 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_extract_jsonb_path(
+      jsonb,
+      internal,
+      internal
+    ),
+    function 3 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_extract_jsonb_query_path(
+      jsonb,
+      internal,
+      smallint,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_consistent_jsonb_path(
+      internal,
+      smallint,
+      jsonb,
+      integer,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      jsonb,
+      jsonb
+    )
+    pg_catalog.gin_triconsistent_jsonb_path(
+      internal,
+      smallint,
+      jsonb,
+      integer,
+      internal,
+      internal,
+      internal
+    ),
     storage integer;
 
 create operator class pg_catalog.kd_point_ops
   for type point
   using spgist
   family pg_catalog.kd_point_ops as
+    operator 1 pg_catalog.<< (point, point),
+    operator 5 pg_catalog.>> (point, point),
+    operator 6 pg_catalog.~= (point, point),
+    operator 10 pg_catalog.<<| (point, point),
+    operator 11 pg_catalog.|>> (point, point),
+    operator 15 pg_catalog.<-> (point, point) for order by pg_catalog.float_ops,
+    operator 29 pg_catalog.<^ (point, point),
+    operator 30 pg_catalog.>^ (point, point),
+    function 1 (point, point) pg_catalog.spg_kd_config(internal, internal),
+    function 2 (point, point) pg_catalog.spg_kd_choose(internal, internal),
+    function 3 (point, point) pg_catalog.spg_kd_picksplit(internal, internal),
+    function 4 (
+      point,
+      point
+    )
+    pg_catalog.spg_kd_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      point,
+      point
+    )
+    pg_catalog.spg_quad_leaf_consistent(
+      internal,
+      internal
+    ),
     storage point;
 
 create operator class pg_catalog.macaddr8_bloom_ops
   for type macaddr8
   using brin
   family pg_catalog.macaddr8_bloom_ops as
+    operator 1 pg_catalog.= (macaddr8, macaddr8),
+    function 1 (macaddr8, macaddr8) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (macaddr8, macaddr8) pg_catalog.brin_bloom_options(internal),
+    function 11 (macaddr8, macaddr8) pg_catalog.hashmacaddr8(macaddr8),
     storage macaddr8;
 
 create operator class pg_catalog.macaddr8_minmax_multi_ops
   for type macaddr8
   using brin
   family pg_catalog.macaddr8_minmax_multi_ops as
+    operator 1 pg_catalog.< (macaddr8, macaddr8),
+    operator 2 pg_catalog.<= (macaddr8, macaddr8),
+    operator 3 pg_catalog.= (macaddr8, macaddr8),
+    operator 4 pg_catalog.>= (macaddr8, macaddr8),
+    operator 5 pg_catalog.> (macaddr8, macaddr8),
+    function 1 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_multi_distance_macaddr8(
+      internal,
+      internal
+    ),
     storage macaddr8;
 
 create operator class pg_catalog.macaddr8_minmax_ops
   default for type macaddr8
   using brin
   family pg_catalog.macaddr8_minmax_ops as
+    operator 1 pg_catalog.< (macaddr8, macaddr8),
+    operator 2 pg_catalog.<= (macaddr8, macaddr8),
+    operator 3 pg_catalog.= (macaddr8, macaddr8),
+    operator 4 pg_catalog.>= (macaddr8, macaddr8),
+    operator 5 pg_catalog.> (macaddr8, macaddr8),
+    function 1 (macaddr8, macaddr8) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage macaddr8;
 
 create operator class pg_catalog.macaddr8_ops
   default for type macaddr8
   using btree
   family pg_catalog.macaddr8_ops as
+    operator 1 pg_catalog.< (macaddr8, macaddr8),
+    operator 2 pg_catalog.<= (macaddr8, macaddr8),
+    operator 3 pg_catalog.= (macaddr8, macaddr8),
+    operator 4 pg_catalog.>= (macaddr8, macaddr8),
+    operator 5 pg_catalog.> (macaddr8, macaddr8),
+    function 1 (macaddr8, macaddr8) pg_catalog.macaddr8_cmp(macaddr8, macaddr8),
+    function 4 (macaddr8, macaddr8) pg_catalog.btequalimage(oid),
     storage macaddr8;
 
 create operator class pg_catalog.macaddr8_ops
   default for type macaddr8
   using hash
   family pg_catalog.macaddr8_ops as
+    operator 1 pg_catalog.= (macaddr8, macaddr8),
+    function 1 (macaddr8, macaddr8) pg_catalog.hashmacaddr8(macaddr8),
+    function 2 (
+      macaddr8,
+      macaddr8
+    )
+    pg_catalog.hashmacaddr8extended(
+      macaddr8,
+      bigint
+    ),
     storage macaddr8;
 
 create operator class pg_catalog.macaddr_bloom_ops
   for type macaddr
   using brin
   family pg_catalog.macaddr_bloom_ops as
+    operator 1 pg_catalog.= (macaddr, macaddr),
+    function 1 (macaddr, macaddr) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (macaddr, macaddr) pg_catalog.brin_bloom_options(internal),
+    function 11 (macaddr, macaddr) pg_catalog.hashmacaddr(macaddr),
     storage macaddr;
 
 create operator class pg_catalog.macaddr_minmax_multi_ops
   for type macaddr
   using brin
   family pg_catalog.macaddr_minmax_multi_ops as
+    operator 1 pg_catalog.< (macaddr, macaddr),
+    operator 2 pg_catalog.<= (macaddr, macaddr),
+    operator 3 pg_catalog.= (macaddr, macaddr),
+    operator 4 pg_catalog.>= (macaddr, macaddr),
+    operator 5 pg_catalog.> (macaddr, macaddr),
+    function 1 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_multi_distance_macaddr(
+      internal,
+      internal
+    ),
     storage macaddr;
 
 create operator class pg_catalog.macaddr_minmax_ops
   default for type macaddr
   using brin
   family pg_catalog.macaddr_minmax_ops as
+    operator 1 pg_catalog.< (macaddr, macaddr),
+    operator 2 pg_catalog.<= (macaddr, macaddr),
+    operator 3 pg_catalog.= (macaddr, macaddr),
+    operator 4 pg_catalog.>= (macaddr, macaddr),
+    operator 5 pg_catalog.> (macaddr, macaddr),
+    function 1 (macaddr, macaddr) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage macaddr;
 
 create operator class pg_catalog.macaddr_ops
   default for type macaddr
   using btree
   family pg_catalog.macaddr_ops as
+    operator 1 pg_catalog.< (macaddr, macaddr),
+    operator 2 pg_catalog.<= (macaddr, macaddr),
+    operator 3 pg_catalog.= (macaddr, macaddr),
+    operator 4 pg_catalog.>= (macaddr, macaddr),
+    operator 5 pg_catalog.> (macaddr, macaddr),
+    function 1 (macaddr, macaddr) pg_catalog.macaddr_cmp(macaddr, macaddr),
+    function 2 (macaddr, macaddr) pg_catalog.macaddr_sortsupport(internal),
+    function 4 (macaddr, macaddr) pg_catalog.btequalimage(oid),
     storage macaddr;
 
 create operator class pg_catalog.macaddr_ops
   default for type macaddr
   using hash
   family pg_catalog.macaddr_ops as
+    operator 1 pg_catalog.= (macaddr, macaddr),
+    function 1 (macaddr, macaddr) pg_catalog.hashmacaddr(macaddr),
+    function 2 (
+      macaddr,
+      macaddr
+    )
+    pg_catalog.hashmacaddrextended(
+      macaddr,
+      bigint
+    ),
     storage macaddr;
 
 create operator class pg_catalog.money_ops
   default for type money
   using btree
   family pg_catalog.money_ops as
+    operator 1 pg_catalog.< (money, money),
+    operator 2 pg_catalog.<= (money, money),
+    operator 3 pg_catalog.= (money, money),
+    operator 4 pg_catalog.>= (money, money),
+    operator 5 pg_catalog.> (money, money),
+    function 1 (money, money) pg_catalog.cash_cmp(money, money),
+    function 4 (money, money) pg_catalog.btequalimage(oid),
     storage money;
 
 create operator class pg_catalog.multirange_ops
   default for type anymultirange
   using btree
   family pg_catalog.multirange_ops as
+    operator 1 pg_catalog.< (anymultirange, anymultirange),
+    operator 2 pg_catalog.<= (anymultirange, anymultirange),
+    operator 3 pg_catalog.= (anymultirange, anymultirange),
+    operator 4 pg_catalog.>= (anymultirange, anymultirange),
+    operator 5 pg_catalog.> (anymultirange, anymultirange),
+    function 1 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.multirange_cmp(
+      anymultirange,
+      anymultirange
+    ),
     storage anymultirange;
 
 create operator class pg_catalog.multirange_ops
   default for type anymultirange
   using gist
   family pg_catalog.multirange_ops as
+    operator 1 pg_catalog.<< (anymultirange, anymultirange),
+    operator 2 pg_catalog.&< (anymultirange, anymultirange),
+    operator 3 pg_catalog.&& (anymultirange, anymultirange),
+    operator 4 pg_catalog.&> (anymultirange, anymultirange),
+    operator 5 pg_catalog.>> (anymultirange, anymultirange),
+    operator 6 pg_catalog.-|- (anymultirange, anymultirange),
+    operator 7 pg_catalog.@> (anymultirange, anymultirange),
+    operator 8 pg_catalog.<@ (anymultirange, anymultirange),
+    operator 18 pg_catalog.= (anymultirange, anymultirange),
+    function 1 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.multirange_gist_consistent(
+      internal,
+      anymultirange,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.range_gist_union(
+      internal,
+      internal
+    ),
+    function 3 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.multirange_gist_compress(
+      internal
+    ),
+    function 5 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.range_gist_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.range_gist_picksplit(
+      internal,
+      internal
+    ),
+    function 7 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.range_gist_same(
+      anyrange,
+      anyrange,
+      internal
+    ),
     storage anyrange;
 
 create operator class pg_catalog.multirange_ops
   default for type anymultirange
   using hash
   family pg_catalog.multirange_ops as
+    operator 1 pg_catalog.= (anymultirange, anymultirange),
+    function 1 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.hash_multirange(
+      anymultirange
+    ),
+    function 2 (
+      anymultirange,
+      anymultirange
+    )
+    pg_catalog.hash_multirange_extended(
+      anymultirange,
+      bigint
+    ),
     storage anymultirange;
 
 create operator class pg_catalog.name_bloom_ops
   for type name
   using brin
   family pg_catalog.name_bloom_ops as
+    operator 1 pg_catalog.= (name, name),
+    function 1 (name, name) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      name,
+      name
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      name,
+      name
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      name,
+      name
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (name, name) pg_catalog.brin_bloom_options(internal),
+    function 11 (name, name) pg_catalog.hashname(name),
     storage name;
 
 create operator class pg_catalog.name_minmax_ops
   default for type name
   using brin
   family pg_catalog.name_minmax_ops as
+    operator 1 pg_catalog.< (name, name),
+    operator 2 pg_catalog.<= (name, name),
+    operator 3 pg_catalog.= (name, name),
+    operator 4 pg_catalog.>= (name, name),
+    operator 5 pg_catalog.> (name, name),
+    function 1 (name, name) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      name,
+      name
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      name,
+      name
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      name,
+      name
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage name;
 
 create operator class pg_catalog.name_ops
   default for type name
   using btree
   family pg_catalog.text_ops as
+    operator 1 pg_catalog.< (name, name),
+    operator 2 pg_catalog.<= (name, name),
+    operator 3 pg_catalog.= (name, name),
+    operator 4 pg_catalog.>= (name, name),
+    operator 5 pg_catalog.> (name, name),
+    function 1 (name, name) pg_catalog.btnamecmp(name, name),
+    function 2 (name, name) pg_catalog.btnamesortsupport(internal),
+    function 4 (name, name) pg_catalog.btvarstrequalimage(oid),
     storage cstring;
 
 create operator class pg_catalog.name_ops
   default for type name
   using hash
   family pg_catalog.text_ops as
+    operator 1 pg_catalog.= (name, name),
+    function 1 (name, name) pg_catalog.hashname(name),
+    function 2 (name, name) pg_catalog.hashnameextended(name, bigint),
     storage name;
 
 create operator class pg_catalog.numeric_bloom_ops
   for type numeric
   using brin
   family pg_catalog.numeric_bloom_ops as
+    operator 1 pg_catalog.= (numeric, numeric),
+    function 1 (numeric, numeric) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (numeric, numeric) pg_catalog.brin_bloom_options(internal),
+    function 11 (numeric, numeric) pg_catalog.hash_numeric(numeric),
     storage numeric;
 
 create operator class pg_catalog.numeric_minmax_multi_ops
   for type numeric
   using brin
   family pg_catalog.numeric_minmax_multi_ops as
+    operator 1 pg_catalog.< (numeric, numeric),
+    operator 2 pg_catalog.<= (numeric, numeric),
+    operator 3 pg_catalog.= (numeric, numeric),
+    operator 4 pg_catalog.>= (numeric, numeric),
+    operator 5 pg_catalog.> (numeric, numeric),
+    function 1 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_multi_distance_numeric(
+      internal,
+      internal
+    ),
     storage numeric;
 
 create operator class pg_catalog.numeric_minmax_ops
   default for type numeric
   using brin
   family pg_catalog.numeric_minmax_ops as
+    operator 1 pg_catalog.< (numeric, numeric),
+    operator 2 pg_catalog.<= (numeric, numeric),
+    operator 3 pg_catalog.= (numeric, numeric),
+    operator 4 pg_catalog.>= (numeric, numeric),
+    operator 5 pg_catalog.> (numeric, numeric),
+    function 1 (numeric, numeric) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      numeric,
+      numeric
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage numeric;
 
 create operator class pg_catalog.numeric_ops
   default for type numeric
   using btree
   family pg_catalog.numeric_ops as
+    operator 1 pg_catalog.< (numeric, numeric),
+    operator 2 pg_catalog.<= (numeric, numeric),
+    operator 3 pg_catalog.= (numeric, numeric),
+    operator 4 pg_catalog.>= (numeric, numeric),
+    operator 5 pg_catalog.> (numeric, numeric),
+    function 1 (numeric, numeric) pg_catalog.numeric_cmp(numeric, numeric),
+    function 2 (numeric, numeric) pg_catalog.numeric_sortsupport(internal),
+    function 3 (
+      numeric,
+      numeric
+    )
+    pg_catalog.in_range(
+      numeric,
+      numeric,
+      numeric,
+      boolean,
+      boolean
+    ),
     storage numeric;
 
 create operator class pg_catalog.numeric_ops
   default for type numeric
   using hash
   family pg_catalog.numeric_ops as
+    operator 1 pg_catalog.= (numeric, numeric),
+    function 1 (numeric, numeric) pg_catalog.hash_numeric(numeric),
+    function 2 (
+      numeric,
+      numeric
+    )
+    pg_catalog.hash_numeric_extended(
+      numeric,
+      bigint
+    ),
     storage numeric;
 
 create operator class pg_catalog.oid_bloom_ops
   for type oid
   using brin
   family pg_catalog.oid_bloom_ops as
+    operator 1 pg_catalog.= (oid, oid),
+    function 1 (oid, oid) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (oid, oid) pg_catalog.brin_bloom_options(internal),
+    function 11 (oid, oid) pg_catalog.hashoid(oid),
     storage oid;
 
 create operator class pg_catalog.oid_minmax_multi_ops
   for type oid
   using brin
   family pg_catalog.oid_minmax_multi_ops as
+    operator 1 pg_catalog.< (oid, oid),
+    operator 2 pg_catalog.<= (oid, oid),
+    operator 3 pg_catalog.= (oid, oid),
+    operator 4 pg_catalog.>= (oid, oid),
+    operator 5 pg_catalog.> (oid, oid),
+    function 1 (oid, oid) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (oid, oid) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_minmax_multi_distance_int4(
+      internal,
+      internal
+    ),
     storage oid;
 
 create operator class pg_catalog.oid_minmax_ops
   default for type oid
   using brin
   family pg_catalog.oid_minmax_ops as
+    operator 1 pg_catalog.< (oid, oid),
+    operator 2 pg_catalog.<= (oid, oid),
+    operator 3 pg_catalog.= (oid, oid),
+    operator 4 pg_catalog.>= (oid, oid),
+    operator 5 pg_catalog.> (oid, oid),
+    function 1 (oid, oid) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      oid,
+      oid
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage oid;
 
 create operator class pg_catalog.oid_ops
   default for type oid
   using btree
   family pg_catalog.oid_ops as
+    operator 1 pg_catalog.< (oid, oid),
+    operator 2 pg_catalog.<= (oid, oid),
+    operator 3 pg_catalog.= (oid, oid),
+    operator 4 pg_catalog.>= (oid, oid),
+    operator 5 pg_catalog.> (oid, oid),
+    function 1 (oid, oid) pg_catalog.btoidcmp(oid, oid),
+    function 2 (oid, oid) pg_catalog.btoidsortsupport(internal),
+    function 4 (oid, oid) pg_catalog.btequalimage(oid),
+    function 6 (oid, oid) pg_catalog.btoidskipsupport(internal),
     storage oid;
 
 create operator class pg_catalog.oid_ops
   default for type oid
   using hash
   family pg_catalog.oid_ops as
+    operator 1 pg_catalog.= (oid, oid),
+    function 1 (oid, oid) pg_catalog.hashoid(oid),
+    function 2 (oid, oid) pg_catalog.hashoidextended(oid, bigint),
     storage oid;
 
 create operator class pg_catalog.oidvector_ops
   default for type oidvector
   using btree
   family pg_catalog.oidvector_ops as
+    operator 1 pg_catalog.< (oidvector, oidvector),
+    operator 2 pg_catalog.<= (oidvector, oidvector),
+    operator 3 pg_catalog.= (oidvector, oidvector),
+    operator 4 pg_catalog.>= (oidvector, oidvector),
+    operator 5 pg_catalog.> (oidvector, oidvector),
+    function 1 (
+      oidvector,
+      oidvector
+    )
+    pg_catalog.btoidvectorcmp(
+      oidvector,
+      oidvector
+    ),
+    function 4 (oidvector, oidvector) pg_catalog.btequalimage(oid),
     storage oidvector;
 
 create operator class pg_catalog.oidvector_ops
   default for type oidvector
   using hash
   family pg_catalog.oidvector_ops as
+    operator 1 pg_catalog.= (oidvector, oidvector),
+    function 1 (oidvector, oidvector) pg_catalog.hashoidvector(oidvector),
+    function 2 (
+      oidvector,
+      oidvector
+    )
+    pg_catalog.hashoidvectorextended(
+      oidvector,
+      bigint
+    ),
     storage oidvector;
 
 create operator class pg_catalog.pg_lsn_bloom_ops
   for type pg_lsn
   using brin
   family pg_catalog.pg_lsn_bloom_ops as
+    operator 1 pg_catalog.= (pg_lsn, pg_lsn),
+    function 1 (pg_lsn, pg_lsn) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (pg_lsn, pg_lsn) pg_catalog.brin_bloom_options(internal),
+    function 11 (pg_lsn, pg_lsn) pg_catalog.pg_lsn_hash(pg_lsn),
     storage pg_lsn;
 
 create operator class pg_catalog.pg_lsn_minmax_multi_ops
   for type pg_lsn
   using brin
   family pg_catalog.pg_lsn_minmax_multi_ops as
+    operator 1 pg_catalog.< (pg_lsn, pg_lsn),
+    operator 2 pg_catalog.<= (pg_lsn, pg_lsn),
+    operator 3 pg_catalog.= (pg_lsn, pg_lsn),
+    operator 4 pg_catalog.>= (pg_lsn, pg_lsn),
+    operator 5 pg_catalog.> (pg_lsn, pg_lsn),
+    function 1 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_minmax_multi_distance_pg_lsn(
+      internal,
+      internal
+    ),
     storage pg_lsn;
 
 create operator class pg_catalog.pg_lsn_minmax_ops
   default for type pg_lsn
   using brin
   family pg_catalog.pg_lsn_minmax_ops as
+    operator 1 pg_catalog.< (pg_lsn, pg_lsn),
+    operator 2 pg_catalog.<= (pg_lsn, pg_lsn),
+    operator 3 pg_catalog.= (pg_lsn, pg_lsn),
+    operator 4 pg_catalog.>= (pg_lsn, pg_lsn),
+    operator 5 pg_catalog.> (pg_lsn, pg_lsn),
+    function 1 (pg_lsn, pg_lsn) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      pg_lsn,
+      pg_lsn
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage pg_lsn;
 
 create operator class pg_catalog.pg_lsn_ops
   default for type pg_lsn
   using btree
   family pg_catalog.pg_lsn_ops as
+    operator 1 pg_catalog.< (pg_lsn, pg_lsn),
+    operator 2 pg_catalog.<= (pg_lsn, pg_lsn),
+    operator 3 pg_catalog.= (pg_lsn, pg_lsn),
+    operator 4 pg_catalog.>= (pg_lsn, pg_lsn),
+    operator 5 pg_catalog.> (pg_lsn, pg_lsn),
+    function 1 (pg_lsn, pg_lsn) pg_catalog.pg_lsn_cmp(pg_lsn, pg_lsn),
+    function 4 (pg_lsn, pg_lsn) pg_catalog.btequalimage(oid),
     storage pg_lsn;
 
 create operator class pg_catalog.pg_lsn_ops
   default for type pg_lsn
   using hash
   family pg_catalog.pg_lsn_ops as
+    operator 1 pg_catalog.= (pg_lsn, pg_lsn),
+    function 1 (pg_lsn, pg_lsn) pg_catalog.pg_lsn_hash(pg_lsn),
+    function 2 (pg_lsn, pg_lsn) pg_catalog.pg_lsn_hash_extended(pg_lsn, bigint),
     storage pg_lsn;
 
 create operator class pg_catalog.point_ops
   default for type point
   using gist
   family pg_catalog.point_ops as
+    operator 1 pg_catalog.<< (point, point),
+    operator 5 pg_catalog.>> (point, point),
+    operator 6 pg_catalog.~= (point, point),
+    operator 10 pg_catalog.<<| (point, point),
+    operator 11 pg_catalog.|>> (point, point),
+    operator 15 pg_catalog.<-> (point, point) for order by pg_catalog.float_ops,
+    operator 29 pg_catalog.<^ (point, point),
+    operator 30 pg_catalog.>^ (point, point),
+    function 1 (
+      point,
+      point
+    )
+    pg_catalog.gist_point_consistent(
+      internal,
+      point,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (point, point) pg_catalog.gist_box_union(internal, internal),
+    function 3 (point, point) pg_catalog.gist_point_compress(internal),
+    function 5 (
+      point,
+      point
+    )
+    pg_catalog.gist_box_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (point, point) pg_catalog.gist_box_picksplit(internal, internal),
+    function 7 (point, point) pg_catalog.gist_box_same(box, box, internal),
+    function 8 (
+      point,
+      point
+    )
+    pg_catalog.gist_point_distance(
+      internal,
+      point,
+      smallint,
+      oid,
+      internal
+    ),
+    function 9 (point, point) pg_catalog.gist_point_fetch(internal),
+    function 11 (point, point) pg_catalog.gist_point_sortsupport(internal),
     storage box;
 
 create operator class pg_catalog.poly_ops
   default for type polygon
   using gist
   family pg_catalog.poly_ops as
+    operator 1 pg_catalog.<< (polygon, polygon),
+    operator 2 pg_catalog.&< (polygon, polygon),
+    operator 3 pg_catalog.&& (polygon, polygon),
+    operator 4 pg_catalog.&> (polygon, polygon),
+    operator 5 pg_catalog.>> (polygon, polygon),
+    operator 6 pg_catalog.~= (polygon, polygon),
+    operator 7 pg_catalog.@> (polygon, polygon),
+    operator 8 pg_catalog.<@ (polygon, polygon),
+    operator 9 pg_catalog.&<| (polygon, polygon),
+    operator 10 pg_catalog.<<| (polygon, polygon),
+    operator 11 pg_catalog.|>> (polygon, polygon),
+    operator 12 pg_catalog.|&> (polygon, polygon),
+    function 1 (
+      polygon,
+      polygon
+    )
+    pg_catalog.gist_poly_consistent(
+      internal,
+      polygon,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (polygon, polygon) pg_catalog.gist_box_union(internal, internal),
+    function 3 (polygon, polygon) pg_catalog.gist_poly_compress(internal),
+    function 5 (
+      polygon,
+      polygon
+    )
+    pg_catalog.gist_box_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      polygon,
+      polygon
+    )
+    pg_catalog.gist_box_picksplit(
+      internal,
+      internal
+    ),
+    function 7 (polygon, polygon) pg_catalog.gist_box_same(box, box, internal),
+    function 8 (
+      polygon,
+      polygon
+    )
+    pg_catalog.gist_poly_distance(
+      internal,
+      polygon,
+      smallint,
+      oid,
+      internal
+    ),
     storage box;
 
 create operator class pg_catalog.poly_ops
   default for type polygon
   using spgist
   family pg_catalog.poly_ops as
+    operator 1 pg_catalog.<< (polygon, polygon),
+    operator 2 pg_catalog.&< (polygon, polygon),
+    operator 3 pg_catalog.&& (polygon, polygon),
+    operator 4 pg_catalog.&> (polygon, polygon),
+    operator 5 pg_catalog.>> (polygon, polygon),
+    operator 6 pg_catalog.~= (polygon, polygon),
+    operator 7 pg_catalog.@> (polygon, polygon),
+    operator 8 pg_catalog.<@ (polygon, polygon),
+    operator 9 pg_catalog.&<| (polygon, polygon),
+    operator 10 pg_catalog.<<| (polygon, polygon),
+    operator 11 pg_catalog.|>> (polygon, polygon),
+    operator 12 pg_catalog.|&> (polygon, polygon),
+    function 1 (
+      polygon,
+      polygon
+    )
+    pg_catalog.spg_bbox_quad_config(
+      internal,
+      internal
+    ),
+    function 2 (
+      polygon,
+      polygon
+    )
+    pg_catalog.spg_box_quad_choose(
+      internal,
+      internal
+    ),
+    function 3 (
+      polygon,
+      polygon
+    )
+    pg_catalog.spg_box_quad_picksplit(
+      internal,
+      internal
+    ),
+    function 4 (
+      polygon,
+      polygon
+    )
+    pg_catalog.spg_box_quad_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      polygon,
+      polygon
+    )
+    pg_catalog.spg_box_quad_leaf_consistent(
+      internal,
+      internal
+    ),
+    function 6 (polygon, polygon) pg_catalog.spg_poly_quad_compress(polygon),
     storage box;
 
 create operator class pg_catalog.quad_point_ops
   default for type point
   using spgist
   family pg_catalog.quad_point_ops as
+    operator 1 pg_catalog.<< (point, point),
+    operator 5 pg_catalog.>> (point, point),
+    operator 6 pg_catalog.~= (point, point),
+    operator 10 pg_catalog.<<| (point, point),
+    operator 11 pg_catalog.|>> (point, point),
+    operator 15 pg_catalog.<-> (point, point) for order by pg_catalog.float_ops,
+    operator 29 pg_catalog.<^ (point, point),
+    operator 30 pg_catalog.>^ (point, point),
+    function 1 (point, point) pg_catalog.spg_quad_config(internal, internal),
+    function 2 (point, point) pg_catalog.spg_quad_choose(internal, internal),
+    function 3 (point, point) pg_catalog.spg_quad_picksplit(internal, internal),
+    function 4 (
+      point,
+      point
+    )
+    pg_catalog.spg_quad_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      point,
+      point
+    )
+    pg_catalog.spg_quad_leaf_consistent(
+      internal,
+      internal
+    ),
     storage point;
 
 create operator class pg_catalog.range_inclusion_ops
   default for type anyrange
   using brin
   family pg_catalog.range_inclusion_ops as
+    operator 1 pg_catalog.<< (anyrange, anyrange),
+    operator 2 pg_catalog.&< (anyrange, anyrange),
+    operator 3 pg_catalog.&& (anyrange, anyrange),
+    operator 4 pg_catalog.&> (anyrange, anyrange),
+    operator 5 pg_catalog.>> (anyrange, anyrange),
+    operator 7 pg_catalog.@> (anyrange, anyrange),
+    operator 8 pg_catalog.<@ (anyrange, anyrange),
+    operator 17 pg_catalog.-|- (anyrange, anyrange),
+    operator 18 pg_catalog.= (anyrange, anyrange),
+    operator 20 pg_catalog.< (anyrange, anyrange),
+    operator 21 pg_catalog.<= (anyrange, anyrange),
+    operator 22 pg_catalog.> (anyrange, anyrange),
+    operator 23 pg_catalog.>= (anyrange, anyrange),
+    function 1 (anyrange, anyrange) pg_catalog.brin_inclusion_opcinfo(internal),
+    function 2 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.brin_inclusion_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.brin_inclusion_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.brin_inclusion_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 11 (anyrange, anyrange) pg_catalog.range_merge(anyrange, anyrange),
+    function 13 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.range_contains(
+      anyrange,
+      anyrange
+    ),
+    function 14 (anyrange, anyrange) pg_catalog.isempty(anyrange),
     storage anyrange;
 
 create operator class pg_catalog.range_ops
   default for type anyrange
   using btree
   family pg_catalog.range_ops as
+    operator 1 pg_catalog.< (anyrange, anyrange),
+    operator 2 pg_catalog.<= (anyrange, anyrange),
+    operator 3 pg_catalog.= (anyrange, anyrange),
+    operator 4 pg_catalog.>= (anyrange, anyrange),
+    operator 5 pg_catalog.> (anyrange, anyrange),
+    function 1 (anyrange, anyrange) pg_catalog.range_cmp(anyrange, anyrange),
+    function 2 (anyrange, anyrange) pg_catalog.range_sortsupport(internal),
     storage anyrange;
 
 create operator class pg_catalog.range_ops
   default for type anyrange
   using gist
   family pg_catalog.range_ops as
+    operator 1 pg_catalog.<< (anyrange, anyrange),
+    operator 2 pg_catalog.&< (anyrange, anyrange),
+    operator 3 pg_catalog.&& (anyrange, anyrange),
+    operator 4 pg_catalog.&> (anyrange, anyrange),
+    operator 5 pg_catalog.>> (anyrange, anyrange),
+    operator 6 pg_catalog.-|- (anyrange, anyrange),
+    operator 7 pg_catalog.@> (anyrange, anyrange),
+    operator 8 pg_catalog.<@ (anyrange, anyrange),
+    operator 18 pg_catalog.= (anyrange, anyrange),
+    function 1 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.range_gist_consistent(
+      internal,
+      anyrange,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.range_gist_union(
+      internal,
+      internal
+    ),
+    function 5 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.range_gist_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.range_gist_picksplit(
+      internal,
+      internal
+    ),
+    function 7 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.range_gist_same(
+      anyrange,
+      anyrange,
+      internal
+    ),
+    function 11 (anyrange, anyrange) pg_catalog.range_sortsupport(internal),
     storage anyrange;
 
 create operator class pg_catalog.range_ops
   default for type anyrange
   using hash
   family pg_catalog.range_ops as
+    operator 1 pg_catalog.= (anyrange, anyrange),
+    function 1 (anyrange, anyrange) pg_catalog.hash_range(anyrange),
+    function 2 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.hash_range_extended(
+      anyrange,
+      bigint
+    ),
     storage anyrange;
 
 create operator class pg_catalog.range_ops
   default for type anyrange
   using spgist
   family pg_catalog.range_ops as
+    operator 1 pg_catalog.<< (anyrange, anyrange),
+    operator 2 pg_catalog.&< (anyrange, anyrange),
+    operator 3 pg_catalog.&& (anyrange, anyrange),
+    operator 4 pg_catalog.&> (anyrange, anyrange),
+    operator 5 pg_catalog.>> (anyrange, anyrange),
+    operator 6 pg_catalog.-|- (anyrange, anyrange),
+    operator 7 pg_catalog.@> (anyrange, anyrange),
+    operator 8 pg_catalog.<@ (anyrange, anyrange),
+    operator 18 pg_catalog.= (anyrange, anyrange),
+    function 1 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.spg_range_quad_config(
+      internal,
+      internal
+    ),
+    function 2 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.spg_range_quad_choose(
+      internal,
+      internal
+    ),
+    function 3 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.spg_range_quad_picksplit(
+      internal,
+      internal
+    ),
+    function 4 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.spg_range_quad_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      anyrange,
+      anyrange
+    )
+    pg_catalog.spg_range_quad_leaf_consistent(
+      internal,
+      internal
+    ),
     storage anyrange;
 
 create operator class pg_catalog.record_image_ops
   for type record
   using btree
   family pg_catalog.record_image_ops as
+    operator 1 pg_catalog.*< (record, record),
+    operator 2 pg_catalog.*<= (record, record),
+    operator 3 pg_catalog.*= (record, record),
+    operator 4 pg_catalog.*>= (record, record),
+    operator 5 pg_catalog.*> (record, record),
+    function 1 (record, record) pg_catalog.btrecordimagecmp(record, record),
     storage record;
 
 create operator class pg_catalog.record_ops
   default for type record
   using btree
   family pg_catalog.record_ops as
+    operator 1 pg_catalog.< (record, record),
+    operator 2 pg_catalog.<= (record, record),
+    operator 3 pg_catalog.= (record, record),
+    operator 4 pg_catalog.>= (record, record),
+    operator 5 pg_catalog.> (record, record),
+    function 1 (record, record) pg_catalog.btrecordcmp(record, record),
     storage record;
 
 create operator class pg_catalog.record_ops
   default for type record
   using hash
   family pg_catalog.record_ops as
+    operator 1 pg_catalog.= (record, record),
+    function 1 (record, record) pg_catalog.hash_record(record),
+    function 2 (record, record) pg_catalog.hash_record_extended(record, bigint),
     storage record;
 
 create operator class pg_catalog.text_bloom_ops
   for type text
   using brin
   family pg_catalog.text_bloom_ops as
+    operator 1 pg_catalog.= (text, text),
+    function 1 (text, text) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      text,
+      text
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      text,
+      text
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      text,
+      text
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (text, text) pg_catalog.brin_bloom_options(internal),
+    function 11 (text, text) pg_catalog.hashtext(text),
     storage text;
 
 create operator class pg_catalog.text_minmax_ops
   default for type text
   using brin
   family pg_catalog.text_minmax_ops as
+    operator 1 pg_catalog.< (text, text),
+    operator 2 pg_catalog.<= (text, text),
+    operator 3 pg_catalog.= (text, text),
+    operator 4 pg_catalog.>= (text, text),
+    operator 5 pg_catalog.> (text, text),
+    function 1 (text, text) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      text,
+      text
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      text,
+      text
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      text,
+      text
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage text;
 
 create operator class pg_catalog.text_ops
   default for type text
   using btree
   family pg_catalog.text_ops as
+    operator 1 pg_catalog.< (text, text),
+    operator 2 pg_catalog.<= (text, text),
+    operator 3 pg_catalog.= (text, text),
+    operator 4 pg_catalog.>= (text, text),
+    operator 5 pg_catalog.> (text, text),
+    function 1 (text, text) pg_catalog.bttextcmp(text, text),
+    function 2 (text, text) pg_catalog.bttextsortsupport(internal),
+    function 4 (text, text) pg_catalog.btvarstrequalimage(oid),
     storage text;
 
 create operator class pg_catalog.text_ops
   default for type text
   using hash
   family pg_catalog.text_ops as
+    operator 1 pg_catalog.= (text, text),
+    function 1 (text, text) pg_catalog.hashtext(text),
+    function 2 (text, text) pg_catalog.hashtextextended(text, bigint),
     storage text;
 
 create operator class pg_catalog.text_ops
   default for type text
   using spgist
   family pg_catalog.text_ops as
+    operator 1 pg_catalog.~<~ (text, text),
+    operator 2 pg_catalog.~<=~ (text, text),
+    operator 3 pg_catalog.= (text, text),
+    operator 4 pg_catalog.~>=~ (text, text),
+    operator 5 pg_catalog.~>~ (text, text),
+    operator 11 pg_catalog.< (text, text),
+    operator 12 pg_catalog.<= (text, text),
+    operator 14 pg_catalog.>= (text, text),
+    operator 15 pg_catalog.> (text, text),
+    operator 28 pg_catalog.^@ (text, text),
+    function 1 (text, text) pg_catalog.spg_text_config(internal, internal),
+    function 2 (text, text) pg_catalog.spg_text_choose(internal, internal),
+    function 3 (text, text) pg_catalog.spg_text_picksplit(internal, internal),
+    function 4 (
+      text,
+      text
+    )
+    pg_catalog.spg_text_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      text,
+      text
+    )
+    pg_catalog.spg_text_leaf_consistent(
+      internal,
+      internal
+    ),
     storage text;
 
 create operator class pg_catalog.text_pattern_ops
   for type text
   using btree
   family pg_catalog.text_pattern_ops as
+    operator 1 pg_catalog.~<~ (text, text),
+    operator 2 pg_catalog.~<=~ (text, text),
+    operator 3 pg_catalog.= (text, text),
+    operator 4 pg_catalog.~>=~ (text, text),
+    operator 5 pg_catalog.~>~ (text, text),
+    function 1 (text, text) pg_catalog.bttext_pattern_cmp(text, text),
+    function 2 (text, text) pg_catalog.bttext_pattern_sortsupport(internal),
+    function 4 (text, text) pg_catalog.btequalimage(oid),
     storage text;
 
 create operator class pg_catalog.text_pattern_ops
   for type text
   using hash
   family pg_catalog.text_pattern_ops as
+    operator 1 pg_catalog.= (text, text),
+    function 1 (text, text) pg_catalog.hashtext(text),
+    function 2 (text, text) pg_catalog.hashtextextended(text, bigint),
     storage text;
 
 create operator class pg_catalog.tid_bloom_ops
   for type tid
   using brin
   family pg_catalog.tid_bloom_ops as
+    operator 1 pg_catalog.= (tid, tid),
+    function 1 (tid, tid) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (tid, tid) pg_catalog.brin_bloom_options(internal),
+    function 11 (tid, tid) pg_catalog.hashtid(tid),
     storage tid;
 
 create operator class pg_catalog.tid_minmax_multi_ops
   for type tid
   using brin
   family pg_catalog.tid_minmax_multi_ops as
+    operator 1 pg_catalog.< (tid, tid),
+    operator 2 pg_catalog.<= (tid, tid),
+    operator 3 pg_catalog.= (tid, tid),
+    operator 4 pg_catalog.>= (tid, tid),
+    operator 5 pg_catalog.> (tid, tid),
+    function 1 (tid, tid) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (tid, tid) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_minmax_multi_distance_tid(
+      internal,
+      internal
+    ),
     storage tid;
 
 create operator class pg_catalog.tid_minmax_ops
   default for type tid
   using brin
   family pg_catalog.tid_minmax_ops as
+    operator 1 pg_catalog.< (tid, tid),
+    operator 2 pg_catalog.<= (tid, tid),
+    operator 3 pg_catalog.= (tid, tid),
+    operator 4 pg_catalog.>= (tid, tid),
+    operator 5 pg_catalog.> (tid, tid),
+    function 1 (tid, tid) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      tid,
+      tid
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage tid;
 
 create operator class pg_catalog.tid_ops
   default for type tid
   using btree
   family pg_catalog.tid_ops as
+    operator 1 pg_catalog.< (tid, tid),
+    operator 2 pg_catalog.<= (tid, tid),
+    operator 3 pg_catalog.= (tid, tid),
+    operator 4 pg_catalog.>= (tid, tid),
+    operator 5 pg_catalog.> (tid, tid),
+    function 1 (tid, tid) pg_catalog.bttidcmp(tid, tid),
+    function 4 (tid, tid) pg_catalog.btequalimage(oid),
     storage tid;
 
 create operator class pg_catalog.tid_ops
   default for type tid
   using hash
   family pg_catalog.tid_ops as
+    operator 1 pg_catalog.= (tid, tid),
+    function 1 (tid, tid) pg_catalog.hashtid(tid),
+    function 2 (tid, tid) pg_catalog.hashtidextended(tid, bigint),
     storage tid;
 
 create operator class pg_catalog.time_bloom_ops
   for type time without time zone
   using brin
   family pg_catalog.time_bloom_ops as
+    operator 1 pg_catalog.= (time without time zone, time without time zone),
+    function 1 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_bloom_opcinfo(
+      internal
+    ),
+    function 2 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_bloom_options(
+      internal
+    ),
+    function 11 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.time_hash(
+      time without time zone
+    ),
     storage time without time zone;
 
 create operator class pg_catalog.time_minmax_multi_ops
   for type time without time zone
   using brin
   family pg_catalog.time_minmax_multi_ops as
+    operator 1 pg_catalog.< (time without time zone, time without time zone),
+    operator 2 pg_catalog.<= (time without time zone, time without time zone),
+    operator 3 pg_catalog.= (time without time zone, time without time zone),
+    operator 4 pg_catalog.>= (time without time zone, time without time zone),
+    operator 5 pg_catalog.> (time without time zone, time without time zone),
+    function 1 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_multi_distance_time(
+      internal,
+      internal
+    ),
     storage time without time zone;
 
 create operator class pg_catalog.time_minmax_ops
   default for type time without time zone
   using brin
   family pg_catalog.time_minmax_ops as
+    operator 1 pg_catalog.< (time without time zone, time without time zone),
+    operator 2 pg_catalog.<= (time without time zone, time without time zone),
+    operator 3 pg_catalog.= (time without time zone, time without time zone),
+    operator 4 pg_catalog.>= (time without time zone, time without time zone),
+    operator 5 pg_catalog.> (time without time zone, time without time zone),
+    function 1 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_opcinfo(
+      internal
+    ),
+    function 2 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage time without time zone;
 
 create operator class pg_catalog.time_ops
   default for type time without time zone
   using btree
   family pg_catalog.time_ops as
+    operator 1 pg_catalog.< (time without time zone, time without time zone),
+    operator 2 pg_catalog.<= (time without time zone, time without time zone),
+    operator 3 pg_catalog.= (time without time zone, time without time zone),
+    operator 4 pg_catalog.>= (time without time zone, time without time zone),
+    operator 5 pg_catalog.> (time without time zone, time without time zone),
+    function 1 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.time_cmp(
+      time without time zone,
+      time without time zone
+    ),
+    function 4 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.btequalimage(
+      oid
+    ),
     storage time without time zone;
 
 create operator class pg_catalog.time_ops
   default for type time without time zone
   using hash
   family pg_catalog.time_ops as
+    operator 1 pg_catalog.= (time without time zone, time without time zone),
+    function 1 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.time_hash(
+      time without time zone
+    ),
+    function 2 (
+      time without time zone,
+      time without time zone
+    )
+    pg_catalog.time_hash_extended(
+      time without time zone,
+      bigint
+    ),
     storage time without time zone;
 
 create operator class pg_catalog.timestamp_bloom_ops
   for type timestamp without time zone
   using brin
   family pg_catalog.datetime_bloom_ops as
+    operator 1 pg_catalog.= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    function 1 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_bloom_opcinfo(
+      internal
+    ),
+    function 2 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_bloom_options(
+      internal
+    ),
+    function 11 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.timestamp_hash(
+      timestamp without time zone
+    ),
     storage timestamp without time zone;
 
 create operator class pg_catalog.timestamp_minmax_multi_ops
   for type timestamp without time zone
   using brin
   family pg_catalog.datetime_minmax_multi_ops as
+    operator 1 pg_catalog.< (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 2 pg_catalog.<= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 3 pg_catalog.= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 4 pg_catalog.>= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 5 pg_catalog.> (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    function 1 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_multi_distance_timestamp(
+      internal,
+      internal
+    ),
     storage timestamp without time zone;
 
 create operator class pg_catalog.timestamp_minmax_ops
   default for type timestamp without time zone
   using brin
   family pg_catalog.datetime_minmax_ops as
+    operator 1 pg_catalog.< (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 2 pg_catalog.<= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 3 pg_catalog.= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 4 pg_catalog.>= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 5 pg_catalog.> (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    function 1 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_opcinfo(
+      internal
+    ),
+    function 2 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage timestamp without time zone;
 
 create operator class pg_catalog.timestamp_ops
   default for type timestamp without time zone
   using btree
   family pg_catalog.datetime_ops as
+    operator 1 pg_catalog.< (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 2 pg_catalog.<= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 3 pg_catalog.= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 4 pg_catalog.>= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    operator 5 pg_catalog.> (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    function 1 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.timestamp_cmp(
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    function 2 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.timestamp_sortsupport(
+      internal
+    ),
+    function 4 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.btequalimage(
+      oid
+    ),
+    function 6 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.timestamp_skipsupport(
+      internal
+    ),
     storage timestamp without time zone;
 
 create operator class pg_catalog.timestamp_ops
   default for type timestamp without time zone
   using hash
   family pg_catalog.timestamp_ops as
+    operator 1 pg_catalog.= (
+      timestamp without time zone,
+      timestamp without time zone
+    ),
+    function 1 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.timestamp_hash(
+      timestamp without time zone
+    ),
+    function 2 (
+      timestamp without time zone,
+      timestamp without time zone
+    )
+    pg_catalog.timestamp_hash_extended(
+      timestamp without time zone,
+      bigint
+    ),
     storage timestamp without time zone;
 
 create operator class pg_catalog.timestamptz_bloom_ops
   for type timestamp with time zone
   using brin
   family pg_catalog.datetime_bloom_ops as
+    operator 1 pg_catalog.= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    function 1 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_bloom_opcinfo(
+      internal
+    ),
+    function 2 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_bloom_options(
+      internal
+    ),
+    function 11 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.timestamp_hash(
+      timestamp without time zone
+    ),
     storage timestamp with time zone;
 
 create operator class pg_catalog.timestamptz_minmax_multi_ops
   for type timestamp with time zone
   using brin
   family pg_catalog.datetime_minmax_multi_ops as
+    operator 1 pg_catalog.< (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 2 pg_catalog.<= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 3 pg_catalog.= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 4 pg_catalog.>= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 5 pg_catalog.> (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    function 1 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_multi_distance_timestamp(
+      internal,
+      internal
+    ),
     storage timestamp with time zone;
 
 create operator class pg_catalog.timestamptz_minmax_ops
   default for type timestamp with time zone
   using brin
   family pg_catalog.datetime_minmax_ops as
+    operator 1 pg_catalog.< (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 2 pg_catalog.<= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 3 pg_catalog.= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 4 pg_catalog.>= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 5 pg_catalog.> (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    function 1 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_opcinfo(
+      internal
+    ),
+    function 2 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage timestamp with time zone;
 
 create operator class pg_catalog.timestamptz_ops
   default for type timestamp with time zone
   using btree
   family pg_catalog.datetime_ops as
+    operator 1 pg_catalog.< (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 2 pg_catalog.<= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 3 pg_catalog.= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 4 pg_catalog.>= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    operator 5 pg_catalog.> (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    function 1 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.timestamptz_cmp(
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    function 2 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.timestamp_sortsupport(
+      internal
+    ),
+    function 4 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.btequalimage(
+      oid
+    ),
+    function 6 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.timestamp_skipsupport(
+      internal
+    ),
     storage timestamp with time zone;
 
 create operator class pg_catalog.timestamptz_ops
   default for type timestamp with time zone
   using hash
   family pg_catalog.timestamptz_ops as
+    operator 1 pg_catalog.= (
+      timestamp with time zone,
+      timestamp with time zone
+    ),
+    function 1 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.timestamptz_hash(
+      timestamp with time zone
+    ),
+    function 2 (
+      timestamp with time zone,
+      timestamp with time zone
+    )
+    pg_catalog.timestamptz_hash_extended(
+      timestamp with time zone,
+      bigint
+    ),
     storage timestamp with time zone;
 
 create operator class pg_catalog.timetz_bloom_ops
   for type time with time zone
   using brin
   family pg_catalog.timetz_bloom_ops as
+    operator 1 pg_catalog.= (time with time zone, time with time zone),
+    function 1 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_bloom_opcinfo(
+      internal
+    ),
+    function 2 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_bloom_options(
+      internal
+    ),
+    function 11 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.timetz_hash(
+      time with time zone
+    ),
     storage time with time zone;
 
 create operator class pg_catalog.timetz_minmax_multi_ops
   for type time with time zone
   using brin
   family pg_catalog.timetz_minmax_multi_ops as
+    operator 1 pg_catalog.< (time with time zone, time with time zone),
+    operator 2 pg_catalog.<= (time with time zone, time with time zone),
+    operator 3 pg_catalog.= (time with time zone, time with time zone),
+    operator 4 pg_catalog.>= (time with time zone, time with time zone),
+    operator 5 pg_catalog.> (time with time zone, time with time zone),
+    function 1 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_multi_opcinfo(
+      internal
+    ),
+    function 2 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_multi_options(
+      internal
+    ),
+    function 11 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_multi_distance_timetz(
+      internal,
+      internal
+    ),
     storage time with time zone;
 
 create operator class pg_catalog.timetz_minmax_ops
   default for type time with time zone
   using brin
   family pg_catalog.timetz_minmax_ops as
+    operator 1 pg_catalog.< (time with time zone, time with time zone),
+    operator 2 pg_catalog.<= (time with time zone, time with time zone),
+    operator 3 pg_catalog.= (time with time zone, time with time zone),
+    operator 4 pg_catalog.>= (time with time zone, time with time zone),
+    operator 5 pg_catalog.> (time with time zone, time with time zone),
+    function 1 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_opcinfo(
+      internal
+    ),
+    function 2 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage time with time zone;
 
 create operator class pg_catalog.timetz_ops
   default for type time with time zone
   using btree
   family pg_catalog.timetz_ops as
+    operator 1 pg_catalog.< (time with time zone, time with time zone),
+    operator 2 pg_catalog.<= (time with time zone, time with time zone),
+    operator 3 pg_catalog.= (time with time zone, time with time zone),
+    operator 4 pg_catalog.>= (time with time zone, time with time zone),
+    operator 5 pg_catalog.> (time with time zone, time with time zone),
+    function 1 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.timetz_cmp(
+      time with time zone,
+      time with time zone
+    ),
+    function 4 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.btequalimage(
+      oid
+    ),
     storage time with time zone;
 
 create operator class pg_catalog.timetz_ops
   default for type time with time zone
   using hash
   family pg_catalog.timetz_ops as
+    operator 1 pg_catalog.= (time with time zone, time with time zone),
+    function 1 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.timetz_hash(
+      time with time zone
+    ),
+    function 2 (
+      time with time zone,
+      time with time zone
+    )
+    pg_catalog.timetz_hash_extended(
+      time with time zone,
+      bigint
+    ),
     storage time with time zone;
 
 create operator class pg_catalog.tsquery_ops
   default for type tsquery
   using btree
   family pg_catalog.tsquery_ops as
+    operator 1 pg_catalog.< (tsquery, tsquery),
+    operator 2 pg_catalog.<= (tsquery, tsquery),
+    operator 3 pg_catalog.= (tsquery, tsquery),
+    operator 4 pg_catalog.>= (tsquery, tsquery),
+    operator 5 pg_catalog.> (tsquery, tsquery),
+    function 1 (tsquery, tsquery) pg_catalog.tsquery_cmp(tsquery, tsquery),
     storage tsquery;
 
 create operator class pg_catalog.tsquery_ops
   default for type tsquery
   using gist
   family pg_catalog.tsquery_ops as
+    operator 7 pg_catalog.@> (tsquery, tsquery),
+    operator 8 pg_catalog.<@ (tsquery, tsquery),
+    function 1 (
+      tsquery,
+      tsquery
+    )
+    pg_catalog.gtsquery_consistent(
+      internal,
+      tsquery,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (tsquery, tsquery) pg_catalog.gtsquery_union(internal, internal),
+    function 3 (tsquery, tsquery) pg_catalog.gtsquery_compress(internal),
+    function 5 (
+      tsquery,
+      tsquery
+    )
+    pg_catalog.gtsquery_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      tsquery,
+      tsquery
+    )
+    pg_catalog.gtsquery_picksplit(
+      internal,
+      internal
+    ),
+    function 7 (
+      tsquery,
+      tsquery
+    )
+    pg_catalog.gtsquery_same(
+      bigint,
+      bigint,
+      internal
+    ),
     storage bigint;
 
 create operator class pg_catalog.tsvector_ops
   default for type tsvector
   using btree
   family pg_catalog.tsvector_ops as
+    operator 1 pg_catalog.< (tsvector, tsvector),
+    operator 2 pg_catalog.<= (tsvector, tsvector),
+    operator 3 pg_catalog.= (tsvector, tsvector),
+    operator 4 pg_catalog.>= (tsvector, tsvector),
+    operator 5 pg_catalog.> (tsvector, tsvector),
+    function 1 (tsvector, tsvector) pg_catalog.tsvector_cmp(tsvector, tsvector),
     storage tsvector;
 
 create operator class pg_catalog.tsvector_ops
   default for type tsvector
   using gin
   family pg_catalog.tsvector_ops as
+    function 1 (tsvector, tsvector) pg_catalog.gin_cmp_tslexeme(text, text),
+    function 2 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gin_extract_tsvector(
+      tsvector,
+      internal,
+      internal
+    ),
+    function 3 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gin_extract_tsquery(
+      tsvector,
+      internal,
+      smallint,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gin_tsquery_consistent(
+      internal,
+      smallint,
+      tsvector,
+      integer,
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gin_cmp_prefix(
+      text,
+      text,
+      smallint,
+      internal
+    ),
+    function 6 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gin_tsquery_triconsistent(
+      internal,
+      smallint,
+      tsvector,
+      integer,
+      internal,
+      internal,
+      internal
+    ),
     storage text;
 
 create operator class pg_catalog.tsvector_ops
   default for type tsvector
   using gist
   family pg_catalog.tsvector_ops as
+    function 1 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gtsvector_consistent(
+      internal,
+      tsvector,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gtsvector_union(
+      internal,
+      internal
+    ),
+    function 3 (tsvector, tsvector) pg_catalog.gtsvector_compress(internal),
+    function 4 (tsvector, tsvector) pg_catalog.gtsvector_decompress(internal),
+    function 5 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gtsvector_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gtsvector_picksplit(
+      internal,
+      internal
+    ),
+    function 7 (
+      tsvector,
+      tsvector
+    )
+    pg_catalog.gtsvector_same(
+      gtsvector,
+      gtsvector,
+      internal
+    ),
+    function 10 (tsvector, tsvector) pg_catalog.gtsvector_options(internal),
     storage gtsvector;
 
 create operator class pg_catalog.uuid_bloom_ops
   for type uuid
   using brin
   family pg_catalog.uuid_bloom_ops as
+    operator 1 pg_catalog.= (uuid, uuid),
+    function 1 (uuid, uuid) pg_catalog.brin_bloom_opcinfo(internal),
+    function 2 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_bloom_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_bloom_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_bloom_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (uuid, uuid) pg_catalog.brin_bloom_options(internal),
+    function 11 (uuid, uuid) pg_catalog.uuid_hash(uuid),
     storage uuid;
 
 create operator class pg_catalog.uuid_minmax_multi_ops
   for type uuid
   using brin
   family pg_catalog.uuid_minmax_multi_ops as
+    operator 1 pg_catalog.< (uuid, uuid),
+    operator 2 pg_catalog.<= (uuid, uuid),
+    operator 3 pg_catalog.= (uuid, uuid),
+    operator 4 pg_catalog.>= (uuid, uuid),
+    operator 5 pg_catalog.> (uuid, uuid),
+    function 1 (uuid, uuid) pg_catalog.brin_minmax_multi_opcinfo(internal),
+    function 2 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_minmax_multi_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_minmax_multi_consistent(
+      internal,
+      internal,
+      internal,
+      integer
+    ),
+    function 4 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_minmax_multi_union(
+      internal,
+      internal,
+      internal
+    ),
+    function 5 (uuid, uuid) pg_catalog.brin_minmax_multi_options(internal),
+    function 11 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_minmax_multi_distance_uuid(
+      internal,
+      internal
+    ),
     storage uuid;
 
 create operator class pg_catalog.uuid_minmax_ops
   default for type uuid
   using brin
   family pg_catalog.uuid_minmax_ops as
+    operator 1 pg_catalog.< (uuid, uuid),
+    operator 2 pg_catalog.<= (uuid, uuid),
+    operator 3 pg_catalog.= (uuid, uuid),
+    operator 4 pg_catalog.>= (uuid, uuid),
+    operator 5 pg_catalog.> (uuid, uuid),
+    function 1 (uuid, uuid) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      uuid,
+      uuid
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage uuid;
 
 create operator class pg_catalog.uuid_ops
   default for type uuid
   using btree
   family pg_catalog.uuid_ops as
+    operator 1 pg_catalog.< (uuid, uuid),
+    operator 2 pg_catalog.<= (uuid, uuid),
+    operator 3 pg_catalog.= (uuid, uuid),
+    operator 4 pg_catalog.>= (uuid, uuid),
+    operator 5 pg_catalog.> (uuid, uuid),
+    function 1 (uuid, uuid) pg_catalog.uuid_cmp(uuid, uuid),
+    function 2 (uuid, uuid) pg_catalog.uuid_sortsupport(internal),
+    function 4 (uuid, uuid) pg_catalog.btequalimage(oid),
+    function 6 (uuid, uuid) pg_catalog.uuid_skipsupport(internal),
     storage uuid;
 
 create operator class pg_catalog.uuid_ops
   default for type uuid
   using hash
   family pg_catalog.uuid_ops as
+    operator 1 pg_catalog.= (uuid, uuid),
+    function 1 (uuid, uuid) pg_catalog.uuid_hash(uuid),
+    function 2 (uuid, uuid) pg_catalog.uuid_hash_extended(uuid, bigint),
     storage uuid;
 
 create operator class pg_catalog.varbit_minmax_ops
   default for type bit varying
   using brin
   family pg_catalog.varbit_minmax_ops as
+    operator 1 pg_catalog.< (bit varying, bit varying),
+    operator 2 pg_catalog.<= (bit varying, bit varying),
+    operator 3 pg_catalog.= (bit varying, bit varying),
+    operator 4 pg_catalog.>= (bit varying, bit varying),
+    operator 5 pg_catalog.> (bit varying, bit varying),
+    function 1 (
+      bit varying,
+      bit varying
+    )
+    pg_catalog.brin_minmax_opcinfo(
+      internal
+    ),
+    function 2 (
+      bit varying,
+      bit varying
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      bit varying,
+      bit varying
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      bit varying,
+      bit varying
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage bit varying;
 
 create operator class pg_catalog.varbit_ops
   default for type bit varying
   using btree
   family pg_catalog.varbit_ops as
+    operator 1 pg_catalog.< (bit varying, bit varying),
+    operator 2 pg_catalog.<= (bit varying, bit varying),
+    operator 3 pg_catalog.= (bit varying, bit varying),
+    operator 4 pg_catalog.>= (bit varying, bit varying),
+    operator 5 pg_catalog.> (bit varying, bit varying),
+    function 1 (
+      bit varying,
+      bit varying
+    )
+    pg_catalog.varbitcmp(
+      bit varying,
+      bit varying
+    ),
+    function 4 (bit varying, bit varying) pg_catalog.btequalimage(oid),
     storage bit varying;
 
 create operator class pg_catalog.varchar_ops
@@ -41402,18 +46065,31 @@ create operator class pg_catalog.xid8_ops
   default for type xid8
   using btree
   family pg_catalog.xid8_ops as
+    operator 1 pg_catalog.< (xid8, xid8),
+    operator 2 pg_catalog.<= (xid8, xid8),
+    operator 3 pg_catalog.= (xid8, xid8),
+    operator 4 pg_catalog.>= (xid8, xid8),
+    operator 5 pg_catalog.> (xid8, xid8),
+    function 1 (xid8, xid8) pg_catalog.xid8cmp(xid8, xid8),
+    function 4 (xid8, xid8) pg_catalog.btequalimage(oid),
     storage xid8;
 
 create operator class pg_catalog.xid8_ops
   default for type xid8
   using hash
   family pg_catalog.xid8_ops as
+    operator 1 pg_catalog.= (xid8, xid8),
+    function 1 (xid8, xid8) pg_catalog.hashxid8(xid8),
+    function 2 (xid8, xid8) pg_catalog.hashxid8extended(xid8, bigint),
     storage xid8;
 
 create operator class pg_catalog.xid_ops
   default for type xid
   using hash
   family pg_catalog.xid_ops as
+    operator 1 pg_catalog.= (xid, xid),
+    function 1 (xid, xid) pg_catalog.hashxid(xid),
+    function 2 (xid, xid) pg_catalog.hashxidextended(xid, bigint),
     storage xid;
 
 create type pg_catalog.daterange as range (
@@ -43383,6 +48059,726 @@ create aggregate pg_catalog.count("any") (
   minitcond = '0',
   parallel = safe
 );
+
+alter operator family pg_catalog.box_inclusion_ops
+  using brin
+  add
+    operator 7 pg_catalog.@> (box, point);
+
+alter operator family pg_catalog.box_ops
+  using gist
+  add
+    operator 15 pg_catalog.<-> (box, point) for order by pg_catalog.float_ops,
+    function 12 (
+      "any",
+      "any"
+    )
+    pg_catalog.gist_translate_cmptype_common(
+      integer
+    );
+
+alter operator family pg_catalog.box_ops
+  using spgist
+  add
+    operator 15 pg_catalog.<-> (box, point) for order by pg_catalog.float_ops;
+
+alter operator family pg_catalog.circle_ops
+  using gist
+  add
+    operator 15 pg_catalog.<-> (circle, point)
+    for order by pg_catalog.float_ops,
+    function 12 (
+      "any",
+      "any"
+    )
+    pg_catalog.gist_translate_cmptype_common(
+      integer
+    );
+
+alter operator family pg_catalog.datetime_minmax_multi_ops
+  using brin
+  add
+    operator 1 pg_catalog.< (date, timestamp with time zone),
+    operator 1 pg_catalog.< (date, timestamp without time zone),
+    operator 1 pg_catalog.< (timestamp with time zone, date),
+    operator 1 pg_catalog.< (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 1 pg_catalog.< (timestamp without time zone, date),
+    operator 1 pg_catalog.< (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 2 pg_catalog.<= (date, timestamp with time zone),
+    operator 2 pg_catalog.<= (date, timestamp without time zone),
+    operator 2 pg_catalog.<= (timestamp with time zone, date),
+    operator 2 pg_catalog.<= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 2 pg_catalog.<= (timestamp without time zone, date),
+    operator 2 pg_catalog.<= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 3 pg_catalog.= (date, timestamp with time zone),
+    operator 3 pg_catalog.= (date, timestamp without time zone),
+    operator 3 pg_catalog.= (timestamp with time zone, date),
+    operator 3 pg_catalog.= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 3 pg_catalog.= (timestamp without time zone, date),
+    operator 3 pg_catalog.= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 4 pg_catalog.>= (date, timestamp with time zone),
+    operator 4 pg_catalog.>= (date, timestamp without time zone),
+    operator 4 pg_catalog.>= (timestamp with time zone, date),
+    operator 4 pg_catalog.>= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 4 pg_catalog.>= (timestamp without time zone, date),
+    operator 4 pg_catalog.>= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 5 pg_catalog.> (date, timestamp with time zone),
+    operator 5 pg_catalog.> (date, timestamp without time zone),
+    operator 5 pg_catalog.> (timestamp with time zone, date),
+    operator 5 pg_catalog.> (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 5 pg_catalog.> (timestamp without time zone, date),
+    operator 5 pg_catalog.> (
+      timestamp without time zone,
+      timestamp with time zone
+    );
+
+alter operator family pg_catalog.datetime_minmax_ops
+  using brin
+  add
+    operator 1 pg_catalog.< (date, timestamp with time zone),
+    operator 1 pg_catalog.< (date, timestamp without time zone),
+    operator 1 pg_catalog.< (timestamp with time zone, date),
+    operator 1 pg_catalog.< (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 1 pg_catalog.< (timestamp without time zone, date),
+    operator 1 pg_catalog.< (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 2 pg_catalog.<= (date, timestamp with time zone),
+    operator 2 pg_catalog.<= (date, timestamp without time zone),
+    operator 2 pg_catalog.<= (timestamp with time zone, date),
+    operator 2 pg_catalog.<= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 2 pg_catalog.<= (timestamp without time zone, date),
+    operator 2 pg_catalog.<= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 3 pg_catalog.= (date, timestamp with time zone),
+    operator 3 pg_catalog.= (date, timestamp without time zone),
+    operator 3 pg_catalog.= (timestamp with time zone, date),
+    operator 3 pg_catalog.= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 3 pg_catalog.= (timestamp without time zone, date),
+    operator 3 pg_catalog.= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 4 pg_catalog.>= (date, timestamp with time zone),
+    operator 4 pg_catalog.>= (date, timestamp without time zone),
+    operator 4 pg_catalog.>= (timestamp with time zone, date),
+    operator 4 pg_catalog.>= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 4 pg_catalog.>= (timestamp without time zone, date),
+    operator 4 pg_catalog.>= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 5 pg_catalog.> (date, timestamp with time zone),
+    operator 5 pg_catalog.> (date, timestamp without time zone),
+    operator 5 pg_catalog.> (timestamp with time zone, date),
+    operator 5 pg_catalog.> (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 5 pg_catalog.> (timestamp without time zone, date),
+    operator 5 pg_catalog.> (
+      timestamp without time zone,
+      timestamp with time zone
+    );
+
+alter operator family pg_catalog.datetime_ops
+  using btree
+  add
+    operator 1 pg_catalog.< (date, timestamp with time zone),
+    operator 1 pg_catalog.< (date, timestamp without time zone),
+    operator 1 pg_catalog.< (timestamp with time zone, date),
+    operator 1 pg_catalog.< (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 1 pg_catalog.< (timestamp without time zone, date),
+    operator 1 pg_catalog.< (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 2 pg_catalog.<= (date, timestamp with time zone),
+    operator 2 pg_catalog.<= (date, timestamp without time zone),
+    operator 2 pg_catalog.<= (timestamp with time zone, date),
+    operator 2 pg_catalog.<= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 2 pg_catalog.<= (timestamp without time zone, date),
+    operator 2 pg_catalog.<= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 3 pg_catalog.= (date, timestamp with time zone),
+    operator 3 pg_catalog.= (date, timestamp without time zone),
+    operator 3 pg_catalog.= (timestamp with time zone, date),
+    operator 3 pg_catalog.= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 3 pg_catalog.= (timestamp without time zone, date),
+    operator 3 pg_catalog.= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 4 pg_catalog.>= (date, timestamp with time zone),
+    operator 4 pg_catalog.>= (date, timestamp without time zone),
+    operator 4 pg_catalog.>= (timestamp with time zone, date),
+    operator 4 pg_catalog.>= (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 4 pg_catalog.>= (timestamp without time zone, date),
+    operator 4 pg_catalog.>= (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    operator 5 pg_catalog.> (date, timestamp with time zone),
+    operator 5 pg_catalog.> (date, timestamp without time zone),
+    operator 5 pg_catalog.> (timestamp with time zone, date),
+    operator 5 pg_catalog.> (
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    operator 5 pg_catalog.> (timestamp without time zone, date),
+    operator 5 pg_catalog.> (
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    function 1 (
+      date,
+      timestamp with time zone
+    )
+    pg_catalog.date_cmp_timestamptz(
+      date,
+      timestamp with time zone
+    ),
+    function 1 (
+      date,
+      timestamp without time zone
+    )
+    pg_catalog.date_cmp_timestamp(
+      date,
+      timestamp without time zone
+    ),
+    function 1 (
+      timestamp with time zone,
+      date
+    )
+    pg_catalog.timestamptz_cmp_date(
+      timestamp with time zone,
+      date
+    ),
+    function 1 (
+      timestamp with time zone,
+      timestamp without time zone
+    )
+    pg_catalog.timestamptz_cmp_timestamp(
+      timestamp with time zone,
+      timestamp without time zone
+    ),
+    function 1 (
+      timestamp without time zone,
+      date
+    )
+    pg_catalog.timestamp_cmp_date(
+      timestamp without time zone,
+      date
+    ),
+    function 1 (
+      timestamp without time zone,
+      timestamp with time zone
+    )
+    pg_catalog.timestamp_cmp_timestamptz(
+      timestamp without time zone,
+      timestamp with time zone
+    ),
+    function 3 (
+      date,
+      interval
+    )
+    pg_catalog.in_range(
+      date,
+      date,
+      interval,
+      boolean,
+      boolean
+    ),
+    function 3 (
+      timestamp with time zone,
+      interval
+    )
+    pg_catalog.in_range(
+      timestamp with time zone,
+      timestamp with time zone,
+      interval,
+      boolean,
+      boolean
+    ),
+    function 3 (
+      timestamp without time zone,
+      interval
+    )
+    pg_catalog.in_range(
+      timestamp without time zone,
+      timestamp without time zone,
+      interval,
+      boolean,
+      boolean
+    );
+
+alter operator family pg_catalog.float_minmax_multi_ops
+  using brin
+  add
+    operator 1 pg_catalog.< (double precision, real),
+    operator 1 pg_catalog.< (real, double precision),
+    operator 2 pg_catalog.<= (double precision, real),
+    operator 2 pg_catalog.<= (real, double precision),
+    operator 3 pg_catalog.= (double precision, real),
+    operator 3 pg_catalog.= (real, double precision),
+    operator 4 pg_catalog.>= (double precision, real),
+    operator 4 pg_catalog.>= (real, double precision),
+    operator 5 pg_catalog.> (double precision, real),
+    operator 5 pg_catalog.> (real, double precision);
+
+alter operator family pg_catalog.float_minmax_ops
+  using brin
+  add
+    operator 1 pg_catalog.< (double precision, real),
+    operator 1 pg_catalog.< (real, double precision),
+    operator 2 pg_catalog.<= (double precision, real),
+    operator 2 pg_catalog.<= (real, double precision),
+    operator 3 pg_catalog.= (double precision, real),
+    operator 3 pg_catalog.= (real, double precision),
+    operator 4 pg_catalog.>= (double precision, real),
+    operator 4 pg_catalog.>= (real, double precision),
+    operator 5 pg_catalog.> (double precision, real),
+    operator 5 pg_catalog.> (real, double precision);
+
+alter operator family pg_catalog.float_ops
+  using btree
+  add
+    operator 1 pg_catalog.< (double precision, real),
+    operator 1 pg_catalog.< (real, double precision),
+    operator 2 pg_catalog.<= (double precision, real),
+    operator 2 pg_catalog.<= (real, double precision),
+    operator 3 pg_catalog.= (double precision, real),
+    operator 3 pg_catalog.= (real, double precision),
+    operator 4 pg_catalog.>= (double precision, real),
+    operator 4 pg_catalog.>= (real, double precision),
+    operator 5 pg_catalog.> (double precision, real),
+    operator 5 pg_catalog.> (real, double precision),
+    function 1 (
+      double precision,
+      real
+    )
+    pg_catalog.btfloat84cmp(
+      double precision,
+      real
+    ),
+    function 1 (
+      real,
+      double precision
+    )
+    pg_catalog.btfloat48cmp(
+      real,
+      double precision
+    ),
+    function 3 (
+      real,
+      double precision
+    )
+    pg_catalog.in_range(
+      real,
+      real,
+      double precision,
+      boolean,
+      boolean
+    );
+
+alter operator family pg_catalog.float_ops
+  using hash
+  add
+    operator 1 pg_catalog.= (double precision, real),
+    operator 1 pg_catalog.= (real, double precision);
+
+alter operator family pg_catalog.integer_minmax_multi_ops
+  using brin
+  add
+    operator 1 pg_catalog.< (bigint, integer),
+    operator 1 pg_catalog.< (bigint, smallint),
+    operator 1 pg_catalog.< (integer, bigint),
+    operator 1 pg_catalog.< (integer, smallint),
+    operator 1 pg_catalog.< (smallint, bigint),
+    operator 1 pg_catalog.< (smallint, integer),
+    operator 2 pg_catalog.<= (bigint, integer),
+    operator 2 pg_catalog.<= (bigint, smallint),
+    operator 2 pg_catalog.<= (integer, bigint),
+    operator 2 pg_catalog.<= (integer, smallint),
+    operator 2 pg_catalog.<= (smallint, bigint),
+    operator 2 pg_catalog.<= (smallint, integer),
+    operator 3 pg_catalog.= (bigint, integer),
+    operator 3 pg_catalog.= (bigint, smallint),
+    operator 3 pg_catalog.= (integer, bigint),
+    operator 3 pg_catalog.= (integer, smallint),
+    operator 3 pg_catalog.= (smallint, bigint),
+    operator 3 pg_catalog.= (smallint, integer),
+    operator 4 pg_catalog.>= (bigint, integer),
+    operator 4 pg_catalog.>= (bigint, smallint),
+    operator 4 pg_catalog.>= (integer, bigint),
+    operator 4 pg_catalog.>= (integer, smallint),
+    operator 4 pg_catalog.>= (smallint, bigint),
+    operator 4 pg_catalog.>= (smallint, integer),
+    operator 5 pg_catalog.> (bigint, integer),
+    operator 5 pg_catalog.> (bigint, smallint),
+    operator 5 pg_catalog.> (integer, bigint),
+    operator 5 pg_catalog.> (integer, smallint),
+    operator 5 pg_catalog.> (smallint, bigint),
+    operator 5 pg_catalog.> (smallint, integer);
+
+alter operator family pg_catalog.integer_minmax_ops
+  using brin
+  add
+    operator 1 pg_catalog.< (bigint, integer),
+    operator 1 pg_catalog.< (bigint, smallint),
+    operator 1 pg_catalog.< (integer, bigint),
+    operator 1 pg_catalog.< (integer, smallint),
+    operator 1 pg_catalog.< (smallint, bigint),
+    operator 1 pg_catalog.< (smallint, integer),
+    operator 2 pg_catalog.<= (bigint, integer),
+    operator 2 pg_catalog.<= (bigint, smallint),
+    operator 2 pg_catalog.<= (integer, bigint),
+    operator 2 pg_catalog.<= (integer, smallint),
+    operator 2 pg_catalog.<= (smallint, bigint),
+    operator 2 pg_catalog.<= (smallint, integer),
+    operator 3 pg_catalog.= (bigint, integer),
+    operator 3 pg_catalog.= (bigint, smallint),
+    operator 3 pg_catalog.= (integer, bigint),
+    operator 3 pg_catalog.= (integer, smallint),
+    operator 3 pg_catalog.= (smallint, bigint),
+    operator 3 pg_catalog.= (smallint, integer),
+    operator 4 pg_catalog.>= (bigint, integer),
+    operator 4 pg_catalog.>= (bigint, smallint),
+    operator 4 pg_catalog.>= (integer, bigint),
+    operator 4 pg_catalog.>= (integer, smallint),
+    operator 4 pg_catalog.>= (smallint, bigint),
+    operator 4 pg_catalog.>= (smallint, integer),
+    operator 5 pg_catalog.> (bigint, integer),
+    operator 5 pg_catalog.> (bigint, smallint),
+    operator 5 pg_catalog.> (integer, bigint),
+    operator 5 pg_catalog.> (integer, smallint),
+    operator 5 pg_catalog.> (smallint, bigint),
+    operator 5 pg_catalog.> (smallint, integer);
+
+alter operator family pg_catalog.integer_ops
+  using btree
+  add
+    operator 1 pg_catalog.< (bigint, integer),
+    operator 1 pg_catalog.< (bigint, smallint),
+    operator 1 pg_catalog.< (integer, bigint),
+    operator 1 pg_catalog.< (integer, smallint),
+    operator 1 pg_catalog.< (smallint, bigint),
+    operator 1 pg_catalog.< (smallint, integer),
+    operator 2 pg_catalog.<= (bigint, integer),
+    operator 2 pg_catalog.<= (bigint, smallint),
+    operator 2 pg_catalog.<= (integer, bigint),
+    operator 2 pg_catalog.<= (integer, smallint),
+    operator 2 pg_catalog.<= (smallint, bigint),
+    operator 2 pg_catalog.<= (smallint, integer),
+    operator 3 pg_catalog.= (bigint, integer),
+    operator 3 pg_catalog.= (bigint, smallint),
+    operator 3 pg_catalog.= (integer, bigint),
+    operator 3 pg_catalog.= (integer, smallint),
+    operator 3 pg_catalog.= (smallint, bigint),
+    operator 3 pg_catalog.= (smallint, integer),
+    operator 4 pg_catalog.>= (bigint, integer),
+    operator 4 pg_catalog.>= (bigint, smallint),
+    operator 4 pg_catalog.>= (integer, bigint),
+    operator 4 pg_catalog.>= (integer, smallint),
+    operator 4 pg_catalog.>= (smallint, bigint),
+    operator 4 pg_catalog.>= (smallint, integer),
+    operator 5 pg_catalog.> (bigint, integer),
+    operator 5 pg_catalog.> (bigint, smallint),
+    operator 5 pg_catalog.> (integer, bigint),
+    operator 5 pg_catalog.> (integer, smallint),
+    operator 5 pg_catalog.> (smallint, bigint),
+    operator 5 pg_catalog.> (smallint, integer),
+    function 1 (bigint, integer) pg_catalog.btint84cmp(bigint, integer),
+    function 1 (bigint, smallint) pg_catalog.btint82cmp(bigint, smallint),
+    function 1 (integer, bigint) pg_catalog.btint48cmp(integer, bigint),
+    function 1 (integer, smallint) pg_catalog.btint42cmp(integer, smallint),
+    function 1 (smallint, bigint) pg_catalog.btint28cmp(smallint, bigint),
+    function 1 (smallint, integer) pg_catalog.btint24cmp(smallint, integer),
+    function 3 (
+      integer,
+      bigint
+    )
+    pg_catalog.in_range(
+      integer,
+      integer,
+      bigint,
+      boolean,
+      boolean
+    ),
+    function 3 (
+      integer,
+      smallint
+    )
+    pg_catalog.in_range(
+      integer,
+      integer,
+      smallint,
+      boolean,
+      boolean
+    ),
+    function 3 (
+      smallint,
+      bigint
+    )
+    pg_catalog.in_range(
+      smallint,
+      smallint,
+      bigint,
+      boolean,
+      boolean
+    ),
+    function 3 (
+      smallint,
+      integer
+    )
+    pg_catalog.in_range(
+      smallint,
+      smallint,
+      integer,
+      boolean,
+      boolean
+    );
+
+alter operator family pg_catalog.integer_ops
+  using hash
+  add
+    operator 1 pg_catalog.= (bigint, integer),
+    operator 1 pg_catalog.= (bigint, smallint),
+    operator 1 pg_catalog.= (integer, bigint),
+    operator 1 pg_catalog.= (integer, smallint),
+    operator 1 pg_catalog.= (smallint, bigint),
+    operator 1 pg_catalog.= (smallint, integer);
+
+alter operator family pg_catalog.jsonb_ops
+  using gin
+  add
+    operator 9 pg_catalog.? (jsonb, text),
+    operator 10 pg_catalog.?| (jsonb, text[]),
+    operator 11 pg_catalog.?& (jsonb, text[]),
+    operator 15 pg_catalog.@? (jsonb, jsonpath),
+    operator 16 pg_catalog.@@ (jsonb, jsonpath);
+
+alter operator family pg_catalog.jsonb_path_ops
+  using gin
+  add
+    operator 15 pg_catalog.@? (jsonb, jsonpath),
+    operator 16 pg_catalog.@@ (jsonb, jsonpath);
+
+alter operator family pg_catalog.kd_point_ops
+  using spgist
+  add
+    operator 8 pg_catalog.<@ (point, box);
+
+alter operator family pg_catalog.multirange_ops
+  using gist
+  add
+    operator 1 pg_catalog.<< (anymultirange, anyrange),
+    operator 2 pg_catalog.&< (anymultirange, anyrange),
+    operator 3 pg_catalog.&& (anymultirange, anyrange),
+    operator 4 pg_catalog.&> (anymultirange, anyrange),
+    operator 5 pg_catalog.>> (anymultirange, anyrange),
+    operator 6 pg_catalog.-|- (anymultirange, anyrange),
+    operator 7 pg_catalog.@> (anymultirange, anyrange),
+    operator 8 pg_catalog.<@ (anymultirange, anyrange),
+    operator 16 pg_catalog.@> (anymultirange, anyelement),
+    function 12 (
+      "any",
+      "any"
+    )
+    pg_catalog.gist_translate_cmptype_common(
+      integer
+    );
+
+alter operator family pg_catalog.network_ops
+  using gist
+  add
+    function 12 (
+      "any",
+      "any"
+    )
+    pg_catalog.gist_translate_cmptype_common(
+      integer
+    );
+
+alter operator family pg_catalog.point_ops
+  using gist
+  add
+    operator 28 pg_catalog.<@ (point, box),
+    operator 48 pg_catalog.<@ (point, polygon),
+    operator 68 pg_catalog.<@ (point, circle);
+
+alter operator family pg_catalog.poly_ops
+  using gist
+  add
+    operator 15 pg_catalog.<-> (polygon, point)
+    for order by pg_catalog.float_ops,
+    function 12 (
+      "any",
+      "any"
+    )
+    pg_catalog.gist_translate_cmptype_common(
+      integer
+    );
+
+alter operator family pg_catalog.poly_ops
+  using spgist
+  add
+    operator 15 pg_catalog.<-> (polygon, point)
+    for order by pg_catalog.float_ops;
+
+alter operator family pg_catalog.quad_point_ops
+  using spgist
+  add
+    operator 8 pg_catalog.<@ (point, box);
+
+alter operator family pg_catalog.range_inclusion_ops
+  using brin
+  add
+    operator 16 pg_catalog.@> (anyrange, anyelement);
+
+alter operator family pg_catalog.range_ops
+  using gist
+  add
+    operator 1 pg_catalog.<< (anyrange, anymultirange),
+    operator 2 pg_catalog.&< (anyrange, anymultirange),
+    operator 3 pg_catalog.&& (anyrange, anymultirange),
+    operator 4 pg_catalog.&> (anyrange, anymultirange),
+    operator 5 pg_catalog.>> (anyrange, anymultirange),
+    operator 6 pg_catalog.-|- (anyrange, anymultirange),
+    operator 7 pg_catalog.@> (anyrange, anymultirange),
+    operator 8 pg_catalog.<@ (anyrange, anymultirange),
+    operator 16 pg_catalog.@> (anyrange, anyelement),
+    function 12 (
+      "any",
+      "any"
+    )
+    pg_catalog.gist_translate_cmptype_common(
+      integer
+    );
+
+alter operator family pg_catalog.range_ops
+  using spgist
+  add
+    operator 16 pg_catalog.@> (anyrange, anyelement);
+
+alter operator family pg_catalog.text_ops
+  using btree
+  add
+    operator 1 pg_catalog.< (name, text),
+    operator 1 pg_catalog.< (text, name),
+    operator 2 pg_catalog.<= (name, text),
+    operator 2 pg_catalog.<= (text, name),
+    operator 3 pg_catalog.= (name, text),
+    operator 3 pg_catalog.= (text, name),
+    operator 4 pg_catalog.>= (name, text),
+    operator 4 pg_catalog.>= (text, name),
+    operator 5 pg_catalog.> (name, text),
+    operator 5 pg_catalog.> (text, name),
+    function 1 (name, text) pg_catalog.btnametextcmp(name, text),
+    function 1 (text, name) pg_catalog.bttextnamecmp(text, name);
+
+alter operator family pg_catalog.text_ops
+  using hash
+  add
+    operator 1 pg_catalog.= (name, text),
+    operator 1 pg_catalog.= (text, name);
+
+alter operator family pg_catalog.time_ops
+  using btree
+  add
+    function 3 (
+      time without time zone,
+      interval
+    )
+    pg_catalog.in_range(
+      time without time zone,
+      time without time zone,
+      interval,
+      boolean,
+      boolean
+    );
+
+alter operator family pg_catalog.timetz_ops
+  using btree
+  add
+    function 3 (
+      time with time zone,
+      interval
+    )
+    pg_catalog.in_range(
+      time with time zone,
+      time with time zone,
+      interval,
+      boolean,
+      boolean
+    );
+
+alter operator family pg_catalog.tsvector_ops
+  using gin
+  add
+    operator 1 pg_catalog.@@ (tsvector, tsquery),
+    operator 2 pg_catalog.@@@ (tsvector, tsquery);
+
+alter operator family pg_catalog.tsvector_ops
+  using gist
+  add
+    operator 1 pg_catalog.@@ (tsvector, tsquery);
 
 create cast ("char" as character)
   with function pg_catalog.bpchar("char")

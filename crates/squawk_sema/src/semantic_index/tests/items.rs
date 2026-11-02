@@ -24,9 +24,9 @@ fn item_at_range() {
     assert_snapshot!(items, @r#"
     5..6 "t" Cte(Idx::<Cte>(0))
     20..21 "a" Column(Idx::<Column>(5727))
-    30..31 "a" Reference(Idx::<Reference>(30259))
-    33..34 "b" Reference(Idx::<Reference>(30260))
-    40..41 "t" Reference(Idx::<Reference>(30258))
+    30..31 "a" Reference(Idx::<Reference>(38687))
+    33..34 "b" Reference(Idx::<Reference>(38688))
+    40..41 "t" Reference(Idx::<Reference>(38686))
     "#);
 
     let token = InFile::new(file, rowan::TextRange::new(33.into(), 34.into()));

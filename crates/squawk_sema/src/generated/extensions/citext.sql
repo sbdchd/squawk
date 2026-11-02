@@ -524,18 +524,32 @@ create operator class citext_ops
   default for type citext
   using btree
   family citext_ops as
+    operator 1 < (citext, citext),
+    operator 2 <= (citext, citext),
+    operator 3 = (citext, citext),
+    operator 4 >= (citext, citext),
+    operator 5 > (citext, citext),
+    function 1 (citext, citext) citext_cmp(citext, citext),
     storage citext;
 
 create operator class citext_ops
   default for type citext
   using hash
   family citext_ops as
+    operator 1 = (citext, citext),
+    function 1 (citext, citext) citext_hash(citext),
     storage citext;
 
 create operator class citext_pattern_ops
   for type citext
   using btree
   family citext_pattern_ops as
+    operator 1 ~<~ (citext, citext),
+    operator 2 ~<=~ (citext, citext),
+    operator 3 = (citext, citext),
+    operator 4 ~>=~ (citext, citext),
+    operator 5 ~>~ (citext, citext),
+    function 1 (citext, citext) citext_pattern_cmp(citext, citext),
     storage citext;
 
 create aggregate max(citext) (
@@ -553,6 +567,11 @@ create aggregate min(citext) (
   sortop = operator(<),
   parallel = safe
 );
+
+alter operator family citext_ops
+  using hash
+  add
+    function 2 (citext, citext) citext_hash_extended(citext, bigint);
 
 create cast (boolean as citext) with function citext(boolean) as assignment;
 

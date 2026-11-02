@@ -107,9 +107,9 @@ create index on t (a text_pattern_ops$0);
         3 │ create index on t (a text_pattern_ops);
           │                      ──────────────── 1. source
           │
-          ⸬  builtins.sql:41143:34
+          ⸬  builtins.sql:44474:34
           │
-    41143 │ create operator class pg_catalog.text_pattern_ops
+    44474 │ create operator class pg_catalog.text_pattern_ops
           ╰╴                                 ──────────────── 2. destination
     ");
 }

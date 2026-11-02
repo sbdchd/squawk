@@ -21,10 +21,14 @@ create operator class int4_ops
   default for type integer
   using bloom
   family int4_ops as
+    operator 1 pg_catalog.= (integer, integer),
+    function 1 (integer, integer) pg_catalog.hashint4(integer),
     storage integer;
 
 create operator class text_ops
   default for type text
   using bloom
   family text_ops as
+    operator 1 pg_catalog.= (text, text),
+    function 1 (text, text) pg_catalog.hashtext(text),
     storage text;

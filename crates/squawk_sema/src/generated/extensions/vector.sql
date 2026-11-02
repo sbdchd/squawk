@@ -1137,144 +1137,283 @@ create operator class bit_hamming_ops
   for type bit
   using hnsw
   family bit_hamming_ops as
+    operator 1 <~> (bit, bit) for order by pg_catalog.float_ops,
+    function 1 (bit, bit) hamming_distance(bit, bit),
+    function 3 (bit, bit) hnsw_bit_support(internal),
     storage bit;
 
 create operator class bit_hamming_ops
   for type bit
   using ivfflat
   family bit_hamming_ops as
+    operator 1 <~> (bit, bit) for order by pg_catalog.float_ops,
+    function 1 (bit, bit) hamming_distance(bit, bit),
+    function 3 (bit, bit) hamming_distance(bit, bit),
+    function 5 (bit, bit) ivfflat_bit_support(internal),
     storage bit;
 
 create operator class bit_jaccard_ops
   for type bit
   using hnsw
   family bit_jaccard_ops as
+    operator 1 <%> (bit, bit) for order by pg_catalog.float_ops,
+    function 1 (bit, bit) jaccard_distance(bit, bit),
+    function 3 (bit, bit) hnsw_bit_support(internal),
     storage bit;
 
 create operator class halfvec_cosine_ops
   for type halfvec
   using hnsw
   family halfvec_cosine_ops as
+    operator 1 <=> (halfvec, halfvec) for order by pg_catalog.float_ops,
+    function 1 (
+      halfvec,
+      halfvec
+    )
+    halfvec_negative_inner_product(
+      halfvec,
+      halfvec
+    ),
+    function 2 (halfvec, halfvec) l2_norm(halfvec),
+    function 3 (halfvec, halfvec) hnsw_halfvec_support(internal),
     storage halfvec;
 
 create operator class halfvec_cosine_ops
   for type halfvec
   using ivfflat
   family halfvec_cosine_ops as
+    operator 1 <=> (halfvec, halfvec) for order by pg_catalog.float_ops,
+    function 1 (
+      halfvec,
+      halfvec
+    )
+    halfvec_negative_inner_product(
+      halfvec,
+      halfvec
+    ),
+    function 2 (halfvec, halfvec) l2_norm(halfvec),
+    function 3 (halfvec, halfvec) halfvec_spherical_distance(halfvec, halfvec),
+    function 4 (halfvec, halfvec) l2_norm(halfvec),
+    function 5 (halfvec, halfvec) ivfflat_halfvec_support(internal),
     storage halfvec;
 
 create operator class halfvec_ip_ops
   for type halfvec
   using hnsw
   family halfvec_ip_ops as
+    operator 1 <#> (halfvec, halfvec) for order by pg_catalog.float_ops,
+    function 1 (
+      halfvec,
+      halfvec
+    )
+    halfvec_negative_inner_product(
+      halfvec,
+      halfvec
+    ),
+    function 3 (halfvec, halfvec) hnsw_halfvec_support(internal),
     storage halfvec;
 
 create operator class halfvec_ip_ops
   for type halfvec
   using ivfflat
   family halfvec_ip_ops as
+    operator 1 <#> (halfvec, halfvec) for order by pg_catalog.float_ops,
+    function 1 (
+      halfvec,
+      halfvec
+    )
+    halfvec_negative_inner_product(
+      halfvec,
+      halfvec
+    ),
+    function 3 (halfvec, halfvec) halfvec_spherical_distance(halfvec, halfvec),
+    function 4 (halfvec, halfvec) l2_norm(halfvec),
+    function 5 (halfvec, halfvec) ivfflat_halfvec_support(internal),
     storage halfvec;
 
 create operator class halfvec_l1_ops
   for type halfvec
   using hnsw
   family halfvec_l1_ops as
+    operator 1 <+> (halfvec, halfvec) for order by pg_catalog.float_ops,
+    function 1 (halfvec, halfvec) l1_distance(halfvec, halfvec),
+    function 3 (halfvec, halfvec) hnsw_halfvec_support(internal),
     storage halfvec;
 
 create operator class halfvec_l2_ops
   for type halfvec
   using hnsw
   family halfvec_l2_ops as
+    operator 1 <-> (halfvec, halfvec) for order by pg_catalog.float_ops,
+    function 1 (halfvec, halfvec) halfvec_l2_squared_distance(halfvec, halfvec),
+    function 3 (halfvec, halfvec) hnsw_halfvec_support(internal),
     storage halfvec;
 
 create operator class halfvec_l2_ops
   for type halfvec
   using ivfflat
   family halfvec_l2_ops as
+    operator 1 <-> (halfvec, halfvec) for order by pg_catalog.float_ops,
+    function 1 (halfvec, halfvec) halfvec_l2_squared_distance(halfvec, halfvec),
+    function 3 (halfvec, halfvec) l2_distance(halfvec, halfvec),
+    function 5 (halfvec, halfvec) ivfflat_halfvec_support(internal),
     storage halfvec;
 
 create operator class halfvec_ops
   default for type halfvec
   using btree
   family halfvec_ops as
+    operator 1 < (halfvec, halfvec),
+    operator 2 <= (halfvec, halfvec),
+    operator 3 = (halfvec, halfvec),
+    operator 4 >= (halfvec, halfvec),
+    operator 5 > (halfvec, halfvec),
+    function 1 (halfvec, halfvec) halfvec_cmp(halfvec, halfvec),
     storage halfvec;
 
 create operator class sparsevec_cosine_ops
   for type sparsevec
   using hnsw
   family sparsevec_cosine_ops as
+    operator 1 <=> (sparsevec, sparsevec) for order by pg_catalog.float_ops,
+    function 1 (
+      sparsevec,
+      sparsevec
+    )
+    sparsevec_negative_inner_product(
+      sparsevec,
+      sparsevec
+    ),
+    function 2 (sparsevec, sparsevec) l2_norm(sparsevec),
+    function 3 (sparsevec, sparsevec) hnsw_sparsevec_support(internal),
     storage sparsevec;
 
 create operator class sparsevec_ip_ops
   for type sparsevec
   using hnsw
   family sparsevec_ip_ops as
+    operator 1 <#> (sparsevec, sparsevec) for order by pg_catalog.float_ops,
+    function 1 (
+      sparsevec,
+      sparsevec
+    )
+    sparsevec_negative_inner_product(
+      sparsevec,
+      sparsevec
+    ),
+    function 3 (sparsevec, sparsevec) hnsw_sparsevec_support(internal),
     storage sparsevec;
 
 create operator class sparsevec_l1_ops
   for type sparsevec
   using hnsw
   family sparsevec_l1_ops as
+    operator 1 <+> (sparsevec, sparsevec) for order by pg_catalog.float_ops,
+    function 1 (sparsevec, sparsevec) l1_distance(sparsevec, sparsevec),
+    function 3 (sparsevec, sparsevec) hnsw_sparsevec_support(internal),
     storage sparsevec;
 
 create operator class sparsevec_l2_ops
   for type sparsevec
   using hnsw
   family sparsevec_l2_ops as
+    operator 1 <-> (sparsevec, sparsevec) for order by pg_catalog.float_ops,
+    function 1 (
+      sparsevec,
+      sparsevec
+    )
+    sparsevec_l2_squared_distance(
+      sparsevec,
+      sparsevec
+    ),
+    function 3 (sparsevec, sparsevec) hnsw_sparsevec_support(internal),
     storage sparsevec;
 
 create operator class sparsevec_ops
   default for type sparsevec
   using btree
   family sparsevec_ops as
+    operator 1 < (sparsevec, sparsevec),
+    operator 2 <= (sparsevec, sparsevec),
+    operator 3 = (sparsevec, sparsevec),
+    operator 4 >= (sparsevec, sparsevec),
+    operator 5 > (sparsevec, sparsevec),
+    function 1 (sparsevec, sparsevec) sparsevec_cmp(sparsevec, sparsevec),
     storage sparsevec;
 
 create operator class vector_cosine_ops
   for type vector
   using hnsw
   family vector_cosine_ops as
+    operator 1 <=> (vector, vector) for order by pg_catalog.float_ops,
+    function 1 (vector, vector) vector_negative_inner_product(vector, vector),
+    function 2 (vector, vector) vector_norm(vector),
     storage vector;
 
 create operator class vector_cosine_ops
   for type vector
   using ivfflat
   family vector_cosine_ops as
+    operator 1 <=> (vector, vector) for order by pg_catalog.float_ops,
+    function 1 (vector, vector) vector_negative_inner_product(vector, vector),
+    function 2 (vector, vector) vector_norm(vector),
+    function 3 (vector, vector) vector_spherical_distance(vector, vector),
+    function 4 (vector, vector) vector_norm(vector),
     storage vector;
 
 create operator class vector_ip_ops
   for type vector
   using hnsw
   family vector_ip_ops as
+    operator 1 <#> (vector, vector) for order by pg_catalog.float_ops,
+    function 1 (vector, vector) vector_negative_inner_product(vector, vector),
     storage vector;
 
 create operator class vector_ip_ops
   for type vector
   using ivfflat
   family vector_ip_ops as
+    operator 1 <#> (vector, vector) for order by pg_catalog.float_ops,
+    function 1 (vector, vector) vector_negative_inner_product(vector, vector),
+    function 3 (vector, vector) vector_spherical_distance(vector, vector),
+    function 4 (vector, vector) vector_norm(vector),
     storage vector;
 
 create operator class vector_l1_ops
   for type vector
   using hnsw
   family vector_l1_ops as
+    operator 1 <+> (vector, vector) for order by pg_catalog.float_ops,
+    function 1 (vector, vector) l1_distance(vector, vector),
     storage vector;
 
 create operator class vector_l2_ops
   for type vector
   using hnsw
   family vector_l2_ops as
+    operator 1 <-> (vector, vector) for order by pg_catalog.float_ops,
+    function 1 (vector, vector) vector_l2_squared_distance(vector, vector),
     storage vector;
 
 create operator class vector_l2_ops
   default for type vector
   using ivfflat
   family vector_l2_ops as
+    operator 1 <-> (vector, vector) for order by pg_catalog.float_ops,
+    function 1 (vector, vector) vector_l2_squared_distance(vector, vector),
+    function 3 (vector, vector) l2_distance(vector, vector),
     storage vector;
 
 create operator class vector_ops
   default for type vector
   using btree
   family vector_ops as
+    operator 1 < (vector, vector),
+    operator 2 <= (vector, vector),
+    operator 3 = (vector, vector),
+    operator 4 >= (vector, vector),
+    operator 5 > (vector, vector),
+    function 1 (vector, vector) vector_cmp(vector, vector),
     storage vector;
 
 create aggregate avg(halfvec) (

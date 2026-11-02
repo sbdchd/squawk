@@ -85,14 +85,14 @@ create function h3_cell_to_child_pos(
   strict
   parallel safe;
 
--- Returns the set of children of the given index.
+-- Returns the ordered set of children of the given index at the next resolution.
 create function h3_cell_to_children(cell h3index) returns setof h3index
   language c
   immutable
   strict
   parallel safe;
 
--- Returns the set of children of the given index.
+-- Returns the ordered set of children of the given index at the target resolution.
 create function h3_cell_to_children(
   cell h3index,
   resolution integer
@@ -102,11 +102,11 @@ create function h3_cell_to_children(
   strict
   parallel safe;
 
--- Slower version of H3ToChildren but allocates less memory.
+-- Compatibility wrapper that recursively expands one resolution step at a time.
 create function h3_cell_to_children_slow(index h3index) returns setof h3index
   language sql;
 
--- Slower version of H3ToChildren but allocates less memory.
+-- Compatibility wrapper that recursively expands one resolution step at a time.
 create function h3_cell_to_children_slow(
   index h3index,
   resolution integer
@@ -127,7 +127,7 @@ create function h3_cell_to_latlng(cell h3index) returns point
   strict
   parallel safe;
 
--- Produces local IJ coordinates for an H3 index anchored by an origin.
+-- Converts a cell to local IJ coordinates in the coordinate system anchored at origin.
 create function h3_cell_to_local_ij(origin h3index, index h3index) returns point
   language c
   immutable
@@ -207,6 +207,17 @@ create function h3_compact_cells(cells h3index[]) returns setof h3index
   strict
   parallel safe;
 
+-- Builds a valid H3 cell from explicit components: the target resolution, the base cell number, and a digits array ordered from resolution 1 up to the target resolution. The digits array must contain exactly one non-NULL entry per resolution step.
+create function h3_construct_cell(
+  resolution integer,
+  base_cell_number integer,
+  digits integer[]
+) returns h3index
+  language c
+  immutable
+  strict
+  parallel safe;
+
 -- Provides the coordinates defining the unidirectional edge.
 create function h3_directed_edge_to_boundary(edge h3index) returns polygon
   language c
@@ -235,7 +246,7 @@ create function h3_edge_length(
   strict
   parallel safe;
 
--- Returns the base cell number of the index.
+-- Returns the base cell number (0 through 121) associated with the index.
 create function h3_get_base_cell_number(h3index) returns integer
   language c
   immutable
@@ -283,8 +294,15 @@ create function h3_get_hexagon_edge_length_avg(
   strict
   parallel safe;
 
--- Find all icosahedron faces intersected by a given H3 index.
+-- Returns the icosahedron face numbers intersected by the index. Some cells span more than one face.
 create function h3_get_icosahedron_faces(h3index) returns integer[]
+  language c
+  immutable
+  strict
+  parallel safe;
+
+-- Returns the index digit at a specific resolution step. Resolution numbering is 1-based: pass 1 for the first digit below the base cell, 2 for the next, and so on.
+create function h3_get_index_digit(h3index, resolution integer) returns integer
   language c
   immutable
   strict
@@ -311,7 +329,7 @@ create function h3_get_res_0_cells() returns setof h3index
   strict
   parallel safe;
 
--- Returns the resolution of the index.
+-- Returns the H3 resolution encoded in the index (0 through 15).
 create function h3_get_resolution(h3index) returns integer
   language c
   immutable
@@ -329,7 +347,7 @@ create function h3_great_circle_distance(
   strict
   parallel safe;
 
--- Produces indices within "k" distance of the origin index.
+-- Preferred disk API. Returns all cells with grid distance less than or equal to k from origin, including cases near pentagons. Row order is not guaranteed.
 create function h3_grid_disk(
   origin h3index,
   k integer default 1
@@ -339,7 +357,7 @@ create function h3_grid_disk(
   strict
   parallel safe;
 
--- Produces indices within "k" distance of the origin index paired with their distance to the origin.
+-- Preferred disk API with distances. Like h3_grid_disk(), but also returns the grid distance from origin for each returned cell. Handles pentagon distortion internally. Row order is not guaranteed.
 create function h3_grid_disk_distances(
   origin h3index,
   k integer default 1,
@@ -351,7 +369,7 @@ create function h3_grid_disk_distances(
   strict
   parallel safe;
 
--- Returns the distance in grid cells between the two indices.
+-- Returns the shortest grid distance between two cells. Raises an error when the cells are not comparable, too far apart, or the path crosses pentagonal distortion.
 create function h3_grid_distance(
   origin h3index,
   destination h3index
@@ -361,7 +379,7 @@ create function h3_grid_distance(
   strict
   parallel safe;
 
--- Given two H3 indexes, return the line of indexes between them (inclusive).
+-- Returns one shortest grid path from origin to destination, including both endpoints.
 --
 -- This function may fail to find the line between two indexes, for
 -- example if they are very far apart. It may also fail when finding
@@ -375,7 +393,17 @@ create function h3_grid_path_cells(
   strict
   parallel safe;
 
--- Returns the hollow hexagonal ring centered at origin with distance "k".
+-- Preferred ring API. Returns the cells exactly "k" grid steps from origin. Continues to work near pentagons, but row order is not guaranteed and the result may contain fewer than 6*k cells when pentagonal distortion removes positions from the ring.
+create function h3_grid_ring(
+  origin h3index,
+  k integer default 1
+) returns setof h3index
+  language c
+  immutable
+  strict
+  parallel safe;
+
+-- Fast-path ring traversal. When it succeeds it walks the ring in traversal order, but it throws if origin or the traversed ring hits pentagonal distortion. Prefer h3_grid_ring() unless you specifically want fail-fast semantics or ring-walk ordering.
 create function h3_grid_ring_unsafe(
   origin h3index,
   k integer default 1
@@ -392,14 +420,14 @@ create function h3_is_pentagon(h3index) returns boolean
   strict
   parallel safe;
 
--- Returns true if this index has a resolution with Class III orientation.
+-- Returns true when the index is at a Class III resolution.
 create function h3_is_res_class_iii(h3index) returns boolean
   language c
   immutable
   strict
   parallel safe;
 
--- Returns true if the given H3Index is valid.
+-- Returns true only for valid H3 cell indexes (hexagons or pentagons). Directed edges, vertices, and malformed values return false.
 create function h3_is_valid_cell(h3index) returns boolean
   language c
   immutable
@@ -408,6 +436,13 @@ create function h3_is_valid_cell(h3index) returns boolean
 
 -- Returns true if the given edge is valid.
 create function h3_is_valid_directed_edge(edge h3index) returns boolean
+  language c
+  immutable
+  strict
+  parallel safe;
+
+-- Returns true for any valid H3 index mode: cell, directed edge, or vertex.
+create function h3_is_valid_index(h3index) returns boolean
   language c
   immutable
   strict
@@ -440,7 +475,7 @@ create function h3_latlng_to_cell(
   strict
   parallel safe;
 
--- Produces an H3 index from local IJ coordinates anchored by an origin.
+-- Converts local IJ coordinates in the coordinate system anchored at origin back to a cell.
 create function h3_local_ij_to_cell(origin h3index, coord point) returns h3index
   language c
   immutable
@@ -480,6 +515,13 @@ create function h3_polygon_to_cells_experimental(
 ) returns setof h3index
   language c
   immutable
+  parallel safe;
+
+-- Returns the directed edge with origin and destination cells reversed.
+create function h3_reverse_directed_edge(edge h3index) returns h3index
+  language c
+  immutable
+  strict
   parallel safe;
 
 -- Uncompacts the given array at the resolution one higher than the highest resolution in the set.
@@ -544,6 +586,64 @@ create function h3index_eq(h3index, h3index) returns boolean
   parallel safe;
 
 create function h3index_ge(h3index, h3index) returns boolean
+  language c
+  immutable
+  strict
+  parallel safe;
+
+create function h3index_gist_consistent(
+  entry internal,
+  query h3index,
+  strategy smallint,
+  subtype oid,
+  recheck internal
+) returns boolean
+  language c
+  immutable
+  strict
+  parallel safe;
+
+create function h3index_gist_distance(
+  entry internal,
+  query h3index,
+  strategy smallint,
+  subtype oid,
+  recheck internal
+) returns double precision
+  language c
+  immutable
+  strict
+  parallel safe;
+
+create function h3index_gist_penalty(
+  internal,
+  internal,
+  internal
+) returns internal
+  language c
+  immutable
+  strict
+  parallel safe;
+
+create function h3index_gist_picksplit(internal, internal) returns internal
+  language c
+  immutable
+  strict
+  parallel safe;
+
+create function h3index_gist_same(h3index, h3index, internal) returns internal
+  language c
+  immutable
+  strict
+  parallel safe;
+
+create function h3index_gist_sortsupport(internal) returns void
+  language c
+  immutable
+  strict
+  parallel safe;
+
+create function h3index_gist_union(internal, internal) returns h3index
   language c
   immutable
   strict
@@ -681,7 +781,7 @@ create operator < (
   negator = >=
 );
 
--- Returns the distance in grid cells between the two indices (at the lowest resolution of the two).
+-- Returns the distance in grid cells between the two indices after refining the coarser input to its center child at the finer resolution. Returns the maximum bigint value when gridDistance fails (e.g. near pentagons).
 create operator <-> (
   leftarg = h3index,
   rightarg = h3index,
@@ -746,6 +846,9 @@ create operator @> (
   commutator = <@
 );
 
+create operator family h3index_gist_ops_experimental
+  using gist;
+
 create operator family h3index_minmax_ops
   using brin;
 
@@ -758,29 +861,157 @@ create operator family h3index_ops
 create operator family h3index_ops_experimental
   using spgist;
 
+create operator class h3index_gist_ops_experimental
+  for type h3index
+  using gist
+  family h3index_gist_ops_experimental as
+    function 1 (
+      h3index,
+      h3index
+    )
+    h3index_gist_consistent(
+      internal,
+      h3index,
+      smallint,
+      oid,
+      internal
+    ),
+    function 2 (h3index, h3index) h3index_gist_union(internal, internal),
+    function 5 (
+      h3index,
+      h3index
+    )
+    h3index_gist_penalty(
+      internal,
+      internal,
+      internal
+    ),
+    function 6 (h3index, h3index) h3index_gist_picksplit(internal, internal),
+    function 7 (h3index, h3index) h3index_gist_same(h3index, h3index, internal),
+    storage h3index;
+
 create operator class h3index_minmax_ops
   default for type h3index
   using brin
   family h3index_minmax_ops as
+    operator 1 < (h3index, h3index),
+    operator 2 <= (h3index, h3index),
+    operator 3 = (h3index, h3index),
+    operator 4 >= (h3index, h3index),
+    operator 5 > (h3index, h3index),
+    function 1 (h3index, h3index) pg_catalog.brin_minmax_opcinfo(internal),
+    function 2 (
+      h3index,
+      h3index
+    )
+    pg_catalog.brin_minmax_add_value(
+      internal,
+      internal,
+      internal,
+      internal
+    ),
+    function 3 (
+      h3index,
+      h3index
+    )
+    pg_catalog.brin_minmax_consistent(
+      internal,
+      internal,
+      internal
+    ),
+    function 4 (
+      h3index,
+      h3index
+    )
+    pg_catalog.brin_minmax_union(
+      internal,
+      internal,
+      internal
+    ),
     storage h3index;
 
 create operator class h3index_ops
   default for type h3index
   using btree
   family h3index_ops as
+    operator 1 < (h3index, h3index),
+    operator 2 <= (h3index, h3index),
+    operator 3 = (h3index, h3index),
+    operator 4 >= (h3index, h3index),
+    operator 5 > (h3index, h3index),
+    function 1 (h3index, h3index) h3index_cmp(h3index, h3index),
     storage h3index;
 
 create operator class h3index_ops
   default for type h3index
   using hash
   family h3index_ops as
+    operator 1 = (h3index, h3index),
+    function 1 (h3index, h3index) h3index_hash(h3index),
     storage h3index;
 
 create operator class h3index_ops_experimental
   for type h3index
   using spgist
   family h3index_ops_experimental as
+    function 1 (h3index, h3index) h3index_spgist_config(internal, internal),
+    function 2 (h3index, h3index) h3index_spgist_choose(internal, internal),
+    function 3 (h3index, h3index) h3index_spgist_picksplit(internal, internal),
+    function 4 (
+      h3index,
+      h3index
+    )
+    h3index_spgist_inner_consistent(
+      internal,
+      internal
+    ),
+    function 5 (
+      h3index,
+      h3index
+    )
+    h3index_spgist_leaf_consistent(
+      internal,
+      internal
+    ),
     storage h3index;
+
+alter operator family h3index_gist_ops_experimental
+  using gist
+  add
+    operator 3 && (h3index, h3index),
+    operator 6 = (h3index, h3index),
+    operator 7 @> (h3index, h3index),
+    operator 8 <@ (h3index, h3index),
+    operator 15 <-> (h3index, h3index) for order by pg_catalog.integer_ops,
+    function 8 (
+      h3index,
+      h3index
+    )
+    h3index_gist_distance(
+      internal,
+      h3index,
+      smallint,
+      oid,
+      internal
+    ),
+    function 11 (h3index, h3index) h3index_gist_sortsupport(internal);
+
+alter operator family h3index_ops
+  using btree
+  add
+    function 2 (h3index, h3index) h3index_sortsupport(internal);
+
+alter operator family h3index_ops
+  using hash
+  add
+    function 2 (h3index, h3index) h3index_hash_extended(h3index, bigint);
+
+alter operator family h3index_ops_experimental
+  using spgist
+  add
+    operator 6 = (h3index, h3index),
+    operator 7 @> (h3index, h3index),
+    operator 8 <@ (h3index, h3index);
 
 create cast (bigint as h3index) with function bigint_to_h3index(bigint);
 

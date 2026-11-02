@@ -261,9 +261,9 @@ select percentile_cont$0(0.5) within group (order by 1.5::float8);
         2 │ select percentile_cont(0.5) within group (order by 1.5::float8);
           │        ─────────────── 1. source
           │
-          ⸬  builtins.sql:42486:29
+          ⸬  builtins.sql:47162:29
           │
-    42486 │ create aggregate pg_catalog.percentile_cont(
+    47162 │ create aggregate pg_catalog.percentile_cont(
           ╰╴                            ─────────────── 2. destination
     ");
 }
@@ -279,9 +279,9 @@ select rank$0(1) within group (order by 2);
         2 │ select rank(1) within group (order by 2);
           │        ──── 1. source
           │
-          ⸬  builtins.sql:42600:29
+          ⸬  builtins.sql:47276:29
           │
-    42600 │ create aggregate pg_catalog.rank(variadic "any" order by variadic "any") (
+    47276 │ create aggregate pg_catalog.rank(variadic "any" order by variadic "any") (
           ╰╴                            ──── 2. destination
     "#);
 }
@@ -297,9 +297,9 @@ select pg_catalog.count$0(1);
         2 │ select pg_catalog.count(1);
           │                   ───── 1. source
           │
-          ⸬  builtins.sql:43375:29
+          ⸬  builtins.sql:48051:29
           │
-    43375 │ create aggregate pg_catalog.count("any") (
+    48051 │ create aggregate pg_catalog.count("any") (
           ╰╴                            ───── 2. destination
     "#);
 }
