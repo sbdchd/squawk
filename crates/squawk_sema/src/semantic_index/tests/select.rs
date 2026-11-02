@@ -664,3 +664,39 @@ alter table users drop column name, drop column nme;
       ╰╴                                                ━━━
     ");
 }
+
+#[test]
+fn non_boolean_conditions() {
+    assert_snapshot!(check("
+create table t (a int, b bool, c text);
+create table p (a int);
+select a from t where a + 1;
+select * from t join p on t.a;
+select a from t group by a having sum(a);
+select a from t where b and 'true';
+select a from t where null;
+delete from t where c;
+update t set a = 1 where a;
+"), @"
+    error: argument of `where` must be type `bool`, not type `int4`
+      ╭▸ 
+    4 │ select a from t where a + 1;
+      ╰╴                      ━━━━━
+    error: argument of `on` must be type `bool`, not type `int4`
+      ╭▸ 
+    5 │ select * from t join p on t.a;
+      ╰╴                          ━━━
+    error: argument of `having` must be type `bool`, not type `int8`
+      ╭▸ 
+    6 │ select a from t group by a having sum(a);
+      ╰╴                                  ━━━━━━
+    error: argument of `where` must be type `bool`, not type `text`
+      ╭▸ 
+    9 │ delete from t where c;
+      ╰╴                    ━
+    error: argument of `where` must be type `bool`, not type `int4`
+       ╭▸ 
+    10 │ update t set a = 1 where a;
+       ╰╴                         ━
+    ");
+}

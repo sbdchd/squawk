@@ -1304,6 +1304,31 @@ pub(crate) enum OutputClause {
     DistinctOn,
 }
 
+#[derive(Clone, Copy)]
+enum Condition {
+    Where,
+    Having,
+    On,
+}
+
+impl Condition {
+    fn context(self) -> ExprContext {
+        match self {
+            Condition::Where => ExprContext::Where,
+            Condition::Having => ExprContext::Having,
+            Condition::On => ExprContext::JoinCondition,
+        }
+    }
+
+    fn keyword(self) -> &'static str {
+        match self {
+            Condition::Where => "where",
+            Condition::Having => "having",
+            Condition::On => "on",
+        }
+    }
+}
+
 struct SelectParts {
     with_clause: Option<ast::WithClause>,
     select_clause: Option<ast::SelectClause>,
@@ -13560,7 +13585,7 @@ impl Lowerer {
         }
 
         if let Some(expr) = parts.where_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Where, &expr);
+            self.lower_condition(Condition::Where, &expr);
         }
         if let Some(list) = parts
             .group_by_clause
@@ -13573,7 +13598,7 @@ impl Lowerer {
             });
         }
         if let Some(expr) = parts.having_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Having, &expr);
+            self.lower_condition(Condition::Having, &expr);
         }
         for clause in parts.tail_clauses {
             self.lower_tail_clause(clause, &columns);
@@ -13763,7 +13788,7 @@ impl Lowerer {
         match delete.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_expr_in(ExprContext::Where, &expr);
+                    self.lower_condition(Condition::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -13822,7 +13847,7 @@ impl Lowerer {
         match update.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_expr_in(ExprContext::Where, &expr);
+                    self.lower_condition(Condition::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -13878,7 +13903,7 @@ impl Lowerer {
             .and_then(|using_on| using_on.on_clause())
             .and_then(|on_clause| on_clause.expr())
         {
-            self.lower_expr_in(ExprContext::JoinCondition, &expr);
+            self.lower_condition(Condition::On, &expr);
         }
 
         for when_clause in merge.merge_when_clauses() {
@@ -14164,7 +14189,7 @@ impl Lowerer {
             }
         };
         if let Some(expr) = where_clause.and_then(|clause| clause.expr()) {
-            self.lower_expr_in(ExprContext::Where, &expr);
+            self.lower_condition(Condition::Where, &expr);
         }
         self.index.queries[query].sources.truncate(len);
         self.set_visible((0..len).into());
@@ -17440,7 +17465,7 @@ impl Lowerer {
             }
             self.set_visible((0..2).into());
             if let Some(expr) = rule_on.where_clause().and_then(|clause| clause.expr()) {
-                self.lower_expr_in(ExprContext::Where, &expr);
+                self.lower_condition(Condition::Where, &expr);
             }
             for (index, name) in names.into_iter().enumerate() {
                 let target = self.index.queries[query].sources[index];
@@ -20598,7 +20623,7 @@ impl Lowerer {
         self.with_visible_sources(visible, |this| match condition {
             ast::JoinCondition::OnClause(on_clause) => {
                 if let Some(expr) = on_clause.expr() {
-                    this.lower_expr(&expr);
+                    this.lower_condition(Condition::On, &expr);
                 }
             }
             ast::JoinCondition::JoinUsingClause(using_clause) => {
@@ -22459,6 +22484,20 @@ impl Lowerer {
 
     fn lower_expr_in(&mut self, context: ExprContext, expr: &ast::Expr) -> Option<Ty> {
         self.with_expr_context(context, |this| this.lower_expr(expr))
+    }
+
+    fn lower_condition(&mut self, condition: Condition, expr: &ast::Expr) {
+        if let Some(found) = self.lower_expr_in(condition.context(), expr)
+            && let Some(bool) = self.builtin_type("bool")
+            && self.overloads().rejects_arg(ArgType::Known(found), bool)
+        {
+            let error = SemaError::KeywordArgType {
+                keyword: condition.keyword(),
+                expected: self.index.ty_name(bool),
+                found: self.index.ty_name(found),
+            };
+            self.push_error(expr.syntax(), error);
+        }
     }
 
     fn lower_call_args(&mut self, arg_list: Option<ast::ArgList>) -> CallArgs {
