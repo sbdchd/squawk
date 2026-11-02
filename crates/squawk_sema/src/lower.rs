@@ -23877,7 +23877,7 @@ impl Lowerer {
             params,
             direct_args,
         }: FunctionParams,
-        ret_type: Option<&ast::RetType>,
+        ret_clause: Option<&ast::RetType>,
     ) -> Option<FunctionId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
@@ -23885,9 +23885,9 @@ impl Lowerer {
 
         let mut ret = None;
         let mut table_columns = None;
-        if let Some(ret_type) = ret_type {
-            ret = self.lower_func_type(ret_type.func_type());
-            if let Some(list) = ret_type.return_table_arg_list() {
+        if let Some(ret_clause) = ret_clause {
+            ret = self.lower_func_type(ret_clause.func_type());
+            if let Some(list) = ret_clause.return_table_arg_list() {
                 let start = self.index.columns.next_idx();
                 for arg in list.args() {
                     let ty = self.lower_func_type(arg.func_type());
@@ -23926,6 +23926,14 @@ impl Lowerer {
             Some(columns) => Some(columns),
             None => self.out_param_columns(params),
         };
+        if kind != FunctionKind::Procedure
+            && table_columns.is_none()
+            && let Some(declared) = ret
+            && let Some(columns) = columns
+            && let Some(ret_clause) = ret_clause
+        {
+            self.check_out_param_result_type(ret_clause, declared, columns);
+        }
         if ret.is_none()
             && kind != FunctionKind::Procedure
             && let Some(columns) = columns
@@ -23959,6 +23967,43 @@ impl Lowerer {
         self.record_comment(node, Item::Function(id));
         self.add_item(segment.syntax(), Item::Function(id));
         Some(id)
+    }
+
+    fn check_out_param_result_type(
+        &mut self,
+        ret_clause: &ast::RetType,
+        declared: Ty,
+        columns: Columns,
+    ) {
+        let expected = match columns.range.len() {
+            1 => self.index.columns[columns.range.start()].ty,
+            _ => self.builtin_type("record"),
+        };
+        let Some(expected) = expected else {
+            return;
+        };
+        let Some(func_type) = ret_clause.func_type() else {
+            return;
+        };
+        if expected == declared {
+            return;
+        }
+        let returns = func_type.setof_token().is_none().then(|| {
+            let range = ret_clause.syntax().text_range();
+            match ret_clause.syntax().prev_sibling_or_token() {
+                Some(prev) if prev.kind() == SyntaxKind::WHITESPACE => {
+                    TextRange::new(prev.text_range().start(), range.end())
+                }
+                _ => range,
+            }
+        });
+        self.push_error(
+            func_type.syntax(),
+            SemaError::OutParamResultType {
+                expected: self.index.ty_name(expected),
+                returns,
+            },
+        );
     }
 
     fn alloc_params(&mut self, param_list: Option<ast::ParamList>) -> FunctionParams {

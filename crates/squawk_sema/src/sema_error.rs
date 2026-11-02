@@ -616,6 +616,10 @@ pub(crate) enum SemaError {
         name: Name,
         kind: TriggerFunctionKind,
     },
+    OutParamResultType {
+        expected: TyName,
+        returns: Option<TextRange>,
+    },
     ConflictingNullability {
         column: Name,
         table: Name,
@@ -1192,7 +1196,9 @@ impl SemaError {
             SemaError::InvalidOrdinal { .. } => DiagnosticKind::InvalidOrdinal,
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
-            SemaError::TriggerReturnType { .. } => DiagnosticKind::WrongReturnType,
+            SemaError::TriggerReturnType { .. } | SemaError::OutParamResultType { .. } => {
+                DiagnosticKind::WrongReturnType
+            }
             SemaError::ConflictingNullability { .. } => DiagnosticKind::ConflictingNullability,
         }
     }
@@ -1391,6 +1397,16 @@ impl SemaError {
                 fix: Fix {
                     title: "Insert `returning *`".into(),
                     edits: vec![Edit::insert(" returning *", returning_at)],
+                },
+            },
+            SemaError::OutParamResultType {
+                returns: Some(returns),
+                ..
+            } => Suggestion {
+                message: "the `out` parameters already determine the result type".into(),
+                fix: Fix {
+                    title: "Remove the `returns` clause".into(),
+                    edits: vec![Edit::delete(returns)],
                 },
             },
             SemaError::WindowWithoutOver { over_at, .. } => Suggestion {
@@ -2589,6 +2605,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "cannot copy window `{}` because it has a frame clause",
                 n(name)
+            ),
+            SemaError::OutParamResultType { expected, .. } => write!(
+                f,
+                "function result type must be `{}` because of `out` parameters",
+                self.ty(expected)
             ),
             SemaError::TriggerReturnType { name, kind } => write!(
                 f,

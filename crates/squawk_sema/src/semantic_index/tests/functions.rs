@@ -1477,3 +1477,171 @@ select u(1);
       ╰ note: missing `$2`
     ");
 }
+
+#[test]
+fn out_param_result_type() {
+    assert_snapshot!(check("
+create domain d as int;
+
+create function f1(out x int) returns text
+  language sql
+  as 'select 1';
+
+create function f2(out x int, out y text) returns int
+  language sql
+  as 'select 1, null';
+
+create function f3(inout x int) returns text
+  language sql
+  as 'select 1';
+
+create function f4(out x int) returns record
+  language sql
+  as 'select 1';
+
+create function f5(out x d) returns int
+  language sql
+  as 'select 1';
+
+create function f6(variadic a int[], out x int) returns text
+  language sql
+  as 'select 1';
+
+create function f7(out x int[]) returns int
+  language sql
+  as 'select 1';
+
+create function f8(out x int) returns setof text
+  language sql
+  as 'select 1';
+
+create or replace function f9(out x int) returns text
+  language sql
+  as 'select 1';
+
+create function f10(out x int) returns setof text[]
+  language sql
+  as 'select 1';
+
+create function ok1(out x int) returns setof int
+  language sql
+  as 'select 1';
+
+create function ok2(out x int, out y text) returns setof record
+  language sql
+  as 'select 1, null';
+
+create function ok3(out x varchar(10)) returns varchar
+  language sql
+  as 'select 1';
+
+create function ok4(a text, out x int) returns int4
+  language sql
+  as 'select 1';
+
+create function ok5(inout x anyelement) returns anyelement
+  language sql
+  as 'select x';
+
+create function ok6() returns table (x int)
+  language sql
+  as 'select 1';
+
+create function ok7(out x int)
+  language sql
+  as 'select 1';
+
+create procedure ok8(out x int)
+  language sql
+  as 'select 1';
+"), @"
+    error: function result type must be `int4` because of `out` parameters
+      ╭▸ 
+    4 │ create function f1(out x int) returns text
+      │                                       ━━━━
+      ╰╴
+    help: the `out` parameters already determine the result type
+      ╭╴
+    4 - create function f1(out x int) returns text
+    4 + create function f1(out x int)
+      ╰╴
+    error: function result type must be `record` because of `out` parameters
+      ╭▸ 
+    8 │ create function f2(out x int, out y text) returns int
+      │                                                   ━━━
+      ╰╴
+    help: the `out` parameters already determine the result type
+      ╭╴
+    8 - create function f2(out x int, out y text) returns int
+    8 + create function f2(out x int, out y text)
+      ╰╴
+    error: function result type must be `int4` because of `out` parameters
+       ╭▸ 
+    12 │ create function f3(inout x int) returns text
+       │                                         ━━━━
+       ╰╴
+    help: the `out` parameters already determine the result type
+       ╭╴
+    12 - create function f3(inout x int) returns text
+    12 + create function f3(inout x int)
+       ╰╴
+    error: function result type must be `int4` because of `out` parameters
+       ╭▸ 
+    16 │ create function f4(out x int) returns record
+       │                                       ━━━━━━
+       ╰╴
+    help: the `out` parameters already determine the result type
+       ╭╴
+    16 - create function f4(out x int) returns record
+    16 + create function f4(out x int)
+       ╰╴
+    error: function result type must be `d` because of `out` parameters
+       ╭▸ 
+    20 │ create function f5(out x d) returns int
+       │                                     ━━━
+       ╰╴
+    help: the `out` parameters already determine the result type
+       ╭╴
+    20 - create function f5(out x d) returns int
+    20 + create function f5(out x d)
+       ╰╴
+    error: function result type must be `int4` because of `out` parameters
+       ╭▸ 
+    24 │ create function f6(variadic a int[], out x int) returns text
+       │                                                         ━━━━
+       ╰╴
+    help: the `out` parameters already determine the result type
+       ╭╴
+    24 - create function f6(variadic a int[], out x int) returns text
+    24 + create function f6(variadic a int[], out x int)
+       ╰╴
+    error: function result type must be `int4[]` because of `out` parameters
+       ╭▸ 
+    28 │ create function f7(out x int[]) returns int
+       │                                         ━━━
+       ╰╴
+    help: the `out` parameters already determine the result type
+       ╭╴
+    28 - create function f7(out x int[]) returns int
+    28 + create function f7(out x int[])
+       ╰╴
+    error: function result type must be `int4` because of `out` parameters
+       ╭▸ 
+    32 │ create function f8(out x int) returns setof text
+       ╰╴                                      ━━━━━━━━━━
+    error: function result type must be `int4` because of `out` parameters
+       ╭▸ 
+    36 │ create or replace function f9(out x int) returns text
+       │                                                  ━━━━
+       ╰╴
+    help: the `out` parameters already determine the result type
+       ╭╴
+    36 - create or replace function f9(out x int) returns text
+    36 + create or replace function f9(out x int)
+       ╰╴
+    error: function result type must be `int4` because of `out` parameters
+       ╭▸ 
+    40 │ create function f10(out x int) returns setof text[]
+       ╰╴                                       ━━━━━━━━━━━━
+    ");
+}
