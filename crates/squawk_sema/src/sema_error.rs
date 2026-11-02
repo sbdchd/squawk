@@ -240,6 +240,14 @@ pub(crate) enum SemaError {
     MisplacedWindow {
         context: ExprContext,
     },
+    MisplacedSetReturningFunction {
+        context: ExprContext,
+    },
+    SetReturningFunctionIn {
+        construct: SetReturningConstruct,
+    },
+    SetReturningFunctionNotTopLevel,
+    TablesampleSetArgument,
     MisplacedSubquery {
         context: ExprContext,
     },
@@ -661,6 +669,14 @@ pub(crate) enum ConflictAction {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum SetReturningConstruct {
+    Aggregate,
+    Window,
+    Case,
+    Coalesce,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ConflictRuleEvent {
     Insert,
     Update,
@@ -861,7 +877,7 @@ impl ExprContext {
             ExprContext::WindowGroups => "window `groups`",
             ExprContext::Limit => "`limit`",
             ExprContext::Offset => "`offset`",
-            ExprContext::Values => "`values`",
+            ExprContext::Values | ExprContext::ValuesSingle => "`values`",
             ExprContext::Returning => "`returning`",
             ExprContext::Insert => "`insert`",
             ExprContext::Update => "`update`",
@@ -912,6 +928,7 @@ impl ExprContext {
             | ExprContext::Limit
             | ExprContext::Offset
             | ExprContext::Values
+            | ExprContext::ValuesSingle
             | ExprContext::Returning
             | ExprContext::Insert
             | ExprContext::Update
@@ -1074,6 +1091,10 @@ impl SemaError {
             SemaError::NestedAggregate
             | SemaError::AggregateContainsWindow
             | SemaError::MisplacedAggregate { .. } => DiagnosticKind::GroupingError,
+            SemaError::MisplacedSetReturningFunction { .. }
+            | SemaError::SetReturningFunctionIn { .. }
+            | SemaError::SetReturningFunctionNotTopLevel => DiagnosticKind::FeatureNotSupported,
+            SemaError::TablesampleSetArgument => DiagnosticKind::TypeMismatch,
             SemaError::MisplacedSubquery { .. }
             | SemaError::DefaultColumnReference
             | SemaError::UnnestColumnDefList
@@ -1524,6 +1545,9 @@ impl SemaError {
 
     pub(crate) fn hint(&self) -> Option<&'static str> {
         match *self {
+            SemaError::SetReturningFunctionIn { .. } => Some(
+                "you might be able to move the set-returning function into a `lateral` `from` item",
+            ),
             SemaError::TypedTableAlter { .. } => {
                 Some("use `alter ... cascade` to alter the typed tables too")
             }
@@ -1682,9 +1706,9 @@ impl SemaError {
                 Some("`create or replace constraint trigger` is not supported")
             }
             SemaError::RenameSelectRule => Some("renaming an `on select` rule is not allowed"),
-            SemaError::NestedAggregate => Some("aggregate function calls cannot be nested"),
+            SemaError::NestedAggregate => Some("aggregate calls cannot be nested"),
             SemaError::AggregateContainsWindow => {
-                Some("aggregate function calls cannot contain window function calls")
+                Some("aggregate calls cannot contain window function calls")
             }
             SemaError::NestedWindow => Some("window function calls cannot be nested"),
             SemaError::InsertMoreTargetsThanExpressions { .. } => {
@@ -1959,6 +1983,35 @@ impl fmt::Display for ErrorMessage<'_> {
                     context => context.label(),
                 };
                 write!(f, "window functions are not allowed in {label}")
+            }
+            SemaError::MisplacedSetReturningFunction { context } => {
+                let label = match context {
+                    ExprContext::WindowRange
+                    | ExprContext::WindowRows
+                    | ExprContext::WindowGroups => ExprContext::WindowDefinition.label(),
+                    context => context.label(),
+                };
+                write!(f, "set-returning functions are not allowed in {label}")
+            }
+            SemaError::SetReturningFunctionIn { construct } => match construct {
+                SetReturningConstruct::Aggregate => {
+                    f.write_str("aggregate calls cannot contain set-returning function calls")
+                }
+                SetReturningConstruct::Window => {
+                    f.write_str("window function calls cannot contain set-returning function calls")
+                }
+                SetReturningConstruct::Case => {
+                    f.write_str("set-returning functions are not allowed in `case`")
+                }
+                SetReturningConstruct::Coalesce => {
+                    f.write_str("set-returning functions are not allowed in `coalesce`")
+                }
+            },
+            SemaError::SetReturningFunctionNotTopLevel => {
+                f.write_str("set-returning functions must appear at top level of `from`")
+            }
+            SemaError::TablesampleSetArgument => {
+                f.write_str("argument of `tablesample` must not return a set")
             }
             SemaError::MisplacedSubquery { context } => write!(
                 f,

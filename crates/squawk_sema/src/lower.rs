@@ -45,8 +45,8 @@ use crate::{
     sema_error::{
         ArgLabel, ConflictAction, ConflictRuleEvent, ConflictTargetKey, DropRelation, ErrorArg,
         ErrorArgs, ErrorCandidates, ErrorParam, LookupKind, ObjectKind, OperandName,
-        OperatorReplacement, OutsideSearchPath, SemaError, Similar, SimilarColumn, SimilarType,
-        TriggerFunctionKind, ViewColumnRename, WindowClause,
+        OperatorReplacement, OutsideSearchPath, SemaError, SetReturningConstruct, Similar,
+        SimilarColumn, SimilarType, TriggerFunctionKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -78,6 +78,7 @@ impl Lowerer {
             from_subqueries: vec![],
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
+            srf_calls: vec![],
             pending_foreign_keys: vec![],
             generated_refs: vec![],
             function: None,
@@ -378,6 +379,7 @@ pub(crate) struct Lowerer {
     from_subqueries: Vec<FromSubquery>,
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
+    srf_calls: Vec<SrfCall>,
     pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
@@ -1307,6 +1309,7 @@ impl Lowerer {
     fn lower_stmt(&mut self, stmt: &ast::Stmt) {
         self.record_search_path(stmt.syntax().text_range().start());
         self.aggregate_calls.clear();
+        self.srf_calls.clear();
         match stmt {
             ast::Stmt::CreateTable(create_table) => self.lower_create_table(
                 create_table,
@@ -10393,6 +10396,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
+            returns_set,
             columns,
             ..
         } = self.index.functions[function];
@@ -10420,6 +10424,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
+            returns_set,
             columns,
         });
         self.index.set_param_function(params, id);
@@ -13627,6 +13632,19 @@ impl Lowerer {
             .row_list()
             .and_then(|list| list.rows().next())
             .map_or(0, |row| row.exprs().count());
+        let insert_source = values
+            .syntax()
+            .parent()
+            .is_some_and(|parent| ast::Insert::can_cast(parent.kind()));
+        let context = if insert_source
+            && values
+                .row_list()
+                .is_some_and(|list| list.rows().count() == 1)
+        {
+            ExprContext::ValuesSingle
+        } else {
+            ExprContext::Values
+        };
         let mut columns = Vec::with_capacity(first_len);
         for (row_index, row) in values
             .row_list()
@@ -13638,7 +13656,7 @@ impl Lowerer {
                 self.push_error(row.syntax(), SemaError::ValuesLengthMismatch);
             }
             for (column_index, expr) in row.exprs().enumerate() {
-                let ty = self.lower_expr_in(ExprContext::Values, &expr);
+                let ty = self.lower_expr_in(context, &expr);
                 if row_index == 0 {
                     let name = self.intern(&format!("column{}", column_index + 1));
                     columns.push(Column {
@@ -13902,7 +13920,7 @@ impl Lowerer {
                     .flat_map(|list| list.rows())
                     .flat_map(|row| row.exprs())
                 {
-                    self.lower_expr_in(ExprContext::Values, &expr);
+                    self.lower_expr_in(ExprContext::ValuesSingle, &expr);
                 }
             }
             ast::MergeAction::MergeUpdate(update) => {
@@ -14797,20 +14815,30 @@ impl Lowerer {
         }
     }
 
+    fn lower_tablesample_arg(&mut self, expr: &ast::Expr) {
+        let srf_calls = self.srf_calls.len();
+        self.lower_expr_in(ExprContext::FromFunction, expr);
+        let inner = self.contained_set_returning(srf_calls).next();
+        if let Some(inner) = inner {
+            self.push_error_ptr(inner.ptr, SemaError::TablesampleSetArgument);
+        }
+        self.srf_calls.truncate(srf_calls);
+    }
+
     fn lower_tablesample(&mut self, tablesample: &ast::TablesampleClause) {
         let Some(call) = tablesample.call_expr() else {
             return;
         };
         for arg in call.arg_list().iter().flat_map(|list| list.args()) {
             if let Some(expr) = arg.func_arg_expr().and_then(|expr| expr.expr()) {
-                self.lower_expr_in(ExprContext::FromFunction, &expr);
+                self.lower_tablesample_arg(&expr);
             }
         }
         if let Some(expr) = tablesample
             .repeatable_clause()
             .and_then(|repeatable| repeatable.expr())
         {
-            self.lower_expr_in(ExprContext::FromFunction, &expr);
+            self.lower_tablesample_arg(&expr);
         }
         let (schema, name_ref) = match call.expr() {
             Some(ast::Expr::NameRef(name_ref)) => (None, name_ref),
@@ -15511,7 +15539,9 @@ impl Lowerer {
         for arg in rows_from_item.rows_from_args() {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
                 (Some(call), Some(list)) => {
+                    let srf_calls = self.srf_calls.len();
                     self.with_from_function(|this| this.lower_call(&call));
+                    self.check_from_set_returning(srf_calls, Some(&call));
                     FunctionColumns {
                         columns: self.column_def_list_columns(&list),
                         scalar: None,
@@ -15564,8 +15594,10 @@ impl Lowerer {
             }
             return self.lower_expanded_unnest(call, &name_ref);
         }
+        let srf_calls = self.srf_calls.len();
         let LoweredCall { args, callee, .. } =
             self.with_from_function(|this| this.lower_call_with_args(call));
+        self.check_from_set_returning(srf_calls, Some(call));
         let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
             return FunctionSource {
                 callee,
@@ -15605,8 +15637,10 @@ impl Lowerer {
         call: &ast::CallExpr,
         name_ref: &ast::NameRef,
     ) -> FunctionSource {
+        let srf_calls = self.srf_calls.len();
         let CallArgs { args, .. } =
             self.with_from_function(|this| this.lower_call_args(call.arg_list()));
+        self.check_from_set_returning(srf_calls, None);
         let name = self.intern("unnest");
         let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
         let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
@@ -21040,6 +21074,7 @@ impl Lowerer {
                 return ty;
             }
             ast::Expr::CaseExpr(case) => {
+                let srf_calls = self.srf_calls.len();
                 self.lower_case_keywords(case);
                 self.lower_exprs(case.expr());
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
@@ -21056,6 +21091,7 @@ impl Lowerer {
                 if let Some(expr) = case.else_clause().and_then(|clause| clause.expr()) {
                     self.lower_common_expr(&mut common, &expr);
                 }
+                self.check_contained_set_returning(srf_calls, SetReturningConstruct::Case);
                 return common.resolve(&self.overloads());
             }
             ast::Expr::CastExpr(cast) => {
@@ -21874,6 +21910,7 @@ impl Lowerer {
     fn lower_call_with_args(&mut self, call: &ast::CallExpr) -> LoweredCall {
         let refs = self.index.references.next_idx();
         let aggregate_calls = self.aggregate_calls.len();
+        let srf_calls = self.srf_calls.len();
         let callee = call.expr();
         let row_source = self.row_source_arg(call);
         let CallArgs {
@@ -22010,6 +22047,7 @@ impl Lowerer {
             self.lower_sequence_arg(&arg);
         }
         self.lower_named_args(function, named_args);
+        self.check_set_returning_call(call, function, srf_calls);
         self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
             self.lower_expr_in(ExprContext::Filter, &expr);
@@ -22039,6 +22077,75 @@ impl Lowerer {
             callee: target,
             ty: None,
         })
+    }
+
+    fn check_set_returning_call(
+        &mut self,
+        call: &ast::CallExpr,
+        function: Option<FunctionId>,
+        srf_calls: usize,
+    ) {
+        let construct = if call.over_clause().is_some() {
+            Some(SetReturningConstruct::Window)
+        } else if function
+            .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
+        {
+            Some(SetReturningConstruct::Aggregate)
+        } else if call_function_like_keyword(call) == Some(ast::FunctionLikeKeyword::Coalesce) {
+            Some(SetReturningConstruct::Coalesce)
+        } else {
+            None
+        };
+        if let Some(construct) = construct {
+            self.check_contained_set_returning(srf_calls, construct);
+        }
+        if !function.is_some_and(|function| self.index.functions[function].returns_set) {
+            return;
+        }
+        let context = self.expr_context;
+        if context.allows_set_returning() {
+            let ptr = self.ptr(call.syntax());
+            let depth = self.scopes.len();
+            self.srf_calls.push(SrfCall { depth, ptr });
+        } else {
+            self.push_error(
+                call.syntax(),
+                SemaError::MisplacedSetReturningFunction { context },
+            );
+        }
+    }
+
+    fn contained_set_returning(&self, start: usize) -> impl Iterator<Item = SrfCall> + '_ {
+        let depth = self.scopes.len();
+        self.srf_calls[start..]
+            .iter()
+            .copied()
+            .filter(move |call| call.depth == depth)
+    }
+
+    fn check_contained_set_returning(&mut self, start: usize, construct: SetReturningConstruct) {
+        let inner = match construct {
+            SetReturningConstruct::Aggregate => self.contained_set_returning(start).next(),
+            SetReturningConstruct::Window
+            | SetReturningConstruct::Case
+            | SetReturningConstruct::Coalesce => self.contained_set_returning(start).last(),
+        };
+        if let Some(inner) = inner {
+            self.push_error_ptr(inner.ptr, SemaError::SetReturningFunctionIn { construct });
+            self.srf_calls.truncate(start);
+        }
+    }
+
+    fn check_from_set_returning(&mut self, start: usize, top: Option<&ast::CallExpr>) {
+        let top = top.map(|call| self.ptr(call.syntax()));
+        let inner = self
+            .contained_set_returning(start)
+            .filter(|call| Some(call.ptr) != top)
+            .last();
+        if let Some(inner) = inner {
+            self.push_error_ptr(inner.ptr, SemaError::SetReturningFunctionNotTopLevel);
+        }
+        self.srf_calls.truncate(start);
     }
 
     fn check_aggregate_call(
@@ -23944,6 +24051,12 @@ impl Lowerer {
             };
         }
 
+        let returns_set = ret_clause.is_some_and(|ret_clause| {
+            ret_clause.return_table_arg_list().is_some()
+                || ret_clause
+                    .func_type()
+                    .is_some_and(|func_type| func_type.setof_token().is_some())
+        });
         let id = self.index.functions.alloc(Function {
             kind,
             window: false,
@@ -23954,6 +24067,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
+            returns_set,
             columns,
         });
         self.index.set_param_function(params, id);
@@ -24529,6 +24643,7 @@ pub(crate) enum ExprContext {
     Limit,
     Offset,
     Values,
+    ValuesSingle,
     Returning,
     Insert,
     Update,
@@ -24561,6 +24676,44 @@ impl ExprContext {
     fn allows_windows(self) -> bool {
         self == ExprContext::Unrestricted
     }
+
+    fn allows_set_returning(self) -> bool {
+        match self {
+            ExprContext::Unrestricted
+            | ExprContext::GroupBy
+            | ExprContext::WindowDefinition
+            | ExprContext::ValuesSingle
+            | ExprContext::Insert
+            | ExprContext::FromFunction => true,
+            ExprContext::Where
+            | ExprContext::JoinCondition
+            | ExprContext::Having
+            | ExprContext::Filter
+            | ExprContext::WindowRange
+            | ExprContext::WindowRows
+            | ExprContext::WindowGroups
+            | ExprContext::Limit
+            | ExprContext::Offset
+            | ExprContext::Values
+            | ExprContext::Returning
+            | ExprContext::Update
+            | ExprContext::MergeWhen
+            | ExprContext::CheckConstraint
+            | ExprContext::Default
+            | ExprContext::GeneratedColumn
+            | ExprContext::IndexExpression
+            | ExprContext::IndexPredicate
+            | ExprContext::StatisticsExpression
+            | ExprContext::PartitionKey
+            | ExprContext::PartitionBound
+            | ExprContext::Policy
+            | ExprContext::TriggerWhen
+            | ExprContext::CallArgument
+            | ExprContext::Transform
+            | ExprContext::CopyWhere
+            | ExprContext::ExecuteParameter => false,
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -24572,6 +24725,12 @@ enum AggregateCallKind {
 #[derive(Clone, Copy)]
 struct AggregateCall {
     kind: AggregateCallKind,
+    depth: usize,
+    ptr: InIrFile<SyntaxNodePtr>,
+}
+
+#[derive(Clone, Copy)]
+struct SrfCall {
     depth: usize,
     ptr: InIrFile<SyntaxNodePtr>,
 }
