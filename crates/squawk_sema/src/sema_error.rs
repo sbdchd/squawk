@@ -247,6 +247,7 @@ pub(crate) enum SemaError {
         construct: SetReturningConstruct,
     },
     SetReturningFunctionNotTopLevel,
+    EmptyArrayType,
     TablesampleSetArgument,
     MisplacedSubquery {
         context: ExprContext,
@@ -1095,6 +1096,7 @@ impl SemaError {
             | SemaError::SetReturningFunctionIn { .. }
             | SemaError::SetReturningFunctionNotTopLevel => DiagnosticKind::FeatureNotSupported,
             SemaError::TablesampleSetArgument => DiagnosticKind::TypeMismatch,
+            SemaError::EmptyArrayType => DiagnosticKind::IndeterminateType,
             SemaError::MisplacedSubquery { .. }
             | SemaError::DefaultColumnReference
             | SemaError::UnnestColumnDefList
@@ -1545,6 +1547,9 @@ impl SemaError {
 
     pub(crate) fn hint(&self) -> Option<&'static str> {
         match *self {
+            SemaError::EmptyArrayType => Some(
+                "explicitly cast to the desired type, for example `array[]::integer[]`",
+            ),
             SemaError::SetReturningFunctionIn { .. } => Some(
                 "you might be able to move the set-returning function into a `lateral` `from` item",
             ),
@@ -2013,6 +2018,7 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::TablesampleSetArgument => {
                 f.write_str("argument of `tablesample` must not return a set")
             }
+            SemaError::EmptyArrayType => f.write_str("cannot determine type of empty array"),
             SemaError::MisplacedSubquery { context } => write!(
                 f,
                 "cannot use subquery in {}",

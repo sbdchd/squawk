@@ -79,6 +79,7 @@ impl Lowerer {
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
             srf_calls: vec![],
+            array_cast: false,
             pending_foreign_keys: vec![],
             generated_refs: vec![],
             function: None,
@@ -380,6 +381,7 @@ pub(crate) struct Lowerer {
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
     srf_calls: Vec<SrfCall>,
+    array_cast: bool,
     pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
     function: Option<FunctionId>,
@@ -20998,9 +21000,17 @@ impl Lowerer {
                 return self.literal_type(literal);
             }
             ast::Expr::ArrayExpr(array) => {
+                let array_cast = std::mem::take(&mut self.array_cast);
+                if !array_cast && array.select_variant().is_none() && array.exprs().next().is_none()
+                {
+                    self.push_error(array.syntax(), SemaError::EmptyArrayType);
+                }
                 let mut element = None;
                 for expr in array.exprs() {
+                    self.array_cast =
+                        array_cast && matches!(expr.unparen(), ast::Expr::ArrayExpr(_));
                     let ty = self.lower_expr(&expr);
+                    self.array_cast = false;
                     element = element.or(ty);
                 }
                 if let Some(query) = array.select_variant() {
@@ -21095,9 +21105,18 @@ impl Lowerer {
                 return common.resolve(&self.overloads());
             }
             ast::Expr::CastExpr(cast) => {
-                self.lower_exprs(cast.expr());
+                let ty = cast.ty().and_then(|ty| self.lower_type(&ty));
+                if let Some(expr) = cast.expr() {
+                    self.array_cast = matches!(expr.unparen(), ast::Expr::ArrayExpr(_))
+                        && ty.is_none_or(|ty| {
+                            self.index
+                                .base_type(ty)
+                                .is_none_or(|ty| matches!(ty, Ty::Array(_)))
+                        });
+                    self.lower_expr(&expr);
+                    self.array_cast = false;
+                }
                 self.lower_exprs(cast.literal().map(ast::Expr::Literal));
-                let ty = self.lower_type(&cast.ty()?);
                 let literal = cast
                     .literal()
                     .or_else(|| cast.expr().and_then(|expr| expr.as_literal()));

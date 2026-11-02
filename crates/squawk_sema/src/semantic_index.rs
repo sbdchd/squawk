@@ -143,6 +143,7 @@ pub enum DiagnosticKind {
     DuplicateOperator,
     DuplicateTransform,
     MissingArrayType,
+    IndeterminateType,
     MissingShellType,
     InvalidOrdinal,
     WrongReturnType,
