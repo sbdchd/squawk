@@ -15029,7 +15029,7 @@ impl Lowerer {
                 let FunctionColumns {
                     columns,
                     scalar: rows_from_scalar,
-                } = self.lower_rows_from_columns(rows_from_item);
+                } = self.lower_rows_from_columns(rows_from_item, from_item);
                 scalar = rows_from_scalar;
                 RelationSource {
                     name: None,
@@ -15536,7 +15536,22 @@ impl Lowerer {
         }
     }
 
-    fn lower_rows_from_columns(&mut self, rows_from_item: &ast::RowsFromItem) -> FunctionColumns {
+    fn lower_rows_from_columns(
+        &mut self,
+        rows_from_item: &ast::RowsFromItem,
+        from_item: &ast::FromItem,
+    ) -> FunctionColumns {
+        let outer_column_defs = match from_item.alias().and_then(|alias| alias.columns()) {
+            Some(ast::FromAliasColumns::ColumnDefList(list))
+                if rows_from_item.rows_from_args().nth(1).is_none() =>
+            {
+                Some(list)
+            }
+            Some(
+                ast::FromAliasColumns::ColumnDefList(_) | ast::FromAliasColumns::ColumnList(_),
+            )
+            | None => None,
+        };
         let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in rows_from_item.rows_from_args() {
             let columns = match (arg.call_expr(), arg.column_def_list()) {
@@ -15560,7 +15575,7 @@ impl Lowerer {
                 (Some(call), None) => {
                     let FunctionSource {
                         columns, scalar, ..
-                    } = self.lower_function_source(&call, None, None);
+                    } = self.lower_function_source(&call, None, outer_column_defs.as_ref());
                     FunctionColumns { columns, scalar }
                 }
                 (None, Some(list)) => FunctionColumns {

@@ -229,3 +229,18 @@ select * from rows from (scalar() as (id int), composite() as (a int, b text));
        ╰╴                                                              ━━━━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn rows_from_single_function_outer_column_def_list() {
+    assert_snapshot!(check("
+create function f() returns record language sql as 'select 1';
+create function s() returns int language sql as 'select 1';
+select x from rows from (f()) as r (x int);
+select x from rows from (s()) as r (x int);
+"), @"
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    5 │ select x from rows from (s()) as r (x int);
+      ╰╴                                   ━━━━━━━
+    ");
+}
