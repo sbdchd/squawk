@@ -141,9 +141,11 @@ impl SyntaxNode {
         }
     }
 
+    #[inline]
     pub fn first_child(&self) -> Option<SyntaxNode> {
         self.children().next()
     }
+    #[inline]
     pub fn last_child(&self) -> Option<SyntaxNode> {
         let count = self.green.child_count(self.id);
         (0..count)
@@ -154,14 +156,17 @@ impl SyntaxNode {
             })
     }
 
+    #[inline]
     pub fn first_child_or_token(&self) -> Option<SyntaxElement> {
         sibling(&self.green, Some(self.id), Some(0))
     }
+    #[inline]
     pub fn last_child_or_token(&self) -> Option<SyntaxElement> {
         let index = self.green.child_count(self.id).checked_sub(1);
         sibling(&self.green, Some(self.id), index)
     }
 
+    #[inline]
     pub fn next_sibling(&self) -> Option<SyntaxNode> {
         let parent = self.green.node_parent(self.id)?;
         let count = self.green.child_count(parent);
@@ -171,6 +176,7 @@ impl SyntaxNode {
             ElementId::Token(_) => None,
         })
     }
+    #[inline]
     pub fn prev_sibling(&self) -> Option<SyntaxNode> {
         let parent = self.green.node_parent(self.id)?;
         let end = self.green.node_index(self.id);
@@ -182,18 +188,22 @@ impl SyntaxNode {
             })
     }
 
+    #[inline]
     pub fn next_sibling_or_token(&self) -> Option<SyntaxElement> {
         let index = self.green.node_index(self.id).checked_add(1);
         sibling(&self.green, self.green.node_parent(self.id), index)
     }
+    #[inline]
     pub fn prev_sibling_or_token(&self) -> Option<SyntaxElement> {
         let index = self.green.node_index(self.id).checked_sub(1);
         sibling(&self.green, self.green.node_parent(self.id), index)
     }
 
+    #[inline]
     pub fn first_token(&self) -> Option<SyntaxToken> {
         self.first_child_or_token()?.first_token()
     }
+    #[inline]
     pub fn last_token(&self) -> Option<SyntaxToken> {
         self.last_child_or_token()?.last_token()
     }
@@ -297,6 +307,7 @@ impl SyntaxNode {
         }
     }
 
+    #[inline]
     pub fn child_or_token_at_range(&self, range: TextRange) -> Option<SyntaxElement> {
         let id = self.green.child_at_range(self.id, range)?;
         Some(element(&self.green, id))
@@ -347,10 +358,12 @@ impl SyntaxToken {
         self.ancestors().last().unwrap()
     }
 
+    #[inline]
     pub fn next_sibling_or_token(&self) -> Option<SyntaxElement> {
         let index = self.green.token_index(self.id).checked_add(1);
         sibling(&self.green, Some(self.green.token_parent(self.id)), index)
     }
+    #[inline]
     pub fn prev_sibling_or_token(&self) -> Option<SyntaxElement> {
         let index = self.green.token_index(self.id).checked_sub(1);
         sibling(&self.green, Some(self.green.token_parent(self.id)), index)
@@ -368,6 +381,7 @@ impl SyntaxToken {
         })
     }
 
+    #[inline]
     pub fn next_token(&self) -> Option<SyntaxToken> {
         match self.next_sibling_or_token() {
             Some(element) => element.first_token(),
@@ -377,6 +391,7 @@ impl SyntaxToken {
                 .and_then(|element| element.first_token()),
         }
     }
+    #[inline]
     pub fn prev_token(&self) -> Option<SyntaxToken> {
         match self.prev_sibling_or_token() {
             Some(element) => element.last_token(),
@@ -438,12 +453,14 @@ impl SyntaxElement {
         }
     }
 
+    #[inline]
     pub fn first_token(&self) -> Option<SyntaxToken> {
         match self {
             NodeOrToken::Node(it) => it.first_token(),
             NodeOrToken::Token(it) => Some(it.clone()),
         }
     }
+    #[inline]
     pub fn last_token(&self) -> Option<SyntaxToken> {
         match self {
             NodeOrToken::Node(it) => it.last_token(),
@@ -451,12 +468,14 @@ impl SyntaxElement {
         }
     }
 
+    #[inline]
     pub fn next_sibling_or_token(&self) -> Option<SyntaxElement> {
         match self {
             NodeOrToken::Node(it) => it.next_sibling_or_token(),
             NodeOrToken::Token(it) => it.next_sibling_or_token(),
         }
     }
+    #[inline]
     pub fn prev_sibling_or_token(&self) -> Option<SyntaxElement> {
         match self {
             NodeOrToken::Node(it) => it.prev_sibling_or_token(),
@@ -567,6 +586,7 @@ pub struct SyntaxNodeChildren {
 
 impl Iterator for SyntaxNodeChildren {
     type Item = SyntaxNode;
+    #[inline]
     fn next(&mut self) -> Option<SyntaxNode> {
         while let Some(child) = self.parent.green.child(self.parent.id, self.next_index) {
             self.next_index += 1;
@@ -586,6 +606,7 @@ pub struct SyntaxElementChildren {
 
 impl Iterator for SyntaxElementChildren {
     type Item = SyntaxElement;
+    #[inline]
     fn next(&mut self) -> Option<SyntaxElement> {
         let child = self.parent.green.child(self.parent.id, self.next_index)?;
         self.next_index += 1;
