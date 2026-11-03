@@ -32,7 +32,7 @@ use crate::syntax_node::Sql;
 
 #[inline]
 pub(super) fn child<N: AstNode>(parent: &SyntaxNode) -> Option<N> {
-    first_child_or_token(parent, ElementKind::Node, N::can_cast)?
+    first_child_or_token(parent, N::can_cast)?
         .into_node()
         .and_then(N::cast)
 }
@@ -44,13 +44,7 @@ pub(super) fn children<N: AstNode>(parent: &SyntaxNode) -> AstChildren<N> {
 
 #[inline]
 pub(super) fn token(parent: &SyntaxNode, kind: SyntaxKind) -> Option<SyntaxToken> {
-    first_child_or_token(parent, ElementKind::Token, |it| it == kind)?.into_token()
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ElementKind {
-    Node,
-    Token,
+    parent.child_token_of_kind(kind)
 }
 
 // avoid allocation compared to:
@@ -60,12 +54,10 @@ enum ElementKind {
 //        .find(|it| it.kind() == kind)
 fn first_child_or_token(
     parent: &SyntaxNode,
-    element_kind: ElementKind,
     kind_matches: impl Fn(SyntaxKind) -> bool,
 ) -> Option<SyntaxElement> {
-    let is_node = element_kind == ElementKind::Node;
     let index = parent.green().children().position(|child| {
-        child.as_node().is_some() == is_node && kind_matches(Sql::kind_from_raw(child.kind()))
+        child.as_node().is_some() && kind_matches(Sql::kind_from_raw(child.kind()))
     })?;
     parent.child_or_token(u32::try_from(index).unwrap())
 }

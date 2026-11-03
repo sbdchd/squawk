@@ -159,6 +159,17 @@ impl GreenNode {
     }
 
     #[inline]
+    pub(crate) fn child_token_of_kind(&self, id: NodeId, kind: SyntaxKind) -> Option<TokenId> {
+        self.tree
+            .children(id)
+            .iter()
+            .find_map(|child| match child.unpack() {
+                ElementId::Token(token) if self.tree.token(token).kind == kind => Some(token),
+                ElementId::Token(_) | ElementId::Node(_) => None,
+            })
+    }
+
+    #[inline]
     pub(crate) fn token_kind(&self, id: TokenId) -> SyntaxKind {
         self.tree.token(id).kind
     }
