@@ -198,6 +198,12 @@ impl<L: Language> SyntaxNode<L> {
         self.raw.descendants().map(SyntaxNode::from)
     }
 
+    pub fn descendant_tokens_of_kind(&self, kind: L::Kind) -> impl Iterator<Item = SyntaxToken<L>> {
+        self.raw
+            .descendant_tokens_of_kind(L::kind_to_raw(kind))
+            .map(SyntaxToken::from)
+    }
+
     pub fn descendants_with_tokens(&self) -> impl Iterator<Item = SyntaxElement<L>> {
         self.raw.descendants_with_tokens().map(NodeOrToken::from)
     }

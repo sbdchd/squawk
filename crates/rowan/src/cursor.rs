@@ -241,6 +241,18 @@ impl SyntaxNode {
     }
 
     #[inline]
+    pub fn descendant_tokens_of_kind(&self, kind: SyntaxKind) -> impl Iterator<Item = SyntaxToken> {
+        let green = self.green.clone();
+        self.green.node_tokens(self.id).filter_map(move |id| {
+            let id = TokenId(id);
+            (green.token_kind(id) == kind).then(|| SyntaxToken {
+                green: green.clone(),
+                id,
+            })
+        })
+    }
+
+    #[inline]
     pub fn descendants_with_tokens(&self) -> impl Iterator<Item = SyntaxElement> {
         DescendantsWithTokens {
             nodes: self.green.node_descendants(self.id),
@@ -869,6 +881,21 @@ mod tests {
         for node in root.descendants() {
             assert_eq!(kinds(node.descendants_with_tokens()), preorder_kinds(&node));
         }
+    }
+
+    #[test]
+    fn descendant_tokens_of_kind_in_subtree() {
+        let root = tree();
+        let subtree = root.children().nth(1).unwrap();
+        let texts = |kind| {
+            subtree
+                .descendant_tokens_of_kind(SyntaxKind(kind))
+                .map(|it| it.text().to_owned())
+                .collect::<Vec<_>>()
+        };
+        assert_eq!(texts(5), vec!["b"]);
+        assert_eq!(texts(6), vec!["c"]);
+        assert!(texts(1).is_empty());
     }
 
     #[test]
