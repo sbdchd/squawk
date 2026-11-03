@@ -1,3 +1,4 @@
+use either::Either;
 use rowan::Direction;
 use squawk_line_index::{UniversalNewlines, find_newline};
 use squawk_syntax::{SyntaxElement, SyntaxKind, SyntaxToken};
@@ -49,8 +50,12 @@ fn comment_tokens(
         Direction::Next => el.next_sibling_or_token(),
         Direction::Prev => el.prev_sibling_or_token(),
     };
+    let el: SyntaxElement = el.clone().into();
+    if !has_comment_sibling(&el, direction) {
+        return vec![];
+    }
     let mut tokens = vec![];
-    let mut curr = sibling(el.clone().into());
+    let mut curr = sibling(el);
     while let Some(rowan::NodeOrToken::Token(token)) = curr {
         match token.kind() {
             SyntaxKind::COMMENT => tokens.push(token.clone()),
@@ -63,6 +68,21 @@ fn comment_tokens(
         tokens.reverse();
     }
     tokens
+}
+
+fn has_comment_sibling(el: &SyntaxElement, direction: Direction) -> bool {
+    let Some(parent) = el.parent() else {
+        return false;
+    };
+    let green = parent.green();
+    let children = green.children();
+    let index = el.index();
+    let mut kinds = match direction {
+        Direction::Next => Either::Left(children.skip(index + 1)),
+        Direction::Prev => Either::Right(children.take(index).rev()),
+    }
+    .map(|child| SyntaxKind::from(child.kind().0));
+    kinds.find(|kind| *kind != SyntaxKind::WHITESPACE) == Some(SyntaxKind::COMMENT)
 }
 
 fn is_trailing_comment(token: &SyntaxToken) -> bool {

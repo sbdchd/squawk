@@ -423,12 +423,24 @@ impl<'a> Iterator for Children<'a> {
     fn size_hint(&self) -> (usize, Option<usize>) {
         self.iter.size_hint()
     }
+
+    #[inline]
+    fn nth(&mut self, n: usize) -> Option<GreenElementRef<'a>> {
+        let id = *self.iter.nth(n)?;
+        Some(self.wrap(id))
+    }
 }
 
 impl DoubleEndedIterator for Children<'_> {
     #[inline]
     fn next_back(&mut self) -> Option<Self::Item> {
         let id = *self.iter.next_back()?;
+        Some(self.wrap(id))
+    }
+
+    #[inline]
+    fn nth_back(&mut self, n: usize) -> Option<Self::Item> {
+        let id = *self.iter.nth_back(n)?;
         Some(self.wrap(id))
     }
 }
