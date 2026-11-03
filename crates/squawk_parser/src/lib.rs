@@ -694,6 +694,7 @@ impl<'t> Parser<'t> {
 
     /// Checks if the current token is `kind`.
     #[must_use]
+    #[inline]
     pub(crate) fn at(&self, kind: SyntaxKind) -> bool {
         self.nth_at(0, kind)
     }
