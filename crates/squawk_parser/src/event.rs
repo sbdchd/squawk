@@ -30,6 +30,7 @@
 //! and the parser algorithm independently.
 
 use std::mem;
+use std::num::NonZeroU32;
 
 use crate::{output::Output, syntax_kind::SyntaxKind};
 
@@ -79,7 +80,7 @@ pub(crate) enum Event {
     /// See also `CompletedMarker::precede`.
     Start {
         kind: SyntaxKind,
-        forward_parent: Option<u32>,
+        forward_parent: Option<NonZeroU32>,
     },
 
     /// Complete the previous `Start` event
@@ -94,9 +95,11 @@ pub(crate) enum Event {
         n_raw_tokens: u8,
     },
     Error {
-        msg: String,
+        index: u32,
     },
 }
+
+const _: () = assert!(mem::size_of::<Event>() == 8);
 
 impl Event {
     pub(crate) fn tombstone() -> Self {
@@ -108,7 +111,7 @@ impl Event {
 }
 
 /// Generate the syntax tree with the control of events.
-pub(super) fn process(mut events: Vec<Event>) -> Output {
+pub(super) fn process(mut events: Vec<Event>, mut errors: Vec<String>) -> Output {
     let mut res = Output::with_capacity(events.len());
     let mut forward_parents = Vec::new();
 
@@ -127,7 +130,7 @@ pub(super) fn process(mut events: Vec<Event>) -> Output {
                 let mut idx = i;
                 let mut fp = forward_parent;
                 while let Some(fwd) = fp {
-                    idx += fwd as usize;
+                    idx += fwd.get() as usize;
                     // append `A`'s forward_parent `B`
                     fp = match mem::replace(&mut events[idx], Event::tombstone()) {
                         Event::Start {
@@ -152,7 +155,7 @@ pub(super) fn process(mut events: Vec<Event>) -> Output {
             Event::Token { kind, n_raw_tokens } => {
                 res.token(kind, n_raw_tokens);
             }
-            Event::Error { msg } => res.error(msg),
+            Event::Error { index } => res.error(mem::take(&mut errors[index as usize])),
         }
     }
 
