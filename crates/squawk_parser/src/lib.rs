@@ -251,6 +251,7 @@ impl<'t> Parser<'t> {
     }
 
     /// Consume the next token if `kind` matches.
+    #[inline]
     pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
         if !self.at(kind) {
             return false;
@@ -716,6 +717,7 @@ impl<'t> Parser<'t> {
     }
 
     #[must_use]
+    #[inline]
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
         match kind {
             // =>
