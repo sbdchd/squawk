@@ -1,4 +1,4 @@
-use std::{fmt, ops::Deref};
+use std::fmt;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum NodeOrToken<N, T> {
@@ -32,15 +32,6 @@ impl<N, T> NodeOrToken<N, T> {
         match self {
             NodeOrToken::Node(_) => None,
             NodeOrToken::Token(token) => Some(token),
-        }
-    }
-}
-
-impl<N: Deref, T: Deref> NodeOrToken<N, T> {
-    pub(crate) fn as_deref(&self) -> NodeOrToken<&N::Target, &T::Target> {
-        match self {
-            NodeOrToken::Node(node) => NodeOrToken::Node(node),
-            NodeOrToken::Token(token) => NodeOrToken::Token(token),
         }
     }
 }
@@ -144,11 +135,3 @@ impl<T> Iterator for TokenAtOffset<T> {
 }
 
 impl<T> ExactSizeIterator for TokenAtOffset<T> {}
-
-macro_rules! _static_assert {
-    ($expr:expr) => {
-        const _: i32 = 0 / $expr as i32;
-    };
-}
-
-pub(crate) use _static_assert as static_assert;

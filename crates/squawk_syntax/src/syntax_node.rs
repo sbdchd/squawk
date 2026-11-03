@@ -49,13 +49,19 @@ pub(crate) type SyntaxNodeChildren = rowan::SyntaxNodeChildren<Sql>;
 // pub type SyntaxElementChildren = rowan::SyntaxElementChildren<Sql>;
 // pub type PreorderWithTokens = rowan::api::PreorderWithTokens<Sql>;
 
-#[derive(Default)]
 pub(crate) struct SyntaxTreeBuilder {
     errors: Vec<SyntaxError>,
-    inner: GreenNodeBuilder<'static>,
+    inner: GreenNodeBuilder,
 }
 
 impl SyntaxTreeBuilder {
+    pub(crate) fn with_text_capacity(text_len: usize) -> Self {
+        SyntaxTreeBuilder {
+            errors: vec![],
+            inner: GreenNodeBuilder::with_text_capacity(text_len),
+        }
+    }
+
     pub(crate) fn finish_raw(self) -> (GreenNode, Vec<SyntaxError>) {
         let green = self.inner.finish();
         (green, self.errors)

@@ -8,19 +8,14 @@
 )]
 #![deny(unsafe_code)]
 
-#[allow(unsafe_code)]
 pub mod cursor;
-#[allow(unsafe_code)]
 mod green;
 
 pub mod api;
 mod syntax_text;
 mod utility_types;
 
-#[allow(unsafe_code)]
-mod arc;
 pub mod ast;
-mod cow_mut;
 #[cfg(feature = "serde1")]
 mod serde_impls;
 
@@ -31,8 +26,8 @@ pub use crate::{
         Language, SyntaxElement, SyntaxElementChildren, SyntaxNode, SyntaxNodeChildren, SyntaxToken,
     },
     green::{
-        Checkpoint, Children, GreenNode, GreenNodeBuilder, GreenNodeData, GreenToken,
-        GreenTokenData, NodeCache, SyntaxKind,
+        Children, GreenElementRef, GreenNode, GreenNodeBuilder, GreenNodeRef, GreenTokenRef,
+        SyntaxKind,
     },
     syntax_text::SyntaxText,
     utility_types::{Direction, NodeOrToken, TokenAtOffset, WalkEvent},

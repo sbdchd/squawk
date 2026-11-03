@@ -397,12 +397,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
-name = "countme"
-version = "3.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7704b5fdd17b18ae31c4c1da5a2e0305a2bf17b5249300a9ee9ed7b72114c636"
-
-[[package]]
 name = "cpufeatures"
 version = "0.2.17"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -921,12 +915,6 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.14.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
-
-[[package]]
-name = "hashbrown"
 version = "0.15.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9229cfe53dfd69f0609a49f65461bd93001ea1ef889cd5529dd176593f5338a1"
@@ -942,7 +930,7 @@ version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7382cf6263419f2d8df38c55d7da83da5c18aef87fc7a7fc1fb1e344edfe14c1"
 dependencies = [
- "hashbrown 0.15.5",
+ "hashbrown",
 ]
 
 [[package]]
@@ -1169,7 +1157,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2481980430f9f78649238835720ddccc57e52df14ffce1c6f37391d61b563e9"
 dependencies = [
  "equivalent",
- "hashbrown 0.15.5",
+ "hashbrown",
 ]
 
 [[package]]
@@ -2012,10 +2000,6 @@ dependencies = [
 name = "rowan"
 version = "0.17.0"
 dependencies = [
- "countme",
- "hashbrown 0.14.5",
- "memoffset",
- "rustc-hash 1.1.0",
  "serde",
  "text-size",
 ]
@@ -2045,12 +2029,6 @@ name = "rustc-demangle"
 version = "0.1.26"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56f7d92ca342cea22a06f2121d944b4fd82af56988c270852495420f961d4ace"
-
-[[package]]
-name = "rustc-hash"
-version = "1.1.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
 
 [[package]]
 name = "rustc-hash"
@@ -2110,7 +2088,7 @@ dependencies = [
  "boxcar",
  "crossbeam-queue",
  "crossbeam-utils",
- "hashbrown 0.15.5",
+ "hashbrown",
  "hashlink",
  "indexmap",
  "intrusive-collections",
@@ -2118,7 +2096,7 @@ dependencies = [
  "parking_lot",
  "portable-atomic",
  "rayon",
- "rustc-hash 2.1.1",
+ "rustc-hash",
  "salsa-macro-rules",
  "salsa-macros",
  "smallvec",
@@ -2521,7 +2499,7 @@ dependencies = [
  "insta",
  "log",
  "rowan",
- "rustc-hash 2.1.1",
+ "rustc-hash",
  "smallvec",
  "squawk-code-actions",
  "squawk-diagnostics",
@@ -2573,7 +2551,7 @@ dependencies = [
  "enum-iterator",
  "insta",
  "rowan",
- "rustc-hash 2.1.1",
+ "rustc-hash",
  "serde",
  "serde_plain",
  "smallvec",
@@ -2604,7 +2582,7 @@ dependencies = [
  "insta",
  "la-arena",
  "rowan",
- "rustc-hash 2.1.1",
+ "rustc-hash",
  "smallvec",
  "squawk-diagnostics",
  "squawk-line-index",
@@ -2623,7 +2601,7 @@ dependencies = [
  "log",
  "lsp-server",
  "rowan",
- "rustc-hash 2.1.1",
+ "rustc-hash",
  "salsa",
  "serde",
  "serde_json",
@@ -3567,7 +3545,7 @@ dependencies = [
  "proc-macro2",
  "quote",
  "regex",
- "rustc-hash 2.1.1",
+ "rustc-hash",
  "serde",
  "serde_json",
  "squawk-fmt",

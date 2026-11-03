@@ -28,7 +28,7 @@ use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
 use num_bigint::BigUint;
-use rowan::{GreenNodeData, GreenTokenData, NodeOrToken, TextRange, TextSize};
+use rowan::{GreenNodeRef, GreenTokenRef, NodeOrToken, TextRange, TextSize};
 use squawk_line_index::{LineEnding, find_newline};
 
 #[cfg(test)]
@@ -2163,7 +2163,7 @@ impl ast::TableConstraint {
 }
 
 pub(crate) fn text_of_first_token(node: &SyntaxNode) -> &str {
-    fn first_token(green_ref: &GreenNodeData) -> &GreenTokenData {
+    fn first_token(green_ref: GreenNodeRef<'_>) -> GreenTokenRef<'_> {
         green_ref
             .children()
             .next()

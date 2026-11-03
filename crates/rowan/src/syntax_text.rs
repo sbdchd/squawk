@@ -1,9 +1,6 @@
 use std::fmt;
 
-use crate::{
-    cursor::{SyntaxNode, SyntaxToken},
-    TextRange, TextSize,
-};
+use crate::{cursor::SyntaxNode, TextRange, TextSize};
 
 #[derive(Clone)]
 pub struct SyntaxText {
@@ -17,6 +14,10 @@ impl SyntaxText {
         SyntaxText { node, range }
     }
 
+    pub fn as_str(&self) -> &str {
+        self.node.text_at(self.range)
+    }
+
     pub fn len(&self) -> TextSize {
         self.range.len()
     }
@@ -26,35 +27,16 @@ impl SyntaxText {
     }
 
     pub fn contains_char(&self, c: char) -> bool {
-        self.try_for_each_chunk(|chunk| if chunk.contains(c) { Err(()) } else { Ok(()) })
-            .is_err()
+        self.as_str().contains(c)
     }
 
     pub fn find_char(&self, c: char) -> Option<TextSize> {
-        let mut acc: TextSize = 0.into();
-        let res = self.try_for_each_chunk(|chunk| {
-            if let Some(pos) = chunk.find(c) {
-                let pos: TextSize = (pos as u32).into();
-                return Err(acc + pos);
-            }
-            acc += TextSize::of(chunk);
-            Ok(())
-        });
-        found(res)
+        let pos = self.as_str().find(c)?;
+        Some(TextSize::new(pos as u32))
     }
 
     pub fn char_at(&self, offset: TextSize) -> Option<char> {
-        let mut start: TextSize = 0.into();
-        let res = self.try_for_each_chunk(|chunk| {
-            let end = start + TextSize::of(chunk);
-            if start <= offset && offset < end {
-                let off: usize = u32::from(offset - start) as usize;
-                return Err(chunk[off..].chars().next().unwrap());
-            }
-            start = end;
-            Ok(())
-        });
-        found(res)
+        self.as_str().get(usize::from(offset)..)?.chars().next()
     }
 
     pub fn slice<R: private::SyntaxTextRange>(&self, range: R) -> SyntaxText {
@@ -87,10 +69,7 @@ impl SyntaxText {
     where
         F: FnMut(T, &str) -> Result<T, E>,
     {
-        self.tokens_with_ranges()
-            .try_fold(init, move |acc, (token, range)| {
-                f(acc, &token.text()[range])
-            })
+        f(init, self.as_str())
     }
 
     pub fn try_for_each_chunk<F: FnMut(&str) -> Result<(), E>, E>(
@@ -101,62 +80,31 @@ impl SyntaxText {
     }
 
     pub fn for_each_chunk<F: FnMut(&str)>(&self, mut f: F) {
-        enum Void {}
-        match self.try_for_each_chunk(|chunk| {
-            f(chunk);
-            Ok::<(), Void>(())
-        }) {
-            Ok(()) => (),
-            Err(void) => match void {},
-        }
+        f(self.as_str())
     }
-
-    fn tokens_with_ranges(&self) -> impl Iterator<Item = (SyntaxToken, TextRange)> {
-        let text_range = self.range;
-        self.node
-            .descendants_with_tokens()
-            .filter_map(|element| element.into_token())
-            .filter_map(move |token| {
-                let token_range = token.text_range();
-                let range = text_range.intersect(token_range)?;
-                Some((token, range - token_range.start()))
-            })
-    }
-}
-
-fn found<T>(res: Result<(), T>) -> Option<T> {
-    res.err()
 }
 
 impl fmt::Debug for SyntaxText {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Debug::fmt(&self.to_string(), f)
+        fmt::Debug::fmt(self.as_str(), f)
     }
 }
 
 impl fmt::Display for SyntaxText {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.try_for_each_chunk(|chunk| fmt::Display::fmt(chunk, f))
+        f.write_str(self.as_str())
     }
 }
 
 impl From<SyntaxText> for String {
     fn from(text: SyntaxText) -> String {
-        text.to_string()
+        text.as_str().to_owned()
     }
 }
 
 impl PartialEq<str> for SyntaxText {
-    fn eq(&self, mut rhs: &str) -> bool {
-        self.try_for_each_chunk(|chunk| {
-            if !rhs.starts_with(chunk) {
-                return Err(());
-            }
-            rhs = &rhs[chunk.len()..];
-            Ok(())
-        })
-        .is_ok()
-            && rhs.is_empty()
+    fn eq(&self, rhs: &str) -> bool {
+        self.as_str() == rhs
     }
 }
 
@@ -180,35 +128,7 @@ impl PartialEq<SyntaxText> for &'_ str {
 
 impl PartialEq for SyntaxText {
     fn eq(&self, other: &SyntaxText) -> bool {
-        if self.range.len() != other.range.len() {
-            return false;
-        }
-        let mut lhs = self.tokens_with_ranges();
-        let mut rhs = other.tokens_with_ranges();
-        zip_texts(&mut lhs, &mut rhs).is_none()
-            && lhs.all(|it| it.1.is_empty())
-            && rhs.all(|it| it.1.is_empty())
-    }
-}
-
-fn zip_texts<I: Iterator<Item = (SyntaxToken, TextRange)>>(xs: &mut I, ys: &mut I) -> Option<()> {
-    let mut x = xs.next()?;
-    let mut y = ys.next()?;
-    loop {
-        while x.1.is_empty() {
-            x = xs.next()?;
-        }
-        while y.1.is_empty() {
-            y = ys.next()?;
-        }
-        let x_text = &x.0.text()[x.1];
-        let y_text = &y.0.text()[y.1];
-        if !(x_text.starts_with(y_text) || y_text.starts_with(x_text)) {
-            return Some(());
-        }
-        let advance = std::cmp::min(x.1.len(), y.1.len());
-        x.1 = TextRange::new(x.1.start() + advance, x.1.end());
-        y.1 = TextRange::new(y.1.start() + advance, y.1.end());
+        self.as_str() == other.as_str()
     }
 }
 
