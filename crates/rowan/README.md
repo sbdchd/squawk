@@ -20,3 +20,6 @@ Rowan is primarily distributed under the terms of both the MIT
 license and the Apache License (Version 2.0).
 
 See LICENSE-APACHE and LICENSE-MIT for details.
+
+Adapted from [rust-glancer](https://github.com/rust-glancer/rust-glancer)'s
+vendored `syntax` crate.

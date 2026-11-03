@@ -1,7 +1,10 @@
 [package]
 name = "rowan"
 version = "0.17.0"
-authors = ["Aleksey Kladov <aleksey.kladov@gmail.com>"]
+authors = [
+  "Aleksey Kladov <aleksey.kladov@gmail.com>",
+  "Igor Aleksanov <popzxc@yandex.ru>",
+]
 repository = "https://github.com/rust-analyzer/rowan"
 license = "MIT OR Apache-2.0"
 description = "Library for generic lossless syntax trees"
