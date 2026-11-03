@@ -7,7 +7,7 @@ use squawk_lexer::BOM;
 use squawk_line_index::{LineEnding, UniversalNewlines, find_newline};
 use squawk_syntax::ast::{self, AstNode, LitKind, is_quoted_name_node, normalize_name_node};
 use squawk_syntax::quote::{
-    quote_bare_column_alias, quote_column_alias, quote_ident, quote_ident_always,
+    needs_quoting, quote_bare_column_alias, quote_column_alias, quote_ident, quote_ident_always,
     quote_quoted_ident,
 };
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
@@ -7622,6 +7622,10 @@ fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> Cow<'_, str>) -> Do
         && !text.starts_with('"')
         && !text.bytes().any(|b| b.is_ascii_uppercase())
     {
+        if !needs_quoting(text) {
+            debug_assert_eq!(quote(text), text);
+            return Doc::text(text.to_string());
+        }
         return Doc::text(quote(text).into_owned());
     }
 
