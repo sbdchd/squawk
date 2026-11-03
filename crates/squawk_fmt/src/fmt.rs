@@ -7612,7 +7612,7 @@ fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> String) -> Doc<'a> 
     }
 
     if ident.kind().is_keyword() {
-        return Doc::text(ident.text().to_ascii_lowercase());
+        return build_keyword_token(&ident);
     }
 
     let text = ident.text();
@@ -15576,7 +15576,7 @@ fn build_fetch_clause<'a>(ctx: &Ctx, fetch: &ast::FetchClause) -> Doc<'a> {
     if let Some(token) = fetch.first_token().or_else(|| fetch.next_token()) {
         doc = doc
             .append(space_before(&token))
-            .append(Doc::text(token.text().to_ascii_lowercase()));
+            .append(build_keyword_token(&token));
     }
     if let Some(expr) = fetch.expr() {
         doc = doc
@@ -15586,7 +15586,7 @@ fn build_fetch_clause<'a>(ctx: &Ctx, fetch: &ast::FetchClause) -> Doc<'a> {
     if let Some(token) = fetch.row_token().or_else(|| fetch.rows_token()) {
         doc = doc
             .append(space_before(&token))
-            .append(Doc::text(token.text().to_ascii_lowercase()));
+            .append(build_keyword_token(&token));
     }
     if let Some(quantity) = fetch.fetch_quantity() {
         doc = doc
@@ -15606,7 +15606,7 @@ fn build_offset_clause<'a>(ctx: &Ctx, offset: &ast::OffsetClause) -> Doc<'a> {
     if let Some(token) = offset.row_token().or_else(|| offset.rows_token()) {
         doc = doc
             .append(space_before(&token))
-            .append(Doc::text(token.text().to_ascii_lowercase()));
+            .append(build_keyword_token(&token));
     }
     doc
 }
@@ -19812,6 +19812,16 @@ fn build_json_keys_unique_clause<'a>(clause: ast::JsonKeysUniqueClause) -> Doc<'
     doc
 }
 
+fn build_keyword_token<'a>(token: &SyntaxToken) -> Doc<'a> {
+    match token.kind().keyword_text() {
+        Some(text) => {
+            debug_assert!(token.text().eq_ignore_ascii_case(text));
+            Doc::text(text)
+        }
+        None => Doc::text(token.text().to_ascii_lowercase()),
+    }
+}
+
 fn build_keyword_node<'a>(node: &SyntaxNode) -> Doc<'a> {
     let mut docs: Vec<Doc<'a>> = vec![];
     let mut after_line_comment = false;
@@ -19836,7 +19846,7 @@ fn build_keyword_node<'a>(node: &SyntaxNode) -> Doc<'a> {
                     docs.push(Doc::space());
                 }
                 after_line_comment = false;
-                docs.push(Doc::text(token.text().to_ascii_lowercase()));
+                docs.push(build_keyword_token(&token));
             }
         }
     }
@@ -19979,7 +19989,7 @@ fn build_operator_token<'a>(token: &SyntaxToken) -> Doc<'a> {
                 doc
             }
         }
-        _ => Doc::text(token.text().to_ascii_lowercase()),
+        _ => build_keyword_token(token),
     }
 }
 
@@ -20266,9 +20276,7 @@ fn build_interval_qualifier<'a>(qualifier: &ast::IntervalQualifier) -> Doc<'a> {
                 .or_else(|| second.hour_token())
                 .or_else(|| second.minute_token())
             {
-                doc = doc
-                    .append(Doc::text(unit.text().to_ascii_lowercase()))
-                    .append(Doc::space());
+                doc = doc.append(build_keyword_token(&unit)).append(Doc::space());
             }
             if let Some(to_token) = second.to_token() {
                 doc = doc

@@ -2081,6 +2081,2079 @@ pub enum SyntaxKind {
 }
 
 impl SyntaxKind {
+    pub fn keyword_text(self) -> Option<&'static str> {
+        let text = match self {
+            SyntaxKind::ABORT_KW => "abort",
+            SyntaxKind::ABSENT_KW => "absent",
+            SyntaxKind::ABSOLUTE_KW => "absolute",
+            SyntaxKind::ACCESS_KW => "access",
+            SyntaxKind::ACTION_KW => "action",
+            SyntaxKind::ADD_KW => "add",
+            SyntaxKind::ADMIN_KW => "admin",
+            SyntaxKind::AFTER_KW => "after",
+            SyntaxKind::AGGREGATE_KW => "aggregate",
+            SyntaxKind::ALL_KW => "all",
+            SyntaxKind::ALSO_KW => "also",
+            SyntaxKind::ALTER_KW => "alter",
+            SyntaxKind::ALWAYS_KW => "always",
+            SyntaxKind::ANALYSE_KW => "analyse",
+            SyntaxKind::ANALYZE_KW => "analyze",
+            SyntaxKind::AND_KW => "and",
+            SyntaxKind::ANY_KW => "any",
+            SyntaxKind::ARRAY_KW => "array",
+            SyntaxKind::AS_KW => "as",
+            SyntaxKind::ASC_KW => "asc",
+            SyntaxKind::ASENSITIVE_KW => "asensitive",
+            SyntaxKind::ASSERTION_KW => "assertion",
+            SyntaxKind::ASSIGNMENT_KW => "assignment",
+            SyntaxKind::ASYMMETRIC_KW => "asymmetric",
+            SyntaxKind::AT_KW => "at",
+            SyntaxKind::ATOMIC_KW => "atomic",
+            SyntaxKind::ATTACH_KW => "attach",
+            SyntaxKind::ATTRIBUTE_KW => "attribute",
+            SyntaxKind::AUTHORIZATION_KW => "authorization",
+            SyntaxKind::BACKWARD_KW => "backward",
+            SyntaxKind::BEFORE_KW => "before",
+            SyntaxKind::BEGIN_KW => "begin",
+            SyntaxKind::BETWEEN_KW => "between",
+            SyntaxKind::BIGINT_KW => "bigint",
+            SyntaxKind::BINARY_KW => "binary",
+            SyntaxKind::BIT_KW => "bit",
+            SyntaxKind::BOOLEAN_KW => "boolean",
+            SyntaxKind::BOTH_KW => "both",
+            SyntaxKind::BREADTH_KW => "breadth",
+            SyntaxKind::BY_KW => "by",
+            SyntaxKind::CACHE_KW => "cache",
+            SyntaxKind::CALL_KW => "call",
+            SyntaxKind::CALLED_KW => "called",
+            SyntaxKind::CASCADE_KW => "cascade",
+            SyntaxKind::CASCADED_KW => "cascaded",
+            SyntaxKind::CASE_KW => "case",
+            SyntaxKind::CAST_KW => "cast",
+            SyntaxKind::CATALOG_KW => "catalog",
+            SyntaxKind::CHAIN_KW => "chain",
+            SyntaxKind::CHAR_KW => "char",
+            SyntaxKind::CHARACTER_KW => "character",
+            SyntaxKind::CHARACTERISTICS_KW => "characteristics",
+            SyntaxKind::CHECK_KW => "check",
+            SyntaxKind::CHECKPOINT_KW => "checkpoint",
+            SyntaxKind::CLASS_KW => "class",
+            SyntaxKind::CLOSE_KW => "close",
+            SyntaxKind::CLUSTER_KW => "cluster",
+            SyntaxKind::COALESCE_KW => "coalesce",
+            SyntaxKind::COLLATE_KW => "collate",
+            SyntaxKind::COLLATION_KW => "collation",
+            SyntaxKind::COLUMN_KW => "column",
+            SyntaxKind::COLUMNS_KW => "columns",
+            SyntaxKind::COMMENT_KW => "comment",
+            SyntaxKind::COMMENTS_KW => "comments",
+            SyntaxKind::COMMIT_KW => "commit",
+            SyntaxKind::COMMITTED_KW => "committed",
+            SyntaxKind::COMPRESSION_KW => "compression",
+            SyntaxKind::CONCURRENTLY_KW => "concurrently",
+            SyntaxKind::CONDITIONAL_KW => "conditional",
+            SyntaxKind::CONFIGURATION_KW => "configuration",
+            SyntaxKind::CONFLICT_KW => "conflict",
+            SyntaxKind::CONNECTION_KW => "connection",
+            SyntaxKind::CONSTRAINT_KW => "constraint",
+            SyntaxKind::CONSTRAINTS_KW => "constraints",
+            SyntaxKind::CONTENT_KW => "content",
+            SyntaxKind::CONTINUE_KW => "continue",
+            SyntaxKind::CONVERSION_KW => "conversion",
+            SyntaxKind::COPY_KW => "copy",
+            SyntaxKind::COST_KW => "cost",
+            SyntaxKind::CREATE_KW => "create",
+            SyntaxKind::CROSS_KW => "cross",
+            SyntaxKind::CSV_KW => "csv",
+            SyntaxKind::CUBE_KW => "cube",
+            SyntaxKind::CURRENT_KW => "current",
+            SyntaxKind::CURRENT_CATALOG_KW => "current_catalog",
+            SyntaxKind::CURRENT_DATE_KW => "current_date",
+            SyntaxKind::CURRENT_ROLE_KW => "current_role",
+            SyntaxKind::CURRENT_SCHEMA_KW => "current_schema",
+            SyntaxKind::CURRENT_TIME_KW => "current_time",
+            SyntaxKind::CURRENT_TIMESTAMP_KW => "current_timestamp",
+            SyntaxKind::CURRENT_USER_KW => "current_user",
+            SyntaxKind::CURSOR_KW => "cursor",
+            SyntaxKind::CYCLE_KW => "cycle",
+            SyntaxKind::DATA_KW => "data",
+            SyntaxKind::DATABASE_KW => "database",
+            SyntaxKind::DAY_KW => "day",
+            SyntaxKind::DEALLOCATE_KW => "deallocate",
+            SyntaxKind::DEC_KW => "dec",
+            SyntaxKind::DECIMAL_KW => "decimal",
+            SyntaxKind::DECLARE_KW => "declare",
+            SyntaxKind::DEFAULT_KW => "default",
+            SyntaxKind::DEFAULTS_KW => "defaults",
+            SyntaxKind::DEFERRABLE_KW => "deferrable",
+            SyntaxKind::DEFERRED_KW => "deferred",
+            SyntaxKind::DEFINER_KW => "definer",
+            SyntaxKind::DELETE_KW => "delete",
+            SyntaxKind::DELIMITER_KW => "delimiter",
+            SyntaxKind::DELIMITERS_KW => "delimiters",
+            SyntaxKind::DEPENDS_KW => "depends",
+            SyntaxKind::DEPTH_KW => "depth",
+            SyntaxKind::DESC_KW => "desc",
+            SyntaxKind::DESTINATION_KW => "destination",
+            SyntaxKind::DETACH_KW => "detach",
+            SyntaxKind::DICTIONARY_KW => "dictionary",
+            SyntaxKind::DISABLE_KW => "disable",
+            SyntaxKind::DISCARD_KW => "discard",
+            SyntaxKind::DISTINCT_KW => "distinct",
+            SyntaxKind::DO_KW => "do",
+            SyntaxKind::DOCUMENT_KW => "document",
+            SyntaxKind::DOMAIN_KW => "domain",
+            SyntaxKind::DOUBLE_KW => "double",
+            SyntaxKind::DROP_KW => "drop",
+            SyntaxKind::EACH_KW => "each",
+            SyntaxKind::EDGE_KW => "edge",
+            SyntaxKind::ELSE_KW => "else",
+            SyntaxKind::EMPTY_KW => "empty",
+            SyntaxKind::ENABLE_KW => "enable",
+            SyntaxKind::ENCODING_KW => "encoding",
+            SyntaxKind::ENCRYPTED_KW => "encrypted",
+            SyntaxKind::END_KW => "end",
+            SyntaxKind::ENFORCED_KW => "enforced",
+            SyntaxKind::ENUM_KW => "enum",
+            SyntaxKind::ERROR_KW => "error",
+            SyntaxKind::ESCAPE_KW => "escape",
+            SyntaxKind::EVENT_KW => "event",
+            SyntaxKind::EXCEPT_KW => "except",
+            SyntaxKind::EXCLUDE_KW => "exclude",
+            SyntaxKind::EXCLUDING_KW => "excluding",
+            SyntaxKind::EXCLUSIVE_KW => "exclusive",
+            SyntaxKind::EXECUTE_KW => "execute",
+            SyntaxKind::EXISTS_KW => "exists",
+            SyntaxKind::EXPLAIN_KW => "explain",
+            SyntaxKind::EXPRESSION_KW => "expression",
+            SyntaxKind::EXTENSION_KW => "extension",
+            SyntaxKind::EXTERNAL_KW => "external",
+            SyntaxKind::EXTRACT_KW => "extract",
+            SyntaxKind::FALSE_KW => "false",
+            SyntaxKind::FAMILY_KW => "family",
+            SyntaxKind::FETCH_KW => "fetch",
+            SyntaxKind::FILTER_KW => "filter",
+            SyntaxKind::FINALIZE_KW => "finalize",
+            SyntaxKind::FIRST_KW => "first",
+            SyntaxKind::FLOAT_KW => "float",
+            SyntaxKind::FOLLOWING_KW => "following",
+            SyntaxKind::FOR_KW => "for",
+            SyntaxKind::FORCE_KW => "force",
+            SyntaxKind::FOREIGN_KW => "foreign",
+            SyntaxKind::FORMAT_KW => "format",
+            SyntaxKind::FORWARD_KW => "forward",
+            SyntaxKind::FREEZE_KW => "freeze",
+            SyntaxKind::FROM_KW => "from",
+            SyntaxKind::FULL_KW => "full",
+            SyntaxKind::FUNCTION_KW => "function",
+            SyntaxKind::FUNCTIONS_KW => "functions",
+            SyntaxKind::GENERATED_KW => "generated",
+            SyntaxKind::GLOBAL_KW => "global",
+            SyntaxKind::GRANT_KW => "grant",
+            SyntaxKind::GRANTED_KW => "granted",
+            SyntaxKind::GRAPH_KW => "graph",
+            SyntaxKind::GRAPH_TABLE_KW => "graph_table",
+            SyntaxKind::GREATEST_KW => "greatest",
+            SyntaxKind::GROUP_KW => "group",
+            SyntaxKind::GROUPING_KW => "grouping",
+            SyntaxKind::GROUPS_KW => "groups",
+            SyntaxKind::HANDLER_KW => "handler",
+            SyntaxKind::HAVING_KW => "having",
+            SyntaxKind::HEADER_KW => "header",
+            SyntaxKind::HOLD_KW => "hold",
+            SyntaxKind::HOUR_KW => "hour",
+            SyntaxKind::IDENTITY_KW => "identity",
+            SyntaxKind::IF_KW => "if",
+            SyntaxKind::IGNORE_KW => "ignore",
+            SyntaxKind::ILIKE_KW => "ilike",
+            SyntaxKind::IMMEDIATE_KW => "immediate",
+            SyntaxKind::IMMUTABLE_KW => "immutable",
+            SyntaxKind::IMPLICIT_KW => "implicit",
+            SyntaxKind::IMPORT_KW => "import",
+            SyntaxKind::IN_KW => "in",
+            SyntaxKind::INCLUDE_KW => "include",
+            SyntaxKind::INCLUDING_KW => "including",
+            SyntaxKind::INCREMENT_KW => "increment",
+            SyntaxKind::INDENT_KW => "indent",
+            SyntaxKind::INDEX_KW => "index",
+            SyntaxKind::INDEXES_KW => "indexes",
+            SyntaxKind::INHERIT_KW => "inherit",
+            SyntaxKind::INHERITS_KW => "inherits",
+            SyntaxKind::INITIALLY_KW => "initially",
+            SyntaxKind::INLINE_KW => "inline",
+            SyntaxKind::INNER_KW => "inner",
+            SyntaxKind::INOUT_KW => "inout",
+            SyntaxKind::INPUT_KW => "input",
+            SyntaxKind::INSENSITIVE_KW => "insensitive",
+            SyntaxKind::INSERT_KW => "insert",
+            SyntaxKind::INSTEAD_KW => "instead",
+            SyntaxKind::INT_KW => "int",
+            SyntaxKind::INTEGER_KW => "integer",
+            SyntaxKind::INTERSECT_KW => "intersect",
+            SyntaxKind::INTERVAL_KW => "interval",
+            SyntaxKind::INTO_KW => "into",
+            SyntaxKind::INVOKER_KW => "invoker",
+            SyntaxKind::IS_KW => "is",
+            SyntaxKind::ISNULL_KW => "isnull",
+            SyntaxKind::ISOLATION_KW => "isolation",
+            SyntaxKind::JOIN_KW => "join",
+            SyntaxKind::JSON_KW => "json",
+            SyntaxKind::JSON_ARRAY_KW => "json_array",
+            SyntaxKind::JSON_ARRAYAGG_KW => "json_arrayagg",
+            SyntaxKind::JSON_EXISTS_KW => "json_exists",
+            SyntaxKind::JSON_OBJECT_KW => "json_object",
+            SyntaxKind::JSON_OBJECTAGG_KW => "json_objectagg",
+            SyntaxKind::JSON_QUERY_KW => "json_query",
+            SyntaxKind::JSON_SCALAR_KW => "json_scalar",
+            SyntaxKind::JSON_SERIALIZE_KW => "json_serialize",
+            SyntaxKind::JSON_TABLE_KW => "json_table",
+            SyntaxKind::JSON_VALUE_KW => "json_value",
+            SyntaxKind::KEEP_KW => "keep",
+            SyntaxKind::KEY_KW => "key",
+            SyntaxKind::KEYS_KW => "keys",
+            SyntaxKind::LABEL_KW => "label",
+            SyntaxKind::LANGUAGE_KW => "language",
+            SyntaxKind::LARGE_KW => "large",
+            SyntaxKind::LAST_KW => "last",
+            SyntaxKind::LATERAL_KW => "lateral",
+            SyntaxKind::LEADING_KW => "leading",
+            SyntaxKind::LEAKPROOF_KW => "leakproof",
+            SyntaxKind::LEAST_KW => "least",
+            SyntaxKind::LEFT_KW => "left",
+            SyntaxKind::LEVEL_KW => "level",
+            SyntaxKind::LIKE_KW => "like",
+            SyntaxKind::LIMIT_KW => "limit",
+            SyntaxKind::LISTEN_KW => "listen",
+            SyntaxKind::LOAD_KW => "load",
+            SyntaxKind::LOCAL_KW => "local",
+            SyntaxKind::LOCALTIME_KW => "localtime",
+            SyntaxKind::LOCALTIMESTAMP_KW => "localtimestamp",
+            SyntaxKind::LOCATION_KW => "location",
+            SyntaxKind::LOCK_KW => "lock",
+            SyntaxKind::LOCKED_KW => "locked",
+            SyntaxKind::LOGGED_KW => "logged",
+            SyntaxKind::LSN_KW => "lsn",
+            SyntaxKind::MAPPING_KW => "mapping",
+            SyntaxKind::MATCH_KW => "match",
+            SyntaxKind::MATCHED_KW => "matched",
+            SyntaxKind::MATERIALIZED_KW => "materialized",
+            SyntaxKind::MAXVALUE_KW => "maxvalue",
+            SyntaxKind::MERGE_KW => "merge",
+            SyntaxKind::MERGE_ACTION_KW => "merge_action",
+            SyntaxKind::METHOD_KW => "method",
+            SyntaxKind::MINUTE_KW => "minute",
+            SyntaxKind::MINVALUE_KW => "minvalue",
+            SyntaxKind::MODE_KW => "mode",
+            SyntaxKind::MONTH_KW => "month",
+            SyntaxKind::MOVE_KW => "move",
+            SyntaxKind::NAME_KW => "name",
+            SyntaxKind::NAMES_KW => "names",
+            SyntaxKind::NATIONAL_KW => "national",
+            SyntaxKind::NATURAL_KW => "natural",
+            SyntaxKind::NCHAR_KW => "nchar",
+            SyntaxKind::NESTED_KW => "nested",
+            SyntaxKind::NEW_KW => "new",
+            SyntaxKind::NEXT_KW => "next",
+            SyntaxKind::NFC_KW => "nfc",
+            SyntaxKind::NFD_KW => "nfd",
+            SyntaxKind::NFKC_KW => "nfkc",
+            SyntaxKind::NFKD_KW => "nfkd",
+            SyntaxKind::NO_KW => "no",
+            SyntaxKind::NODE_KW => "node",
+            SyntaxKind::NONE_KW => "none",
+            SyntaxKind::NORMALIZE_KW => "normalize",
+            SyntaxKind::NORMALIZED_KW => "normalized",
+            SyntaxKind::NOT_KW => "not",
+            SyntaxKind::NOTHING_KW => "nothing",
+            SyntaxKind::NOTIFY_KW => "notify",
+            SyntaxKind::NOTNULL_KW => "notnull",
+            SyntaxKind::NOWAIT_KW => "nowait",
+            SyntaxKind::NULL_KW => "null",
+            SyntaxKind::NULLIF_KW => "nullif",
+            SyntaxKind::NULLS_KW => "nulls",
+            SyntaxKind::NUMERIC_KW => "numeric",
+            SyntaxKind::OBJECT_KW => "object",
+            SyntaxKind::OBJECTS_KW => "objects",
+            SyntaxKind::OF_KW => "of",
+            SyntaxKind::OFF_KW => "off",
+            SyntaxKind::OFFSET_KW => "offset",
+            SyntaxKind::OIDS_KW => "oids",
+            SyntaxKind::OLD_KW => "old",
+            SyntaxKind::OMIT_KW => "omit",
+            SyntaxKind::ON_KW => "on",
+            SyntaxKind::ONLY_KW => "only",
+            SyntaxKind::OPERATOR_KW => "operator",
+            SyntaxKind::OPTION_KW => "option",
+            SyntaxKind::OPTIONS_KW => "options",
+            SyntaxKind::OR_KW => "or",
+            SyntaxKind::ORDER_KW => "order",
+            SyntaxKind::ORDINALITY_KW => "ordinality",
+            SyntaxKind::OTHERS_KW => "others",
+            SyntaxKind::OUT_KW => "out",
+            SyntaxKind::OUTER_KW => "outer",
+            SyntaxKind::OVER_KW => "over",
+            SyntaxKind::OVERLAPS_KW => "overlaps",
+            SyntaxKind::OVERLAY_KW => "overlay",
+            SyntaxKind::OVERRIDING_KW => "overriding",
+            SyntaxKind::OWNED_KW => "owned",
+            SyntaxKind::OWNER_KW => "owner",
+            SyntaxKind::PARALLEL_KW => "parallel",
+            SyntaxKind::PARAMETER_KW => "parameter",
+            SyntaxKind::PARSER_KW => "parser",
+            SyntaxKind::PARTIAL_KW => "partial",
+            SyntaxKind::PARTITION_KW => "partition",
+            SyntaxKind::PARTITIONS_KW => "partitions",
+            SyntaxKind::PASSING_KW => "passing",
+            SyntaxKind::PASSWORD_KW => "password",
+            SyntaxKind::PATH_KW => "path",
+            SyntaxKind::PERIOD_KW => "period",
+            SyntaxKind::PLACING_KW => "placing",
+            SyntaxKind::PLAN_KW => "plan",
+            SyntaxKind::PLANS_KW => "plans",
+            SyntaxKind::POLICY_KW => "policy",
+            SyntaxKind::PORTION_KW => "portion",
+            SyntaxKind::POSITION_KW => "position",
+            SyntaxKind::PRECEDING_KW => "preceding",
+            SyntaxKind::PRECISION_KW => "precision",
+            SyntaxKind::PREPARE_KW => "prepare",
+            SyntaxKind::PREPARED_KW => "prepared",
+            SyntaxKind::PRESERVE_KW => "preserve",
+            SyntaxKind::PRIMARY_KW => "primary",
+            SyntaxKind::PRIOR_KW => "prior",
+            SyntaxKind::PRIVILEGES_KW => "privileges",
+            SyntaxKind::PROCEDURAL_KW => "procedural",
+            SyntaxKind::PROCEDURE_KW => "procedure",
+            SyntaxKind::PROCEDURES_KW => "procedures",
+            SyntaxKind::PROGRAM_KW => "program",
+            SyntaxKind::PROPERTIES_KW => "properties",
+            SyntaxKind::PROPERTY_KW => "property",
+            SyntaxKind::PUBLICATION_KW => "publication",
+            SyntaxKind::QUOTE_KW => "quote",
+            SyntaxKind::QUOTES_KW => "quotes",
+            SyntaxKind::RANGE_KW => "range",
+            SyntaxKind::READ_KW => "read",
+            SyntaxKind::REAL_KW => "real",
+            SyntaxKind::REASSIGN_KW => "reassign",
+            SyntaxKind::RECURSIVE_KW => "recursive",
+            SyntaxKind::REF_KW => "ref",
+            SyntaxKind::REFERENCES_KW => "references",
+            SyntaxKind::REFERENCING_KW => "referencing",
+            SyntaxKind::REFRESH_KW => "refresh",
+            SyntaxKind::REINDEX_KW => "reindex",
+            SyntaxKind::RELATIONSHIP_KW => "relationship",
+            SyntaxKind::RELATIVE_KW => "relative",
+            SyntaxKind::RELEASE_KW => "release",
+            SyntaxKind::RENAME_KW => "rename",
+            SyntaxKind::REPACK_KW => "repack",
+            SyntaxKind::REPEATABLE_KW => "repeatable",
+            SyntaxKind::REPLACE_KW => "replace",
+            SyntaxKind::REPLICA_KW => "replica",
+            SyntaxKind::RESET_KW => "reset",
+            SyntaxKind::RESPECT_KW => "respect",
+            SyntaxKind::RESTART_KW => "restart",
+            SyntaxKind::RESTRICT_KW => "restrict",
+            SyntaxKind::RETURN_KW => "return",
+            SyntaxKind::RETURNING_KW => "returning",
+            SyntaxKind::RETURNS_KW => "returns",
+            SyntaxKind::REVOKE_KW => "revoke",
+            SyntaxKind::RIGHT_KW => "right",
+            SyntaxKind::ROLE_KW => "role",
+            SyntaxKind::ROLLBACK_KW => "rollback",
+            SyntaxKind::ROLLUP_KW => "rollup",
+            SyntaxKind::ROUTINE_KW => "routine",
+            SyntaxKind::ROUTINES_KW => "routines",
+            SyntaxKind::ROW_KW => "row",
+            SyntaxKind::ROWS_KW => "rows",
+            SyntaxKind::RULE_KW => "rule",
+            SyntaxKind::SAVEPOINT_KW => "savepoint",
+            SyntaxKind::SCALAR_KW => "scalar",
+            SyntaxKind::SCHEMA_KW => "schema",
+            SyntaxKind::SCHEMAS_KW => "schemas",
+            SyntaxKind::SCROLL_KW => "scroll",
+            SyntaxKind::SEARCH_KW => "search",
+            SyntaxKind::SECOND_KW => "second",
+            SyntaxKind::SECURITY_KW => "security",
+            SyntaxKind::SELECT_KW => "select",
+            SyntaxKind::SEQUENCE_KW => "sequence",
+            SyntaxKind::SEQUENCES_KW => "sequences",
+            SyntaxKind::SERIALIZABLE_KW => "serializable",
+            SyntaxKind::SERVER_KW => "server",
+            SyntaxKind::SESSION_KW => "session",
+            SyntaxKind::SESSION_USER_KW => "session_user",
+            SyntaxKind::SET_KW => "set",
+            SyntaxKind::SETOF_KW => "setof",
+            SyntaxKind::SETS_KW => "sets",
+            SyntaxKind::SHARE_KW => "share",
+            SyntaxKind::SHOW_KW => "show",
+            SyntaxKind::SIMILAR_KW => "similar",
+            SyntaxKind::SIMPLE_KW => "simple",
+            SyntaxKind::SKIP_KW => "skip",
+            SyntaxKind::SMALLINT_KW => "smallint",
+            SyntaxKind::SNAPSHOT_KW => "snapshot",
+            SyntaxKind::SOME_KW => "some",
+            SyntaxKind::SOURCE_KW => "source",
+            SyntaxKind::SPLIT_KW => "split",
+            SyntaxKind::SQL_KW => "sql",
+            SyntaxKind::STABLE_KW => "stable",
+            SyntaxKind::STANDALONE_KW => "standalone",
+            SyntaxKind::START_KW => "start",
+            SyntaxKind::STATEMENT_KW => "statement",
+            SyntaxKind::STATISTICS_KW => "statistics",
+            SyntaxKind::STDIN_KW => "stdin",
+            SyntaxKind::STDOUT_KW => "stdout",
+            SyntaxKind::STORAGE_KW => "storage",
+            SyntaxKind::STORED_KW => "stored",
+            SyntaxKind::STRICT_KW => "strict",
+            SyntaxKind::STRING_KW => "string",
+            SyntaxKind::STRIP_KW => "strip",
+            SyntaxKind::SUBSCRIPTION_KW => "subscription",
+            SyntaxKind::SUBSTRING_KW => "substring",
+            SyntaxKind::SUPPORT_KW => "support",
+            SyntaxKind::SYMMETRIC_KW => "symmetric",
+            SyntaxKind::SYSID_KW => "sysid",
+            SyntaxKind::SYSTEM_KW => "system",
+            SyntaxKind::SYSTEM_USER_KW => "system_user",
+            SyntaxKind::TABLE_KW => "table",
+            SyntaxKind::TABLES_KW => "tables",
+            SyntaxKind::TABLESAMPLE_KW => "tablesample",
+            SyntaxKind::TABLESPACE_KW => "tablespace",
+            SyntaxKind::TARGET_KW => "target",
+            SyntaxKind::TEMP_KW => "temp",
+            SyntaxKind::TEMPLATE_KW => "template",
+            SyntaxKind::TEMPORARY_KW => "temporary",
+            SyntaxKind::TEXT_KW => "text",
+            SyntaxKind::THEN_KW => "then",
+            SyntaxKind::TIES_KW => "ties",
+            SyntaxKind::TIME_KW => "time",
+            SyntaxKind::TIMESTAMP_KW => "timestamp",
+            SyntaxKind::TO_KW => "to",
+            SyntaxKind::TRAILING_KW => "trailing",
+            SyntaxKind::TRANSACTION_KW => "transaction",
+            SyntaxKind::TRANSFORM_KW => "transform",
+            SyntaxKind::TREAT_KW => "treat",
+            SyntaxKind::TRIGGER_KW => "trigger",
+            SyntaxKind::TRIM_KW => "trim",
+            SyntaxKind::TRUE_KW => "true",
+            SyntaxKind::TRUNCATE_KW => "truncate",
+            SyntaxKind::TRUSTED_KW => "trusted",
+            SyntaxKind::TYPE_KW => "type",
+            SyntaxKind::TYPES_KW => "types",
+            SyntaxKind::UESCAPE_KW => "uescape",
+            SyntaxKind::UNBOUNDED_KW => "unbounded",
+            SyntaxKind::UNCOMMITTED_KW => "uncommitted",
+            SyntaxKind::UNCONDITIONAL_KW => "unconditional",
+            SyntaxKind::UNENCRYPTED_KW => "unencrypted",
+            SyntaxKind::UNION_KW => "union",
+            SyntaxKind::UNIQUE_KW => "unique",
+            SyntaxKind::UNKNOWN_KW => "unknown",
+            SyntaxKind::UNLISTEN_KW => "unlisten",
+            SyntaxKind::UNLOGGED_KW => "unlogged",
+            SyntaxKind::UNTIL_KW => "until",
+            SyntaxKind::UPDATE_KW => "update",
+            SyntaxKind::USER_KW => "user",
+            SyntaxKind::USING_KW => "using",
+            SyntaxKind::VACUUM_KW => "vacuum",
+            SyntaxKind::VALID_KW => "valid",
+            SyntaxKind::VALIDATE_KW => "validate",
+            SyntaxKind::VALIDATOR_KW => "validator",
+            SyntaxKind::VALUE_KW => "value",
+            SyntaxKind::VALUES_KW => "values",
+            SyntaxKind::VARCHAR_KW => "varchar",
+            SyntaxKind::VARIADIC_KW => "variadic",
+            SyntaxKind::VARYING_KW => "varying",
+            SyntaxKind::VERBOSE_KW => "verbose",
+            SyntaxKind::VERSION_KW => "version",
+            SyntaxKind::VERTEX_KW => "vertex",
+            SyntaxKind::VIEW_KW => "view",
+            SyntaxKind::VIEWS_KW => "views",
+            SyntaxKind::VIRTUAL_KW => "virtual",
+            SyntaxKind::VOLATILE_KW => "volatile",
+            SyntaxKind::WAIT_KW => "wait",
+            SyntaxKind::WHEN_KW => "when",
+            SyntaxKind::WHERE_KW => "where",
+            SyntaxKind::WHITESPACE_KW => "whitespace",
+            SyntaxKind::WINDOW_KW => "window",
+            SyntaxKind::WITH_KW => "with",
+            SyntaxKind::WITHIN_KW => "within",
+            SyntaxKind::WITHOUT_KW => "without",
+            SyntaxKind::WORK_KW => "work",
+            SyntaxKind::WRAPPER_KW => "wrapper",
+            SyntaxKind::WRITE_KW => "write",
+            SyntaxKind::XML_KW => "xml",
+            SyntaxKind::XMLATTRIBUTES_KW => "xmlattributes",
+            SyntaxKind::XMLCONCAT_KW => "xmlconcat",
+            SyntaxKind::XMLELEMENT_KW => "xmlelement",
+            SyntaxKind::XMLEXISTS_KW => "xmlexists",
+            SyntaxKind::XMLFOREST_KW => "xmlforest",
+            SyntaxKind::XMLNAMESPACES_KW => "xmlnamespaces",
+            SyntaxKind::XMLPARSE_KW => "xmlparse",
+            SyntaxKind::XMLPI_KW => "xmlpi",
+            SyntaxKind::XMLROOT_KW => "xmlroot",
+            SyntaxKind::XMLSERIALIZE_KW => "xmlserialize",
+            SyntaxKind::XMLTABLE_KW => "xmltable",
+            SyntaxKind::YEAR_KW => "year",
+            SyntaxKind::YES_KW => "yes",
+            SyntaxKind::ZONE_KW => "zone",
+            SyntaxKind::ALIAS_KW => "alias",
+            SyntaxKind::ASSERT_KW => "assert",
+            SyntaxKind::COLUMN_NAME_KW => "column_name",
+            SyntaxKind::CONSTANT_KW => "constant",
+            SyntaxKind::CONSTRAINT_NAME_KW => "constraint_name",
+            SyntaxKind::DATATYPE_KW => "datatype",
+            SyntaxKind::DEBUG_KW => "debug",
+            SyntaxKind::DETAIL_KW => "detail",
+            SyntaxKind::DIAGNOSTICS_KW => "diagnostics",
+            SyntaxKind::DUMP_KW => "dump",
+            SyntaxKind::ELSEIF_KW => "elseif",
+            SyntaxKind::ELSIF_KW => "elsif",
+            SyntaxKind::ERRCODE_KW => "errcode",
+            SyntaxKind::EXCEPTION_KW => "exception",
+            SyntaxKind::EXIT_KW => "exit",
+            SyntaxKind::FOREACH_KW => "foreach",
+            SyntaxKind::GET_KW => "get",
+            SyntaxKind::HINT_KW => "hint",
+            SyntaxKind::INFO_KW => "info",
+            SyntaxKind::LOG_KW => "log",
+            SyntaxKind::LOOP_KW => "loop",
+            SyntaxKind::MESSAGE_KW => "message",
+            SyntaxKind::MESSAGE_TEXT_KW => "message_text",
+            SyntaxKind::NOTICE_KW => "notice",
+            SyntaxKind::OPEN_KW => "open",
+            SyntaxKind::PERFORM_KW => "perform",
+            SyntaxKind::PG_CONTEXT_KW => "pg_context",
+            SyntaxKind::PG_DATATYPE_NAME_KW => "pg_datatype_name",
+            SyntaxKind::PG_EXCEPTION_CONTEXT_KW => "pg_exception_context",
+            SyntaxKind::PG_EXCEPTION_DETAIL_KW => "pg_exception_detail",
+            SyntaxKind::PG_EXCEPTION_HINT_KW => "pg_exception_hint",
+            SyntaxKind::PG_ROUTINE_OID_KW => "pg_routine_oid",
+            SyntaxKind::PRINT_STRICT_PARAMS_KW => "print_strict_params",
+            SyntaxKind::QUERY_KW => "query",
+            SyntaxKind::RAISE_KW => "raise",
+            SyntaxKind::RETURNED_SQLSTATE_KW => "returned_sqlstate",
+            SyntaxKind::REVERSE_KW => "reverse",
+            SyntaxKind::ROW_COUNT_KW => "row_count",
+            SyntaxKind::ROWTYPE_KW => "rowtype",
+            SyntaxKind::SCHEMA_NAME_KW => "schema_name",
+            SyntaxKind::SLICE_KW => "slice",
+            SyntaxKind::SQLSTATE_KW => "sqlstate",
+            SyntaxKind::STACKED_KW => "stacked",
+            SyntaxKind::TABLE_NAME_KW => "table_name",
+            SyntaxKind::USE_COLUMN_KW => "use_column",
+            SyntaxKind::USE_VARIABLE_KW => "use_variable",
+            SyntaxKind::VARIABLE_CONFLICT_KW => "variable_conflict",
+            SyntaxKind::WARNING_KW => "warning",
+            SyntaxKind::WHILE_KW => "while",
+            SyntaxKind::TOMBSTONE
+            | SyntaxKind::EOF
+            | SyntaxKind::DOLLAR
+            | SyntaxKind::SEMICOLON
+            | SyntaxKind::COMMA
+            | SyntaxKind::L_PAREN
+            | SyntaxKind::R_PAREN
+            | SyntaxKind::L_BRACK
+            | SyntaxKind::R_BRACK
+            | SyntaxKind::L_CURLY
+            | SyntaxKind::R_CURLY
+            | SyntaxKind::L_ANGLE
+            | SyntaxKind::LESS_LESS
+            | SyntaxKind::LTEQ
+            | SyntaxKind::NEQB
+            | SyntaxKind::R_ANGLE
+            | SyntaxKind::GREATER_GREATER
+            | SyntaxKind::GTEQ
+            | SyntaxKind::AT
+            | SyntaxKind::POUND
+            | SyntaxKind::TILDE
+            | SyntaxKind::QUESTION
+            | SyntaxKind::AMP
+            | SyntaxKind::PIPE
+            | SyntaxKind::PLUS
+            | SyntaxKind::STAR
+            | SyntaxKind::SLASH
+            | SyntaxKind::CARET
+            | SyntaxKind::PERCENT
+            | SyntaxKind::UNDERSCORE
+            | SyntaxKind::DOT
+            | SyntaxKind::DOT_DOT
+            | SyntaxKind::COLON
+            | SyntaxKind::COLON_EQ
+            | SyntaxKind::EQ
+            | SyntaxKind::FAT_ARROW
+            | SyntaxKind::BANG
+            | SyntaxKind::NEQ
+            | SyntaxKind::MINUS
+            | SyntaxKind::BACKTICK
+            | SyntaxKind::BIT_STRING
+            | SyntaxKind::BYTE_STRING
+            | SyntaxKind::DOLLAR_QUOTED_STRING
+            | SyntaxKind::ESC_STRING
+            | SyntaxKind::INT_NUMBER
+            | SyntaxKind::NATIONAL_STRING
+            | SyntaxKind::NULL
+            | SyntaxKind::NUMERIC_NUMBER
+            | SyntaxKind::POSITIONAL_PARAM
+            | SyntaxKind::PSQL_COMMAND_TEXT
+            | SyntaxKind::PSQL_TERMINATOR_TEXT
+            | SyntaxKind::STRING
+            | SyntaxKind::UNICODE_ESC_STRING
+            | SyntaxKind::COMMENT
+            | SyntaxKind::ERROR
+            | SyntaxKind::IDENT
+            | SyntaxKind::WHITESPACE
+            | SyntaxKind::ABSOLUTE
+            | SyntaxKind::ACCESS_EXCLUSIVE
+            | SyntaxKind::ACCESS_METHOD
+            | SyntaxKind::ACCESS_METHOD_REF
+            | SyntaxKind::ACCESS_METHOD_TYPE_INDEX
+            | SyntaxKind::ACCESS_METHOD_TYPE_TABLE
+            | SyntaxKind::ACCESS_SHARE
+            | SyntaxKind::ADD_ATTRIBUTE
+            | SyntaxKind::ADD_COLUMN
+            | SyntaxKind::ADD_CONSTRAINT
+            | SyntaxKind::ADD_EDGE_TABLES
+            | SyntaxKind::ADD_FOREIGN_OPTION
+            | SyntaxKind::ADD_GENERATED
+            | SyntaxKind::ADD_LABEL
+            | SyntaxKind::ADD_MAPPING
+            | SyntaxKind::ADD_OP_CLASS_OPTIONS
+            | SyntaxKind::ADD_PUBLICATION
+            | SyntaxKind::ADD_PUBLICATION_OBJECTS
+            | SyntaxKind::ADD_USERS
+            | SyntaxKind::ADD_VALUE
+            | SyntaxKind::ADD_VERTEX_EDGE_LABEL_PROPERTIES
+            | SyntaxKind::ADD_VERTEX_EDGE_TABLES
+            | SyntaxKind::ADD_VERTEX_TABLES
+            | SyntaxKind::ADMIN_OPTION_FOR
+            | SyntaxKind::AFTER_VALUE
+            | SyntaxKind::AGGREGATE
+            | SyntaxKind::AGGREGATE_NAME
+            | SyntaxKind::AGGREGATE_ORDER_BY
+            | SyntaxKind::AGGREGATE_RENAME_TO
+            | SyntaxKind::ALL
+            | SyntaxKind::ALL_FN
+            | SyntaxKind::ALL_IN_TABLESPACE
+            | SyntaxKind::ALL_PRIVILEGES
+            | SyntaxKind::ALL_PROPERTIES
+            | SyntaxKind::ALL_PUBLICATION_SEQUENCES
+            | SyntaxKind::ALL_PUBLICATION_TABLES
+            | SyntaxKind::ALTER_AGGREGATE
+            | SyntaxKind::ALTER_ATTRIBUTE
+            | SyntaxKind::ALTER_COLLATION
+            | SyntaxKind::ALTER_COLUMN
+            | SyntaxKind::ALTER_CONSTRAINT
+            | SyntaxKind::ALTER_CONVERSION
+            | SyntaxKind::ALTER_DATABASE
+            | SyntaxKind::ALTER_DEFAULT_PRIVILEGES
+            | SyntaxKind::ALTER_DOMAIN
+            | SyntaxKind::ALTER_EVENT_TRIGGER
+            | SyntaxKind::ALTER_EXTENSION
+            | SyntaxKind::ALTER_EXTENSION_ADD
+            | SyntaxKind::ALTER_EXTENSION_DROP
+            | SyntaxKind::ALTER_EXTENSION_UPDATE
+            | SyntaxKind::ALTER_FOREIGN_DATA_WRAPPER
+            | SyntaxKind::ALTER_FOREIGN_TABLE
+            | SyntaxKind::ALTER_FUNCTION
+            | SyntaxKind::ALTER_GROUP
+            | SyntaxKind::ALTER_INDEX
+            | SyntaxKind::ALTER_LABEL
+            | SyntaxKind::ALTER_LANGUAGE
+            | SyntaxKind::ALTER_LARGE_OBJECT
+            | SyntaxKind::ALTER_MAPPING
+            | SyntaxKind::ALTER_MATERIALIZED_VIEW
+            | SyntaxKind::ALTER_OPERATOR
+            | SyntaxKind::ALTER_OPERATOR_CLASS
+            | SyntaxKind::ALTER_OPERATOR_FAMILY
+            | SyntaxKind::ALTER_OPTION_LIST
+            | SyntaxKind::ALTER_POLICY
+            | SyntaxKind::ALTER_POLICY_TO
+            | SyntaxKind::ALTER_PROCEDURE
+            | SyntaxKind::ALTER_PROPERTY_GRAPH
+            | SyntaxKind::ALTER_PUBLICATION
+            | SyntaxKind::ALTER_ROLE
+            | SyntaxKind::ALTER_ROUTINE
+            | SyntaxKind::ALTER_RULE
+            | SyntaxKind::ALTER_SCHEMA
+            | SyntaxKind::ALTER_SEQUENCE
+            | SyntaxKind::ALTER_SERVER
+            | SyntaxKind::ALTER_SET_STATISTICS
+            | SyntaxKind::ALTER_STATISTICS
+            | SyntaxKind::ALTER_SUBSCRIPTION
+            | SyntaxKind::ALTER_SYSTEM
+            | SyntaxKind::ALTER_TABLE
+            | SyntaxKind::ALTER_TABLESPACE
+            | SyntaxKind::ALTER_TEXT_SEARCH_CONFIGURATION
+            | SyntaxKind::ALTER_TEXT_SEARCH_DICTIONARY
+            | SyntaxKind::ALTER_TEXT_SEARCH_PARSER
+            | SyntaxKind::ALTER_TEXT_SEARCH_TEMPLATE
+            | SyntaxKind::ALTER_TRIGGER
+            | SyntaxKind::ALTER_TYPE
+            | SyntaxKind::ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+            | SyntaxKind::ALTER_USER
+            | SyntaxKind::ALTER_USER_MAPPING
+            | SyntaxKind::ALTER_VERTEX_EDGE_LABELS
+            | SyntaxKind::ALTER_VIEW
+            | SyntaxKind::ALTER_VIEW_COLUMN
+            | SyntaxKind::ANALYZE
+            | SyntaxKind::AND_CHAIN
+            | SyntaxKind::AND_NO_CHAIN
+            | SyntaxKind::ANY_FN
+            | SyntaxKind::ARG
+            | SyntaxKind::ARG_LIST
+            | SyntaxKind::ARRAY_BOUND
+            | SyntaxKind::ARRAY_EXPR
+            | SyntaxKind::ARRAY_TYPE
+            | SyntaxKind::ASENSITIVE
+            | SyntaxKind::ASYMMETRIC
+            | SyntaxKind::AS_ASSIGNMENT
+            | SyntaxKind::AS_DEFINITION
+            | SyntaxKind::AS_FUNC_OPTION
+            | SyntaxKind::AS_IMPLICIT
+            | SyntaxKind::AS_NAME
+            | SyntaxKind::AS_OBJ_FILE
+            | SyntaxKind::AS_POLICY_TYPE
+            | SyntaxKind::ATOMIC_BODY
+            | SyntaxKind::ATTACH_INDEX_PARTITION
+            | SyntaxKind::ATTACH_PARTITION
+            | SyntaxKind::ATTRIBUTE_LIST
+            | SyntaxKind::ATTRIBUTE_NAME
+            | SyntaxKind::ATTRIBUTE_NAMESPACE
+            | SyntaxKind::ATTRIBUTE_OPTION
+            | SyntaxKind::ATTRIBUTE_VALUE
+            | SyntaxKind::AT_LOCAL
+            | SyntaxKind::AT_TIME_ZONE
+            | SyntaxKind::AUTHORIZATION_SCHEMA
+            | SyntaxKind::BACKWARD
+            | SyntaxKind::BASE_TYPE
+            | SyntaxKind::BEFORE_VALUE
+            | SyntaxKind::BEGIN
+            | SyntaxKind::BETWEEN_EXPR
+            | SyntaxKind::BIND_PARAM_NAME_REF
+            | SyntaxKind::BIN_EXPR
+            | SyntaxKind::BIT_TYPE
+            | SyntaxKind::BIT_VARYING_TYPE
+            | SyntaxKind::BREADTH_FIRST
+            | SyntaxKind::BY_TARGET
+            | SyntaxKind::CALL
+            | SyntaxKind::CALLED_ON_NULL_INPUT_FUNC_OPTION
+            | SyntaxKind::CALL_EXPR
+            | SyntaxKind::CASCADE
+            | SyntaxKind::CASCADED_CHECK_OPTION
+            | SyntaxKind::CASE_EXPR
+            | SyntaxKind::CAST_EXPR
+            | SyntaxKind::CAST_SIG
+            | SyntaxKind::CHANNEL
+            | SyntaxKind::CHANNEL_REF
+            | SyntaxKind::CHARACTER_TYPE
+            | SyntaxKind::CHECKPOINT
+            | SyntaxKind::CHECKPOINT_OPTION
+            | SyntaxKind::CHECKPOINT_OPTION_LIST
+            | SyntaxKind::CHECKPOINT_OPTION_NAME
+            | SyntaxKind::CHECK_CONSTRAINT
+            | SyntaxKind::CLOSE
+            | SyntaxKind::CLUSTER
+            | SyntaxKind::CLUSTER_LEGACY
+            | SyntaxKind::CLUSTER_ON
+            | SyntaxKind::CLUSTER_USING_INDEX
+            | SyntaxKind::COLLATE
+            | SyntaxKind::COLLATION
+            | SyntaxKind::COLLATION_FOR_FN
+            | SyntaxKind::COLLATION_FROM
+            | SyntaxKind::COLLATION_REF
+            | SyntaxKind::COLLATION_RENAME_TO
+            | SyntaxKind::COLON_COLON
+            | SyntaxKind::COLUMN
+            | SyntaxKind::COLUMN_DEF
+            | SyntaxKind::COLUMN_DEF_LIST
+            | SyntaxKind::COLUMN_LIST
+            | SyntaxKind::COLUMN_NAME
+            | SyntaxKind::COLUMN_NAME_REF
+            | SyntaxKind::COLUMN_REF_LIST
+            | SyntaxKind::COLUMN_TARGET
+            | SyntaxKind::COLUMN_TARGET_LIST
+            | SyntaxKind::COMMENT_ON
+            | SyntaxKind::COMMIT_PREPARED
+            | SyntaxKind::COMMIT_TRANSACTION
+            | SyntaxKind::COMPOSITE_FIELD
+            | SyntaxKind::COMPOSITE_FIELD_DEF
+            | SyntaxKind::COMPOSITE_FIELD_LIST
+            | SyntaxKind::COMPOSITE_FIELD_REF
+            | SyntaxKind::COMPOSITE_TYPE
+            | SyntaxKind::COMPOUND_SELECT
+            | SyntaxKind::COMPRESSION_METHOD
+            | SyntaxKind::COMPRESSION_METHOD_NAME
+            | SyntaxKind::CONFIG_PARAMETER_REF
+            | SyntaxKind::CONFIG_VALUE_NAME
+            | SyntaxKind::CONFLICT_DO_NOTHING
+            | SyntaxKind::CONFLICT_DO_SELECT
+            | SyntaxKind::CONFLICT_DO_UPDATE_SET
+            | SyntaxKind::CONFLICT_INDEX_ITEM
+            | SyntaxKind::CONFLICT_INDEX_ITEM_LIST
+            | SyntaxKind::CONFLICT_ON_CONSTRAINT
+            | SyntaxKind::CONFLICT_ON_INDEX
+            | SyntaxKind::CONNECTION_CLAUSE
+            | SyntaxKind::CONSTRAINT_COLUMN_REF_LIST
+            | SyntaxKind::CONSTRAINT_EXCLUSION
+            | SyntaxKind::CONSTRAINT_EXCLUSION_LIST
+            | SyntaxKind::CONSTRAINT_INCLUDE_CLAUSE
+            | SyntaxKind::CONSTRAINT_INDEX_METHOD
+            | SyntaxKind::CONSTRAINT_INDEX_TABLESPACE
+            | SyntaxKind::CONSTRAINT_NAME
+            | SyntaxKind::CONSTRAINT_NAME_CLAUSE
+            | SyntaxKind::CONSTRAINT_NAME_REF
+            | SyntaxKind::CONTINUE_IDENTITY
+            | SyntaxKind::CONVERSION
+            | SyntaxKind::CONVERSION_REF
+            | SyntaxKind::CONVERSION_RENAME_TO
+            | SyntaxKind::COPY
+            | SyntaxKind::COPY_FROM
+            | SyntaxKind::COPY_LEGACY_OPTION
+            | SyntaxKind::COPY_OPTION
+            | SyntaxKind::COPY_OPTION_ARG
+            | SyntaxKind::COPY_OPTION_ARG_LIST
+            | SyntaxKind::COPY_OPTION_KEY
+            | SyntaxKind::COPY_OPTION_LIST
+            | SyntaxKind::COPY_OPTION_VALUE
+            | SyntaxKind::COPY_OPTION_VALUE_NAME
+            | SyntaxKind::COPY_PROGRAM
+            | SyntaxKind::COPY_QUERY
+            | SyntaxKind::COPY_STDIN
+            | SyntaxKind::COPY_STDOUT
+            | SyntaxKind::COPY_TABLE
+            | SyntaxKind::COPY_TO
+            | SyntaxKind::COST_FUNC_OPTION
+            | SyntaxKind::CREATE_ACCESS_METHOD
+            | SyntaxKind::CREATE_AGGREGATE
+            | SyntaxKind::CREATE_CAST
+            | SyntaxKind::CREATE_COLLATION
+            | SyntaxKind::CREATE_CONVERSION
+            | SyntaxKind::CREATE_DATABASE
+            | SyntaxKind::CREATE_DOMAIN
+            | SyntaxKind::CREATE_EVENT_TRIGGER
+            | SyntaxKind::CREATE_EXTENSION
+            | SyntaxKind::CREATE_FOREIGN_DATA_WRAPPER
+            | SyntaxKind::CREATE_FOREIGN_TABLE
+            | SyntaxKind::CREATE_FUNCTION
+            | SyntaxKind::CREATE_GROUP
+            | SyntaxKind::CREATE_INDEX
+            | SyntaxKind::CREATE_LANGUAGE
+            | SyntaxKind::CREATE_MATERIALIZED_VIEW
+            | SyntaxKind::CREATE_OPERATOR
+            | SyntaxKind::CREATE_OPERATOR_CLASS
+            | SyntaxKind::CREATE_OPERATOR_FAMILY
+            | SyntaxKind::CREATE_POLICY
+            | SyntaxKind::CREATE_PROCEDURE
+            | SyntaxKind::CREATE_PROPERTY_GRAPH
+            | SyntaxKind::CREATE_PUBLICATION
+            | SyntaxKind::CREATE_ROLE
+            | SyntaxKind::CREATE_RULE
+            | SyntaxKind::CREATE_SCHEMA
+            | SyntaxKind::CREATE_SEQUENCE
+            | SyntaxKind::CREATE_SERVER
+            | SyntaxKind::CREATE_STATISTICS
+            | SyntaxKind::CREATE_SUBSCRIPTION
+            | SyntaxKind::CREATE_TABLE
+            | SyntaxKind::CREATE_TABLESPACE
+            | SyntaxKind::CREATE_TABLE_AS
+            | SyntaxKind::CREATE_TEXT_SEARCH_CONFIGURATION
+            | SyntaxKind::CREATE_TEXT_SEARCH_DICTIONARY
+            | SyntaxKind::CREATE_TEXT_SEARCH_PARSER
+            | SyntaxKind::CREATE_TEXT_SEARCH_TEMPLATE
+            | SyntaxKind::CREATE_TRANSFORM
+            | SyntaxKind::CREATE_TRIGGER
+            | SyntaxKind::CREATE_TYPE
+            | SyntaxKind::CREATE_USER
+            | SyntaxKind::CREATE_USER_MAPPING
+            | SyntaxKind::CREATE_VIEW
+            | SyntaxKind::CTE_NAME
+            | SyntaxKind::CURRENT_ROW
+            | SyntaxKind::CURSOR
+            | SyntaxKind::CURSOR_REF
+            | SyntaxKind::CUSTOM_OP
+            | SyntaxKind::CYCLE_CLAUSE
+            | SyntaxKind::CYCLE_COLUMNS
+            | SyntaxKind::CYCLE_COLUMN_TO
+            | SyntaxKind::CYCLE_DEFAULT
+            | SyntaxKind::CYCLE_PATH
+            | SyntaxKind::CYCLE_SET_COLUMN
+            | SyntaxKind::DATABASE
+            | SyntaxKind::DATABASE_OPTION_CONNECTION_LIMIT
+            | SyntaxKind::DATABASE_OPTION_ENCODING
+            | SyntaxKind::DATABASE_OPTION_GENERIC
+            | SyntaxKind::DATABASE_OPTION_LIST
+            | SyntaxKind::DATABASE_OPTION_OWNER
+            | SyntaxKind::DATABASE_OPTION_TABLESPACE
+            | SyntaxKind::DATABASE_OPTION_TEMPLATE
+            | SyntaxKind::DATABASE_REF
+            | SyntaxKind::DATABASE_RENAME_TO
+            | SyntaxKind::DEALLOCATE
+            | SyntaxKind::DECLARE
+            | SyntaxKind::DEFAULT_CONSTRAINT
+            | SyntaxKind::DEFAULT_LABEL
+            | SyntaxKind::DEFAULT_VALUES
+            | SyntaxKind::DEFERRABLE
+            | SyntaxKind::DEFERRABLE_CONSTRAINT_OPTION
+            | SyntaxKind::DEFERRED
+            | SyntaxKind::DELETE
+            | SyntaxKind::DELETE_ROWS
+            | SyntaxKind::DEPENDS_ON_EXTENSION
+            | SyntaxKind::DEPTH_FIRST
+            | SyntaxKind::DEST_VERTEX_TABLE
+            | SyntaxKind::DETACH_CONCURRENTLY
+            | SyntaxKind::DETACH_FINALIZE
+            | SyntaxKind::DETACH_PARTITION
+            | SyntaxKind::DISABLE
+            | SyntaxKind::DISABLE_RLS
+            | SyntaxKind::DISABLE_RULE
+            | SyntaxKind::DISABLE_SUBSCRIPTION
+            | SyntaxKind::DISABLE_TRIGGER
+            | SyntaxKind::DISCARD
+            | SyntaxKind::DISCARD_ALL
+            | SyntaxKind::DISCARD_PLANS
+            | SyntaxKind::DISCARD_SEQUENCES
+            | SyntaxKind::DISCARD_TEMP
+            | SyntaxKind::DISTINCT
+            | SyntaxKind::DISTINCT_CLAUSE
+            | SyntaxKind::DISTINCT_ON
+            | SyntaxKind::DO
+            | SyntaxKind::DOMAIN
+            | SyntaxKind::DOMAIN_REF
+            | SyntaxKind::DOMAIN_RENAME_TO
+            | SyntaxKind::DOUBLE_TYPE
+            | SyntaxKind::DO_LANGUAGE
+            | SyntaxKind::DROP
+            | SyntaxKind::DROP_ACCESS_METHOD
+            | SyntaxKind::DROP_AGGREGATE
+            | SyntaxKind::DROP_ATTRIBUTE
+            | SyntaxKind::DROP_CAST
+            | SyntaxKind::DROP_COLLATION
+            | SyntaxKind::DROP_COLUMN
+            | SyntaxKind::DROP_CONSTRAINT
+            | SyntaxKind::DROP_CONVERSION
+            | SyntaxKind::DROP_DATABASE
+            | SyntaxKind::DROP_DATABASE_FORCE_CLAUSE
+            | SyntaxKind::DROP_DEFAULT
+            | SyntaxKind::DROP_DOMAIN
+            | SyntaxKind::DROP_EDGE_TABLES
+            | SyntaxKind::DROP_EVENT_TRIGGER
+            | SyntaxKind::DROP_EXPRESSION
+            | SyntaxKind::DROP_EXTENSION
+            | SyntaxKind::DROP_FOREIGN_DATA_WRAPPER
+            | SyntaxKind::DROP_FOREIGN_OPTION
+            | SyntaxKind::DROP_FOREIGN_TABLE
+            | SyntaxKind::DROP_FUNCTION
+            | SyntaxKind::DROP_GROUP
+            | SyntaxKind::DROP_IDENTITY
+            | SyntaxKind::DROP_INDEX
+            | SyntaxKind::DROP_LANGUAGE
+            | SyntaxKind::DROP_MAPPING
+            | SyntaxKind::DROP_MATERIALIZED_VIEW
+            | SyntaxKind::DROP_NOT_NULL
+            | SyntaxKind::DROP_OPERATOR
+            | SyntaxKind::DROP_OPERATOR_CLASS
+            | SyntaxKind::DROP_OPERATOR_FAMILY
+            | SyntaxKind::DROP_OP_CLASS_OPTIONS
+            | SyntaxKind::DROP_OP_CLASS_OPTION_FUNCTION
+            | SyntaxKind::DROP_OP_CLASS_OPTION_LIST
+            | SyntaxKind::DROP_OP_CLASS_OPTION_OPERATOR
+            | SyntaxKind::DROP_OWNED
+            | SyntaxKind::DROP_POLICY
+            | SyntaxKind::DROP_PROCEDURE
+            | SyntaxKind::DROP_PROPERTY_GRAPH
+            | SyntaxKind::DROP_PUBLICATION
+            | SyntaxKind::DROP_PUBLICATION_OBJECTS
+            | SyntaxKind::DROP_ROLE
+            | SyntaxKind::DROP_ROUTINE
+            | SyntaxKind::DROP_RULE
+            | SyntaxKind::DROP_SCHEMA
+            | SyntaxKind::DROP_SEQUENCE
+            | SyntaxKind::DROP_SERVER
+            | SyntaxKind::DROP_STATISTICS
+            | SyntaxKind::DROP_SUBSCRIPTION
+            | SyntaxKind::DROP_SUBSCRIPTION_PUBLICATION
+            | SyntaxKind::DROP_TABLE
+            | SyntaxKind::DROP_TABLESPACE
+            | SyntaxKind::DROP_TEXT_SEARCH_CONFIG
+            | SyntaxKind::DROP_TEXT_SEARCH_DICT
+            | SyntaxKind::DROP_TEXT_SEARCH_PARSER
+            | SyntaxKind::DROP_TEXT_SEARCH_TEMPLATE
+            | SyntaxKind::DROP_TRANSFORM
+            | SyntaxKind::DROP_TRIGGER
+            | SyntaxKind::DROP_TYPE
+            | SyntaxKind::DROP_USER
+            | SyntaxKind::DROP_USERS
+            | SyntaxKind::DROP_USER_MAPPING
+            | SyntaxKind::DROP_VERTEX_EDGE_LABEL
+            | SyntaxKind::DROP_VERTEX_EDGE_LABEL_PROPERTIES
+            | SyntaxKind::DROP_VERTEX_TABLES
+            | SyntaxKind::DROP_VIEW
+            | SyntaxKind::EDGE_ANY
+            | SyntaxKind::EDGE_LEFT
+            | SyntaxKind::EDGE_RIGHT
+            | SyntaxKind::EDGE_TABLES
+            | SyntaxKind::EDGE_TABLE_DEF
+            | SyntaxKind::ELEMENT_TABLE_ALIAS
+            | SyntaxKind::ELEMENT_TABLE_ALIAS_CLAUSE
+            | SyntaxKind::ELEMENT_TABLE_KEY_CLAUSE
+            | SyntaxKind::ELEMENT_TABLE_REF
+            | SyntaxKind::ELEMENT_TAG
+            | SyntaxKind::ELEMENT_VARIABLE
+            | SyntaxKind::ELSE_CLAUSE
+            | SyntaxKind::EMPTY_STMT
+            | SyntaxKind::ENABLE
+            | SyntaxKind::ENABLE_ALWAYS
+            | SyntaxKind::ENABLE_ALWAYS_RULE
+            | SyntaxKind::ENABLE_ALWAYS_TRIGGER
+            | SyntaxKind::ENABLE_REPLICA
+            | SyntaxKind::ENABLE_REPLICA_RULE
+            | SyntaxKind::ENABLE_REPLICA_TRIGGER
+            | SyntaxKind::ENABLE_RLS
+            | SyntaxKind::ENABLE_RULE
+            | SyntaxKind::ENABLE_SUBSCRIPTION
+            | SyntaxKind::ENABLE_TRIGGER
+            | SyntaxKind::ENFORCED
+            | SyntaxKind::ENUM_TYPE
+            | SyntaxKind::EVENT_TRIGGER
+            | SyntaxKind::EVENT_TRIGGER_EVENT
+            | SyntaxKind::EVENT_TRIGGER_FILTER_VARIABLE
+            | SyntaxKind::EVENT_TRIGGER_REF
+            | SyntaxKind::EVENT_TRIGGER_RENAME_TO
+            | SyntaxKind::EVENT_TRIGGER_WHEN
+            | SyntaxKind::EVENT_TRIGGER_WHEN_AND
+            | SyntaxKind::EVENT_TRIGGER_WHEN_CLAUSE
+            | SyntaxKind::EXCEPT
+            | SyntaxKind::EXCEPT_TABLES
+            | SyntaxKind::EXCEPT_TABLE_CLAUSE
+            | SyntaxKind::EXCEPT_TABLE_NAME
+            | SyntaxKind::EXCLUDE_CONSTRAINT
+            | SyntaxKind::EXCLUDING_PROPERTY
+            | SyntaxKind::EXCLUSIVE
+            | SyntaxKind::EXECUTE
+            | SyntaxKind::EXISTS_FN
+            | SyntaxKind::EXPLAIN
+            | SyntaxKind::EXPLAIN_ANALYZE
+            | SyntaxKind::EXPLAIN_OPTION
+            | SyntaxKind::EXPLAIN_OPTION_LIST
+            | SyntaxKind::EXPLAIN_OPTION_NAME
+            | SyntaxKind::EXPLAIN_OPTION_VALUE
+            | SyntaxKind::EXPLAIN_VERBOSE
+            | SyntaxKind::EXPR_AS_COLUMN_NAME
+            | SyntaxKind::EXPR_AS_COLUMN_NAME_LIST
+            | SyntaxKind::EXPR_AS_ELEMENT_TAG
+            | SyntaxKind::EXPR_AS_ELEMENT_TAG_LIST
+            | SyntaxKind::EXPR_AS_PROPERTY_NAME
+            | SyntaxKind::EXPR_AS_PROPERTY_NAME_LIST
+            | SyntaxKind::EXPR_AS_XML_ATTR
+            | SyntaxKind::EXPR_AS_XML_ATTR_LIST
+            | SyntaxKind::EXPR_FOLLOWING
+            | SyntaxKind::EXPR_FROM_ITEM
+            | SyntaxKind::EXPR_PRECEDING
+            | SyntaxKind::EXTENSION
+            | SyntaxKind::EXTENSION_REF
+            | SyntaxKind::EXTENSION_SCHEMA
+            | SyntaxKind::EXTENSION_VERSION
+            | SyntaxKind::EXTENSION_VERSION_CLAUSE
+            | SyntaxKind::EXTRACT_FIELD_LITERAL
+            | SyntaxKind::EXTRACT_FIELD_NAME
+            | SyntaxKind::EXTRACT_FN
+            | SyntaxKind::FDW_OPTION_LIST
+            | SyntaxKind::FETCH
+            | SyntaxKind::FETCH_CLAUSE
+            | SyntaxKind::FETCH_ONLY
+            | SyntaxKind::FIELD_ACCESSOR
+            | SyntaxKind::FIELD_EXPR
+            | SyntaxKind::FILTER_CLAUSE
+            | SyntaxKind::FIRST
+            | SyntaxKind::FORCE
+            | SyntaxKind::FORCE_NOT_NULL
+            | SyntaxKind::FORCE_NULL
+            | SyntaxKind::FORCE_QUOTE
+            | SyntaxKind::FORCE_RLS
+            | SyntaxKind::FOREIGN_DATA_WRAPPER
+            | SyntaxKind::FOREIGN_DATA_WRAPPER_REF
+            | SyntaxKind::FOREIGN_DATA_WRAPPER_RENAME_TO
+            | SyntaxKind::FOREIGN_KEY_COLUMN_LIST
+            | SyntaxKind::FOREIGN_KEY_CONSTRAINT
+            | SyntaxKind::FOREIGN_OPTION_NAME
+            | SyntaxKind::FORWARD
+            | SyntaxKind::FOR_ALL_PUBLICATION_OBJECTS
+            | SyntaxKind::FOR_EACH_ROW
+            | SyntaxKind::FOR_EACH_STATEMENT
+            | SyntaxKind::FOR_KEY_SHARE
+            | SyntaxKind::FOR_NO_KEY_UPDATE
+            | SyntaxKind::FOR_PORTION_OF
+            | SyntaxKind::FOR_PROVIDER
+            | SyntaxKind::FOR_PUBLICATION_OBJECTS
+            | SyntaxKind::FOR_ROLES
+            | SyntaxKind::FOR_SHARE
+            | SyntaxKind::FOR_UPDATE
+            | SyntaxKind::FRAME_BETWEEN
+            | SyntaxKind::FRAME_CLAUSE
+            | SyntaxKind::FRAME_EXCLUDE
+            | SyntaxKind::FRAME_GROUPS
+            | SyntaxKind::FRAME_RANGE
+            | SyntaxKind::FRAME_ROWS
+            | SyntaxKind::FROM_ALIAS
+            | SyntaxKind::FROM_CLAUSE
+            | SyntaxKind::FROM_CURRENT
+            | SyntaxKind::FROM_TABLE
+            | SyntaxKind::FUNCTION_FROM_ITEM
+            | SyntaxKind::FUNCTION_NAME
+            | SyntaxKind::FUNCTION_NAME_REF
+            | SyntaxKind::FUNCTION_RENAME_TO
+            | SyntaxKind::FUNCTION_SIG
+            | SyntaxKind::FUNCTION_SIG_LIST
+            | SyntaxKind::FUNC_OPTION_LIST
+            | SyntaxKind::GENERATED_ALWAYS
+            | SyntaxKind::GENERATED_BY_DEFAULT
+            | SyntaxKind::GENERATED_CONSTRAINT
+            | SyntaxKind::GENERATED_IDENTITY
+            | SyntaxKind::GENERATED_STORED
+            | SyntaxKind::GRANT
+            | SyntaxKind::GRANTED_BY_CLAUSE
+            | SyntaxKind::GRANT_DEFAULT_PRIVILEGES
+            | SyntaxKind::GRANT_OPTION
+            | SyntaxKind::GRANT_OPTION_FOR
+            | SyntaxKind::GRANT_ROLE_OPTION
+            | SyntaxKind::GRANT_ROLE_OPTION_LIST
+            | SyntaxKind::GRANT_ROLE_OPTION_NAME
+            | SyntaxKind::GRANT_WITH_CLAUSE
+            | SyntaxKind::GRAPH_PATTERN_QUALIFIER
+            | SyntaxKind::GRAPH_TABLE_FN
+            | SyntaxKind::GRAPH_TABLE_FROM_ITEM
+            | SyntaxKind::GROUP
+            | SyntaxKind::GROUPING_CUBE
+            | SyntaxKind::GROUPING_EXPR
+            | SyntaxKind::GROUPING_ROLLUP
+            | SyntaxKind::GROUPING_SETS
+            | SyntaxKind::GROUP_BY_CLAUSE
+            | SyntaxKind::GROUP_BY_LIST
+            | SyntaxKind::HANDLER_CLAUSE
+            | SyntaxKind::HASH_PARTITION_BOUND
+            | SyntaxKind::HAVING_CLAUSE
+            | SyntaxKind::IF_EXISTS
+            | SyntaxKind::IF_NOT_EXISTS
+            | SyntaxKind::IGNORE_NULLS
+            | SyntaxKind::IMMEDIATE
+            | SyntaxKind::IMMUTABLE
+            | SyntaxKind::IMPORT_FOREIGN_SCHEMA
+            | SyntaxKind::INCLUDING_PROPERTY
+            | SyntaxKind::INDENT
+            | SyntaxKind::INDEX
+            | SyntaxKind::INDEX_ACCESSOR
+            | SyntaxKind::INDEX_EXPR
+            | SyntaxKind::INDEX_INCLUDE_CLAUSE
+            | SyntaxKind::INDEX_PARAMETERS
+            | SyntaxKind::INDEX_REF
+            | SyntaxKind::INDEX_RENAME_TO
+            | SyntaxKind::INHERIT
+            | SyntaxKind::INHERITS
+            | SyntaxKind::INHERIT_OPTION_FOR
+            | SyntaxKind::INHERIT_TABLE
+            | SyntaxKind::INITIALLY_DEFERRED_CONSTRAINT_OPTION
+            | SyntaxKind::INITIALLY_IMMEDIATE_CONSTRAINT_OPTION
+            | SyntaxKind::INLINE_CLAUSE
+            | SyntaxKind::INSENSITIVE
+            | SyntaxKind::INSERT
+            | SyntaxKind::INTERSECT
+            | SyntaxKind::INTERVAL_DAY
+            | SyntaxKind::INTERVAL_HOUR
+            | SyntaxKind::INTERVAL_MINUTE
+            | SyntaxKind::INTERVAL_MONTH
+            | SyntaxKind::INTERVAL_SECOND
+            | SyntaxKind::INTERVAL_TYPE
+            | SyntaxKind::INTERVAL_YEAR
+            | SyntaxKind::INTO_CLAUSE
+            | SyntaxKind::INTO_SCHEMA
+            | SyntaxKind::IN_DATABASE
+            | SyntaxKind::IN_SCHEMAS
+            | SyntaxKind::IS_DISTINCT_FROM
+            | SyntaxKind::IS_JSON
+            | SyntaxKind::IS_JSON_ARRAY
+            | SyntaxKind::IS_JSON_OBJECT
+            | SyntaxKind::IS_JSON_SCALAR
+            | SyntaxKind::IS_JSON_VALUE
+            | SyntaxKind::IS_LABEL
+            | SyntaxKind::IS_NORMALIZED
+            | SyntaxKind::IS_NOT
+            | SyntaxKind::IS_NOT_DISTINCT_FROM
+            | SyntaxKind::IS_NOT_JSON
+            | SyntaxKind::IS_NOT_JSON_ARRAY
+            | SyntaxKind::IS_NOT_JSON_OBJECT
+            | SyntaxKind::IS_NOT_JSON_SCALAR
+            | SyntaxKind::IS_NOT_JSON_VALUE
+            | SyntaxKind::IS_NOT_NORMALIZED
+            | SyntaxKind::JOIN
+            | SyntaxKind::JOIN_CROSS
+            | SyntaxKind::JOIN_EXPR
+            | SyntaxKind::JOIN_FULL
+            | SyntaxKind::JOIN_INNER
+            | SyntaxKind::JOIN_LEFT
+            | SyntaxKind::JOIN_RIGHT
+            | SyntaxKind::JOIN_USING_CLAUSE
+            | SyntaxKind::JSON_ABSENT_ON_NULL
+            | SyntaxKind::JSON_ARRAY_AGG_FN
+            | SyntaxKind::JSON_ARRAY_FN
+            | SyntaxKind::JSON_BEHAVIOR_DEFAULT
+            | SyntaxKind::JSON_BEHAVIOR_EMPTY_ARRAY
+            | SyntaxKind::JSON_BEHAVIOR_EMPTY_OBJECT
+            | SyntaxKind::JSON_BEHAVIOR_ERROR
+            | SyntaxKind::JSON_BEHAVIOR_FALSE
+            | SyntaxKind::JSON_BEHAVIOR_NULL
+            | SyntaxKind::JSON_BEHAVIOR_TRUE
+            | SyntaxKind::JSON_BEHAVIOR_UNKNOWN
+            | SyntaxKind::JSON_ENCODING
+            | SyntaxKind::JSON_ENCODING_CLAUSE
+            | SyntaxKind::JSON_EXISTS_FN
+            | SyntaxKind::JSON_EXPR_FORMAT
+            | SyntaxKind::JSON_FN
+            | SyntaxKind::JSON_FORMAT_CLAUSE
+            | SyntaxKind::JSON_KEY_VALUE
+            | SyntaxKind::JSON_NULL_ON_NULL
+            | SyntaxKind::JSON_OBJECT_AGG_FN
+            | SyntaxKind::JSON_OBJECT_FN
+            | SyntaxKind::JSON_ON_EMPTY_CLAUSE
+            | SyntaxKind::JSON_ON_ERROR_CLAUSE
+            | SyntaxKind::JSON_PASSING_ARG
+            | SyntaxKind::JSON_PASSING_CLAUSE
+            | SyntaxKind::JSON_PATH_CLAUSE
+            | SyntaxKind::JSON_PATH_NAME
+            | SyntaxKind::JSON_PATH_NAME_CLAUSE
+            | SyntaxKind::JSON_PATH_NAME_REF
+            | SyntaxKind::JSON_QUERY_FN
+            | SyntaxKind::JSON_QUOTES_CLAUSE
+            | SyntaxKind::JSON_RETURNING_CLAUSE
+            | SyntaxKind::JSON_SCALAR_FN
+            | SyntaxKind::JSON_SELECT_FORMAT
+            | SyntaxKind::JSON_SERIALIZE_FN
+            | SyntaxKind::JSON_TABLE
+            | SyntaxKind::JSON_TABLE_COLUMN_LIST
+            | SyntaxKind::JSON_TABLE_EXISTS_COLUMN
+            | SyntaxKind::JSON_TABLE_FROM_ITEM
+            | SyntaxKind::JSON_TABLE_NESTED_COLUMN
+            | SyntaxKind::JSON_TABLE_ORDINALITY_COLUMN
+            | SyntaxKind::JSON_TABLE_PLAN_CHOICE
+            | SyntaxKind::JSON_TABLE_PLAN_CLAUSE
+            | SyntaxKind::JSON_TABLE_PLAN_CROSS
+            | SyntaxKind::JSON_TABLE_PLAN_INNER
+            | SyntaxKind::JSON_TABLE_PLAN_JOIN
+            | SyntaxKind::JSON_TABLE_PLAN_OUTER
+            | SyntaxKind::JSON_TABLE_PLAN_UNION
+            | SyntaxKind::JSON_TABLE_VALUE_COLUMN
+            | SyntaxKind::JSON_VALUE_EXPR
+            | SyntaxKind::JSON_VALUE_FN
+            | SyntaxKind::JSON_VARIABLE_NAME
+            | SyntaxKind::JSON_WITHOUT_UNIQUE_KEYS
+            | SyntaxKind::JSON_WITHOUT_WRAPPER
+            | SyntaxKind::JSON_WITH_CONDITIONAL_WRAPPER
+            | SyntaxKind::JSON_WITH_UNCONDITIONAL_WRAPPER
+            | SyntaxKind::JSON_WITH_UNIQUE_KEYS
+            | SyntaxKind::KEEP_QUOTES
+            | SyntaxKind::LABEL
+            | SyntaxKind::LABEL_AND_PROPERTIES
+            | SyntaxKind::LABEL_AND_PROPERTIES_LIST
+            | SyntaxKind::LABEL_REF
+            | SyntaxKind::LANGUAGE
+            | SyntaxKind::LANGUAGE_FUNC_OPTION
+            | SyntaxKind::LANGUAGE_REF
+            | SyntaxKind::LANGUAGE_RENAME_TO
+            | SyntaxKind::LAST
+            | SyntaxKind::LEAKPROOF_FUNC_OPTION
+            | SyntaxKind::LIKE_CLAUSE
+            | SyntaxKind::LIMIT_CLAUSE
+            | SyntaxKind::LIMIT_TO_TABLES
+            | SyntaxKind::LISTEN
+            | SyntaxKind::LITERAL
+            | SyntaxKind::LOAD
+            | SyntaxKind::LOCAL_CHECK_OPTION
+            | SyntaxKind::LOCAL_SCOPE
+            | SyntaxKind::LOCK
+            | SyntaxKind::LOCKING_CLAUSE
+            | SyntaxKind::LOCKING_OF
+            | SyntaxKind::LOCK_MODE_CLAUSE
+            | SyntaxKind::MATCH_FULL
+            | SyntaxKind::MATCH_PARTIAL
+            | SyntaxKind::MATCH_SIMPLE
+            | SyntaxKind::MATERIALIZED
+            | SyntaxKind::MERGE
+            | SyntaxKind::MERGE_CONDITION
+            | SyntaxKind::MERGE_DELETE
+            | SyntaxKind::MERGE_DO_NOTHING
+            | SyntaxKind::MERGE_INSERT
+            | SyntaxKind::MERGE_PARTITIONS
+            | SyntaxKind::MERGE_UPDATE
+            | SyntaxKind::MERGE_WHEN_MATCHED
+            | SyntaxKind::MERGE_WHEN_NOT_MATCHED_SOURCE
+            | SyntaxKind::MERGE_WHEN_NOT_MATCHED_TARGET
+            | SyntaxKind::MOVE
+            | SyntaxKind::NAMED_ARG
+            | SyntaxKind::NAMED_LABEL
+            | SyntaxKind::NAMED_SCHEMA
+            | SyntaxKind::NAME_REF
+            | SyntaxKind::NEW_TABLE
+            | SyntaxKind::NEXT
+            | SyntaxKind::NON_STANDARD_PARAM
+            | SyntaxKind::NOTHING
+            | SyntaxKind::NOTIFY
+            | SyntaxKind::NOT_DEFERRABLE
+            | SyntaxKind::NOT_DEFERRABLE_CONSTRAINT_OPTION
+            | SyntaxKind::NOT_ENFORCED
+            | SyntaxKind::NOT_ILIKE
+            | SyntaxKind::NOT_IN
+            | SyntaxKind::NOT_LEAKPROOF_FUNC_OPTION
+            | SyntaxKind::NOT_LIKE
+            | SyntaxKind::NOT_MATERIALIZED
+            | SyntaxKind::NOT_NULL_CONSTRAINT
+            | SyntaxKind::NOT_OF
+            | SyntaxKind::NOT_SIMILAR_TO
+            | SyntaxKind::NOT_VALID
+            | SyntaxKind::NOWAIT
+            | SyntaxKind::NO_ACTION
+            | SyntaxKind::NO_DEPENDS_ON_EXTENSION
+            | SyntaxKind::NO_FORCE_RLS
+            | SyntaxKind::NO_INDENT
+            | SyntaxKind::NO_INHERIT
+            | SyntaxKind::NO_INHERIT_TABLE
+            | SyntaxKind::NO_OTHERS
+            | SyntaxKind::NO_PROPERTIES
+            | SyntaxKind::NO_SCROLL
+            | SyntaxKind::NULLS_DISTINCT
+            | SyntaxKind::NULLS_FIRST
+            | SyntaxKind::NULLS_LAST
+            | SyntaxKind::NULLS_NOT_DISTINCT
+            | SyntaxKind::NULL_CONSTRAINT
+            | SyntaxKind::OBJECT_ACCESS_METHOD
+            | SyntaxKind::OBJECT_AGGREGATE
+            | SyntaxKind::OBJECT_CAST
+            | SyntaxKind::OBJECT_COLLATION
+            | SyntaxKind::OBJECT_COLUMN
+            | SyntaxKind::OBJECT_CONSTRAINT
+            | SyntaxKind::OBJECT_CONVERSION
+            | SyntaxKind::OBJECT_DATABASE
+            | SyntaxKind::OBJECT_DOMAIN
+            | SyntaxKind::OBJECT_EVENT_TRIGGER
+            | SyntaxKind::OBJECT_EXTENSION
+            | SyntaxKind::OBJECT_FOREIGN_DATA_WRAPPER
+            | SyntaxKind::OBJECT_FOREIGN_TABLE
+            | SyntaxKind::OBJECT_FUNCTION
+            | SyntaxKind::OBJECT_INDEX
+            | SyntaxKind::OBJECT_LANGUAGE
+            | SyntaxKind::OBJECT_LARGE_OBJECT
+            | SyntaxKind::OBJECT_MATERIALIZED_VIEW
+            | SyntaxKind::OBJECT_OPERATOR
+            | SyntaxKind::OBJECT_OPERATOR_CLASS
+            | SyntaxKind::OBJECT_OPERATOR_FAMILY
+            | SyntaxKind::OBJECT_POLICY
+            | SyntaxKind::OBJECT_PROCEDURE
+            | SyntaxKind::OBJECT_PROPERTY_GRAPH
+            | SyntaxKind::OBJECT_PUBLICATION
+            | SyntaxKind::OBJECT_ROLE
+            | SyntaxKind::OBJECT_ROUTINE
+            | SyntaxKind::OBJECT_RULE
+            | SyntaxKind::OBJECT_SCHEMA
+            | SyntaxKind::OBJECT_SEQUENCE
+            | SyntaxKind::OBJECT_SERVER
+            | SyntaxKind::OBJECT_STATISTICS
+            | SyntaxKind::OBJECT_SUBSCRIPTION
+            | SyntaxKind::OBJECT_TABLE
+            | SyntaxKind::OBJECT_TABLESPACE
+            | SyntaxKind::OBJECT_TEXT_SEARCH_CONFIG
+            | SyntaxKind::OBJECT_TEXT_SEARCH_DICT
+            | SyntaxKind::OBJECT_TEXT_SEARCH_PARSER
+            | SyntaxKind::OBJECT_TEXT_SEARCH_TEMPLATE
+            | SyntaxKind::OBJECT_TRANSFORM
+            | SyntaxKind::OBJECT_TRIGGER
+            | SyntaxKind::OBJECT_TYPE
+            | SyntaxKind::OBJECT_VIEW
+            | SyntaxKind::OFFSET_CLAUSE
+            | SyntaxKind::OF_TYPE
+            | SyntaxKind::OLD_TABLE
+            | SyntaxKind::OMIT_QUOTES
+            | SyntaxKind::ON_CLAUSE
+            | SyntaxKind::ON_COMMIT
+            | SyntaxKind::ON_CONFLICT_CLAUSE
+            | SyntaxKind::ON_DELETE_ACTION
+            | SyntaxKind::ON_PATH
+            | SyntaxKind::ON_PRIVILEGE_OBJECTS_CLAUSE
+            | SyntaxKind::ON_RELATION
+            | SyntaxKind::ON_SCALAR_STRING
+            | SyntaxKind::ON_TABLE
+            | SyntaxKind::ON_UPDATE_ACTION
+            | SyntaxKind::OP
+            | SyntaxKind::OPERATOR_CALL
+            | SyntaxKind::OPERATOR_CLASS_OPTION_LIST
+            | SyntaxKind::OPERATOR_FAMILY_CLAUSE
+            | SyntaxKind::OPTIONAL_AS_ALIAS
+            | SyntaxKind::OPTION_ALTER_OPTION_LIST
+            | SyntaxKind::OPTION_AS_TYPE
+            | SyntaxKind::OPTION_CACHE
+            | SyntaxKind::OPTION_CONNECTION
+            | SyntaxKind::OPTION_CYCLE
+            | SyntaxKind::OPTION_DEFAULT
+            | SyntaxKind::OPTION_HANDLER
+            | SyntaxKind::OPTION_IDENT
+            | SyntaxKind::OPTION_INCREMENT
+            | SyntaxKind::OPTION_ITEM
+            | SyntaxKind::OPTION_ITEM_KEY
+            | SyntaxKind::OPTION_ITEM_LIST
+            | SyntaxKind::OPTION_ITEM_VALUE
+            | SyntaxKind::OPTION_ITEM_VALUE_NAME
+            | SyntaxKind::OPTION_LOGGED
+            | SyntaxKind::OPTION_MAX_VALUE
+            | SyntaxKind::OPTION_MIN_VALUE
+            | SyntaxKind::OPTION_NOT_NULL
+            | SyntaxKind::OPTION_NO_CONNECTION
+            | SyntaxKind::OPTION_NO_CYCLE
+            | SyntaxKind::OPTION_NO_HANDLER
+            | SyntaxKind::OPTION_NO_MAX_VALUE
+            | SyntaxKind::OPTION_NO_MIN_VALUE
+            | SyntaxKind::OPTION_NO_VALIDATOR
+            | SyntaxKind::OPTION_NULL
+            | SyntaxKind::OPTION_OWNED_BY
+            | SyntaxKind::OPTION_PATH
+            | SyntaxKind::OPTION_RESTART
+            | SyntaxKind::OPTION_SEQUENCE_NAME
+            | SyntaxKind::OPTION_START
+            | SyntaxKind::OPTION_UNLOGGED
+            | SyntaxKind::OPTION_VALIDATOR
+            | SyntaxKind::OP_CLASS_FOR_ORDER_BY
+            | SyntaxKind::OP_CLASS_FOR_SEARCH
+            | SyntaxKind::OP_CLASS_NAME
+            | SyntaxKind::OP_CLASS_OPTION_FUNCTION
+            | SyntaxKind::OP_CLASS_OPTION_OPERATOR
+            | SyntaxKind::OP_CLASS_OPTION_STORAGE
+            | SyntaxKind::OP_CLASS_REF
+            | SyntaxKind::OP_CLASS_RENAME_TO
+            | SyntaxKind::OP_FAMILY_NAME
+            | SyntaxKind::OP_FAMILY_REF
+            | SyntaxKind::OP_FAMILY_RENAME_TO
+            | SyntaxKind::OP_SIG
+            | SyntaxKind::OP_SIG_LIST
+            | SyntaxKind::ORDER_BY_CLAUSE
+            | SyntaxKind::OR_REPLACE
+            | SyntaxKind::OVERLAY_EXPRS
+            | SyntaxKind::OVERLAY_FN
+            | SyntaxKind::OVERLAY_PLACING
+            | SyntaxKind::OVERRIDING_SYSTEM_VALUE
+            | SyntaxKind::OVERRIDING_USER_VALUE
+            | SyntaxKind::OVER_CLAUSE
+            | SyntaxKind::OVER_WINDOW_SPEC
+            | SyntaxKind::OWNED_BY_NONE
+            | SyntaxKind::OWNED_BY_ROLES
+            | SyntaxKind::OWNER_TO
+            | SyntaxKind::PARALLEL_FUNC_OPTION
+            | SyntaxKind::PARAM
+            | SyntaxKind::PARAM_DEFAULT
+            | SyntaxKind::PARAM_IN
+            | SyntaxKind::PARAM_IN_OUT
+            | SyntaxKind::PARAM_LIST
+            | SyntaxKind::PARAM_NAME
+            | SyntaxKind::PARAM_NAME_REF
+            | SyntaxKind::PARAM_OUT
+            | SyntaxKind::PARAM_VARIADIC
+            | SyntaxKind::PAREN_EXPR
+            | SyntaxKind::PAREN_FROM_ITEM
+            | SyntaxKind::PAREN_GRAPH_PATTERN
+            | SyntaxKind::PAREN_JSON_TABLE_PLAN
+            | SyntaxKind::PAREN_SELECT
+            | SyntaxKind::PARTITION
+            | SyntaxKind::PARTITION_BY
+            | SyntaxKind::PARTITION_BY_CLAUSE
+            | SyntaxKind::PARTITION_DEFAULT
+            | SyntaxKind::PARTITION_FOR_VALUES_FROM
+            | SyntaxKind::PARTITION_FOR_VALUES_IN
+            | SyntaxKind::PARTITION_FOR_VALUES_WITH
+            | SyntaxKind::PARTITION_FROM_VALUES
+            | SyntaxKind::PARTITION_ITEM
+            | SyntaxKind::PARTITION_ITEM_LIST
+            | SyntaxKind::PARTITION_LIST
+            | SyntaxKind::PARTITION_OF
+            | SyntaxKind::PARTITION_STRATEGY
+            | SyntaxKind::PARTITION_TO_VALUES
+            | SyntaxKind::PATH
+            | SyntaxKind::PATH_FACTOR
+            | SyntaxKind::PATH_PATTERN
+            | SyntaxKind::PATH_PATTERN_LIST
+            | SyntaxKind::PATH_REF
+            | SyntaxKind::PATH_SEGMENT
+            | SyntaxKind::PATH_SEGMENT_REF
+            | SyntaxKind::PATH_TYPE
+            | SyntaxKind::PERCENT_TYPE
+            | SyntaxKind::PERCENT_TYPE_CLAUSE
+            | SyntaxKind::PERIOD_COLUMN
+            | SyntaxKind::PLPGSQL
+            | SyntaxKind::PLPGSQL_ALIAS_DECL
+            | SyntaxKind::PLPGSQL_ALIAS_TARGET
+            | SyntaxKind::PLPGSQL_ASSERT_STMT
+            | SyntaxKind::PLPGSQL_ASSIGN_STMT
+            | SyntaxKind::PLPGSQL_ASSIGN_TARGET
+            | SyntaxKind::PLPGSQL_BLOCK
+            | SyntaxKind::PLPGSQL_BODY
+            | SyntaxKind::PLPGSQL_CALL_STMT
+            | SyntaxKind::PLPGSQL_CASE_STMT
+            | SyntaxKind::PLPGSQL_CASE_WHEN
+            | SyntaxKind::PLPGSQL_CLOSE_STMT
+            | SyntaxKind::PLPGSQL_COMMIT_STMT
+            | SyntaxKind::PLPGSQL_COMP_OPTION_DUMP
+            | SyntaxKind::PLPGSQL_COMP_OPTION_PRINT_STRICT_PARAMS
+            | SyntaxKind::PLPGSQL_COMP_OPTION_VARIABLE_CONFLICT
+            | SyntaxKind::PLPGSQL_CONDITION
+            | SyntaxKind::PLPGSQL_CONTINUE_STMT
+            | SyntaxKind::PLPGSQL_CURSOR_ARG
+            | SyntaxKind::PLPGSQL_CURSOR_ARG_LIST
+            | SyntaxKind::PLPGSQL_CURSOR_DECL
+            | SyntaxKind::PLPGSQL_CURSOR_VARIABLE_REF
+            | SyntaxKind::PLPGSQL_DECLARE_SECTION
+            | SyntaxKind::PLPGSQL_DIAG_AREA
+            | SyntaxKind::PLPGSQL_DIAG_ITEM
+            | SyntaxKind::PLPGSQL_DIAG_ITEM_LIST
+            | SyntaxKind::PLPGSQL_DIAG_KIND
+            | SyntaxKind::PLPGSQL_DIAG_TARGET
+            | SyntaxKind::PLPGSQL_DO_STMT
+            | SyntaxKind::PLPGSQL_DYN_EXECUTE_STMT
+            | SyntaxKind::PLPGSQL_ELSE_CLAUSE
+            | SyntaxKind::PLPGSQL_ELSIF_CLAUSE
+            | SyntaxKind::PLPGSQL_EXCEPTION_HANDLER
+            | SyntaxKind::PLPGSQL_EXCEPTION_SECTION
+            | SyntaxKind::PLPGSQL_EXEC_SQL_STMT
+            | SyntaxKind::PLPGSQL_EXIT_STMT
+            | SyntaxKind::PLPGSQL_EXIT_WHEN
+            | SyntaxKind::PLPGSQL_EXPR
+            | SyntaxKind::PLPGSQL_FETCH_STMT
+            | SyntaxKind::PLPGSQL_FOR_CURSOR_STMT
+            | SyntaxKind::PLPGSQL_FOR_DYN_STMT
+            | SyntaxKind::PLPGSQL_FOR_EACH_SLICE
+            | SyntaxKind::PLPGSQL_FOR_EACH_STMT
+            | SyntaxKind::PLPGSQL_FOR_I_STMT
+            | SyntaxKind::PLPGSQL_FOR_QUERY_STMT
+            | SyntaxKind::PLPGSQL_FOR_RANGE
+            | SyntaxKind::PLPGSQL_FOR_VARIABLE
+            | SyntaxKind::PLPGSQL_GET_DIAG_STMT
+            | SyntaxKind::PLPGSQL_IF_STMT
+            | SyntaxKind::PLPGSQL_INTO_CLAUSE
+            | SyntaxKind::PLPGSQL_INTO_TARGET
+            | SyntaxKind::PLPGSQL_INTO_TARGET_LIST
+            | SyntaxKind::PLPGSQL_LABEL
+            | SyntaxKind::PLPGSQL_LABEL_NAME
+            | SyntaxKind::PLPGSQL_LABEL_NAME_REF
+            | SyntaxKind::PLPGSQL_LOOP_STMT
+            | SyntaxKind::PLPGSQL_MOVE_STMT
+            | SyntaxKind::PLPGSQL_NOT_NULL
+            | SyntaxKind::PLPGSQL_NULL_STMT
+            | SyntaxKind::PLPGSQL_OPEN_EXECUTE
+            | SyntaxKind::PLPGSQL_OPEN_QUERY
+            | SyntaxKind::PLPGSQL_OPEN_STMT
+            | SyntaxKind::PLPGSQL_OPTION_VALUE
+            | SyntaxKind::PLPGSQL_PERCENT_ROWTYPE
+            | SyntaxKind::PLPGSQL_PERFORM_STMT
+            | SyntaxKind::PLPGSQL_RAISE_LEVEL
+            | SyntaxKind::PLPGSQL_RAISE_MESSAGE
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_COLUMN
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_CONSTRAINT
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_DATATYPE
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_DETAIL
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_ERRCODE
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_HINT
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_MESSAGE
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_SCHEMA
+            | SyntaxKind::PLPGSQL_RAISE_OPTION_TABLE
+            | SyntaxKind::PLPGSQL_RAISE_STMT
+            | SyntaxKind::PLPGSQL_RAISE_USING_CLAUSE
+            | SyntaxKind::PLPGSQL_RETURN_NEXT_STMT
+            | SyntaxKind::PLPGSQL_RETURN_QUERY_EXECUTE_STMT
+            | SyntaxKind::PLPGSQL_RETURN_QUERY_STMT
+            | SyntaxKind::PLPGSQL_RETURN_STMT
+            | SyntaxKind::PLPGSQL_ROLLBACK_STMT
+            | SyntaxKind::PLPGSQL_USING_CLAUSE
+            | SyntaxKind::PLPGSQL_VAR_DECL
+            | SyntaxKind::PLPGSQL_VAR_INIT
+            | SyntaxKind::PLPGSQL_VAR_NAME
+            | SyntaxKind::PLPGSQL_VAR_NAME_REF
+            | SyntaxKind::PLPGSQL_WHILE_STMT
+            | SyntaxKind::POLICY
+            | SyntaxKind::POLICY_COMMAND
+            | SyntaxKind::POLICY_COMMAND_ALL
+            | SyntaxKind::POLICY_COMMAND_DELETE
+            | SyntaxKind::POLICY_COMMAND_INSERT
+            | SyntaxKind::POLICY_COMMAND_SELECT
+            | SyntaxKind::POLICY_COMMAND_UPDATE
+            | SyntaxKind::POLICY_REF
+            | SyntaxKind::POLICY_RENAME_TO
+            | SyntaxKind::POLICY_ROLES
+            | SyntaxKind::PORTION_FROM_TO
+            | SyntaxKind::PORTION_RANGE
+            | SyntaxKind::POSITION_FN
+            | SyntaxKind::POSTFIX_EXPR
+            | SyntaxKind::PREFIX_EXPR
+            | SyntaxKind::PREPARE
+            | SyntaxKind::PREPARED_STATEMENT
+            | SyntaxKind::PREPARED_STATEMENT_REF
+            | SyntaxKind::PREPARE_TRANSACTION
+            | SyntaxKind::PRESERVE_ROWS
+            | SyntaxKind::PRESERVE_WHITESPACE
+            | SyntaxKind::PRIMARY_KEY_CONSTRAINT
+            | SyntaxKind::PRIOR
+            | SyntaxKind::PRIVILEGE_ALL_FUNCTIONS_IN_SCHEMA
+            | SyntaxKind::PRIVILEGE_ALL_PROCEDURES_IN_SCHEMA
+            | SyntaxKind::PRIVILEGE_ALL_ROUTINES_IN_SCHEMA
+            | SyntaxKind::PRIVILEGE_ALL_SEQUENCES_IN_SCHEMA
+            | SyntaxKind::PRIVILEGE_ALL_TABLES_IN_SCHEMA
+            | SyntaxKind::PRIVILEGE_DATABASE
+            | SyntaxKind::PRIVILEGE_DEFAULT
+            | SyntaxKind::PRIVILEGE_DOMAIN
+            | SyntaxKind::PRIVILEGE_FOREIGN_DATA_WRAPPER
+            | SyntaxKind::PRIVILEGE_FOREIGN_SERVER
+            | SyntaxKind::PRIVILEGE_FUNCTION
+            | SyntaxKind::PRIVILEGE_LANGUAGE
+            | SyntaxKind::PRIVILEGE_LARGE_OBJECT
+            | SyntaxKind::PRIVILEGE_PARAMETER
+            | SyntaxKind::PRIVILEGE_PROCEDURE
+            | SyntaxKind::PRIVILEGE_PROPERTY_GRAPH
+            | SyntaxKind::PRIVILEGE_ROUTINE
+            | SyntaxKind::PRIVILEGE_SCHEMA
+            | SyntaxKind::PRIVILEGE_SEQUENCE
+            | SyntaxKind::PRIVILEGE_TABLE
+            | SyntaxKind::PRIVILEGE_TABLESPACE
+            | SyntaxKind::PRIVILEGE_TARGET_FUNCTIONS
+            | SyntaxKind::PRIVILEGE_TARGET_LARGE_OBJECTS
+            | SyntaxKind::PRIVILEGE_TARGET_ROUTINES
+            | SyntaxKind::PRIVILEGE_TARGET_SCHEMAS
+            | SyntaxKind::PRIVILEGE_TARGET_SEQUENCES
+            | SyntaxKind::PRIVILEGE_TARGET_TABLES
+            | SyntaxKind::PRIVILEGE_TARGET_TYPES
+            | SyntaxKind::PRIVILEGE_TYPE
+            | SyntaxKind::PROCEDURE_NAME
+            | SyntaxKind::PROCEDURE_NAME_REF
+            | SyntaxKind::PROCEDURE_RENAME_TO
+            | SyntaxKind::PROCEDURE_SIG
+            | SyntaxKind::PROCEDURE_SIG_LIST
+            | SyntaxKind::PROPERTIES
+            | SyntaxKind::PROPERTY_ALL
+            | SyntaxKind::PROPERTY_COMMENTS
+            | SyntaxKind::PROPERTY_COMPRESSION
+            | SyntaxKind::PROPERTY_CONSTRAINTS
+            | SyntaxKind::PROPERTY_DEFAULTS
+            | SyntaxKind::PROPERTY_GENERATED
+            | SyntaxKind::PROPERTY_GRAPH
+            | SyntaxKind::PROPERTY_GRAPH_REF
+            | SyntaxKind::PROPERTY_GRAPH_RENAME_TO
+            | SyntaxKind::PROPERTY_IDENTITY
+            | SyntaxKind::PROPERTY_INDEXES
+            | SyntaxKind::PROPERTY_NAME
+            | SyntaxKind::PROPERTY_NAME_REF
+            | SyntaxKind::PROPERTY_STATISTICS
+            | SyntaxKind::PROPERTY_STORAGE
+            | SyntaxKind::PSQL_COMMAND
+            | SyntaxKind::PUBLICATION
+            | SyntaxKind::PUBLICATION_OBJECT_CURRENT_SCHEMA
+            | SyntaxKind::PUBLICATION_OBJECT_TABLE
+            | SyntaxKind::PUBLICATION_OBJECT_TABLES_IN_SCHEMA
+            | SyntaxKind::PUBLICATION_REF
+            | SyntaxKind::PUBLICATION_RENAME_TO
+            | SyntaxKind::QUALIFIED_COLUMN_NAME_REF
+            | SyntaxKind::QUALIFIER_MAX
+            | SyntaxKind::QUALIFIER_MIN
+            | SyntaxKind::RANGE_TYPE
+            | SyntaxKind::READ_COMMITTED
+            | SyntaxKind::READ_ONLY
+            | SyntaxKind::READ_UNCOMMITTED
+            | SyntaxKind::READ_WRITE
+            | SyntaxKind::REASSIGN
+            | SyntaxKind::REFERENCES_CONSTRAINT
+            | SyntaxKind::REFERENCES_TABLE
+            | SyntaxKind::REFERENCING
+            | SyntaxKind::REFRESH
+            | SyntaxKind::REFRESH_COLLATION_VERSION
+            | SyntaxKind::REFRESH_PUBLICATION
+            | SyntaxKind::REFRESH_VERSION
+            | SyntaxKind::REINDEX
+            | SyntaxKind::REINDEX_OPTION_CONCURRENTLY
+            | SyntaxKind::REINDEX_OPTION_LIST
+            | SyntaxKind::REINDEX_OPTION_TABLESPACE
+            | SyntaxKind::REINDEX_OPTION_VERBOSE
+            | SyntaxKind::REINDEX_TARGET_DATABASE
+            | SyntaxKind::REINDEX_TARGET_INDEX
+            | SyntaxKind::REINDEX_TARGET_SCHEMA
+            | SyntaxKind::REINDEX_TARGET_SYSTEM
+            | SyntaxKind::REINDEX_TARGET_TABLE
+            | SyntaxKind::RELATION_FROM_ITEM
+            | SyntaxKind::RELATION_LIST
+            | SyntaxKind::RELATION_NAME
+            | SyntaxKind::RELATION_NAME_REF
+            | SyntaxKind::RELATIVE
+            | SyntaxKind::RELEASE_SAVEPOINT
+            | SyntaxKind::REMOTE_TABLE_NAME_REF
+            | SyntaxKind::RENAME_ATTRIBUTE
+            | SyntaxKind::RENAME_COLUMN
+            | SyntaxKind::RENAME_CONSTRAINT
+            | SyntaxKind::RENAME_VALUE
+            | SyntaxKind::REPACK
+            | SyntaxKind::REPEATABLE_CLAUSE
+            | SyntaxKind::REPEATABLE_READ
+            | SyntaxKind::REPLACE_DICTIONARY
+            | SyntaxKind::REPLICA_IDENTITY
+            | SyntaxKind::REPLICA_IDENTITY_DEFAULT
+            | SyntaxKind::REPLICA_IDENTITY_FULL
+            | SyntaxKind::REPLICA_IDENTITY_NOTHING
+            | SyntaxKind::REQUIRED_AS_ALIAS
+            | SyntaxKind::RESET
+            | SyntaxKind::RESET_CONFIG_PARAM
+            | SyntaxKind::RESET_FUNC_OPTION
+            | SyntaxKind::RESET_OPTIONS
+            | SyntaxKind::RESET_ROLE
+            | SyntaxKind::RESET_SESSION_AUTH
+            | SyntaxKind::RESET_TIME_ZONE
+            | SyntaxKind::RESET_TRANSACTION_ISOLATION
+            | SyntaxKind::RESPECT_NULLS
+            | SyntaxKind::RESTART
+            | SyntaxKind::RESTART_IDENTITY
+            | SyntaxKind::RESTRICT
+            | SyntaxKind::RETURNING_CLAUSE
+            | SyntaxKind::RETURNING_NEW
+            | SyntaxKind::RETURNING_OLD
+            | SyntaxKind::RETURNING_OPTION_LIST
+            | SyntaxKind::RETURNS_NULL_ON_NULL_INPUT_FUNC_OPTION
+            | SyntaxKind::RETURN_STMT
+            | SyntaxKind::RETURN_TABLE_ARG_LIST
+            | SyntaxKind::RETURN_TABLE_COLUMN
+            | SyntaxKind::RET_TYPE
+            | SyntaxKind::REVOKE
+            | SyntaxKind::REVOKE_COMMAND
+            | SyntaxKind::REVOKE_COMMAND_LIST
+            | SyntaxKind::REVOKE_DEFAULT_PRIVILEGES
+            | SyntaxKind::ROLE
+            | SyntaxKind::ROLE_NAME_REF
+            | SyntaxKind::ROLE_OPTION_ADMIN
+            | SyntaxKind::ROLE_OPTION_CONNECTION_LIMIT
+            | SyntaxKind::ROLE_OPTION_ENCRYPTED_PASSWORD
+            | SyntaxKind::ROLE_OPTION_GENERIC
+            | SyntaxKind::ROLE_OPTION_INHERIT
+            | SyntaxKind::ROLE_OPTION_IN_GROUP
+            | SyntaxKind::ROLE_OPTION_IN_ROLE
+            | SyntaxKind::ROLE_OPTION_LIST
+            | SyntaxKind::ROLE_OPTION_PASSWORD
+            | SyntaxKind::ROLE_OPTION_ROLE
+            | SyntaxKind::ROLE_OPTION_SYSID
+            | SyntaxKind::ROLE_OPTION_USER
+            | SyntaxKind::ROLE_OPTION_VALID_UNTIL
+            | SyntaxKind::ROLE_REF
+            | SyntaxKind::ROLE_REF_CURRENT_ROLE
+            | SyntaxKind::ROLE_REF_CURRENT_USER
+            | SyntaxKind::ROLE_REF_LIST
+            | SyntaxKind::ROLE_REF_SESSION_USER
+            | SyntaxKind::ROLE_RENAME_TO
+            | SyntaxKind::ROLLBACK_PREPARED
+            | SyntaxKind::ROLLBACK_TO_SAVEPOINT
+            | SyntaxKind::ROLLBACK_TRANSACTION
+            | SyntaxKind::ROUTINE_NAME
+            | SyntaxKind::ROUTINE_NAME_REF
+            | SyntaxKind::ROUTINE_RENAME_TO
+            | SyntaxKind::ROUTINE_SIG
+            | SyntaxKind::ROUTINE_SIG_LIST
+            | SyntaxKind::ROW
+            | SyntaxKind::ROWS_FROM_ARG
+            | SyntaxKind::ROWS_FROM_ITEM
+            | SyntaxKind::ROWS_FUNC_OPTION
+            | SyntaxKind::ROW_EXCLUSIVE
+            | SyntaxKind::ROW_LIST
+            | SyntaxKind::ROW_SHARE
+            | SyntaxKind::RULE
+            | SyntaxKind::RULE_DO
+            | SyntaxKind::RULE_EVENT
+            | SyntaxKind::RULE_ON
+            | SyntaxKind::RULE_REF
+            | SyntaxKind::RULE_RENAME_TO
+            | SyntaxKind::RULE_STMT_LIST
+            | SyntaxKind::SAVEPOINT
+            | SyntaxKind::SAVEPOINT_CREATE
+            | SyntaxKind::SAVEPOINT_REF
+            | SyntaxKind::SCHEMA
+            | SyntaxKind::SCHEMA_REF
+            | SyntaxKind::SCHEMA_RENAME_TO
+            | SyntaxKind::SCROLL
+            | SyntaxKind::SEARCH_CLAUSE
+            | SyntaxKind::SEARCH_COLUMNS
+            | SyntaxKind::SEARCH_SET_COLUMN
+            | SyntaxKind::SECURITY_DEFINER_FUNC_OPTION
+            | SyntaxKind::SECURITY_INVOKER_FUNC_OPTION
+            | SyntaxKind::SECURITY_LABEL
+            | SyntaxKind::SECURITY_LABEL_PROVIDER
+            | SyntaxKind::SELECT
+            | SyntaxKind::SELECT_CLAUSE
+            | SyntaxKind::SELECT_INTO
+            | SyntaxKind::SEQUENCE
+            | SyntaxKind::SEQUENCE_OPTION_LIST
+            | SyntaxKind::SEQUENCE_REF
+            | SyntaxKind::SEQUENCE_RENAME_TO
+            | SyntaxKind::SERIALIZABLE
+            | SyntaxKind::SERVER
+            | SyntaxKind::SERVER_CLAUSE
+            | SyntaxKind::SERVER_REF
+            | SyntaxKind::SERVER_RENAME_TO
+            | SyntaxKind::SERVER_TYPE
+            | SyntaxKind::SERVER_VERSION
+            | SyntaxKind::SESSION_AUTHORIZATION
+            | SyntaxKind::SESSION_CHARACTERISTICS
+            | SyntaxKind::SESSION_SCOPE
+            | SyntaxKind::SET
+            | SyntaxKind::SET_ACCESS_METHOD
+            | SyntaxKind::SET_ALL_PUBLICATION_OBJECT_LIST
+            | SyntaxKind::SET_CATALOG
+            | SyntaxKind::SET_CLAUSE
+            | SyntaxKind::SET_COLUMN_LIST
+            | SyntaxKind::SET_COMPRESSION
+            | SyntaxKind::SET_CONFIG
+            | SyntaxKind::SET_CONFIG_PARAM
+            | SyntaxKind::SET_CONSTRAINTS
+            | SyntaxKind::SET_DEFAULT
+            | SyntaxKind::SET_DEFAULT_COLUMNS
+            | SyntaxKind::SET_EXPR
+            | SyntaxKind::SET_EXPRESSION
+            | SyntaxKind::SET_EXPR_LIST
+            | SyntaxKind::SET_FOREIGN_OPTION
+            | SyntaxKind::SET_FUNC_OPTION
+            | SyntaxKind::SET_GENERATED
+            | SyntaxKind::SET_GENERATED_OPTIONS
+            | SyntaxKind::SET_LOGGED
+            | SyntaxKind::SET_MULTIPLE_COLUMNS
+            | SyntaxKind::SET_NOT_NULL
+            | SyntaxKind::SET_NULL_COLUMNS
+            | SyntaxKind::SET_OPTIONS
+            | SyntaxKind::SET_OPTIONS_LIST
+            | SyntaxKind::SET_OPTION_FOR
+            | SyntaxKind::SET_PUBLICATION
+            | SyntaxKind::SET_PUBLICATION_OBJECTS
+            | SyntaxKind::SET_ROLE
+            | SyntaxKind::SET_ROLE_NONE
+            | SyntaxKind::SET_SCHEMA
+            | SyntaxKind::SET_SCHEMA_VALUE
+            | SyntaxKind::SET_SEQUENCE_OPTION
+            | SyntaxKind::SET_SESSION_AUTH
+            | SyntaxKind::SET_SESSION_AUTH_DEFAULT
+            | SyntaxKind::SET_SINGLE_COLUMN
+            | SyntaxKind::SET_STATISTICS
+            | SyntaxKind::SET_STORAGE
+            | SyntaxKind::SET_TABLESPACE
+            | SyntaxKind::SET_TIME_ZONE
+            | SyntaxKind::SET_TRANSACTION
+            | SyntaxKind::SET_TYPE
+            | SyntaxKind::SET_UNLOGGED
+            | SyntaxKind::SET_WITHOUT_CLUSTER
+            | SyntaxKind::SET_WITHOUT_OIDS
+            | SyntaxKind::SET_XML_OPTION
+            | SyntaxKind::SHARE
+            | SyntaxKind::SHARE_ROW_EXCLUSIVE
+            | SyntaxKind::SHARE_UPDATE_EXCLUSIVE
+            | SyntaxKind::SHOW
+            | SyntaxKind::SIMILAR_TO
+            | SyntaxKind::SKIP_LOCKED
+            | SyntaxKind::SKIP_SUBSCRIPTION
+            | SyntaxKind::SLICE_ACCESSOR
+            | SyntaxKind::SLICE_EXPR
+            | SyntaxKind::SOME_FN
+            | SyntaxKind::SORT_ASC
+            | SyntaxKind::SORT_BY
+            | SyntaxKind::SORT_BY_LIST
+            | SyntaxKind::SORT_DESC
+            | SyntaxKind::SORT_USING
+            | SyntaxKind::SOURCE_FILE
+            | SyntaxKind::SOURCE_VERTEX_TABLE
+            | SyntaxKind::SPLIT_PARTITION
+            | SyntaxKind::STABLE
+            | SyntaxKind::STANDALONE_NO
+            | SyntaxKind::STANDALONE_NO_VALUE
+            | SyntaxKind::STANDALONE_YES
+            | SyntaxKind::STATISTICS
+            | SyntaxKind::STATISTICS_KIND
+            | SyntaxKind::STATISTICS_ON_CLAUSE
+            | SyntaxKind::STATISTICS_REF
+            | SyntaxKind::STATISTICS_RENAME_TO
+            | SyntaxKind::STAT_TYPES
+            | SyntaxKind::STORAGE
+            | SyntaxKind::STORAGE_MODE
+            | SyntaxKind::STORED
+            | SyntaxKind::STRICT_FUNC_OPTION
+            | SyntaxKind::STRIP_WHITESPACE
+            | SyntaxKind::SUBSCRIPTION
+            | SyntaxKind::SUBSCRIPTION_REF
+            | SyntaxKind::SUBSCRIPTION_RENAME_TO
+            | SyntaxKind::SUBSTRING_EXPRS
+            | SyntaxKind::SUBSTRING_FN
+            | SyntaxKind::SUBSTRING_FOR_FROM
+            | SyntaxKind::SUBSTRING_FROM_FOR
+            | SyntaxKind::SUBSTRING_SIMILAR_ESCAPE
+            | SyntaxKind::SUPPORT_FUNC_OPTION
+            | SyntaxKind::SYMMETRIC
+            | SyntaxKind::TABLE
+            | SyntaxKind::TABLESAMPLE_CLAUSE
+            | SyntaxKind::TABLESPACE
+            | SyntaxKind::TABLESPACE_CLAUSE
+            | SyntaxKind::TABLESPACE_OWNER
+            | SyntaxKind::TABLESPACE_REF
+            | SyntaxKind::TABLESPACE_RENAME_TO
+            | SyntaxKind::TABLE_ALIAS
+            | SyntaxKind::TABLE_AND_COLUMNS
+            | SyntaxKind::TABLE_AND_COLUMNS_LIST
+            | SyntaxKind::TABLE_ARG_LIST
+            | SyntaxKind::TABLE_LIST
+            | SyntaxKind::TABLE_NAME
+            | SyntaxKind::TABLE_NAME_REF
+            | SyntaxKind::TABLE_NAME_REF_LIST
+            | SyntaxKind::TABLE_RELATION_NAME
+            | SyntaxKind::TABLE_RENAME_TO
+            | SyntaxKind::TARGET
+            | SyntaxKind::TARGET_LIST
+            | SyntaxKind::TEMP
+            | SyntaxKind::TEXT_SEARCH_CONFIGURATION
+            | SyntaxKind::TEXT_SEARCH_CONFIGURATION_REF
+            | SyntaxKind::TEXT_SEARCH_CONFIGURATION_RENAME_TO
+            | SyntaxKind::TEXT_SEARCH_DICTIONARY
+            | SyntaxKind::TEXT_SEARCH_DICTIONARY_REF
+            | SyntaxKind::TEXT_SEARCH_DICTIONARY_RENAME_TO
+            | SyntaxKind::TEXT_SEARCH_PARSER
+            | SyntaxKind::TEXT_SEARCH_PARSER_REF
+            | SyntaxKind::TEXT_SEARCH_PARSER_RENAME_TO
+            | SyntaxKind::TEXT_SEARCH_TEMPLATE
+            | SyntaxKind::TEXT_SEARCH_TEMPLATE_REF
+            | SyntaxKind::TEXT_SEARCH_TEMPLATE_RENAME_TO
+            | SyntaxKind::TEXT_SEARCH_TOKEN_KIND
+            | SyntaxKind::TIES
+            | SyntaxKind::TIMESTAMP_TYPE
+            | SyntaxKind::TIME_TYPE
+            | SyntaxKind::TIME_ZONE
+            | SyntaxKind::TIMING_AFTER
+            | SyntaxKind::TIMING_BEFORE
+            | SyntaxKind::TIMING_INSTEAD_OF
+            | SyntaxKind::TO_CONFIG_VALUE
+            | SyntaxKind::TRANSACTION_ISOLATION_LEVEL
+            | SyntaxKind::TRANSACTION_MODES
+            | SyntaxKind::TRANSACTION_MODE_LIST
+            | SyntaxKind::TRANSACTION_SNAPSHOT
+            | SyntaxKind::TRANSFORM_FOR_TYPE
+            | SyntaxKind::TRANSFORM_FROM_FUNC
+            | SyntaxKind::TRANSFORM_FUNC_OPTION
+            | SyntaxKind::TRANSFORM_TO_FUNC
+            | SyntaxKind::TRANSITION_RELATION_NAME
+            | SyntaxKind::TRIGGER
+            | SyntaxKind::TRIGGER_EVENT_DELETE
+            | SyntaxKind::TRIGGER_EVENT_INSERT
+            | SyntaxKind::TRIGGER_EVENT_LIST
+            | SyntaxKind::TRIGGER_EVENT_TRUNCATE
+            | SyntaxKind::TRIGGER_EVENT_UPDATE
+            | SyntaxKind::TRIGGER_REF
+            | SyntaxKind::TRIGGER_RENAME_TO
+            | SyntaxKind::TRIM_BOTH
+            | SyntaxKind::TRIM_EXPRS
+            | SyntaxKind::TRIM_EXPR_FROM
+            | SyntaxKind::TRIM_FN
+            | SyntaxKind::TRIM_FROM
+            | SyntaxKind::TRIM_LEADING
+            | SyntaxKind::TRIM_TRAILING
+            | SyntaxKind::TRUNCATE
+            | SyntaxKind::TUPLE_EXPR
+            | SyntaxKind::TYPE_NAME
+            | SyntaxKind::TYPE_NAME_REF
+            | SyntaxKind::TYPE_RENAME_TO
+            | SyntaxKind::UNBOUNDED_FOLLOWING
+            | SyntaxKind::UNBOUNDED_PRECEDING
+            | SyntaxKind::UNICODE_NORMAL_FORM
+            | SyntaxKind::UNION
+            | SyntaxKind::UNIQUE_CONSTRAINT
+            | SyntaxKind::UNLISTEN
+            | SyntaxKind::UNLOGGED
+            | SyntaxKind::UPDATE
+            | SyntaxKind::UPDATE_TO
+            | SyntaxKind::USER
+            | SyntaxKind::USER_MAPPING_ROLE
+            | SyntaxKind::USING_CLAUSE
+            | SyntaxKind::USING_EXPR
+            | SyntaxKind::USING_EXPR_CLAUSE
+            | SyntaxKind::USING_INDEX
+            | SyntaxKind::USING_INDEX_NAME
+            | SyntaxKind::USING_METHOD
+            | SyntaxKind::USING_ON_CLAUSE
+            | SyntaxKind::VACUUM
+            | SyntaxKind::VACUUM_OPTION
+            | SyntaxKind::VACUUM_OPTION_LIST
+            | SyntaxKind::VACUUM_OPTION_NAME
+            | SyntaxKind::VACUUM_OPTION_VALUE
+            | SyntaxKind::VACUUM_OPTION_VALUE_NAME
+            | SyntaxKind::VALIDATE_CONSTRAINT
+            | SyntaxKind::VALIDATOR_CLAUSE
+            | SyntaxKind::VALUES
+            | SyntaxKind::VARCHAR_TYPE
+            | SyntaxKind::VARIANT
+            | SyntaxKind::VARIANT_LIST
+            | SyntaxKind::VERTEX_OR_EDGE
+            | SyntaxKind::VERTEX_PATTERN
+            | SyntaxKind::VERTEX_TABLES
+            | SyntaxKind::VERTEX_TABLE_DEF
+            | SyntaxKind::VERTEX_TABLE_REF
+            | SyntaxKind::VIEW
+            | SyntaxKind::VIEW_REF
+            | SyntaxKind::VIEW_RENAME_TO
+            | SyntaxKind::VIRTUAL
+            | SyntaxKind::VOLATILE
+            | SyntaxKind::WHEN_CLAUSE
+            | SyntaxKind::WHEN_CLAUSE_LIST
+            | SyntaxKind::WHEN_CONDITION
+            | SyntaxKind::WHERE_CLAUSE
+            | SyntaxKind::WHERE_CONDITION_CLAUSE
+            | SyntaxKind::WHERE_CURRENT_OF
+            | SyntaxKind::WINDOW
+            | SyntaxKind::WINDOW_CLAUSE
+            | SyntaxKind::WINDOW_DEF
+            | SyntaxKind::WINDOW_FUNC_OPTION
+            | SyntaxKind::WINDOW_REF
+            | SyntaxKind::WINDOW_SPEC
+            | SyntaxKind::WITHIN_CLAUSE
+            | SyntaxKind::WITHOUT_FUNCTION
+            | SyntaxKind::WITHOUT_HOLD
+            | SyntaxKind::WITHOUT_OIDS
+            | SyntaxKind::WITHOUT_OVERLAPS
+            | SyntaxKind::WITHOUT_TIMEZONE
+            | SyntaxKind::WITH_CHECK_EXPR_CLAUSE
+            | SyntaxKind::WITH_CHECK_OPTION
+            | SyntaxKind::WITH_CLAUSE
+            | SyntaxKind::WITH_DATA
+            | SyntaxKind::WITH_FUNCTION
+            | SyntaxKind::WITH_HOLD
+            | SyntaxKind::WITH_INOUT
+            | SyntaxKind::WITH_NO_DATA
+            | SyntaxKind::WITH_OPTIONS
+            | SyntaxKind::WITH_ORDINALITY
+            | SyntaxKind::WITH_PARAMS
+            | SyntaxKind::WITH_TABLE
+            | SyntaxKind::WITH_TIES
+            | SyntaxKind::WITH_TIMEZONE
+            | SyntaxKind::XML_ATTR
+            | SyntaxKind::XML_COLUMN_OPTION_LIST
+            | SyntaxKind::XML_CONTENT
+            | SyntaxKind::XML_DOCUMENT
+            | SyntaxKind::XML_ELEMENT_FN
+            | SyntaxKind::XML_EXISTS_FN
+            | SyntaxKind::XML_FOREST_FN
+            | SyntaxKind::XML_NAMESPACE
+            | SyntaxKind::XML_NAMESPACE_LIST
+            | SyntaxKind::XML_NAMESPACE_PREFIX
+            | SyntaxKind::XML_PARSE_FN
+            | SyntaxKind::XML_PASSING_DOC
+            | SyntaxKind::XML_PASSING_MECH_BY_REF
+            | SyntaxKind::XML_PASSING_MECH_BY_VALUE
+            | SyntaxKind::XML_PI_FN
+            | SyntaxKind::XML_PI_TARGET
+            | SyntaxKind::XML_ROOT_FN
+            | SyntaxKind::XML_ROW_PASSING_CLAUSE
+            | SyntaxKind::XML_SERIALIZE_FN
+            | SyntaxKind::XML_TABLE
+            | SyntaxKind::XML_TABLE_COLUMN
+            | SyntaxKind::XML_TABLE_COLUMN_LIST
+            | SyntaxKind::XML_TABLE_FROM_ITEM
+            | SyntaxKind::XML_VERSION_EXPR
+            | SyntaxKind::XML_VERSION_NO_VALUE
+            | SyntaxKind::__LAST => return None,
+        };
+        Some(text)
+    }
     pub(crate) fn from_keyword(ident: &str) -> Option<SyntaxKind> {
         let kw = match ident.len() {
             2 => {
