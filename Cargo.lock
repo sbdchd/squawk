@@ -1997,14 +1997,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rowan"
-version = "0.17.0"
-dependencies = [
- "serde",
- "text-size",
-]
-
-[[package]]
 name = "rsa"
 version = "0.9.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2444,11 +2436,11 @@ dependencies = [
  "insta",
  "itertools",
  "num-bigint",
- "rowan",
  "smol_str",
  "squawk-diagnostics",
  "squawk-ide-db",
  "squawk-line-index",
+ "squawk-rowan",
  "squawk-sema",
  "squawk-syntax",
 ]
@@ -2473,9 +2465,9 @@ dependencies = [
  "insta",
  "itertools",
  "mimalloc",
- "rowan",
  "squawk-lexer",
  "squawk-line-index",
+ "squawk-rowan",
  "squawk-syntax",
  "tiny_pretty",
 ]
@@ -2498,13 +2490,13 @@ dependencies = [
  "annotate-snippets",
  "insta",
  "log",
- "rowan",
  "rustc-hash",
  "smallvec",
  "squawk-code-actions",
  "squawk-diagnostics",
  "squawk-ide-db",
  "squawk-line-index",
+ "squawk-rowan",
  "squawk-sema",
  "squawk-syntax",
  "tabled",
@@ -2515,10 +2507,10 @@ name = "squawk-ide-db"
 version = "2.71.0"
 dependencies = [
  "etcetera",
- "rowan",
  "salsa",
  "smallvec",
  "squawk-line-index",
+ "squawk-rowan",
  "squawk-sema",
  "squawk-syntax",
  "url",
@@ -2550,13 +2542,13 @@ dependencies = [
  "annotate-snippets",
  "enum-iterator",
  "insta",
- "rowan",
  "rustc-hash",
  "serde",
  "serde_plain",
  "smallvec",
  "squawk-diagnostics",
  "squawk-line-index",
+ "squawk-rowan",
  "squawk-syntax",
  "tabled",
 ]
@@ -2575,17 +2567,25 @@ dependencies = [
 ]
 
 [[package]]
+name = "squawk-rowan"
+version = "2.71.0"
+dependencies = [
+ "serde",
+ "text-size",
+]
+
+[[package]]
 name = "squawk-sema"
 version = "2.71.0"
 dependencies = [
  "annotate-snippets",
  "insta",
  "la-arena",
- "rowan",
  "rustc-hash",
  "smallvec",
  "squawk-diagnostics",
  "squawk-line-index",
+ "squawk-rowan",
  "squawk-syntax",
 ]
 
@@ -2600,7 +2600,6 @@ dependencies = [
  "insta",
  "log",
  "lsp-server",
- "rowan",
  "rustc-hash",
  "salsa",
  "serde",
@@ -2612,6 +2611,7 @@ dependencies = [
  "squawk-lexer",
  "squawk-line-index",
  "squawk-linter",
+ "squawk-rowan",
  "squawk-sema",
  "squawk-syntax",
  "squawk-thread",
@@ -2629,11 +2629,11 @@ dependencies = [
  "either",
  "insta",
  "num-bigint",
- "rowan",
  "smallvec",
  "smol_str",
  "squawk-line-index",
  "squawk-parser",
+ "squawk-rowan",
 ]
 
 [[package]]
@@ -2655,7 +2655,6 @@ dependencies = [
  "console_error_panic_hook",
  "console_log",
  "log",
- "rowan",
  "serde",
  "serde-wasm-bindgen",
  "squawk-diagnostics",
@@ -2664,6 +2663,7 @@ dependencies = [
  "squawk-lexer",
  "squawk-line-index",
  "squawk-linter",
+ "squawk-rowan",
  "squawk-sema",
  "squawk-syntax",
  "wasm-bindgen",

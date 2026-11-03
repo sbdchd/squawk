@@ -1,6 +1,6 @@
 use std::fmt::{self, Write as _};
 
-use rowan::TextSize;
+use squawk_rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode, LitKind};
 
 use squawk_sema::lower::literal_type_name;

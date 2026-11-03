@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use rowan::{GreenNode, TextRange};
+use squawk_rowan::{GreenNode, TextRange};
 
 use crate::{syntax_error::SyntaxError, syntax_node::SyntaxTreeBuilder};
 

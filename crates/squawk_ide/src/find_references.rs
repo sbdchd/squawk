@@ -1,4 +1,4 @@
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::file::{FilePosition, FileRange, InFile};
 use squawk_sema::ir::Item;
 use squawk_sema::semantic_index::{AsOf, SemanticIndex};

@@ -1,7 +1,7 @@
 use std::fmt;
 use std::ops::{Range, RangeInclusive};
 
-use rowan::TextSize;
+use squawk_rowan::TextSize;
 
 use crate::decoded_text::DecodedText;
 

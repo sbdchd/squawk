@@ -1,5 +1,5 @@
-use rowan::TextSize;
 use squawk_diagnostics::Edit;
+use squawk_rowan::TextSize;
 use squawk_sema::file::InFile;
 use squawk_syntax::ast::{self, AstNode, NameLike};
 

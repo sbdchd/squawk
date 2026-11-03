@@ -1,4 +1,4 @@
-use rowan::{NodeOrToken, TextRange, TextSize, WalkEvent};
+use squawk_rowan::{NodeOrToken, TextRange, TextSize, WalkEvent};
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxToken,
     ast::{self, AstNode},

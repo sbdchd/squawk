@@ -1,9 +1,9 @@
 pub mod builtins;
 pub mod offsets;
 
-use rowan::TextSize;
 use salsa::{Setter, Storage};
 use squawk_line_index::{LineIndex, find_newline};
+use squawk_rowan::TextSize;
 use squawk_sema::extensions::BundledExtension;
 use squawk_sema::file::{FileId, FileIndex, InFile};
 use squawk_sema::semantic_index::SemanticIndex;

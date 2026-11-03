@@ -3,8 +3,8 @@ use squawk_sema::file::InFile;
 use squawk_sema::semantic_index_builder::SemanticIndexBuilder;
 
 use crate::goto_definition::goto_definition;
-use rowan::TextSize;
 use squawk_ide_db::{Database, original_file, parse, semantic_index};
+use squawk_rowan::TextSize;
 
 #[test]
 fn source_file_identity() {

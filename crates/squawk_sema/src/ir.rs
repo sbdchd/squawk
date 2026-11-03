@@ -1,7 +1,7 @@
 use std::range::Range;
 
 use la_arena::Idx;
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{AstPtr, SyntaxNodePtr, ast, sql_body::SqlBody};
 
 use crate::arena::{IdxRange, LayeredArena};

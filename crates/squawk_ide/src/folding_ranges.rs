@@ -29,8 +29,8 @@
 
 use rustc_hash::FxHashSet;
 
-use rowan::{NodeOrToken, SyntaxText, TextRange};
 use squawk_line_index::find_newline;
+use squawk_rowan::{NodeOrToken, SyntaxText, TextRange};
 use squawk_syntax::SyntaxKind;
 use squawk_syntax::ast::{self, AstNode, AstToken};
 

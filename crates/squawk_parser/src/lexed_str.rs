@@ -206,7 +206,7 @@ impl<'a> Converter<'a> {
         // A note on an intended tradeoff:
         // We drop some useful information here (see patterns with double dots `..`)
         // Storing that info in `SyntaxKind` is not possible due to its layout requirements of
-        // being `u16` that come from `rowan::SyntaxKind`.
+        // being `u16` that come from `squawk_rowan::SyntaxKind`.
         let mut err = "";
         let mut err_range: Option<ops::Range<u32>> = None;
 

@@ -28,7 +28,7 @@ use std::cmp::Ordering;
 
 use crate::extensions::BundledExtension;
 use crate::ir::BodyId;
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{AstPtr, SyntaxNodePtr, ast::AstNode};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

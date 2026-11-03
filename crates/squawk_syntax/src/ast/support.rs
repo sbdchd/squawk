@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use rowan::{Language, TextRange, TextSize};
+use squawk_rowan::{Language, TextRange, TextSize};
 
 use super::{AstChildren, AstNode, SyntaxKind, SyntaxNode, SyntaxToken};
 use crate::SyntaxElement;

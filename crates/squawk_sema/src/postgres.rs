@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt, fmt::Write};
 
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 
 const MAX_IDENTIFIER_LEN: usize = 63;
 

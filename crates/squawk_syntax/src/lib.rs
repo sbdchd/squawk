@@ -48,7 +48,7 @@ pub use squawk_parser::SyntaxKind;
 
 use ast::AstNode;
 pub use ptr::{AstPtr, SyntaxNodePtr};
-use rowan::GreenNode;
+use squawk_rowan::GreenNode;
 use syntax_error::SyntaxError;
 pub use syntax_node::{SyntaxElement, SyntaxNode, SyntaxToken};
 
@@ -192,7 +192,7 @@ macro_rules! match_ast {
 #[test]
 fn api_walkthrough() {
     use ast::SourceFile;
-    use rowan::{Direction, NodeOrToken, SyntaxText, TextRange, WalkEvent};
+    use squawk_rowan::{Direction, NodeOrToken, SyntaxText, TextRange, WalkEvent};
     use std::fmt::Write;
 
     let source_code = "

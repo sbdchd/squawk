@@ -1,7 +1,7 @@
 use std::fmt::Write;
 
 use insta::assert_snapshot;
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::{file::InFile, semantic_index_builder::SemanticIndexBuilder};
 use squawk_syntax::SourceFile;
 

@@ -1,4 +1,4 @@
-use rowan::TextRange;
+use squawk_rowan::TextRange;
 use squawk_syntax::{
     SyntaxNode,
     ast::{self, AstNode, NameLike},

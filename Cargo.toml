@@ -42,7 +42,6 @@ toml = "0.5.9"
 dir-test = "0.4"
 drop_bomb = "0.1.5"
 camino = "1.1.9"
-rowan = { path = "crates/rowan" }
 salsa = "0.26.0"
 smol_str = "0.3.2"
 enum-iterator = "2.1.0"
@@ -93,6 +92,7 @@ squawk-ide-db = { path = "./crates/squawk_ide_db", version = "2.71.0" }
 squawk-lexer = { path = "./crates/squawk_lexer", version = "2.71.0" }
 squawk-line-index = { path = "./crates/squawk_line_index", version = "2.61.0" }
 squawk-parser = { path = "./crates/squawk_parser", version = "2.71.0" }
+squawk-rowan = { path = "./crates/squawk_rowan", version = "2.71.0" }
 squawk-syntax = { path = "./crates/squawk_syntax", version = "2.71.0" }
 squawk-linter = { path = "./crates/squawk_linter", version = "2.71.0" }
 squawk-sema = { path = "./crates/squawk_sema", version = "2.71.0" }
@@ -166,6 +166,6 @@ debug = 0
 insta.opt-level = 3
 similar.opt-level = 3
 # These speed up local tests.
-rowan.opt-level = 3
+squawk-rowan.opt-level = 3
 squawk-line-index.opt-level = 3
 text-size.opt-level = 3

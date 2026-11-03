@@ -1,6 +1,6 @@
-use rowan::{TextRange, TextSize};
 use squawk_diagnostics::Edit;
 use squawk_line_index::{NewlineWithTrailingNewline, find_newline};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     SyntaxToken,
     ast::{self, AstNode, AstToken},

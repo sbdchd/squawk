@@ -28,12 +28,12 @@ use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
 use num_bigint::BigUint;
-use rowan::{GreenNodeRef, GreenTokenRef, NodeOrToken, TextRange, TextSize};
 use squawk_line_index::{LineEnding, find_newline};
+use squawk_rowan::{GreenNodeRef, GreenTokenRef, NodeOrToken, TextRange, TextSize};
 
 #[cfg(test)]
 use crate::SourceFile;
-use rowan::Direction;
+use squawk_rowan::Direction;
 
 use crate::ast;
 use crate::ast::{AstNode, NameLike};

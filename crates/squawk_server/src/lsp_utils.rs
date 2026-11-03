@@ -240,7 +240,7 @@ pub(crate) fn apply_incremental_changes(
 
 pub(crate) fn to_location(
     snapshot: &Snapshot,
-    loc: squawk_sema::file::InFile<rowan::TextRange>,
+    loc: squawk_sema::file::InFile<squawk_rowan::TextRange>,
 ) -> Option<Location> {
     let db = snapshot.db();
     let file = original_file(db, loc.file_id);

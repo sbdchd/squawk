@@ -1,8 +1,8 @@
 use anyhow::Result;
 use gen_lsp_types::{DocumentFormattingParams, TextEdit};
-use rowan::{TextRange, TextSize};
 use squawk_ide::db::{line_index, original_file, parse};
 use squawk_line_index::find_newline;
+use squawk_rowan::{TextRange, TextSize};
 
 use crate::global_state::Snapshot;
 use crate::lsp_utils;

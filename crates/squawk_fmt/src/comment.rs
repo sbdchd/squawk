@@ -1,6 +1,6 @@
 use either::Either;
-use rowan::Direction;
 use squawk_line_index::{UniversalNewlines, find_newline};
+use squawk_rowan::Direction;
 use squawk_syntax::{SyntaxElement, SyntaxKind, SyntaxToken};
 use tiny_pretty::Doc;
 
@@ -56,7 +56,7 @@ fn comment_tokens(
     }
     let mut tokens = vec![];
     let mut curr = sibling(el);
-    while let Some(rowan::NodeOrToken::Token(token)) = curr {
+    while let Some(squawk_rowan::NodeOrToken::Token(token)) = curr {
         match token.kind() {
             SyntaxKind::COMMENT => tokens.push(token.clone()),
             SyntaxKind::WHITESPACE => (),
@@ -230,8 +230,8 @@ fn kind_before(comments: &CommentRun) -> Option<SyntaxKind> {
 
 fn starts_with_closing_token(el: SyntaxElement) -> bool {
     let first = match el {
-        rowan::NodeOrToken::Node(node) => node.first_token(),
-        rowan::NodeOrToken::Token(token) => Some(token),
+        squawk_rowan::NodeOrToken::Node(node) => node.first_token(),
+        squawk_rowan::NodeOrToken::Token(token) => Some(token),
     };
     first.is_none_or(|token| {
         matches!(

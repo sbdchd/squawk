@@ -2,8 +2,8 @@ use std::fmt;
 
 use rustc_hash::{FxHashMap, FxHashSet};
 
-use rowan::TextRange;
 use squawk_line_index::LineIndex;
+use squawk_rowan::TextRange;
 
 use crate::{Ignore, Rule, ignore::IgnoreKind};
 

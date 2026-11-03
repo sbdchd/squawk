@@ -13,10 +13,10 @@ use crate::unescape::{UnicodeEscError, escape_unicode_esc_str, uescape_char};
 use crate::{
     SyntaxNode, SyntaxToken, ast, match_ast, sql_body::SqlBody, syntax_error::SyntaxError,
 };
-use rowan::{TextRange, TextSize, WalkEvent};
 use squawk_parser::{
     SyntaxKind::*, is_col_name_keyword, is_reserved_keyword, is_type_func_name_keyword,
 };
+use squawk_rowan::{TextRange, TextSize, WalkEvent};
 pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
     for token in root.descendant_tokens_of_kind(IDENT) {
         validate_unicode_esc_ident(&token, errors);
@@ -834,11 +834,11 @@ fn validate_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
     // literals or missing new lines.
     for e in lit.syntax().children_with_tokens() {
         match e {
-            rowan::NodeOrToken::Node(_) => {
+            squawk_rowan::NodeOrToken::Node(_) => {
                 // not sure when this would occur
                 state = LookingFor::OpenString;
             }
-            rowan::NodeOrToken::Token(token) => {
+            squawk_rowan::NodeOrToken::Token(token) => {
                 match state {
                     LookingFor::OpenString => {
                         if matches!(
@@ -1292,8 +1292,8 @@ fn validate_custom_op(op: &ast::CustomOp, acc: &mut Vec<SyntaxError>) {
     let mut found = 0;
     for node_or_token in op.syntax().children_with_tokens() {
         match node_or_token {
-            rowan::NodeOrToken::Node(_) => (),
-            rowan::NodeOrToken::Token(_) => {
+            squawk_rowan::NodeOrToken::Node(_) => (),
+            squawk_rowan::NodeOrToken::Token(_) => {
                 found += 1;
             }
         }
@@ -1302,8 +1302,8 @@ fn validate_custom_op(op: &ast::CustomOp, acc: &mut Vec<SyntaxError>) {
         }
     }
     let token = op.syntax().children_with_tokens().find_map(|x| match x {
-        rowan::NodeOrToken::Node(_) => None,
-        rowan::NodeOrToken::Token(tk) => Some(tk.kind()),
+        squawk_rowan::NodeOrToken::Node(_) => None,
+        squawk_rowan::NodeOrToken::Token(tk) => Some(tk.kind()),
     });
     if let Some(STAR | SLASH | L_ANGLE | R_ANGLE | EQ | PERCENT | CARET) = token {
         acc.push(SyntaxError::new(

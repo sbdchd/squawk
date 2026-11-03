@@ -1,5 +1,5 @@
-use rowan::{TextRange, TextSize};
 use smallvec::{SmallVec, smallvec};
+use squawk_rowan::{TextRange, TextSize};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct DecodedText {

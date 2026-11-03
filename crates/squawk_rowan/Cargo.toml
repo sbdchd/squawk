@@ -1,15 +1,15 @@
 [package]
-name = "rowan"
-version = "0.17.0"
+name = "squawk-rowan"
+version.workspace = true
 authors = [
   "Aleksey Kladov <aleksey.kladov@gmail.com>",
   "Igor Aleksanov <popzxc@yandex.ru>",
 ]
-repository = "https://github.com/rust-analyzer/rowan"
+repository.workspace = true
 license = "MIT OR Apache-2.0"
 description = "Library for generic lossless syntax trees"
 edition = "2021"
-publish = false
+rust-version.workspace = true
 
 [dependencies]
 text-size = "1.1.0"

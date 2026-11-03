@@ -1,4 +1,4 @@
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     ast::{self, AstNode, NameLike},
     match_ast,

@@ -1,6 +1,6 @@
-use rowan::{Direction, NodeOrToken};
 use smallvec::SmallVec;
 use squawk_line_index::UniversalNewlines;
+use squawk_rowan::{Direction, NodeOrToken};
 use squawk_syntax::{
     SyntaxNode, SyntaxToken,
     ast::{self, AstToken},

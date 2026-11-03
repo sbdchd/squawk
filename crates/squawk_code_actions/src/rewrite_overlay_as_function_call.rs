@@ -1,8 +1,8 @@
 use squawk_sema::file::InFile;
 use std::fmt::Write as _;
 
-use rowan::TextSize;
 use squawk_diagnostics::Edit;
+use squawk_rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode, OverlayArgs};
 
 use squawk_ide_db::Db;

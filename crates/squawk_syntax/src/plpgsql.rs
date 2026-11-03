@@ -1,4 +1,4 @@
-use rowan::GreenNode;
+use squawk_rowan::GreenNode;
 
 use crate::{
     ast,
@@ -49,7 +49,7 @@ mod tests {
     use crate::ast::AstNode;
     use crate::test::render_errors;
     use insta::assert_snapshot;
-    use rowan::{TextRange, TextSize};
+    use squawk_rowan::{TextRange, TextSize};
 
     fn find(sql: &str) -> Option<Plpgsql> {
         let parse = SourceFile::parse(sql);

@@ -1,5 +1,5 @@
 use insta::assert_snapshot;
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 
 use super::{build_index, check};
 use crate::file::InFile;

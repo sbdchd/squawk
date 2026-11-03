@@ -1,6 +1,6 @@
-use rowan::TextSize;
 use squawk_diagnostics::Edit;
 use squawk_ide_db::{Database, Db, original_file, parse};
+use squawk_rowan::TextSize;
 use squawk_sema::file::{FileIndex, InFile};
 use squawk_syntax::ast;
 

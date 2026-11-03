@@ -1,5 +1,5 @@
-use rowan::TextSize;
 use squawk_diagnostics::Edit;
+use squawk_rowan::TextSize;
 use squawk_sema::file::InFile;
 use squawk_syntax::{
     SyntaxKind,
@@ -58,7 +58,7 @@ pub(super) fn rewrite_normalize_as_function_call(
     Some(())
 }
 
-fn normal_form(expr: &ast::Expr) -> Option<(rowan::TextRange, String)> {
+fn normal_form(expr: &ast::Expr) -> Option<(squawk_rowan::TextRange, String)> {
     let name = expr.as_name_ref()?;
     let token = name.syntax().first_token()?;
     if !matches!(
