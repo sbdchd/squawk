@@ -593,19 +593,46 @@ impl Iterator for SyntaxElementChildren {
     }
 }
 
+#[inline]
+fn element_parent(green: &GreenNode, id: ElementId) -> Option<NodeId> {
+    match id {
+        ElementId::Node(id) => green.node_parent(id),
+        ElementId::Token(id) => Some(green.token_parent(id)),
+    }
+}
+
+#[inline]
+fn element_index(green: &GreenNode, id: ElementId) -> u32 {
+    match id {
+        ElementId::Node(id) => green.node_index(id),
+        ElementId::Token(id) => green.token_index(id),
+    }
+}
+
+#[inline]
+fn first_child_node(green: &GreenNode, parent: NodeId, from: u32) -> Option<NodeId> {
+    let count = green.child_count(parent);
+    (from..count).find_map(|index| match green.child(parent, index)? {
+        ElementId::Node(id) => Some(id),
+        ElementId::Token(_) => None,
+    })
+}
+
 #[derive(Debug, Clone)]
 pub struct Preorder {
-    start: SyntaxNode,
-    next: Option<WalkEvent<SyntaxNode>>,
+    green: Rc<GreenNode>,
+    start: NodeId,
+    next: Option<WalkEvent<NodeId>>,
     skip_subtree: bool,
 }
 
 impl Preorder {
+    #[inline]
     fn new(start: SyntaxNode) -> Preorder {
-        let next = Some(WalkEvent::Enter(start.clone()));
         Preorder {
-            start,
-            next,
+            next: Some(WalkEvent::Enter(start.id)),
+            start: start.id,
+            green: start.green,
             skip_subtree: false,
         }
     }
@@ -616,9 +643,33 @@ impl Preorder {
 
     #[cold]
     fn do_skip(&mut self) {
+        let green = &self.green;
         self.next = self.next.take().map(|next| match next {
-            WalkEvent::Enter(first_child) => WalkEvent::Leave(first_child.parent().unwrap()),
+            WalkEvent::Enter(first_child) => {
+                WalkEvent::Leave(green.node_parent(first_child).unwrap())
+            }
             WalkEvent::Leave(parent) => WalkEvent::Leave(parent),
+        })
+    }
+
+    #[inline]
+    fn advance(&self, event: WalkEvent<NodeId>) -> Option<WalkEvent<NodeId>> {
+        let green = &self.green;
+        Some(match event {
+            WalkEvent::Enter(node) => match first_child_node(green, node, 0) {
+                Some(child) => WalkEvent::Enter(child),
+                None => WalkEvent::Leave(node),
+            },
+            WalkEvent::Leave(node) => {
+                if node == self.start {
+                    return None;
+                }
+                let parent = green.node_parent(node)?;
+                match first_child_node(green, parent, green.node_index(node) + 1) {
+                    Some(sibling) => WalkEvent::Enter(sibling),
+                    None => WalkEvent::Leave(parent),
+                }
+            }
         })
     }
 }
@@ -626,46 +677,37 @@ impl Preorder {
 impl Iterator for Preorder {
     type Item = WalkEvent<SyntaxNode>;
 
+    #[inline]
     fn next(&mut self) -> Option<WalkEvent<SyntaxNode>> {
         if self.skip_subtree {
             self.do_skip();
             self.skip_subtree = false;
         }
-        let next = self.next.take();
-        self.next = next.as_ref().and_then(|next| {
-            Some(match next {
-                WalkEvent::Enter(node) => match node.first_child() {
-                    Some(child) => WalkEvent::Enter(child),
-                    None => WalkEvent::Leave(node.clone()),
-                },
-                WalkEvent::Leave(node) => {
-                    if node == &self.start {
-                        return None;
-                    }
-                    match node.next_sibling() {
-                        Some(sibling) => WalkEvent::Enter(sibling),
-                        None => WalkEvent::Leave(node.parent()?),
-                    }
-                }
-            })
-        });
-        next
+        let next = self.next.take()?;
+        self.next = self.advance(next);
+        let green = &self.green;
+        Some(next.map(|id| SyntaxNode {
+            green: green.clone(),
+            id,
+        }))
     }
 }
 
 #[derive(Debug, Clone)]
 pub struct PreorderWithTokens {
-    start: SyntaxElement,
-    next: Option<WalkEvent<SyntaxElement>>,
+    green: Rc<GreenNode>,
+    start: NodeId,
+    next: Option<WalkEvent<ElementId>>,
     skip_subtree: bool,
 }
 
 impl PreorderWithTokens {
+    #[inline]
     fn new(start: SyntaxNode) -> PreorderWithTokens {
-        let next = Some(WalkEvent::Enter(start.clone().into()));
         PreorderWithTokens {
-            start: start.into(),
-            next,
+            next: Some(WalkEvent::Enter(ElementId::Node(start.id))),
+            start: start.id,
+            green: start.green,
             skip_subtree: false,
         }
     }
@@ -676,9 +718,32 @@ impl PreorderWithTokens {
 
     #[cold]
     fn do_skip(&mut self) {
+        let green = &self.green;
         self.next = self.next.take().map(|next| match next {
-            WalkEvent::Enter(first_child) => WalkEvent::Leave(first_child.parent().unwrap().into()),
+            WalkEvent::Enter(first_child) => {
+                WalkEvent::Leave(ElementId::Node(element_parent(green, first_child).unwrap()))
+            }
             WalkEvent::Leave(parent) => WalkEvent::Leave(parent),
+        })
+    }
+
+    #[inline]
+    fn advance(&self, event: WalkEvent<ElementId>) -> Option<WalkEvent<ElementId>> {
+        let green = &self.green;
+        Some(match event {
+            WalkEvent::Enter(ElementId::Node(node)) => match green.child(node, 0) {
+                Some(child) => WalkEvent::Enter(child),
+                None => WalkEvent::Leave(ElementId::Node(node)),
+            },
+            WalkEvent::Enter(token @ ElementId::Token(_)) => WalkEvent::Leave(token),
+            WalkEvent::Leave(ElementId::Node(node)) if node == self.start => return None,
+            WalkEvent::Leave(el) => {
+                let parent = element_parent(green, el)?;
+                match green.child(parent, element_index(green, el) + 1) {
+                    Some(sibling) => WalkEvent::Enter(sibling),
+                    None => WalkEvent::Leave(ElementId::Node(parent)),
+                }
+            }
         })
     }
 }
@@ -686,29 +751,16 @@ impl PreorderWithTokens {
 impl Iterator for PreorderWithTokens {
     type Item = WalkEvent<SyntaxElement>;
 
+    #[inline]
     fn next(&mut self) -> Option<WalkEvent<SyntaxElement>> {
         if self.skip_subtree {
             self.do_skip();
             self.skip_subtree = false;
         }
-        let next = self.next.take();
-        self.next = next.as_ref().and_then(|next| {
-            Some(match next {
-                WalkEvent::Enter(el) => match el {
-                    NodeOrToken::Node(node) => match node.first_child_or_token() {
-                        Some(child) => WalkEvent::Enter(child),
-                        None => WalkEvent::Leave(node.clone().into()),
-                    },
-                    NodeOrToken::Token(token) => WalkEvent::Leave(token.clone().into()),
-                },
-                WalkEvent::Leave(el) if el == &self.start => return None,
-                WalkEvent::Leave(el) => match el.next_sibling_or_token() {
-                    Some(sibling) => WalkEvent::Enter(sibling),
-                    None => WalkEvent::Leave(el.parent()?.into()),
-                },
-            })
-        });
-        next
+        let next = self.next.take()?;
+        self.next = self.advance(next);
+        let green = &self.green;
+        Some(next.map(|id| element(green, id)))
     }
 }
 // endregion
