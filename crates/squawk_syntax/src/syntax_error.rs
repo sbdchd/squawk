@@ -26,7 +26,7 @@
 
 use std::{borrow::Cow, fmt};
 
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 
 /// Represents the result of unsuccessful tokenization, parsing
 /// or tree validation.

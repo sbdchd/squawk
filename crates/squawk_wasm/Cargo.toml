@@ -26,7 +26,7 @@ squawk-lexer.workspace = true
 squawk-ide.workspace = true
 squawk-sema.workspace = true
 squawk-fmt.workspace = true
-rowan.workspace = true
+squawk-rowan.workspace = true
 
 wasm-bindgen.workspace = true
 serde-wasm-bindgen.workspace = true

@@ -17,7 +17,7 @@ doctest = false
 squawk-syntax.workspace = true
 squawk-diagnostics.workspace = true
 
-rowan.workspace = true
+squawk-rowan.workspace = true
 serde.workspace = true
 enum-iterator.workspace = true
 squawk-line-index.workspace = true

@@ -1,5 +1,5 @@
-use rowan::{TextRange, TextSize};
 use smallvec::SmallVec;
+use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxToken,
     ast::{self, AstNode},

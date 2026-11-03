@@ -1,4 +1,4 @@
-use rowan::TextSize;
+use squawk_rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode};
 
 use squawk_diagnostics::Edit;

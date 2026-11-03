@@ -8,8 +8,8 @@ pub use ignore::Ignore;
 use ignore::find_ignores;
 use ignore::has_disable_assume_in_transaction;
 use ignore_index::IgnoreIndex;
-use rowan::TextRange;
 use serde::Deserialize;
+use squawk_rowan::TextRange;
 
 use squawk_diagnostics::Fix;
 use squawk_syntax::SyntaxNode;

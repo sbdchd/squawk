@@ -2,13 +2,13 @@ use std::borrow::Cow;
 use std::fmt::Write as _;
 
 use log::info;
-use rowan::{TextRange, TextSize};
 use serde::{Deserialize, Serialize};
 use squawk_ide::builtins::builtins_file;
 use squawk_ide::db::{self, Database, File, original_file};
 use squawk_ide::folding_ranges::{FoldKind, folding_ranges};
 use squawk_ide::semantic_tokens::{SemanticTokenType, semantic_tokens};
 use squawk_line_index::{LineIndex, find_newline};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::file::{FileId, FileIndex, InFile};
 use squawk_syntax::ast::AstNode;
 use wasm_bindgen::prelude::*;
@@ -715,7 +715,7 @@ fn position_to_offset(
     file: FileId,
     line: u32,
     col: u32,
-) -> Result<InFile<rowan::TextSize>, Error> {
+) -> Result<InFile<squawk_rowan::TextSize>, Error> {
     let line_index = db::line_index(db, file);
     let wide_pos = squawk_line_index::WideLineCol { line, col };
 

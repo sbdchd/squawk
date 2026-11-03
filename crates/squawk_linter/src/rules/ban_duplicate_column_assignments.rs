@@ -6,8 +6,8 @@ use squawk_syntax::{
     column_name::ColumnName,
 };
 
-use rowan::TextRange;
 use squawk_diagnostics::{Edit, Fix};
+use squawk_rowan::TextRange;
 
 use crate::{Linter, Rule, Violation};
 

@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use rowan::{GreenNode, TextRange};
+use squawk_rowan::{GreenNode, TextRange};
 
 use crate::{
     Parse, SyntaxNode, ast, ast::AstNode, decoded_text::DecodedText, syntax_error::SyntaxError,
@@ -90,7 +90,7 @@ impl<T: BodyLanguage> Body<T> {
         self.decoded.source_range(range)
     }
 
-    pub fn body_position(&self, source: rowan::TextSize) -> Option<rowan::TextSize> {
+    pub fn body_position(&self, source: squawk_rowan::TextSize) -> Option<squawk_rowan::TextSize> {
         self.decoded.decoded_pos(source)
     }
 

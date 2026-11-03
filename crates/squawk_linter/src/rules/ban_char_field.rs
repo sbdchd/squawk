@@ -1,7 +1,7 @@
 use rustc_hash::FxHashSet;
 
-use rowan::TextRange;
 use squawk_diagnostics::{Edit, Fix};
+use squawk_rowan::TextRange;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},

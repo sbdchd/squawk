@@ -2,7 +2,7 @@
 //   cargo xtask codegen
 
 #![allow(bad_style, missing_docs, clippy::upper_case_acronyms)]
-#[doc = r"The kind of syntax node, e.g. `IDENT`, `SELECT_KW`, or `WHERE_CLAUSE`. Needs to be compatible with [`rowan::SyntaxKind`]"]
+#[doc = r"The kind of syntax node, e.g. `IDENT`, `SELECT_KW`, or `WHERE_CLAUSE`. Needs to be compatible with [`squawk_rowan::SyntaxKind`]"]
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Debug)]
 #[repr(u16)]
 pub enum SyntaxKind {

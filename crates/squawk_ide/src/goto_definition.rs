@@ -1,5 +1,5 @@
-use rowan::{TextRange, TextSize};
 use smallvec::{SmallVec, smallvec};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::file::{FilePosition, FileRange, InFile, IrFileRange};
 use squawk_sema::ir::{ColumnId, FunctionId, Item, ParamId, SourceId, SourceKind, TypeId};
 use squawk_sema::semantic_index::{AsOf, SemanticIndex};

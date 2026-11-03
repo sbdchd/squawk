@@ -6,8 +6,8 @@ use squawk_sema::semantic_index::SemanticIndex;
 use std::fmt::Write;
 use std::iter;
 
-use rowan::TextSize;
 use rustc_hash::FxHashSet;
+use squawk_rowan::TextSize;
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode},

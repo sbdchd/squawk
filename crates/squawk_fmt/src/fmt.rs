@@ -47,7 +47,7 @@ fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a>
     let mut at_start = true;
     for el in source_file.syntax().children_with_tokens() {
         match el {
-            rowan::NodeOrToken::Node(node) => {
+            squawk_rowan::NodeOrToken::Node(node) => {
                 if let Some(stmt) = ast::Stmt::cast(node.clone()) {
                     let is_empty_stmt = matches!(&stmt, ast::Stmt::EmptyStmt(_));
                     if previous_was_stmt && !is_empty_stmt {
@@ -71,7 +71,7 @@ fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a>
                 needs_space = true;
                 at_start = false;
             }
-            rowan::NodeOrToken::Token(token) => {
+            squawk_rowan::NodeOrToken::Token(token) => {
                 previous_was_stmt = false;
                 if token.kind() == SyntaxKind::COMMENT {
                     if needs_space {
@@ -19934,13 +19934,13 @@ fn build_operator<'a>(op: &ast::Op) -> Doc<'a> {
 
     for element in op.syntax().children_with_tokens() {
         match element {
-            rowan::NodeOrToken::Node(node) => {
+            squawk_rowan::NodeOrToken::Node(node) => {
                 doc = doc.append(match path_ref.as_ref() {
                     Some(path) if path.syntax() == &node => build_path_ref(path),
                     _ => build_operator_part(&node),
                 });
             }
-            rowan::NodeOrToken::Token(token) => {
+            squawk_rowan::NodeOrToken::Token(token) => {
                 doc = doc.append(build_operator_token(&token));
             }
         }
@@ -19953,8 +19953,8 @@ fn build_operator_part<'a>(node: &SyntaxNode) -> Doc<'a> {
     Doc::list(
         node.children_with_tokens()
             .map(|element| match element {
-                rowan::NodeOrToken::Node(node) => build_operator_part(&node),
-                rowan::NodeOrToken::Token(token) => build_operator_token(&token),
+                squawk_rowan::NodeOrToken::Node(node) => build_operator_part(&node),
+                squawk_rowan::NodeOrToken::Token(token) => build_operator_token(&token),
             })
             .collect(),
     )
@@ -20004,7 +20004,7 @@ fn build_string_literal<'a>(lit: &ast::Literal) -> Doc<'a> {
         .syntax()
         .children_with_tokens()
         .filter_map(|el| match el {
-            rowan::NodeOrToken::Token(t) if t.kind() != SyntaxKind::WHITESPACE => {
+            squawk_rowan::NodeOrToken::Token(t) if t.kind() != SyntaxKind::WHITESPACE => {
                 Some(Doc::text(format_string_token(&t)))
             }
             _ => None,

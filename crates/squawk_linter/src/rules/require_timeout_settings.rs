@@ -1,8 +1,8 @@
 use std::borrow::Cow;
 use std::fmt;
 
-use rowan::TextSize;
 use squawk_diagnostics::{Edit, Fix};
+use squawk_rowan::TextSize;
 use squawk_syntax::{
     Parse, SourceFile, SyntaxKind,
     ast::{self, AstNode},

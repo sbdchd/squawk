@@ -1,4 +1,4 @@
-use rowan::{TextRange, TextSize};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::{
     file::{FilePosition, FileRange, InFile, IrFileRange},
     ir::{Item, Ty},

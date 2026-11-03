@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use rowan::{GreenNode, GreenNodeBuilder, Language, TextSize};
+use squawk_rowan::{GreenNode, GreenNodeBuilder, Language, TextSize};
 
 use crate::{SyntaxKind, syntax_error::SyntaxError};
 
@@ -33,29 +33,35 @@ pub enum Sql {}
 impl Language for Sql {
     type Kind = SyntaxKind;
 
-    fn kind_from_raw(raw: rowan::SyntaxKind) -> SyntaxKind {
+    fn kind_from_raw(raw: squawk_rowan::SyntaxKind) -> SyntaxKind {
         SyntaxKind::from(raw.0)
     }
 
-    fn kind_to_raw(kind: SyntaxKind) -> rowan::SyntaxKind {
-        rowan::SyntaxKind(kind.into())
+    fn kind_to_raw(kind: SyntaxKind) -> squawk_rowan::SyntaxKind {
+        squawk_rowan::SyntaxKind(kind.into())
     }
 }
 
-pub type SyntaxNode = rowan::SyntaxNode<Sql>;
-pub type SyntaxToken = rowan::SyntaxToken<Sql>;
-pub type SyntaxElement = rowan::SyntaxElement<Sql>;
-pub(crate) type SyntaxNodeChildren = rowan::SyntaxNodeChildren<Sql>;
-// pub type SyntaxElementChildren = rowan::SyntaxElementChildren<Sql>;
-// pub type PreorderWithTokens = rowan::api::PreorderWithTokens<Sql>;
+pub type SyntaxNode = squawk_rowan::SyntaxNode<Sql>;
+pub type SyntaxToken = squawk_rowan::SyntaxToken<Sql>;
+pub type SyntaxElement = squawk_rowan::SyntaxElement<Sql>;
+pub(crate) type SyntaxNodeChildren = squawk_rowan::SyntaxNodeChildren<Sql>;
+// pub type SyntaxElementChildren = squawk_rowan::SyntaxElementChildren<Sql>;
+// pub type PreorderWithTokens = squawk_rowan::api::PreorderWithTokens<Sql>;
 
-#[derive(Default)]
 pub(crate) struct SyntaxTreeBuilder {
     errors: Vec<SyntaxError>,
-    inner: GreenNodeBuilder<'static>,
+    inner: GreenNodeBuilder,
 }
 
 impl SyntaxTreeBuilder {
+    pub(crate) fn with_text_capacity(text_len: usize) -> Self {
+        SyntaxTreeBuilder {
+            errors: vec![],
+            inner: GreenNodeBuilder::with_text_capacity(text_len),
+        }
+    }
+
     pub(crate) fn finish_raw(self) -> (GreenNode, Vec<SyntaxError>) {
         let green = self.inner.finish();
         (green, self.errors)

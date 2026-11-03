@@ -1,6 +1,6 @@
 use rustc_hash::FxHashSet;
 
-use rowan::{NodeOrToken, TextRange, TextSize};
+use squawk_rowan::{NodeOrToken, TextRange, TextSize};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 
 use crate::{Linter, Rule, Violation};
@@ -87,7 +87,7 @@ pub fn ignore_rule_info(token: &SyntaxToken) -> Option<(&str, TextRange, IgnoreK
 pub(crate) fn find_ignores(ctx: &mut Linter, file: &SyntaxNode) {
     for event in file.preorder_with_tokens() {
         match event {
-            rowan::WalkEvent::Enter(NodeOrToken::Token(token))
+            squawk_rowan::WalkEvent::Enter(NodeOrToken::Token(token))
                 if token.kind() == SyntaxKind::COMMENT =>
             {
                 if let Some((rule_names, range, kind)) = ignore_rule_info(&token) {
@@ -149,7 +149,7 @@ const DISABLE_ASSUME_IN_TRANSACTION: &str = "squawk-disable-assume-in-transactio
 pub fn has_disable_assume_in_transaction(file: &SyntaxNode) -> bool {
     for event in file.preorder_with_tokens() {
         match event {
-            rowan::WalkEvent::Enter(NodeOrToken::Token(token))
+            squawk_rowan::WalkEvent::Enter(NodeOrToken::Token(token))
                 if token.kind() == SyntaxKind::COMMENT =>
             {
                 if let Some((body, _range)) = comment_body(&token)

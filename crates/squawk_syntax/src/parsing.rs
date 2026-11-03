@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use rowan::{GreenNode, TextRange};
+use squawk_rowan::{GreenNode, TextRange};
 
 use crate::{syntax_error::SyntaxError, syntax_node::SyntaxTreeBuilder};
 
@@ -32,7 +32,7 @@ pub(crate) fn parse_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
     let lexed = squawk_parser::LexedStr::new(text);
     let parser_input = lexed.to_input();
     let parser_output = squawk_parser::EntryPoint::SourceFile.parse(&parser_input);
-    let (node, errors, _eof) = build_tree(&lexed, &parser_output);
+    let (node, errors, _eof) = build_tree(text, &lexed, &parser_output);
     (node, errors)
 }
 
@@ -40,15 +40,16 @@ pub(crate) fn parse_plpgsql_text(text: &str) -> (GreenNode, Vec<SyntaxError>) {
     let lexed = squawk_parser::LexedStr::new(text);
     let parser_input = lexed.to_input();
     let parser_output = squawk_parser::EntryPoint::Plpgsql.parse(&parser_input);
-    let (node, errors, _eof) = build_tree(&lexed, &parser_output);
+    let (node, errors, _eof) = build_tree(text, &lexed, &parser_output);
     (node, errors)
 }
 
 pub(crate) fn build_tree(
+    text: &str,
     lexed: &squawk_parser::LexedStr<'_>,
     parser_output: &squawk_parser::Output,
 ) -> (GreenNode, Vec<SyntaxError>, bool) {
-    let mut builder = SyntaxTreeBuilder::default();
+    let mut builder = SyntaxTreeBuilder::with_text_capacity(text.len());
 
     let is_eof = lexed.intersperse_trivia(parser_output, &mut |step| match step {
         squawk_parser::StrStep::Token { kind, text } => builder.token(kind, text),

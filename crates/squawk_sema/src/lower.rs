@@ -1,9 +1,9 @@
 use std::{borrow::Cow, cmp::Ordering, collections::hash_map::Entry, range::Range};
 
 use la_arena::Idx;
-use rowan::{TextRange, TextSize};
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use smallvec::{SmallVec, smallvec};
+use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode, NameLike},
@@ -11555,7 +11555,7 @@ impl Lowerer {
         for element in std::iter::successors(node.prev_sibling_or_token(), |element| {
             element.prev_sibling_or_token()
         }) {
-            let rowan::NodeOrToken::Token(token) = element else {
+            let squawk_rowan::NodeOrToken::Token(token) = element else {
                 break;
             };
             match token.kind() {

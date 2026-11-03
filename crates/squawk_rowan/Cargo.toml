@@ -1,0 +1,20 @@
+[package]
+name = "squawk-rowan"
+version.workspace = true
+authors = [
+  "Aleksey Kladov <aleksey.kladov@gmail.com>",
+  "Igor Aleksanov <popzxc@yandex.ru>",
+]
+repository.workspace = true
+license = "MIT OR Apache-2.0"
+description = "Library for generic lossless syntax trees"
+edition = "2021"
+rust-version.workspace = true
+
+[dependencies]
+text-size = "1.1.0"
+
+serde = { version = "1.0.89", optional = true, default-features = false }
+
+[features]
+serde1 = ["serde", "text-size/serde"]

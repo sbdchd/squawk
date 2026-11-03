@@ -1,7 +1,7 @@
 use std::ops::Range;
 
 use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::DecorStyle};
-use rowan::TextSize;
+use squawk_rowan::TextSize;
 use squawk_sema::builtins::BUILTINS_SQL;
 use squawk_sema::extensions::BundledExtension;
 use squawk_sema::file::{FileId, FileIndex, FilePosition, FileRange, InFile};

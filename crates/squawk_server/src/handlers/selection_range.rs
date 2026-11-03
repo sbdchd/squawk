@@ -1,6 +1,6 @@
 use gen_lsp_types::{SelectionRange, SelectionRangeParams};
-use rowan::TextRange;
 use squawk_ide::db::{line_index, parse};
+use squawk_rowan::TextRange;
 
 use crate::global_state::Snapshot;
 use crate::lsp_utils;

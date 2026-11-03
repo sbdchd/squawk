@@ -9,7 +9,7 @@ use squawk_sema::ir::{
 use squawk_sema::semantic_index::SemanticIndex;
 use std::fmt::{self, Write as _};
 
-use rowan::TextSize;
+use squawk_rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::hover_literal::{LiteralHover, hover_literal};

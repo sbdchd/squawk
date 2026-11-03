@@ -16,7 +16,7 @@ doctest = false
 [dependencies]
 squawk-line-index.workspace = true
 squawk-parser.workspace = true
-rowan.workspace = true
+squawk-rowan.workspace = true
 smol_str.workspace = true
 smallvec.workspace = true
 either.workspace = true

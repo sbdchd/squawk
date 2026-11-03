@@ -29,9 +29,9 @@ fn item_at_range() {
     40..41 "t" Reference(Idx::<Reference>(38686))
     "#);
 
-    let token = InFile::new(file, rowan::TextRange::new(33.into(), 34.into()));
+    let token = InFile::new(file, squawk_rowan::TextRange::new(33.into(), 34.into()));
     let ItemRange { range, item } = index.item_at_range(token).unwrap().value;
-    assert_eq!(range, rowan::TextRange::new(33.into(), 34.into()));
+    assert_eq!(range, squawk_rowan::TextRange::new(33.into(), 34.into()));
     let crate::ir::Item::Reference(reference) = item else {
         panic!("expected a reference");
     };
