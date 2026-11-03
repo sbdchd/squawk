@@ -1,4 +1,4 @@
-use std::{fmt, hash::Hash, iter::FusedIterator, slice, sync::Arc};
+use std::{fmt, hash::Hash, iter::FusedIterator, ops::Range, slice, sync::Arc};
 
 use crate::{NodeOrToken, TextRange, TextSize};
 
@@ -7,10 +7,10 @@ use crate::{NodeOrToken, TextRange, TextSize};
 pub struct SyntaxKind(pub u16);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) struct NodeId(u32);
+pub(crate) struct NodeId(pub(crate) u32);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-pub(crate) struct TokenId(u32);
+pub(crate) struct TokenId(pub(crate) u32);
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) enum ElementId {
@@ -47,6 +47,9 @@ struct NodeData {
     index_in_parent: u32,
     first_child: u32,
     child_count: u32,
+    first_token: u32,
+    nodes_end: u32,
+    tokens_end: u32,
     text_range: TextRange,
 }
 
@@ -111,6 +114,22 @@ impl GreenNode {
     #[inline]
     pub(crate) fn node_index(&self, id: NodeId) -> u32 {
         self.tree.node(id).index_in_parent
+    }
+
+    #[inline]
+    pub(crate) fn node_descendants(&self, id: NodeId) -> Range<u32> {
+        id.0..self.tree.node(id).nodes_end
+    }
+
+    #[inline]
+    pub(crate) fn node_first_token(&self, id: NodeId) -> u32 {
+        self.tree.node(id).first_token
+    }
+
+    #[inline]
+    pub(crate) fn node_tokens(&self, id: NodeId) -> Range<u32> {
+        let node = self.tree.node(id);
+        node.first_token..node.tokens_end
     }
 
     #[inline]
@@ -480,6 +499,9 @@ impl GreenNodeBuilder {
             index_in_parent: 0,
             first_child: 0,
             child_count: 0,
+            first_token: u32::try_from(self.tokens.len()).expect("too many tokens"),
+            nodes_end: 0,
+            tokens_end: 0,
             text_range: TextRange::empty(self.offset),
         });
         self.stack.push(OpenNode {
@@ -506,10 +528,14 @@ impl GreenNodeBuilder {
             u32::try_from(self.pending.len() - parent.first_pending).expect("too many children")
         });
 
+        let nodes_end = u32::try_from(self.nodes.len()).expect("too many nodes");
+        let tokens_end = u32::try_from(self.tokens.len()).expect("too many tokens");
         let node = &mut self.nodes[open.id.0 as usize];
         node.index_in_parent = index_in_parent;
         node.first_child = first_child;
         node.child_count = child_count;
+        node.nodes_end = nodes_end;
+        node.tokens_end = tokens_end;
         node.text_range = TextRange::new(open.start, self.offset);
 
         if self.stack.last().is_some() {

@@ -7,6 +7,7 @@ use std::{
     fmt,
     hash::{Hash, Hasher},
     iter,
+    ops::Range,
     rc::Rc,
 };
 
@@ -230,18 +231,22 @@ impl SyntaxNode {
 
     #[inline]
     pub fn descendants(&self) -> impl Iterator<Item = SyntaxNode> {
-        self.preorder().filter_map(|event| match event {
-            WalkEvent::Enter(node) => Some(node),
-            WalkEvent::Leave(_) => None,
-        })
+        let green = self.green.clone();
+        self.green
+            .node_descendants(self.id)
+            .map(move |id| SyntaxNode {
+                green: green.clone(),
+                id: NodeId(id),
+            })
     }
 
     #[inline]
     pub fn descendants_with_tokens(&self) -> impl Iterator<Item = SyntaxElement> {
-        self.preorder_with_tokens().filter_map(|event| match event {
-            WalkEvent::Enter(it) => Some(it),
-            WalkEvent::Leave(_) => None,
-        })
+        DescendantsWithTokens {
+            nodes: self.green.node_descendants(self.id),
+            tokens: self.green.node_tokens(self.id),
+            green: self.green.clone(),
+        }
     }
 
     #[inline]
@@ -785,3 +790,97 @@ impl Iterator for PreorderWithTokens {
     }
 }
 // endregion
+
+struct DescendantsWithTokens {
+    green: Rc<GreenNode>,
+    nodes: Range<u32>,
+    tokens: Range<u32>,
+}
+
+impl Iterator for DescendantsWithTokens {
+    type Item = SyntaxElement;
+
+    #[inline]
+    fn next(&mut self) -> Option<SyntaxElement> {
+        let id = match (
+            self.nodes.start < self.nodes.end,
+            self.tokens.start < self.tokens.end,
+        ) {
+            (true, true)
+                if self.green.node_first_token(NodeId(self.nodes.start)) > self.tokens.start =>
+            {
+                ElementId::Token(TokenId(self.tokens.next()?))
+            }
+            (true, _) => ElementId::Node(NodeId(self.nodes.next()?)),
+            (false, true) => ElementId::Token(TokenId(self.tokens.next()?)),
+            (false, false) => return None,
+        };
+        Some(element(&self.green, id))
+    }
+
+    #[inline]
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let len = self.nodes.len() + self.tokens.len();
+        (len, Some(len))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn tree() -> SyntaxNode {
+        let mut builder = GreenNodeBuilder::new();
+        builder.start_node(SyntaxKind(0));
+        builder.token(SyntaxKind(1), "a");
+        builder.start_node(SyntaxKind(2));
+        builder.finish_node();
+        builder.start_node(SyntaxKind(3));
+        builder.start_node(SyntaxKind(4));
+        builder.token(SyntaxKind(5), "b");
+        builder.finish_node();
+        builder.token(SyntaxKind(6), "c");
+        builder.start_node(SyntaxKind(7));
+        builder.finish_node();
+        builder.finish_node();
+        builder.token(SyntaxKind(8), "d");
+        builder.finish_node();
+        SyntaxNode::new_root(builder.finish())
+    }
+
+    fn kinds(it: impl Iterator<Item = SyntaxElement>) -> Vec<u16> {
+        it.map(|it| it.kind().0).collect()
+    }
+
+    fn preorder_kinds(node: &SyntaxNode) -> Vec<u16> {
+        kinds(node.preorder_with_tokens().filter_map(|event| match event {
+            WalkEvent::Enter(it) => Some(it),
+            WalkEvent::Leave(_) => None,
+        }))
+    }
+
+    #[test]
+    fn descendants_with_tokens_matches_preorder() {
+        let root = tree();
+        assert_eq!(
+            kinds(root.descendants_with_tokens()),
+            vec![0, 1, 2, 3, 4, 5, 6, 7, 8]
+        );
+        for node in root.descendants() {
+            assert_eq!(kinds(node.descendants_with_tokens()), preorder_kinds(&node));
+        }
+    }
+
+    #[test]
+    fn descendants_matches_preorder() {
+        let root = tree();
+        let subtree = root.children().nth(1).unwrap();
+        assert_eq!(
+            subtree
+                .descendants()
+                .map(|it| it.kind().0)
+                .collect::<Vec<_>>(),
+            vec![3, 4, 7]
+        );
+    }
+}
