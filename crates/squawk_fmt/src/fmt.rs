@@ -7615,6 +7615,14 @@ fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> String) -> Doc<'a> 
         return Doc::text(ident.text().to_ascii_lowercase());
     }
 
+    let text = ident.text();
+    if ident.kind() == SyntaxKind::IDENT
+        && !text.starts_with('"')
+        && !text.bytes().any(|b| b.is_ascii_uppercase())
+    {
+        return Doc::text(quote(text));
+    }
+
     Doc::text(quote(&normalize_name_node(node)))
 }
 
