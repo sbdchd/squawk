@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use squawk_rowan::{Language, TextRange, TextSize};
+use squawk_rowan::Language;
 
 use super::{AstChildren, AstNode, SyntaxKind, SyntaxNode, SyntaxToken};
 use crate::SyntaxElement;
@@ -64,18 +64,8 @@ fn first_child_or_token(
     kind_matches: impl Fn(SyntaxKind) -> bool,
 ) -> Option<SyntaxElement> {
     let is_node = element_kind == ElementKind::Node;
-    let mut offset = parent.text_range().start();
-    for child in parent.green().children() {
-        let len = child.text_len();
-        if child.as_node().is_some() == is_node && kind_matches(Sql::kind_from_raw(child.kind())) {
-            if len == TextSize::new(0) {
-                return parent
-                    .children_with_tokens()
-                    .find(|it| it.as_node().is_some() == is_node && kind_matches(it.kind()));
-            }
-            return parent.child_or_token_at_range(TextRange::at(offset, len));
-        }
-        offset += len;
-    }
-    None
+    let index = parent.green().children().position(|child| {
+        child.as_node().is_some() == is_node && kind_matches(Sql::kind_from_raw(child.kind()))
+    })?;
+    parent.child_or_token(u32::try_from(index).unwrap())
 }

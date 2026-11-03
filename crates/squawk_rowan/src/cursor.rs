@@ -162,6 +162,10 @@ impl SyntaxNode {
         sibling(&self.green, Some(self.id), Some(0))
     }
     #[inline]
+    pub fn child_or_token(&self, index: u32) -> Option<SyntaxElement> {
+        sibling(&self.green, Some(self.id), Some(index))
+    }
+    #[inline]
     pub fn last_child_or_token(&self) -> Option<SyntaxElement> {
         let index = self.green.child_count(self.id).checked_sub(1);
         sibling(&self.green, Some(self.id), index)
