@@ -481,9 +481,9 @@ impl GreenNodeBuilder {
         }
     }
 
-    pub fn with_capacity(text_len: usize, nodes: usize, tokens: usize) -> GreenNodeBuilder {
+    pub fn with_source(source: &str, nodes: usize, tokens: usize) -> GreenNodeBuilder {
         GreenNodeBuilder {
-            source: String::with_capacity(text_len),
+            source: source.to_owned(),
             nodes: Vec::with_capacity(nodes),
             tokens: Vec::with_capacity(tokens),
             children: Vec::with_capacity(nodes + tokens),
@@ -507,6 +507,22 @@ impl GreenNodeBuilder {
         });
         self.pending.push(PackedElementId::token(id));
         self.source.push_str(text);
+        self.offset += len;
+    }
+
+    #[inline]
+    pub fn source_token(&mut self, kind: SyntaxKind, len: TextSize) {
+        let parent = self.stack.last().expect("tokens must be inside a node");
+        let id = TokenId(u32::try_from(self.tokens.len()).expect("too many tokens"));
+        let index_in_parent =
+            u32::try_from(self.pending.len() - parent.first_pending).expect("too many children");
+        self.tokens.push(TokenData {
+            kind,
+            parent: parent.id,
+            index_in_parent,
+            text_range: TextRange::at(self.offset, len),
+        });
+        self.pending.push(PackedElementId::token(id));
         self.offset += len;
     }
 
@@ -572,9 +588,10 @@ impl GreenNodeBuilder {
     /// `start_node` and `finish_node` calls
     /// are paired!
     #[inline]
-    pub fn finish(self) -> GreenNode {
+    pub fn finish(mut self) -> GreenNode {
         assert!(self.stack.is_empty(), "unfinished node");
         assert_eq!(self.root, Some(GreenNode::ROOT));
+        self.source.truncate(self.offset.into());
         GreenNode {
             tree: Arc::new(GreenTree {
                 source: self.source.into_boxed_str(),

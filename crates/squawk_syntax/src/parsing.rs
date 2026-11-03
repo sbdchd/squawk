@@ -49,8 +49,7 @@ pub(crate) fn build_tree(
     lexed: &squawk_parser::LexedStr<'_>,
     parser_output: &squawk_parser::Output,
 ) -> (GreenNode, Vec<SyntaxError>, bool) {
-    let mut builder =
-        SyntaxTreeBuilder::with_capacity(text.len(), parser_output.node_count(), lexed.len());
+    let mut builder = SyntaxTreeBuilder::with_source(text, parser_output.node_count(), lexed.len());
 
     let is_eof = lexed.intersperse_trivia(parser_output, &mut |step| match step {
         squawk_parser::StrStep::Token { kind, text } => builder.token(kind, text),

@@ -55,10 +55,10 @@ pub(crate) struct SyntaxTreeBuilder {
 }
 
 impl SyntaxTreeBuilder {
-    pub(crate) fn with_capacity(text_len: usize, nodes: usize, tokens: usize) -> Self {
+    pub(crate) fn with_source(source: &str, nodes: usize, tokens: usize) -> Self {
         SyntaxTreeBuilder {
             errors: vec![],
-            inner: GreenNodeBuilder::with_capacity(text_len, nodes, tokens),
+            inner: GreenNodeBuilder::with_source(source, nodes, tokens),
         }
     }
 
@@ -80,7 +80,7 @@ impl SyntaxTreeBuilder {
 
     pub(crate) fn token(&mut self, kind: SyntaxKind, text: &str) {
         let kind = Sql::kind_to_raw(kind);
-        self.inner.token(kind, text);
+        self.inner.source_token(kind, TextSize::of(text));
     }
 
     pub(crate) fn start_node(&mut self, kind: SyntaxKind) {
