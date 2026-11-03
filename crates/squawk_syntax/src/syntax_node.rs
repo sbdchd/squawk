@@ -33,10 +33,12 @@ pub enum Sql {}
 impl Language for Sql {
     type Kind = SyntaxKind;
 
+    #[inline]
     fn kind_from_raw(raw: squawk_rowan::SyntaxKind) -> SyntaxKind {
         SyntaxKind::from(raw.0)
     }
 
+    #[inline]
     fn kind_to_raw(kind: SyntaxKind) -> squawk_rowan::SyntaxKind {
         squawk_rowan::SyntaxKind(kind.into())
     }
