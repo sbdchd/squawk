@@ -37,7 +37,7 @@ use crate::{output::Output, syntax_kind::SyntaxKind};
 /// `Parser` produces a flat list of `Event`s.
 /// They are converted to a tree-structure in
 /// a separate pass, via `SyntaxTreeBuilder`.
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 pub(crate) enum Event {
     /// This event signifies the start of the node.
     /// It should be either abandoned (in which case the
@@ -116,7 +116,15 @@ pub(super) fn process(mut events: Vec<Event>, mut errors: Vec<String>) -> Output
     let mut forward_parents = Vec::new();
 
     for i in 0..events.len() {
-        match mem::replace(&mut events[i], Event::tombstone()) {
+        match events[i] {
+            Event::Start {
+                kind,
+                forward_parent: None,
+            } => {
+                if kind != SyntaxKind::TOMBSTONE {
+                    res.enter_node(kind);
+                }
+            }
             Event::Start {
                 kind,
                 forward_parent,
