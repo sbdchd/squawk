@@ -109,7 +109,7 @@ impl Event {
 
 /// Generate the syntax tree with the control of events.
 pub(super) fn process(mut events: Vec<Event>) -> Output {
-    let mut res = Output::default();
+    let mut res = Output::with_capacity(events.len());
     let mut forward_parents = Vec::new();
 
     for i in 0..events.len() {

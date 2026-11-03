@@ -55,10 +55,10 @@ pub(crate) struct SyntaxTreeBuilder {
 }
 
 impl SyntaxTreeBuilder {
-    pub(crate) fn with_text_capacity(text_len: usize) -> Self {
+    pub(crate) fn with_capacity(text_len: usize, nodes: usize, tokens: usize) -> Self {
         SyntaxTreeBuilder {
             errors: vec![],
-            inner: GreenNodeBuilder::with_text_capacity(text_len),
+            inner: GreenNodeBuilder::with_capacity(text_len, nodes, tokens),
         }
     }
 

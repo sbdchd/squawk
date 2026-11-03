@@ -481,6 +481,16 @@ impl GreenNodeBuilder {
         }
     }
 
+    pub fn with_capacity(text_len: usize, nodes: usize, tokens: usize) -> GreenNodeBuilder {
+        GreenNodeBuilder {
+            source: String::with_capacity(text_len),
+            nodes: Vec::with_capacity(nodes),
+            tokens: Vec::with_capacity(tokens),
+            children: Vec::with_capacity(nodes + tokens),
+            ..GreenNodeBuilder::default()
+        }
+    }
+
     /// Adds new token to the current branch.
     #[inline]
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {

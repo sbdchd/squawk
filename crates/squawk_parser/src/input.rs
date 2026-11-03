@@ -47,6 +47,14 @@ pub struct Input {
 
 /// `pub` impl used by callers to create `Tokens`.
 impl Input {
+    pub(crate) fn with_capacity(capacity: usize) -> Self {
+        Input {
+            kind: Vec::with_capacity(capacity),
+            joint: Vec::with_capacity(capacity.div_ceil(bits::BITS as usize)),
+            contextual_kind: Vec::with_capacity(capacity),
+        }
+    }
+
     #[inline]
     pub(crate) fn push(&mut self, kind: SyntaxKind) {
         self.push_impl(kind, SyntaxKind::EOF);

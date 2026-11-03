@@ -70,13 +70,13 @@ impl<'a> LexedStr<'a> {
     //     self.text
     // }
 
-    pub(crate) fn len(&self) -> usize {
+    pub fn len(&self) -> usize {
         self.kind.len() - 1
     }
 
-    // pub(crate) fn is_empty(&self) -> bool {
-    //     self.len() == 0
-    // }
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 
     pub(crate) fn kind(&self, i: usize) -> SyntaxKind {
         assert!(i < self.len());
