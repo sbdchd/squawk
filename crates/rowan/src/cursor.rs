@@ -1,12 +1,13 @@
 //! Implementation of the cursors -- API for convenient access to syntax trees.
 //!
 //! A cursor (`SyntaxNode` or `SyntaxToken`) is a reference counted handle to
-//! a `GreenNode` plus the id of an entry in its node or token table.
+//! shared `Rc<GreenNode>` plus the id of an entry in its node or token table.
 
 use std::{
     fmt,
     hash::{Hash, Hasher},
     iter,
+    rc::Rc,
 };
 
 use crate::{
@@ -19,18 +20,18 @@ pub type SyntaxElement = NodeOrToken<SyntaxNode, SyntaxToken>;
 
 #[derive(Clone)]
 pub struct SyntaxNode {
-    green: GreenNode,
+    green: Rc<GreenNode>,
     id: NodeId,
 }
 
 #[derive(Clone)]
 pub struct SyntaxToken {
-    green: GreenNode,
+    green: Rc<GreenNode>,
     id: TokenId,
 }
 
 #[inline]
-fn element(green: &GreenNode, id: ElementId) -> SyntaxElement {
+fn element(green: &Rc<GreenNode>, id: ElementId) -> SyntaxElement {
     let green = green.clone();
     match id {
         ElementId::Node(id) => SyntaxNode { green, id }.into(),
@@ -39,7 +40,11 @@ fn element(green: &GreenNode, id: ElementId) -> SyntaxElement {
 }
 
 #[inline]
-fn sibling(green: &GreenNode, parent: Option<NodeId>, index: Option<u32>) -> Option<SyntaxElement> {
+fn sibling(
+    green: &Rc<GreenNode>,
+    parent: Option<NodeId>,
+    index: Option<u32>,
+) -> Option<SyntaxElement> {
     let id = green.child(parent?, index?)?;
     Some(element(green, id))
 }
@@ -47,7 +52,7 @@ fn sibling(green: &GreenNode, parent: Option<NodeId>, index: Option<u32>) -> Opt
 impl SyntaxNode {
     pub fn new_root(green: GreenNode) -> SyntaxNode {
         SyntaxNode {
-            green,
+            green: Rc::new(green),
             id: GreenNode::ROOT,
         }
     }
