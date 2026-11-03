@@ -421,7 +421,7 @@ impl FusedIterator for Children<'_> {}
 struct OpenNode {
     id: NodeId,
     start: TextSize,
-    children: Vec<PackedElementId>,
+    first_pending: usize,
 }
 
 /// A builder for a green tree.
@@ -431,6 +431,7 @@ pub struct GreenNodeBuilder {
     nodes: Vec<NodeData>,
     tokens: Vec<TokenData>,
     children: Vec<PackedElementId>,
+    pending: Vec<PackedElementId>,
     stack: Vec<OpenNode>,
     root: Option<NodeId>,
     offset: TextSize,
@@ -452,17 +453,18 @@ impl GreenNodeBuilder {
     /// Adds new token to the current branch.
     #[inline]
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {
-        let parent = self.stack.last_mut().expect("tokens must be inside a node");
+        let parent = self.stack.last().expect("tokens must be inside a node");
         let id = TokenId(u32::try_from(self.tokens.len()).expect("too many tokens"));
         let len = TextSize::of(text);
-        let index_in_parent = u32::try_from(parent.children.len()).expect("too many children");
+        let index_in_parent =
+            u32::try_from(self.pending.len() - parent.first_pending).expect("too many children");
         self.tokens.push(TokenData {
             kind,
             parent: parent.id,
             index_in_parent,
             text_range: TextRange::at(self.offset, len),
         });
-        parent.children.push(PackedElementId::token(id));
+        self.pending.push(PackedElementId::token(id));
         self.source.push_str(text);
         self.offset += len;
     }
@@ -483,7 +485,7 @@ impl GreenNodeBuilder {
         self.stack.push(OpenNode {
             id,
             start: self.offset,
-            children: Vec::new(),
+            first_pending: self.pending.len(),
         });
     }
 
@@ -495,21 +497,23 @@ impl GreenNodeBuilder {
             .stack
             .pop()
             .expect("`finish_node` called without a matching `start_node`");
-        let index_in_parent = self.stack.last().map_or(0, |parent| {
-            u32::try_from(parent.children.len()).expect("too many children")
-        });
         let first_child = u32::try_from(self.children.len()).expect("too many children");
-        let child_count = u32::try_from(open.children.len()).expect("too many children");
+        let child_count =
+            u32::try_from(self.pending.len() - open.first_pending).expect("too many children");
+        self.children
+            .extend(self.pending.drain(open.first_pending..));
+        let index_in_parent = self.stack.last().map_or(0, |parent| {
+            u32::try_from(self.pending.len() - parent.first_pending).expect("too many children")
+        });
 
         let node = &mut self.nodes[open.id.0 as usize];
         node.index_in_parent = index_in_parent;
         node.first_child = first_child;
         node.child_count = child_count;
         node.text_range = TextRange::new(open.start, self.offset);
-        self.children.extend_from_slice(&open.children);
 
-        if let Some(parent) = self.stack.last_mut() {
-            parent.children.push(PackedElementId::node(open.id));
+        if self.stack.last().is_some() {
+            self.pending.push(PackedElementId::node(open.id));
         } else {
             assert!(self.root.is_none(), "a green tree has exactly one root");
             self.root = Some(open.id);
