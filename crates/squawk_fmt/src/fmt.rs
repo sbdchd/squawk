@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use anyhow::Result;
 use either::Either;
 use itertools::Itertools;
@@ -7585,7 +7587,7 @@ fn build_column_label<'a>(node: &SyntaxNode) -> Doc<'a> {
     build_name_with(node, quote_column_alias)
 }
 
-fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> String) -> Doc<'a> {
+fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> Cow<'_, str>) -> Doc<'a> {
     let mut tokens = node
         .children_with_tokens()
         .filter_map(|el| el.into_token())
@@ -7620,10 +7622,10 @@ fn build_name_with<'a>(node: &SyntaxNode, quote: fn(&str) -> String) -> Doc<'a> 
         && !text.starts_with('"')
         && !text.bytes().any(|b| b.is_ascii_uppercase())
     {
-        return Doc::text(quote(text));
+        return Doc::text(quote(text).into_owned());
     }
 
-    Doc::text(quote(&normalize_name_node(node)))
+    Doc::text(quote(&normalize_name_node(node)).into_owned())
 }
 
 fn is_unicode_escape(text: &str) -> bool {
@@ -20331,9 +20333,9 @@ fn build_target<'a>(ctx: &Ctx, target: &ast::Target) -> Option<Doc<'a>> {
 
         if let Some(column_name) = as_name.name() {
             let alias = if as_name.as_token().is_some() {
-                quote_column_alias(&column_name.text())
+                quote_column_alias(&column_name.text()).into_owned()
             } else {
-                quote_bare_column_alias(&column_name.text())
+                quote_bare_column_alias(&column_name.text()).into_owned()
             };
             let comments = if as_name.as_token().is_some() {
                 leading_comments(column_name.syntax())

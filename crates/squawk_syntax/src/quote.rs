@@ -1,3 +1,5 @@
+use std::borrow::Cow;
+
 use crate::SyntaxNode;
 use crate::generated::keywords::{
     AS_LABEL_KEYWORDS, COL_NAME_KEYWORDS, RESERVED_KEYWORDS, TYPE_FUNC_NAME_KEYWORDS,
@@ -11,33 +13,33 @@ pub fn quote_ident_always(text: &str) -> String {
     format!(r#""{}""#, text.replace('"', r#""""#))
 }
 
-pub fn quote_column_alias(text: &str) -> String {
+pub fn quote_column_alias(text: &str) -> Cow<'_, str> {
     if needs_quoting(text) {
-        quote_ident_always(text)
+        Cow::Owned(quote_ident_always(text))
     } else {
-        text.to_string()
+        Cow::Borrowed(text)
     }
 }
 
-pub fn quote_bare_column_alias(text: &str) -> String {
+pub fn quote_bare_column_alias(text: &str) -> Cow<'_, str> {
     if needs_quoting(text) || is_as_label_word(text) {
-        quote_ident_always(text)
+        Cow::Owned(quote_ident_always(text))
     } else {
-        text.to_string()
+        Cow::Borrowed(text)
     }
 }
 
-pub fn quote_ident(text: &str) -> String {
+pub fn quote_ident(text: &str) -> Cow<'_, str> {
     if needs_quoting(text) || is_reserved_word(text) || is_type_func_name_word(text) {
-        quote_ident_always(text)
+        Cow::Owned(quote_ident_always(text))
     } else {
-        text.to_string()
+        Cow::Borrowed(text)
     }
 }
 
-pub fn quote_quoted_ident(text: &str) -> String {
+pub fn quote_quoted_ident(text: &str) -> Cow<'_, str> {
     if is_col_name_word(text) {
-        quote_ident_always(text)
+        Cow::Owned(quote_ident_always(text))
     } else {
         quote_ident(text)
     }
