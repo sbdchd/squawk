@@ -46,14 +46,14 @@ enum State {
     PendingExit,
 }
 
-struct Builder<'a, 'b> {
+struct Builder<'a, 'b, F: FnMut(StrStep<'_>)> {
     lexed: &'a LexedStr<'a>,
     pos: usize,
     state: State,
-    sink: &'b mut dyn FnMut(StrStep<'_>),
+    sink: &'b mut F,
 }
 
-impl Builder<'_, '_> {
+impl<F: FnMut(StrStep<'_>)> Builder<'_, '_, F> {
     fn token(&mut self, kind: SyntaxKind, n_tokens: u8) {
         match mem::replace(&mut self.state, State::Normal) {
             State::PendingEnter => unreachable!(),
@@ -107,7 +107,7 @@ impl Builder<'_, '_> {
 
 impl LexedStr<'_> {
     pub fn to_input(&self) -> crate::Input {
-        let mut res = crate::Input::default();
+        let mut res = crate::Input::with_capacity(self.len());
         let mut was_joint = false;
         for i in 0..self.len() {
             let kind = self.kind(i);
@@ -133,7 +133,7 @@ impl LexedStr<'_> {
     }
 
     /// NB: only valid to call with Output from Reparser/TopLevelEntry.
-    pub fn intersperse_trivia(&self, output: &Output, sink: &mut dyn FnMut(StrStep<'_>)) -> bool {
+    pub fn intersperse_trivia(&self, output: &Output, sink: &mut impl FnMut(StrStep<'_>)) -> bool {
         let mut builder = Builder {
             lexed: self,
             pos: 0,

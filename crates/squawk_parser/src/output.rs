@@ -46,6 +46,7 @@ pub struct Output {
     ///
     event: Vec<u32>,
     error: Vec<String>,
+    node_count: usize,
 }
 
 #[derive(Debug)]
@@ -77,6 +78,18 @@ impl Output {
     const TOKEN_EVENT: u8 = 0;
     const ENTER_EVENT: u8 = 1;
     const EXIT_EVENT: u8 = 2;
+
+    pub(crate) fn with_capacity(capacity: usize) -> Self {
+        Output {
+            event: Vec::with_capacity(capacity),
+            error: vec![],
+            node_count: 0,
+        }
+    }
+
+    pub fn node_count(&self) -> usize {
+        self.node_count
+    }
 
     pub(crate) fn iter(&self) -> impl Iterator<Item = Step<'_>> {
         self.event.iter().map(|&event| {
@@ -120,6 +133,7 @@ impl Output {
             | (u32::from(Self::ENTER_EVENT) << Self::TAG_SHIFT)
             | Self::EVENT_MASK;
         self.event.push(e);
+        self.node_count += 1;
     }
 
     pub(crate) fn leave_node(&mut self) {

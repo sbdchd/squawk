@@ -159,6 +159,10 @@ disallowed_types = "deny"
 disallowed_methods = "deny"
 uninlined_format_args = "deny"
 
+[profile.release]
+lto = "fat"
+codegen-units = 1
+
 [profile.dev]
 debug = 0
 

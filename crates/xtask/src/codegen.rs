@@ -379,6 +379,9 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
         .punct
         .iter()
         .map(|(token, _name)| format!("`{token}`"));
+    let keyword_texts = all_keywords_values
+        .iter()
+        .map(|keyword| keyword.to_lowercase());
     let keywords_display = all_keywords_values
         .iter()
         .map(|keyword| format!("`{}`", keyword.to_lowercase()));
@@ -415,6 +418,20 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
 
             #[space_hack]
             impl SyntaxKind {
+                pub fn keyword_text(self) -> Option<&'static str> {
+                    let text = match self {
+                        #(SyntaxKind::#all_keywords => #keyword_texts,)*
+                        SyntaxKind::TOMBSTONE
+                        | SyntaxKind::EOF
+                        #(| SyntaxKind::#punctuation)*
+                        #(| SyntaxKind::#literals)*
+                        #(| SyntaxKind::#tokens)*
+                        #(| SyntaxKind::#nodes)*
+                        | SyntaxKind::__LAST => return None,
+                    };
+                    Some(text)
+                }
+
                 pub(crate) fn from_keyword(ident: &str) -> Option<SyntaxKind> {
                     #keyword_lookup
                 }

@@ -28,6 +28,7 @@ use drop_bomb::DropBomb;
 use event::Event;
 use grammar::OPERATOR_FIRST;
 use std::cell::Cell;
+use std::num::NonZeroU32;
 use token_set::TokenSet;
 mod event;
 mod generated;
@@ -127,7 +128,8 @@ impl CompletedMarker {
         let idx = self.pos as usize;
         match &mut p.events[idx] {
             Event::Start { forward_parent, .. } => {
-                *forward_parent = Some(new_pos.pos - self.pos);
+                *forward_parent = NonZeroU32::new(new_pos.pos - self.pos);
+                debug_assert!(forward_parent.is_some());
             }
             _ => unreachable!(),
         }
@@ -140,7 +142,8 @@ impl CompletedMarker {
         let idx = m.pos as usize;
         match &mut p.events[idx] {
             Event::Start { forward_parent, .. } => {
-                *forward_parent = Some(self.pos - m.pos);
+                *forward_parent = NonZeroU32::new(self.pos - m.pos);
+                debug_assert!(forward_parent.is_some());
             }
             _ => unreachable!(),
         }
@@ -167,9 +170,8 @@ impl EntryPoint {
             Self::SourceFile => grammar::entry_point(&mut p),
             Self::Plpgsql => plpgsql_grammar::plpgsql_entry_point(&mut p),
         }
-        let events = p.finish();
         // 3. forward parents
-        event::process(events)
+        event::process(p.events, p.errors)
     }
 }
 
@@ -178,6 +180,7 @@ pub(crate) struct Parser<'t> {
     pos: usize,
     limit: usize,
     events: Vec<Event>,
+    errors: Vec<String>,
     steps: Cell<u32>,
 }
 
@@ -219,6 +222,7 @@ impl<'t> Parser<'t> {
             pos: 0,
             limit: usize::MAX,
             events: Vec::with_capacity(inp.len() * 4),
+            errors: vec![],
             steps: Cell::new(0),
         }
     }
@@ -251,6 +255,7 @@ impl<'t> Parser<'t> {
     }
 
     /// Consume the next token if `kind` matches.
+    #[inline]
     pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
         if !self.at(kind) {
             return false;
@@ -678,21 +683,19 @@ impl<'t> Parser<'t> {
         self.events.push(event);
     }
 
-    fn finish(self) -> Vec<Event> {
-        self.events
-    }
-
     /// Emit error with the `message`
     /// FIXME: this should be much more fancy and support
     /// structured errors with spans and notes, like rustc
     /// does.
     pub(crate) fn error<T: Into<String>>(&mut self, message: T) {
-        let msg = message.into();
-        self.push_event(Event::Error { msg });
+        let index = u32::try_from(self.errors.len()).expect("too many parse errors");
+        self.errors.push(message.into());
+        self.push_event(Event::Error { index });
     }
 
     /// Checks if the current token is `kind`.
     #[must_use]
+    #[inline]
     pub(crate) fn at(&self, kind: SyntaxKind) -> bool {
         self.nth_at(0, kind)
     }
@@ -716,6 +719,7 @@ impl<'t> Parser<'t> {
     }
 
     #[must_use]
+    #[inline]
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
         match kind {
             // =>

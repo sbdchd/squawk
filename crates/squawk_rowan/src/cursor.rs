@@ -82,6 +82,14 @@ impl SyntaxNode {
     }
 
     #[inline]
+    fn token(&self, id: TokenId) -> SyntaxToken {
+        SyntaxToken {
+            green: self.green.clone(),
+            id,
+        }
+    }
+
+    #[inline]
     pub(crate) fn text_at(&self, range: TextRange) -> &str {
         self.green.text_at(range)
     }
@@ -160,6 +168,15 @@ impl SyntaxNode {
     #[inline]
     pub fn first_child_or_token(&self) -> Option<SyntaxElement> {
         sibling(&self.green, Some(self.id), Some(0))
+    }
+    #[inline]
+    pub fn child_token_of_kind(&self, kind: SyntaxKind) -> Option<SyntaxToken> {
+        let id = self.green.child_token_of_kind(self.id, kind)?;
+        Some(self.token(id))
+    }
+    #[inline]
+    pub fn child_or_token(&self, index: u32) -> Option<SyntaxElement> {
+        sibling(&self.green, Some(self.id), Some(index))
     }
     #[inline]
     pub fn last_child_or_token(&self) -> Option<SyntaxElement> {

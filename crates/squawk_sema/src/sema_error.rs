@@ -1342,7 +1342,7 @@ impl SemaError {
                 similar: Some(Similar::Column(similar)),
                 ..
             } => {
-                let column = quote_ident(names.resolve(similar.column));
+                let column = quote_ident(names.resolve(similar.column)).into_owned();
                 let replacement = match similar.qualifier {
                     Some(qualifier) => {
                         format!("{}.{column}", quote_ident(names.resolve(qualifier)))
@@ -1357,14 +1357,14 @@ impl SemaError {
             } => replace_suggestion(
                 "a relation with a similar name exists",
                 range,
-                quote_ident(names.resolve(table)),
+                quote_ident(names.resolve(table)).into_owned(),
             ),
             SemaError::UnresolvedReference {
                 similar: Some(Similar::Type(similar)),
                 ..
             } => {
                 let replacement = match similar {
-                    SimilarType::Named(name) => quote_ident(names.resolve(name)),
+                    SimilarType::Named(name) => quote_ident(names.resolve(name)).into_owned(),
                     SimilarType::Keyword(keyword) => keyword.to_owned(),
                 };
                 replace_suggestion("a type with a similar name exists", range, replacement)
@@ -1375,7 +1375,7 @@ impl SemaError {
             } => replace_suggestion(
                 "a window with a similar name exists",
                 range,
-                quote_ident(names.resolve(window)),
+                quote_ident(names.resolve(window)).into_owned(),
             ),
             SemaError::UnresolvedReference {
                 similar: Some(Similar::EnumLabel(label)),
@@ -1395,7 +1395,7 @@ impl SemaError {
             } => replace_suggestion(
                 "a column with a similar name exists",
                 range,
-                quote_ident(names.resolve(similar)),
+                quote_ident(names.resolve(similar)).into_owned(),
             ),
             SemaError::ProcedureCalledAsFunction {
                 select_range: Some(select_range),
@@ -1464,7 +1464,7 @@ impl SemaError {
                         quote_ident(names.resolve(schema)),
                         quote_ident(names.resolve(view))
                     ),
-                    None => quote_ident(names.resolve(view)),
+                    None => quote_ident(names.resolve(view)).into_owned(),
                 };
                 let rename = format!(
                     "alter view {view} rename column {} to {}",
@@ -1626,7 +1626,11 @@ impl SemaError {
                     RoutineKind::Aggregate => "an aggregate with a similar name exists",
                     RoutineKind::Procedure => "a procedure with a similar name exists",
                 };
-                replace_suggestion(message, range, quote_ident(names.resolve(similar)))
+                replace_suggestion(
+                    message,
+                    range,
+                    quote_ident(names.resolve(similar)).into_owned(),
+                )
             }
             SemaError::NotLateral {
                 table,

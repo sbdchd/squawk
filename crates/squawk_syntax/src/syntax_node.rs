@@ -33,10 +33,12 @@ pub enum Sql {}
 impl Language for Sql {
     type Kind = SyntaxKind;
 
+    #[inline]
     fn kind_from_raw(raw: squawk_rowan::SyntaxKind) -> SyntaxKind {
         SyntaxKind::from(raw.0)
     }
 
+    #[inline]
     fn kind_to_raw(kind: SyntaxKind) -> squawk_rowan::SyntaxKind {
         squawk_rowan::SyntaxKind(kind.into())
     }
@@ -55,10 +57,10 @@ pub(crate) struct SyntaxTreeBuilder {
 }
 
 impl SyntaxTreeBuilder {
-    pub(crate) fn with_text_capacity(text_len: usize) -> Self {
+    pub(crate) fn with_source(source: &str, nodes: usize, tokens: usize) -> Self {
         SyntaxTreeBuilder {
             errors: vec![],
-            inner: GreenNodeBuilder::with_text_capacity(text_len),
+            inner: GreenNodeBuilder::with_source(source, nodes, tokens),
         }
     }
 
@@ -80,7 +82,7 @@ impl SyntaxTreeBuilder {
 
     pub(crate) fn token(&mut self, kind: SyntaxKind, text: &str) {
         let kind = Sql::kind_to_raw(kind);
-        self.inner.token(kind, text);
+        self.inner.source_token(kind, TextSize::of(text));
     }
 
     pub(crate) fn start_node(&mut self, kind: SyntaxKind) {

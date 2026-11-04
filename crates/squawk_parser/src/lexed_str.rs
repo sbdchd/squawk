@@ -70,14 +70,17 @@ impl<'a> LexedStr<'a> {
     //     self.text
     // }
 
-    pub(crate) fn len(&self) -> usize {
+    #[inline]
+    pub fn len(&self) -> usize {
         self.kind.len() - 1
     }
 
-    // pub(crate) fn is_empty(&self) -> bool {
-    //     self.len() == 0
-    // }
+    #[inline]
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
 
+    #[inline]
     pub(crate) fn kind(&self, i: usize) -> SyntaxKind {
         assert!(i < self.len());
         self.kind[i]
@@ -87,6 +90,7 @@ impl<'a> LexedStr<'a> {
         self.range_text(i..i + 1)
     }
 
+    #[inline]
     pub(crate) fn range_text(&self, r: ops::Range<usize>) -> &str {
         assert!(r.start < r.end && r.end <= self.len());
         let lo = self.start[r.start] as usize;
@@ -101,6 +105,7 @@ impl<'a> LexedStr<'a> {
         let hi = self.start[i + 1] as usize;
         lo..hi
     }
+    #[inline]
     pub fn text_start(&self, i: usize) -> usize {
         assert!(i <= self.len());
         self.start[i] as usize

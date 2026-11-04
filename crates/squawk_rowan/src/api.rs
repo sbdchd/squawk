@@ -154,6 +154,14 @@ impl<L: Language> SyntaxNode<L> {
     pub fn first_child_or_token(&self) -> Option<SyntaxElement<L>> {
         self.raw.first_child_or_token().map(NodeOrToken::from)
     }
+    pub fn child_token_of_kind(&self, kind: L::Kind) -> Option<SyntaxToken<L>> {
+        self.raw
+            .child_token_of_kind(L::kind_to_raw(kind))
+            .map(SyntaxToken::from)
+    }
+    pub fn child_or_token(&self, index: u32) -> Option<SyntaxElement<L>> {
+        self.raw.child_or_token(index).map(NodeOrToken::from)
+    }
     pub fn last_child_or_token(&self) -> Option<SyntaxElement<L>> {
         self.raw.last_child_or_token().map(NodeOrToken::from)
     }

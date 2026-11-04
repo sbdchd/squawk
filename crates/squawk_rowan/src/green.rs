@@ -40,17 +40,21 @@ impl PackedElementId {
     }
 }
 
+const NO_PARENT: NodeId = NodeId(u32::MAX);
+
+const _: () = assert!(std::mem::size_of::<NodeData>() == 32);
+const _: () = assert!(std::mem::size_of::<TokenData>() == 16);
+
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct NodeData {
     kind: SyntaxKind,
-    parent: Option<NodeId>,
+    parent: NodeId,
     index_in_parent: u32,
     first_child: u32,
     child_count: u32,
     first_token: u32,
     nodes_end: u32,
     tokens_end: u32,
-    text_range: TextRange,
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -58,7 +62,7 @@ struct TokenData {
     kind: SyntaxKind,
     parent: NodeId,
     index_in_parent: u32,
-    text_range: TextRange,
+    start: TextSize,
 }
 
 #[derive(Debug, PartialEq, Eq, Hash)]
@@ -78,6 +82,27 @@ impl GreenTree {
     #[inline]
     fn token(&self, id: TokenId) -> &TokenData {
         &self.tokens[id.0 as usize]
+    }
+
+    #[inline]
+    fn token_start(&self, index: u32) -> TextSize {
+        self.tokens
+            .get(index as usize)
+            .map_or_else(|| TextSize::of(&*self.source), |token| token.start)
+    }
+
+    #[inline]
+    fn node_range(&self, id: NodeId) -> TextRange {
+        let node = self.node(id);
+        TextRange::new(
+            self.token_start(node.first_token),
+            self.token_start(node.tokens_end),
+        )
+    }
+
+    #[inline]
+    fn token_range(&self, id: TokenId) -> TextRange {
+        TextRange::new(self.token(id).start, self.token_start(id.0 + 1))
     }
 
     #[inline]
@@ -103,12 +128,13 @@ impl GreenNode {
 
     #[inline]
     pub(crate) fn node_range(&self, id: NodeId) -> TextRange {
-        self.tree.node(id).text_range
+        self.tree.node_range(id)
     }
 
     #[inline]
     pub(crate) fn node_parent(&self, id: NodeId) -> Option<NodeId> {
-        self.tree.node(id).parent
+        let parent = self.tree.node(id).parent;
+        (parent != NO_PARENT).then_some(parent)
     }
 
     #[inline]
@@ -133,13 +159,24 @@ impl GreenNode {
     }
 
     #[inline]
+    pub(crate) fn child_token_of_kind(&self, id: NodeId, kind: SyntaxKind) -> Option<TokenId> {
+        self.tree
+            .children(id)
+            .iter()
+            .find_map(|child| match child.unpack() {
+                ElementId::Token(token) if self.tree.token(token).kind == kind => Some(token),
+                ElementId::Token(_) | ElementId::Node(_) => None,
+            })
+    }
+
+    #[inline]
     pub(crate) fn token_kind(&self, id: TokenId) -> SyntaxKind {
         self.tree.token(id).kind
     }
 
     #[inline]
     pub(crate) fn token_range(&self, id: TokenId) -> TextRange {
-        self.tree.token(id).text_range
+        self.tree.token_range(id)
     }
 
     #[inline]
@@ -282,12 +319,12 @@ impl<'a> GreenNodeRef<'a> {
 
     #[inline]
     pub fn text_len(&self) -> TextSize {
-        self.tree.node(self.id).text_range.len()
+        self.tree.node_range(self.id).len()
     }
 
     #[inline]
     pub fn text(&self) -> &'a str {
-        &self.tree.source[self.tree.node(self.id).text_range]
+        &self.tree.source[self.tree.node_range(self.id)]
     }
 
     #[inline]
@@ -336,12 +373,12 @@ impl<'a> GreenTokenRef<'a> {
 
     #[inline]
     pub fn text(&self) -> &'a str {
-        &self.tree.source[self.tree.token(self.id).text_range]
+        &self.tree.source[self.tree.token_range(self.id)]
     }
 
     #[inline]
     pub fn text_len(&self) -> TextSize {
-        self.tree.token(self.id).text_range.len()
+        self.tree.token_range(self.id).len()
     }
 }
 
@@ -451,7 +488,6 @@ impl FusedIterator for Children<'_> {}
 
 struct OpenNode {
     id: NodeId,
-    start: TextSize,
     first_pending: usize,
 }
 
@@ -481,6 +517,16 @@ impl GreenNodeBuilder {
         }
     }
 
+    pub fn with_source(source: &str, nodes: usize, tokens: usize) -> GreenNodeBuilder {
+        GreenNodeBuilder {
+            source: source.to_owned(),
+            nodes: Vec::with_capacity(nodes),
+            tokens: Vec::with_capacity(tokens),
+            children: Vec::with_capacity(nodes + tokens),
+            ..GreenNodeBuilder::default()
+        }
+    }
+
     /// Adds new token to the current branch.
     #[inline]
     pub fn token(&mut self, kind: SyntaxKind, text: &str) {
@@ -493,10 +539,26 @@ impl GreenNodeBuilder {
             kind,
             parent: parent.id,
             index_in_parent,
-            text_range: TextRange::at(self.offset, len),
+            start: self.offset,
         });
         self.pending.push(PackedElementId::token(id));
         self.source.push_str(text);
+        self.offset += len;
+    }
+
+    #[inline]
+    pub fn source_token(&mut self, kind: SyntaxKind, len: TextSize) {
+        let parent = self.stack.last().expect("tokens must be inside a node");
+        let id = TokenId(u32::try_from(self.tokens.len()).expect("too many tokens"));
+        let index_in_parent =
+            u32::try_from(self.pending.len() - parent.first_pending).expect("too many children");
+        self.tokens.push(TokenData {
+            kind,
+            parent: parent.id,
+            index_in_parent,
+            start: self.offset,
+        });
+        self.pending.push(PackedElementId::token(id));
         self.offset += len;
     }
 
@@ -504,7 +566,7 @@ impl GreenNodeBuilder {
     #[inline]
     pub fn start_node(&mut self, kind: SyntaxKind) {
         let id = NodeId(u32::try_from(self.nodes.len()).expect("too many nodes"));
-        let parent = self.stack.last().map(|node| node.id);
+        let parent = self.stack.last().map_or(NO_PARENT, |node| node.id);
         self.nodes.push(NodeData {
             kind,
             parent,
@@ -514,11 +576,9 @@ impl GreenNodeBuilder {
             first_token: u32::try_from(self.tokens.len()).expect("too many tokens"),
             nodes_end: 0,
             tokens_end: 0,
-            text_range: TextRange::empty(self.offset),
         });
         self.stack.push(OpenNode {
             id,
-            start: self.offset,
             first_pending: self.pending.len(),
         });
     }
@@ -548,7 +608,6 @@ impl GreenNodeBuilder {
         node.child_count = child_count;
         node.nodes_end = nodes_end;
         node.tokens_end = tokens_end;
-        node.text_range = TextRange::new(open.start, self.offset);
 
         if self.stack.last().is_some() {
             self.pending.push(PackedElementId::node(open.id));
@@ -562,9 +621,10 @@ impl GreenNodeBuilder {
     /// `start_node` and `finish_node` calls
     /// are paired!
     #[inline]
-    pub fn finish(self) -> GreenNode {
+    pub fn finish(mut self) -> GreenNode {
         assert!(self.stack.is_empty(), "unfinished node");
         assert_eq!(self.root, Some(GreenNode::ROOT));
+        self.source.truncate(self.offset.into());
         GreenNode {
             tree: Arc::new(GreenTree {
                 source: self.source.into_boxed_str(),
