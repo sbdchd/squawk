@@ -11,13 +11,41 @@ fn is_int_name(name: &str) -> bool {
     matches!(name, "int" | "integer" | "int4" | "serial" | "serial4")
 }
 
-fn int_to_bigint_replacement(int_type: &str) -> &'static str {
+fn int_to_bigint_replacement(int_type: &str) -> BigintType {
     match int_type {
-        "int" | "integer" => "bigint",
-        "int4" => "int8",
-        "serial" => "bigserial",
-        "serial4" => "serial8",
-        _ => "bigint",
+        "int" | "integer" => BigintType::Bigint,
+        "int4" => BigintType::Int8,
+        "serial" => BigintType::Bigserial,
+        "serial4" => BigintType::Serial8,
+        _ => BigintType::Bigint,
+    }
+}
+
+#[derive(Clone, Copy)]
+pub(crate) enum BigintType {
+    Bigint,
+    Int8,
+    Bigserial,
+    Serial8,
+}
+
+impl BigintType {
+    pub(crate) fn name(self) -> &'static str {
+        match self {
+            BigintType::Bigint => "bigint",
+            BigintType::Int8 => "int8",
+            BigintType::Bigserial => "bigserial",
+            BigintType::Serial8 => "serial8",
+        }
+    }
+
+    pub(crate) fn fix_title(self) -> &'static str {
+        match self {
+            BigintType::Bigint => "Replace with a 64-bit integer type: `bigint`",
+            BigintType::Int8 => "Replace with a 64-bit integer type: `int8`",
+            BigintType::Bigserial => "Replace with a 64-bit integer type: `bigserial`",
+            BigintType::Serial8 => "Replace with a 64-bit integer type: `serial8`",
+        }
     }
 }
 
@@ -28,11 +56,8 @@ fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
     let name = ty.path_ref()?.segment()?;
     let int_type = name.text();
     let i64 = int_to_bigint_replacement(&int_type);
-    let edit = Edit::replace(name.syntax().text_range(), i64);
-    Some(Fix::new(
-        format!("Replace with a 64-bit integer type: `{i64}`"),
-        vec![edit],
-    ))
+    let edit = Edit::replace(name.syntax().text_range(), i64.name());
+    Some(Fix::new(i64.fix_title(), vec![edit]))
 }
 
 fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
