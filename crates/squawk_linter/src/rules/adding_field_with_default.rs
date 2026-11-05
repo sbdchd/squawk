@@ -69,6 +69,17 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
     }
 }
 
+fn is_virtual(generated: &ast::GeneratedConstraint, pg_version: Version) -> bool {
+    let Some(ast::GeneratedAs::GeneratedStored(generated_stored)) = generated.generated_as() else {
+        return false;
+    };
+    match generated_stored.generated_kind() {
+        Some(ast::GeneratedKind::Virtual(_)) => true,
+        Some(ast::GeneratedKind::Stored(_)) => false,
+        None => pg_version >= Version::new(18, None, None),
+    }
+}
+
 // Generated via the following Postgres query:
 //      select proname from pg_proc where provolatile <> 'v';
 const NON_VOLATILE_BUILT_IN_FUNCTIONS: &str = include_str!("non_volatile_built_in_functions.txt");
@@ -107,6 +118,9 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                 );
                             }
                             ast::Constraint::GeneratedConstraint(generated) => {
+                                if is_virtual(&generated, ctx.settings.pg_version) {
+                                    continue;
+                                }
                                 ctx.report(
                                     Violation::for_node(
                                         Rule::AddingFieldWithDefault,
@@ -320,6 +334,46 @@ ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
         "#;
 
         assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
+    }
+
+    #[test]
+    fn generated_virtual_ok() {
+        let sql = r#"
+alter table t add column c int generated always as (x + 1) virtual;
+        "#;
+
+        lint_ok(sql, Rule::AddingFieldWithDefault);
+    }
+
+    #[test]
+    fn generated_without_kind_ok_on_pg_18() {
+        let sql = r#"
+alter table t add column d int generated always as (x + 1);
+        "#;
+
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                pg_version: "18".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingFieldWithDefault,
+        );
+    }
+
+    #[test]
+    fn generated_without_kind_err_before_pg_18() {
+        let sql = r#"
+alter table t add column d int generated always as (x + 1);
+        "#;
+
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                pg_version: "17".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+        ));
     }
 
     #[test]

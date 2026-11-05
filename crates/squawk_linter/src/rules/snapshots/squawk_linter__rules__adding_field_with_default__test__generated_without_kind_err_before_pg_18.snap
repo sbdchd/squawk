@@ -1,0 +1,10 @@
+---
+source: crates/squawk_linter/src/rules/adding_field_with_default.rs
+expression: "lint_errors_with(sql, LinterSettings\n{\n    pg_version: \"17\".parse().expect(\"Invalid PostgreSQL version\"),\n    ..Default::default()\n},)"
+---
+warning[adding-field-with-default]: adding a generated column rewrites the table under an `access exclusive` lock
+  ╭▸ 
+2 │ alter table t add column d int generated always as (x + 1);
+  │                                ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead

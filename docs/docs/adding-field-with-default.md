@@ -49,7 +49,9 @@ See ["How not valid constraints work"](constraint-missing-not-valid.md#how-not-v
 
 ### Adding a generated column
 
-Adding a generated column in Postgres will cause a table rewrite, locking the table while the update completes.
+Adding a stored generated column in Postgres will cause a table rewrite, locking the table while the update completes.
+
+Virtual generated columns don't rewrite the table.
 
 Instead of using a generated column, use a trigger.
 
