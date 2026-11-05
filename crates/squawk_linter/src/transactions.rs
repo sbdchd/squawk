@@ -9,7 +9,7 @@ pub(crate) struct TablesCreatedInTransaction {
     inside_transaction: bool,
 }
 
-fn table_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
+pub(crate) fn table_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
     std::iter::successors(Some(path), |path| path.qualifier())
         .filter_map(|path| path.segment())
         .map(|segment| Name::from_node(&segment))

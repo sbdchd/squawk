@@ -2,7 +2,7 @@ use squawk_syntax::ast::NameLike;
 
 use crate::rules::identifier_too_long::MAX_IDENT_BYTES;
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub(crate) struct Name(String);
 
 impl Name {
