@@ -2579,6 +2579,7 @@ name = "squawk-sema"
 version = "2.71.0"
 dependencies = [
  "annotate-snippets",
+ "hashbrown",
  "insta",
  "la-arena",
  "rustc-hash",
