@@ -1,0 +1,11 @@
+---
+source: crates/squawk_linter/src/rules/adding_field_with_default.rs
+expression: "lint_errors(sql, Rule::AddingFieldWithDefault)"
+---
+warning[adding-field-with-default]: adding a column with a volatile default rewrites the table under an `access exclusive` lock
+  ╭▸ 
+2 │ alter table t add column a float8 default abs(random());
+  │                                           ━━━━━━━━━━━━━
+  │
+  ├ note: in Postgres 11+, non-volatile defaults can be added without a rewrite
+  ╰ help: add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead

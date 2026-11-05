@@ -32,20 +32,24 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
             false
         }
         ast::Expr::CallExpr(call_expr) => {
-            if let Some(arglist) = call_expr.arg_list() {
-                let no_args = arglist.args().count() == 0;
+            let Some(arg_list) = call_expr.arg_list() else {
+                return false;
+            };
 
-                // TODO: what about FieldExpr? like, pg_catalog.uuid()
-                let Some(name_ref) = call_expr.expr().and_then(|expr| expr.as_name_ref()) else {
-                    return false;
-                };
+            // TODO: what about FieldExpr? like, pg_catalog.uuid()
+            let Some(name_ref) = call_expr.expr().and_then(|expr| expr.as_name_ref()) else {
+                return false;
+            };
 
-                let non_volatile_name = NON_VOLATILE_FUNCS.contains(name_ref.text().as_ref());
+            let non_volatile_name = name_ref.sql_value_function().is_some()
+                || NON_VOLATILE_FUNCS.contains(name_ref.text().as_ref());
 
-                no_args && non_volatile_name
-            } else {
-                false
-            }
+            non_volatile_name
+                && arg_list.args().all(|arg| {
+                    arg.func_arg_expr()
+                        .and_then(|arg| arg.expr())
+                        .is_some_and(|expr| is_non_volatile_or_const(&expr))
+                })
         }
         // array[]::t[] is non-volatile. We don't check for a plain array expr
         // since postgres will reject it as a default unless it's cast to a type.
@@ -59,10 +63,7 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
         ast::Expr::Collate(collate) => collate
             .expr()
             .is_some_and(|expr| is_non_volatile_or_const(&expr)),
-        // current_timestamp is the same as calling now()
-        ast::Expr::NameRef(name_ref) => {
-            name_ref.sql_value_function() == Some(ast::SqlValueFunction::CurrentTimestamp)
-        }
+        ast::Expr::NameRef(name_ref) => name_ref.sql_value_function().is_some(),
         _ => false,
     }
 }
@@ -306,7 +307,7 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" jsonb DEFAULT myjsonb();
     fn default_random_with_args_err() {
         let sql = r#"
 -- NON-VOLATILE
-ALTER TABLE "core_recipe" ADD COLUMN "foo" timestamptz DEFAULT now(123);
+ALTER TABLE "core_recipe" ADD COLUMN "foo" float8 DEFAULT random_normal(0, 1);
         "#;
 
         assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
@@ -329,6 +330,41 @@ alter table t add column c timestamptz default current_timestamp;
         "#;
 
         lint_ok(sql, Rule::AddingFieldWithDefault);
+    }
+
+    #[test]
+    fn default_sql_value_functions_ok() {
+        let sql = r#"
+alter table t add column a date default current_date;
+
+alter table t add column b timestamp default localtimestamp;
+
+alter table t add column c timetz default current_time;
+
+alter table t add column d text default current_user;
+
+alter table t add column e timestamptz default current_timestamp(2);
+        "#;
+
+        lint_ok(sql, Rule::AddingFieldWithDefault);
+    }
+
+    #[test]
+    fn default_non_volatile_func_with_args_ok() {
+        let sql = r#"
+alter table t add column a text default lower('A');
+        "#;
+
+        lint_ok(sql, Rule::AddingFieldWithDefault);
+    }
+
+    #[test]
+    fn default_non_volatile_func_with_volatile_arg_err() {
+        let sql = r#"
+alter table t add column a float8 default abs(random());
+        "#;
+
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
