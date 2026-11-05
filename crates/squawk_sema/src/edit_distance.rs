@@ -73,9 +73,11 @@ fn edit_distance_slices<'a, T: PartialEq>(
     let mut prev = &mut prev_row[..];
     let mut current = &mut current_row[..];
 
+    let mut prev_min = 0;
     // row by row
     for i in 1..=a.len() {
         current[0] = i;
+        let mut current_min = i;
         let a_idx = i - 1;
 
         // column by column
@@ -100,7 +102,13 @@ fn edit_distance_slices<'a, T: PartialEq>(
                 // transposition
                 current[j] = cmp::min(current[j], prev_prev[j - 2] + 1);
             }
+            current_min = cmp::min(current_min, current[j]);
         }
+
+        if current_min > limit && prev_min >= limit {
+            return None;
+        }
+        prev_min = current_min;
 
         // Rotate the buffers, reusing the memory.
         [prev_prev, prev, current] = [prev, current, prev_prev];
