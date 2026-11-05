@@ -523,6 +523,8 @@ impl GreenNodeBuilder {
             nodes: Vec::with_capacity(nodes),
             tokens: Vec::with_capacity(tokens),
             children: Vec::with_capacity(nodes + tokens),
+            pending: Vec::with_capacity(64),
+            stack: Vec::with_capacity(32),
             ..GreenNodeBuilder::default()
         }
     }
