@@ -62,4 +62,20 @@ mod test {
             Rule::BanAddColumn,
         );
     }
+
+    #[test]
+    fn new_foreign_table_and_table_as_ok() {
+        lint_ok(
+            "create foreign table ft (id int) server s; alter foreign table ft add column c int;",
+            Rule::BanAddColumn,
+        );
+        lint_ok(
+            "create table t as select 1 as id; alter table t add column c int;",
+            Rule::BanAddColumn,
+        );
+        lint_ok(
+            "select 1 as id into t; alter table t add column c int;",
+            Rule::BanAddColumn,
+        );
+    }
 }

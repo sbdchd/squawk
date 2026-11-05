@@ -53,6 +53,29 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<Sour
                     tables.insert(object_name(&name));
                 }
             }
+            ast::Stmt::CreateForeignTable(table) => {
+                if table.if_not_exists().is_none()
+                    && let Some(name) = table.table_name().and_then(|n| n.path())
+                {
+                    tables.insert(object_name(&name));
+                }
+            }
+            ast::Stmt::CreateTableAs(table) => {
+                if table.if_not_exists().is_none()
+                    && let Some(name) = table.table_name().and_then(|n| n.path())
+                {
+                    tables.insert(object_name(&name));
+                }
+            }
+            ast::Stmt::SelectInto(select) => {
+                if let Some(name) = select
+                    .into_clause()
+                    .and_then(|into| into.table_name())
+                    .and_then(|n| n.path())
+                {
+                    tables.insert(object_name(&name));
+                }
+            }
             ast::Stmt::CreateType(ty) => {
                 if let Some(name) = ty.type_name().and_then(|n| n.path()) {
                     types.insert(object_name(&name));
@@ -89,6 +112,14 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<Sour
                 }
             }
             ast::Stmt::AlterForeignTable(table) => {
+                let new_table = table
+                    .table_relation_name()
+                    .and_then(|n| n.table_name_ref())
+                    .and_then(|n| n.path_ref())
+                    .is_some_and(|n| tables.contains(&object_name_ref(n)));
+                if new_table {
+                    continue;
+                }
                 for action in table.actions() {
                     if ctx.rules.contains(&Rule::BanAddColumn) {
                         ban_add_column::check(ctx, &action);
