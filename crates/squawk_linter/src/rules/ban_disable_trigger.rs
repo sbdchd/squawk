@@ -23,12 +23,6 @@ pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                         "changing trigger or rule firing may change database side effects for existing clients",
                         None,
                     ),
-                    ast::AlterTableAction::DisableRls(_)
-                    | ast::AlterTableAction::ForceRls(_)
-                    | ast::AlterTableAction::NoForceRls(_) => (
-                        "changing row level security can change visible rows or reject access for existing clients",
-                        None,
-                    ),
                     _ => continue,
                 };
                 let violation =
@@ -51,9 +45,9 @@ mod test {
     use insta::assert_snapshot;
     #[test]
     fn err() {
-        let sql = "ALTER TABLE t DISABLE TRIGGER trg; ALTER TABLE t DISABLE RULE r; ALTER TABLE t DISABLE ROW LEVEL SECURITY; ALTER TABLE t FORCE ROW LEVEL SECURITY;";
+        let sql = "ALTER TABLE t DISABLE TRIGGER trg; ALTER TABLE t DISABLE RULE r;";
         let errors = lint_errors(sql, Rule::BanDisableTrigger);
-        assert_eq!(errors.matches("warning[ban-disable-trigger]").count(), 4);
+        assert_eq!(errors.matches("warning[ban-disable-trigger]").count(), 2);
         assert_snapshot!(errors);
     }
     #[test]
@@ -70,16 +64,16 @@ mod test {
     #[test]
     fn ok() {
         lint_ok(
-            "ALTER TABLE t ENABLE ROW LEVEL SECURITY;",
+            "ALTER TABLE t ENABLE ROW LEVEL SECURITY; ALTER TABLE t DISABLE ROW LEVEL SECURITY; ALTER TABLE t FORCE ROW LEVEL SECURITY; ALTER TABLE t NO FORCE ROW LEVEL SECURITY;",
             Rule::BanDisableTrigger,
         );
     }
 
     #[test]
     fn enforcement_variants() {
-        let sql = "ALTER TABLE t ENABLE REPLICA TRIGGER tr; ALTER TABLE t ENABLE REPLICA RULE r; ALTER TABLE t ENABLE ALWAYS TRIGGER tr; ALTER TABLE t ENABLE ALWAYS RULE r; ALTER TABLE t NO FORCE ROW LEVEL SECURITY;";
+        let sql = "ALTER TABLE t ENABLE REPLICA TRIGGER tr; ALTER TABLE t ENABLE REPLICA RULE r; ALTER TABLE t ENABLE ALWAYS TRIGGER tr; ALTER TABLE t ENABLE ALWAYS RULE r;";
         let errors = lint_errors(sql, Rule::BanDisableTrigger);
-        assert_eq!(errors.matches("warning[ban-disable-trigger]").count(), 5);
+        assert_eq!(errors.matches("warning[ban-disable-trigger]").count(), 4);
         assert_eq!(
             errors
                 .matches("earlier application revisions may depend on its side effects")
