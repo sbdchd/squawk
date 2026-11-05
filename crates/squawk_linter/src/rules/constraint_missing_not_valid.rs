@@ -86,15 +86,17 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                     && let Some(constraint) = add_constraint.constraint()
                     && !constraint.is_not_valid()
                 {
-                    if let ast::Constraint::UniqueConstraint(uc) = &constraint
-                        && uc.using_index().is_some()
-                    {
-                        continue;
-                    }
-                    if let ast::Constraint::PrimaryKeyConstraint(pk) = &constraint
-                        && pk.using_index().is_some()
-                    {
-                        continue;
+                    match constraint {
+                        ast::Constraint::CheckConstraint(_)
+                        | ast::Constraint::ForeignKeyConstraint(_)
+                        | ast::Constraint::NotNullConstraint(_) => (),
+                        ast::Constraint::DefaultConstraint(_)
+                        | ast::Constraint::ExcludeConstraint(_)
+                        | ast::Constraint::GeneratedConstraint(_)
+                        | ast::Constraint::NullConstraint(_)
+                        | ast::Constraint::PrimaryKeyConstraint(_)
+                        | ast::Constraint::ReferencesConstraint(_)
+                        | ast::Constraint::UniqueConstraint(_) => continue,
                     }
 
                     ctx.report(Violation::for_node(
@@ -288,9 +290,9 @@ commit;";
         let sql = "begin;
 create table t as
   select 1 as id;
-alter table t add primary key (id);
+alter table t add check (id > 0);
 select 1 as id into u;
-alter table u add primary key (id);
+alter table u add check (id > 0);
 commit;";
         lint_ok(sql, Rule::ConstraintMissingNotValid);
     }
@@ -299,9 +301,9 @@ commit;";
     fn new_tables_in_assumed_transaction_ok() {
         let sql = "create table t as
   select 1 as id;
-alter table t add primary key (id);
+alter table t add check (id > 0);
 select 1 as id into u;
-alter table u add primary key (id);";
+alter table u add check (id > 0);";
         lint_ok_with(
             sql,
             LinterSettings {
@@ -315,20 +317,20 @@ alter table u add primary key (id);";
     fn new_tables_without_transaction_err() {
         let sql = "create table t as
   select 1 as id;
-alter table t add primary key (id);
+alter table t add check (id > 0);
 select 1 as id into u;
-alter table u add primary key (id);";
+alter table u add check (id > 0);";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
         warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
-        3 │ alter table t add primary key (id);
-          │               ━━━━━━━━━━━━━━━━━━━━
+        3 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
           │
           ╰ help: use `not valid` with a later `validate constraint` call
         warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
-        5 │ alter table u add primary key (id);
-          │               ━━━━━━━━━━━━━━━━━━━━
+        5 │ alter table u add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
           │
           ╰ help: use `not valid` with a later `validate constraint` call
         ");
@@ -482,6 +484,16 @@ ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
     fn using_unique_index_ok() {
         let sql = r#"
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
+        "#;
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
+    }
+
+    #[test]
+    fn constraints_without_not_valid_support_ok() {
+        let sql = r#"
+alter table t add constraint u unique (a);
+alter table t add constraint pk primary key (a);
+alter table t add constraint ex exclude using gist (a with =);
         "#;
         lint_ok(sql, Rule::ConstraintMissingNotValid);
     }
