@@ -270,3 +270,19 @@ create rule "_RETURN" as on select to v do instead select a from t;
       ╰╴            ━━━━━━━━━
     "#);
 }
+
+#[test]
+fn rule_cycle() {
+    assert_snapshot!(check("
+create table t (a int);
+create rule r as on insert
+  to t
+  do also insert into t values (new.a);
+insert into t values (1);
+create view v as
+  select 1 as a;
+create rule rr as on update
+  to v
+  do instead update v set a = new.a;
+update v set a = 2;"), @"no diagnostics");
+}

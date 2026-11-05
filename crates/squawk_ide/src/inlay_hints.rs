@@ -137,7 +137,7 @@ impl Hints<'_> {
                     Some(_) | None => None,
                 };
                 columns.push(ColumnHint {
-                    label: name.text(),
+                    label: name.text().into_owned(),
                     target,
                 });
             }

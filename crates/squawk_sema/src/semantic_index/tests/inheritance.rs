@@ -344,3 +344,26 @@ alter table t rename constraint nn to d4;
        ╰╴                                ━
     ");
 }
+
+#[test]
+fn inherit_circular() {
+    assert_snapshot!(check("
+create table t (x int);
+create table u () inherits (t);
+alter table t inherit u;
+alter table t inherit t;
+"), @"
+    error: circular inheritance
+      ╭▸ 
+    4 │ alter table t inherit u;
+      │                       ━
+      │
+      ╰ note: `u` is already a child of `t`
+    error: circular inheritance
+      ╭▸ 
+    5 │ alter table t inherit t;
+      │                       ━
+      │
+      ╰ note: `t` is already a child of `t`
+    ");
+}

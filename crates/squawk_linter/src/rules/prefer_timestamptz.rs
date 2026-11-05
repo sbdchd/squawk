@@ -17,15 +17,10 @@ pub(crate) fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
             }
         }
         ast::Type::PathType(path_type) => {
-            let Some(ty_name) = path_type
-                .path_ref()
-                .and_then(|x| x.segment())
-                .map(|x| x.text())
-            else {
+            let Some(segment) = path_type.path_ref().and_then(|x| x.segment()) else {
                 return false;
             };
-            // if we don't have any args, then it's the same as `text`
-            ty_name == "varchar" && path_type.arg_list().is_some()
+            segment.text() == "timestamp"
         }
         ast::Type::VarcharType(_) | ast::Type::CharacterType(_) => false,
         ast::Type::BitType(_) | ast::Type::BitVaryingType(_) => false,
@@ -44,6 +39,11 @@ fn fix_timestamp(ty: &ast::Type) -> Option<Fix> {
         ast::Type::TimestampType(_) => {
             let range = ty.syntax().text_range();
             let edit = Edit::replace(range, "timestamptz");
+            Some(Fix::new("Replace with `timestamptz`", vec![edit]))
+        }
+        ast::Type::PathType(path_type) => {
+            let segment = path_type.path_ref()?.segment()?;
+            let edit = Edit::replace(segment.syntax().text_range(), "timestamptz");
             Some(Fix::new("Replace with `timestamptz`", vec![edit]))
         }
         ast::Type::ArrayType(array_type) => {
@@ -143,6 +143,48 @@ create table app.events
             timestamps timestamptz[]
         );
         ");
+    }
+
+    #[test]
+    fn fix_path_timestamp() {
+        assert_snapshot!(fix(r#"
+create table t (
+  a "timestamp",
+  b pg_catalog.timestamp(3),
+  c "timestamp"(2)[]
+);
+"#), @"
+        create table t (
+          a timestamptz,
+          b pg_catalog.timestamptz(3),
+          c timestamptz(2)[]
+        );
+        ");
+    }
+
+    #[test]
+    fn create_table_with_path_timestamp_err() {
+        let sql = r#"
+create table t (
+  a "timestamp",
+  b pg_catalog.timestamp(3),
+  c "timestamp"(2)[]
+);
+"#;
+        assert_snapshot!(lint_errors(sql, Rule::PreferTimestampTz));
+    }
+
+    #[test]
+    fn path_varchar_and_timestamptz_ok() {
+        let sql = r#"
+create table t (
+  a "varchar"(100),
+  b pg_catalog.varchar(10),
+  c pg_catalog.timestamptz(3),
+  d timestamptz
+);
+"#;
+        lint_ok(sql, Rule::PreferTimestampTz);
     }
 
     #[test]

@@ -1501,3 +1501,33 @@ drop type s;
        ╰╴          ━
     ");
 }
+
+#[test]
+fn dependency_cycle() {
+    assert_snapshot!(check("
+create function f() returns int
+  language sql
+  return 1;
+create table t (a int default f());
+create or replace function f() returns int
+  language sql
+  begin atomic
+    select count(*) from t;
+  end;
+create view v as
+  select f() as a;
+drop function f cascade;
+select a from t;
+select a from v;"), @"
+    error: relation `v` does not exist
+       ╭▸ 
+    15 │ select a from v;
+       │               ━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    15 - select a from v;
+    15 + select a from t;
+       ╰╴
+    ");
+}

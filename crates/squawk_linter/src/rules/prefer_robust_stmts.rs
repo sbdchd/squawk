@@ -87,8 +87,10 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                 .and_then(|constraint| constraint.path_ref())
                                 .and_then(|path| path.segment())
                             {
-                                constraint_names
-                                    .insert(constraint_name.text(), Constraint::Dropped);
+                                constraint_names.insert(
+                                    constraint_name.text().into_owned(),
+                                    Constraint::Dropped,
+                                );
                             }
                             if drop_constraint.if_exists().is_some() {
                                 continue;
@@ -119,7 +121,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                                 .constraint_name_ref()
                                 .and_then(|constraint| constraint.path_ref())
                                 .and_then(|path| path.segment())
-                                && constraint_names.contains_key(&constraint_name.text())
+                                && constraint_names.contains_key(constraint_name.text().as_ref())
                             {
                                 continue;
                             }
@@ -130,7 +132,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
                             if let Some(constraint_name) =
                                 constraint.and_then(|constraint| constraint.constraint_name())
                                 && let Some(constraint) =
-                                    constraint_names.get_mut(&constraint_name.text())
+                                    constraint_names.get_mut(constraint_name.text().as_ref())
                                 && *constraint == Constraint::Dropped
                             {
                                 *constraint = Constraint::Added;

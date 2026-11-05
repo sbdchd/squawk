@@ -395,3 +395,19 @@ select * from a;
       ╰╴     +++++++++
     ");
 }
+
+#[test]
+fn cte_mutual_recursion() {
+    assert_snapshot!(check("
+with recursive a as (
+  select 1 as x union all select x from b
+),
+b as (
+  select x from a
+)
+select x from a;
+with recursive a as (
+  select x from a
+)
+select x from a;"), @"no diagnostics");
+}

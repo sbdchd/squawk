@@ -118,6 +118,8 @@ pub enum DiagnosticKind {
     WrongRelationKind,
     WrongRoutineKind,
     CannotChangeDatabase,
+    CircularInheritance,
+    CompositeMemberOfItself,
     DuplicateRole,
     DuplicatePolicy,
     DuplicateAccessMethod,

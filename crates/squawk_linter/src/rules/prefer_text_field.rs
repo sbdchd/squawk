@@ -18,15 +18,11 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
             }
         }
         ast::Type::PathType(path_type) => {
-            let Some(ty_name) = path_type
-                .path_ref()
-                .and_then(|x| x.segment())
-                .map(|x| x.text())
-            else {
+            let Some(segment) = path_type.path_ref().and_then(|x| x.segment()) else {
                 return false;
             };
             // if we don't have any args, then it's the same as `text`
-            ty_name == "varchar" && path_type.arg_list().is_some()
+            segment.text() == "varchar" && path_type.arg_list().is_some()
         }
         ast::Type::VarcharType(varchar_type) => varchar_type.arg_list().is_some(),
         ast::Type::CharacterType(_) => false,

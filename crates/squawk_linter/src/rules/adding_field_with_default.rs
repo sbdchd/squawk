@@ -40,7 +40,7 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
                     return false;
                 };
 
-                let non_volatile_name = non_volatile_funcs().contains(name_ref.text().as_str());
+                let non_volatile_name = non_volatile_funcs().contains(name_ref.text().as_ref());
 
                 no_args && non_volatile_name
             } else {
