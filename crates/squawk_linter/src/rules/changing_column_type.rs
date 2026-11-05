@@ -8,9 +8,9 @@ use crate::{Linter, Rule, Violation};
 pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
     for stmt in file.stmts() {
-        let actions = match stmt {
-            ast::Stmt::AlterTable(table) => table.actions(),
-            ast::Stmt::AlterForeignTable(table) => table.actions(),
+        let (actions, is_foreign) = match stmt {
+            ast::Stmt::AlterTable(table) => (table.actions(), false),
+            ast::Stmt::AlterForeignTable(table) => (table.actions(), true),
             ast::Stmt::AlterType(ty) => {
                 if let Some(ast::AlterTypeAction::AlterTypeAttributeActionList(list)) = ty.action()
                 {
@@ -32,6 +32,14 @@ pub(crate) fn changing_column_type(ctx: &mut Linter, parse: &Parse<SourceFile>) 
             if let ast::AlterTableAction::AlterColumn(alter_column) = action
                 && let Some(ast::AlterColumnOption::SetType(set_type)) = alter_column.option()
             {
+                if is_foreign {
+                    ctx.report(Violation::for_node(
+                        Rule::ChangingColumnType,
+                        "changing a column type may break existing clients".into(),
+                        set_type.syntax(),
+                    ));
+                    continue;
+                }
                 ctx.report(Violation::for_node(
                         Rule::ChangingColumnType,
                         "changing a column type rewrites the table under an `access exclusive` lock".into(),
@@ -82,5 +90,18 @@ COMMIT;
         let sql = "ALTER TYPE composite ALTER ATTRIBUTE a TYPE text; ALTER FOREIGN TABLE ft ALTER COLUMN a TYPE text;";
         let errors = lint_errors(sql, Rule::ChangingColumnType);
         assert_eq!(errors.matches("warning[changing-column-type]").count(), 2);
+    }
+
+    #[test]
+    fn foreign_table_err() {
+        let sql = r#"
+alter foreign table t alter column c type text;
+        "#;
+        assert_snapshot!(lint_errors(sql, Rule::ChangingColumnType), @"
+        warning[changing-column-type]: changing a column type may break existing clients
+          ╭▸ 
+        2 │ alter foreign table t alter column c type text;
+          ╰╴                                     ━━━━━━━━━
+        ");
     }
 }
