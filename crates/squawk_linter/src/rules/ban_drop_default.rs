@@ -12,7 +12,7 @@ pub(crate) fn ban_drop_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanDropDefault,
-                "dropping a column default may break existing clients".into(),
+                "dropping a domain default may break existing clients".into(),
                 node.syntax(),
             ));
         }
@@ -72,5 +72,16 @@ ALTER TABLE tbl ALTER COLUMN c DROP DEFAULT, ALTER COLUMN d DROP DEFAULT;
             "ALTER TABLE tbl ALTER COLUMN c SET DEFAULT 1; ALTER TABLE tbl ALTER COLUMN c DROP NOT NULL; DROP DOMAIN d; DROP INDEX i;",
             Rule::BanDropDefault,
         );
+    }
+
+    #[test]
+    fn domain_err() {
+        let sql = "alter domain d drop default;";
+        assert_snapshot!(lint_errors(sql, Rule::BanDropDefault), @"
+        warning[ban-drop-default]: dropping a domain default may break existing clients
+          ╭▸ 
+        1 │ alter domain d drop default;
+          ╰╴               ━━━━━━━━━━━━
+        ");
     }
 }
