@@ -1,6 +1,7 @@
 use std::range::Range;
 
 use la_arena::Idx;
+use smallvec::SmallVec;
 use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{AstPtr, SyntaxNodePtr, ast, sql_body::SqlBody};
 
@@ -916,7 +917,7 @@ pub struct Query {
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     #[expect(dead_code)]
     pub(crate) parent: Option<QueryId>,
-    pub sources: Vec<SourceId>,
+    pub sources: SmallVec<[SourceId; 2]>,
     pub(crate) columns: Columns,
 }
 

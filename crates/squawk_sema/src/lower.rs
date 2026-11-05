@@ -14002,7 +14002,7 @@ impl Lowerer {
                 columns,
             });
             let query = &mut self.index.queries[id];
-            query.sources = vec![source];
+            query.sources = smallvec![source];
             query.columns = columns;
         }
         self.lower_tail_clauses_for_outputs(id, table.tail_clauses());
@@ -25300,7 +25300,7 @@ impl Lowerer {
             kind,
             ptr,
             parent: self.scopes.last().map(|scope| scope.query),
-            sources: vec![],
+            sources: SmallVec::new(),
             columns,
         })
     }
