@@ -1,4 +1,4 @@
-use std::sync::OnceLock;
+use std::sync::LazyLock;
 
 use rustc_hash::FxHashSet;
 
@@ -6,18 +6,16 @@ use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile};
 
+use crate::visitors::is_serial_type;
 use crate::{Linter, Rule, Version, Violation};
 
-fn non_volatile_funcs() -> &'static FxHashSet<&'static str> {
-    static NON_VOLATILE_FUNCS: OnceLock<FxHashSet<&'static str>> = OnceLock::new();
-    NON_VOLATILE_FUNCS.get_or_init(|| {
-        NON_VOLATILE_BUILT_IN_FUNCTIONS
-            .split('\n')
-            .map(|x| x.trim())
-            .filter(|x| !x.is_empty())
-            .collect()
-    })
-}
+static NON_VOLATILE_FUNCS: LazyLock<FxHashSet<&'static str>> = LazyLock::new(|| {
+    NON_VOLATILE_BUILT_IN_FUNCTIONS
+        .split('\n')
+        .map(|x| x.trim())
+        .filter(|x| !x.is_empty())
+        .collect()
+});
 
 fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
     match expr {
@@ -42,7 +40,7 @@ fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
                     return false;
                 };
 
-                let non_volatile_name = non_volatile_funcs().contains(name_ref.text().as_ref());
+                let non_volatile_name = NON_VOLATILE_FUNCS.contains(name_ref.text().as_ref());
 
                 no_args && non_volatile_name
             } else {
@@ -89,6 +87,9 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
     let default_note = "in Postgres 11+, non-volatile defaults can be added without a rewrite";
     let generated_message =
         "adding a generated column rewrites the table under an `access exclusive` lock";
+    let serial_message =
+        "adding a `serial` column rewrites the table under an `access exclusive` lock";
+    let serial_note = "`serial` columns have an implicit `nextval()` default, which is volatile";
     let help = "add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead";
     let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
@@ -96,6 +97,19 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddColumn(add_column) = action {
+                    if let Some(ty) = add_column.ty()
+                        && is_serial_type(&ty)
+                    {
+                        ctx.report(
+                            Violation::for_node(
+                                Rule::AddingFieldWithDefault,
+                                serial_message.into(),
+                                ty.syntax(),
+                            )
+                            .note(serial_note)
+                            .help(help),
+                        );
+                    }
                     for constraint in add_column.constraints() {
                         match constraint {
                             ast::Constraint::DefaultConstraint(default) => {
@@ -374,6 +388,15 @@ alter table t add column d int generated always as (x + 1);
                 ..Default::default()
             },
         ));
+    }
+
+    #[test]
+    fn add_serial_column_err() {
+        let sql = r#"
+alter table t add column e bigserial;
+        "#;
+
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]

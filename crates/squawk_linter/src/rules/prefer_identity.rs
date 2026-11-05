@@ -1,5 +1,3 @@
-use rustc_hash::FxHashSet;
-
 use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::{
     Parse, SourceFile,
@@ -8,23 +6,7 @@ use squawk_syntax::{
 
 use crate::{Linter, Rule, Violation};
 
-use std::sync::OnceLock;
-
-use crate::visitors::{check_not_allowed_types, is_not_valid_int_type};
-
-fn serial_types() -> &'static FxHashSet<&'static str> {
-    static SERIAL_TYPES: OnceLock<FxHashSet<&'static str>> = OnceLock::new();
-    SERIAL_TYPES.get_or_init(|| {
-        FxHashSet::from_iter([
-            "serial",
-            "serial2",
-            "serial4",
-            "serial8",
-            "smallserial",
-            "bigserial",
-        ])
-    })
-}
+use crate::visitors::{check_not_allowed_types, is_serial_type};
 
 fn replace_serial(serial_type: &str) -> &'static str {
     match serial_type {
@@ -47,7 +29,7 @@ fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
 
 fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty
-        && is_not_valid_int_type(&ty, serial_types())
+        && is_serial_type(&ty)
     {
         let fix = create_identity_fix(&ty);
 

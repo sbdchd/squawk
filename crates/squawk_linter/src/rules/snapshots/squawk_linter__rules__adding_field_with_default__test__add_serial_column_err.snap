@@ -1,0 +1,11 @@
+---
+source: crates/squawk_linter/src/rules/adding_field_with_default.rs
+expression: "lint_errors(sql, Rule::AddingFieldWithDefault)"
+---
+warning[adding-field-with-default]: adding a `serial` column rewrites the table under an `access exclusive` lock
+  ╭▸ 
+2 │ alter table t add column e bigserial;
+  │                            ━━━━━━━━━
+  │
+  ├ note: `serial` columns have an implicit `nextval()` default, which is volatile
+  ╰ help: add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead
