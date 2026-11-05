@@ -730,10 +730,12 @@ impl Linter {
     }
 
     fn errors(&mut self, text: &str) -> Vec<Violation> {
-        let ignore_index = IgnoreIndex::new(text, &self.ignores);
         let mut errors = std::mem::take(&mut self.errors);
-        errors.retain(|err| !ignore_index.contains(err.text_range, err.code));
-        self.ignores.clear();
+        if !self.ignores.is_empty() {
+            let ignore_index = IgnoreIndex::new(text, &self.ignores);
+            errors.retain(|err| !ignore_index.contains(err.text_range, err.code));
+            self.ignores.clear();
+        }
         // ensure we order them by where they appear in the file
         errors.sort_by_key(|x| x.text_range.start());
         errors
