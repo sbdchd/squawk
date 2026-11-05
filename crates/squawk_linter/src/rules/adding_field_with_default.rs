@@ -89,7 +89,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                 let Some(expr) = default.expr() else {
                                     continue;
                                 };
-                                if ctx.settings.pg_version > Version::new(11, None, None)
+                                if ctx.settings.pg_version >= Version::new(11, None, None)
                                     && is_non_volatile_or_const(&expr)
                                 {
                                     continue;
@@ -127,7 +127,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
 mod test {
     use insta::assert_snapshot;
 
-    use crate::test_utils::{lint_errors, lint_ok};
+    use crate::test_utils::{lint_errors, lint_ok, lint_ok_with};
     use crate::{LinterSettings, Rule};
 
     #[must_use]
@@ -308,7 +308,7 @@ ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED;
     }
 
     #[test]
-    fn docs_example_error_on_pg_11() {
+    fn docs_example_error_on_pg_10() {
         let sql = r#"
 -- instead of
 ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
@@ -317,9 +317,25 @@ ALTER TABLE "core_recipe" ADD COLUMN "foo" integer DEFAULT 10;
         assert_snapshot!(lint_errors_with(
             sql,
             LinterSettings {
-                pg_version: "11".parse().expect("Invalid PostgreSQL version"),
+                pg_version: "10".parse().expect("Invalid PostgreSQL version"),
                 ..Default::default()
             },
         ));
+    }
+
+    #[test]
+    fn docs_example_ok_on_pg_11() {
+        let sql = r#"
+alter table t add column a int default 1;
+        "#;
+
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                pg_version: "11".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingFieldWithDefault,
+        );
     }
 }

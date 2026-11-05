@@ -1,6 +1,6 @@
 ---
 source: crates/squawk_linter/src/rules/adding_field_with_default.rs
-expression: "lint_errors_with(sql, LinterSettings\n{\n    pg_version: \"11\".parse().expect(\"Invalid PostgreSQL version\"),\n    ..Default::default()\n},)"
+expression: "lint_errors_with(sql, LinterSettings\n{\n    pg_version: \"10\".parse().expect(\"Invalid PostgreSQL version\"),\n    ..Default::default()\n},)"
 ---
 warning[adding-field-with-default]: adding a column with a volatile default rewrites the table under an `access exclusive` lock
   ╭▸ 
