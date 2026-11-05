@@ -9,6 +9,8 @@ While regular index creation can happen inside a transaction, this is not allowe
 
 https://www.postgresql.org/docs/current/sql-createindex.html#SQL-CREATEINDEX-CONCURRENTLY
 
+Also applies to `drop index concurrently`, `reindex concurrently`, and `alter table ... detach partition ... concurrently`.
+
 ## solution
 
 Remove surrounding transaction markers if any.

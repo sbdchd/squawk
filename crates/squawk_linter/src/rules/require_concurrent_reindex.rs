@@ -1,4 +1,5 @@
 use squawk_diagnostics::{Edit, Fix};
+use squawk_rowan::TextRange;
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode},
@@ -19,14 +20,22 @@ fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
     Some(Fix::new("Add `concurrently`", vec![edit]))
 }
 
-fn has_concurrently(reindex: &ast::Reindex) -> bool {
-    reindex
+pub(crate) fn concurrently_range(reindex: &ast::Reindex) -> Option<TextRange> {
+    if let Some(token) = reindex
         .reindex_target()
-        .is_some_and(|target| target.concurrently_token().is_some())
-        || reindex.reindex_option_list().is_some_and(|option_list| {
-            option_list
-                .reindex_options()
-                .any(|option| matches!(option, ast::ReindexOption::ReindexOptionConcurrently(_)))
+        .and_then(|target| target.concurrently_token())
+    {
+        return Some(token.text_range());
+    }
+    reindex
+        .reindex_option_list()?
+        .reindex_options()
+        .find_map(|option| match option {
+            ast::ReindexOption::ReindexOptionConcurrently(concurrently) => {
+                Some(concurrently.syntax().text_range())
+            }
+            ast::ReindexOption::ReindexOptionTablespace(_)
+            | ast::ReindexOption::ReindexOptionVerbose(_) => None,
         })
 }
 
@@ -40,7 +49,7 @@ pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, parse: &Parse<SourceF
             ) {
                 continue;
             }
-            if !has_concurrently(&reindex) {
+            if concurrently_range(&reindex).is_none() {
                 let fix = concurrently_fix(&reindex);
                 ctx.report(
                     Violation::for_node(
