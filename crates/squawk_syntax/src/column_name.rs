@@ -1,4 +1,4 @@
-use std::fmt;
+use std::{borrow::Cow, fmt};
 
 use crate::{
     SyntaxKind, SyntaxNode,
@@ -29,12 +29,18 @@ pub enum ColumnNameValue {
     Syntax(SyntaxNode),
 }
 
+impl ColumnNameValue {
+    pub fn text(&self) -> Cow<'_, str> {
+        match self {
+            Self::Static(name) => Cow::Borrowed(name),
+            Self::Syntax(node) => ast::normalize_name_node(node),
+        }
+    }
+}
+
 impl fmt::Display for ColumnNameValue {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Self::Static(name) => f.write_str(name),
-            Self::Syntax(node) => f.write_str(&ast::normalize_name_node(node)),
-        }
+        f.write_str(&self.text())
     }
 }
 
@@ -88,15 +94,19 @@ impl ColumnName {
         ColumnName::Column(ColumnNameValue::Syntax(node.clone()))
     }
 
-    pub fn to_string(&self) -> Option<String> {
+    pub fn text(&self) -> Option<Cow<'_, str>> {
         match self {
-            ColumnName::Column(name) => Some(name.to_string()),
+            ColumnName::Column(name) => Some(name.text()),
             ColumnName::Star => None,
             ColumnName::UnknownColumn(name) => Some(
                 name.as_ref()
-                    .map_or_else(|| "?column?".to_owned(), ColumnNameValue::to_string),
+                    .map_or(Cow::Borrowed("?column?"), ColumnNameValue::text),
             ),
         }
+    }
+
+    pub fn to_string(&self) -> Option<String> {
+        self.text().map(Cow::into_owned)
     }
 }
 

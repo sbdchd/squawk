@@ -2584,6 +2584,7 @@ dependencies = [
  "la-arena",
  "rustc-hash",
  "smallvec",
+ "smol_str",
  "squawk-diagnostics",
  "squawk-line-index",
  "squawk-rowan",

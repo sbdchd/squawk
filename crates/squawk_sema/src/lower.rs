@@ -3,6 +3,7 @@ use std::{borrow::Cow, cmp::Ordering, collections::hash_map::Entry, range::Range
 use la_arena::Idx;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use smallvec::{SmallVec, smallvec};
+use smol_str::{SmolStr, StrExt};
 use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
@@ -21587,7 +21588,7 @@ impl Lowerer {
             let Some((column_name, node)) = ColumnName::from_target(&target) else {
                 continue;
             };
-            let name = column_name.to_string().map(|name| self.intern(&name));
+            let name = column_name.text().map(|name| self.intern(&name));
             if target.as_name().is_some() {
                 explicit.push(columns.len());
             }
@@ -25880,8 +25881,8 @@ pub fn is_public_role(name_ref: &ast::RoleNameRef) -> bool {
     name_ref.text() == "public"
 }
 
-fn attribute_name(option: &ast::AttributeOption) -> Option<String> {
-    Some(option.name()?.text().to_ascii_lowercase())
+fn attribute_name(option: &ast::AttributeOption) -> Option<SmolStr> {
+    Some(option.name()?.text().to_ascii_lowercase_smolstr())
 }
 
 fn graph_element_live(
