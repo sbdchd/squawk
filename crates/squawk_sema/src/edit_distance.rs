@@ -22,11 +22,36 @@ use smallvec::{SmallVec, smallvec};
 /// [edit distance]: https://en.wikipedia.org/wiki/Edit_distance
 fn edit_distance(a: &str, b: &str, limit: usize) -> Option<usize> {
     if a.is_ascii() && b.is_ascii() {
-        return edit_distance_slices(a.as_bytes(), b.as_bytes(), limit);
+        let a = a.as_bytes();
+        let b = b.as_bytes();
+        if a.len().abs_diff(b.len()) > limit || bag_distance(a, b) > limit {
+            return None;
+        }
+        return edit_distance_slices(a, b, limit);
     }
     let a = a.chars().collect::<Vec<_>>();
     let b = b.chars().collect::<Vec<_>>();
     edit_distance_slices(&a, &b, limit)
+}
+
+fn bag_distance(a: &[u8], b: &[u8]) -> usize {
+    let mut counts = [0i32; 128];
+    for &c in a {
+        counts[usize::from(c)] += 1;
+    }
+    for &c in b {
+        counts[usize::from(c)] -= 1;
+    }
+    let mut extra = 0;
+    let mut missing = 0;
+    for count in counts {
+        if count > 0 {
+            extra += count.unsigned_abs();
+        } else {
+            missing += count.unsigned_abs();
+        }
+    }
+    cmp::max(extra, missing) as usize
 }
 
 fn edit_distance_slices<'a, T: PartialEq>(
