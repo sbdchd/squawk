@@ -27,7 +27,7 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
     }
 
     match bin_expr.lhs()? {
-        ast::Expr::NameRef(name_ref) => Some(name_ref.text()),
+        ast::Expr::NameRef(name_ref) => Some(name_ref.text().into_owned()),
         _ => None,
     }
 }
@@ -39,7 +39,8 @@ fn get_table_name(alter_table: &ast::AlterTable) -> Option<String> {
             .table_name_ref()?
             .path_ref()?
             .segment()?
-            .text(),
+            .text()
+            .into_owned(),
     )
 }
 
@@ -81,7 +82,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             && let Some(column) = is_not_null_check(&expr)
                         {
                             not_null_constraints.insert(
-                                constraint_name.text(),
+                                constraint_name.text().into_owned(),
                                 TableColumn {
                                     table: table.clone(),
                                     column,
@@ -97,9 +98,9 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                             .constraint_name_ref()
                             .and_then(|constraint| constraint.path_ref())
                             .and_then(|path| path.segment())
-                            .map(|name| name.text())
                         {
-                            if let Some(table_column) = not_null_constraints.get(&constraint_name)
+                            if let Some(table_column) =
+                                not_null_constraints.get(constraint_name.text().as_ref())
                                 && table_column.table == table
                             {
                                 validated_not_null_columns.insert(table_column.clone());
@@ -120,8 +121,9 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         };
 
                         if is_pg12_plus
-                            && let Some(column) =
-                                alter_column.column_name_ref().map(|column| column.text())
+                            && let Some(column) = alter_column
+                                .column_name_ref()
+                                .map(|column| column.text().into_owned())
                         {
                             let table_column = TableColumn {
                                 table: table.clone(),

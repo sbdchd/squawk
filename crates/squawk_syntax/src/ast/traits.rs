@@ -1,10 +1,12 @@
 // based on rust-analyzer's ast traits
 // https://github.com/rust-lang/rust-analyzer/blob/d8887c0758bbd2d5f752d5bd405d4491e90e7ed6/crates/syntax/src/ast/traits.rs
+use std::borrow::Cow;
+
 use crate::ast;
 use crate::ast::{AstNode, support};
 
 pub trait NameLike: AstNode {
-    fn text(&self) -> String;
+    fn text(&self) -> Cow<'_, str>;
     fn is_quoted(&self) -> bool;
 }
 

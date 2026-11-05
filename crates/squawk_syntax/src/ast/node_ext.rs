@@ -24,12 +24,14 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+use std::borrow::Cow;
+
 use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
 use num_bigint::BigUint;
 use squawk_line_index::{LineEnding, find_newline};
-use squawk_rowan::{GreenNodeRef, GreenTokenRef, NodeOrToken, TextRange, TextSize};
+use squawk_rowan::{GreenNodeRef, GreenTokenRef, Language, NodeOrToken, TextRange, TextSize};
 
 #[cfg(test)]
 use crate::SourceFile;
@@ -42,6 +44,7 @@ use crate::quote::{
     dollar_quote_tag, strip_dollar_quotes, strip_prefixed_quotes, strip_quotes,
     strip_unicode_esc_prefix,
 };
+use crate::syntax_node::Sql;
 use crate::unescape::{
     decode_esc_string, decode_plain_string, decode_unicode_esc_string, escape_unicode_esc_str,
     uescape_char,
@@ -1244,7 +1247,7 @@ impl ast::CompoundSelect {
 
 impl ast::NameRef {
     #[inline]
-    pub fn text(&self) -> String {
+    pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())
     }
 
@@ -1362,7 +1365,7 @@ impl ast::VertexOrEdge {
 
 impl ast::ColumnName {
     #[inline]
-    pub fn text(&self) -> String {
+    pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())
     }
 
@@ -1374,7 +1377,7 @@ impl ast::ColumnName {
 
 impl ast::PathSegment {
     #[inline]
-    pub fn text(&self) -> String {
+    pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())
     }
 
@@ -1386,7 +1389,7 @@ impl ast::PathSegment {
 
 impl ast::PathSegmentRef {
     #[inline]
-    pub fn text(&self) -> String {
+    pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())
     }
 
@@ -1429,7 +1432,7 @@ fn language_name(
 ) -> Option<LanguageName> {
     if let Some(language_ref) = language_ref {
         return Some(LanguageName {
-            name: normalize_name_node(language_ref.syntax()),
+            name: normalize_name_node(language_ref.syntax()).into_owned(),
             range: language_ref.syntax().text_range(),
         });
     }
@@ -1454,20 +1457,23 @@ impl ast::DoLanguage {
 }
 
 // TODO: return a NewType wrapper around String?
-pub fn normalize_name_node(node: &SyntaxNode) -> String {
+pub fn normalize_name_node(node: &SyntaxNode) -> Cow<'_, str> {
     let mut tokens = node
-        .children_with_tokens()
-        .filter_map(|el| el.into_token())
-        .filter(|t| !t.kind().is_trivia());
+        .green()
+        .children()
+        .filter_map(NodeOrToken::into_token)
+        .filter(|t| !Sql::kind_from_raw(t.kind()).is_trivia());
 
     let Some(mut ident_token) = tokens.next() else {
-        return String::new();
+        return Cow::Borrowed("");
     };
     // Support some deprecated syntax where you can plop a `group` keyword
     // before a role name.
-    if node.kind() == SyntaxKind::ROLE_REF && ident_token.kind() == SyntaxKind::GROUP_KW {
+    if node.kind() == SyntaxKind::ROLE_REF
+        && Sql::kind_from_raw(ident_token.kind()) == SyntaxKind::GROUP_KW
+    {
         let Some(role_name) = tokens.next() else {
-            return String::new();
+            return Cow::Borrowed("");
         };
         ident_token = role_name;
     }
@@ -1481,32 +1487,45 @@ pub fn normalize_name_node(node: &SyntaxNode) -> String {
     if let Some(inner) = unicode_inner {
         let mut escape_char = '\\';
         if let Some(uesc) = tokens.next()
-            && uesc.kind() == SyntaxKind::UESCAPE_KW
+            && Sql::kind_from_raw(uesc.kind()) == SyntaxKind::UESCAPE_KW
             && let Some(token) = tokens.next()
             && let Some(ch) = uescape_char(token.text())
         {
             escape_char = ch;
         }
 
-        let inner = inner.replace(r#""""#, "\"");
+        let inner = unescape_quoted_ident(inner);
         let mut result = String::with_capacity(inner.len());
         escape_unicode_esc_str(&inner, escape_char, |_range, r| {
             if let Ok(ch) = r {
                 result.push(ch);
             }
         });
-        return result;
+        return Cow::Owned(result);
     }
 
-    raw.strip_prefix('"')
-        .and_then(|t| t.strip_suffix('"'))
-        .map(|x| x.replace(r#""""#, "\""))
-        .unwrap_or_else(|| raw.to_ascii_lowercase())
+    if let Some(inner) = raw.strip_prefix('"').and_then(|t| t.strip_suffix('"')) {
+        return unescape_quoted_ident(inner);
+    }
+
+    if raw.bytes().any(|b| b.is_ascii_uppercase()) {
+        Cow::Owned(raw.to_ascii_lowercase())
+    } else {
+        Cow::Borrowed(raw)
+    }
+}
+
+fn unescape_quoted_ident(inner: &str) -> Cow<'_, str> {
+    if inner.contains(r#""""#) {
+        Cow::Owned(inner.replace(r#""""#, "\""))
+    } else {
+        Cow::Borrowed(inner)
+    }
 }
 
 impl ast::PlpgsqlOptionValue {
     #[inline]
-    pub fn text(&self) -> String {
+    pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())
     }
 }
@@ -1589,7 +1608,7 @@ impl ast::Type {
 
     pub fn serial_type_name(&self) -> Option<&'static str> {
         let segment = self.path_ref()?.unqualified_segment()?;
-        match segment.text().as_str() {
+        match segment.text().as_ref() {
             "smallserial" | "serial2" => Some("int2"),
             "serial" | "serial4" => Some("int4"),
             "bigserial" | "serial8" => Some("int8"),
@@ -1609,7 +1628,7 @@ impl ast::PathType {
         if segment.ident_token().is_some() {
             return None;
         }
-        let name = match segment.text().as_str() {
+        let name = match segment.text().as_ref() {
             "int" | "integer" => "int4",
             "smallint" => "int2",
             "bigint" => "int8",
@@ -1661,7 +1680,7 @@ impl ast::ExplainMode {
             ast::ExplainMode::ExplainOptionList(list) => list.explain_options().any(|option| {
                 option
                     .explain_option_name()
-                    .is_some_and(|name| matches!(name.text().as_str(), "analyze" | "analyse"))
+                    .is_some_and(|name| matches!(name.text().as_ref(), "analyze" | "analyse"))
                     && option
                         .explain_option_value()
                         .is_none_or(|value| value.bool_value() != Some(false))
@@ -1776,15 +1795,32 @@ impl ast::OpSig {
     }
 }
 
-fn operator_text(tokens: impl Iterator<Item = SyntaxToken>) -> String {
-    let mut text = String::new();
-    for token in tokens.filter(|token| !token.kind().is_trivia()) {
-        text.push_str(token.text());
+fn operator_text(
+    node: &SyntaxNode,
+    range: TextRange,
+    tokens: impl Iterator<Item = SyntaxToken>,
+) -> Cow<'_, str> {
+    let text = &node.green().text()[range - node.text_range().start()];
+    let mut owned: Option<String> = None;
+    for token in tokens {
+        if token.kind().is_trivia() {
+            if owned.is_none() {
+                let end = token.text_range().start() - range.start();
+                owned = Some(text[..usize::from(end)].to_owned());
+            }
+        } else if let Some(owned) = &mut owned {
+            owned.push_str(token.text());
+        }
     }
+    let text = match owned {
+        Some(owned) => Cow::Owned(owned),
+        None => Cow::Borrowed(text),
+    };
     if text == "!=" {
-        text.replace_range(.., "<>");
+        Cow::Borrowed("<>")
+    } else {
+        text
     }
-    text
 }
 
 impl ast::Op {
@@ -1796,9 +1832,11 @@ impl ast::Op {
         }
     }
 
-    pub fn operator_text(&self) -> String {
+    pub fn operator_text(&self) -> Cow<'_, str> {
         let range = self.operator_range();
         operator_text(
+            self.syntax(),
+            range,
             self.syntax()
                 .descendants_with_tokens()
                 .filter_map(|element| element.into_token())
@@ -1808,14 +1846,16 @@ impl ast::Op {
 }
 
 impl ast::CustomOp {
-    pub fn operator_text(&self) -> String {
-        operator_text(self.tokens())
+    pub fn operator_text(&self) -> Cow<'_, str> {
+        operator_text(self.syntax(), self.syntax().text_range(), self.tokens())
     }
 }
 
 impl ast::AttributeValue {
-    pub fn operator_text(&self) -> String {
+    pub fn operator_text(&self) -> Cow<'_, str> {
         operator_text(
+            self.syntax(),
+            self.syntax().text_range(),
             self.syntax()
                 .descendants_with_tokens()
                 .filter_map(|element| element.into_token()),
@@ -1874,7 +1914,7 @@ impl ast::CreateConversion {
 }
 
 impl ast::ExtractFieldName {
-    pub fn text(&self) -> String {
+    pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())
     }
 }
@@ -2251,7 +2291,7 @@ where
     ast::AnyName: From<T>,
 {
     #[inline]
-    fn text(&self) -> String {
+    fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())
     }
 
@@ -2336,7 +2376,7 @@ fn name() {
             .unwrap()
             .name()
             .unwrap();
-        name.text()
+        name.text().into_owned()
     }
 }
 
@@ -2367,7 +2407,7 @@ fn name_ref() {
         let ast::Expr::NameRef(name_ref) = target.expr().unwrap() else {
             unreachable!()
         };
-        name_ref.text()
+        name_ref.text().into_owned()
     }
 }
 

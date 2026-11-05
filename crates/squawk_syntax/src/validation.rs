@@ -156,7 +156,7 @@ fn validate_hash_partition_bounds(it: &ast::PartitionForValuesWith, acc: &mut Ve
             continue;
         };
         let actual = ast::normalize_name_node(bound.syntax());
-        match actual.as_str() {
+        match actual.as_ref() {
             "modulus" if !seen_modulus => seen_modulus = true,
             "remainder" if !seen_remainder => seen_remainder = true,
             "modulus" | "remainder" => {

@@ -8147,14 +8147,17 @@ impl Lowerer {
             let (name, node) = match (item.column_name(), expr) {
                 (Some(column_name), _) => {
                     explicit.push(columns.len());
-                    (column_name.text(), column_name.syntax().clone())
+                    (
+                        self.intern(&column_name.text()),
+                        column_name.syntax().clone(),
+                    )
                 }
                 (None, Some(ast::Expr::FieldExpr(field_expr))) => match field_expr.field() {
-                    Some(field) => (field.text(), field.syntax().clone()),
+                    Some(field) => (self.intern(&field.text()), field.syntax().clone()),
                     None => continue,
                 },
                 (None, Some(ast::Expr::NameRef(name_ref))) => {
-                    (name_ref.text(), name_ref.syntax().clone())
+                    (self.intern(&name_ref.text()), name_ref.syntax().clone())
                 }
                 (
                     None,
@@ -8178,7 +8181,7 @@ impl Lowerer {
                 ) => continue,
             };
             columns.push(Column {
-                name: Some(self.intern(&name)),
+                name: Some(name),
                 ptr: self.ptr(&node),
                 ty,
                 merge: None,
@@ -12849,7 +12852,7 @@ impl Lowerer {
     }
 
     fn lower_type_lookup(&mut self, ty: &ast::Type, if_missing: IfMissing) -> TypeLookup {
-        let (node, schema, name): (_, _, Cow<str>) = match ty {
+        let (node, schema, name) = match ty {
             ast::Type::ArrayType(array) => {
                 let Some(element) = array.ty() else {
                     return TypeLookup::Unknown;
@@ -12867,49 +12870,41 @@ impl Lowerer {
                     return TypeLookup::Unknown;
                 };
                 let qualifier = path.qualifier();
-                let (schema, name) = match path_type.keyword_type_name() {
-                    Some(name) => (Some(self.pg_catalog), name.into()),
-                    None => (
-                        self.lower_schema_qualifier(qualifier),
-                        segment.text().into(),
+                return match path_type.keyword_type_name() {
+                    Some(name) => self.lookup_type_name(
+                        segment.syntax(),
+                        Some(self.pg_catalog),
+                        name,
+                        if_missing,
                     ),
+                    None => {
+                        let schema = self.lower_schema_qualifier(qualifier);
+                        self.lookup_type_name(segment.syntax(), schema, &segment.text(), if_missing)
+                    }
                 };
-                (segment.syntax().clone(), schema, name)
             }
-            ast::Type::BitType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "bit".into()),
-            ast::Type::BitVaryingType(_) => {
-                (ty.syntax().clone(), Some(self.pg_catalog), "varbit".into())
-            }
-            ast::Type::CharacterType(_) => {
-                (ty.syntax().clone(), Some(self.pg_catalog), "bpchar".into())
-            }
-            ast::Type::DoubleType(_) => {
-                (ty.syntax().clone(), Some(self.pg_catalog), "float8".into())
-            }
-            ast::Type::IntervalType(_) => (
-                ty.syntax().clone(),
-                Some(self.pg_catalog),
-                "interval".into(),
-            ),
+            ast::Type::BitType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "bit"),
+            ast::Type::BitVaryingType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "varbit"),
+            ast::Type::CharacterType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "bpchar"),
+            ast::Type::DoubleType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "float8"),
+            ast::Type::IntervalType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "interval"),
             ast::Type::TimeType(time) => {
                 let name = match time.timezone() {
                     Some(ast::Timezone::WithTimezone(_)) => "timetz",
                     Some(ast::Timezone::WithoutTimezone(_)) | None => "time",
                 };
-                (ty.syntax().clone(), Some(self.pg_catalog), name.into())
+                (ty.syntax().clone(), Some(self.pg_catalog), name)
             }
             ast::Type::TimestampType(timestamp) => {
                 let name = match timestamp.timezone() {
                     Some(ast::Timezone::WithTimezone(_)) => "timestamptz",
                     Some(ast::Timezone::WithoutTimezone(_)) | None => "timestamp",
                 };
-                (ty.syntax().clone(), Some(self.pg_catalog), name.into())
+                (ty.syntax().clone(), Some(self.pg_catalog), name)
             }
-            ast::Type::VarcharType(_) => {
-                (ty.syntax().clone(), Some(self.pg_catalog), "varchar".into())
-            }
+            ast::Type::VarcharType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "varchar"),
         };
-        self.lookup_type_name(&node, schema, &name, if_missing)
+        self.lookup_type_name(&node, schema, name, if_missing)
     }
 
     fn lower_column_type(&mut self, ty: &ast::Type) -> Option<Ty> {
@@ -13385,16 +13380,21 @@ impl Lowerer {
         }
         let mut path = smallvec![];
         for value in value.config_values() {
-            let (node, schema) = match value {
-                ast::ConfigValue::ConfigValueName(name) => (name.syntax().clone(), name.text()),
-                ast::ConfigValue::Literal(literal) => match literal.string_value() {
-                    Some(schema) => (literal.syntax().clone(), schema),
-                    None => continue,
-                },
-                ast::ConfigValue::PrefixExpr(_) => continue,
-            };
-            if !schema.is_empty() {
-                path.push(self.lower_search_path_schema(&node, &schema));
+            match value {
+                ast::ConfigValue::ConfigValueName(name) => {
+                    let schema = name.text();
+                    if !schema.is_empty() {
+                        path.push(self.lower_search_path_schema(name.syntax(), &schema));
+                    }
+                }
+                ast::ConfigValue::Literal(literal) => {
+                    if let Some(schema) = literal.string_value()
+                        && !schema.is_empty()
+                    {
+                        path.push(self.lower_search_path_schema(literal.syntax(), &schema));
+                    }
+                }
+                ast::ConfigValue::PrefixExpr(_) => (),
             }
         }
         Some(path)
@@ -13482,6 +13482,11 @@ impl Lowerer {
 
     fn intern(&mut self, text: &str) -> Name {
         self.index.names.intern(postgres::truncate_identifier(text))
+    }
+
+    fn intern_multirange_name(&mut self, range_name: Name) -> Name {
+        let name = postgres::make_multirange_type_name(self.index.names.resolve(range_name));
+        self.intern(&name)
     }
 
     fn intern_schema(&mut self, schema: &str) -> Name {
@@ -18584,7 +18589,7 @@ impl Lowerer {
                 continue;
             };
             if !matches!(
-                key.text().as_str(),
+                key.text().as_ref(),
                 "force_quote" | "force_not_null" | "force_null"
             ) {
                 continue;
@@ -24706,27 +24711,20 @@ impl Lowerer {
     fn alloc_multirange_type(&mut self, range_id: TypeId, multirange_name: MultirangeName) {
         let range = &self.index.types[range_id];
         let (ptr, name_ptr, range_schema) = (range.ptr, range.name_ptr, range.schema);
-        let range_name = self.index.names.resolve(range.name);
+        let range_name = range.name;
         let (schema, name) = match multirange_name {
             MultirangeName::Path(path) => match path.segment() {
                 Some(segment) => {
                     let schema = self
                         .lower_schema_qualifier(path.qualifier())
                         .unwrap_or(range_schema);
-                    (schema, segment.text())
+                    (schema, self.intern(&segment.text()))
                 }
-                None => (
-                    range_schema,
-                    postgres::make_multirange_type_name(range_name),
-                ),
+                None => (range_schema, self.intern_multirange_name(range_name)),
             },
-            MultirangeName::String(name) => (range_schema, name),
-            MultirangeName::Default => (
-                range_schema,
-                postgres::make_multirange_type_name(range_name),
-            ),
+            MultirangeName::String(name) => (range_schema, self.intern(&name)),
+            MultirangeName::Default => (range_schema, self.intern_multirange_name(range_name)),
         };
-        let name = self.intern(&name);
         let array_name = self.new_array_name(schema, name, true);
         self.index.types.alloc(
             Type {
@@ -25772,9 +25770,7 @@ pub fn is_public_role(name_ref: &ast::RoleNameRef) -> bool {
 }
 
 fn attribute_name(option: &ast::AttributeOption) -> Option<String> {
-    let mut name = option.name()?.text();
-    name.make_ascii_lowercase();
-    Some(name)
+    Some(option.name()?.text().to_ascii_lowercase())
 }
 
 fn graph_element_live(

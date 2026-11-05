@@ -759,7 +759,7 @@ impl Symbols<'_> {
 
 fn channel_symbol(stmt: &ast::Stmt, channel: &impl NameLike, detail: &str) -> DocumentSymbol {
     DocumentSymbol {
-        name: channel.text(),
+        name: channel.text().into_owned(),
         detail: Some(detail.to_string()),
         kind: DocumentSymbolKind::Channel,
         full_range: stmt.syntax().text_range(),

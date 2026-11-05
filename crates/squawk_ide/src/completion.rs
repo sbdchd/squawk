@@ -184,7 +184,7 @@ impl CompletionContext {
             return None;
         }
         Some(CompletionContext::Table {
-            schema: Some(qualifier.segment()?.text()),
+            schema: Some(qualifier.segment()?.text().into_owned()),
         })
     }
 
@@ -215,7 +215,7 @@ impl CompletionContext {
             let ast::Expr::NameRef(base) = field_expr.base()? else {
                 return None;
             };
-            qualifier = Some(base.text());
+            qualifier = Some(base.text().into_owned());
             node = field_expr.syntax().clone();
         }
         node.ancestors().find_map(|node| {
@@ -468,7 +468,7 @@ impl Completions<'_> {
                     if path.arg_list().is_none()
                         && let Some(segment) = path.path_ref().and_then(|path| path.segment()) =>
                 {
-                    segment.text()
+                    segment.text().into_owned()
                 }
                 _ => ty.syntax().text().to_string(),
             });

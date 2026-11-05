@@ -24,9 +24,8 @@ fn not_valid_validate_in_transaction(
                                 .constraint_name_ref()
                                 .and_then(|constraint| constraint.path_ref())
                                 .and_then(|path| path.segment())
-                                .map(|name| name.text())
                                 && inside_transaction
-                                && not_valid_names.contains(&constraint_name)
+                                && not_valid_names.contains(constraint_name.text().as_ref())
                             {
                                 ctx.report(
                                         Violation::for_node(
@@ -41,7 +40,7 @@ fn not_valid_validate_in_transaction(
                                 && constraint.is_not_valid()
                                 && let Some(constraint_name) = constraint.constraint_name()
                             {
-                                not_valid_names.insert(constraint_name.text());
+                                not_valid_names.insert(constraint_name.text().into_owned());
                             }
                         }
                         _ => (),

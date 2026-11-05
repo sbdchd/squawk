@@ -7,7 +7,7 @@ pub(crate) struct Name(String);
 
 impl Name {
     pub(crate) fn from_node(node: &impl NameLike) -> Self {
-        Self::from_string(node.text())
+        Self::from_string(node.text().into_owned())
     }
 
     pub(crate) fn from_string(mut text: String) -> Self {

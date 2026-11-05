@@ -17,14 +17,10 @@ pub(crate) fn is_not_valid_int_type(
             }
         }
         ast::Type::PathType(path_type) => {
-            let Some(ty_name) = path_type
-                .path_ref()
-                .and_then(|x| x.segment())
-                .map(|x| x.text())
-            else {
+            let Some(segment) = path_type.path_ref().and_then(|x| x.segment()) else {
                 return false;
             };
-            invalid_type_names.contains(ty_name.as_str())
+            invalid_type_names.contains(segment.text().as_ref())
         }
         ast::Type::VarcharType(_) | ast::Type::CharacterType(_) => false,
         ast::Type::BitType(_) | ast::Type::BitVaryingType(_) => false,

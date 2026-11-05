@@ -7497,7 +7497,7 @@ fn build_create_table_partition_type<'a>(ctx: &Ctx, partition_type: ast::Partiti
                 if let Some(token) = bound.ident_token() {
                     bound_doc = bound_doc
                         .append(leading_comments(&token))
-                        .append(Doc::text(ast::normalize_name_node(&syntax)));
+                        .append(Doc::text(ast::normalize_name_node(&syntax).into_owned()));
                 }
                 parts.push((
                     leading_comments(&syntax).append(append_literal(bound_doc, bound.literal())),
@@ -11371,7 +11371,7 @@ fn build_role_option<'a>(ctx: &Ctx, option: ast::RoleOption) -> Doc<'a> {
         ast::RoleOption::RoleOptionGeneric(n) => {
             let name = normalize_name_node(n.syntax());
             if is_quoted_name_node(n.syntax())
-                && matches!(name.as_str(), "admin" | "role" | "encrypted" | "reset")
+                && matches!(name.as_ref(), "admin" | "role" | "encrypted" | "reset")
             {
                 Doc::text(quote_ident_always(&name))
             } else {
@@ -16447,7 +16447,7 @@ fn build_grouping_expr<'a>(ctx: &Ctx, expr: ast::Expr) -> Doc<'a> {
         && is_quoted_name_node(name.syntax())
     {
         let name = normalize_name_node(name.syntax());
-        if matches!(name.as_str(), "rollup" | "cube") {
+        if matches!(name.as_ref(), "rollup" | "cube") {
             let mut doc = Doc::text(quote_ident_always(&name));
             if let Some(arg_list) = call.arg_list() {
                 doc = doc
