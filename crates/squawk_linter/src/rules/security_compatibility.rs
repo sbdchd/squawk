@@ -1,11 +1,8 @@
 use crate::{Linter, Rule, Violation};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
-pub(crate) fn security_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for stmt in parse.tree().stmts() {
+pub(crate) fn security_compatibility(ctx: &mut Linter, file: &ast::SourceFile) {
+    for stmt in file.stmts() {
         match stmt {
             ast::Stmt::CreatePolicy(node) => report(
                 ctx,
@@ -248,6 +245,7 @@ fn report(ctx: &mut Linter, rule: Rule, message: &'static str, node: &squawk_syn
 mod tests {
     use super::*;
     use crate::test_utils::{lint_errors, lint_ok};
+    use squawk_syntax::SourceFile;
 
     #[test]
     fn security_rules_are_targeted_and_configurable() {

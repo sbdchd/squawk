@@ -1,11 +1,8 @@
 use crate::{Linter, Rule, Violation};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
-pub(crate) fn ban_replace_view_function(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for stmt in parse.tree().stmts() {
+pub(crate) fn ban_replace_view_function(ctx: &mut Linter, file: &ast::SourceFile) {
+    for stmt in file.stmts() {
         match stmt {
             ast::Stmt::CreateView(node) if node.or_replace().is_some() => {
                 ctx.report(Violation::for_node(Rule::BanReplaceViewFunction, "replacing a view, function, or procedure may silently change behavior for existing clients".into(), node.syntax()));

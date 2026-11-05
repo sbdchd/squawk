@@ -1,12 +1,8 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-pub(crate) fn ban_drop_not_null(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn ban_drop_not_null(ctx: &mut Linter, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         if let ast::Stmt::AlterDomain(domain) = &stmt
             && let Some(ast::AlterDomainAction::DropNotNull(node)) = domain.action()

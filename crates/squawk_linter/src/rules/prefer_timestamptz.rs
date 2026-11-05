@@ -1,8 +1,5 @@
 use squawk_diagnostics::{Edit, Fix};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::visitors::check_not_allowed_types;
 use crate::{Linter, Rule, Violation};
@@ -72,9 +69,8 @@ fn check_ty_for_timestamp(ctx: &mut Linter, ty: Option<ast::Type>) {
     }
 }
 
-pub(crate) fn prefer_timestamptz(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-    check_not_allowed_types(ctx, &file, check_ty_for_timestamp);
+pub(crate) fn prefer_timestamptz(ctx: &mut Linter, file: &ast::SourceFile) {
+    check_not_allowed_types(ctx, file, check_ty_for_timestamp);
 }
 
 #[cfg(test)]

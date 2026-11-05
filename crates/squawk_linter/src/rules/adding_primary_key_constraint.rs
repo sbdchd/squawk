@@ -1,14 +1,10 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
-pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+pub(crate) fn adding_primary_key_constraint(ctx: &mut Linter, file: &ast::SourceFile) {
     let message = "adding a primary key constraint requires an `access exclusive` lock that will block all reads and writes to the table while the primary key index is built";
     let help = "add the `primary key` constraint `using` an index";
-    let file = parse.tree();
     let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
         tables_created.update(&stmt);

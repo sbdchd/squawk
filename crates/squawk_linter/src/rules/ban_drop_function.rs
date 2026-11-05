@@ -1,12 +1,9 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-pub(crate) fn ban_drop_function(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for stmt in parse.tree().stmts() {
+pub(crate) fn ban_drop_function(ctx: &mut Linter, file: &ast::SourceFile) {
+    for stmt in file.stmts() {
         match stmt {
             ast::Stmt::DropAggregate(node) => ctx.report(Violation::for_node(
                 Rule::BanDropFunction,

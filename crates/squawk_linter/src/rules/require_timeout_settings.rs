@@ -4,7 +4,7 @@ use std::fmt;
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::TextSize;
 use squawk_syntax::{
-    Parse, SourceFile, SyntaxKind,
+    SourceFile, SyntaxKind,
     ast::{self, AstNode},
 };
 
@@ -345,9 +345,7 @@ fn disables_timeout(set_config: &ast::SetConfig) -> bool {
         .is_ok_and(|value| value == 0.0)
 }
 
-pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-
+pub(crate) fn require_timeout_settings(ctx: &mut Linter, file: &ast::SourceFile) {
     // treat a disabled rule as already reported so it never reports
     let mut lock_timeout = if ctx.rules.contains(&Rule::RequireLockTimeout) {
         ReportOnce::Missing
@@ -406,7 +404,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                     ctx.report(
                         violation
                             .help("configure a `lock_timeout` before this statement")
-                            .fix(create_lock_timeout_fix(&file)),
+                            .fix(create_lock_timeout_fix(file)),
                     );
                     lock_timeout = ReportOnce::Reported;
                 }
@@ -419,7 +417,7 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                             stmt.syntax(),
                         )
                         .help("configure a `statement_timeout` before this statement")
-                        .fix(create_stmt_timeout_fix(&file)),
+                        .fix(create_stmt_timeout_fix(file)),
                     );
                     stmt_timeout = ReportOnce::Reported;
                 }

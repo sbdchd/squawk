@@ -1,8 +1,5 @@
 use squawk_diagnostics::{Edit, Fix};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TransactionState};
 
@@ -13,9 +10,9 @@ fn concurrently_fix(detach_partition: &ast::DetachPartition) -> Option<Fix> {
     Some(Fix::new("Add `concurrently`", vec![edit]))
 }
 
-pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
-    for stmt in parse.tree().stmts() {
+    for stmt in file.stmts() {
         transaction.update(&stmt);
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {

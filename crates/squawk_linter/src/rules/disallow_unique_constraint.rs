@@ -1,14 +1,10 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
-pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, file: &ast::SourceFile) {
     let message = "adding a `unique` constraint requires an `access exclusive` lock which blocks reads and writes to the table while the index is built";
     let help = "create an index `concurrently` and create the constraint using the index";
-    let file = parse.tree();
     let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
         tables_created.update(&stmt);

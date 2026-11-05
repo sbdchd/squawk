@@ -1,6 +1,6 @@
 use squawk_diagnostics::{Edit, Fix};
+use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{Parse, SourceFile, ast};
 
 use crate::{Linter, Rule, Violation};
 
@@ -52,9 +52,8 @@ fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     }
 }
 
-pub(crate) fn prefer_bigint_over_smallint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-    check_not_allowed_types(ctx, &file, check_ty_for_small_int);
+pub(crate) fn prefer_bigint_over_smallint(ctx: &mut Linter, file: &ast::SourceFile) {
+    check_not_allowed_types(ctx, file, check_ty_for_small_int);
 }
 
 #[cfg(test)]

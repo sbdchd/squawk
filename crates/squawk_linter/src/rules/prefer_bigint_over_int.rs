@@ -1,6 +1,6 @@
 use squawk_diagnostics::{Edit, Fix};
+use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{Parse, SourceFile, ast};
 
 use crate::{Linter, Rule, Violation};
 
@@ -54,9 +54,8 @@ fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
 }
 
 // TODO: we should have this be a config option instead of having a bunch of prefer_$int rules
-pub(crate) fn prefer_bigint_over_int(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-    check_not_allowed_types(ctx, &file, check_ty_for_big_int);
+pub(crate) fn prefer_bigint_over_int(ctx: &mut Linter, file: &ast::SourceFile) {
+    check_not_allowed_types(ctx, file, check_ty_for_big_int);
 }
 
 #[cfg(test)]
