@@ -11725,13 +11725,12 @@ impl Lowerer {
     }
 
     fn similar_enum_label(&self, ty: TypeId, name: Name) -> Option<Name> {
-        let candidates: Vec<Name> = self
+        let candidates = self
             .index
             .enum_labels(ty)
-            .map(|id| self.index.enum_labels[id].name)
-            .collect();
+            .map(|id| self.index.enum_labels[id].name);
         find_best_match_for_name_with_substrings(
-            &candidates,
+            candidates,
             |candidate| self.index.names.resolve(candidate),
             self.index.names.resolve(name),
             None,
@@ -15606,7 +15605,7 @@ impl Lowerer {
         });
     }
 
-    fn visible_sources(&self, scope: &QueryScope) -> impl Iterator<Item = SourceId> + '_ {
+    fn visible_sources(&self, scope: &QueryScope) -> impl Iterator<Item = SourceId> + Clone + '_ {
         let sources = &self.index.queries[scope.query].sources;
         self.index.scopes[scope.scope]
             .visible_indices()
@@ -22246,15 +22245,14 @@ impl Lowerer {
         if self.is_shadowed_in_from(name) {
             return None;
         }
-        let candidates: Vec<Name> = self
+        let candidates = self
             .scopes
             .iter()
             .rev()
             .flat_map(|scope| self.visible_sources(scope))
-            .filter_map(|source| self.index.sources[source].name)
-            .collect();
+            .filter_map(|source| self.index.sources[source].name);
         find_best_match_for_name_with_substrings(
-            &candidates,
+            candidates,
             |candidate| self.index.names.resolve(candidate),
             self.index.names.resolve(name),
             None,
@@ -22290,12 +22288,11 @@ impl Lowerer {
 
     fn similar_window(&self, name: Name) -> Option<Name> {
         let scope = self.scopes.last()?;
-        let candidates: Vec<Name> = self.windows[scope.windows]
+        let candidates = self.windows[scope.windows]
             .iter()
-            .map(|&window| self.index.windows[window].name)
-            .collect();
+            .map(|&window| self.index.windows[window].name);
         find_best_match_for_name_with_substrings(
-            &candidates,
+            candidates,
             |candidate| self.index.names.resolve(candidate),
             self.index.names.resolve(name),
             None,
@@ -24333,31 +24330,30 @@ impl Lowerer {
     }
 
     fn similar_column(&self, name: Name) -> Option<SimilarColumn> {
-        let mut candidates: Vec<SimilarColumn> = vec![];
-        for scope in self.scopes.iter().rev() {
-            for source in self.visible_sources(scope) {
-                let source = &self.index.sources[source];
-                if source.kind.is_qualified_only() {
-                    continue;
-                }
-                candidates.extend(source.columns.range.iter().filter_map(|column| {
+        let candidates = self
+            .scopes
+            .iter()
+            .rev()
+            .flat_map(|scope| self.visible_sources(scope))
+            .map(|source| &self.index.sources[source])
+            .filter(|source| !source.kind.is_qualified_only())
+            .flat_map(move |source| {
+                source.columns.range.iter().filter_map(move |column| {
                     let column = self.index.columns[column].name?;
                     (column != name).then_some(SimilarColumn {
                         qualifier: source.name,
                         column,
                     })
-                }));
-            }
-        }
+                })
+            });
         let lookup = self.index.names.resolve(name);
         let mut similar = find_best_match_for_name_with_substrings(
-            &candidates,
+            candidates.clone(),
             |candidate| self.index.names.resolve(candidate.column),
             lookup,
             None,
         )?;
         if candidates
-            .iter()
             .filter(|candidate| candidate.column == similar.column)
             .count()
             == 1
@@ -24368,21 +24364,23 @@ impl Lowerer {
     }
 
     fn similar_table(&self, schema: Option<Name>, name: Name, lookup: TableLookup) -> Option<Name> {
-        let mut candidates: Vec<Name> = vec![];
-        if lookup == TableLookup::FromItem && schema.is_none() {
-            candidates.extend(self.ctes.iter().map(|cte| self.index.ctes[*cte].name));
-        }
-        for schema in self.search_path(schema, Lookup::Relation) {
-            candidates.extend(self.index.tables.in_schema(schema).filter_map(|id| {
+        let ctes = (lookup == TableLookup::FromItem && schema.is_none())
+            .then_some(&self.ctes)
+            .into_iter()
+            .flatten()
+            .map(|cte| self.index.ctes[*cte].name);
+        let tables = self
+            .search_path(schema, Lookup::Relation)
+            .flat_map(|schema| self.index.tables.in_schema(schema))
+            .filter_map(move |id| {
                 let table = &self.index.tables[id];
                 (lookup.accepts(table.kind)
                     && self.visible(table.schema, table.ptr.file_id)
                     && !self.dropped_tables.contains(&id))
                 .then_some(table.name)
-            }));
-        }
+            });
         find_best_match_for_name_with_substrings(
-            &candidates,
+            ctes.chain(tables),
             |candidate| self.index.names.resolve(candidate),
             self.index.names.resolve(name),
             None,
@@ -24399,35 +24397,37 @@ impl Lowerer {
             TypeCandidates::TypeName => (None, true),
             TypeCandidates::Types(kind) => (kind, false),
         };
-        let mut similar: Vec<SimilarType> = vec![];
-        if type_names && schema.is_none() {
-            similar.extend(
-                ast::KEYWORD_TYPE_NAMES
-                    .iter()
-                    .copied()
-                    .map(SimilarType::Keyword),
-            );
-        }
-        for schema in self.search_path(schema, Lookup::Type) {
-            similar.extend(self.index.types.in_schema(schema).filter_map(|id| {
-                let ty = &self.index.types[id];
-                (kind.is_none_or(|kind| ty.kind == kind)
-                    && ty.category != Some(TypeCategory::Array)
-                    && self.visible(ty.schema, ty.ptr.file_id)
-                    && !self.dropped_types.contains(&id))
-                .then_some(SimilarType::Named(ty.name))
-            }));
-            if type_names && schema != self.pg_catalog {
-                similar.extend(self.index.tables.in_schema(schema).filter_map(|id| {
-                    let table = &self.index.tables[id];
-                    (self.visible(table.schema, table.ptr.file_id)
-                        && !self.dropped_tables.contains(&id))
-                    .then_some(SimilarType::Named(table.name))
-                }));
-            }
-        }
+        let keywords = (type_names && schema.is_none())
+            .then_some(ast::KEYWORD_TYPE_NAMES)
+            .into_iter()
+            .flatten()
+            .copied()
+            .map(SimilarType::Keyword);
+        let named = self
+            .search_path(schema, Lookup::Type)
+            .flat_map(move |schema| {
+                let types = self.index.types.in_schema(schema).filter_map(move |id| {
+                    let ty = &self.index.types[id];
+                    (kind.is_none_or(|kind| ty.kind == kind)
+                        && ty.category != Some(TypeCategory::Array)
+                        && self.visible(ty.schema, ty.ptr.file_id)
+                        && !self.dropped_types.contains(&id))
+                    .then_some(SimilarType::Named(ty.name))
+                });
+                let tables = (type_names && schema != self.pg_catalog)
+                    .then(|| self.index.tables.in_schema(schema))
+                    .into_iter()
+                    .flatten()
+                    .filter_map(|id| {
+                        let table = &self.index.tables[id];
+                        (self.visible(table.schema, table.ptr.file_id)
+                            && !self.dropped_tables.contains(&id))
+                        .then_some(SimilarType::Named(table.name))
+                    });
+                types.chain(tables)
+            });
         find_best_match_for_name(
-            &similar,
+            keywords.chain(named),
             |candidate| match candidate {
                 SimilarType::Named(name) => self.index.names.resolve(name),
                 SimilarType::Keyword(keyword) => keyword,
@@ -24444,7 +24444,7 @@ impl Lowerer {
         kind: RoutineKind,
         lookup: LookupKind,
     ) -> Option<Name> {
-        let candidates: Vec<Name> = self
+        let candidates = self
             .search_path(schema, Lookup::Function)
             .flat_map(|schema| self.index.functions.in_schema(schema))
             .filter_map(|id| {
@@ -24460,10 +24460,9 @@ impl Lowerer {
                     && self.visible(function.schema, function.ptr.file_id)
                     && !self.dropped_functions.contains(&id))
                 .then_some(function.name)
-            })
-            .collect();
+            });
         find_best_match_for_name(
-            &candidates,
+            candidates,
             |candidate| self.index.names.resolve(candidate),
             self.index.names.resolve(name),
             None,
@@ -24476,11 +24475,9 @@ impl Lowerer {
         columns: impl Iterator<Item = ColumnId>,
         name: Name,
     ) -> Option<Name> {
-        let candidates: Vec<Name> = columns
-            .filter_map(|column| self.index.columns[column].name)
-            .collect();
+        let candidates = columns.filter_map(|column| self.index.columns[column].name);
         find_best_match_for_name_with_substrings(
-            &candidates,
+            candidates,
             |candidate| self.index.names.resolve(candidate),
             self.index.names.resolve(name),
             None,

@@ -193,7 +193,7 @@ fn edit_distance_with_substrings(a: &str, b: &str, limit: usize) -> Option<usize
 /// We use case insensitive comparison to improve accuracy on an edge case with a lower(upper)case
 /// letters mismatch.
 pub(crate) fn find_best_match_for_name_with_substrings<'a, T: Copy>(
-    candidates: &[T],
+    candidates: impl Iterator<Item = T>,
     name: impl Fn(T) -> &'a str,
     lookup: &str,
     dist: Option<usize>,
@@ -202,7 +202,7 @@ pub(crate) fn find_best_match_for_name_with_substrings<'a, T: Copy>(
 }
 
 pub(crate) fn find_best_match_for_name<'a, T: Copy>(
-    candidates: &[T],
+    candidates: impl Iterator<Item = T>,
     name: impl Fn(T) -> &'a str,
     lookup: &str,
     dist: Option<usize>,
@@ -213,7 +213,7 @@ pub(crate) fn find_best_match_for_name<'a, T: Copy>(
 #[cold]
 fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     use_substring_score: bool,
-    candidates: &[T],
+    candidates: impl Iterator<Item = T>,
     name: &F,
     lookup: &str,
     dist: Option<usize>,
@@ -222,25 +222,34 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     // 1. Exact case insensitive match
     // 2. Edit distance match
     // 3. Sorted word match
-    if let Some(c) = candidates.iter().find(|c| eq_uppercase(name(**c), lookup)) {
-        return Some(*c);
-    }
+    //
+    // These are found in a single pass. An edit distance of 0 implies a case insensitive match,
+    // so returning on the first case insensitive match keeps the priority.
 
     // `fn edit_distance()` use `chars()` to calculate edit distance, so we must
     // also use `chars()` (and not `str::len()`) to calculate length here.
     let lookup_len = lookup.chars().count();
+    let lookup_sorted_by_words = sort_by_words(lookup);
 
     let mut dist = dist.unwrap_or_else(|| cmp::max(lookup_len, 3) / 3);
     let mut best = None;
+    let mut sorted_words_match = None;
     // store the candidates with the same distance, only for `use_substring_score` current.
     let mut next_candidates = vec![];
     for c in candidates {
+        let candidate_name = name(c);
+        if eq_uppercase(candidate_name, lookup) {
+            return Some(c);
+        }
+        if is_sorted_words_match(candidate_name, lookup, &lookup_sorted_by_words) {
+            sorted_words_match = Some(c);
+        }
         match if use_substring_score {
-            edit_distance_with_substrings(lookup, name(*c), dist)
+            edit_distance_with_substrings(lookup, candidate_name, dist)
         } else {
-            edit_distance(lookup, name(*c), dist)
+            edit_distance(lookup, candidate_name, dist)
         } {
-            Some(0) => return Some(*c),
+            Some(0) => return Some(c),
             Some(d) => {
                 if use_substring_score {
                     if d < dist {
@@ -250,11 +259,11 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
                         // `d == dist` here, we need to store the candidates with the same distance
                         // so we won't decrease the distance in the next loop.
                     }
-                    next_candidates.push(*c);
+                    next_candidates.push(c);
                 } else {
                     dist = d - 1;
                 }
-                best = Some(*c);
+                best = Some(c);
             }
             None => {}
         }
@@ -267,17 +276,13 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
         debug_assert!(use_substring_score);
         best = find_best_match_for_name_impl(
             false,
-            &next_candidates,
+            next_candidates.iter().copied(),
             name,
             lookup,
             Some(lookup.len()),
         );
     }
-    if best.is_some() {
-        return best;
-    }
-
-    find_match_by_sorted_words(candidates, name, lookup)
+    best.or(sorted_words_match)
 }
 
 fn eq_uppercase(a: &str, b: &str) -> bool {
@@ -289,27 +294,14 @@ fn eq_uppercase(a: &str, b: &str) -> bool {
         .eq(b.chars().flat_map(char::to_uppercase))
 }
 
-fn find_match_by_sorted_words<'a, T: Copy>(
-    iter_names: &[T],
-    name: impl Fn(T) -> &'a str,
-    lookup: &str,
-) -> Option<T> {
-    let lookup_sorted_by_words = sort_by_words(lookup);
-    iter_names.iter().fold(None, |result, candidate| {
-        let candidate_name = name(*candidate);
-        if candidate_name.len() == lookup.len()
-            && candidate_name.split('_').count() == lookup_sorted_by_words.len()
-            && sort_by_words(candidate_name) == lookup_sorted_by_words
-        {
-            Some(*candidate)
-        } else {
-            result
-        }
-    })
+fn is_sorted_words_match(name: &str, lookup: &str, lookup_sorted_by_words: &[&str]) -> bool {
+    name.len() == lookup.len()
+        && name.split('_').count() == lookup_sorted_by_words.len()
+        && *sort_by_words(name) == *lookup_sorted_by_words
 }
 
-fn sort_by_words(name: &str) -> Vec<&str> {
-    let mut split_words: Vec<&str> = name.split('_').collect();
+fn sort_by_words(name: &str) -> SmallVec<[&str; 8]> {
+    let mut split_words: SmallVec<[&str; 8]> = name.split('_').collect();
     // We are sorting primitive &strs and can use unstable sort here.
     split_words.sort_unstable();
     split_words
@@ -322,13 +314,13 @@ mod tests {
     use super::{find_best_match_for_name, find_best_match_for_name_with_substrings};
 
     fn best(candidates: &[&str], lookup: &str) -> String {
-        find_best_match_for_name_with_substrings(candidates, |c| c, lookup, None)
+        find_best_match_for_name_with_substrings(candidates.iter().copied(), |c| c, lookup, None)
             .unwrap_or("no match")
             .to_string()
     }
 
     fn best_without_substrings(candidates: &[&str], lookup: &str) -> String {
-        find_best_match_for_name(candidates, |c| c, lookup, None)
+        find_best_match_for_name(candidates.iter().copied(), |c| c, lookup, None)
             .unwrap_or("no match")
             .to_string()
     }

@@ -957,7 +957,7 @@ pub struct Scope {
 }
 
 impl Scope {
-    pub fn visible_indices(&self) -> impl Iterator<Item = usize> + '_ {
+    pub fn visible_indices(&self) -> impl Iterator<Item = usize> + Clone + '_ {
         self.visible
             .into_iter()
             .filter(|index| !self.hidden.iter().any(|range| range.contains(index)))
