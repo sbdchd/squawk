@@ -19,13 +19,23 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, parse: &Parse<
         if let ast::Stmt::DropIndex(drop_index) = stmt
             && drop_index.concurrently_token().is_none()
         {
-            let fix = concurrently_fix(&drop_index);
-
-            ctx.report(Violation::for_node(
-                    Rule::RequireConcurrentIndexDeletion,
-            "a normal `drop index` acquires an `access exclusive` lock on the table, blocking other accesses until the index drop can complete".into(),
-                    drop_index.syntax(),
-                ).help("drop the index `concurrently`").fix(fix));
+            let violation = Violation::for_node(
+                Rule::RequireConcurrentIndexDeletion,
+                "a normal `drop index` acquires an `access exclusive` lock on the table, blocking other accesses until the index drop can complete".into(),
+                drop_index.syntax(),
+            );
+            let violation = if drop_index.index_refs().nth(1).is_some() {
+                violation.help("drop each index in its own `drop index concurrently` statement")
+            } else if let Some(ast::DropBehavior::Cascade(_)) = drop_index.drop_behavior() {
+                violation.help(
+                    "drop the dependent objects first, then drop the index `concurrently` without `cascade`",
+                )
+            } else {
+                violation
+                    .help("drop the index `concurrently`")
+                    .fix(concurrently_fix(&drop_index))
+            };
+            ctx.report(violation);
         }
     }
 }
@@ -59,10 +69,19 @@ mod test {
     }
 
     #[test]
-    fn fix_add_concurrently_multiple_indexes() {
-        let sql = r#"DROP INDEX "idx1", "idx2";"#;
-        let result = fix(sql);
-        assert_snapshot!(result, @r#"DROP INDEX concurrently "idx1", "idx2";"#);
+    fn multiple_indexes_err() {
+        let sql = r#"
+drop index a, b;
+        "#;
+        assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexDeletion));
+    }
+
+    #[test]
+    fn cascade_err() {
+        let sql = r#"
+drop index c cascade;
+        "#;
+        assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentIndexDeletion));
     }
 
     #[test]
