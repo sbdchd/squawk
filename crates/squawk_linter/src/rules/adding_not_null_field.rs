@@ -5,7 +5,7 @@ use squawk_syntax::{
     ast::{self, AstNode, NameLike},
 };
 
-use crate::{Linter, Rule, Version, Violation};
+use crate::{Linter, Rule, Version, Violation, transactions::TablesCreatedInTransaction};
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct TableColumn {
@@ -55,11 +55,19 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
     // in the same file (cross-migration pattern).
     let mut tables_with_external_validated_constraints: FxHashSet<String> = FxHashSet::default();
 
+    let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
+
     for stmt in file.stmts() {
+        tables_created.update(&stmt);
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             let Some(table) = get_table_name(&alter_table) else {
                 continue;
             };
+            let created_in_transaction = alter_table
+                .table_relation_name()
+                .and_then(|relation| relation.table_name_ref())
+                .and_then(|table| table.path_ref())
+                .is_some_and(|path| tables_created.contains(&path));
 
             for action in alter_table.actions() {
                 match action {
@@ -119,6 +127,9 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         else {
                             continue;
                         };
+                        if created_in_transaction {
+                            continue;
+                        }
 
                         if is_pg12_plus
                             && let Some(column) = alter_column
@@ -406,5 +417,16 @@ ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
             },
             Rule::AddingNotNullableField
         ));
+    }
+
+    #[test]
+    fn table_created_in_transaction_ok() {
+        let sql = r#"
+begin;
+create table t (id bigint);
+alter table t alter column id set not null;
+commit;
+        "#;
+        lint_ok(sql, Rule::AddingNotNullableField);
     }
 }

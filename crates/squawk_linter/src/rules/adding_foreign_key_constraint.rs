@@ -49,6 +49,9 @@ pub(crate) fn adding_foreign_key_constraint(ctx: &mut Linter, parse: &Parse<Sour
                                 }
                             }
                             ast::AlterTableAction::AddColumn(add_column) => {
+                                if tables_created.contains(&table_name) {
+                                    continue;
+                                }
                                 for constraint in add_column.constraints() {
                                     if matches!(
                                         constraint,
@@ -229,5 +232,14 @@ COMMIT;
         "#;
 
         assert_snapshot!(lint_errors(sql, Rule::AddingForeignKeyConstraint));
+    }
+
+    #[test]
+    fn add_column_to_table_created_in_transaction_ok() {
+        let sql = "begin;
+create table t (id bigint);
+alter table t add column a bigint references u (id);
+commit;";
+        lint_ok(sql, Rule::AddingForeignKeyConstraint);
     }
 }
