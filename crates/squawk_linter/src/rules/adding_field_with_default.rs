@@ -22,7 +22,9 @@ fn non_volatile_funcs() -> &'static FxHashSet<&'static str> {
 fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
     match expr {
         ast::Expr::Literal(_) => true,
-        ast::Expr::ArrayExpr(_) => true,
+        ast::Expr::ArrayExpr(array_expr) => array_expr
+            .exprs()
+            .all(|expr| is_non_volatile_or_const(&expr)),
         ast::Expr::BinExpr(bin_expr) => {
             if let Some(lhs) = bin_expr.lhs()
                 && let Some(rhs) = bin_expr.rhs()
@@ -204,9 +206,22 @@ alter table t add column a double precision[] default array[]::double precision[
 alter table t add column b bigint[] default cast(array[] as bigint[]);
 
 alter table t add column c text[] default array['foo', 'bar']::text[];
+
+alter table t add column d int[] default array[[1, 2], [3, 4]]::int[];
             "#;
 
         lint_ok(sql, Rule::AddingFieldWithDefault);
+    }
+
+    #[test]
+    fn default_array_with_volatile_element_err() {
+        let sql = r#"
+alter table t add column a float8[] default array[random()];
+
+alter table t add column b float8[] default array[random()]::float8[];
+            "#;
+
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
     }
 
     #[test]
