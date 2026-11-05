@@ -3,7 +3,7 @@ use std::{borrow::Cow, cmp::Ordering, collections::hash_map::Entry, range::Range
 use la_arena::Idx;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use smallvec::{SmallVec, smallvec};
-use smol_str::{SmolStr, StrExt};
+use smol_str::{SmolStr, StrExt, format_smolstr};
 use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
@@ -13948,7 +13948,7 @@ impl Lowerer {
         } else {
             ExprContext::Values
         };
-        let mut columns = Vec::with_capacity(first_len);
+        let mut columns: SmallVec<[Column; 8]> = SmallVec::with_capacity(first_len);
         for (row_index, row) in values
             .row_list()
             .into_iter()
@@ -13961,7 +13961,7 @@ impl Lowerer {
             for (column_index, expr) in row.exprs().enumerate() {
                 let ty = self.lower_expr_in(context, &expr);
                 if row_index == 0 {
-                    let name = self.intern(&format!("column{}", column_index + 1));
+                    let name = self.intern(&format_smolstr!("column{}", column_index + 1));
                     columns.push(Column {
                         name: Some(name),
                         ptr: self.ptr(expr.syntax()),
@@ -21540,9 +21540,9 @@ impl Lowerer {
     }
 
     fn lower_target_list(&mut self, query: QueryId, list: Option<ast::TargetList>) -> Columns {
-        let mut columns =
-            Vec::with_capacity(list.as_ref().map_or(0, |list| list.targets().count()));
-        let mut explicit = vec![];
+        let mut columns: SmallVec<[Column; 8]> =
+            SmallVec::with_capacity(list.as_ref().map_or(0, |list| list.targets().count()));
+        let mut explicit: SmallVec<[usize; 8]> = SmallVec::new();
         let mut complete = true;
         for target in list.into_iter().flat_map(|list| list.targets()) {
             if let Some(star) = target.star_token() {
