@@ -1,0 +1,10 @@
+---
+source: crates/squawk_linter/src/rules/require_concurrent_partition_detach.rs
+expression: "lint_errors(sql, Rule::RequireConcurrentPartitionDetach)"
+---
+warning[require-concurrent-partition-detach]: detaching a partition requires an `access exclusive` lock, which prevents reads and writes to the table
+  ╭▸ 
+3 │ alter table t detach partition p;
+  │               ━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: detach the partition `concurrently` outside of a transaction

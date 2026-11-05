@@ -4,7 +4,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
-use crate::{Linter, Rule, Violation};
+use crate::{Linter, Rule, Violation, transactions::TransactionState};
 
 fn concurrently_fix(detach_partition: &ast::DetachPartition) -> Option<Fix> {
     let path = detach_partition.table_name_ref()?.path_ref()?;
@@ -14,22 +14,28 @@ fn concurrently_fix(detach_partition: &ast::DetachPartition) -> Option<Fix> {
 }
 
 pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+    let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
     for stmt in parse.tree().stmts() {
+        transaction.update(&stmt);
         if let ast::Stmt::AlterTable(alter_table) = stmt {
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::DetachPartition(detach_partition) = action
                     && detach_partition.detach_partition_option().is_none()
                 {
-                    let fix = concurrently_fix(&detach_partition);
-                    ctx.report(
-                            Violation::for_node(
-                                Rule::RequireConcurrentPartitionDetach,
-                                "detaching a partition requires an `access exclusive` lock, which prevents reads and writes to the table".into(),
-                                detach_partition.syntax(),
-                            )
+                    let violation = Violation::for_node(
+                        Rule::RequireConcurrentPartitionDetach,
+                        "detaching a partition requires an `access exclusive` lock, which prevents reads and writes to the table".into(),
+                        detach_partition.syntax(),
+                    );
+                    let violation = if transaction.inside_transaction() {
+                        violation
+                            .help("detach the partition `concurrently` outside of a transaction")
+                    } else {
+                        violation
                             .help("detach the partition `concurrently`")
-                            .fix(fix),
-                        );
+                            .fix(concurrently_fix(&detach_partition))
+                    };
+                    ctx.report(violation);
                 }
             }
         }
@@ -83,5 +89,15 @@ mod test {
         let sql = "ALTER TABLE t DETACH PARTITION p;";
         let result = fix(sql);
         assert_snapshot!(result, @"ALTER TABLE t DETACH PARTITION p concurrently;");
+    }
+
+    #[test]
+    fn in_transaction_err() {
+        let sql = r#"
+begin;
+alter table t detach partition p;
+commit;
+        "#;
+        assert_snapshot!(lint_errors(sql, Rule::RequireConcurrentPartitionDetach));
     }
 }
