@@ -25,7 +25,7 @@ struct TableConstraint {
 }
 
 fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
-    let ast::Expr::BinExpr(bin_expr) = expr else {
+    let ast::Expr::BinExpr(bin_expr) = expr.unparen() else {
         return None;
     };
     let ast::BinOp::IsNot(_) = bin_expr.op()? else {
@@ -37,7 +37,7 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
         return None;
     }
 
-    match bin_expr.lhs()? {
+    match bin_expr.lhs()?.unparen() {
         ast::Expr::NameRef(name_ref) => Some(name_ref.text().into_owned()),
         _ => None,
     }
@@ -473,5 +473,22 @@ alter table b.users alter column email set not null;
             },
             Rule::AddingNotNullableField
         ));
+    }
+
+    #[test]
+    fn pg16_validated_parenthesized_check_ok() {
+        let sql = r#"
+alter table t add constraint chk check ((email is not null)) not valid;
+alter table t validate constraint chk;
+alter table t alter column email set not null;
+        "#;
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                pg_version: "16".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField,
+        );
     }
 }
