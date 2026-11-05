@@ -10,5 +10,5 @@ warning[ban-uncommitted-transaction]: transaction never committed or rolled back
   ├ help: add a `commit` or `rollback` statement to complete the transaction
   ╭╴
 6 ±         
-7 + COMMIT;
+7 + commit;
   ╰╴

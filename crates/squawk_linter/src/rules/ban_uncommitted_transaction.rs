@@ -32,7 +32,7 @@ pub(crate) fn ban_uncommitted_transaction(ctx: &mut Linter, parse: &Parse<Source
             "Add `commit`",
             vec![Edit::insert(
                 format!(
-                    "{line_ending}COMMIT;{line_ending}",
+                    "{line_ending}commit;{line_ending}",
                     line_ending = line_ending.as_str()
                 ),
                 end_pos,
@@ -75,7 +75,7 @@ CREATE TABLE users (id bigint);
           ├ help: add a `commit` or `rollback` statement to complete the transaction
           ╭╴
         4 ±         
-        5 + COMMIT;
+        5 + commit;
           ╰╴
         ");
     }
@@ -127,7 +127,7 @@ CREATE TABLE posts (id bigint);
           ├ help: add a `commit` or `rollback` statement to complete the transaction
           ╭╴
         8 ±         
-        9 + COMMIT;
+        9 + commit;
           ╰╴
         ");
     }
@@ -147,7 +147,7 @@ CREATE TABLE users (id bigint);
           ├ help: add a `commit` or `rollback` statement to complete the transaction
           ╭╴
         4 ±         
-        5 + COMMIT;
+        5 + commit;
           ╰╴
         ");
     }
@@ -177,7 +177,7 @@ CREATE TABLE users (id bigint);
           ├ help: add a `commit` or `rollback` statement to complete the transaction
           ╭╴
         4 ±         
-        5 + COMMIT;
+        5 + commit;
           ╰╴
         ");
     }
@@ -190,11 +190,11 @@ BEGIN;
 CREATE TABLE users (id bigint);
         ",
             Rule::BanUncommittedTransaction,
-        ), @r"
+        ), @"
         BEGIN;
         CREATE TABLE users (id bigint);
                 
-        COMMIT;
+        commit;
         ");
     }
 
@@ -208,7 +208,7 @@ CREATE TABLE users (id bigint);
                     Rule::BanUncommittedTransaction,
                 )
             ),
-            @r#""BEGIN;\rCREATE TABLE users (id bigint);\rCOMMIT;\r""#
+            @r#""BEGIN;\rCREATE TABLE users (id bigint);\rcommit;\r""#
         );
     }
 
@@ -218,10 +218,11 @@ CREATE TABLE users (id bigint);
             "START TRANSACTION;
 CREATE TABLE posts (id bigint);",
             Rule::BanUncommittedTransaction,
-        ), @r"START TRANSACTION;
-CREATE TABLE posts (id bigint);
-COMMIT;
-");
+        ), @"
+        START TRANSACTION;
+        CREATE TABLE posts (id bigint);
+        commit;
+        ");
     }
 
     #[test]
