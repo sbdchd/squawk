@@ -3,6 +3,7 @@ use squawk_syntax::{
     ast::{self, AstNode},
 };
 
+use crate::visitors::is_serial_type;
 use crate::{Linter, Rule, Violation};
 
 pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
@@ -12,6 +13,9 @@ pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddColumn(add_column) = action {
                     if has_generated_constrait(add_column.constraints()) {
+                        continue;
+                    }
+                    if add_column.ty().is_some_and(|ty| is_serial_type(&ty)) {
                         continue;
                     }
                     if has_not_null_and_no_default_constraint(add_column.constraints()) {
@@ -98,6 +102,14 @@ ALTER TABLE foo
         let sql = r#"
  ALTER TABLE foo
     ADD COLUMN bar numeric GENERATED ALWAYS AS (bar + baz) STORED ;
+  "#;
+        lint_ok(sql, Rule::AddingRequiredField);
+    }
+
+    #[test]
+    fn serial_not_null_ok() {
+        let sql = r#"
+alter table t add column e bigserial not null;
   "#;
         lint_ok(sql, Rule::AddingRequiredField);
     }
