@@ -1,0 +1,11 @@
+---
+source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
+expression: lint_errors(sql)
+---
+warning[prefer-robust-stmts]: missing `if not exists`, the migration can't be rerun if it fails part way through
+  ╭▸ 
+5 │ create index i on t (a);
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━
+  ╭╴
+5 │ create index if not exists i on t (a);
+  ╰╴             +++++++++++++
