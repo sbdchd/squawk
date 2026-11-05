@@ -320,6 +320,31 @@ impl LockKind {
     }
 }
 
+fn disables_timeout(set_config: &ast::SetConfig) -> bool {
+    let Some(ast::ConfigAssignment::ToConfigValue(to_config_value)) =
+        set_config.config_assignment()
+    else {
+        return false;
+    };
+    let mut values = to_config_value.config_values();
+    let (Some(ast::ConfigValue::Literal(literal)), None) = (values.next(), values.next()) else {
+        return false;
+    };
+    let text = if literal.is_string() {
+        let Some(value) = literal.string_value() else {
+            return false;
+        };
+        value
+    } else {
+        literal.syntax().text().to_string()
+    };
+    text.trim()
+        .trim_end_matches(|c: char| c.is_ascii_alphabetic())
+        .trim_end()
+        .parse::<f64>()
+        .is_ok_and(|value| value == 0.0)
+}
+
 pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
 
@@ -350,10 +375,19 @@ pub(crate) fn require_timeout_settings(ctx: &mut Linter, parse: &Parse<SourceFil
                         .and_then(|config_parameter| config_parameter.path_ref()?.unqualified_segment())
                 {
                     let name = segment.text();
-                    if name == "lock_timeout" {
-                        lock_timeout = ReportOnce::Present;
+                    let timeout = if name == "lock_timeout" {
+                        &mut lock_timeout
                     } else if name == "statement_timeout" {
-                        stmt_timeout = ReportOnce::Present;
+                        &mut stmt_timeout
+                    } else {
+                        continue;
+                    };
+                    if *timeout != ReportOnce::Reported {
+                        *timeout = if disables_timeout(&set_config) {
+                            ReportOnce::Missing
+                        } else {
+                            ReportOnce::Present
+                        };
                     }
                 }
             }
@@ -1074,5 +1108,26 @@ ALTER TABLE users ADD COLUMN email TEXT;
         CREATE TABLE users (id SERIAL);
         ALTER TABLE users ADD COLUMN email TEXT;
         ");
+    }
+
+    #[test]
+    fn err_timeouts_set_to_zero() {
+        let sql = r#"
+set lock_timeout = 0;
+set statement_timeout = '0s';
+alter table t add column c int;
+"#;
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings));
+    }
+
+    #[test]
+    fn err_timeout_disabled_after_being_set() {
+        let sql = r#"
+set lock_timeout = '1s';
+set statement_timeout = '5s';
+set lock_timeout = '0';
+alter table t add column c int;
+"#;
+        assert_snapshot!(lint_errors(sql, Rule::RequireTimeoutSettings));
     }
 }
