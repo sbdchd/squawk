@@ -18,8 +18,14 @@ static NON_VOLATILE_FUNCS: LazyLock<FxHashSet<&'static str>> = LazyLock::new(|| 
 });
 
 fn is_non_volatile_or_const(expr: &ast::Expr) -> bool {
-    match expr {
+    match expr.unparen() {
         ast::Expr::Literal(_) => true,
+        ast::Expr::PrefixExpr(prefix_expr) => {
+            prefix_expr.op().is_some()
+                && prefix_expr
+                    .expr()
+                    .is_some_and(|expr| is_non_volatile_or_const(&expr))
+        }
         ast::Expr::ArrayExpr(array_expr) => array_expr
             .exprs()
             .all(|expr| is_non_volatile_or_const(&expr)),
@@ -362,6 +368,32 @@ alter table t add column a text default lower('A');
     fn default_non_volatile_func_with_volatile_arg_err() {
         let sql = r#"
 alter table t add column a float8 default abs(random());
+        "#;
+
+        assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
+    }
+
+    #[test]
+    fn default_paren_and_prefix_ok() {
+        let sql = r#"
+alter table t add column a int default (1);
+
+alter table t add column b timestamptz default (now() - interval '1 day');
+
+alter table t add column c int default -1;
+
+alter table t add column d bool default not (true);
+        "#;
+
+        lint_ok(sql, Rule::AddingFieldWithDefault);
+    }
+
+    #[test]
+    fn default_paren_and_prefix_volatile_err() {
+        let sql = r#"
+alter table t add column a float8 default (random());
+
+alter table t add column b float8 default -random();
         "#;
 
         assert_snapshot!(lint_errors(sql, Rule::AddingFieldWithDefault));
