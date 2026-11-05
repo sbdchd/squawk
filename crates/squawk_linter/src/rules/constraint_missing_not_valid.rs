@@ -5,58 +5,54 @@ use squawk_syntax::{
     ast::{self, AstNode, NameLike},
 };
 
-use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
+use crate::transactions::{TablesCreatedInTransaction, TransactionControl, TransactionState};
+use crate::{Linter, Rule, Violation};
 
 fn not_valid_validate_in_transaction(
     ctx: &mut Linter,
     assume_in_transaction: bool,
     file: &ast::SourceFile,
 ) {
-    let mut inside_transaction = assume_in_transaction;
+    let mut transaction = TransactionState::new(assume_in_transaction);
     let mut not_valid_names: FxHashSet<String> = FxHashSet::default();
     for stmt in file.stmts() {
-        match stmt {
-            ast::Stmt::AlterTable(alter_table) => {
-                for action in alter_table.actions() {
-                    match action {
-                        ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
-                            if let Some(constraint_name) = validate_constraint
-                                .constraint_name_ref()
-                                .and_then(|constraint| constraint.path_ref())
-                                .and_then(|path| path.segment())
-                                && inside_transaction
-                                && not_valid_names.contains(constraint_name.text().as_ref())
-                            {
-                                ctx.report(
-                                        Violation::for_node(
-                                        Rule::ConstraintMissingNotValid,
-                                        "using `not valid` and `validate constraint` in the same transaction will block all reads while the constraint is validated".into(),
-                                        validate_constraint.syntax(),
-                                    ).help("add constraint as `not valid` in one transaction and `validate constraint` in a separate transaction"));
-                            }
+        if let Some(TransactionControl::End { .. }) = transaction.update(&stmt) {
+            not_valid_names.clear();
+        }
+        let inside_transaction = transaction.inside_transaction();
+        if let ast::Stmt::AlterTable(alter_table) = stmt {
+            for action in alter_table.actions() {
+                match action {
+                    ast::AlterTableAction::ValidateConstraint(validate_constraint) => {
+                        if let Some(constraint_name) = validate_constraint
+                            .constraint_name_ref()
+                            .and_then(|constraint| constraint.path_ref())
+                            .and_then(|path| path.segment())
+                            && inside_transaction
+                            && not_valid_names.contains(constraint_name.text().as_ref())
+                        {
+                            ctx.report(
+                                    Violation::for_node(
+                                    Rule::ConstraintMissingNotValid,
+                                    "using `not valid` and `validate constraint` in the same transaction will block all reads while the constraint is validated".into(),
+                                    validate_constraint.syntax(),
+                                ).help("add constraint as `not valid` in one transaction and `validate constraint` in a separate transaction"));
                         }
-                        ast::AlterTableAction::AddConstraint(add_constraint) => {
-                            if let Some(constraint) = add_constraint.constraint()
-                                && constraint.is_not_valid()
-                                && let Some(constraint_name) = constraint.constraint_name()
-                            {
-                                not_valid_names.insert(constraint_name.text().into_owned());
-                            }
-                        }
-                        _ => (),
                     }
+                    ast::AlterTableAction::AddConstraint(add_constraint) => {
+                        if let Some(constraint) = add_constraint.constraint()
+                            && constraint.is_not_valid()
+                            && let Some(constraint_name) = constraint.constraint_name()
+                        {
+                            not_valid_names.insert(constraint_name.text().into_owned());
+                        }
+                    }
+                    _ => (),
                 }
             }
-            ast::Stmt::Begin(_) => {
-                if !inside_transaction {
-                    not_valid_names.clear();
-                }
-                inside_transaction = true;
-            }
-            ast::Stmt::Commit(_) => {
-                inside_transaction = false;
-            }
-            _ => (),
+        }
+        if !inside_transaction {
+            not_valid_names.clear();
         }
     }
 }
@@ -86,15 +82,17 @@ pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<Sourc
                     && let Some(constraint) = add_constraint.constraint()
                     && !constraint.is_not_valid()
                 {
-                    if let ast::Constraint::UniqueConstraint(uc) = &constraint
-                        && uc.using_index().is_some()
-                    {
-                        continue;
-                    }
-                    if let ast::Constraint::PrimaryKeyConstraint(pk) = &constraint
-                        && pk.using_index().is_some()
-                    {
-                        continue;
+                    match constraint {
+                        ast::Constraint::CheckConstraint(_)
+                        | ast::Constraint::ForeignKeyConstraint(_)
+                        | ast::Constraint::NotNullConstraint(_) => (),
+                        ast::Constraint::DefaultConstraint(_)
+                        | ast::Constraint::ExcludeConstraint(_)
+                        | ast::Constraint::GeneratedConstraint(_)
+                        | ast::Constraint::NullConstraint(_)
+                        | ast::Constraint::PrimaryKeyConstraint(_)
+                        | ast::Constraint::ReferencesConstraint(_)
+                        | ast::Constraint::UniqueConstraint(_) => continue,
                     }
 
                     ctx.report(Violation::for_node(
@@ -288,9 +286,9 @@ commit;";
         let sql = "begin;
 create table t as
   select 1 as id;
-alter table t add primary key (id);
+alter table t add check (id > 0);
 select 1 as id into u;
-alter table u add primary key (id);
+alter table u add check (id > 0);
 commit;";
         lint_ok(sql, Rule::ConstraintMissingNotValid);
     }
@@ -299,9 +297,9 @@ commit;";
     fn new_tables_in_assumed_transaction_ok() {
         let sql = "create table t as
   select 1 as id;
-alter table t add primary key (id);
+alter table t add check (id > 0);
 select 1 as id into u;
-alter table u add primary key (id);";
+alter table u add check (id > 0);";
         lint_ok_with(
             sql,
             LinterSettings {
@@ -315,20 +313,20 @@ alter table u add primary key (id);";
     fn new_tables_without_transaction_err() {
         let sql = "create table t as
   select 1 as id;
-alter table t add primary key (id);
+alter table t add check (id > 0);
 select 1 as id into u;
-alter table u add primary key (id);";
+alter table u add check (id > 0);";
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid), @"
         warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
-        3 │ alter table t add primary key (id);
-          │               ━━━━━━━━━━━━━━━━━━━━
+        3 │ alter table t add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
           │
           ╰ help: use `not valid` with a later `validate constraint` call
         warning[constraint-missing-not-valid]: by default new constraints require a table scan and block writes to the table while that scan occurs
           ╭▸ 
-        5 │ alter table u add primary key (id);
-          │               ━━━━━━━━━━━━━━━━━━━━
+        5 │ alter table u add check (id > 0);
+          │               ━━━━━━━━━━━━━━━━━━
           │
           ╰ help: use `not valid` with a later `validate constraint` call
         ");
@@ -483,6 +481,53 @@ ALTER TABLE "core_foo" ADD CONSTRAINT "age_restriction" CHECK ("age" >= 25);
         let sql = r#"
 ALTER TABLE "app_email" ADD CONSTRAINT "email_uniq" UNIQUE USING INDEX "email_idx";
         "#;
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
+    }
+
+    #[test]
+    fn constraints_without_not_valid_support_ok() {
+        let sql = r#"
+alter table t add constraint u unique (a);
+alter table t add constraint pk primary key (a);
+alter table t add constraint ex exclude using gist (a with =);
+        "#;
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
+    }
+
+    #[test]
+    fn not_valid_validate_after_rollback_ok() {
+        let sql = r#"
+begin;
+alter table t add constraint c check (a > 0) not valid;
+rollback;
+begin;
+alter table t validate constraint c;
+commit;
+        "#;
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
+    }
+
+    #[test]
+    fn not_valid_validate_after_rollback_to_savepoint_err() {
+        let sql = r#"
+begin;
+alter table t add constraint c check (a > 0) not valid;
+savepoint s;
+rollback to savepoint s;
+alter table t validate constraint c;
+commit;
+        "#;
+        assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid));
+    }
+
+    #[test]
+    fn created_table_in_public_schema_ok() {
+        let sql = "begin;
+create table public.t (id int);
+alter table t add check (id > 0);
+create table u (id int);
+alter table public.u add check (id > 0);
+commit;";
         lint_ok(sql, Rule::ConstraintMissingNotValid);
     }
 }

@@ -2,7 +2,7 @@ use squawk_syntax::ast::NameLike;
 
 use crate::rules::identifier_too_long::MAX_IDENT_BYTES;
 
-#[derive(Debug, Eq, Hash, PartialEq)]
+#[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub(crate) struct Name(String);
 
 impl Name {
@@ -17,5 +17,9 @@ impl Name {
 
     pub(crate) fn as_str(&self) -> &str {
         &self.0
+    }
+
+    pub(crate) fn is_public_schema(&self) -> bool {
+        self.0 == "public"
     }
 }

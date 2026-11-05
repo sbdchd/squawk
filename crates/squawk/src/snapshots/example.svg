@@ -1,4 +1,4 @@
-<svg width="1457px" height="1478px" xmlns="http://www.w3.org/2000/svg">
+<svg width="1457px" height="1352px" xmlns="http://www.w3.org/2000/svg">
   <style>
     .fg { fill: #AAAAAA }
     .bg { fill: #000000 }
@@ -148,41 +148,27 @@
 </tspan>
     <tspan x="10px" y="1144px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰╴</tspan>
 </tspan>
-    <tspan x="10px" y="1162px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/constraint-missing-not-valid">constraint-missing-not-valid</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: by default new constraints require a table scan and block writes to the table while that scan occurs</tspan>
+    <tspan x="10px" y="1162px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/disallowed-unique-constraint">disallowed-unique-constraint</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: adding a `unique` constraint requires an `access exclusive` lock which blocks reads and writes to the table while the index is built</tspan>
 </tspan>
-    <tspan x="10px" y="1180px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:24</tspan>
+    <tspan x="10px" y="1180px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:28</tspan>
 </tspan>
     <tspan x="10px" y="1198px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
     <tspan x="10px" y="1216px"><tspan class="fg-bright-blue bold">12</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);</tspan>
 </tspan>
-    <tspan x="10px" y="1234px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan>                        </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
+    <tspan x="10px" y="1234px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan>                            </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
 </tspan>
     <tspan x="10px" y="1252px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
 </tspan>
-    <tspan x="10px" y="1270px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: use `not valid` with a later `validate constraint` call</tspan>
+    <tspan x="10px" y="1270px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: create an index `concurrently` and create the constraint using the index</tspan>
 </tspan>
-    <tspan x="10px" y="1288px"><tspan class="fg-yellow bold">warning[</tspan><tspan class="fg-yellow bold"><a href="https://squawkhq.com/docs/disallowed-unique-constraint">disallowed-unique-constraint</a></tspan><tspan class="fg-yellow bold">]</tspan><tspan class="bold">: adding a `unique` constraint requires an `access exclusive` lock which blocks reads and writes to the table while the index is built</tspan>
+    <tspan x="10px" y="1288px">
 </tspan>
-    <tspan x="10px" y="1306px"><tspan>  </tspan><tspan class="fg-bright-blue bold"> ╭▸ </tspan><tspan>../../example.sql:12:28</tspan>
+    <tspan x="10px" y="1306px"><tspan>Find detailed examples and solutions for each rule at </tspan><tspan class="underline">https://squawkhq.com/docs/rules</tspan>
 </tspan>
-    <tspan x="10px" y="1324px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
+    <tspan x="10px" y="1324px"><tspan>Found 7 issues in 1 file (checked 1 source file)</tspan>
 </tspan>
-    <tspan x="10px" y="1342px"><tspan class="fg-bright-blue bold">12</tspan><tspan> </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan> ALTER TABLE table_name ADD CONSTRAINT field_name_constraint UNIQUE (field_name);</tspan>
-</tspan>
-    <tspan x="10px" y="1360px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan><tspan>                            </tspan><tspan class="fg-yellow bold">━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</tspan>
-</tspan>
-    <tspan x="10px" y="1378px"><tspan>   </tspan><tspan class="fg-bright-blue bold">│</tspan>
-</tspan>
-    <tspan x="10px" y="1396px"><tspan>   </tspan><tspan class="fg-bright-blue bold">╰ </tspan><tspan class="bold">help</tspan><tspan>: create an index `concurrently` and create the constraint using the index</tspan>
-</tspan>
-    <tspan x="10px" y="1414px">
-</tspan>
-    <tspan x="10px" y="1432px"><tspan>Find detailed examples and solutions for each rule at </tspan><tspan class="underline">https://squawkhq.com/docs/rules</tspan>
-</tspan>
-    <tspan x="10px" y="1450px"><tspan>Found 8 issues in 1 file (checked 1 source file)</tspan>
-</tspan>
-    <tspan x="10px" y="1468px">
+    <tspan x="10px" y="1342px">
 </tspan>
   </text>
 

@@ -1,0 +1,10 @@
+---
+source: crates/squawk_linter/src/rules/constraint_missing_not_valid.rs
+expression: "lint_errors(sql, Rule::ConstraintMissingNotValid)"
+---
+warning[constraint-missing-not-valid]: using `not valid` and `validate constraint` in the same transaction will block all reads while the constraint is validated
+  ╭▸ 
+6 │ alter table t validate constraint c;
+  │               ━━━━━━━━━━━━━━━━━━━━━
+  │
+  ╰ help: add constraint as `not valid` in one transaction and `validate constraint` in a separate transaction

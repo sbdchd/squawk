@@ -7,7 +7,4 @@ warning[require-enum-value-ordering]: `add value` without `before` or `after` ap
 2 │ ALTER TYPE my_enum ADD VALUE 'new_value';
   │                    ━━━━━━━━━━━━━━━━━━━━━
   │
-  ├ help: add `before` or `after` to specify the position of the new enum value
-  ╭╴
-2 │ ALTER TYPE my_enum ADD VALUE 'new_value' BEFORE 'existing_value';
-  ╰╴                                         +++++++++++++++++++++++
+  ╰ help: add `before` or `after` to specify the position of the new enum value

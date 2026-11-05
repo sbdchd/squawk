@@ -1,0 +1,14 @@
+---
+source: crates/squawk_linter/src/rules/require_timeout_settings.rs
+expression: "lint_errors(sql, Rule::RequireTimeoutSettings)"
+---
+warning[require-lock-timeout]: missing `set lock_timeout` before potentially slow `access exclusive` lock operations
+  ╭▸ 
+5 │ alter table t add column c int;
+  │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ note: statement requires: `access exclusive` lock; blocking: reads, writes, schema changes
+  ├ help: configure a `lock_timeout` before this statement
+  ╭╴
+2 + set lock_timeout = '1s';
+  ╰╴

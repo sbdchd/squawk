@@ -16,7 +16,16 @@ fn object_name(path: &ast::Path) -> SmallVec<[Name; 2]> {
     if let Some(segment) = path.segment() {
         name.push(Name::from_node(&segment));
     }
+    strip_public_schema(&mut name);
     name
+}
+
+fn strip_public_schema(name: &mut SmallVec<[Name; 2]>) {
+    if let [schema, _] = name.as_slice()
+        && schema.is_public_schema()
+    {
+        name.remove(0);
+    }
 }
 
 fn object_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
@@ -25,6 +34,7 @@ fn object_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
         .map(|segment| Name::from_node(&segment))
         .collect::<SmallVec<[Name; 2]>>();
     name.reverse();
+    strip_public_schema(&mut name);
     name
 }
 
@@ -39,6 +49,29 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<Sour
             ast::Stmt::CreateTable(table) => {
                 if table.if_not_exists().is_none()
                     && let Some(name) = table.table_name().and_then(|n| n.path())
+                {
+                    tables.insert(object_name(&name));
+                }
+            }
+            ast::Stmt::CreateForeignTable(table) => {
+                if table.if_not_exists().is_none()
+                    && let Some(name) = table.table_name().and_then(|n| n.path())
+                {
+                    tables.insert(object_name(&name));
+                }
+            }
+            ast::Stmt::CreateTableAs(table) => {
+                if table.if_not_exists().is_none()
+                    && let Some(name) = table.table_name().and_then(|n| n.path())
+                {
+                    tables.insert(object_name(&name));
+                }
+            }
+            ast::Stmt::SelectInto(select) => {
+                if let Some(name) = select
+                    .into_clause()
+                    .and_then(|into| into.table_name())
+                    .and_then(|n| n.path())
                 {
                     tables.insert(object_name(&name));
                 }
@@ -79,6 +112,14 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<Sour
                 }
             }
             ast::Stmt::AlterForeignTable(table) => {
+                let new_table = table
+                    .table_relation_name()
+                    .and_then(|n| n.table_name_ref())
+                    .and_then(|n| n.path_ref())
+                    .is_some_and(|n| tables.contains(&object_name_ref(n)));
+                if new_table {
+                    continue;
+                }
                 for action in table.actions() {
                     if ctx.rules.contains(&Rule::BanAddColumn) {
                         ban_add_column::check(ctx, &action);

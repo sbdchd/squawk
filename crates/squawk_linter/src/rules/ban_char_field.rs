@@ -1,5 +1,3 @@
-use rustc_hash::FxHashSet;
-
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::TextRange;
 use squawk_syntax::{
@@ -10,15 +8,8 @@ use squawk_syntax::{
 use crate::visitors::check_not_allowed_types;
 use crate::{Linter, Rule, Violation};
 
-use std::sync::OnceLock;
-
-fn char_types() -> &'static FxHashSet<&'static str> {
-    static CHAR_TYPES: OnceLock<FxHashSet<&'static str>> = OnceLock::new();
-    CHAR_TYPES.get_or_init(|| FxHashSet::from_iter(["char", "character", "bpchar"]))
-}
-
 fn is_char_type(x: &str) -> bool {
-    char_types().contains(x.to_ascii_lowercase().as_str())
+    x.eq_ignore_ascii_case("character") || x.eq_ignore_ascii_case("bpchar")
 }
 
 fn create_fix(range: TextRange, args: Option<ast::ArgList>) -> Fix {
@@ -110,7 +101,6 @@ mod test {
         assert_snapshot!(fix("CREATE TABLE t (c character(255));"), @"CREATE TABLE t (c varchar(255));");
         assert_snapshot!(fix("CREATE TABLE t (c bpchar(50));"), @"CREATE TABLE t (c varchar(50));");
 
-        assert_snapshot!(fix(r#"CREATE TABLE t (c "char"(100));"#), @"CREATE TABLE t (c varchar(100));");
         assert_snapshot!(fix(r#"CREATE TABLE t (c "character"(255));"#), @"CREATE TABLE t (c varchar(255));");
         assert_snapshot!(fix(r#"CREATE TABLE t (c "bpchar"(50));"#), @"CREATE TABLE t (c varchar(50));");
     }
@@ -187,6 +177,14 @@ create table t (
 );
         "#;
         assert_snapshot!(lint_errors(sql, Rule::BanCharField));
+    }
+
+    #[test]
+    fn internal_char_type_ok() {
+        let sql = r#"
+create table t (a "char", b pg_catalog.char, c "char"[]);
+        "#;
+        lint_ok(sql, Rule::BanCharField);
     }
 
     #[test]

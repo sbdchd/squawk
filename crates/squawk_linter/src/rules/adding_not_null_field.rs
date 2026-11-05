@@ -1,20 +1,31 @@
 use rustc_hash::{FxHashMap, FxHashSet};
+use smallvec::SmallVec;
 
 use squawk_syntax::{
     Parse, SourceFile,
     ast::{self, AstNode, NameLike},
 };
 
+use crate::name::Name;
+use crate::transactions::{TablesCreatedInTransaction, table_name_ref};
 use crate::{Linter, Rule, Version, Violation};
+
+type TableName = SmallVec<[Name; 2]>;
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 struct TableColumn {
-    table: String,
+    table: TableName,
     column: String,
 }
 
+#[derive(Debug, PartialEq, Eq, Hash)]
+struct TableConstraint {
+    table: TableName,
+    constraint: String,
+}
+
 fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
-    let ast::Expr::BinExpr(bin_expr) = expr else {
+    let ast::Expr::BinExpr(bin_expr) = expr.unparen() else {
         return None;
     };
     let ast::BinOp::IsNot(_) = bin_expr.op()? else {
@@ -26,22 +37,17 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
         return None;
     }
 
-    match bin_expr.lhs()? {
+    match bin_expr.lhs()?.unparen() {
         ast::Expr::NameRef(name_ref) => Some(name_ref.text().into_owned()),
         _ => None,
     }
 }
 
-fn get_table_name(alter_table: &ast::AlterTable) -> Option<String> {
-    Some(
-        alter_table
-            .table_relation_name()?
-            .table_name_ref()?
-            .path_ref()?
-            .segment()?
-            .text()
-            .into_owned(),
-    )
+fn get_table_path(alter_table: &ast::AlterTable) -> Option<ast::PathRef> {
+    alter_table
+        .table_relation_name()?
+        .table_name_ref()?
+        .path_ref()
 }
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
@@ -51,15 +57,20 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
 
     let mut not_null_constraints: FxHashMap<String, TableColumn> = FxHashMap::default();
     let mut validated_not_null_columns: FxHashSet<TableColumn> = FxHashSet::default();
-    // Tables where VALIDATE CONSTRAINT was seen without a matching ADD CONSTRAINT
-    // in the same file (cross-migration pattern).
-    let mut tables_with_external_validated_constraints: FxHashSet<String> = FxHashSet::default();
+    // VALIDATE CONSTRAINT seen without a matching ADD CONSTRAINT in the same
+    // file (cross-migration pattern).
+    let mut external_validated_constraints: FxHashSet<TableConstraint> = FxHashSet::default();
+
+    let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
 
     for stmt in file.stmts() {
+        tables_created.update(&stmt);
         if let ast::Stmt::AlterTable(alter_table) = stmt {
-            let Some(table) = get_table_name(&alter_table) else {
+            let Some(path) = get_table_path(&alter_table) else {
                 continue;
             };
+            let created_in_transaction = tables_created.contains(&path);
+            let table = table_name_ref(path);
 
             for action in alter_table.actions() {
                 match action {
@@ -106,9 +117,13 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                                 validated_not_null_columns.insert(table_column.clone());
                             } else {
                                 // Cross-migration pattern: the ADD CONSTRAINT ... NOT VALID
-                                // was in a previous migration file. Track the table so that
-                                // a subsequent SET NOT NULL is considered safe.
-                                tables_with_external_validated_constraints.insert(table.clone());
+                                // was in a previous migration file. Track the constraint so
+                                // that a subsequent SET NOT NULL on a column it's named after
+                                // is considered safe.
+                                external_validated_constraints.insert(TableConstraint {
+                                    table: table.clone(),
+                                    constraint: constraint_name.text().into_owned(),
+                                });
                             }
                         }
                     }
@@ -119,18 +134,26 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>)
                         else {
                             continue;
                         };
+                        if created_in_transaction {
+                            continue;
+                        }
 
                         if is_pg12_plus
                             && let Some(column) = alter_column
                                 .column_name_ref()
                                 .map(|column| column.text().into_owned())
                         {
+                            let validated_externally =
+                                external_validated_constraints.iter().any(|validated| {
+                                    validated.table == table
+                                        && validated.constraint.contains(column.as_str())
+                                });
                             let table_column = TableColumn {
                                 table: table.clone(),
                                 column,
                             };
-                            if validated_not_null_columns.contains(&table_column)
-                                || tables_with_external_validated_constraints.contains(&table)
+                            if validated_externally
+                                || validated_not_null_columns.contains(&table_column)
                             {
                                 continue;
                             }
@@ -406,5 +429,66 @@ ALTER TABLE foo ALTER COLUMN bar SET NOT NULL;
             },
             Rule::AddingNotNullableField
         ));
+    }
+
+    #[test]
+    fn table_created_in_transaction_ok() {
+        let sql = r#"
+begin;
+create table t (id bigint);
+alter table t alter column id set not null;
+commit;
+        "#;
+        lint_ok(sql, Rule::AddingNotNullableField);
+    }
+
+    #[test]
+    fn pg16_cross_migration_validate_unrelated_constraint_err() {
+        let sql = r#"
+alter table t validate constraint some_fk;
+alter table t alter column x set not null;
+        "#;
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                pg_version: "16".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField
+        ));
+    }
+
+    #[test]
+    fn pg16_validated_check_in_other_schema_err() {
+        let sql = r#"
+alter table a.users add constraint email_not_null check (email is not null) not valid;
+alter table a.users validate constraint email_not_null;
+alter table b.users alter column email set not null;
+        "#;
+        assert_snapshot!(lint_errors_with(
+            sql,
+            LinterSettings {
+                pg_version: "16".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField
+        ));
+    }
+
+    #[test]
+    fn pg16_validated_parenthesized_check_ok() {
+        let sql = r#"
+alter table t add constraint chk check ((email is not null)) not valid;
+alter table t validate constraint chk;
+alter table t alter column email set not null;
+        "#;
+        lint_ok_with(
+            sql,
+            LinterSettings {
+                pg_version: "16".parse().expect("Invalid PostgreSQL version"),
+                ..Default::default()
+            },
+            Rule::AddingNotNullableField,
+        );
     }
 }

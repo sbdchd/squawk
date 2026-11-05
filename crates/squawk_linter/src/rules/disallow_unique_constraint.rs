@@ -39,6 +39,9 @@ pub(crate) fn disallow_unique_constraint(ctx: &mut Linter, parse: &Parse<SourceF
                         }
                     }
                     ast::AlterTableAction::AddColumn(add_column) => {
+                        if tables_created.contains(&table_name) {
+                            continue;
+                        }
                         for constraint in add_column.constraints() {
                             if let ast::Constraint::UniqueConstraint(unique_constraint) = constraint
                             {
@@ -194,5 +197,14 @@ ALTER TABLE foo ADD COLUMN bar text CONSTRAINT foo_bar_unique UNIQUE;
 ALTER TABLE foo ADD COLUMN bar text UNIQUE;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::DisallowedUniqueConstraint));
+    }
+
+    #[test]
+    fn add_column_to_table_created_in_transaction_ok() {
+        let sql = "begin;
+create table t (id bigint);
+alter table t add column b bigint unique;
+commit;";
+        lint_ok(sql, Rule::DisallowedUniqueConstraint);
     }
 }

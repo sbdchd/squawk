@@ -1,0 +1,10 @@
+---
+source: crates/squawk_linter/src/rules/require_concurrent_reindex.rs
+expression: "lint_errors(sql, Rule::RequireConcurrentReindex)"
+---
+warning[require-concurrent-reindex]: reindexing a table or index without `concurrently` blocks reads and writes
+  ╭▸ 
+3 │ reindex index i;
+  │ ━━━━━━━━━━━━━━━━
+  │
+  ╰ help: use `concurrently` outside of a transaction to avoid blocking reads and writes

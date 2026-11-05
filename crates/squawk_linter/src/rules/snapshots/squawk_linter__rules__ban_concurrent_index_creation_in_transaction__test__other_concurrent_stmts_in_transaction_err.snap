@@ -1,0 +1,28 @@
+---
+source: crates/squawk_linter/src/rules/ban_concurrent_index_creation_in_transaction.rs
+expression: "lint_errors(sql, Rule::BanConcurrentIndexCreationInTransaction)"
+---
+warning[ban-concurrent-index-creation-in-transaction]: `drop index concurrently` can't run inside a transaction
+  ╭▸ 
+3 │ drop index concurrently i;
+  │            ━━━━━━━━━━━━
+  │
+  ╰ help: drop the index outside any transactions
+warning[ban-concurrent-index-creation-in-transaction]: `reindex concurrently` can't run inside a transaction
+  ╭▸ 
+4 │ reindex index concurrently i;
+  │               ━━━━━━━━━━━━
+  │
+  ╰ help: reindex outside any transactions
+warning[ban-concurrent-index-creation-in-transaction]: `reindex concurrently` can't run inside a transaction
+  ╭▸ 
+5 │ reindex (concurrently) table t;
+  │          ━━━━━━━━━━━━
+  │
+  ╰ help: reindex outside any transactions
+warning[ban-concurrent-index-creation-in-transaction]: `detach partition concurrently` can't run inside a transaction
+  ╭▸ 
+6 │ alter table t detach partition p concurrently;
+  │                                  ━━━━━━━━━━━━
+  │
+  ╰ help: detach the partition outside any transactions

@@ -20,7 +20,7 @@ pub(crate) fn ban_drop_function(ctx: &mut Linter, parse: &Parse<SourceFile>) {
             )),
             ast::Stmt::DropProcedure(node) => ctx.report(Violation::for_node(
                 Rule::BanDropFunction,
-                "dropping a function may break existing clients".into(),
+                "dropping a procedure may break existing clients".into(),
                 node.syntax(),
             )),
             ast::Stmt::DropRoutine(node) => ctx.report(Violation::for_node(

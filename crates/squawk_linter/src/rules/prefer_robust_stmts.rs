@@ -6,6 +6,7 @@ use squawk_syntax::{
     ast::{self, AstNode, NameLike},
 };
 
+use crate::transactions::{TransactionControl, TransactionState};
 use crate::{Linter, Rule, Violation};
 
 #[derive(PartialEq)]
@@ -30,23 +31,26 @@ fn alembic_version_commit_tx_indices(
     let mut tx_start = None;
     let mut has_alembic_version_update = false;
     for (i, stmt) in stmts.enumerate() {
-        match &stmt {
-            ast::Stmt::Begin(_) => {
+        match TransactionControl::from_stmt(&stmt) {
+            Some(TransactionControl::Begin) => {
                 tx_start = Some(i);
                 has_alembic_version_update = false;
             }
-            ast::Stmt::Commit(_) | ast::Stmt::Rollback(_) => {
+            Some(TransactionControl::End { and_chain }) => {
                 if let Some(start) = tx_start.take()
                     && has_alembic_version_update
                 {
                     indices.extend(start..=i);
                 }
+                if and_chain {
+                    tx_start = Some(i);
+                }
                 has_alembic_version_update = false;
             }
-            _ if tx_start.is_some() && is_alembic_version_update(&stmt) => {
+            None if tx_start.is_some() && is_alembic_version_update(&stmt) => {
                 has_alembic_version_update = true;
             }
-            _ => {}
+            None => {}
         }
     }
     (!indices.is_empty()).then_some(indices)
@@ -54,7 +58,7 @@ fn alembic_version_commit_tx_indices(
 
 pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     let file = parse.tree();
-    let mut inside_transaction = ctx.settings.assume_in_transaction;
+    let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
     let mut constraint_names: FxHashMap<String, Constraint> = FxHashMap::default();
 
     let version_tx_indices = alembic_version_commit_tx_indices(file.stmts());
@@ -68,16 +72,11 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
     for (i, stmt) in file.stmts().enumerate() {
         let in_robust_tx = match &version_tx_indices {
             Some(set) => ctx.settings.assume_in_transaction || set.contains(&i),
-            None => inside_transaction,
+            None => transaction.inside_transaction(),
         };
+        transaction.update(&stmt);
 
         match &stmt {
-            ast::Stmt::Begin(_) => {
-                inside_transaction = true;
-            }
-            ast::Stmt::Commit(_) => {
-                inside_transaction = false;
-            }
             ast::Stmt::AlterTable(alter_table) => {
                 for action in alter_table.actions() {
                     let (message_type, fix) = match &action {
@@ -858,5 +857,28 @@ select 1; -- so we don't skip checking
 CREATE TABLE test_table (id int) ON COMMIT DROP;
         "#
         ));
+    }
+
+    #[test]
+    fn after_rollback_err() {
+        let sql = r#"
+begin;
+select 1;
+rollback;
+create index i on t (a);
+        "#;
+        assert_snapshot!(lint_errors(sql));
+    }
+
+    #[test]
+    fn after_rollback_to_savepoint_ok() {
+        let sql = r#"
+begin;
+savepoint s;
+rollback to savepoint s;
+create index i on t (a);
+commit;
+        "#;
+        lint_ok(sql);
     }
 }

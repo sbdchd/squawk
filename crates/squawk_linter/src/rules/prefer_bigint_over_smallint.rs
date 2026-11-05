@@ -1,5 +1,3 @@
-use rustc_hash::FxHashSet;
-
 use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::ast::AstNode;
 use squawk_syntax::{Parse, SourceFile, ast};
@@ -9,12 +7,8 @@ use crate::{Linter, Rule, Violation};
 use crate::visitors::check_not_allowed_types;
 use crate::visitors::is_not_valid_int_type;
 
-use std::sync::OnceLock;
-
-fn small_int_types() -> &'static FxHashSet<&'static str> {
-    static SMALL_INT_TYPES: OnceLock<FxHashSet<&'static str>> = OnceLock::new();
-    SMALL_INT_TYPES
-        .get_or_init(|| FxHashSet::from_iter(["smallint", "int2", "smallserial", "serial2"]))
+fn is_small_int_name(name: &str) -> bool {
+    matches!(name, "smallint" | "int2" | "smallserial" | "serial2")
 }
 
 fn smallint_to_bigint(smallint_type: &str) -> &'static str {
@@ -42,7 +36,7 @@ fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
 
 fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty
-        && is_not_valid_int_type(&ty, small_int_types())
+        && is_not_valid_int_type(&ty, is_small_int_name)
     {
         let fix = create_bigint_fix(&ty);
 

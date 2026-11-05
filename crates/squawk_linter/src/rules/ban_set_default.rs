@@ -11,7 +11,7 @@ pub(crate) fn ban_set_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
         {
             ctx.report(Violation::for_node(
                 Rule::BanSetDefault,
-                "setting a column default may silently change values written by existing clients"
+                "setting a domain default may silently change values written by existing clients"
                     .into(),
                 node.syntax(),
             ));
@@ -61,5 +61,16 @@ mod test {
             "ALTER TABLE t ALTER COLUMN c DROP DEFAULT;",
             Rule::BanSetDefault,
         );
+    }
+
+    #[test]
+    fn domain_err() {
+        let sql = "alter domain d set default 1;";
+        assert_snapshot!(lint_errors(sql, Rule::BanSetDefault), @"
+        warning[ban-set-default]: setting a domain default may silently change values written by existing clients
+          ╭▸ 
+        1 │ alter domain d set default 1;
+          ╰╴               ━━━━━━━━━━━━━
+        ");
     }
 }

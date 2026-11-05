@@ -1,0 +1,14 @@
+---
+source: crates/squawk_linter/src/rules/ban_uncommitted_transaction.rs
+expression: "lint_errors(sql, Rule::BanUncommittedTransaction)"
+---
+warning[ban-uncommitted-transaction]: transaction never committed or rolled back
+  ╭▸ 
+2 │ begin;
+  │ ━━━━━━
+  │
+  ├ help: add a `commit` or `rollback` statement to complete the transaction
+  ╭╴
+6 ±         
+7 + commit;
+  ╰╴

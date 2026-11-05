@@ -1,0 +1,10 @@
+---
+source: crates/squawk_linter/src/rules/adding_not_null_field.rs
+expression: "lint_errors_with(sql, LinterSettings\n{\n    pg_version: \"16\".parse().expect(\"Invalid PostgreSQL version\"),\n    ..Default::default()\n}, Rule::AddingNotNullableField)"
+---
+warning[adding-not-nullable-field]: setting a column `not null` blocks reads while the table is scanned
+  ╭▸ 
+4 │ alter table b.users alter column email set not null;
+  │                                        ━━━━━━━━━━━━
+  │
+  ╰ help: make the field nullable and use a `check` constraint instead
