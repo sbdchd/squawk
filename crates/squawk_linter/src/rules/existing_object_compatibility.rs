@@ -16,7 +16,16 @@ fn object_name(path: &ast::Path) -> SmallVec<[Name; 2]> {
     if let Some(segment) = path.segment() {
         name.push(Name::from_node(&segment));
     }
+    strip_public_schema(&mut name);
     name
+}
+
+fn strip_public_schema(name: &mut SmallVec<[Name; 2]>) {
+    if let [schema, _] = name.as_slice()
+        && schema.is_public_schema()
+    {
+        name.remove(0);
+    }
 }
 
 fn object_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
@@ -25,6 +34,7 @@ fn object_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
         .map(|segment| Name::from_node(&segment))
         .collect::<SmallVec<[Name; 2]>>();
     name.reverse();
+    strip_public_schema(&mut name);
     name
 }
 

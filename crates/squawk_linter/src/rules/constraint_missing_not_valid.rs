@@ -519,4 +519,15 @@ commit;
         "#;
         assert_snapshot!(lint_errors(sql, Rule::ConstraintMissingNotValid));
     }
+
+    #[test]
+    fn created_table_in_public_schema_ok() {
+        let sql = "begin;
+create table public.t (id int);
+alter table t add check (id > 0);
+create table u (id int);
+alter table public.u add check (id > 0);
+commit;";
+        lint_ok(sql, Rule::ConstraintMissingNotValid);
+    }
 }

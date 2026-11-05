@@ -50,4 +50,16 @@ mod test {
             1
         );
     }
+
+    #[test]
+    fn new_table_in_public_schema_ok() {
+        lint_ok(
+            "create table public.t (id int); alter table t add column c int;",
+            Rule::BanAddColumn,
+        );
+        lint_ok(
+            "create table t (id int); alter table public.t add column c int;",
+            Rule::BanAddColumn,
+        );
+    }
 }

@@ -18,4 +18,8 @@ impl Name {
     pub(crate) fn as_str(&self) -> &str {
         &self.0
     }
+
+    pub(crate) fn is_public_schema(&self) -> bool {
+        self.0 == "public"
+    }
 }

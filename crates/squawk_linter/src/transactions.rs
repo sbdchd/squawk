@@ -56,10 +56,20 @@ pub(crate) struct TablesCreatedInTransaction {
 }
 
 pub(crate) fn table_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
-    std::iter::successors(Some(path), |path| path.qualifier())
+    let mut name: SmallVec<[Name; 2]> = std::iter::successors(Some(path), |path| path.qualifier())
         .filter_map(|path| path.segment())
         .map(|segment| Name::from_node(&segment))
-        .collect()
+        .collect();
+    strip_public_schema(&mut name);
+    name
+}
+
+fn strip_public_schema(name: &mut SmallVec<[Name; 2]>) {
+    if let [_, schema] = name.as_slice()
+        && schema.is_public_schema()
+    {
+        name.pop();
+    }
 }
 
 impl TablesCreatedInTransaction {
@@ -91,13 +101,14 @@ impl TablesCreatedInTransaction {
         if let Some(path) = table.and_then(|table| table.path())
             && let Some(segment) = path.segment()
         {
-            let name = std::iter::once(Name::from_node(&segment))
+            let mut name = std::iter::once(Name::from_node(&segment))
                 .chain(
                     std::iter::successors(path.qualifier(), |path| path.qualifier())
                         .filter_map(|path| path.segment())
                         .map(|segment| Name::from_node(&segment)),
                 )
                 .collect();
+            strip_public_schema(&mut name);
             self.names.insert(name);
         }
     }
