@@ -143,7 +143,15 @@ impl LockKind {
             | ast::AlterTableAction::SetOptions(_)
             | ast::AlterTableAction::SetWithoutCluster(_)
             | ast::AlterTableAction::ValidateConstraint(_) => LockKind::ShareUpdateExclusive,
-            ast::AlterTableAction::DetachPartition(_) => LockKind::AccessExclusive,
+            ast::AlterTableAction::DetachPartition(detach_partition) => {
+                match detach_partition.detach_partition_option() {
+                    Some(
+                        ast::DetachPartitionOption::DetachConcurrently(_)
+                        | ast::DetachPartitionOption::DetachFinalize(_),
+                    ) => LockKind::ShareUpdateExclusive,
+                    None => LockKind::AccessExclusive,
+                }
+            }
             ast::AlterTableAction::AddConstraint(add_constraint) => {
                 if let Some(ast::Constraint::ForeignKeyConstraint(_)) = add_constraint.constraint()
                 {
@@ -487,6 +495,7 @@ mod test {
             "ALTER TABLE t SET WITHOUT CLUSTER;",
             "ALTER TABLE t DETACH PARTITION p;",
             "ALTER TABLE t DETACH PARTITION p CONCURRENTLY;",
+            "ALTER TABLE t DETACH PARTITION p FINALIZE;",
             "ALTER TABLE t ADD CONSTRAINT fk FOREIGN KEY (a) REFERENCES o (id);",
             "ALTER TABLE t ADD CONSTRAINT ck CHECK (a > 0);",
             "ALTER TABLE t DISABLE TRIGGER trg;",
@@ -510,7 +519,8 @@ mod test {
          ALTER TABLE t CLUSTER ON idx;                                      | ShareUpdateExclusive 
          ALTER TABLE t SET WITHOUT CLUSTER;                                 | ShareUpdateExclusive 
          ALTER TABLE t DETACH PARTITION p;                                  | AccessExclusive      
-         ALTER TABLE t DETACH PARTITION p CONCURRENTLY;                     | AccessExclusive      
+         ALTER TABLE t DETACH PARTITION p CONCURRENTLY;                     | ShareUpdateExclusive 
+         ALTER TABLE t DETACH PARTITION p FINALIZE;                         | ShareUpdateExclusive 
          ALTER TABLE t ADD CONSTRAINT fk FOREIGN KEY (a) REFERENCES o (id); | ShareRowExclusive    
          ALTER TABLE t ADD CONSTRAINT ck CHECK (a > 0);                     | AccessExclusive      
          ALTER TABLE t DISABLE TRIGGER trg;                                 | ShareRowExclusive    
