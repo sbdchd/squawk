@@ -1,7 +1,4 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::AstNode,
-};
+use squawk_syntax::{Parse, SourceFile, ast::AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TransactionControl};
 

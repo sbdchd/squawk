@@ -15,7 +15,9 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
         transaction.update(&stmt);
         match stmt {
             ast::Stmt::CreateIndex(create_index) => {
-                if transaction.inside_transaction() && let Some(concurrently) = create_index.concurrently_token() {
+                if transaction.inside_transaction()
+                    && let Some(concurrently) = create_index.concurrently_token()
+                {
                     errors.push(Violation::for_range(
                             Rule::BanConcurrentIndexCreationInTransaction,
                             "while regular index creation can happen inside a transaction, this is not allowed when the `concurrently` option is used".into(),
@@ -154,7 +156,10 @@ commit and chain;
 create index concurrently i on t (id);
 commit;
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::BanConcurrentIndexCreationInTransaction));
+        assert_snapshot!(lint_errors(
+            sql,
+            Rule::BanConcurrentIndexCreationInTransaction
+        ));
     }
 
     #[test]
@@ -166,7 +171,10 @@ rollback to savepoint s;
 create index concurrently i on t (a);
 commit;
         "#;
-        assert_snapshot!(lint_errors(sql, Rule::BanConcurrentIndexCreationInTransaction));
+        assert_snapshot!(lint_errors(
+            sql,
+            Rule::BanConcurrentIndexCreationInTransaction
+        ));
     }
 
     #[test]

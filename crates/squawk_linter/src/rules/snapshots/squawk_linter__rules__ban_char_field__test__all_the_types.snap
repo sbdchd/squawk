@@ -35,14 +35,6 @@ warning[ban-char-field]: using `character` is likely a mistake and should almost
   ╰╴
 warning[ban-char-field]: using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`
    ╭▸ 
-15 │     o pg_catalog.char,
-   │       ━━━━━━━━━━━━━━━
-   ╭╴
-15 -     o pg_catalog.char,
-15 +     o pg_catalog.text,
-   ╰╴
-warning[ban-char-field]: using `character` is likely a mistake and should almost always be replaced by `text` or `varchar`
-   ╭▸ 
 16 │     p char[],
    │       ━━━━
    ╭╴

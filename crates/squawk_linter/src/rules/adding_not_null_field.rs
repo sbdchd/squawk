@@ -44,7 +44,10 @@ fn is_not_null_check(expr: &ast::Expr) -> Option<String> {
 }
 
 fn get_table_path(alter_table: &ast::AlterTable) -> Option<ast::PathRef> {
-    alter_table.table_relation_name()?.table_name_ref()?.path_ref()
+    alter_table
+        .table_relation_name()?
+        .table_name_ref()?
+        .path_ref()
 }
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
