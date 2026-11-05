@@ -1,0 +1,36 @@
+---
+source: crates/squawk_linter/src/rules/prefer_timestamptz.rs
+expression: "lint_errors(sql, Rule::PreferTimestampTz)"
+---
+warning[prefer-timestamp-tz]: `timestamp` drops the UTC offset when storing a datetime
+  ╭▸ 
+3 │   a "timestamp",
+  │     ━━━━━━━━━━━
+  │
+  ├ note: `2019-10-11 21:11:24+02` and `2019-10-11 21:11:24-06` are both stored as `2019-10-11 21:11:24`, even though they are eight hours apart
+  ├ help: use `timestamptz` instead of `timestamp`
+  ╭╴
+3 -   a "timestamp",
+3 +   a timestamptz,
+  ╰╴
+warning[prefer-timestamp-tz]: `timestamp` drops the UTC offset when storing a datetime
+  ╭▸ 
+4 │   b pg_catalog.timestamp(3),
+  │     ━━━━━━━━━━━━━━━━━━━━━━━
+  │
+  ├ note: `2019-10-11 21:11:24+02` and `2019-10-11 21:11:24-06` are both stored as `2019-10-11 21:11:24`, even though they are eight hours apart
+  ├ help: use `timestamptz` instead of `timestamp`
+  ╭╴
+4 │   b pg_catalog.timestamptz(3),
+  ╰╴                        ++
+warning[prefer-timestamp-tz]: `timestamp` drops the UTC offset when storing a datetime
+  ╭▸ 
+5 │   c "timestamp"(2)[]
+  │     ━━━━━━━━━━━━━━━━
+  │
+  ├ note: `2019-10-11 21:11:24+02` and `2019-10-11 21:11:24-06` are both stored as `2019-10-11 21:11:24`, even though they are eight hours apart
+  ├ help: use `timestamptz` instead of `timestamp`
+  ╭╴
+5 -   c "timestamp"(2)[]
+5 +   c timestamptz(2)[]
+  ╰╴
