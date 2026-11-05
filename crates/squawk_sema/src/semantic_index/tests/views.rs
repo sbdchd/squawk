@@ -486,3 +486,33 @@ create or replace view s.v as select a as x from t;
       ╰╴
     ");
 }
+
+#[test]
+fn view_cycle() {
+    assert_snapshot!(check("
+create view v as
+  select 1 as a;
+create or replace view v as
+  select a from v;
+select a from v;
+create view v1 as
+  select 1 as a;
+create view v2 as
+  select a from v1;
+create or replace view v1 as
+  select a from v2;
+select a from v1;
+drop view v1 cascade;
+select a from v2;"), @"
+    error: relation `v2` does not exist
+       ╭▸ 
+    15 │ select a from v2;
+       │               ━━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    15 - select a from v2;
+    15 + select a from v;
+       ╰╴
+    ");
+}

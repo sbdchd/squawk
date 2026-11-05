@@ -4389,6 +4389,29 @@ impl Lowerer {
         }
     }
 
+    fn report_circular_inheritance(
+        &mut self,
+        node: &SyntaxNode,
+        parent: TableId,
+        child: TableId,
+    ) -> bool {
+        if parent != child
+            && !self
+                .inheritances
+                .ancestors(parent, |table| !self.dropped_tables.contains(&table))
+                .contains(&child)
+        {
+            return false;
+        }
+        let tables = &self.index.tables;
+        let error = SemaError::CircularInheritance {
+            parent: tables[child].name,
+            child: tables[parent].name,
+        };
+        self.push_error(node, error);
+        true
+    }
+
     fn remove_inheritance(&mut self, parent: TableId, child: TableId, kind: InheritanceKind) {
         let inheritance = Inheritance {
             parent,
@@ -12054,6 +12077,7 @@ impl Lowerer {
                     self.lower_collate(&collate);
                 }
                 if let (Some(ty), Some(field)) = (ty, add.composite_field())
+                    && !self.report_type_member_of_itself(add.ty(), column_ty, ty)
                     && let Some(tables) =
                         self.typed_tables_to_alter(ty, add.drop_behavior().as_ref(), node)
                 {
@@ -12091,6 +12115,7 @@ impl Lowerer {
                 }
                 if let (Some(ty), Some(column)) = (ty, column)
                     && let Some(name) = self.index.columns[column].name
+                    && !self.report_type_member_of_itself(alter.ty(), column_ty, ty)
                     && let Some(tables) =
                         self.typed_tables_to_alter(ty, alter.drop_behavior().as_ref(), node)
                 {
@@ -12107,6 +12132,91 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn report_type_member_of_itself(
+        &mut self,
+        node: Option<ast::Type>,
+        column_ty: Option<Ty>,
+        ty: TypeId,
+    ) -> bool {
+        let Some(column_ty) = column_ty else {
+            return false;
+        };
+        let target = std::iter::once(Ty::Type(ty))
+            .chain(self.typed_tables(ty).map(Ty::Table))
+            .find(|target| self.type_contains(column_ty, *target));
+        self.report_member_of_itself(node, target)
+    }
+
+    fn report_table_member_of_itself(
+        &mut self,
+        node: Option<ast::Type>,
+        column_ty: Option<Ty>,
+        table: TableId,
+    ) -> bool {
+        let Some(column_ty) = column_ty else {
+            return false;
+        };
+        let target = std::iter::once(table)
+            .chain(
+                self.inheritances
+                    .descendants(table, |child| self.is_live_child(child)),
+            )
+            .map(Ty::Table)
+            .find(|target| self.type_contains(column_ty, *target));
+        self.report_member_of_itself(node, target)
+    }
+
+    fn report_member_of_itself(&mut self, node: Option<ast::Type>, target: Option<Ty>) -> bool {
+        let Some(target) = target else {
+            return false;
+        };
+        let name = match target {
+            Ty::Type(id) => self.index.types[id].name,
+            Ty::Table(id) => self.index.tables[id].name,
+            Ty::Cte(_) | Ty::Array(_) => return false,
+        };
+        if let Some(node) = node {
+            self.push_error(node.syntax(), SemaError::CompositeMemberOfItself { name });
+        }
+        true
+    }
+
+    fn type_contains(&self, ty: Ty, target: Ty) -> bool {
+        let mut seen = FxHashSet::default();
+        let mut stack = vec![ty];
+        while let Some(ty) = stack.pop() {
+            if ty == target {
+                return true;
+            }
+            if !seen.insert(ty) {
+                continue;
+            }
+            let columns = match ty {
+                Ty::Type(id) => {
+                    let ty = &self.index.types[id];
+                    stack.extend([ty.base, ty.element, ty.subtype].into_iter().flatten());
+                    stack.extend(ty.range.map(Ty::Type));
+                    ty.columns
+                }
+                Ty::Table(id) => Some(self.index.tables[id].columns),
+                Ty::Array(_) => {
+                    stack.extend(ty.element());
+                    None
+                }
+                Ty::Cte(_) => None,
+            };
+            if let Some(columns) = columns {
+                stack.extend(
+                    columns
+                        .range
+                        .into_iter()
+                        .filter_map(|id| self.index.columns[id].ty),
+                );
+            }
+        }
+        false
     }
 
     fn typed_tables(&self, ty: TypeId) -> impl Iterator<Item = TableId> {
@@ -16496,6 +16606,7 @@ impl Lowerer {
                             TableLookup::TableOrForeignTable,
                         )
                         && let Some(table) = table
+                        && !self.report_circular_inheritance(path.syntax(), parent, table)
                     {
                         self.add_inheritance(parent, table, InheritanceKind::Inherits);
                     }
@@ -16545,6 +16656,7 @@ impl Lowerer {
                             TableLookup::TableOrForeignTable,
                         )
                         && let Some(table) = table
+                        && !self.report_circular_inheritance(path.syntax(), table, partition)
                     {
                         self.add_inheritance(table, partition, InheritanceKind::Partition);
                     }
@@ -16862,6 +16974,7 @@ impl Lowerer {
                 }
                 if let Some(table) = table
                     && self.index.tables.is_local(table)
+                    && !self.report_table_member_of_itself(set_type.ty(), ty, table)
                 {
                     self.set_table_column_type(table, column, ty);
                     self.set_inherited_column_type(table, column, ty);
@@ -17005,6 +17118,7 @@ impl Lowerer {
             && let Some(column_name) = &column_name
             && let Some(name) = name
             && self.index.tables.is_local(table)
+            && !self.report_table_member_of_itself(add_column.ty(), ty, table)
         {
             let columns = self.index.tables[table].columns;
             if self.columns_contain(columns.range, name) {

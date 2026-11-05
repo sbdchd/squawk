@@ -1645,3 +1645,28 @@ create procedure ok8(out x int)
        ╰╴                                       ━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn function_cycle() {
+    assert_snapshot!(check("
+create function f() returns int
+  language sql
+  return 1;
+create or replace function f() returns int
+  language sql
+  return f();
+create function g() returns int
+  language sql
+  return f();
+create or replace function f() returns int
+  language sql
+  return g();
+select f(), g();
+drop function g cascade;
+select f();"), @"
+    error: function `f()` does not exist
+       ╭▸ 
+    16 │ select f();
+       ╰╴       ━
+    ");
+}

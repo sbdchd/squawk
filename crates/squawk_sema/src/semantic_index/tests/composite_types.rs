@@ -507,3 +507,69 @@ select (null::c).a;
        ╰╴                 ━
     ");
 }
+
+#[test]
+fn composite_member_of_itself() {
+    assert_snapshot!(check("
+create type t as (
+  a int
+);
+alter type t add attribute b t;
+alter type t add attribute c t[];
+alter type t alter attribute a type t;
+create type m1 as (
+  a int
+);
+create type m2 as (
+  b m1
+);
+alter type m1 add attribute c m2;
+create domain d as m1;
+alter type m1 add attribute e d;
+create type r as range (subtype = m1);
+alter type m1 add attribute f r;
+create type typed as (
+  a int
+);
+create table x
+  of typed;
+alter type typed add attribute b x cascade;
+select (null::t).b, (null::m1).c;"), @"
+    error: composite type `t` cannot be made a member of itself
+      ╭▸ 
+    5 │ alter type t add attribute b t;
+      ╰╴                             ━
+    error: composite type `t` cannot be made a member of itself
+      ╭▸ 
+    6 │ alter type t add attribute c t[];
+      ╰╴                             ━━━
+    error: composite type `t` cannot be made a member of itself
+      ╭▸ 
+    7 │ alter type t alter attribute a type t;
+      ╰╴                                    ━
+    error: composite type `m1` cannot be made a member of itself
+       ╭▸ 
+    14 │ alter type m1 add attribute c m2;
+       ╰╴                              ━━
+    error: composite type `m1` cannot be made a member of itself
+       ╭▸ 
+    16 │ alter type m1 add attribute e d;
+       ╰╴                              ━
+    error: composite type `m1` cannot be made a member of itself
+       ╭▸ 
+    18 │ alter type m1 add attribute f r;
+       ╰╴                              ━
+    error: composite type `x` cannot be made a member of itself
+       ╭▸ 
+    24 │ alter type typed add attribute b x cascade;
+       ╰╴                                 ━
+    error: column `b` does not exist
+       ╭▸ 
+    25 │ select (null::t).b, (null::m1).c;
+       ╰╴                 ━
+    error: column `c` does not exist
+       ╭▸ 
+    25 │ select (null::t).b, (null::m1).c;
+       ╰╴                               ━
+    ");
+}

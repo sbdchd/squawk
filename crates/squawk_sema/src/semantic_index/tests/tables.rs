@@ -767,3 +767,69 @@ drop table t, v;
       ╰ hint: use `drop view` to remove a view
     ");
 }
+
+#[test]
+fn table_member_of_itself() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int
+);
+alter table t add column c t;
+alter table t add column d t[];
+alter table t alter column b type t;
+create table p (a int);
+create table c () inherits (p);
+alter table p add column e c;
+create table ok (a int);
+create table ok2 (b ok);
+alter table ok add column c int;
+select c, d, e from t, p;"), @"
+    error: composite type `t` cannot be made a member of itself
+      ╭▸ 
+    6 │ alter table t add column c t;
+      ╰╴                           ━
+    error: composite type `t` cannot be made a member of itself
+      ╭▸ 
+    7 │ alter table t add column d t[];
+      ╰╴                           ━━━
+    error: composite type `t` cannot be made a member of itself
+      ╭▸ 
+    8 │ alter table t alter column b type t;
+      ╰╴                                  ━
+    error: composite type `c` cannot be made a member of itself
+       ╭▸ 
+    11 │ alter table p add column e c;
+       ╰╴                           ━
+    error: column `c` does not exist
+       ╭▸ 
+    15 │ select c, d, e from t, p;
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    15 - select c, d, e from t, p;
+    15 + select t.a, d, e from t, p;
+       ╰╴
+    error: column `d` does not exist
+       ╭▸ 
+    15 │ select c, d, e from t, p;
+       │           ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    15 - select c, d, e from t, p;
+    15 + select c, t.a, e from t, p;
+       ╰╴
+    error: column `e` does not exist
+       ╭▸ 
+    15 │ select c, d, e from t, p;
+       │              ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    15 - select c, d, e from t, p;
+    15 + select c, d, t.a from t, p;
+       ╰╴
+    ");
+}

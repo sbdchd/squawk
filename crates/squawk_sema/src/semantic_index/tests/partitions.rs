@@ -182,3 +182,27 @@ alter table p split partition nope into (partition p3 for values from (20) to (3
        ╰╴                              ━━━━
     ");
 }
+
+#[test]
+fn attach_partition_circular() {
+    assert_snapshot!(check("
+create table p (a int) partition by list (a);
+create table c partition of p for values in (1) partition by list (a);
+alter table c attach partition p for values in (2);
+alter table p attach partition p for values in (3);
+alter table c add primary key (a);
+"), @"
+    error: circular inheritance
+      ╭▸ 
+    4 │ alter table c attach partition p for values in (2);
+      │                                ━
+      │
+      ╰ note: `c` is already a child of `p`
+    error: circular inheritance
+      ╭▸ 
+    5 │ alter table p attach partition p for values in (3);
+      │                                ━
+      │
+      ╰ note: `p` is already a child of `p`
+    ");
+}

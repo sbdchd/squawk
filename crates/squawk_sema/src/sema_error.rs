@@ -290,6 +290,13 @@ pub(crate) enum SemaError {
         owner: Name,
         domain: bool,
     },
+    CircularInheritance {
+        child: Name,
+        parent: Name,
+    },
+    CompositeMemberOfItself {
+        name: Name,
+    },
     DuplicateColumn {
         name: Name,
         relation: Name,
@@ -1221,6 +1228,8 @@ impl SemaError {
             SemaError::DuplicateTrigger { .. } => DiagnosticKind::DuplicateTrigger,
             SemaError::DuplicateRule { .. } => DiagnosticKind::DuplicateRule,
             SemaError::DuplicateConstraint { .. } => DiagnosticKind::DuplicateConstraint,
+            SemaError::CircularInheritance { .. } => DiagnosticKind::CircularInheritance,
+            SemaError::CompositeMemberOfItself { .. } => DiagnosticKind::CompositeMemberOfItself,
             SemaError::DuplicateColumn { .. } => DiagnosticKind::DuplicateColumn,
             SemaError::DuplicateFunction { .. } => DiagnosticKind::DuplicateFunction,
             SemaError::DuplicateTransform { .. } => DiagnosticKind::DuplicateTransform,
@@ -1913,6 +1922,13 @@ impl SemaError {
                 "foreign tables can't have unique or exclusion constraints",
             ));
         }
+        if let SemaError::CircularInheritance { child, parent } = *self {
+            return Some(Cow::Owned(format!(
+                "`{}` is already a child of `{}`",
+                names.resolve(child),
+                names.resolve(parent)
+            )));
+        }
         if let SemaError::ConflictWithRules { table, rule, event } = *self {
             return Some(Cow::Owned(format!(
                 "`{}` has an {} rule `{}`",
@@ -2272,6 +2288,14 @@ impl fmt::Display for ErrorMessage<'_> {
                     "constraint `{}` for {what} `{}` already exists",
                     n(name),
                     n(owner)
+                )
+            }
+            SemaError::CircularInheritance { .. } => f.write_str("circular inheritance"),
+            SemaError::CompositeMemberOfItself { name } => {
+                write!(
+                    f,
+                    "composite type `{}` cannot be made a member of itself",
+                    n(name)
                 )
             }
             SemaError::DuplicateColumn { name, relation } => {
