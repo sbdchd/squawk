@@ -13,15 +13,27 @@
 
 use std::{cmp, mem};
 
+use smallvec::{SmallVec, smallvec};
+
 /// Finds the [edit distance] between two strings.
 ///
 /// Returns `None` if the distance exceeds the limit.
 ///
 /// [edit distance]: https://en.wikipedia.org/wiki/Edit_distance
 fn edit_distance(a: &str, b: &str, limit: usize) -> Option<usize> {
-    let mut a = &a.chars().collect::<Vec<_>>()[..];
-    let mut b = &b.chars().collect::<Vec<_>>()[..];
+    if a.is_ascii() && b.is_ascii() {
+        return edit_distance_slices(a.as_bytes(), b.as_bytes(), limit);
+    }
+    let a = a.chars().collect::<Vec<_>>();
+    let b = b.chars().collect::<Vec<_>>();
+    edit_distance_slices(&a, &b, limit)
+}
 
+fn edit_distance_slices<'a, T: PartialEq>(
+    mut a: &'a [T],
+    mut b: &'a [T],
+    limit: usize,
+) -> Option<usize> {
     // Ensure that `b` is the shorter string, minimizing memory use.
     if a.len() < b.len() {
         mem::swap(&mut a, &mut b);
@@ -54,9 +66,12 @@ fn edit_distance(a: &str, b: &str, limit: usize) -> Option<usize> {
         return Some(min_dist);
     }
 
-    let mut prev_prev = vec![usize::MAX; b.len() + 1];
-    let mut prev = (0..=b.len()).collect::<Vec<_>>();
-    let mut current = vec![0; b.len() + 1];
+    let mut prev_prev_row: SmallVec<[usize; 64]> = smallvec![usize::MAX; b.len() + 1];
+    let mut prev_row: SmallVec<[usize; 64]> = (0..=b.len()).collect();
+    let mut current_row: SmallVec<[usize; 64]> = smallvec![0; b.len() + 1];
+    let mut prev_prev = &mut prev_prev_row[..];
+    let mut prev = &mut prev_row[..];
+    let mut current = &mut current_row[..];
 
     // row by row
     for i in 1..=a.len() {
@@ -170,16 +185,11 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     lookup: &str,
     dist: Option<usize>,
 ) -> Option<T> {
-    let lookup_uppercase = lookup.to_uppercase();
-
     // Priority of matches:
     // 1. Exact case insensitive match
     // 2. Edit distance match
     // 3. Sorted word match
-    if let Some(c) = candidates
-        .iter()
-        .find(|c| name(**c).to_uppercase() == lookup_uppercase)
-    {
+    if let Some(c) = candidates.iter().find(|c| eq_uppercase(name(**c), lookup)) {
         return Some(*c);
     }
 
@@ -237,6 +247,15 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     find_match_by_sorted_words(candidates, name, lookup)
 }
 
+fn eq_uppercase(a: &str, b: &str) -> bool {
+    if a.is_ascii() && b.is_ascii() {
+        return a.eq_ignore_ascii_case(b);
+    }
+    a.chars()
+        .flat_map(char::to_uppercase)
+        .eq(b.chars().flat_map(char::to_uppercase))
+}
+
 fn find_match_by_sorted_words<'a, T: Copy>(
     iter_names: &[T],
     name: impl Fn(T) -> &'a str,
@@ -244,7 +263,11 @@ fn find_match_by_sorted_words<'a, T: Copy>(
 ) -> Option<T> {
     let lookup_sorted_by_words = sort_by_words(lookup);
     iter_names.iter().fold(None, |result, candidate| {
-        if sort_by_words(name(*candidate)) == lookup_sorted_by_words {
+        let candidate_name = name(*candidate);
+        if candidate_name.len() == lookup.len()
+            && candidate_name.split('_').count() == lookup_sorted_by_words.len()
+            && sort_by_words(candidate_name) == lookup_sorted_by_words
+        {
             Some(*candidate)
         } else {
             result
