@@ -58,7 +58,7 @@ fn cluster_fix(cluster: &ast::Cluster) -> Option<Fix> {
 }
 
 pub(crate) fn prefer_repack(ctx: &mut Linter, file: &ast::SourceFile) {
-    if ctx.settings.pg_version < Version::new(19, None, None) {
+    if ctx.settings.pg_version < Version::major(19) {
         return;
     }
     let help = "use `repack` to rewrite the table without blocking reads and writes";

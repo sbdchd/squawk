@@ -80,7 +80,7 @@ fn is_virtual(generated: &ast::GeneratedConstraint, pg_version: Version) -> bool
     match generated_stored.generated_kind() {
         Some(ast::GeneratedKind::Virtual(_)) => true,
         Some(ast::GeneratedKind::Stored(_)) => false,
-        None => pg_version >= Version::new(18, None, None),
+        None => pg_version >= Version::major(18),
     }
 }
 
@@ -121,7 +121,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, file: &ast::SourceFile
                                 let Some(expr) = default.expr() else {
                                     continue;
                                 };
-                                if ctx.settings.pg_version >= Version::new(11, None, None)
+                                if ctx.settings.pg_version >= Version::major(11)
                                     && is_non_volatile_or_const(&expr)
                                 {
                                     continue;

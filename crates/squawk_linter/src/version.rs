@@ -23,6 +23,15 @@ impl Version {
             patch: patch.into(),
         }
     }
+
+    #[must_use]
+    pub(crate) const fn major(major: i32) -> Self {
+        Self {
+            major,
+            minor: None,
+            patch: None,
+        }
+    }
 }
 
 impl Default for Version {
@@ -128,15 +137,15 @@ mod test_pg_version {
     use super::*;
     #[test]
     fn eq() {
-        assert_eq!(Version::new(10, None, None), Version::new(10, None, None));
+        assert_eq!(Version::major(10), Version::major(10));
     }
     #[test]
     fn gt() {
-        assert!(Version::new(10, Some(1), None) > Version::new(10, None, None));
-        assert!(Version::new(10, None, Some(1)) > Version::new(10, None, None));
-        assert!(Version::new(10, None, Some(1)) > Version::new(9, None, None));
+        assert!(Version::new(10, Some(1), None) > Version::major(10));
+        assert!(Version::new(10, None, Some(1)) > Version::major(10));
+        assert!(Version::new(10, None, Some(1)) > Version::major(9));
 
-        assert!(!(Version::new(10, None, None) > Version::new(10, None, None)));
+        assert!(!(Version::major(10) > Version::major(10)));
     }
     #[test]
     fn parse() {
@@ -144,7 +153,7 @@ mod test_pg_version {
             Version::from_str("10.1"),
             Ok(Version::new(10, Some(1), None))
         );
-        assert_eq!(Version::from_str("10"), Ok(Version::new(10, None, None)));
+        assert_eq!(Version::from_str("10"), Ok(Version::major(10)));
         assert_eq!(
             Version::from_str("10.2.1"),
             Ok(Version::new(10, Some(2), Some(1)))

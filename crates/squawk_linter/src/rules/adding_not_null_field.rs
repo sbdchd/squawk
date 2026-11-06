@@ -48,7 +48,7 @@ fn get_table_path(alter_table: &ast::AlterTable) -> Option<ast::PathRef> {
 }
 
 pub(crate) fn adding_not_null_field(ctx: &mut Linter, file: &ast::SourceFile) {
-    let is_pg12_plus = ctx.settings.pg_version >= Version::new(12, None, None);
+    let is_pg12_plus = ctx.settings.pg_version >= Version::major(12);
 
     let mut not_null_constraints: FxHashMap<String, TableColumn> = FxHashMap::default();
     let mut validated_not_null_columns: FxHashSet<TableColumn> = FxHashSet::default();
