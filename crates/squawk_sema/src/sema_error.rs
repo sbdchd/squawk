@@ -761,6 +761,15 @@ pub(crate) enum SemaError {
         column: Name,
         identity: bool,
     },
+    DropColumnWithDependents {
+        column: Name,
+        table: Name,
+        view: Name,
+    },
+    AlterColumnTypeWithDependents {
+        column: Name,
+        view: Name,
+    },
     GeneratedColumnUpdate {
         column: Name,
         identity: bool,
@@ -1394,7 +1403,11 @@ impl SemaError {
             SemaError::DuplicateAssignment { .. } => DiagnosticKind::DuplicateAssignment,
             SemaError::DuplicateWindow { .. } => DiagnosticKind::DuplicateWindow,
             SemaError::DuplicateParam { .. } => DiagnosticKind::DuplicateParam,
-            SemaError::DependentObjects { .. } => DiagnosticKind::DependentObjectsStillExist,
+            SemaError::DependentObjects { .. }
+            | SemaError::DropColumnWithDependents { .. }
+            | SemaError::AlterColumnTypeWithDependents { .. } => {
+                DiagnosticKind::DependentObjectsStillExist
+            }
             SemaError::TruncateReferenced { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::RequiredBySystem { .. } => DiagnosticKind::RequiredBySystem,
             SemaError::AccessMethodKindMismatch { .. } => DiagnosticKind::AccessMethodKindMismatch,
@@ -1935,6 +1948,9 @@ impl SemaError {
             SemaError::CannotOpenIndex { .. } => {
                 Some("this operation is not supported for indexes")
             }
+            SemaError::DropColumnWithDependents { .. } => {
+                Some("use `drop column ... cascade` to drop the dependent objects too")
+            }
             SemaError::RecursiveCteTypeMismatch { .. } => {
                 Some("cast the output of the non-recursive term to the overall type")
             }
@@ -2144,6 +2160,15 @@ impl SemaError {
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
         if let SemaError::NonBoolComparison { comparison, .. } = *self {
             return Some(Cow::Borrowed(comparison.note()));
+        }
+        if let SemaError::DropColumnWithDependents { column, view, .. }
+        | SemaError::AlterColumnTypeWithDependents { column, view } = *self
+        {
+            return Some(Cow::Owned(format!(
+                "view `{}` depends on column `{}`",
+                names.resolve(view),
+                names.resolve(column)
+            )));
         }
         if let SemaError::GeneratedColumnInsert { column, identity }
         | SemaError::GeneratedColumnUpdate { column, identity } = *self
@@ -2977,6 +3002,15 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(table),
                 n(column)
             ),
+            SemaError::DropColumnWithDependents { column, table, .. } => write!(
+                f,
+                "cannot drop column `{}` of table `{}` because other objects depend on it",
+                n(column),
+                n(table)
+            ),
+            SemaError::AlterColumnTypeWithDependents { .. } => {
+                write!(f, "cannot alter type of a column used by a view or rule")
+            }
             SemaError::GeneratedColumnInsert { column, .. } => write!(
                 f,
                 "cannot insert a non-default value into column `{}`",

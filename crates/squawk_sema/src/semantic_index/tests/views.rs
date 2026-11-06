@@ -516,3 +516,86 @@ select a from v2;"), @"
        ╰╴
     ");
 }
+
+#[test]
+fn alter_column_type_used_by_view() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+create view v as select a from t;
+alter table t alter column a type text;
+alter table t alter column b type bigint;
+create view vq as select x.b from t as x where x.b is not null;
+alter table t rename column b to bb;
+alter table t alter column bb type int;
+"), @"
+    error: cannot alter type of a column used by a view or rule
+      ╭▸ 
+    4 │ alter table t alter column a type text;
+      │                            ━
+      │
+      ╰ note: view `v` depends on column `a`
+    error: cannot alter type of a column used by a view or rule
+      ╭▸ 
+    8 │ alter table t alter column bb type int;
+      │                            ━━
+      │
+      ╰ note: view `vq` depends on column `bb`
+    ");
+}
+
+#[test]
+fn drop_column_used_by_view() {
+    assert_snapshot!(check("
+create table t (a int, b int, c int);
+create view v as select a from t;
+alter table t drop column a;
+select sum(a) from t;
+alter table t drop column c;
+create view vs as select * from t;
+alter table t drop column b;
+begin;
+drop view vs;
+alter table t drop column b;
+rollback;
+alter table t drop column b cascade;
+select * from vs;
+create materialized view mv as select a from t;
+drop view v;
+alter table t drop column a;
+create table u (k int, j int);
+create view vu as select u from u;
+alter table u drop column j;
+"), @"
+    error: cannot drop column `a` of table `t` because other objects depend on it
+      ╭▸ 
+    4 │ alter table t drop column a;
+      │                           ━
+      │
+      ├ note: view `v` depends on column `a`
+      ╰ hint: use `drop column ... cascade` to drop the dependent objects too
+    error: cannot drop column `b` of table `t` because other objects depend on it
+      ╭▸ 
+    8 │ alter table t drop column b;
+      │                           ━
+      │
+      ├ note: view `vs` depends on column `b`
+      ╰ hint: use `drop column ... cascade` to drop the dependent objects too
+    error: relation `vs` does not exist
+       ╭▸ 
+    14 │ select * from vs;
+       │               ━━
+       ╰╴
+    help: a relation with a similar name exists
+       ╭╴
+    14 - select * from vs;
+    14 + select * from v;
+       ╰╴
+    error: cannot drop column `a` of table `t` because other objects depend on it
+       ╭▸ 
+    17 │ alter table t drop column a;
+       │                           ━
+       │
+       ├ note: view `mv` depends on column `a`
+       ╰ hint: use `drop column ... cascade` to drop the dependent objects too
+    ");
+}

@@ -106,6 +106,7 @@ impl Lowerer {
             inheritances: InheritanceGraph::default(),
             column_exprs: ColumnExprs::default(),
             partition_keys: FxHashMap::default(),
+            view_column_deps: vec![],
             next_column_expr: 0,
             dropped_operator_family_members: FxHashSet::default(),
             undo: vec![],
@@ -410,6 +411,7 @@ pub(crate) struct Lowerer {
     inheritances: InheritanceGraph,
     column_exprs: ColumnExprs,
     partition_keys: FxHashMap<TableId, PartitionKey>,
+    view_column_deps: Vec<ViewColumnDep>,
     next_column_expr: u32,
     dropped_operator_family_members: FxHashSet<OperatorFamilyMemberId>,
     undo: Vec<Undo>,
@@ -501,6 +503,13 @@ struct Snapshot {
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct ColumnExprId(u32);
+
+#[derive(Clone, Copy)]
+struct ViewColumnDep {
+    view: TableId,
+    table: TableId,
+    column: Name,
+}
 
 #[derive(Clone, Copy)]
 enum PartitionKey {
@@ -1170,6 +1179,7 @@ enum Undo {
     ConstraintKind(ConstraintId, ConstraintKind),
     IndexKey(IndexId, Option<IdxRange<Name>>),
     PartitionKey(TableId, PartitionKey),
+    ViewColumnDep(usize, Name),
     IndexColumns(IndexId, IdxRange<Name>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),
@@ -2400,6 +2410,14 @@ impl Lowerer {
                 self.undo.push(Undo::IndexKey(id, previous));
             }
         }
+        for (i, dep) in self.view_column_deps.iter_mut().enumerate() {
+            if dep.table == table && dep.column == from {
+                dep.column = to;
+                if in_transaction {
+                    self.undo.push(Undo::ViewColumnDep(i, from));
+                }
+            }
+        }
         if let Some(&previous @ PartitionKey::Columns(key)) = self.partition_keys.get(&table)
             && self
                 .index
@@ -3518,6 +3536,9 @@ impl Lowerer {
                 }
                 Undo::PartitionKey(table, key) => {
                     self.partition_keys.insert(table, key);
+                }
+                Undo::ViewColumnDep(dep, column) => {
+                    self.view_column_deps[dep].column = column;
                 }
                 Undo::IndexColumns(id, columns) => {
                     self.index.indexes.set_columns(id, columns);
@@ -11281,6 +11302,7 @@ impl Lowerer {
 
     fn lower_create_view(&mut self, create_view: &ast::CreateView) {
         let refs = self.index.references.next_idx();
+        let stars = self.index.star_columns.next_idx();
         let start = self.index.tables.next_idx();
         let query = create_view.query().map(|query| self.lower_query(query));
         let Some(path) = create_view.view().and_then(|view| view.path()) else {
@@ -11322,7 +11344,64 @@ impl Lowerer {
             columns,
         );
         self.alloc_return_rule(table);
+        self.record_view_column_deps(table, refs, stars);
         self.depend_on_refs(refs, self.index.tables.range_from(start), Object::Table);
+    }
+
+    fn record_view_column_deps(&mut self, view: TableId, refs: RefId, stars: Idx<ColumnId>) {
+        let referenced = self
+            .index
+            .references
+            .range_from(refs)
+            .iter()
+            .filter_map(|reference| {
+                let Resolution::Column { column, .. } = self.index.references[reference].resolution
+                else {
+                    return None;
+                };
+                Some(column)
+            })
+            .chain(
+                self.index
+                    .star_columns
+                    .range_from(stars)
+                    .iter()
+                    .map(|id| self.index.star_columns[id]),
+            );
+        let mut deps: SmallVec<[ViewColumnDep; 8]> = smallvec![];
+        for column in referenced {
+            let ColumnOwner::Table(table) = self.index.column_owner(column) else {
+                continue;
+            };
+            let Some(name) = self.index.columns[column].name else {
+                continue;
+            };
+            let dep = ViewColumnDep {
+                view,
+                table,
+                column: name,
+            };
+            if table != view
+                && self.index.tables.is_local(table)
+                && !deps
+                    .iter()
+                    .any(|existing| existing.table == table && existing.column == name)
+            {
+                deps.push(dep);
+            }
+        }
+        self.view_column_deps.extend(deps);
+    }
+
+    fn view_depending_on_column(&self, table: TableId, column: Name) -> Option<TableId> {
+        self.view_column_deps
+            .iter()
+            .find(|dep| {
+                dep.table == table
+                    && dep.column == column
+                    && !self.dropped_tables.contains(&dep.view)
+            })
+            .map(|dep| dep.view)
     }
 
     fn view_replace_rejected(
@@ -11388,6 +11467,7 @@ impl Lowerer {
 
     fn lower_create_materialized_view(&mut self, create_view: &ast::CreateMaterializedView) {
         let refs = self.index.references.next_idx();
+        let stars = self.index.star_columns.next_idx();
         let start = self.index.tables.next_idx();
         let query = create_view.query().map(|query| self.lower_query(query));
         if let Some(using_method) = create_view.using_method() {
@@ -11418,6 +11498,7 @@ impl Lowerer {
             columns,
         ) {
             self.alloc_return_rule(table);
+            self.record_view_column_deps(table, refs, stars);
         }
         self.depend_on_refs(refs, self.index.tables.range_from(start), Object::Table);
     }
@@ -17190,6 +17271,27 @@ impl Lowerer {
             self.add_ref(name, ReferenceKind::Column, column_ref.syntax(), resolution);
             if let Some(table) = table
                 && column.is_some()
+                && let Some(view) = self.view_depending_on_column(table, name)
+            {
+                if matches!(
+                    drop_column.drop_behavior(),
+                    Some(ast::DropBehavior::Cascade(_))
+                ) {
+                    while let Some(view) = self.view_depending_on_column(table, name) {
+                        self.drop_object(Object::Table(view));
+                    }
+                } else {
+                    let error = SemaError::DropColumnWithDependents {
+                        column: name,
+                        table: self.index.tables[table].name,
+                        view: self.index.tables[view].name,
+                    };
+                    self.push_error(column_ref.syntax(), error);
+                    continue;
+                }
+            }
+            if let Some(table) = table
+                && column.is_some()
             {
                 self.set_column_expr(table, name, None);
                 self.drop_column_sequences(table, name);
@@ -17209,12 +17311,7 @@ impl Lowerer {
                     .iter()
                     .filter(|column| !dropped.contains(column)),
             );
-            if self.in_transaction() {
-                self.undo.push(Undo::TableColumns(table, columns));
-            }
-            self.index
-                .tables
-                .set_columns(table, Columns { range, ..columns }, &self.index.columns);
+            self.set_table_columns(table, range);
             if recurse {
                 for &column in &dropped {
                     self.drop_inherited_column(table, self.index.columns[column]);
@@ -17352,6 +17449,16 @@ impl Lowerer {
                     self.with_table_scope(QueryKind::Constraint, table, node, |this| {
                         this.lower_expr_in(ExprContext::Transform, &expr);
                     });
+                }
+                if let Some(table) = table
+                    && let Some(view) = self.view_depending_on_column(table, column)
+                {
+                    let error = SemaError::AlterColumnTypeWithDependents {
+                        column,
+                        view: self.index.tables[view].name,
+                    };
+                    self.push_error(column_ref.syntax(), error);
+                    return;
                 }
                 if let Some(table) = table
                     && self.index.tables.is_local(table)
