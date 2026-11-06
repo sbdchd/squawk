@@ -198,6 +198,10 @@ impl Errors {
         self.entries.push(ErrorEntry { range, error });
     }
 
+    pub(crate) fn len(&self) -> usize {
+        self.entries.len()
+    }
+
     pub(crate) fn shrink_to_fit(&mut self) {
         self.entries.shrink_to_fit();
         self.args.shrink_to_fit();

@@ -120,6 +120,11 @@ pub(crate) struct ErrorCandidates {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct AssignmentCast {
+    pub(crate) parens: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ForeignKeyPair {
     pub(crate) column: Name,
     pub(crate) referenced_column: Name,
@@ -789,6 +794,13 @@ pub(crate) enum SemaError {
     CannotCast {
         source: TyName,
         target: TyName,
+    },
+    AssignmentTypeMismatch {
+        column: Name,
+        column_ty: TyName,
+        expr_ty: TyName,
+        default: bool,
+        cast: Option<AssignmentCast>,
     },
     AlterColumnTypeWithoutUsing {
         column: Name,
@@ -1491,9 +1503,9 @@ impl SemaError {
             SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
                 DiagnosticKind::TypeMismatch
             }
-            SemaError::AlterColumnTypeWithoutUsing { .. } | SemaError::CannotCast { .. } => {
-                DiagnosticKind::TypeMismatch
-            }
+            SemaError::AlterColumnTypeWithoutUsing { .. }
+            | SemaError::CannotCast { .. }
+            | SemaError::AssignmentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
@@ -1743,6 +1755,28 @@ impl SemaError {
                     fix: Fix {
                         title: format!("Insert `{target}`").into(),
                         edits: vec![Edit::insert(format!(" {target}"), insert_at)],
+                    },
+                }
+            }
+            SemaError::AssignmentTypeMismatch {
+                column_ty,
+                cast: Some(AssignmentCast { parens }),
+                ..
+            } => {
+                let suffix = if column_ty.array { "[]" } else { "" };
+                let ty = format!("{}{suffix}", names.resolve(column_ty.name));
+                let mut edits = Vec::with_capacity(2);
+                if parens {
+                    edits.push(Edit::insert("(", range.start()));
+                    edits.push(Edit::insert(format!(")::{ty}"), range.end()));
+                } else {
+                    edits.push(Edit::insert(format!("::{ty}"), range.end()));
+                }
+                Suggestion {
+                    message: "cast the expression to the column's type".into(),
+                    fix: Fix {
+                        title: format!("Cast to `{ty}`").into(),
+                        edits,
                     },
                 }
             }
@@ -2010,6 +2044,9 @@ impl SemaError {
             SemaError::AlterColumnTypeWithoutUsing {
                 insert_at: None, ..
             } => Some("add a `using` clause that converts the existing values"),
+            SemaError::AssignmentTypeMismatch { cast: None, .. } => {
+                Some("rewrite the expression to produce the column's type")
+            }
             SemaError::RecursiveCteTypeMismatch { .. } => {
                 Some("cast the output of the non-recursive term to the overall type")
             }
@@ -3074,6 +3111,20 @@ impl fmt::Display for ErrorMessage<'_> {
                 kind.label(),
                 n(table),
                 n(column)
+            ),
+            SemaError::AssignmentTypeMismatch {
+                column,
+                column_ty,
+                expr_ty,
+                default,
+                ..
+            } => write!(
+                f,
+                "column `{}` is of type `{}` but {}expression is of type `{}`",
+                n(column),
+                self.ty(column_ty),
+                if default { "default " } else { "" },
+                self.ty(expr_ty)
             ),
             SemaError::CannotCast { source, target } => write!(
                 f,

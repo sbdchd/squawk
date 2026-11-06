@@ -45,10 +45,10 @@ use crate::{
         TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, CandidateReason, ColumnDefListReason, Comparison, CompoundOp, ConflictAction,
-        ConflictRuleEvent, ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs,
-        ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType, ForeignKeyPair,
-        GeneratedKind, LookupKind, ObjectKind, OperandName, OperatorReplacement,
+        ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, Comparison, CompoundOp,
+        ConflictAction, ConflictRuleEvent, ConflictTargetKey, DefaultChange, DropRelation,
+        ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType,
+        ForeignKeyPair, GeneratedKind, LookupKind, ObjectKind, OperandName, OperatorReplacement,
         OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
         SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
         TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
@@ -110,6 +110,7 @@ impl Lowerer {
             partition_keys: FxHashMap::default(),
             view_column_deps: vec![],
             view_bases: FxHashMap::default(),
+            insert_values: vec![],
             next_column_expr: 0,
             dropped_operator_family_members: FxHashSet::default(),
             undo: vec![],
@@ -417,6 +418,7 @@ pub(crate) struct Lowerer {
     partition_keys: FxHashMap<TableId, PartitionKey>,
     view_column_deps: Vec<ViewColumnDep>,
     view_bases: FxHashMap<TableId, TableId>,
+    insert_values: Vec<InsertValue>,
     next_column_expr: u32,
     dropped_operator_family_members: FxHashSet<OperatorFamilyMemberId>,
     undo: Vec<Undo>,
@@ -520,6 +522,20 @@ struct ViewColumnDep {
 enum PartitionKey {
     Columns(IdxRange<Name>),
     Expressions,
+}
+
+struct InsertValue {
+    position: usize,
+    ty: ArgType,
+    expr: ast::Expr,
+}
+
+#[derive(Clone, Copy)]
+struct Assignment {
+    column: Name,
+    target: Ty,
+    value: ArgType,
+    default: bool,
 }
 
 struct ForeignKeyMismatch {
@@ -3955,10 +3971,25 @@ impl Lowerer {
             ColumnExprKind::Default => ExprContext::Default,
             ColumnExprKind::Generated { .. } => ExprContext::GeneratedColumn,
         };
-        self.lower_expr_in(context, expr);
+        let errors = self.index.errors.len();
+        let ty = self.lower_expr_in(context, expr);
         let (Some(table), Some(column)) = (table, column) else {
             return;
         };
+        if kind == ColumnExprKind::Default
+            && self.index.errors.len() == errors
+            && let Some(target) = self
+                .find_table_column(table, column)
+                .and_then(|id| self.index.columns[id].ty)
+        {
+            let assignment = Assignment {
+                column,
+                target,
+                value: expr_arg_type(Some(expr), ty),
+                default: true,
+            };
+            self.check_assignment(assignment, expr);
+        }
         let id = ColumnExprId(self.next_column_expr);
         self.next_column_expr += 1;
         self.set_column_expr(table, column, Some(ColumnExpr { id, kind }));
@@ -14430,6 +14461,13 @@ impl Lowerer {
             }
             for (column_index, expr) in row.exprs().enumerate() {
                 let ty = self.lower_expr_in(context, &expr);
+                if insert_source && !expr.is_default() {
+                    self.insert_values.push(InsertValue {
+                        position: column_index,
+                        ty: expr_arg_type(Some(&expr), ty),
+                        expr: expr.clone(),
+                    });
+                }
                 if row_index == 0 {
                     let name = self.intern(&format_smolstr!("column{}", column_index + 1));
                     columns.push(Column {
@@ -14714,12 +14752,14 @@ impl Lowerer {
         let id = self.alloc_query(QueryKind::Insert, insert.syntax());
         self.push_scope(id);
 
+        let values_mark = self.insert_values.len();
         let source = match insert.insert_source() {
             Some(ast::InsertSource::SelectVariant(query)) => {
                 Some((self.lower_query(query.clone()), query))
             }
             Some(ast::InsertSource::DefaultValues(_)) | None => None,
         };
+        let values = self.insert_values.split_off(values_mark);
 
         let target = insert.relation_name_ref().map(|relation_name_ref| {
             let node = relation_name_ref.syntax().clone();
@@ -14749,6 +14789,7 @@ impl Lowerer {
                 && let SourceKind::Table(table) = self.index.sources[target].kind
             {
                 self.check_insert_generated_columns(insert, table, *query, source);
+                self.check_insert_assignments(insert, table, *query, source, &values);
             }
         }
         self.set_visible((0..self.index.queries[id].sources.len()).into());
@@ -14816,6 +14857,121 @@ impl Lowerer {
                 }
             }
         }
+    }
+
+    fn check_insert_assignments(
+        &mut self,
+        insert: &ast::Insert,
+        table: TableId,
+        query: QueryId,
+        source: &ast::SelectVariant,
+        values: &[InsertValue],
+    ) {
+        let targets: SmallVec<[Option<Name>; 8]> = match insert.column_target_list() {
+            Some(list) => list
+                .column_targets()
+                .map(|target| {
+                    if target.accessors().next().is_some() {
+                        return None;
+                    }
+                    target.name().map(|name| self.intern(&name.text()))
+                })
+                .collect(),
+            None => {
+                let columns = self.index.tables[table].columns;
+                if !columns.complete {
+                    return;
+                }
+                columns
+                    .range
+                    .iter()
+                    .map(|id| self.index.columns[id].name)
+                    .collect()
+            }
+        };
+        if targets
+            .iter()
+            .enumerate()
+            .any(|(i, target)| target.is_some() && targets[..i].contains(target))
+        {
+            return;
+        }
+        let target_ty = |this: &Self, position: usize| {
+            let column = (*targets.get(position)?)?;
+            let ty = this
+                .find_table_column(table, column)
+                .and_then(|id| this.index.columns[id].ty)?;
+            Some((column, ty))
+        };
+        if let ast::SelectVariant::Values(_) = source {
+            for value in values {
+                if let Some((column, target)) = target_ty(self, value.position) {
+                    let assignment = Assignment {
+                        column,
+                        target,
+                        value: value.ty,
+                        default: false,
+                    };
+                    self.check_assignment(assignment, &value.expr);
+                }
+            }
+            return;
+        }
+        let columns = self.index.queries[query].columns;
+        if !columns.complete {
+            return;
+        }
+        for (position, id) in columns.range.iter().enumerate() {
+            let Some((column, target)) = target_ty(self, position) else {
+                continue;
+            };
+            let Some(ty) = self.index.columns[id].ty else {
+                continue;
+            };
+            if insert_output_is_unknown_literal(source, position) {
+                continue;
+            }
+            let Some(expr) = output_expr(source, position) else {
+                continue;
+            };
+            let assignment = Assignment {
+                column,
+                target,
+                value: ArgType::Known(ty),
+                default: false,
+            };
+            self.check_assignment(assignment, &expr);
+        }
+    }
+
+    fn check_assignment(&mut self, assignment: Assignment, expr: &ast::Expr) {
+        let Assignment {
+            column,
+            target,
+            value,
+            default,
+        } = assignment;
+        let ArgType::Known(ty) = value else {
+            return;
+        };
+        let overloads = self.overloads();
+        if overloads.coercion(ty, target, CastContext::Assignment) != Coercion::No {
+            return;
+        }
+        let cast =
+            (overloads.coercion(ty, target, CastContext::Explicit) == Coercion::Yes).then(|| {
+                AssignmentCast {
+                    parens: !binds_tighter_than_cast(expr),
+                }
+            });
+        let error = SemaError::AssignmentTypeMismatch {
+            column,
+            column_ty: self.index.ty_name(target),
+            expr_ty: self.index.ty_name(ty),
+            default,
+            cast,
+        };
+        self.push_error(expr.syntax(), error);
     }
 
     fn check_insert_generated_column(
@@ -15069,7 +15225,12 @@ impl Lowerer {
                         }
                     }
                     if let Some(expr) = single.set_expr().and_then(|set_expr| set_expr.expr()) {
-                        self.lower_expr_in(ExprContext::Update, &expr);
+                        let ty = self.lower_expr_in(ExprContext::Update, &expr);
+                        if let Some(table) = table
+                            && let Some(column_target) = single.column_target()
+                        {
+                            self.check_set_assignment(table, &column_target, &expr, ty);
+                        }
                     }
                 }
                 ast::SetColumn::SetMultipleColumns(multiple) => {
@@ -15098,17 +15259,58 @@ impl Lowerer {
                     if let Some(paren_select) = multiple.paren_select() {
                         self.lower_query(ast::SelectVariant::ParenSelect(paren_select));
                     }
-                    for expr in multiple
+                    let mut column_targets = multiple
+                        .column_target_list()
+                        .into_iter()
+                        .flat_map(|list| list.column_targets());
+                    for set_expr in multiple
                         .set_expr_list()
                         .into_iter()
                         .flat_map(|list| list.set_exprs())
-                        .filter_map(|set_expr| set_expr.expr())
                     {
-                        self.lower_expr_in(ExprContext::Update, &expr);
+                        let column_target = column_targets.next();
+                        let Some(expr) = set_expr.expr() else {
+                            continue;
+                        };
+                        let ty = self.lower_expr_in(ExprContext::Update, &expr);
+                        if let Some(table) = table
+                            && let Some(column_target) = column_target
+                        {
+                            self.check_set_assignment(table, &column_target, &expr, ty);
+                        }
                     }
                 }
             }
         }
+    }
+
+    fn check_set_assignment(
+        &mut self,
+        table: TableId,
+        column_target: &ast::ColumnTarget,
+        expr: &ast::Expr,
+        ty: Option<Ty>,
+    ) {
+        if column_target.accessors().next().is_some() {
+            return;
+        }
+        let Some(name) = column_target.name() else {
+            return;
+        };
+        let column = self.intern(&name.text());
+        let Some(target) = self
+            .find_table_column(table, column)
+            .and_then(|id| self.index.columns[id].ty)
+        else {
+            return;
+        };
+        let assignment = Assignment {
+            column,
+            target,
+            value: expr_arg_type(Some(expr), ty),
+            default: false,
+        };
+        self.check_assignment(assignment, expr);
     }
 
     fn check_duplicate_assignment(
@@ -27558,6 +27760,20 @@ fn call_field_base(base: &ast::Expr) -> Option<ast::CallExpr> {
     }
 }
 
+fn binds_tighter_than_cast(expr: &ast::Expr) -> bool {
+    matches!(
+        expr,
+        ast::Expr::Literal(_)
+            | ast::Expr::NameRef(_)
+            | ast::Expr::FieldExpr(_)
+            | ast::Expr::CallExpr(_)
+            | ast::Expr::ParenExpr(_)
+            | ast::Expr::CastExpr(_)
+            | ast::Expr::ArrayExpr(_)
+            | ast::Expr::IndexExpr(_)
+    )
+}
+
 fn output_expr(query: &ast::SelectVariant, position: usize) -> Option<ast::Expr> {
     match query {
         ast::SelectVariant::Select(select) => select
@@ -27573,6 +27789,25 @@ fn output_expr(query: &ast::SelectVariant, position: usize) -> Option<ast::Expr>
         ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => None,
+    }
+}
+
+fn insert_output_is_unknown_literal(source: &ast::SelectVariant, position: usize) -> bool {
+    match source {
+        ast::SelectVariant::Values(values) => values.row_list().is_some_and(|list| {
+            list.rows().all(|row| {
+                row.exprs()
+                    .nth(position)
+                    .is_some_and(|expr| is_unknown_literal_expr(&expr))
+            })
+        }),
+        ast::SelectVariant::ParenSelect(paren) => paren
+            .select()
+            .is_some_and(|inner| insert_output_is_unknown_literal(&inner, position)),
+        ast::SelectVariant::Select(_)
+        | ast::SelectVariant::CompoundSelect(_)
+        | ast::SelectVariant::SelectInto(_)
+        | ast::SelectVariant::Table(_) => output_is_unknown_literal(source, position),
     }
 }
 

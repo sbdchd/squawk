@@ -1146,3 +1146,115 @@ insert into v14 (a) values (1) on conflict do nothing;
        ╰ note: `t` has an `on update` rule `r`
     ");
 }
+
+#[test]
+fn assignment_type_mismatch() {
+    assert_snapshot!(check("
+create table t (a int, b text, c int[], d bool);
+insert into t (a) values (now());
+insert into t (a) values ('1'::text);
+insert into t (a) values (1.5);
+insert into t (b) values (1);
+insert into t (a, b) values (1, 'x'), (now() + interval '1 day', 'y');
+insert into t select now();
+insert into t (d) values (1);
+insert into t (c) values (array['a'::text]);
+insert into t (a) values ('1');
+update t set a = '1'::text;
+update t set (a, b) = (now(), 1);
+create table u (a int default '1'::text);
+create table v (a int default 1.5);
+insert into t values (1, 'x', default, true);
+alter table t alter column d set default 0;
+"), @"
+    error: column `a` is of type `int4` but expression is of type `timestamptz`
+      ╭▸ 
+    3 │ insert into t (a) values (now());
+      │                           ━━━━━
+      │
+      ╰ hint: rewrite the expression to produce the column's type
+    error: column `a` is of type `int4` but expression is of type `text`
+      ╭▸ 
+    4 │ insert into t (a) values ('1'::text);
+      │                           ━━━━━━━━━
+      ╰╴
+    help: cast the expression to the column's type
+      ╭╴
+    4 │ insert into t (a) values ('1'::text::int4);
+      ╰╴                                   ++++++
+    error: column `a` is of type `int4` but expression is of type `timestamptz`
+      ╭▸ 
+    7 │ insert into t (a, b) values (1, 'x'), (now() + interval '1 day', 'y');
+      │                                        ━━━━━━━━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: rewrite the expression to produce the column's type
+    error: column `a` is of type `int4` but expression is of type `timestamptz`
+      ╭▸ 
+    8 │ insert into t select now();
+      │                      ━━━━━
+      │
+      ╰ hint: rewrite the expression to produce the column's type
+    error: column `d` is of type `bool` but expression is of type `int4`
+      ╭▸ 
+    9 │ insert into t (d) values (1);
+      │                           ━
+      ╰╴
+    help: cast the expression to the column's type
+      ╭╴
+    9 │ insert into t (d) values (1::bool);
+      ╰╴                           ++++++
+    error: column `c` is of type `int4[]` but expression is of type `text[]`
+       ╭▸ 
+    10 │ insert into t (c) values (array['a'::text]);
+       │                           ━━━━━━━━━━━━━━━━
+       ╰╴
+    help: cast the expression to the column's type
+       ╭╴
+    10 │ insert into t (c) values (array['a'::text]::int4[]);
+       ╰╴                                          ++++++++
+    error: column `a` is of type `int4` but expression is of type `text`
+       ╭▸ 
+    12 │ update t set a = '1'::text;
+       │                  ━━━━━━━━━
+       ╰╴
+    help: cast the expression to the column's type
+       ╭╴
+    12 │ update t set a = '1'::text::int4;
+       ╰╴                          ++++++
+    error: column `a` is of type `int4` but expression is of type `timestamptz`
+       ╭▸ 
+    13 │ update t set (a, b) = (now(), 1);
+       │                        ━━━━━
+       │
+       ╰ hint: rewrite the expression to produce the column's type
+    error: column `a` is of type `int4` but default expression is of type `text`
+       ╭▸ 
+    14 │ create table u (a int default '1'::text);
+       │                               ━━━━━━━━━
+       ╰╴
+    help: cast the expression to the column's type
+       ╭╴
+    14 │ create table u (a int default '1'::text::int4);
+       ╰╴                                       ++++++
+    error: column `d` is of type `bool` but default expression is of type `int4`
+       ╭▸ 
+    17 │ alter table t alter column d set default 0;
+       │                                          ━
+       ╰╴
+    help: cast the expression to the column's type
+       ╭╴
+    17 │ alter table t alter column d set default 0::bool;
+       ╰╴                                          ++++++
+    ");
+}
+
+#[test]
+fn insert_parenthesized_values_literals() {
+    assert_snapshot!(check("
+create table t (a int);
+insert into t (a) (values ('2'));
+insert into t (a) (values ('2'), ('3'));
+insert into t (a) select '2';
+insert into t (a) (select '2');
+"), @"no diagnostics");
+}
