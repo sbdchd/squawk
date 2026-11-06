@@ -187,6 +187,8 @@ struct Candidate<Id> {
     matches: SmallVec<[Match; 4]>,
 }
 
+type Viable<Id> = SmallVec<[Candidate<Id>; 16]>;
+
 pub(crate) struct Overloads<'a> {
     index: &'a IndexData,
     pg_catalog: Name,
@@ -214,7 +216,7 @@ impl<'a> Overloads<'a> {
         candidates: impl Iterator<Item = FunctionId>,
         args: &[CallArg],
     ) -> Resolution {
-        let mut viable: SmallVec<[Candidate<FunctionId>; 4]> = SmallVec::new();
+        let mut viable: Viable<FunctionId> = SmallVec::new();
         for id in candidates {
             let function = &self.index.functions[id];
             let Some(candidate) = self
@@ -258,7 +260,7 @@ impl<'a> Overloads<'a> {
             .filter(|base| Some(*base) != assumed);
         let mut exact = None;
         let mut exact_base = None;
-        let mut viable: SmallVec<[Candidate<OperatorId>; 4]> = SmallVec::new();
+        let mut viable: Viable<OperatorId> = SmallVec::new();
         for (id, operator) in candidates {
             if (operator.left == Operand::None) != left.is_none()
                 || (operator.right == Operand::None) != right.is_none()
@@ -303,7 +305,7 @@ impl<'a> Overloads<'a> {
 
     fn choose<Id: Copy>(
         &self,
-        mut viable: SmallVec<[Candidate<Id>; 4]>,
+        mut viable: Viable<Id>,
         args: &[CallArg],
         resolution: impl Fn(Id) -> Resolution,
     ) -> Resolution {
@@ -895,11 +897,7 @@ impl<'a> Overloads<'a> {
         }
     }
 
-    fn resolve_unknown_literals<Id>(
-        &self,
-        viable: &mut SmallVec<[Candidate<Id>; 4]>,
-        args: &[CallArg],
-    ) {
+    fn resolve_unknown_literals<Id>(&self, viable: &mut Viable<Id>, args: &[CallArg]) {
         if viable.len() < 2 {
             return;
         }
@@ -937,7 +935,7 @@ impl<'a> Overloads<'a> {
         }
     }
 
-    fn assume_known_type<Id>(&self, viable: &mut SmallVec<[Candidate<Id>; 4]>, args: &[CallArg]) {
+    fn assume_known_type<Id>(&self, viable: &mut Viable<Id>, args: &[CallArg]) {
         if viable.len() < 2 || !args.iter().any(|arg| arg.ty == ArgType::UnknownLiteral) {
             return;
         }
@@ -1084,10 +1082,7 @@ impl<'a> Overloads<'a> {
     }
 }
 
-fn retain_max<Id>(
-    viable: &mut SmallVec<[Candidate<Id>; 4]>,
-    score: impl Fn(&Candidate<Id>) -> usize,
-) {
+fn retain_max<Id>(viable: &mut Viable<Id>, score: impl Fn(&Candidate<Id>) -> usize) {
     if viable.len() < 2 {
         return;
     }

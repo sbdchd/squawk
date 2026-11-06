@@ -1,9 +1,6 @@
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::TextRange;
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::transactions::TransactionState;
 use crate::{Linter, Rule, Version, Violation};
@@ -60,14 +57,14 @@ fn cluster_fix(cluster: &ast::Cluster) -> Option<Fix> {
     Some(Fix::new("Replace with `repack (concurrently)`", vec![edit]))
 }
 
-pub(crate) fn prefer_repack(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    if ctx.settings.pg_version < Version::new(19, None, None) {
+pub(crate) fn prefer_repack(ctx: &mut Linter, file: &ast::SourceFile) {
+    if ctx.settings.pg_version < Version::major(19) {
         return;
     }
     let help = "use `repack` to rewrite the table without blocking reads and writes";
     let transaction_help = "use `repack (concurrently)` outside of a transaction to rewrite the table without blocking reads and writes";
     let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
-    for stmt in parse.tree().stmts() {
+    for stmt in file.stmts() {
         transaction.update(&stmt);
         let in_transaction = transaction.inside_transaction();
         match stmt {

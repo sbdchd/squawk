@@ -1,8 +1,5 @@
 use crate::{Linter, Rule, Violation};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 fn report_set_schema(ctx: &mut Linter, set_schema: &ast::SetSchema) {
     ctx.report(Violation::for_node(
@@ -12,8 +9,8 @@ fn report_set_schema(ctx: &mut Linter, set_schema: &ast::SetSchema) {
     ));
 }
 
-pub(crate) fn ban_set_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for stmt in parse.tree().stmts() {
+pub(crate) fn ban_set_schema(ctx: &mut Linter, file: &ast::SourceFile) {
+    for stmt in file.stmts() {
         match stmt {
             ast::Stmt::AlterForeignTable(node) => {
                 for action in node.actions() {

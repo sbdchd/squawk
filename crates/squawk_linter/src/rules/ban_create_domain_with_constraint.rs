@@ -1,13 +1,9 @@
 use squawk_rowan::TextRange;
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn ban_create_domain_with_constraint(ctx: &mut Linter, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         if let ast::Stmt::CreateDomain(domain) = stmt {
             let range = domain

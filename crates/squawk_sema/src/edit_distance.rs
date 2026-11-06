@@ -13,15 +13,52 @@
 
 use std::{cmp, mem};
 
+use smallvec::{SmallVec, smallvec};
+
 /// Finds the [edit distance] between two strings.
 ///
 /// Returns `None` if the distance exceeds the limit.
 ///
 /// [edit distance]: https://en.wikipedia.org/wiki/Edit_distance
 fn edit_distance(a: &str, b: &str, limit: usize) -> Option<usize> {
-    let mut a = &a.chars().collect::<Vec<_>>()[..];
-    let mut b = &b.chars().collect::<Vec<_>>()[..];
+    if a.is_ascii() && b.is_ascii() {
+        let a = a.as_bytes();
+        let b = b.as_bytes();
+        if a.len().abs_diff(b.len()) > limit || bag_distance(a, b) > limit {
+            return None;
+        }
+        return edit_distance_slices(a, b, limit);
+    }
+    let a = a.chars().collect::<Vec<_>>();
+    let b = b.chars().collect::<Vec<_>>();
+    edit_distance_slices(&a, &b, limit)
+}
 
+fn bag_distance(a: &[u8], b: &[u8]) -> usize {
+    let mut counts = [0i32; 128];
+    for &c in a {
+        counts[usize::from(c)] += 1;
+    }
+    for &c in b {
+        counts[usize::from(c)] -= 1;
+    }
+    let mut extra = 0;
+    let mut missing = 0;
+    for count in counts {
+        if count > 0 {
+            extra += count.unsigned_abs();
+        } else {
+            missing += count.unsigned_abs();
+        }
+    }
+    cmp::max(extra, missing) as usize
+}
+
+fn edit_distance_slices<'a, T: PartialEq>(
+    mut a: &'a [T],
+    mut b: &'a [T],
+    limit: usize,
+) -> Option<usize> {
     // Ensure that `b` is the shorter string, minimizing memory use.
     if a.len() < b.len() {
         mem::swap(&mut a, &mut b);
@@ -54,13 +91,18 @@ fn edit_distance(a: &str, b: &str, limit: usize) -> Option<usize> {
         return Some(min_dist);
     }
 
-    let mut prev_prev = vec![usize::MAX; b.len() + 1];
-    let mut prev = (0..=b.len()).collect::<Vec<_>>();
-    let mut current = vec![0; b.len() + 1];
+    let mut prev_prev_row: SmallVec<[usize; 64]> = smallvec![usize::MAX; b.len() + 1];
+    let mut prev_row: SmallVec<[usize; 64]> = (0..=b.len()).collect();
+    let mut current_row: SmallVec<[usize; 64]> = smallvec![0; b.len() + 1];
+    let mut prev_prev = &mut prev_prev_row[..];
+    let mut prev = &mut prev_row[..];
+    let mut current = &mut current_row[..];
 
+    let mut prev_min = 0;
     // row by row
     for i in 1..=a.len() {
         current[0] = i;
+        let mut current_min = i;
         let a_idx = i - 1;
 
         // column by column
@@ -85,7 +127,13 @@ fn edit_distance(a: &str, b: &str, limit: usize) -> Option<usize> {
                 // transposition
                 current[j] = cmp::min(current[j], prev_prev[j - 2] + 1);
             }
+            current_min = cmp::min(current_min, current[j]);
         }
+
+        if current_min > limit && prev_min >= limit {
+            return None;
+        }
+        prev_min = current_min;
 
         // Rotate the buffers, reusing the memory.
         [prev_prev, prev, current] = [prev, current, prev_prev];
@@ -145,7 +193,7 @@ fn edit_distance_with_substrings(a: &str, b: &str, limit: usize) -> Option<usize
 /// We use case insensitive comparison to improve accuracy on an edge case with a lower(upper)case
 /// letters mismatch.
 pub(crate) fn find_best_match_for_name_with_substrings<'a, T: Copy>(
-    candidates: &[T],
+    candidates: impl Iterator<Item = T>,
     name: impl Fn(T) -> &'a str,
     lookup: &str,
     dist: Option<usize>,
@@ -154,7 +202,7 @@ pub(crate) fn find_best_match_for_name_with_substrings<'a, T: Copy>(
 }
 
 pub(crate) fn find_best_match_for_name<'a, T: Copy>(
-    candidates: &[T],
+    candidates: impl Iterator<Item = T>,
     name: impl Fn(T) -> &'a str,
     lookup: &str,
     dist: Option<usize>,
@@ -165,39 +213,43 @@ pub(crate) fn find_best_match_for_name<'a, T: Copy>(
 #[cold]
 fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     use_substring_score: bool,
-    candidates: &[T],
+    candidates: impl Iterator<Item = T>,
     name: &F,
     lookup: &str,
     dist: Option<usize>,
 ) -> Option<T> {
-    let lookup_uppercase = lookup.to_uppercase();
-
     // Priority of matches:
     // 1. Exact case insensitive match
     // 2. Edit distance match
     // 3. Sorted word match
-    if let Some(c) = candidates
-        .iter()
-        .find(|c| name(**c).to_uppercase() == lookup_uppercase)
-    {
-        return Some(*c);
-    }
+    //
+    // These are found in a single pass. An edit distance of 0 implies a case insensitive match,
+    // so returning on the first case insensitive match keeps the priority.
 
     // `fn edit_distance()` use `chars()` to calculate edit distance, so we must
     // also use `chars()` (and not `str::len()`) to calculate length here.
     let lookup_len = lookup.chars().count();
+    let lookup_sorted_by_words = sort_by_words(lookup);
 
     let mut dist = dist.unwrap_or_else(|| cmp::max(lookup_len, 3) / 3);
     let mut best = None;
+    let mut sorted_words_match = None;
     // store the candidates with the same distance, only for `use_substring_score` current.
     let mut next_candidates = vec![];
     for c in candidates {
+        let candidate_name = name(c);
+        if eq_uppercase(candidate_name, lookup) {
+            return Some(c);
+        }
+        if is_sorted_words_match(candidate_name, lookup, &lookup_sorted_by_words) {
+            sorted_words_match = Some(c);
+        }
         match if use_substring_score {
-            edit_distance_with_substrings(lookup, name(*c), dist)
+            edit_distance_with_substrings(lookup, candidate_name, dist)
         } else {
-            edit_distance(lookup, name(*c), dist)
+            edit_distance(lookup, candidate_name, dist)
         } {
-            Some(0) => return Some(*c),
+            Some(0) => return Some(c),
             Some(d) => {
                 if use_substring_score {
                     if d < dist {
@@ -207,11 +259,11 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
                         // `d == dist` here, we need to store the candidates with the same distance
                         // so we won't decrease the distance in the next loop.
                     }
-                    next_candidates.push(*c);
+                    next_candidates.push(c);
                 } else {
                     dist = d - 1;
                 }
-                best = Some(*c);
+                best = Some(c);
             }
             None => {}
         }
@@ -224,36 +276,32 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
         debug_assert!(use_substring_score);
         best = find_best_match_for_name_impl(
             false,
-            &next_candidates,
+            next_candidates.iter().copied(),
             name,
             lookup,
             Some(lookup.len()),
         );
     }
-    if best.is_some() {
-        return best;
+    best.or(sorted_words_match)
+}
+
+fn eq_uppercase(a: &str, b: &str) -> bool {
+    if a.is_ascii() && b.is_ascii() {
+        return a.eq_ignore_ascii_case(b);
     }
-
-    find_match_by_sorted_words(candidates, name, lookup)
+    a.chars()
+        .flat_map(char::to_uppercase)
+        .eq(b.chars().flat_map(char::to_uppercase))
 }
 
-fn find_match_by_sorted_words<'a, T: Copy>(
-    iter_names: &[T],
-    name: impl Fn(T) -> &'a str,
-    lookup: &str,
-) -> Option<T> {
-    let lookup_sorted_by_words = sort_by_words(lookup);
-    iter_names.iter().fold(None, |result, candidate| {
-        if sort_by_words(name(*candidate)) == lookup_sorted_by_words {
-            Some(*candidate)
-        } else {
-            result
-        }
-    })
+fn is_sorted_words_match(name: &str, lookup: &str, lookup_sorted_by_words: &[&str]) -> bool {
+    name.len() == lookup.len()
+        && name.split('_').count() == lookup_sorted_by_words.len()
+        && *sort_by_words(name) == *lookup_sorted_by_words
 }
 
-fn sort_by_words(name: &str) -> Vec<&str> {
-    let mut split_words: Vec<&str> = name.split('_').collect();
+fn sort_by_words(name: &str) -> SmallVec<[&str; 8]> {
+    let mut split_words: SmallVec<[&str; 8]> = name.split('_').collect();
     // We are sorting primitive &strs and can use unstable sort here.
     split_words.sort_unstable();
     split_words
@@ -266,13 +314,13 @@ mod tests {
     use super::{find_best_match_for_name, find_best_match_for_name_with_substrings};
 
     fn best(candidates: &[&str], lookup: &str) -> String {
-        find_best_match_for_name_with_substrings(candidates, |c| c, lookup, None)
+        find_best_match_for_name_with_substrings(candidates.iter().copied(), |c| c, lookup, None)
             .unwrap_or("no match")
             .to_string()
     }
 
     fn best_without_substrings(candidates: &[&str], lookup: &str) -> String {
-        find_best_match_for_name(candidates, |c| c, lookup, None)
+        find_best_match_for_name(candidates.iter().copied(), |c| c, lookup, None)
             .unwrap_or("no match")
             .to_string()
     }

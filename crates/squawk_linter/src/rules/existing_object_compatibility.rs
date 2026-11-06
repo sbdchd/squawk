@@ -7,7 +7,7 @@ mod ban_new_write_restriction;
 
 use rustc_hash::FxHashSet;
 use smallvec::SmallVec;
-use squawk_syntax::{Parse, SourceFile, ast};
+use squawk_syntax::ast;
 
 use crate::{Linter, Rule, name::Name};
 
@@ -39,12 +39,12 @@ fn object_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
 }
 
 // Only unconditional CREATE statements establish that an object is new to this file.
-pub(crate) fn existing_object_compatibility(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut tables = FxHashSet::default();
     let mut types = FxHashSet::default();
     let mut sequences = FxHashSet::default();
 
-    for stmt in parse.tree().stmts() {
+    for stmt in file.stmts() {
         match stmt {
             ast::Stmt::CreateTable(table) => {
                 if table.if_not_exists().is_none()

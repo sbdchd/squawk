@@ -1,12 +1,8 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-pub(crate) fn renaming_column(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn renaming_column(ctx: &mut Linter, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         match stmt {
             ast::Stmt::AlterType(ty) => {

@@ -1,13 +1,9 @@
 use squawk_diagnostics::{Edit, Fix};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TransactionControl};
 
-pub(crate) fn ban_uncommitted_transaction(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn ban_uncommitted_transaction(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut uncommitted_begin: Option<ast::Begin> = None;
 
     for stmt in file.stmts() {

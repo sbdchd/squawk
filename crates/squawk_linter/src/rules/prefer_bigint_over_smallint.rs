@@ -1,9 +1,10 @@
 use squawk_diagnostics::{Edit, Fix};
+use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{Parse, SourceFile, ast};
 
 use crate::{Linter, Rule, Violation};
 
+use crate::rules::prefer_bigint_over_int::BigintType;
 use crate::visitors::check_not_allowed_types;
 use crate::visitors::is_not_valid_int_type;
 
@@ -11,13 +12,13 @@ fn is_small_int_name(name: &str) -> bool {
     matches!(name, "smallint" | "int2" | "smallserial" | "serial2")
 }
 
-fn smallint_to_bigint(smallint_type: &str) -> &'static str {
+fn smallint_to_bigint(smallint_type: &str) -> BigintType {
     match smallint_type {
-        "smallint" => "bigint",
-        "int2" => "int8",
-        "smallserial" => "bigserial",
-        "serial2" => "serial8",
-        _ => "bigint",
+        "smallint" => BigintType::Bigint,
+        "int2" => BigintType::Int8,
+        "smallserial" => BigintType::Bigserial,
+        "serial2" => BigintType::Serial8,
+        _ => BigintType::Bigint,
     }
 }
 
@@ -27,11 +28,8 @@ fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
     }
     let name = ty.path_ref()?.segment()?;
     let i64 = smallint_to_bigint(&name.text());
-    let edit = Edit::replace(name.syntax().text_range(), i64);
-    Some(Fix::new(
-        format!("Replace with a 64-bit integer type: `{i64}`"),
-        vec![edit],
-    ))
+    let edit = Edit::replace(name.syntax().text_range(), i64.name());
+    Some(Fix::new(i64.fix_title(), vec![edit]))
 }
 
 fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
@@ -52,9 +50,8 @@ fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
     }
 }
 
-pub(crate) fn prefer_bigint_over_smallint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-    check_not_allowed_types(ctx, &file, check_ty_for_small_int);
+pub(crate) fn prefer_bigint_over_smallint(ctx: &mut Linter, file: &ast::SourceFile) {
+    check_not_allowed_types(ctx, file, check_ty_for_small_int);
 }
 
 #[cfg(test)]

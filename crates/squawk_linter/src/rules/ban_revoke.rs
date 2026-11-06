@@ -1,11 +1,8 @@
 use crate::{Linter, Rule, Violation};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
-pub(crate) fn ban_revoke(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for stmt in parse.tree().stmts() {
+pub(crate) fn ban_revoke(ctx: &mut Linter, file: &ast::SourceFile) {
+    for stmt in file.stmts() {
         for owner in stmt.syntax().descendants().filter_map(ast::OwnerTo::cast) {
             ctx.report(Violation::for_node(
                 Rule::BanRevoke,

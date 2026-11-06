@@ -4,7 +4,6 @@ use rustc_hash::FxHashSet;
 
 use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{Parse, SourceFile};
 
 use crate::visitors::is_serial_type;
 use crate::{Linter, Rule, Version, Violation};
@@ -81,7 +80,7 @@ fn is_virtual(generated: &ast::GeneratedConstraint, pg_version: Version) -> bool
     match generated_stored.generated_kind() {
         Some(ast::GeneratedKind::Virtual(_)) => true,
         Some(ast::GeneratedKind::Stored(_)) => false,
-        None => pg_version >= Version::new(18, None, None),
+        None => pg_version >= Version::major(18),
     }
 }
 
@@ -89,7 +88,7 @@ fn is_virtual(generated: &ast::GeneratedConstraint, pg_version: Version) -> bool
 //      select proname from pg_proc where provolatile <> 'v';
 const NON_VOLATILE_BUILT_IN_FUNCTIONS: &str = include_str!("non_volatile_built_in_functions.txt");
 
-pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+pub(crate) fn adding_field_with_default(ctx: &mut Linter, file: &ast::SourceFile) {
     let default_message = "adding a column with a volatile default rewrites the table under an `access exclusive` lock";
     let default_note = "in Postgres 11+, non-volatile defaults can be added without a rewrite";
     let generated_message =
@@ -98,7 +97,6 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
         "adding a `serial` column rewrites the table under an `access exclusive` lock";
     let serial_note = "`serial` columns have an implicit `nextval()` default, which is volatile";
     let help = "add the column as nullable, backfill existing rows, and add a trigger to update the column on write instead";
-    let file = parse.tree();
     // TODO: use match_ast! like in #api_walkthrough
     for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(alter_table) = stmt {
@@ -123,7 +121,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, parse: &Parse<SourceFi
                                 let Some(expr) = default.expr() else {
                                     continue;
                                 };
-                                if ctx.settings.pg_version >= Version::new(11, None, None)
+                                if ctx.settings.pg_version >= Version::major(11)
                                     && is_non_volatile_or_const(&expr)
                                 {
                                     continue;

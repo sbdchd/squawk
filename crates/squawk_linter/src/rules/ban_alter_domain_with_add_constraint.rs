@@ -1,12 +1,8 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn ban_alter_domain_with_add_constraint(ctx: &mut Linter, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         if let ast::Stmt::AlterDomain(alter_domain) = stmt
             && let Some(ast::AlterDomainAction::AddConstraint(add_constraint)) =

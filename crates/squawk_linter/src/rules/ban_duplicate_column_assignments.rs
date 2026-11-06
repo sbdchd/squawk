@@ -1,7 +1,7 @@
 use rustc_hash::FxHashMap;
 use smallvec::SmallVec;
 use squawk_syntax::{
-    Parse, SourceFile, SyntaxKind, SyntaxNode,
+    SyntaxKind, SyntaxNode,
     ast::{self, AstNode},
     column_name::ColumnName,
 };
@@ -26,8 +26,8 @@ struct InsertAssignment {
     is_partial: bool,
 }
 
-pub(crate) fn ban_duplicate_column_assignments(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for node in parse.tree().syntax().descendants() {
+pub(crate) fn ban_duplicate_column_assignments(ctx: &mut Linter, file: &ast::SourceFile) {
+    for node in file.syntax().descendants() {
         if let Some(set_clause) = ast::SetClause::cast(node.clone()) {
             check_set_clause(ctx, &set_clause);
         } else if let Some(insert) = ast::Insert::cast(node.clone())

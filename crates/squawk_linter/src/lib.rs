@@ -13,7 +13,7 @@ use squawk_rowan::TextRange;
 
 use squawk_diagnostics::Fix;
 use squawk_syntax::SyntaxNode;
-use squawk_syntax::{Parse, SourceFile};
+use squawk_syntax::{Parse, SourceFile, ast::AstNode};
 
 pub use version::Version;
 
@@ -504,8 +504,9 @@ impl Linter {
     }
 
     #[must_use]
-    pub fn lint(&mut self, file: &Parse<SourceFile>, text: &str) -> Vec<Violation> {
-        if has_disable_assume_in_transaction(&file.syntax_node()) {
+    pub fn lint(&mut self, parse: &Parse<SourceFile>, text: &str) -> Vec<Violation> {
+        let file = &parse.tree();
+        if has_disable_assume_in_transaction(file.syntax()) {
             self.settings.assume_in_transaction = false;
         }
 
@@ -724,16 +725,18 @@ impl Linter {
         // xtask:new-rule:rule-call
 
         // locate any ignores in the file
-        find_ignores(self, &file.syntax_node());
+        find_ignores(self, file.syntax());
 
         self.errors(text)
     }
 
     fn errors(&mut self, text: &str) -> Vec<Violation> {
-        let ignore_index = IgnoreIndex::new(text, &self.ignores);
         let mut errors = std::mem::take(&mut self.errors);
-        errors.retain(|err| !ignore_index.contains(err.text_range, err.code));
-        self.ignores.clear();
+        if !self.ignores.is_empty() {
+            let ignore_index = IgnoreIndex::new(text, &self.ignores);
+            errors.retain(|err| !ignore_index.contains(err.text_range, err.code));
+            self.ignores.clear();
+        }
         // ensure we order them by where they appear in the file
         errors.sort_by_key(|x| x.text_range.start());
         errors

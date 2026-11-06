@@ -1,9 +1,6 @@
 use rustc_hash::FxHashSet;
 
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode, NameLike},
-};
+use squawk_syntax::ast::{self, AstNode, NameLike};
 
 use crate::transactions::{TablesCreatedInTransaction, TransactionControl, TransactionState};
 use crate::{Linter, Rule, Violation};
@@ -57,12 +54,10 @@ fn not_valid_validate_in_transaction(
     }
 }
 
-pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-
+pub(crate) fn constraint_missing_not_valid(ctx: &mut Linter, file: &ast::SourceFile) {
     let assume_in_transaction = ctx.settings.assume_in_transaction;
 
-    not_valid_validate_in_transaction(ctx, assume_in_transaction, &file);
+    not_valid_validate_in_transaction(ctx, assume_in_transaction, file);
 
     let mut tables_created = TablesCreatedInTransaction::new(assume_in_transaction);
 

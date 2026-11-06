@@ -1,9 +1,8 @@
-use squawk_syntax::{Parse, SourceFile, ast::AstNode};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TransactionControl};
 
-pub(crate) fn transaction_nesting(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn transaction_nesting(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut in_explicit_transaction = false;
     let assume_in_transaction_help = "move these statements to a separate migration file, or turn off the `assume-in-transaction` setting";
 

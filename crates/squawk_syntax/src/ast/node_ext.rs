@@ -30,6 +30,7 @@ use either::Either;
 #[cfg(test)]
 use insta::assert_snapshot;
 use num_bigint::BigUint;
+use smol_str::SmolStr;
 use squawk_line_index::{LineEnding, find_newline};
 use squawk_rowan::{GreenNodeRef, GreenTokenRef, Language, NodeOrToken, TextRange, TextSize};
 
@@ -1422,7 +1423,7 @@ pub fn is_quoted_name_node(node: &SyntaxNode) -> bool {
 }
 
 pub struct LanguageName {
-    pub name: String,
+    pub name: SmolStr,
     pub range: TextRange,
 }
 
@@ -1432,14 +1433,14 @@ fn language_name(
 ) -> Option<LanguageName> {
     if let Some(language_ref) = language_ref {
         return Some(LanguageName {
-            name: normalize_name_node(language_ref.syntax()).into_owned(),
+            name: SmolStr::new(normalize_name_node(language_ref.syntax())),
             range: language_ref.syntax().text_range(),
         });
     }
 
     let literal = literal?;
     Some(LanguageName {
-        name: literal.string_value()?,
+        name: SmolStr::new(literal.decoded_value()?.text()),
         range: literal.syntax().text_range(),
     })
 }

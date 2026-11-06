@@ -1,9 +1,6 @@
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::TextRange;
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::visitors::check_not_allowed_types;
 use crate::{Linter, Rule, Violation};
@@ -69,9 +66,8 @@ fn check_ty(ctx: &mut Linter, ty: Option<ast::Type>) {
     }
 }
 
-pub(crate) fn ban_char_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-    check_not_allowed_types(ctx, &file, check_ty);
+pub(crate) fn ban_char_field(ctx: &mut Linter, file: &ast::SourceFile) {
+    check_not_allowed_types(ctx, file, check_ty);
 }
 
 #[cfg(test)]

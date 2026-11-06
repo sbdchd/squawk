@@ -1,10 +1,9 @@
+use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
-use squawk_syntax::{Parse, SourceFile, ast};
 
 use crate::{Linter, Rule, Violation};
 
-pub(crate) fn ban_truncate_cascade(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn ban_truncate_cascade(ctx: &mut Linter, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         if let ast::Stmt::Truncate(truncate) = stmt
             && let Some(ast::DropBehavior::Cascade(cascade)) = truncate.drop_behavior()

@@ -1,10 +1,7 @@
 use rustc_hash::{FxHashMap, FxHashSet};
 use smallvec::SmallVec;
 
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode, NameLike},
-};
+use squawk_syntax::ast::{self, AstNode, NameLike};
 
 use crate::name::Name;
 use crate::transactions::{TablesCreatedInTransaction, table_name_ref};
@@ -50,10 +47,8 @@ fn get_table_path(alter_table: &ast::AlterTable) -> Option<ast::PathRef> {
         .path_ref()
 }
 
-pub(crate) fn adding_not_null_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-
-    let is_pg12_plus = ctx.settings.pg_version >= Version::new(12, None, None);
+pub(crate) fn adding_not_null_field(ctx: &mut Linter, file: &ast::SourceFile) {
+    let is_pg12_plus = ctx.settings.pg_version >= Version::major(12);
 
     let mut not_null_constraints: FxHashMap<String, TableColumn> = FxHashMap::default();
     let mut validated_not_null_columns: FxHashSet<TableColumn> = FxHashSet::default();

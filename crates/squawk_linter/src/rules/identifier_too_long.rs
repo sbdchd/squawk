@@ -1,7 +1,4 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::quote::needs_quoting;
@@ -12,13 +9,8 @@ use crate::{Linter, Rule, Violation};
 const NAMEDATALEN: usize = 64;
 pub(crate) const MAX_IDENT_BYTES: usize = NAMEDATALEN - 1;
 
-pub(crate) fn identifier_too_long(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for name in parse
-        .tree()
-        .syntax()
-        .descendants()
-        .filter_map(ast::AnyName::cast)
-    {
+pub(crate) fn identifier_too_long(ctx: &mut Linter, file: &ast::SourceFile) {
+    for name in file.syntax().descendants().filter_map(ast::AnyName::cast) {
         check_name(ctx, &name);
     }
 }

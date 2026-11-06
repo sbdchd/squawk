@@ -31,8 +31,11 @@ pub(crate) fn build_comment<'a>(token: &SyntaxToken) -> Doc<'a> {
         }
         Doc::text(text.to_string())
     };
-    let mut docs = vec![];
     let mut text = token.text();
+    if find_newline(text).is_none() {
+        return line(text);
+    }
+    let mut docs = vec![];
     while let Some((position, line_ending)) = find_newline(text) {
         docs.push(line(&text[..position]));
         docs.push(Doc::empty_line());

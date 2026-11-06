@@ -1,17 +1,13 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::rules::require_concurrent_reindex::concurrently_range;
 use crate::{Linter, Rule, Violation, transactions::TransactionState};
 
 pub(crate) fn ban_concurrent_index_creation_in_transaction(
     ctx: &mut Linter,
-    parse: &Parse<SourceFile>,
+    file: &ast::SourceFile,
 ) {
     let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
-    let file = parse.tree();
     let mut errors = vec![];
     let mut stmt_count = 0;
     for stmt in file.stmts() {

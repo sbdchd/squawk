@@ -1,10 +1,7 @@
 use rustc_hash::{FxHashMap, FxHashSet};
 
 use squawk_diagnostics::{Edit, Fix};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode, NameLike},
-};
+use squawk_syntax::ast::{self, AstNode, NameLike};
 
 use crate::transactions::{TransactionControl, TransactionState};
 use crate::{Linter, Rule, Violation};
@@ -56,8 +53,7 @@ fn alembic_version_commit_tx_indices(
     (!indices.is_empty()).then_some(indices)
 }
 
-pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
     let mut constraint_names: FxHashMap<String, Constraint> = FxHashMap::default();
 

@@ -1,11 +1,8 @@
 use crate::{Linter, Rule, Violation};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
-pub(crate) fn ban_disable_trigger(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    for stmt in parse.tree().stmts() {
+pub(crate) fn ban_disable_trigger(ctx: &mut Linter, file: &ast::SourceFile) {
+    for stmt in file.stmts() {
         if let ast::Stmt::AlterTable(table) = stmt {
             for action in table.actions() {
                 let (message, note) = match action {

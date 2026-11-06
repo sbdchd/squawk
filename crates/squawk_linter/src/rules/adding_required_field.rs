@@ -1,13 +1,9 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::visitors::is_serial_type;
 use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
-pub(crate) fn adding_required_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn adding_required_field(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
     for stmt in file.stmts() {
         tables_created.update(&stmt);

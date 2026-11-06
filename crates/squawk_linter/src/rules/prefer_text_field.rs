@@ -1,8 +1,5 @@
 use squawk_diagnostics::{Edit, Fix};
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
@@ -68,9 +65,8 @@ fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
     }
 }
 
-pub(crate) fn prefer_text_field(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
-    check_not_allowed_types(ctx, &file, check_ty_for_varchar);
+pub(crate) fn prefer_text_field(ctx: &mut Linter, file: &ast::SourceFile) {
+    check_not_allowed_types(ctx, file, check_ty_for_varchar);
 }
 
 #[cfg(test)]

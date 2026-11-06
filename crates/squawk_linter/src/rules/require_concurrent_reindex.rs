@@ -1,9 +1,6 @@
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::TextRange;
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TransactionState};
 
@@ -39,9 +36,9 @@ pub(crate) fn concurrently_range(reindex: &ast::Reindex) -> Option<TextRange> {
         })
 }
 
-pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, parse: &Parse<SourceFile>) {
+pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
-    for stmt in parse.tree().stmts() {
+    for stmt in file.stmts() {
         transaction.update(&stmt);
         if let ast::Stmt::Reindex(reindex) = stmt {
             // REINDEX SYSTEM does not support CONCURRENTLY

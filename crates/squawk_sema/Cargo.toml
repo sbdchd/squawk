@@ -21,7 +21,9 @@ squawk-line-index.workspace = true
 squawk-rowan.workspace = true
 la-arena.workspace = true
 smallvec.workspace = true
+smol_str.workspace = true
 rustc-hash.workspace = true
+hashbrown.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

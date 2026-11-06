@@ -161,11 +161,12 @@ fn is_empty_quoted_ident(token_text: &str, uescape: bool) -> bool {
 
 impl<'a> Converter<'a> {
     fn new(text: &'a str) -> Self {
+        let tokens = text.len() / 4 + 1;
         Self {
             res: LexedStr {
                 text,
-                kind: Vec::new(),
-                start: Vec::new(),
+                kind: Vec::with_capacity(tokens),
+                start: Vec::with_capacity(tokens),
                 error: Vec::new(),
             },
             offset: 0,

@@ -1,13 +1,9 @@
-use squawk_syntax::{
-    Parse, SourceFile,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
 /// Brad's Rule aka ban dropping database statements.
-pub(crate) fn ban_drop_database(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn ban_drop_database(ctx: &mut Linter, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         if let ast::Stmt::DropDatabase(drop_database) = stmt {
             ctx.report(Violation::for_node(

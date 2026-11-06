@@ -1,12 +1,11 @@
 use squawk_syntax::{
-    Parse, SourceFile, SyntaxNode,
+    SyntaxNode,
     ast::{self, AstNode},
 };
 
 use crate::{Linter, Rule, Violation};
 
-pub(crate) fn require_table_schema(ctx: &mut Linter, parse: &Parse<SourceFile>) {
-    let file = parse.tree();
+pub(crate) fn require_table_schema(ctx: &mut Linter, file: &ast::SourceFile) {
     for stmt in file.stmts() {
         match stmt {
             ast::Stmt::CreateTable(create_table) => {
