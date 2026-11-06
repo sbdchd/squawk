@@ -811,7 +811,7 @@ select f(a) from t;
 alter table t alter column a type text;
 select f(a) from t;
 begin;
-alter table t alter column a type int;
+alter table t alter column a type int using a::int;
 rollback;
 select f(a) from t;
 "), @"
@@ -948,5 +948,79 @@ select c, d, e from t, p;"), @"
     15 - select c, d, e from t, p;
     15 + select c, d, t.a from t, p;
        ╰╴
+    ");
+}
+
+#[test]
+fn alter_column_type_without_using() {
+    assert_snapshot!(check("
+create table t (
+  a text,
+  b int,
+  c int[],
+  d date,
+  e text[],
+  f bool,
+  g varchar(10),
+  h numeric,
+  i json,
+  j point
+);
+alter table t alter column a type int;
+alter table t alter column b type text;
+alter table t alter column b type bigint;
+alter table t alter column c type bigint[];
+alter table t alter column c type text[];
+alter table t alter column d type timestamp;
+alter table t alter column e type int[];
+alter table t alter column f type int;
+alter table t alter column g type varchar(20);
+alter table t alter column h type int;
+alter table t alter column i type jsonb;
+alter table t alter column a type int using a::int;
+alter table t alter column j type int;
+"), @"
+    error: column `a` cannot be cast automatically to type `int4`
+       ╭▸ 
+    14 │ alter table t alter column a type int;
+       │                                   ━━━
+       ╰╴
+    help: convert the existing values with an explicit cast
+       ╭╴
+    14 │ alter table t alter column a type int using a::int4;
+       ╰╴                                      +++++++++++++
+    error: column `b` cannot be cast automatically to type `int8`
+       ╭▸ 
+    16 │ alter table t alter column b type bigint;
+       │                                   ━━━━━━
+       ╰╴
+    help: convert the existing values with an explicit cast
+       ╭╴
+    16 │ alter table t alter column b type bigint using b::int8;
+       ╰╴                                         +++++++++++++
+    error: column `e` cannot be cast automatically to type `int4[]`
+       ╭▸ 
+    20 │ alter table t alter column e type int[];
+       │                                   ━━━━━
+       ╰╴
+    help: convert the existing values with an explicit cast
+       ╭╴
+    20 │ alter table t alter column e type int[] using e::int4[];
+       ╰╴                                        +++++++++++++++
+    error: column `f` cannot be cast automatically to type `int4`
+       ╭▸ 
+    21 │ alter table t alter column f type int;
+       │                                   ━━━
+       ╰╴
+    help: convert the existing values with an explicit cast
+       ╭╴
+    21 │ alter table t alter column f type int using f::int4;
+       ╰╴                                      +++++++++++++
+    error: column `j` cannot be cast automatically to type `int4`
+       ╭▸ 
+    26 │ alter table t alter column j type int;
+       │                                   ━━━
+       │
+       ╰ hint: add a `using` clause that converts the existing values
     ");
 }

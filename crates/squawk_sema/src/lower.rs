@@ -57,7 +57,7 @@ use crate::{
 };
 use crate::{
     overload::{
-        ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, CommonType,
+        ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
     postgres,
@@ -17598,19 +17598,21 @@ impl Lowerer {
                     });
                 }
                 if let Some(table) = table
-                    && let Some(view) = self.view_depending_on_column(table, column)
-                {
-                    let error = SemaError::AlterColumnTypeWithDependents {
-                        column,
-                        view: self.index.tables[view].name,
-                    };
-                    self.push_error(column_ref.syntax(), error);
-                    return;
-                }
-                if let Some(table) = table
                     && self.index.tables.is_local(table)
                     && !self.report_table_member_of_itself(set_type.ty(), ty, table)
+                    && !ty.is_some_and(|ty| {
+                        set_type.using_expr().is_none()
+                            && self.report_alter_column_type_cast(table, column, ty, &set_type)
+                    })
                 {
+                    if let Some(view) = self.view_depending_on_column(table, column) {
+                        let error = SemaError::AlterColumnTypeWithDependents {
+                            column,
+                            view: self.index.tables[view].name,
+                        };
+                        self.push_error(column_ref.syntax(), error);
+                        return;
+                    }
                     self.set_table_column_type(table, column, ty);
                     self.revalidate_foreign_keys(table, column, alter_column.syntax());
                     self.set_inherited_column_type(table, column, ty, alter_column.syntax());
@@ -17788,6 +17790,36 @@ impl Lowerer {
     fn identity_kind_of(&self, table: TableId, column: Name) -> Option<IdentityKind> {
         let sequence = self.identity_sequence(table, column)?;
         self.index.tables[sequence].sequence_owner?.identity
+    }
+
+    fn report_alter_column_type_cast(
+        &mut self,
+        table: TableId,
+        column: Name,
+        ty: Ty,
+        set_type: &ast::SetType,
+    ) -> bool {
+        let Some(current) = self
+            .find_table_column(table, column)
+            .and_then(|id| self.index.columns[id].ty)
+        else {
+            return false;
+        };
+        let overloads = self.overloads();
+        if overloads.coercion(current, ty, CastContext::Assignment) != Coercion::No {
+            return false;
+        }
+        let explicit = overloads.coercion(current, ty, CastContext::Explicit) == Coercion::Yes;
+        let error = SemaError::AlterColumnTypeWithoutUsing {
+            column,
+            ty: self.index.ty_name(ty),
+            insert_at: explicit.then(|| self.node_range(set_type.syntax()).end()),
+        };
+        let node = set_type
+            .ty()
+            .map_or_else(|| set_type.syntax().clone(), |ty| ty.syntax().clone());
+        self.push_error(&node, error);
+        true
     }
 
     fn identity_sequence(&self, table: TableId, column: Name) -> Option<TableId> {

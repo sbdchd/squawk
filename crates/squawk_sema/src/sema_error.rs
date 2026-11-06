@@ -786,6 +786,11 @@ pub(crate) enum SemaError {
         column: Name,
         identity: bool,
     },
+    AlterColumnTypeWithoutUsing {
+        column: Name,
+        ty: TyName,
+        insert_at: Option<TextSize>,
+    },
     DropColumnWithDependents {
         column: Name,
         table: Name,
@@ -1482,6 +1487,7 @@ impl SemaError {
             SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
                 DiagnosticKind::TypeMismatch
             }
+            SemaError::AlterColumnTypeWithoutUsing { .. } => DiagnosticKind::TypeMismatch,
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
@@ -1734,6 +1740,25 @@ impl SemaError {
                     },
                 }
             }
+            SemaError::AlterColumnTypeWithoutUsing {
+                column,
+                ty,
+                insert_at: Some(insert_at),
+            } => {
+                let suffix = if ty.array { "[]" } else { "" };
+                let using = format!(
+                    "using {}::{}{suffix}",
+                    quote_ident(names.resolve(column)),
+                    names.resolve(ty.name)
+                );
+                Suggestion {
+                    message: "convert the existing values with an explicit cast".into(),
+                    fix: Fix {
+                        title: format!("Insert `{using}`").into(),
+                        edits: vec![Edit::insert(format!(" {using}"), insert_at)],
+                    },
+                }
+            }
             SemaError::OrdinalityColumnDefList {
                 fix: Some(OrdinalityColumnDefListFix { call_range, alias }),
             } => {
@@ -1976,6 +2001,9 @@ impl SemaError {
             SemaError::DropColumnWithDependents { .. } => {
                 Some("use `drop column ... cascade` to drop the dependent objects too")
             }
+            SemaError::AlterColumnTypeWithoutUsing {
+                insert_at: None, ..
+            } => Some("add a `using` clause that converts the existing values"),
             SemaError::RecursiveCteTypeMismatch { .. } => {
                 Some("cast the output of the non-recursive term to the overall type")
             }
@@ -3040,6 +3068,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 kind.label(),
                 n(table),
                 n(column)
+            ),
+            SemaError::AlterColumnTypeWithoutUsing { column, ty, .. } => write!(
+                f,
+                "column `{}` cannot be cast automatically to type `{}`",
+                n(column),
+                self.ty(ty)
             ),
             SemaError::DropColumnWithDependents { column, table, .. } => write!(
                 f,

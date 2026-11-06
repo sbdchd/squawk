@@ -122,6 +122,21 @@ impl CommonType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Coercion {
+    Yes,
+    No,
+    Unknown,
+}
+
+fn cast_rank(context: CastContext) -> u8 {
+    match context {
+        CastContext::Implicit => 0,
+        CastContext::Assignment => 1,
+        CastContext::Explicit => 2,
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum CommonTypeResult {
     Found(Ty),
     Mismatch,
@@ -643,6 +658,60 @@ impl<'a> Overloads<'a> {
             ArgType::UnknownLiteral => Some(Match::UnknownLiteral),
             ArgType::Untyped => Some(Match::Uncertain),
         }
+    }
+
+    pub(crate) fn coercion(&self, source: Ty, target: Ty, context: CastContext) -> Coercion {
+        if source == target {
+            return Coercion::Yes;
+        }
+        if self.pseudo(source).is_some() || self.pseudo(target).is_some() {
+            return Coercion::Unknown;
+        }
+        let (Some(source), Some(target)) =
+            (self.index.base_type(source), self.index.base_type(target))
+        else {
+            return Coercion::Unknown;
+        };
+        if source == target {
+            return Coercion::Yes;
+        }
+        if let Some(cast) = self
+            .index
+            .casts
+            .get(CastTypes { source, target })
+            .find(|cast| !self.dropped_casts.contains(cast))
+        {
+            return if cast_rank(self.index.casts[cast].context) <= cast_rank(context) {
+                Coercion::Yes
+            } else {
+                Coercion::No
+            };
+        }
+        if !matches!(self.builtin_name(target), Some("int2vector" | "oidvector"))
+            && let (Some(source_element), Some(target_element)) = (
+                self.index.element_type(source),
+                self.index.element_type(target),
+            )
+        {
+            match self.coercion(source_element, target_element, context) {
+                Coercion::Yes => return Coercion::Yes,
+                Coercion::Unknown => return Coercion::Unknown,
+                Coercion::No => {}
+            }
+        }
+        let (Some(source_category), Some(target_category)) =
+            (self.category(source), self.category(target))
+        else {
+            return Coercion::Unknown;
+        };
+        let via_io = match context {
+            CastContext::Implicit => false,
+            CastContext::Assignment => target_category == Category::String,
+            CastContext::Explicit => {
+                target_category == Category::String || source_category == Category::String
+            }
+        };
+        if via_io { Coercion::Yes } else { Coercion::No }
     }
 
     fn coerce(&self, arg: Ty, param: Ty) -> Option<Match> {
