@@ -14378,12 +14378,11 @@ impl Lowerer {
             | SourceKind::ElementVariable
             | SourceKind::Other => None,
         });
-        if let Some(table) = table {
-            self.check_conflict_on_system_catalog(table, on_conflict);
-        }
+        let checked =
+            table.filter(|table| !self.check_conflict_on_system_catalog(*table, on_conflict));
         match on_conflict.conflict_target() {
             Some(ast::ConflictTarget::ConflictOnIndex(on_index)) => {
-                if let Some(table) = table {
+                if let Some(table) = checked {
                     self.check_conflict_arbiter(table, &on_index);
                 }
                 for item in on_index
@@ -14415,9 +14414,9 @@ impl Lowerer {
                     self.check_conflict_constraint(constraint, on_conflict, &name_ref);
                 }
             }
-            None => self.check_missing_conflict_target(table, on_conflict),
+            None => self.check_missing_conflict_target(checked, on_conflict),
         }
-        if let Some(table) = table {
+        if let Some(table) = checked {
             self.check_conflict_rules(table, on_conflict);
         }
 
@@ -20926,7 +20925,7 @@ impl Lowerer {
         &mut self,
         table: TableId,
         on_conflict: &ast::OnConflictClause,
-    ) {
+    ) -> bool {
         let Table { kind, schema, .. } = self.index.tables[table];
         let is_table = match kind {
             TableKind::Table => true,
@@ -20937,17 +20936,16 @@ impl Lowerer {
             | TableKind::PropertyGraph => false,
         };
         if !is_table || schema != self.pg_catalog || self.index.tables.is_local(table) {
-            return;
+            return false;
         }
-        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
-        else {
-            return;
-        };
-        let range = TextRange::new(on.text_range().start(), conflict.text_range().end());
-        self.push_error_at(
-            InIrFile::new(self.file_id, range),
-            SemaError::ConflictOnSystemCatalog,
-        );
+        if let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token()) {
+            let range = TextRange::new(on.text_range().start(), conflict.text_range().end());
+            self.push_error_at(
+                InIrFile::new(self.file_id, range),
+                SemaError::ConflictOnSystemCatalog,
+            );
+        }
+        true
     }
 
     fn check_whole_row_conflict_target(&mut self, target: Option<SourceId>, expr: &ast::Expr) {
@@ -21119,10 +21117,7 @@ impl Lowerer {
             | TableKind::Sequence
             | TableKind::PropertyGraph => false,
         };
-        is_table
-            && constraints_complete
-            && self.index.tables.is_local(table)
-            && !self.dropped_tables.contains(&table)
+        is_table && constraints_complete && !self.dropped_tables.contains(&table)
     }
 
     fn find_unique_index(
