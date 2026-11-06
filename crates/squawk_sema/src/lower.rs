@@ -82,6 +82,7 @@ impl Lowerer {
             from_subqueries: vec![],
             expr_context: ExprContext::Unrestricted,
             aggregate_calls: vec![],
+            outer_aggregates: vec![],
             srf_calls: vec![],
             array_cast: false,
             foreign_keys: vec![],
@@ -107,6 +108,7 @@ impl Lowerer {
             column_exprs: ColumnExprs::default(),
             partition_keys: FxHashMap::default(),
             view_column_deps: vec![],
+            view_bases: FxHashMap::default(),
             next_column_expr: 0,
             dropped_operator_family_members: FxHashSet::default(),
             undo: vec![],
@@ -387,6 +389,7 @@ pub(crate) struct Lowerer {
     from_subqueries: Vec<FromSubquery>,
     expr_context: ExprContext,
     aggregate_calls: Vec<AggregateCall>,
+    outer_aggregates: Vec<usize>,
     srf_calls: Vec<SrfCall>,
     array_cast: bool,
     foreign_keys: Vec<ForeignKey>,
@@ -412,6 +415,7 @@ pub(crate) struct Lowerer {
     column_exprs: ColumnExprs,
     partition_keys: FxHashMap<TableId, PartitionKey>,
     view_column_deps: Vec<ViewColumnDep>,
+    view_bases: FxHashMap<TableId, TableId>,
     next_column_expr: u32,
     dropped_operator_family_members: FxHashSet<OperatorFamilyMemberId>,
     undo: Vec<Undo>,
@@ -515,6 +519,28 @@ struct ViewColumnDep {
 enum PartitionKey {
     Columns(IdxRange<Name>),
     Expressions,
+}
+
+struct ConflictRules {
+    found: Option<ConflictRule>,
+    instead_insert: bool,
+}
+
+#[derive(Clone, Copy)]
+struct ConflictRule {
+    rule: Name,
+    event: ConflictRuleEvent,
+}
+
+struct TableConflictRule {
+    table: TableId,
+    rule: ConflictRule,
+}
+
+#[derive(Clone, Copy)]
+struct TriggerFlags {
+    constraint: bool,
+    instead_of_insert: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -1512,6 +1538,7 @@ impl Lowerer {
     fn lower_stmt(&mut self, stmt: &ast::Stmt) {
         self.record_search_path(stmt.syntax().text_range().start());
         self.aggregate_calls.clear();
+        self.outer_aggregates.clear();
         self.srf_calls.clear();
         match stmt {
             ast::Stmt::CreateTable(create_table) => self.lower_create_table(
@@ -11304,6 +11331,11 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         let stars = self.index.star_columns.next_idx();
         let start = self.index.tables.next_idx();
+        let calls = CallMarks {
+            aggregate: self.aggregate_calls.len(),
+            outer_aggregate: self.outer_aggregates.len(),
+            srf: self.srf_calls.len(),
+        };
         let query = create_view.query().map(|query| self.lower_query(query));
         let Some(path) = create_view.view().and_then(|view| view.path()) else {
             return;
@@ -11345,7 +11377,116 @@ impl Lowerer {
         );
         self.alloc_return_rule(table);
         self.record_view_column_deps(table, refs, stars);
+        if let (Some(query), Some(query_node)) = (query, create_view.query())
+            && let Some(base) = self.auto_updatable_view_base(query, &query_node, refs, calls)
+        {
+            self.view_bases.insert(table, base);
+        }
         self.depend_on_refs(refs, self.index.tables.range_from(start), Object::Table);
+    }
+
+    fn auto_updatable_view_base(
+        &self,
+        query: QueryId,
+        node: &ast::SelectVariant,
+        refs: RefId,
+        calls: CallMarks,
+    ) -> Option<TableId> {
+        let ast::SelectVariant::Select(select) = node else {
+            return None;
+        };
+        let select_clause = select.select_clause()?;
+        if select.with_clause().is_some()
+            || select_clause.select_quantifier().is_some_and(|quantifier| {
+                matches!(quantifier, ast::SelectQuantifier::DistinctClause(_))
+            })
+            || select.group_by_clause().is_some()
+            || select.having_clause().is_some()
+            || select.window_clause().is_some()
+            || select.tail_clauses().any(|clause| match clause {
+                ast::SelectTailClause::FetchClause(_)
+                | ast::SelectTailClause::LimitClause(_)
+                | ast::SelectTailClause::OffsetClause(_) => true,
+                ast::SelectTailClause::LockingClause(_)
+                | ast::SelectTailClause::OrderByClause(_) => false,
+            })
+            || select.from_clause().is_some_and(|from| {
+                from.items().any(|item| {
+                    matches!(
+                        item,
+                        ast::FromListItem::FromItem(ast::FromItem::RelationFromItem(relation))
+                            if relation.tablesample_clause().is_some()
+                    )
+                })
+            })
+        {
+            return None;
+        }
+        let depth = self.scopes.len() + 1;
+        if self.aggregate_calls[calls.aggregate..]
+            .iter()
+            .any(|call| call.depth == depth)
+            || self.outer_aggregates[calls.outer_aggregate..].contains(&depth)
+            || self.srf_calls[calls.srf..]
+                .iter()
+                .any(|call| call.depth == depth)
+        {
+            return None;
+        }
+        let [source] = self.index.queries[query].sources[..] else {
+            return None;
+        };
+        let SourceKind::Table(table) = self.index.sources[source].kind else {
+            return None;
+        };
+        match self.index.tables[table].kind {
+            TableKind::Table | TableKind::ForeignTable | TableKind::View => {}
+            TableKind::MaterializedView | TableKind::Sequence | TableKind::PropertyGraph => {
+                return None;
+            }
+        }
+        let has_updatable_column = select_clause
+            .target_list()
+            .into_iter()
+            .flat_map(|list| list.targets())
+            .any(|target| {
+                let star = target.star_token().is_some()
+                    || matches!(target.expr(), Some(ast::Expr::FieldExpr(field)) if field.star_token().is_some());
+                if star {
+                    return !self.index.tables[table].columns.range.is_empty();
+                }
+                target
+                    .expr()
+                    .is_some_and(|expr| self.is_source_column(refs, source, &expr))
+            });
+        has_updatable_column.then_some(table)
+    }
+
+    fn is_source_column(&self, refs: RefId, source: SourceId, expr: &ast::Expr) -> bool {
+        let expr = expr.unparen();
+        let column_ref = matches!(&expr, ast::Expr::NameRef(_))
+            || matches!(&expr, ast::Expr::FieldExpr(field) if field.star_token().is_none());
+        if !column_ref {
+            return false;
+        }
+        let range = expr.syntax().text_range();
+        self.index
+            .references
+            .range_from(refs)
+            .iter()
+            .rev()
+            .map(|reference| &self.index.references[reference])
+            .find(|reference| {
+                reference.kind == ReferenceKind::Column
+                    && reference.range.file_id == self.file_id
+                    && range.contains_range(reference.range.value)
+            })
+            .is_some_and(|reference| {
+                matches!(
+                    reference.resolution,
+                    Resolution::Column { source: Some(found), .. } if found == source
+                )
+            })
     }
 
     fn record_view_column_deps(&mut self, view: TableId, refs: RefId, stars: Idx<ColumnId>) {
@@ -18181,13 +18322,24 @@ impl Lowerer {
         if constraint && let Some(or_replace) = create_trigger.or_replace() {
             self.push_error(or_replace.syntax(), SemaError::ReplaceConstraintTrigger);
         }
+        let instead_of_insert = matches!(
+            create_trigger.timing(),
+            Some(ast::Timing::TimingInsteadOf(_))
+        ) && create_trigger
+            .trigger_event_list()
+            .into_iter()
+            .flat_map(|list| list.trigger_events())
+            .any(|event| matches!(event, ast::TriggerEvent::TriggerEventInsert(_)));
         if let (Some(table), Some(name)) = (table, create_trigger.trigger()) {
             self.alloc_trigger(
                 IfExists::from_or_replace(create_trigger.or_replace().as_ref()),
                 create_trigger.syntax(),
                 &name,
                 table,
-                constraint,
+                TriggerFlags {
+                    constraint,
+                    instead_of_insert,
+                },
             );
         }
         self.depend_on_refs(refs, self.index.triggers.range_from(start), Object::Trigger);
@@ -18199,8 +18351,12 @@ impl Lowerer {
         node: &SyntaxNode,
         name_node: &impl NameLike,
         table: TableId,
-        constraint: bool,
+        flags: TriggerFlags,
     ) {
+        let TriggerFlags {
+            constraint,
+            instead_of_insert,
+        } = flags;
         let name = self.intern(&name_node.text());
         if let Some(existing) = self.find_trigger(table, name) {
             match if_exists {
@@ -18221,6 +18377,7 @@ impl Lowerer {
             name,
             table,
             constraint,
+            instead_of_insert,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
@@ -18315,7 +18472,10 @@ impl Lowerer {
                     && let Some(name) = rename.trigger()
                 {
                     let Trigger {
-                        table, constraint, ..
+                        table,
+                        constraint,
+                        instead_of_insert,
+                        ..
                     } = self.index.triggers[trigger];
                     let new_name = self.intern(&name.text());
                     if self.find_trigger(table, new_name).is_some() {
@@ -18329,7 +18489,10 @@ impl Lowerer {
                         alter_trigger.syntax(),
                         &name,
                         table,
-                        constraint,
+                        TriggerFlags {
+                            constraint,
+                            instead_of_insert,
+                        },
                     );
                     self.record_moves(
                         Object::Trigger(trigger),
@@ -21557,15 +21720,52 @@ impl Lowerer {
         if self.function.is_some() {
             return;
         }
-        let Table { kind, name, .. } = self.index.tables[table];
-        let mut auto_updatable_view = match kind {
-            TableKind::View => true,
-            TableKind::Table
-            | TableKind::ForeignTable
-            | TableKind::MaterializedView
-            | TableKind::Sequence
-            | TableKind::PropertyGraph => false,
+        let Some(TableConflictRule {
+            table,
+            rule: ConflictRule { rule, event },
+        }) = self.conflict_rule_through_views(table)
+        else {
+            return;
         };
+        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
+        else {
+            return;
+        };
+        let range = TextRange::new(on.text_range().start(), conflict.text_range().end());
+        self.push_error_at(
+            InIrFile::new(self.file_id, range),
+            SemaError::ConflictWithRules {
+                table: self.index.tables[table].name,
+                rule,
+                event,
+            },
+        );
+    }
+
+    fn conflict_rule_through_views(&self, table: TableId) -> Option<TableConflictRule> {
+        let mut table = table;
+        for _ in 0..32 {
+            let ConflictRules {
+                found,
+                instead_insert,
+            } = self.conflict_rules(table);
+            let is_view = self.index.tables[table].kind == TableKind::View;
+            let auto_updatable = is_view
+                && !instead_insert
+                && !self.index.triggers.get(table).any(|id| {
+                    !self.dropped_triggers.contains(&id)
+                        && self.index.triggers[id].instead_of_insert
+                });
+            if !auto_updatable {
+                return found.map(|rule| TableConflictRule { table, rule });
+            }
+            table = *self.view_bases.get(&table)?;
+        }
+        None
+    }
+
+    fn conflict_rules(&self, table: TableId) -> ConflictRules {
+        let mut instead_insert = false;
         let mut found = None;
         for id in self.index.rules.get(table) {
             if self.dropped_rules.contains(&id) {
@@ -21584,7 +21784,7 @@ impl Lowerer {
                         RuleEnabled::Replica | RuleEnabled::Disabled => continue,
                     }
                     if behavior.mode == RuleMode::Instead {
-                        auto_updatable_view = false;
+                        instead_insert = true;
                     }
                     if !behavior.has_actions {
                         continue;
@@ -21594,27 +21794,12 @@ impl Lowerer {
                 RuleEvent::Update => ConflictRuleEvent::Update,
                 RuleEvent::Select | RuleEvent::Delete => continue,
             };
-            found.get_or_insert((rule, event));
+            found.get_or_insert(ConflictRule { rule, event });
         }
-        if auto_updatable_view {
-            return;
+        ConflictRules {
+            found,
+            instead_insert,
         }
-        let Some((rule, event)) = found else {
-            return;
-        };
-        let (Some(on), Some(conflict)) = (on_conflict.on_token(), on_conflict.conflict_token())
-        else {
-            return;
-        };
-        let range = TextRange::new(on.text_range().start(), conflict.text_range().end());
-        self.push_error_at(
-            InIrFile::new(self.file_id, range),
-            SemaError::ConflictWithRules {
-                table: name,
-                rule,
-                event,
-            },
-        );
     }
 
     fn check_do_select_returning(&mut self, on_conflict: &ast::OnConflictClause) {
@@ -23903,8 +24088,12 @@ impl Lowerer {
         } else {
             return;
         };
-        if kind == AggregateCallKind::Aggregate && !self.aggregate_is_local(refs) {
-            return;
+        if kind == AggregateCallKind::Aggregate {
+            let depth = self.aggregate_depth(refs);
+            if depth != self.scopes.len() {
+                self.outer_aggregates.push(depth);
+                return;
+            }
         }
         let ptr = self.ptr(call.syntax());
         let context = self.expr_context;
@@ -23947,38 +24136,45 @@ impl Lowerer {
             .push(AggregateCall { kind, depth, ptr });
     }
 
-    fn aggregate_is_local(&self, refs: RefId) -> bool {
+    fn aggregate_depth(&self, refs: RefId) -> usize {
+        let depth = self.scopes.len();
         let Some(scope) = self.scopes.last() else {
-            return true;
+            return depth;
         };
         let sources = &self.index.queries[scope.query].sources;
-        let mut outer = false;
+        let mut owner = None;
         for id in self.index.references.range_from(refs) {
             let reference = &self.index.references[id];
             if reference.scope != Some(scope.scope) {
                 continue;
             }
-            match reference.resolution {
+            let outer = match reference.resolution {
                 Resolution::Column {
                     source: Some(source),
                     ..
                 }
                 | Resolution::Source(source) => {
                     if sources.contains(&source) {
-                        return true;
+                        return depth;
                     }
-                    outer = true;
+                    self.scopes[..depth - 1]
+                        .iter()
+                        .rposition(|scope| {
+                            self.index.queries[scope.query].sources.contains(&source)
+                        })
+                        .map_or(depth - 1, |position| position + 1)
                 }
-                Resolution::Column { source: None, .. } => return true,
+                Resolution::Column { source: None, .. } => return depth,
                 Resolution::Unresolved | Resolution::Unknown | Resolution::Ambiguous
                     if reference.kind == ReferenceKind::Column =>
                 {
-                    outer = true;
+                    depth - 1
                 }
-                _ => {}
-            }
+                _ => continue,
+            };
+            owner = owner.max(Some(outer));
         }
-        !outer
+        owner.unwrap_or(depth)
     }
 
     fn with_expr_context<T>(&mut self, context: ExprContext, f: impl FnOnce(&mut Self) -> T) -> T {
@@ -26591,6 +26787,13 @@ struct AggregateCall {
     kind: AggregateCallKind,
     depth: usize,
     ptr: InIrFile<SyntaxNodePtr>,
+}
+
+#[derive(Clone, Copy)]
+struct CallMarks {
+    aggregate: usize,
+    outer_aggregate: usize,
+    srf: usize,
 }
 
 #[derive(Clone, Copy)]

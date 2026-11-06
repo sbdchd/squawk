@@ -170,6 +170,7 @@ pub struct Trigger {
     pub name: Name,
     pub table: TableId,
     pub constraint: bool,
+    pub(crate) instead_of_insert: bool,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<SyntaxNodePtr>,
     pub name_ptr: InIrFile<SyntaxNodePtr>,
