@@ -9,6 +9,7 @@ use crate::ir::{
 };
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::{TextRange, TextSize};
+use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
@@ -523,7 +524,12 @@ pub(crate) enum SemaError {
         what: &'static str,
     },
     CompoundColumnCount {
-        op: &'static str,
+        op: CompoundOp,
+    },
+    CompoundTypeMismatch {
+        op: CompoundOp,
+        left: TyName,
+        right: TyName,
     },
     ColumnListTooLong {
         what: &'static str,
@@ -839,6 +845,33 @@ impl Quantifier {
             Quantifier::Any => "any",
             Quantifier::Some => "some",
             Quantifier::All => "all",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum CompoundOp {
+    Union,
+    Intersect,
+    Except,
+}
+
+impl CompoundOp {
+    fn keyword(self) -> &'static str {
+        match self {
+            CompoundOp::Union => "union",
+            CompoundOp::Intersect => "intersect",
+            CompoundOp::Except => "except",
+        }
+    }
+}
+
+impl From<ast::CompoundOp> for CompoundOp {
+    fn from(op: ast::CompoundOp) -> CompoundOp {
+        match op {
+            ast::CompoundOp::Union(_) => CompoundOp::Union,
+            ast::CompoundOp::Intersect(_) => CompoundOp::Intersect,
+            ast::CompoundOp::Except(_) => CompoundOp::Except,
         }
     }
 }
@@ -1402,6 +1435,7 @@ impl SemaError {
             | SemaError::TableRowTypeAlteredAsType { .. } => DiagnosticKind::WrongTypeKind,
             SemaError::TypedTableAlter { .. } => DiagnosticKind::TypedTableAlter,
             SemaError::InvalidDomainConstraint { .. } => DiagnosticKind::InvalidDomainConstraint,
+            SemaError::CompoundTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
@@ -3028,9 +3062,18 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::InvalidDomainConstraint { what } => {
                 write!(f, "{what} not possible for domains")
             }
-            SemaError::CompoundColumnCount { op } => {
-                write!(f, "each `{op}` query must have the same number of columns")
-            }
+            SemaError::CompoundColumnCount { op } => write!(
+                f,
+                "each `{}` query must have the same number of columns",
+                op.keyword()
+            ),
+            SemaError::CompoundTypeMismatch { op, left, right } => write!(
+                f,
+                "`{}` types `{}` and `{}` cannot be matched",
+                op.keyword(),
+                self.ty(left),
+                self.ty(right)
+            ),
             SemaError::ColumnListTooLong {
                 what,
                 name,

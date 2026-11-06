@@ -45,7 +45,7 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
+        ArgLabel, ColumnDefListReason, Comparison, CompoundOp, ConflictAction, ConflictRuleEvent,
         ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates,
         ErrorParam, ErrorReturnType, GeneratedKind, LookupKind, ObjectKind, OperandName,
         OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
@@ -57,7 +57,7 @@ use crate::{
 use crate::{
     overload::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, CommonType,
-        MissingParam, Overloads,
+        CommonTypeResult, MissingParam, Overloads,
     },
     postgres,
 };
@@ -506,6 +506,14 @@ struct ColumnExprId(u32);
 enum PartitionKey {
     Columns(IdxRange<Name>),
     Expressions,
+}
+
+#[derive(Clone, Copy)]
+struct CompoundOperands<'a> {
+    lhs: QueryId,
+    rhs: QueryId,
+    lhs_node: &'a ast::SelectVariant,
+    rhs_node: &'a ast::SelectVariant,
 }
 
 struct InsertValues<'a> {
@@ -13960,17 +13968,26 @@ impl Lowerer {
             self.index
                 .set_column_owner(columns.range, ColumnOwner::Cte(cte));
         }
+        let mut columns = lhs.map(|lhs| self.index.queries[lhs].columns);
         if let Some(rhs) = compound.rhs() {
             let rhs_query = self.lower_query(rhs.clone());
-            if let Some(lhs) = lhs {
-                self.check_compound_arity(compound, lhs, rhs_query, &rhs);
+            if let Some(lhs) = lhs
+                && self.check_compound_arity(compound, lhs, rhs_query, &rhs)
+                && let Some(lhs_node) = compound.lhs()
+            {
+                let operands = CompoundOperands {
+                    lhs,
+                    rhs: rhs_query,
+                    lhs_node: &lhs_node,
+                    rhs_node: &rhs,
+                };
+                columns = self.compound_columns(compound, operands);
             }
         }
         let id = self.alloc_query(QueryKind::Compound, compound.syntax());
-        if let Some(lhs) = lhs {
-            self.index.queries[id].columns = self.index.queries[lhs].columns;
-        } else {
-            self.index.queries[id].columns.complete = false;
+        match columns {
+            Some(columns) => self.index.queries[id].columns = columns,
+            None => self.index.queries[id].columns.complete = false,
         }
         self.lower_tail_clauses_for_outputs(id, compound.tail_clauses());
         self.ctes.truncate(mark);
@@ -13983,19 +14000,107 @@ impl Lowerer {
         lhs: QueryId,
         rhs: QueryId,
         rhs_node: &ast::SelectVariant,
-    ) {
+    ) -> bool {
         let lhs = self.index.queries[lhs].columns;
         let rhs = self.index.queries[rhs].columns;
-        if !lhs.complete || !rhs.complete || lhs.range.len() == rhs.range.len() {
-            return;
+        if !lhs.complete || !rhs.complete {
+            return false;
         }
-        let op = match compound.op() {
-            Some(ast::CompoundOp::Union(_)) => "union",
-            Some(ast::CompoundOp::Intersect(_)) => "intersect",
-            Some(ast::CompoundOp::Except(_)) => "except",
-            None => return,
-        };
-        self.push_error(rhs_node.syntax(), SemaError::CompoundColumnCount { op });
+        if lhs.range.len() == rhs.range.len() {
+            return true;
+        }
+        if let Some(op) = compound.op() {
+            self.push_error(
+                rhs_node.syntax(),
+                SemaError::CompoundColumnCount { op: op.into() },
+            );
+        }
+        false
+    }
+
+    fn compound_columns(
+        &mut self,
+        compound: &ast::CompoundSelect,
+        operands: CompoundOperands,
+    ) -> Option<Columns> {
+        let lhs_columns = self.index.queries[operands.lhs].columns;
+        let rhs_columns = self.index.queries[operands.rhs].columns;
+        let op: CompoundOp = compound.op()?.into();
+        let mut resolved: SmallVec<[Option<Ty>; 8]> =
+            SmallVec::with_capacity(lhs_columns.range.len());
+        for (position, (left, right)) in lhs_columns
+            .range
+            .iter()
+            .zip(rhs_columns.range.iter())
+            .enumerate()
+        {
+            resolved.push(self.compound_column_type(&operands, op, position, left, right));
+        }
+        if lhs_columns
+            .range
+            .iter()
+            .zip(&resolved)
+            .all(|(column, ty)| self.index.columns[column].ty == *ty)
+        {
+            return Some(lhs_columns);
+        }
+        let range = self.index.columns.alloc_copies(lhs_columns.range);
+        for (column, ty) in range.iter().zip(resolved) {
+            self.index.columns[column].ty = ty;
+        }
+        Some(Columns {
+            range,
+            complete: lhs_columns.complete,
+        })
+    }
+
+    fn compound_column_type(
+        &mut self,
+        operands: &CompoundOperands,
+        op: CompoundOp,
+        position: usize,
+        left: ColumnId,
+        right: ColumnId,
+    ) -> Option<Ty> {
+        let left_ty = self.index.columns[left].ty;
+        let right_ty = self.index.columns[right].ty;
+        let left_unknown = output_is_unknown_literal(operands.lhs_node, position);
+        let right_unknown = output_is_unknown_literal(operands.rhs_node, position);
+        match (left_ty, right_ty) {
+            _ if left_unknown && right_unknown => left_ty,
+            (_, Some(right_ty)) if left_unknown => Some(right_ty),
+            (Some(left_ty), _) if right_unknown => Some(left_ty),
+            (Some(left_ty), Some(right_ty)) => {
+                Some(self.compound_common_type(op, left_ty, right_ty, operands.rhs_node, position))
+            }
+            (None, _) | (_, None) => left_ty,
+        }
+    }
+
+    fn compound_common_type(
+        &mut self,
+        op: CompoundOp,
+        left: Ty,
+        right: Ty,
+        rhs_node: &ast::SelectVariant,
+        position: usize,
+    ) -> Ty {
+        match self.overloads().select_common_type_or_mismatch(left, right) {
+            CommonTypeResult::Found(ty) => ty,
+            CommonTypeResult::Unknown => left,
+            CommonTypeResult::Mismatch => {
+                let error = SemaError::CompoundTypeMismatch {
+                    op,
+                    left: self.index.ty_name(left),
+                    right: self.index.ty_name(right),
+                };
+                match output_expr(rhs_node, position) {
+                    Some(expr) => self.push_error(expr.syntax(), error),
+                    None => self.push_error(rhs_node.syntax(), error),
+                }
+                left
+            }
+        }
     }
 
     fn lower_values(&mut self, values: &ast::Values) -> QueryId {
@@ -26794,6 +26899,42 @@ fn call_field_base(base: &ast::Expr) -> Option<ast::CallExpr> {
         Some(call)
     } else {
         None
+    }
+}
+
+fn output_expr(query: &ast::SelectVariant, position: usize) -> Option<ast::Expr> {
+    match query {
+        ast::SelectVariant::Select(select) => select
+            .select_clause()?
+            .target_list()?
+            .targets()
+            .nth(position)?
+            .expr(),
+        ast::SelectVariant::Values(values) => {
+            values.row_list()?.rows().next()?.exprs().nth(position)
+        }
+        ast::SelectVariant::ParenSelect(paren) => output_expr(&paren.select()?, position),
+        ast::SelectVariant::CompoundSelect(_)
+        | ast::SelectVariant::SelectInto(_)
+        | ast::SelectVariant::Table(_) => None,
+    }
+}
+
+fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> bool {
+    match query {
+        ast::SelectVariant::Select(select) => select
+            .select_clause()
+            .and_then(|clause| clause.target_list())
+            .and_then(|list| list.targets().nth(position))
+            .and_then(|target| target.expr())
+            .is_some_and(|expr| is_unknown_literal_expr(&expr)),
+        ast::SelectVariant::ParenSelect(paren) => paren
+            .select()
+            .is_some_and(|inner| output_is_unknown_literal(&inner, position)),
+        ast::SelectVariant::Values(_)
+        | ast::SelectVariant::CompoundSelect(_)
+        | ast::SelectVariant::SelectInto(_)
+        | ast::SelectVariant::Table(_) => false,
     }
 }
 

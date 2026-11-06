@@ -664,3 +664,84 @@ alter table users drop column name, drop column nme;
       ╰╴                                                ━━━
     ");
 }
+
+#[test]
+fn set_operation_type_mismatch() {
+    assert_snapshot!(check("
+create table t (a int, n text);
+select a from t union select n from t;
+select 1 union select 'a'::text;
+select 'a' union select 1;
+select null union select 1;
+select 1 union select now();
+select 1::int union select 1::bigint union select 'x'::text;
+select 1 intersect select true;
+select 1 except select 1.5;
+select 'a'::varchar union select 'b'::text;
+select x + 1 from (select 1 as x union select 1.5) s;
+values (1) union values ('a'::text);
+(select 1) union (select 'x'::text);
+select 1, 'a' union select 2, 3;
+"), @"
+    error: `union` types `int4` and `text` cannot be matched
+      ╭▸ 
+    3 │ select a from t union select n from t;
+      ╰╴                             ━
+    error: `union` types `int4` and `text` cannot be matched
+      ╭▸ 
+    4 │ select 1 union select 'a'::text;
+      ╰╴                      ━━━━━━━━━
+    error: `union` types `int4` and `timestamptz` cannot be matched
+      ╭▸ 
+    7 │ select 1 union select now();
+      ╰╴                      ━━━━━
+    error: `union` types `int8` and `text` cannot be matched
+      ╭▸ 
+    8 │ select 1::int union select 1::bigint union select 'x'::text;
+      ╰╴                                                  ━━━━━━━━━
+    error: `intersect` types `int4` and `bool` cannot be matched
+      ╭▸ 
+    9 │ select 1 intersect select true;
+      ╰╴                          ━━━━
+    error: `union` types `int4` and `text` cannot be matched
+       ╭▸ 
+    13 │ values (1) union values ('a'::text);
+       ╰╴                         ━━━━━━━━━
+    error: `union` types `int4` and `text` cannot be matched
+       ╭▸ 
+    14 │ (select 1) union (select 'x'::text);
+       ╰╴                         ━━━━━━━━━
+    ");
+}
+
+#[test]
+fn set_operation_values_literals_are_text() {
+    assert_snapshot!(check("
+values ('a') union select 1;
+select 1 union values ('2');
+select 1 union values ('2'), ('3');
+with recursive r(n) as (
+  values ('a') union all select 1 from r
+)
+select n from r;
+select 1 union (select '2');
+select 1 union select ('2');
+"), @"
+    error: `union` types `text` and `int4` cannot be matched
+      ╭▸ 
+    2 │ values ('a') union select 1;
+      ╰╴                          ━
+    error: `union` types `int4` and `text` cannot be matched
+      ╭▸ 
+    3 │ select 1 union values ('2');
+      ╰╴                       ━━━
+    error: `union` types `int4` and `text` cannot be matched
+      ╭▸ 
+    4 │ select 1 union values ('2'), ('3');
+      ╰╴                       ━━━
+    error: `union` types `text` and `int4` cannot be matched
+      ╭▸ 
+    6 │   values ('a') union all select 1 from r
+      ╰╴                                ━
+    ");
+}
