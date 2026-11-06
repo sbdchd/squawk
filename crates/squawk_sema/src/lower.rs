@@ -20797,7 +20797,12 @@ impl Lowerer {
             self.lower_enum_comparison(Some(ty), lhs);
         }
         if elements.len() > 1 && common != ArgType::Untyped {
-            return self.add_expr_operator_ref(op_range, None, operator, Some(left), Some(common));
+            let found =
+                self.add_expr_operator_ref(op_range, None, operator, Some(left), Some(common));
+            if let (ArgType::Known(left), ArgType::Known(right)) = (left, common) {
+                self.check_comparison(comparison, rhs.syntax(), left, right, found);
+            }
+            return self.builtin_type("bool");
         }
         for (expr, right) in list.exprs().zip(elements) {
             let Some(operator) = self.add_expr_operator_ref_at(
