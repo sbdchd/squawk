@@ -48,7 +48,7 @@ use crate::{
         ConflictTargetKey, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam,
         LookupKind, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
         OutsideSearchPath, SemaError, SetReturningConstruct, Similar, SimilarColumn, SimilarType,
-        TriggerFunctionKind, ViewColumnRename, WindowClause,
+        TriggerFunctionKind, TruncateCascade, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -619,6 +619,11 @@ struct ForeignKey {
     columns: Option<SmallVec<[Name; 4]>>,
     ptr: InIrFile<SyntaxNodePtr>,
     referencing: Referencing,
+}
+
+struct TruncateTarget {
+    table: TableId,
+    node: SyntaxNode,
 }
 
 struct PendingForeignKey {
@@ -18728,7 +18733,7 @@ impl Lowerer {
     }
 
     fn lower_truncate(&mut self, truncate: &ast::Truncate) {
-        let mut targets: SmallVec<[TableId; 4]> = smallvec![];
+        let mut targets: SmallVec<[TruncateTarget; 4]> = smallvec![];
         for relation_name in truncate
             .table_list()
             .iter()
@@ -18744,13 +18749,28 @@ impl Lowerer {
             else {
                 continue;
             };
-            if targets.contains(&table) {
+            if targets.iter().any(|target| target.table == table) {
                 continue;
             }
-            targets.push(table);
-            if let Some(only) = relation_name.only_token()
-                && self.index.tables[table].partitioned
-            {
+            targets.push(TruncateTarget {
+                table,
+                node: path.syntax().clone(),
+            });
+            let Some(only) = relation_name.only_token() else {
+                for child in self
+                    .inheritances
+                    .descendants(table, |child| self.is_live_child(child))
+                {
+                    if !targets.iter().any(|target| target.table == child) {
+                        targets.push(TruncateTarget {
+                            table: child,
+                            node: path.syntax().clone(),
+                        });
+                    }
+                }
+                continue;
+            };
+            if self.index.tables[table].partitioned {
                 self.push_error(
                     path.syntax(),
                     SemaError::TruncateOnlyPartitioned {
@@ -18764,8 +18784,72 @@ impl Lowerer {
                             .map(|token| token.text_range()),
                     },
                 );
+                return;
             }
         }
+        let cascade = match truncate.drop_behavior() {
+            Some(ast::DropBehavior::Cascade(_)) => return,
+            Some(ast::DropBehavior::Restrict(restrict)) => {
+                TruncateCascade::ReplaceRestrict(restrict.syntax().text_range())
+            }
+            None => {
+                let Some(end) = truncate
+                    .identity_action()
+                    .map(|action| action.syntax().text_range().end())
+                    .or_else(|| {
+                        truncate
+                            .table_list()
+                            .map(|list| list.syntax().text_range().end())
+                    })
+                else {
+                    return;
+                };
+                TruncateCascade::Insert(end)
+            }
+        };
+        let Some((target, referencing)) = targets.iter().find_map(|target| {
+            self.truncate_referencer(target.table, &targets)
+                .map(|referencing| (target, referencing))
+        }) else {
+            return;
+        };
+        self.push_error(
+            &target.node,
+            SemaError::TruncateReferenced {
+                name: self.index.tables[target.table].name,
+                referencing: self.index.tables[referencing].name,
+                cascade,
+            },
+        );
+    }
+
+    fn truncate_referencer(&self, table: TableId, targets: &[TruncateTarget]) -> Option<TableId> {
+        let mut referenced = Some(table);
+        while let Some(current) = referenced {
+            let referencer = self.foreign_keys.iter().find_map(|foreign_key| {
+                let Referencing {
+                    table: referencing,
+                    constraint,
+                    ..
+                } = foreign_key.referencing;
+                (foreign_key.table == current
+                    && !self.dropped_constraints.contains(&constraint)
+                    && !self.dropped_tables.contains(&referencing)
+                    && !targets.iter().any(|target| target.table == referencing))
+                .then_some(referencing)
+            });
+            if referencer.is_some() {
+                return referencer;
+            }
+            referenced = self
+                .inheritances
+                .parents(current)
+                .iter()
+                .find(|inheritance| inheritance.kind == InheritanceKind::Partition)
+                .map(|inheritance| inheritance.parent)
+                .filter(|parent| !self.dropped_tables.contains(parent));
+        }
+        None
     }
 
     fn lower_lock(&mut self, lock: &ast::Lock) {

@@ -389,6 +389,114 @@ truncate v restart identity cascade;
 }
 
 #[test]
+fn truncate_referenced_table() {
+    assert_snapshot!(check("
+create table p (a int primary key);
+create table c (a int references p);
+create table s (
+  a int primary key,
+  b int references s
+);
+truncate p;
+truncate table p restart identity;
+truncate p restrict;
+truncate p, c;
+truncate c, p;
+truncate p cascade;
+truncate s;
+create table pc () inherits (p);
+truncate pc;
+create table pp (a int primary key) partition by range (a);
+create table pp1
+  partition of pp
+  for values from (0) to (10);
+create table cp (a int references pp);
+truncate pp1;
+truncate pp, cp;
+create table q (a int primary key);
+create table rp (a int references q) partition by range (a);
+create table rp1
+  partition of rp
+  for values from (0) to (10);
+truncate q, rp1;
+truncate q, rp;
+create table d (a int);
+alter table d add foreign key (a) references q;
+truncate q, rp;
+alter table d drop constraint d_a_fkey;
+truncate q, rp;
+drop table c;
+truncate p;
+begin;
+create table e (a int references p);
+rollback;
+truncate p;
+"), @"
+    error: cannot truncate table `p` because it is referenced in a foreign key constraint
+      ╭▸ 
+    8 │ truncate p;
+      │          ━
+      │
+      ╰ note: table `c` references `p`
+    help: truncate `c` at the same time, or use `cascade`
+      ╭╴
+    8 │ truncate p cascade;
+      ╰╴           +++++++
+    error: cannot truncate table `p` because it is referenced in a foreign key constraint
+      ╭▸ 
+    9 │ truncate table p restart identity;
+      │                ━
+      │
+      ╰ note: table `c` references `p`
+    help: truncate `c` at the same time, or use `cascade`
+      ╭╴
+    9 │ truncate table p restart identity cascade;
+      ╰╴                                  +++++++
+    error: cannot truncate table `p` because it is referenced in a foreign key constraint
+       ╭▸ 
+    10 │ truncate p restrict;
+       │          ━
+       │
+       ╰ note: table `c` references `p`
+    help: truncate `c` at the same time, or use `cascade`
+       ╭╴
+    10 - truncate p restrict;
+    10 + truncate p cascade;
+       ╰╴
+    error: cannot truncate table `pp1` because it is referenced in a foreign key constraint
+       ╭▸ 
+    22 │ truncate pp1;
+       │          ━━━
+       │
+       ╰ note: table `cp` references `pp1`
+    help: truncate `cp` at the same time, or use `cascade`
+       ╭╴
+    22 │ truncate pp1 cascade;
+       ╰╴             +++++++
+    error: cannot truncate table `q` because it is referenced in a foreign key constraint
+       ╭▸ 
+    29 │ truncate q, rp1;
+       │          ━
+       │
+       ╰ note: table `rp` references `q`
+    help: truncate `rp` at the same time, or use `cascade`
+       ╭╴
+    29 │ truncate q, rp1 cascade;
+       ╰╴                +++++++
+    error: cannot truncate table `q` because it is referenced in a foreign key constraint
+       ╭▸ 
+    33 │ truncate q, rp;
+       │          ━
+       │
+       ╰ note: table `d` references `q`
+    help: truncate `d` at the same time, or use `cascade`
+       ╭╴
+    33 │ truncate q, rp cascade;
+       ╰╴               +++++++
+    ");
+}
+
+#[test]
 fn lock() {
     assert_snapshot!(check("
 create table t (a int);
