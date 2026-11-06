@@ -1019,6 +1019,18 @@ create table c3 (pid int references p3 (id));
 alter table p3 alter id type text using id::text;
 alter table c1 alter other type text;
 alter table p1 alter n type text;
+create table r4 (a int primary key);
+create table p4 (a int);
+create table c4 (foreign key (a) references r4) inherits (p4);
+alter table p4 alter column a type text;
+create table p5 (a int);
+create table c5 (a int primary key) inherits (p5);
+create table x5 (a int references c5);
+alter table p5 alter column a type text;
+create table r6 (a int primary key);
+create table p6 (k int, a int references r6) partition by range (k);
+create table c6 partition of p6 for values from (1) to (10);
+alter table p6 alter column a type text;
 "), @"
     error: foreign key constraint `c1_pid_fkey` cannot be implemented
        ╭▸ 
@@ -1032,5 +1044,23 @@ alter table p1 alter n type text;
        │                ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        │
        ╰ note: key columns `pid` and `id` are of incompatible types: `int4` and `text`
+    error: foreign key constraint `c4_a_fkey` cannot be implemented
+       ╭▸ 
+    23 │ alter table p4 alter column a type text;
+       │                ━━━━━━━━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `a` and `a` are of incompatible types: `text` and `int4`
+    error: foreign key constraint `x5_a_fkey` cannot be implemented
+       ╭▸ 
+    27 │ alter table p5 alter column a type text;
+       │                ━━━━━━━━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `a` and `a` are of incompatible types: `int4` and `text`
+    error: foreign key constraint `p6_a_fkey` cannot be implemented
+       ╭▸ 
+    31 │ alter table p6 alter column a type text;
+       │                ━━━━━━━━━━━━━━━━━━━━━━━━
+       │
+       ╰ note: key columns `a` and `a` are of incompatible types: `text` and `int4`
     ");
 }

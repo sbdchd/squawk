@@ -16984,8 +16984,8 @@ impl Lowerer {
                     && !self.report_table_member_of_itself(set_type.ty(), ty, table)
                 {
                     self.set_table_column_type(table, column, ty);
-                    self.set_inherited_column_type(table, column, ty);
                     self.revalidate_foreign_keys(table, column, alter_column.syntax());
+                    self.set_inherited_column_type(table, column, ty, alter_column.syntax());
                 }
             }
             Some(ast::AlterColumnOption::SetDefault(set_default)) => {
@@ -17262,7 +17262,13 @@ impl Lowerer {
         }
     }
 
-    fn set_inherited_column_type(&mut self, parent: TableId, name: Name, ty: Option<Ty>) {
+    fn set_inherited_column_type(
+        &mut self,
+        parent: TableId,
+        name: Name,
+        ty: Option<Ty>,
+        node: &SyntaxNode,
+    ) {
         let mut i = 0;
         while let Some(&inheritance) = self.inheritances.children(parent).get(i) {
             i += 1;
@@ -17274,7 +17280,8 @@ impl Lowerer {
                 continue;
             }
             self.set_table_column_type(child, name, ty);
-            self.set_inherited_column_type(child, name, ty);
+            self.revalidate_foreign_keys(child, name, node);
+            self.set_inherited_column_type(child, name, ty, node);
         }
     }
 
