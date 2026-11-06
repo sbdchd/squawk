@@ -206,3 +206,40 @@ alter table c add primary key (a);
       ╰ note: `p` is already a child of `p`
     ");
 }
+
+#[test]
+fn truncate_only_partitioned_table() {
+    assert_snapshot!(check("
+create table p (a int) partition by range (a);
+create table c
+  partition of p
+  for values from (0) to (10);
+create table l (a int);
+truncate only p;
+truncate table only (p), c;
+truncate only c, l;
+truncate p;
+truncate p, only p;
+"), @"
+    error: cannot truncate only partitioned table `p`
+      ╭▸ 
+    7 │ truncate only p;
+      │               ━
+      ╰╴
+    help: remove `only` to also truncate the partitions, or truncate the partitions directly
+      ╭╴
+    7 - truncate only p;
+    7 + truncate p;
+      ╰╴
+    error: cannot truncate only partitioned table `p`
+      ╭▸ 
+    8 │ truncate table only (p), c;
+      │                      ━
+      ╰╴
+    help: remove `only` to also truncate the partitions, or truncate the partitions directly
+      ╭╴
+    8 - truncate table only (p), c;
+    8 + truncate table p, c;
+      ╰╴
+    ");
+}

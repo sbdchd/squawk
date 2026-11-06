@@ -539,6 +539,16 @@ pub(crate) enum SemaError {
         copy_from: bool,
         kind: TableKind,
     },
+    TruncateOnlyPartitioned {
+        name: Name,
+        only_range: TextRange,
+        r_paren_range: Option<TextRange>,
+    },
+    TruncateReferenced {
+        name: Name,
+        referencing: Name,
+        cascade: TruncateCascade,
+    },
     CannotOpenIndex {
         name: Name,
     },
@@ -703,6 +713,12 @@ pub(crate) struct ViewColumnRename {
     pub(crate) schema: Option<Name>,
     pub(crate) view: Name,
     pub(crate) insert_at: TextSize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum TruncateCascade {
+    Insert(TextSize),
+    ReplaceRestrict(TextRange),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1237,6 +1253,7 @@ impl SemaError {
             SemaError::DuplicateWindow { .. } => DiagnosticKind::DuplicateWindow,
             SemaError::DuplicateParam { .. } => DiagnosticKind::DuplicateParam,
             SemaError::DependentObjects { .. } => DiagnosticKind::DependentObjectsStillExist,
+            SemaError::TruncateReferenced { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::RequiredBySystem { .. } => DiagnosticKind::RequiredBySystem,
             SemaError::AccessMethodKindMismatch { .. } => DiagnosticKind::AccessMethodKindMismatch,
             SemaError::UnresolvedCast { .. } => DiagnosticKind::UnresolvedCast,
@@ -1293,6 +1310,7 @@ impl SemaError {
             SemaError::WrongRelationKind { .. }
             | SemaError::CompositeTypeAlteredAsTable { .. }
             | SemaError::CannotCopy { .. }
+            | SemaError::TruncateOnlyPartitioned { .. }
             | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
             SemaError::NotIdentityColumn { .. } => DiagnosticKind::NotIdentityColumn,
@@ -1668,6 +1686,47 @@ impl SemaError {
                 replacement: Some(replacement),
                 ..
             } => replace_suggestion(replacement.message(), range, replacement.text().into()),
+            SemaError::TruncateOnlyPartitioned {
+                only_range,
+                r_paren_range,
+                ..
+            } => {
+                let mut edits = Vec::with_capacity(2);
+                edits.push(Edit::delete(only_range));
+                if let Some(r_paren_range) = r_paren_range {
+                    edits.push(Edit::delete(r_paren_range));
+                }
+                Suggestion {
+                    message: "remove `only` to also truncate the partitions, or truncate the partitions directly".into(),
+                    fix: Fix {
+                        title: "Remove `only`".into(),
+                        edits,
+                    },
+                }
+            }
+            SemaError::TruncateReferenced {
+                referencing,
+                cascade,
+                ..
+            } => {
+                let (title, edit) = match cascade {
+                    TruncateCascade::Insert(at) => ("Add `cascade`", Edit::insert(" cascade", at)),
+                    TruncateCascade::ReplaceRestrict(range) => {
+                        ("Replace with `cascade`", Edit::replace(range, "cascade"))
+                    }
+                };
+                Suggestion {
+                    message: format!(
+                        "truncate `{}` at the same time, or use `cascade`",
+                        names.resolve(referencing)
+                    )
+                    .into(),
+                    fix: Fix {
+                        title: title.into(),
+                        edits: vec![edit],
+                    },
+                }
+            }
             SemaError::FutureCte { name, recursive_at } => Suggestion {
                 message: format!(
                     "to reference `{}`, mark the `with` clause as `recursive`",
@@ -1921,6 +1980,16 @@ impl SemaError {
             return Some(Cow::Borrowed(
                 "foreign tables can't have unique or exclusion constraints",
             ));
+        }
+        if let SemaError::TruncateReferenced {
+            name, referencing, ..
+        } = *self
+        {
+            return Some(Cow::Owned(format!(
+                "table `{}` references `{}`",
+                names.resolve(referencing),
+                names.resolve(name)
+            )));
         }
         if let SemaError::CircularInheritance { child, parent } = *self {
             return Some(Cow::Owned(format!(
@@ -2808,6 +2877,14 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::CannotCreateIndex { name, kind } => {
                 write!(f, "cannot create index on {} `{}`", kind.label(), n(name))
             }
+            SemaError::TruncateOnlyPartitioned { name, .. } => {
+                write!(f, "cannot truncate only partitioned table `{}`", n(name))
+            }
+            SemaError::TruncateReferenced { name, .. } => write!(
+                f,
+                "cannot truncate table `{}` because it is referenced in a foreign key constraint",
+                n(name)
+            ),
             SemaError::NotIdentityColumn { column, relation } => write!(
                 f,
                 "column `{}.{}` is not an identity column",
