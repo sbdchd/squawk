@@ -19723,15 +19723,25 @@ impl Lowerer {
             return self.add_expr_operator_ref(op_range, None, operator, Some(left), Some(common));
         }
         for (expr, right) in list.exprs().zip(elements) {
-            let found = self.add_expr_operator_ref_at(
+            let Some(operator) = self.add_expr_operator_ref_at(
                 op_range,
                 expr.syntax().text_range(),
                 None,
                 operator,
                 Some(left),
                 Some(right),
-            );
-            if let (ArgType::Known(left), ArgType::Known(right)) = (left, right) {
+            ) else {
+                continue;
+            };
+            let found = self.operator_result_type(operator, Some(left), Some(right));
+            let Operator {
+                left: declared_left,
+                right: declared_right,
+                ..
+            } = self.index.operators[operator];
+            if let Some(left) = operand_ty(left, declared_left)
+                && let Some(right) = operand_ty(right, declared_right)
+            {
                 self.check_comparison(comparison, expr.syntax(), left, right, found);
             }
         }
@@ -19900,7 +19910,8 @@ impl Lowerer {
         left: Option<ArgType>,
         right: Option<ArgType>,
     ) -> Option<Ty> {
-        self.add_expr_operator_ref_at(range, range, schema, text, left, right)
+        let operator = self.add_expr_operator_ref_at(range, range, schema, text, left, right)?;
+        self.operator_result_type(operator, left, right)
     }
 
     fn add_expr_operator_ref_at(
@@ -19911,7 +19922,7 @@ impl Lowerer {
         text: &str,
         left: Option<ArgType>,
         right: Option<ArgType>,
-    ) -> Option<Ty> {
+    ) -> Option<OperatorId> {
         let name = self.intern(text);
         let mut resolution = self.select_operator(schema, name, left, right);
         if matches!(resolution, Resolution::Unresolved | Resolution::Ambiguous)
@@ -19935,7 +19946,7 @@ impl Lowerer {
         let Resolution::Operator(operator) = resolution else {
             return None;
         };
-        self.operator_result_type(operator, left, right)
+        Some(operator)
     }
 
     fn operator_result_type(
@@ -25912,6 +25923,15 @@ fn expr_arg_type(expr: Option<&ast::Expr>, ty: Option<Ty>) -> ArgType {
         _ if expr.is_some_and(is_unknown_literal_expr) => ArgType::UnknownLiteral,
         Some(ty) => ArgType::Known(ty),
         None => ArgType::Untyped,
+    }
+}
+
+fn operand_ty(arg: ArgType, declared: Operand) -> Option<Ty> {
+    match (arg, declared) {
+        (ArgType::Known(ty), _) | (ArgType::UnknownLiteral | ArgType::Untyped, Operand::Ty(ty)) => {
+            Some(ty)
+        }
+        (ArgType::UnknownLiteral | ArgType::Untyped, Operand::None | Operand::Unknown) => None,
     }
 }
 

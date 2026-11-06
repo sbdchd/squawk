@@ -259,6 +259,16 @@ select 1 from t where a in ('x'::text);
 select 1 from t where a not in ('x'::text, 'y'::text);
 select 1 from t where a in (b);
 select 1 from t where a in (1, now());
+create function eqp(point, text) returns int
+  language sql
+  return 1;
+create operator = (
+  leftarg = point,
+  rightarg = text,
+  function = eqp
+);
+create table p (p point);
+select 1 from p where p in ('x');
 "), @"
     error: operator `int4 = text` must return type `bool`, not type `int4`
        ╭▸ 
@@ -290,6 +300,12 @@ select 1 from t where a in (1, now());
        │                                ━━━━━
        │
        ╰ hint: consider adding explicit type casts
+    error: operator `point = text` must return type `bool`, not type `int4`
+       ╭▸ 
+    33 │ select 1 from p where p in ('x');
+       │                             ━━━
+       │
+       ╰ note: `in` compares each element using `=`
     ");
 }
 
