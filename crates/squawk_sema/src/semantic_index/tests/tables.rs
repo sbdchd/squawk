@@ -443,64 +443,64 @@ truncate p;
 "), @"
     error: cannot truncate table `p` because it is referenced in a foreign key constraint
       ╭▸ 
-    8 │ truncate p;
+    9 │ truncate p;
       │          ━
       │
       ╰ note: table `c` references `p`
     help: truncate `c` at the same time, or use `cascade`
       ╭╴
-    8 │ truncate p cascade;
+    9 │ truncate p cascade;
       ╰╴           +++++++
     error: cannot truncate table `p` because it is referenced in a foreign key constraint
-      ╭▸ 
-    9 │ truncate table p restart identity;
-      │                ━
-      │
-      ╰ note: table `c` references `p`
+       ╭▸ 
+    10 │ truncate table p restart identity;
+       │                ━
+       │
+       ╰ note: table `c` references `p`
     help: truncate `c` at the same time, or use `cascade`
-      ╭╴
-    9 │ truncate table p restart identity cascade;
-      ╰╴                                  +++++++
+       ╭╴
+    10 │ truncate table p restart identity cascade;
+       ╰╴                                  +++++++
     error: cannot truncate table `p` because it is referenced in a foreign key constraint
        ╭▸ 
-    10 │ truncate p restrict;
+    11 │ truncate p restrict;
        │          ━
        │
        ╰ note: table `c` references `p`
     help: truncate `c` at the same time, or use `cascade`
        ╭╴
-    10 - truncate p restrict;
-    10 + truncate p cascade;
+    11 - truncate p restrict;
+    11 + truncate p cascade;
        ╰╴
     error: cannot truncate table `pp1` because it is referenced in a foreign key constraint
        ╭▸ 
-    22 │ truncate pp1;
+    26 │ truncate pp1;
        │          ━━━
        │
        ╰ note: table `cp` references `pp1`
     help: truncate `cp` at the same time, or use `cascade`
        ╭╴
-    22 │ truncate pp1 cascade;
+    26 │ truncate pp1 cascade;
        ╰╴             +++++++
     error: cannot truncate table `q` because it is referenced in a foreign key constraint
        ╭▸ 
-    29 │ truncate q, rp1;
+    34 │ truncate q, rp1;
        │          ━
        │
        ╰ note: table `rp` references `q`
     help: truncate `rp` at the same time, or use `cascade`
        ╭╴
-    29 │ truncate q, rp1 cascade;
+    34 │ truncate q, rp1 cascade;
        ╰╴                +++++++
     error: cannot truncate table `q` because it is referenced in a foreign key constraint
        ╭▸ 
-    33 │ truncate q, rp;
+    39 │ truncate q, rp;
        │          ━
        │
        ╰ note: table `d` references `q`
     help: truncate `d` at the same time, or use `cascade`
        ╭╴
-    33 │ truncate q, rp cascade;
+    39 │ truncate q, rp cascade;
        ╰╴               +++++++
     ");
 }
