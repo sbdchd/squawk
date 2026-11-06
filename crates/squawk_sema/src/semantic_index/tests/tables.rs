@@ -397,15 +397,19 @@ create table s (
   a int primary key,
   b int references s
 );
+
 truncate p;
 truncate table p restart identity;
 truncate p restrict;
 truncate p, c;
 truncate c, p;
 truncate p cascade;
+
 truncate s;
+
 create table pc () inherits (p);
 truncate pc;
+
 create table pp (a int primary key) partition by range (a);
 create table pp1
   partition of pp
@@ -413,6 +417,7 @@ create table pp1
 create table cp (a int references pp);
 truncate pp1;
 truncate pp, cp;
+
 create table q (a int primary key);
 create table rp (a int references q) partition by range (a);
 create table rp1
@@ -420,13 +425,17 @@ create table rp1
   for values from (0) to (10);
 truncate q, rp1;
 truncate q, rp;
+
 create table d (a int);
 alter table d add foreign key (a) references q;
 truncate q, rp;
+
 alter table d drop constraint d_a_fkey;
 truncate q, rp;
+
 drop table c;
 truncate p;
+
 begin;
 create table e (a int references p);
 rollback;
