@@ -20173,13 +20173,20 @@ impl Lowerer {
             let Some(item) = exclusion.partition_item() else {
                 continue;
             };
-            if let Some(path) = item.op_class_ref().and_then(|op_class| op_class.path_ref()) {
+            let op_class = item.op_class_ref();
+            if let Some(path) = op_class.as_ref().and_then(|op_class| op_class.path_ref()) {
                 self.lower_operator_class_ref(&path, access_method, IfMissing::Error);
             }
             let Some(expr) = item.expr() else {
                 continue;
             };
             let ty = self.lower_expr_in(ExprContext::IndexExpression, &expr);
+            if op_class.is_none()
+                && let Some(ty) = ty
+                && let Some(access_method) = access_method
+            {
+                self.check_default_operator_class(access_method, ty, expr.syntax());
+            }
             let op = exclusion
                 .op()
                 .or_else(|| exclusion.operator_call().and_then(|call| call.op()));

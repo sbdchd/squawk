@@ -108,6 +108,12 @@ create table t6 (a int, exclude using missing (a with =));
        ╭▸ 
     13 │ alter table t set access method gin;
        ╰╴                                ━━━
+    error: data type `int4` has no default operator class for access method `gist`
+       ╭▸ 
+    14 │ create table t5 (a int, exclude using gist (a with =));
+       │                                             ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
     error: access method `missing` does not exist
        ╭▸ 
     15 │ create table t6 (a int, exclude using missing (a with =));

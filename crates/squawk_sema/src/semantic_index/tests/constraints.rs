@@ -249,6 +249,12 @@ create table t (
   exclude using gist (a with &&)
 );
 "), @"
+    error: data type `int4` has no default operator class for access method `gist`
+      ╭▸ 
+    7 │   exclude using gist (a with =, r with &&),
+      │                       ━
+      │
+      ╰ hint: specify an operator class for the index or define a default operator class for the data type
     error: operator `===` does not exist
       ╭▸ 
     9 │   exclude (a with operator(public.===)),
@@ -257,11 +263,29 @@ create table t (
        ╭▸ 
     10 │   exclude (a with !!!),
        ╰╴                  ━━━
+    error: data type `int4` has no default operator class for access method `gist`
+       ╭▸ 
+    11 │   exclude using gist (a with &&)
+       │                       ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
     error: operator `&&` does not exist
        ╭▸ 
     11 │   exclude using gist (a with &&)
        ╰╴                             ━━
     ");
+}
+
+#[test]
+fn exclusion_constraint_btree_gist_default_operator_class() {
+    assert_snapshot!(check("
+create extension btree_gist;
+create table t (
+  a int,
+  r tstzrange,
+  exclude using gist (a with =, r with &&)
+);
+"), @"no diagnostics");
 }
 
 #[test]
