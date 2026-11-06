@@ -323,6 +323,13 @@ impl ast::Expr {
         }
     }
 
+    pub fn is_default(&self) -> bool {
+        match self {
+            ast::Expr::Literal(literal) => matches!(literal.kind(), Some(LitKind::Default(_))),
+            _ => false,
+        }
+    }
+
     pub fn is_name_path(&self) -> bool {
         match self {
             ast::Expr::NameRef(_) => true,

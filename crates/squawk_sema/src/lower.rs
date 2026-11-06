@@ -29,20 +29,20 @@ use crate::{
         Conversion, ConversionId, Cte, CteId, Cursor, CursorId, Database, DatabaseId, EnumLabel,
         EnumLabelId, EventTrigger, EventTriggerId, Extension, ExtensionId, ForeignDataWrapper,
         ForeignDataWrapperId, Function, FunctionId, FunctionKind, GraphElement, GraphElementId,
-        GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId, Index, IndexId,
-        Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId, MemberKind, MemberOwner,
-        Merge, Operand, Operands, Operator, OperatorClass, OperatorClassId, OperatorFamily,
-        OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId, Param, ParamId,
-        ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId, PreparedTransaction,
-        PreparedTransactionId, Publication, PublicationId, Query, QueryId, QueryKind, RefId,
-        Reference, ReferenceKind, Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule,
-        RuleBehavior, RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema,
-        SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner, Server, ServerId, Source,
-        SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript, Subscription,
-        SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId, TextSearch,
-        TextSearchId, TextSearchKind, Transaction, TransactionId, Transform, TransformId,
-        TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind, Window,
-        WindowClauses, WindowId,
+        GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId, IdentityKind,
+        Index, IndexId, Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId, MemberKind,
+        MemberOwner, Merge, Operand, Operands, Operator, OperatorClass, OperatorClassId,
+        OperatorFamily, OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId,
+        Param, ParamId, ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId,
+        PreparedTransaction, PreparedTransactionId, Publication, PublicationId, Query, QueryId,
+        QueryKind, RefId, Reference, ReferenceKind, Resolution, ReturnKind, Role, RoleId,
+        RoutineKind, Rule, RuleBehavior, RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint,
+        SavepointId, Schema, SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner, Server,
+        ServerId, Source, SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript,
+        Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
+        TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
+        TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
+        Window, WindowClauses, WindowId,
     },
     sema_error::{
         ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
@@ -506,6 +506,13 @@ struct ColumnExprId(u32);
 enum PartitionKey {
     Columns(IdxRange<Name>),
     Expressions,
+}
+
+struct InsertValues<'a> {
+    rows: Option<ast::RowList>,
+    width: usize,
+    source: &'a ast::SelectVariant,
+    overriding: bool,
 }
 
 struct Replacement<'a> {
@@ -2615,6 +2622,7 @@ impl Lowerer {
         &mut self,
         table: Option<TableId>,
         column: Option<Name>,
+        kind: IdentityKind,
         options: Option<ast::SequenceOptionList>,
         node: &SyntaxNode,
     ) {
@@ -2667,7 +2675,7 @@ impl Lowerer {
             Some(SequenceOwner {
                 table,
                 column,
-                identity: true,
+                identity: Some(kind),
             }),
         );
     }
@@ -2694,7 +2702,7 @@ impl Lowerer {
             Some(SequenceOwner {
                 table,
                 column,
-                identity: false,
+                identity: None,
             }),
         );
         self.add_not_null_constraint(table, column, node, None);
@@ -2836,7 +2844,7 @@ impl Lowerer {
                     Some(SequenceOwner {
                         table,
                         column: self.intern(&segment.text()),
-                        identity: false,
+                        identity: None,
                     })
                 }
                 Some(ast::OwnedByTarget::OwnedByNone(_)) | None => None,
@@ -14339,6 +14347,11 @@ impl Lowerer {
         }
         if let Some((query, source)) = &source {
             self.check_insert_arity(insert, target, *query, source);
+            if let Some(target) = target
+                && let SourceKind::Table(table) = self.index.sources[target].kind
+            {
+                self.check_insert_generated_columns(insert, table, *query, source);
+            }
         }
         self.set_visible((0..self.index.queries[id].sources.len()).into());
 
@@ -14356,6 +14369,109 @@ impl Lowerer {
         self.scopes.pop();
         self.ctes.truncate(mark);
         id
+    }
+
+    fn check_insert_generated_columns(
+        &mut self,
+        insert: &ast::Insert,
+        table: TableId,
+        query: QueryId,
+        source: &ast::SelectVariant,
+    ) {
+        if self.index.tables[table].kind != TableKind::Table {
+            return;
+        }
+        let overriding = insert.overriding_clause().is_some();
+        let rows = match source {
+            ast::SelectVariant::Values(values) => values.row_list(),
+            ast::SelectVariant::CompoundSelect(_)
+            | ast::SelectVariant::ParenSelect(_)
+            | ast::SelectVariant::Select(_)
+            | ast::SelectVariant::SelectInto(_)
+            | ast::SelectVariant::Table(_) => None,
+        };
+        let values = InsertValues {
+            rows,
+            width: self.index.queries[query].columns.range.len(),
+            source,
+            overriding,
+        };
+        match insert.column_target_list() {
+            Some(list) => {
+                for (position, column_target) in list.column_targets().enumerate() {
+                    if let Some(name) = column_target.name() {
+                        let column = self.intern(&name.text());
+                        let node = Some(column_target.syntax());
+                        self.check_insert_generated_column(table, column, position, &values, node);
+                    }
+                }
+            }
+            None => {
+                let columns = self.index.tables[table].columns;
+                if !columns.complete {
+                    return;
+                }
+                for (position, id) in columns.range.iter().enumerate() {
+                    if let Some(column) = self.index.columns[id].name {
+                        self.check_insert_generated_column(table, column, position, &values, None);
+                    }
+                }
+            }
+        }
+    }
+
+    fn check_insert_generated_column(
+        &mut self,
+        table: TableId,
+        column: Name,
+        position: usize,
+        values: &InsertValues,
+        node: Option<&SyntaxNode>,
+    ) {
+        let identity = self.identity_kind_of(table, column) == Some(IdentityKind::Always);
+        let generated = !identity
+            && self
+                .column_exprs
+                .get(ColumnKey { table, column })
+                .is_some_and(|expression| {
+                    matches!(expression.kind, ColumnExprKind::Generated { .. })
+                });
+        if !(identity && !values.overriding || generated) {
+            return;
+        }
+        let value = match &values.rows {
+            Some(rows) => {
+                let Some(value) = rows
+                    .rows()
+                    .find_map(|row| row.exprs().nth(position).filter(|expr| !expr.is_default()))
+                else {
+                    return;
+                };
+                value.syntax().clone()
+            }
+            None if position < values.width => values.source.syntax().clone(),
+            None => return,
+        };
+        let error = SemaError::GeneratedColumnInsert { column, identity };
+        self.push_error(node.unwrap_or(&value), error);
+    }
+
+    fn check_generated_column_update(&mut self, table: TableId, column_target: &ast::ColumnTarget) {
+        let Some(name) = column_target.name() else {
+            return;
+        };
+        let column = self.intern(&name.text());
+        let identity = self.identity_kind_of(table, column) == Some(IdentityKind::Always);
+        let generated = self
+            .column_exprs
+            .get(ColumnKey { table, column })
+            .is_some_and(|expression| matches!(expression.kind, ColumnExprKind::Generated { .. }));
+        if identity || generated {
+            self.push_error(
+                column_target.syntax(),
+                SemaError::GeneratedColumnUpdate { column, identity },
+            );
+        }
     }
 
     fn check_insert_arity(
@@ -14517,6 +14633,22 @@ impl Lowerer {
     }
 
     fn lower_set_clause(&mut self, target: Option<SourceId>, set_clause: &ast::SetClause) {
+        let table = target
+            .and_then(|target| match self.index.sources[target].kind {
+                SourceKind::Table(table) => Some(table),
+                SourceKind::Cte(_)
+                | SourceKind::External
+                | SourceKind::Subquery(_)
+                | SourceKind::Function(_)
+                | SourceKind::Join
+                | SourceKind::UsingAlias
+                | SourceKind::Returning(_)
+                | SourceKind::Excluded(_)
+                | SourceKind::RuleRelation(_)
+                | SourceKind::ElementVariable
+                | SourceKind::Other => None,
+            })
+            .filter(|table| self.index.tables[*table].kind == TableKind::Table);
         let mut seen = smallvec![];
         for set_column in set_clause
             .set_column_list()
@@ -14530,12 +14662,23 @@ impl Lowerer {
                         if let Some(target) = target {
                             self.lower_column_target(ExprContext::Update, target, &column_target);
                         }
+                        if let Some(table) = table
+                            && single
+                                .set_expr()
+                                .is_some_and(|set_expr| set_expr.default_token().is_none())
+                        {
+                            self.check_generated_column_update(table, &column_target);
+                        }
                     }
                     if let Some(expr) = single.set_expr().and_then(|set_expr| set_expr.expr()) {
                         self.lower_expr_in(ExprContext::Update, &expr);
                     }
                 }
                 ast::SetColumn::SetMultipleColumns(multiple) => {
+                    let mut set_exprs = multiple
+                        .set_expr_list()
+                        .into_iter()
+                        .flat_map(|list| list.set_exprs());
                     for column_target in multiple
                         .column_target_list()
                         .into_iter()
@@ -14544,6 +14687,14 @@ impl Lowerer {
                         self.check_duplicate_assignment(&mut seen, &column_target);
                         if let Some(target) = target {
                             self.lower_column_target(ExprContext::Update, target, &column_target);
+                        }
+                        let default = set_exprs
+                            .next()
+                            .is_some_and(|set_expr| set_expr.default_token().is_some());
+                        if let Some(table) = table
+                            && !default
+                        {
+                            self.check_generated_column_update(table, &column_target);
                         }
                     }
                     if let Some(paren_select) = multiple.paren_select() {
@@ -17119,12 +17270,15 @@ impl Lowerer {
                 }
             }
             Some(ast::AlterColumnOption::AddGenerated(add_generated)) => {
-                self.lower_identity(
-                    table,
-                    Some(column),
-                    add_generated.sequence_option_list(),
-                    add_generated.syntax(),
-                );
+                if let Some(when) = add_generated.generated_when() {
+                    self.lower_identity(
+                        table,
+                        Some(column),
+                        when.into(),
+                        add_generated.sequence_option_list(),
+                        add_generated.syntax(),
+                    );
+                }
             }
             Some(ast::AlterColumnOption::SetSequenceOption(set_option)) => {
                 if let Some(option) = set_option.sequence_option() {
@@ -17139,9 +17293,22 @@ impl Lowerer {
                                 self.lower_sequence_option(&option);
                             }
                         }
-                        ast::SetGeneratedOption::Restart(_)
-                        | ast::SetGeneratedOption::SetGenerated(_) => {}
+                        ast::SetGeneratedOption::SetGenerated(set_generated) => {
+                            if let Some(table) = table
+                                && let Some(when) = set_generated.generated_when()
+                            {
+                                self.set_identity_kind(table, column, when.into());
+                            }
+                        }
+                        ast::SetGeneratedOption::Restart(_) => {}
                     }
+                }
+            }
+            Some(ast::AlterColumnOption::SetGenerated(set_generated)) => {
+                if let Some(table) = table
+                    && let Some(when) = set_generated.generated_when()
+                {
+                    self.set_identity_kind(table, column, when.into());
                 }
             }
             Some(ast::AlterColumnOption::DropIdentity(drop_identity)) => {
@@ -17169,7 +17336,6 @@ impl Lowerer {
                 | ast::AlterColumnOption::ResetOptions(_)
                 | ast::AlterColumnOption::Restart(_)
                 | ast::AlterColumnOption::SetCompression(_)
-                | ast::AlterColumnOption::SetGenerated(_)
                 | ast::AlterColumnOption::SetOptions(_)
                 | ast::AlterColumnOption::SetOptionsList(_)
                 | ast::AlterColumnOption::SetStatistics(_)
@@ -17177,6 +17343,30 @@ impl Lowerer {
             )
             | None => {}
         }
+    }
+
+    fn set_identity_kind(&mut self, table: TableId, column: Name, kind: IdentityKind) {
+        let Some(sequence) = self.identity_sequence(table, column) else {
+            return;
+        };
+        let Some(owner) = self.index.tables[sequence].sequence_owner else {
+            return;
+        };
+        self.index.tables.set_sequence_owner(
+            sequence,
+            Some(SequenceOwner {
+                identity: Some(kind),
+                ..owner
+            }),
+        );
+        if self.in_transaction() {
+            self.undo.push(Undo::SequenceOwner(sequence, owner));
+        }
+    }
+
+    fn identity_kind_of(&self, table: TableId, column: Name) -> Option<IdentityKind> {
+        let sequence = self.identity_sequence(table, column)?;
+        self.index.tables[sequence].sequence_owner?.identity
     }
 
     fn identity_sequence(&self, table: TableId, column: Name) -> Option<TableId> {
@@ -17187,7 +17377,7 @@ impl Lowerer {
             .find(|id| {
                 self.index.tables[*id]
                     .sequence_owner
-                    .is_some_and(|owner| owner.column == column && owner.identity)
+                    .is_some_and(|owner| owner.column == column && owner.identity.is_some())
                     && !self.dropped_tables.contains(id)
             })
     }
@@ -19485,12 +19675,15 @@ impl Lowerer {
                 }
             }
             Some(ast::GeneratedAs::GeneratedIdentity(identity)) => {
-                self.lower_identity(
-                    table,
-                    column,
-                    identity.sequence_option_list(),
-                    identity.syntax(),
-                );
+                if let Some(when) = identity.generated_when() {
+                    self.lower_identity(
+                        table,
+                        column,
+                        when.into(),
+                        identity.sequence_option_list(),
+                        identity.syntax(),
+                    );
+                }
             }
             None => {}
         }

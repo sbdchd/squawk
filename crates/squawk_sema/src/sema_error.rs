@@ -745,6 +745,14 @@ pub(crate) enum SemaError {
         kind: UniqueKind,
         table: Name,
     },
+    GeneratedColumnInsert {
+        column: Name,
+        identity: bool,
+    },
+    GeneratedColumnUpdate {
+        column: Name,
+        identity: bool,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1319,6 +1327,9 @@ impl SemaError {
             | SemaError::UniqueOnExpressionPartitionKey { .. } => {
                 DiagnosticKind::InvalidTableDefinition
             }
+            SemaError::GeneratedColumnInsert { .. } | SemaError::GeneratedColumnUpdate { .. } => {
+                DiagnosticKind::GeneratedColumnWrite
+            }
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -1882,6 +1893,9 @@ impl SemaError {
             SemaError::CannotOpenIndex { .. } => {
                 Some("this operation is not supported for indexes")
             }
+            SemaError::GeneratedColumnInsert { identity: true, .. } => {
+                Some("use `overriding system value` to override")
+            }
             SemaError::IdentityColumnDefault {
                 change: DefaultChange::Drop,
                 ..
@@ -2085,6 +2099,16 @@ impl SemaError {
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
         if let SemaError::NonBoolComparison { comparison, .. } = *self {
             return Some(Cow::Borrowed(comparison.note()));
+        }
+        if let SemaError::GeneratedColumnInsert { column, identity }
+        | SemaError::GeneratedColumnUpdate { column, identity } = *self
+        {
+            let column = names.resolve(column);
+            return Some(Cow::Owned(if identity {
+                format!("`{column}` is an identity column defined as `generated always`")
+            } else {
+                format!("`{column}` is a generated column")
+            }));
         }
         if let SemaError::PseudoTypeColumn { .. } = *self {
             return Some(Cow::Borrowed(
@@ -2908,6 +2932,14 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(table),
                 n(column)
             ),
+            SemaError::GeneratedColumnInsert { column, .. } => write!(
+                f,
+                "cannot insert a non-default value into column `{}`",
+                n(column)
+            ),
+            SemaError::GeneratedColumnUpdate { column, .. } => {
+                write!(f, "column `{}` can only be updated to `default`", n(column))
+            }
             SemaError::UniqueOnExpressionPartitionKey { kind, table } => write!(
                 f,
                 "{} is not supported on partitioned table `{}` because its partition key contains expressions",
