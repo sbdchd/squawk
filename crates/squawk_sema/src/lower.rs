@@ -50,7 +50,7 @@ use crate::{
         ErrorParam, ErrorReturnType, GeneratedKind, LookupKind, ObjectKind, OperandName,
         OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
         SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
-        TruncateCascade, ViewColumnRename, WindowClause,
+        TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -105,6 +105,7 @@ impl Lowerer {
             dependencies: DependencyGraph::default(),
             inheritances: InheritanceGraph::default(),
             column_exprs: ColumnExprs::default(),
+            partition_keys: FxHashMap::default(),
             next_column_expr: 0,
             dropped_operator_family_members: FxHashSet::default(),
             undo: vec![],
@@ -408,6 +409,7 @@ pub(crate) struct Lowerer {
     dependencies: DependencyGraph,
     inheritances: InheritanceGraph,
     column_exprs: ColumnExprs,
+    partition_keys: FxHashMap<TableId, PartitionKey>,
     next_column_expr: u32,
     dropped_operator_family_members: FxHashSet<OperatorFamilyMemberId>,
     undo: Vec<Undo>,
@@ -499,6 +501,12 @@ struct Snapshot {
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct ColumnExprId(u32);
+
+#[derive(Clone, Copy)]
+enum PartitionKey {
+    Columns(IdxRange<Name>),
+    Expressions,
+}
 
 struct Replacement<'a> {
     ret: Option<Ty>,
@@ -1140,6 +1148,7 @@ enum Undo {
     SequenceOwner(TableId, SequenceOwner),
     ConstraintKind(ConstraintId, ConstraintKind),
     IndexKey(IndexId, Option<IdxRange<Name>>),
+    PartitionKey(TableId, PartitionKey),
     IndexColumns(IndexId, IdxRange<Name>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),
@@ -2370,6 +2379,20 @@ impl Lowerer {
                 self.undo.push(Undo::IndexKey(id, previous));
             }
         }
+        if let Some(&previous @ PartitionKey::Columns(key)) = self.partition_keys.get(&table)
+            && self
+                .index
+                .indexes
+                .key_names(key)
+                .any(|column| column == from)
+        {
+            let key = self.index.indexes.alloc_renamed_key(key, from, to);
+            self.partition_keys
+                .insert(table, PartitionKey::Columns(key));
+            if in_transaction {
+                self.undo.push(Undo::PartitionKey(table, previous));
+            }
+        }
     }
 
     fn index_key_contains(&self, index: IndexId, column: Name) -> bool {
@@ -3470,6 +3493,9 @@ impl Lowerer {
                 }
                 Undo::IndexKey(id, key) => {
                     self.index.indexes.set_key(id, key);
+                }
+                Undo::PartitionKey(table, key) => {
+                    self.partition_keys.insert(table, key);
                 }
                 Undo::IndexColumns(id, columns) => {
                     self.index.indexes.set_columns(id, columns);
@@ -11069,6 +11095,20 @@ impl Lowerer {
             == Some(ast::PartitionStrategyKind::Hash);
         let access_method = self.intern(if hash { "hash" } else { "btree" });
         let access_method = self.find_access_method(access_method);
+        let columns: Option<SmallVec<[Name; 4]>> = partition_by
+            .partition_item_list()
+            .into_iter()
+            .flat_map(|list| list.partition_items())
+            .map(|item| match item.expr()?.unparen() {
+                ast::Expr::NameRef(name_ref) => self.name_ref_name(&name_ref),
+                _ => None,
+            })
+            .collect();
+        let key = match columns {
+            Some(columns) => PartitionKey::Columns(self.index.indexes.alloc_key(columns)),
+            None => PartitionKey::Expressions,
+        };
+        self.partition_keys.insert(table, key);
         self.with_table_scope(QueryKind::Constraint, Some(table), node, |this| {
             for item in partition_by
                 .partition_item_list()
@@ -17457,6 +17497,19 @@ impl Lowerer {
         let unique = create_index.unique_token().is_some();
         let partial = create_index.where_clause().is_some();
         if unique
+            && let Some(table) = table
+            && let Some(items) = create_index.partition_item_list()
+        {
+            let columns: SmallVec<[Name; 4]> = items
+                .partition_items()
+                .filter_map(|item| match item.expr()?.unparen() {
+                    ast::Expr::NameRef(name_ref) => self.name_ref_name(&name_ref),
+                    _ => None,
+                })
+                .collect();
+            self.check_partitioned_unique(table, &columns, UniqueKind::UniqueIndex, items.syntax());
+        }
+        if unique
             && let Some(access_method) = access_method
             && let Some(access_method_ref) = create_index
                 .using_method()
@@ -17526,6 +17579,44 @@ impl Lowerer {
             }
         }
         self.depend_on_refs(refs, self.index.indexes.range_from(start), Object::Index);
+    }
+
+    fn check_partitioned_unique(
+        &mut self,
+        table: TableId,
+        columns: &[Name],
+        kind: UniqueKind,
+        node: &SyntaxNode,
+    ) {
+        let Some(&key) = self.partition_keys.get(&table) else {
+            return;
+        };
+        if !self.index.tables[table].partitioned || self.dropped_tables.contains(&table) {
+            return;
+        }
+        let table_name = self.index.tables[table].name;
+        let error = match key {
+            PartitionKey::Expressions => SemaError::UniqueOnExpressionPartitionKey {
+                kind,
+                table: table_name,
+            },
+            PartitionKey::Columns(key) => {
+                let Some(column) = self
+                    .index
+                    .indexes
+                    .key_names(key)
+                    .find(|column| !columns.contains(column))
+                else {
+                    return;
+                };
+                SemaError::UniqueMissingPartitionColumn {
+                    kind,
+                    table: table_name,
+                    column,
+                }
+            }
+        };
+        self.push_error(node, error);
     }
 
     fn lower_index_key(&mut self, items: &ast::PartitionItemList) -> Option<IdxRange<Name>> {
@@ -19479,6 +19570,12 @@ impl Lowerer {
         }
         if index.is_none() {
             self.check_key_operator_classes(table, &columns[..key_len], primary_key.syntax());
+            self.check_partitioned_unique(
+                table,
+                &columns[..key_len],
+                UniqueKind::PrimaryKey,
+                primary_key.syntax(),
+            );
         }
         let name = primary_key
             .constraint_name_clause()
@@ -19552,6 +19649,12 @@ impl Lowerer {
         };
         if index.is_none() {
             self.check_key_operator_classes(table, &columns[..key_len], unique.syntax());
+            self.check_partitioned_unique(
+                table,
+                &columns[..key_len],
+                UniqueKind::Unique,
+                unique.syntax(),
+            );
         }
         let name = unique
             .constraint_name_clause()

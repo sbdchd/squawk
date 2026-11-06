@@ -60,6 +60,10 @@ impl IndexIndex {
             .alloc_mapped_copies(key, |column| if column == from { to } else { column })
     }
 
+    pub(crate) fn key_names(&self, key: IdxRange<Name>) -> impl Iterator<Item = Name> + '_ {
+        key.iter().map(|column| self.keys[column])
+    }
+
     pub(crate) fn key(&self, id: IndexId) -> Option<impl Iterator<Item = Name> + '_> {
         let key = self.arena[id].key?;
         Some(key.iter().map(|column| self.keys[column]))

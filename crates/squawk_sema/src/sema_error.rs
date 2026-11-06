@@ -736,6 +736,32 @@ pub(crate) enum SemaError {
         name: Name,
     },
     ReplaceFunctionRemovesDefaults,
+    UniqueMissingPartitionColumn {
+        kind: UniqueKind,
+        table: Name,
+        column: Name,
+    },
+    UniqueOnExpressionPartitionKey {
+        kind: UniqueKind,
+        table: Name,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum UniqueKind {
+    PrimaryKey,
+    Unique,
+    UniqueIndex,
+}
+
+impl UniqueKind {
+    fn label(self) -> &'static str {
+        match self {
+            UniqueKind::PrimaryKey => "primary key",
+            UniqueKind::Unique => "unique constraint",
+            UniqueKind::UniqueIndex => "unique index",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1289,6 +1315,10 @@ impl SemaError {
             SemaError::ReplaceFunctionReturnType { .. }
             | SemaError::ReplaceFunctionParamName { .. }
             | SemaError::ReplaceFunctionRemovesDefaults => DiagnosticKind::IncompatibleReplacement,
+            SemaError::UniqueMissingPartitionColumn { .. }
+            | SemaError::UniqueOnExpressionPartitionKey { .. } => {
+                DiagnosticKind::InvalidTableDefinition
+            }
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -2867,6 +2897,23 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::ReplaceFunctionRemovesDefaults => {
                 write!(f, "cannot remove parameter defaults from existing function")
             }
+            SemaError::UniqueMissingPartitionColumn {
+                kind,
+                table,
+                column,
+            } => write!(
+                f,
+                "{} on partitioned table `{}` must include partition key column `{}`",
+                kind.label(),
+                n(table),
+                n(column)
+            ),
+            SemaError::UniqueOnExpressionPartitionKey { kind, table } => write!(
+                f,
+                "{} is not supported on partitioned table `{}` because its partition key contains expressions",
+                kind.label(),
+                n(table)
+            ),
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
                 f,
                 "cannot change type of view column `{}` from `{}` to `{}`",
