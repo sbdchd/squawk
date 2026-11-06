@@ -2681,6 +2681,7 @@ impl Lowerer {
                 name_ptr: column_ptr,
                 columns,
                 constraints_complete: true,
+                partitioned: false,
                 sequence_owner: None,
                 of_type: None,
                 array_name: None,
@@ -10971,6 +10972,7 @@ impl Lowerer {
             .set_constraints_complete(table, constraints_complete);
         self.index.tables.set_of_type(table, typed_table_of);
         if let Some(partition_by) = partition_by {
+            self.index.tables.set_partitioned(table);
             self.lower_partition_by(table, create_table.syntax(), &partition_by);
         }
         let Some(args) = create_table.table_arg_list() else {
@@ -18726,13 +18728,43 @@ impl Lowerer {
     }
 
     fn lower_truncate(&mut self, truncate: &ast::Truncate) {
-        for path in truncate
+        let mut targets: SmallVec<[TableId; 4]> = smallvec![];
+        for relation_name in truncate
             .table_list()
             .iter()
             .flat_map(|list| list.table_relation_names())
-            .filter_map(|name| name.table_name_ref()?.path_ref())
         {
-            self.lower_table_ref(&path, IfMissing::Error, TableLookup::Truncate);
+            let Some(name_ref) = relation_name.table_name_ref() else {
+                continue;
+            };
+            let Some(path) = name_ref.path_ref() else {
+                continue;
+            };
+            let Some(table) = self.lower_table_ref(&path, IfMissing::Error, TableLookup::Truncate)
+            else {
+                continue;
+            };
+            if targets.contains(&table) {
+                continue;
+            }
+            targets.push(table);
+            if let Some(only) = relation_name.only_token()
+                && self.index.tables[table].partitioned
+            {
+                self.push_error(
+                    path.syntax(),
+                    SemaError::TruncateOnlyPartitioned {
+                        name: self.index.tables[table].name,
+                        only_range: TextRange::new(
+                            only.text_range().start(),
+                            name_ref.syntax().text_range().start(),
+                        ),
+                        r_paren_range: relation_name
+                            .r_paren_token()
+                            .map(|token| token.text_range()),
+                    },
+                );
+            }
         }
     }
 
@@ -24802,6 +24834,7 @@ impl Lowerer {
                 name_ptr: self.ptr(name_node),
                 columns,
                 constraints_complete: true,
+                partitioned: false,
                 sequence_owner: None,
                 of_type: None,
                 array_name,

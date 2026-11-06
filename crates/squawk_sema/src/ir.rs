@@ -95,6 +95,7 @@ pub struct Table {
     pub name_ptr: InIrFile<SyntaxNodePtr>,
     pub columns: Columns,
     pub(crate) constraints_complete: bool,
+    pub(crate) partitioned: bool,
     pub(crate) sequence_owner: Option<SequenceOwner>,
     pub(crate) of_type: Option<TypeId>,
     pub(crate) array_name: Option<Name>,

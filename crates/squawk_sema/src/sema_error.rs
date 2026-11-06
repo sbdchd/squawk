@@ -539,6 +539,11 @@ pub(crate) enum SemaError {
         copy_from: bool,
         kind: TableKind,
     },
+    TruncateOnlyPartitioned {
+        name: Name,
+        only_range: TextRange,
+        r_paren_range: Option<TextRange>,
+    },
     CannotOpenIndex {
         name: Name,
     },
@@ -1293,6 +1298,7 @@ impl SemaError {
             SemaError::WrongRelationKind { .. }
             | SemaError::CompositeTypeAlteredAsTable { .. }
             | SemaError::CannotCopy { .. }
+            | SemaError::TruncateOnlyPartitioned { .. }
             | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
             SemaError::NotIdentityColumn { .. } => DiagnosticKind::NotIdentityColumn,
@@ -1668,6 +1674,20 @@ impl SemaError {
                 replacement: Some(replacement),
                 ..
             } => replace_suggestion(replacement.message(), range, replacement.text().into()),
+            SemaError::TruncateOnlyPartitioned {
+                only_range,
+                r_paren_range,
+                ..
+            } => Suggestion {
+                message: "remove `only` to also truncate the partitions, or truncate the partitions directly".into(),
+                fix: Fix {
+                    title: "Remove `only`".into(),
+                    edits: std::iter::once(only_range)
+                        .chain(r_paren_range)
+                        .map(Edit::delete)
+                        .collect(),
+                },
+            },
             SemaError::FutureCte { name, recursive_at } => Suggestion {
                 message: format!(
                     "to reference `{}`, mark the `with` clause as `recursive`",
@@ -2807,6 +2827,9 @@ impl fmt::Display for ErrorMessage<'_> {
             }
             SemaError::CannotCreateIndex { name, kind } => {
                 write!(f, "cannot create index on {} `{}`", kind.label(), n(name))
+            }
+            SemaError::TruncateOnlyPartitioned { name, .. } => {
+                write!(f, "cannot truncate only partitioned table `{}`", n(name))
             }
             SemaError::NotIdentityColumn { column, relation } => write!(
                 f,

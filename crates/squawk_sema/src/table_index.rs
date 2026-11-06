@@ -222,6 +222,10 @@ impl TableIndex {
         self.local_mut(id).constraints_complete = complete;
     }
 
+    pub(crate) fn set_partitioned(&mut self, id: TableId) {
+        self.local_mut(id).partitioned = true;
+    }
+
     fn local_mut(&mut self, id: TableId) -> &mut Table {
         self.arena
             .get_local_mut(id)
