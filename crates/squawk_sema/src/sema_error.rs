@@ -1690,16 +1690,20 @@ impl SemaError {
                 only_range,
                 r_paren_range,
                 ..
-            } => Suggestion {
-                message: "remove `only` to also truncate the partitions, or truncate the partitions directly".into(),
-                fix: Fix {
-                    title: "Remove `only`".into(),
-                    edits: std::iter::once(only_range)
-                        .chain(r_paren_range)
-                        .map(Edit::delete)
-                        .collect(),
-                },
-            },
+            } => {
+                let mut edits = Vec::with_capacity(2);
+                edits.push(Edit::delete(only_range));
+                if let Some(r_paren_range) = r_paren_range {
+                    edits.push(Edit::delete(r_paren_range));
+                }
+                Suggestion {
+                    message: "remove `only` to also truncate the partitions, or truncate the partitions directly".into(),
+                    fix: Fix {
+                        title: "Remove `only`".into(),
+                        edits,
+                    },
+                }
+            }
             SemaError::TruncateReferenced {
                 referencing,
                 cascade,

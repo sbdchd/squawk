@@ -18826,21 +18826,30 @@ impl Lowerer {
     fn truncate_referencer(&self, table: TableId, targets: &[TruncateTarget]) -> Option<TableId> {
         let mut referenced = Some(table);
         while let Some(current) = referenced {
-            let referencer = self.foreign_keys.iter().find_map(|foreign_key| {
-                let Referencing {
-                    table: referencing,
-                    constraint,
-                    ..
-                } = foreign_key.referencing;
-                (foreign_key.table == current
-                    && !self.dropped_constraints.contains(&constraint)
-                    && !self.dropped_tables.contains(&referencing)
-                    && !targets.iter().any(|target| target.table == referencing))
-                .then_some(referencing)
-            });
-            if referencer.is_some() {
-                return referencer;
+            for foreign_key in &self.foreign_keys {
+                if foreign_key.table != current {
+                    continue;
+                }
+
+                let referencing = &foreign_key.referencing;
+                if self.dropped_constraints.contains(&referencing.constraint) {
+                    continue;
+                }
+
+                if self.dropped_tables.contains(&referencing.table) {
+                    continue;
+                }
+
+                let truncated_together = targets
+                    .iter()
+                    .any(|target| target.table == referencing.table);
+                if truncated_together {
+                    continue;
+                }
+
+                return Some(referencing.table);
             }
+
             referenced = self
                 .inheritances
                 .parents(current)
