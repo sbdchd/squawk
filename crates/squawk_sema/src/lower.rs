@@ -45,10 +45,11 @@ use crate::{
     },
     sema_error::{
         ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
-        ConflictTargetKey, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam,
-        LookupKind, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
-        OutsideSearchPath, Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn,
-        SimilarType, TriggerFunctionKind, TruncateCascade, ViewColumnRename, WindowClause,
+        ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates,
+        ErrorParam, GeneratedKind, LookupKind, ObjectKind, OperandName, OperatorReplacement,
+        OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
+        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
+        TruncateCascade, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -501,7 +502,7 @@ struct ColumnExprId(u32);
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ColumnExprKind {
     Default,
-    Generated,
+    Generated { kind: GeneratedKind },
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -1842,7 +1843,9 @@ impl Lowerer {
                     && self
                         .column_exprs
                         .get(ColumnKey { table, column })
-                        .is_some_and(|expression| expression.kind == ColumnExprKind::Generated)
+                        .is_some_and(|expression| {
+                            matches!(expression.kind, ColumnExprKind::Generated { .. })
+                        })
                 {
                     self.push_error_at(range, SemaError::GeneratedColumnReference { column });
                 }
@@ -3759,7 +3762,7 @@ impl Lowerer {
         let generated = self
             .column_exprs
             .get(key)
-            .is_some_and(|expression| expression.kind == ColumnExprKind::Generated);
+            .is_some_and(|expression| matches!(expression.kind, ColumnExprKind::Generated { .. }));
         self.set_column_expr(key.table, key.column, None);
         if generated {
             self.drop_table_column(key.table, key.column);
@@ -3822,7 +3825,7 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         let context = match kind {
             ColumnExprKind::Default => ExprContext::Default,
-            ColumnExprKind::Generated => ExprContext::GeneratedColumn,
+            ColumnExprKind::Generated { .. } => ExprContext::GeneratedColumn,
         };
         self.lower_expr_in(context, expr);
         let (Some(table), Some(column)) = (table, column) else {
@@ -3831,7 +3834,7 @@ impl Lowerer {
         let id = ColumnExprId(self.next_column_expr);
         self.next_column_expr += 1;
         self.set_column_expr(table, column, Some(ColumnExpr { id, kind }));
-        if kind == ColumnExprKind::Generated {
+        if let ColumnExprKind::Generated { .. } = kind {
             self.generated_refs.push(GeneratedRefs {
                 table,
                 refs: self.index.references.range_from(refs),
@@ -16989,25 +16992,52 @@ impl Lowerer {
                 }
             }
             Some(ast::AlterColumnOption::SetDefault(set_default)) => {
+                if let Some(table) = table
+                    && self.report_column_default_change(
+                        table,
+                        column,
+                        &column_ref,
+                        DefaultChange::Set,
+                    )
+                {
+                    return;
+                }
                 if let Some(expr) = set_default.expr() {
                     self.lower_column_expr(table, Some(column), &expr, ColumnExprKind::Default);
                 }
             }
             Some(ast::AlterColumnOption::SetExpression(set_expression)) => {
                 if let Some(expr) = set_expression.expr() {
+                    let kind = table
+                        .and_then(|table| self.column_exprs.get(ColumnKey { table, column }))
+                        .and_then(|expression| match expression.kind {
+                            ColumnExprKind::Generated { kind } => Some(kind),
+                            ColumnExprKind::Default => None,
+                        })
+                        .unwrap_or(GeneratedKind::Virtual);
                     self.with_table_scope(QueryKind::Constraint, table, node, |this| {
                         this.lower_column_expr(
                             table,
                             Some(column),
                             &expr,
-                            ColumnExprKind::Generated,
+                            ColumnExprKind::Generated { kind },
                         );
                     });
                 }
             }
-            Some(
-                ast::AlterColumnOption::DropDefault(_) | ast::AlterColumnOption::DropExpression(_),
-            ) => {
+            Some(ast::AlterColumnOption::DropDefault(_)) => {
+                if let Some(table) = table
+                    && !self.report_column_default_change(
+                        table,
+                        column,
+                        &column_ref,
+                        DefaultChange::Drop,
+                    )
+                {
+                    self.set_column_expr(table, column, None);
+                }
+            }
+            Some(ast::AlterColumnOption::DropExpression(_)) => {
                 if let Some(table) = table {
                     self.set_column_expr(table, column, None);
                 }
@@ -17065,18 +17095,7 @@ impl Lowerer {
                 let Some(table) = table else {
                     return;
                 };
-                let sequence = self
-                    .index
-                    .tables
-                    .owned_sequences(table)
-                    .into_iter()
-                    .find(|id| {
-                        self.index.tables[*id]
-                            .sequence_owner
-                            .is_some_and(|owner| owner.column == column && owner.identity)
-                            && !self.dropped_tables.contains(id)
-                    });
-                match sequence {
+                match self.identity_sequence(table, column) {
                     Some(sequence) => self.drop_table(sequence),
                     None if drop_identity.if_exists().is_none()
                         && self.index.tables[table].constraints_complete
@@ -17105,6 +17124,51 @@ impl Lowerer {
             )
             | None => {}
         }
+    }
+
+    fn identity_sequence(&self, table: TableId, column: Name) -> Option<TableId> {
+        self.index
+            .tables
+            .owned_sequences(table)
+            .into_iter()
+            .find(|id| {
+                self.index.tables[*id]
+                    .sequence_owner
+                    .is_some_and(|owner| owner.column == column && owner.identity)
+                    && !self.dropped_tables.contains(id)
+            })
+    }
+
+    fn report_column_default_change(
+        &mut self,
+        table: TableId,
+        column: Name,
+        column_ref: &ast::ColumnNameRef,
+        change: DefaultChange,
+    ) -> bool {
+        let relation = self.index.tables[table].name;
+        let error = if self.identity_sequence(table, column).is_some() {
+            SemaError::IdentityColumnDefault {
+                column,
+                relation,
+                change,
+            }
+        } else if let Some(ColumnExpr {
+            kind: ColumnExprKind::Generated { kind },
+            ..
+        }) = self.column_exprs.get(ColumnKey { table, column })
+        {
+            SemaError::GeneratedColumnDefault {
+                column,
+                relation,
+                change,
+                kind,
+            }
+        } else {
+            return false;
+        };
+        self.push_error(column_ref.syntax(), error);
+        true
     }
 
     fn lower_add_column(
@@ -19302,9 +19366,18 @@ impl Lowerer {
         generated: &ast::GeneratedConstraint,
     ) {
         match generated.generated_as() {
-            Some(ast::GeneratedAs::GeneratedStored(stored)) => {
-                if let Some(expr) = stored.expr() {
-                    self.lower_column_expr(table, column, &expr, ColumnExprKind::Generated);
+            Some(ast::GeneratedAs::GeneratedStored(generated_stored)) => {
+                if let Some(expr) = generated_stored.expr() {
+                    let kind = match generated_stored.generated_kind() {
+                        Some(ast::GeneratedKind::Stored(_)) => GeneratedKind::Stored,
+                        Some(ast::GeneratedKind::Virtual(_)) | None => GeneratedKind::Virtual,
+                    };
+                    self.lower_column_expr(
+                        table,
+                        column,
+                        &expr,
+                        ColumnExprKind::Generated { kind },
+                    );
                 }
             }
             Some(ast::GeneratedAs::GeneratedIdentity(identity)) => {

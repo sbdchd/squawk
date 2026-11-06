@@ -113,6 +113,7 @@ pub enum DiagnosticKind {
     DropReturnRule,
     RenameSelectRule,
     NotIdentityColumn,
+    ColumnDefaultNotAllowed,
     WrongTypeKind,
     TypeMismatch,
     WrongRelationKind,

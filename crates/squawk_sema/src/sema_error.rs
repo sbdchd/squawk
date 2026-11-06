@@ -564,6 +564,17 @@ pub(crate) enum SemaError {
         column: Name,
         relation: Name,
     },
+    IdentityColumnDefault {
+        column: Name,
+        relation: Name,
+        change: DefaultChange,
+    },
+    GeneratedColumnDefault {
+        column: Name,
+        relation: Name,
+        change: DefaultChange,
+        kind: GeneratedKind,
+    },
     ConstraintTrigger {
         name: Name,
         relation: Name,
@@ -723,6 +734,18 @@ pub(crate) struct ViewColumnRename {
 pub(crate) enum TruncateCascade {
     Insert(TextSize),
     ReplaceRestrict(TextRange),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum DefaultChange {
+    Set,
+    Drop,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum GeneratedKind {
+    Stored,
+    Virtual,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1335,6 +1358,9 @@ impl SemaError {
             | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
             SemaError::NotIdentityColumn { .. } => DiagnosticKind::NotIdentityColumn,
+            SemaError::IdentityColumnDefault { .. } | SemaError::GeneratedColumnDefault { .. } => {
+                DiagnosticKind::ColumnDefaultNotAllowed
+            }
             SemaError::ConstraintTrigger { .. } => DiagnosticKind::ReplaceConstraintTrigger,
             SemaError::DropReturnRule { .. } => DiagnosticKind::DropReturnRule,
             SemaError::MultiplePrimaryKeys { .. } => DiagnosticKind::MultiplePrimaryKeys,
@@ -1808,6 +1834,23 @@ impl SemaError {
             SemaError::CannotOpenIndex { .. } => {
                 Some("this operation is not supported for indexes")
             }
+            SemaError::IdentityColumnDefault {
+                change: DefaultChange::Drop,
+                ..
+            } => {
+                Some("use `drop identity` instead")
+            }
+            SemaError::GeneratedColumnDefault {
+                change: DefaultChange::Set,
+                ..
+            } => {
+                Some("use `set expression` instead")
+            }
+            SemaError::GeneratedColumnDefault {
+                change: DefaultChange::Drop,
+                kind: GeneratedKind::Stored,
+                ..
+            } => Some("use `drop expression` instead"),
             SemaError::WindowFrameCopy { hint, .. } => {
                 hint.then_some("omit the parentheses in this `over` clause")
             }
@@ -2910,6 +2953,22 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::NotIdentityColumn { column, relation } => write!(
                 f,
                 "column `{}.{}` is not an identity column",
+                n(relation),
+                n(column)
+            ),
+            SemaError::IdentityColumnDefault {
+                column, relation, ..
+            } => write!(
+                f,
+                "column `{}.{}` is an identity column",
+                n(relation),
+                n(column)
+            ),
+            SemaError::GeneratedColumnDefault {
+                column, relation, ..
+            } => write!(
+                f,
+                "column `{}.{}` is a generated column",
                 n(relation),
                 n(column)
             ),
