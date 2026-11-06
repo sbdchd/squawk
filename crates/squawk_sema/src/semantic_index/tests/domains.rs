@@ -32,7 +32,8 @@ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
     10 │ select f(a), f(b), g(a), g(b), h(a), h(c), h(d) from t;
        │                                            ━
        │
-       ├ note: candidates are `h(posint)`, `h(int4)`
+       ├ note: `h(posint)` expects `posint` for argument 1, found `text`
+       ├ note: `h(int4)` expects `int4` for argument 1, found `text`
        ╰ hint: consider adding explicit type casts
     ");
 }

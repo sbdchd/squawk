@@ -45,12 +45,13 @@ use crate::{
         Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ColumnDefListReason, Comparison, CompoundOp, ConflictAction, ConflictRuleEvent,
-        ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates,
-        ErrorParam, ErrorReturnType, GeneratedKind, LookupKind, ObjectKind, OperandName,
-        OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
-        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
-        TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
+        ArgLabel, CandidateReason, ColumnDefListReason, Comparison, CompoundOp, ConflictAction,
+        ConflictRuleEvent, ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs,
+        ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType, GeneratedKind, LookupKind,
+        ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
+        OutsideSearchPath, Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn,
+        SimilarType, TriggerFunctionKind, TruncateCascade, UniqueKind, ViewColumnRename,
+        WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -20849,7 +20850,7 @@ impl Lowerer {
         let candidates = if misplaced_order_by {
             None
         } else {
-            self.routine_overloads(kind, schema, name)
+            self.routine_overloads(kind, schema, name, args)
         };
         let outside_search_path = if schema.is_none() && candidates.is_none() {
             self.outside_search_path(kind, name, args, node)
@@ -24615,6 +24616,7 @@ impl Lowerer {
         kind: RoutineKind,
         schema: Option<Name>,
         name: Name,
+        args: &[CallArg],
     ) -> Option<ErrorCandidates> {
         let mut functions = self.routine_candidates(schema, name, call_kind(kind));
         let mut shown: SmallVec<[FunctionId; MAX_CANDIDATES]> =
@@ -24626,13 +24628,45 @@ impl Lowerer {
         shown.sort_unstable();
         let start = self.index.errors.candidates.next_idx();
         for function in shown {
+            let reason = self.candidate_reason(function, args);
             let args = self.candidate_args(function);
-            self.index.errors.candidates.alloc(args);
+            self.index
+                .errors
+                .candidates
+                .alloc(ErrorCandidate { args, reason });
         }
         Some(ErrorCandidates {
             shown: self.index.errors.candidates.range_from(start),
             total,
         })
+    }
+
+    fn candidate_reason(&self, function: FunctionId, args: &[CallArg]) -> Option<CandidateReason> {
+        if args.iter().any(|arg| arg.name.is_some() || arg.variadic) {
+            return None;
+        }
+        let overloads = self.overloads();
+        match overloads.mismatch(&self.index.functions[function], args)? {
+            CallMismatch::ArgType(ArgMismatch {
+                position,
+                found,
+                expected,
+            }) => (!overloads.is_pseudo(expected)).then(|| CandidateReason::ArgType {
+                position,
+                expected: self.index.ty_name(expected),
+                found: self.index.ty_name(found),
+            }),
+            CallMismatch::ArgCount(ArgCount { min, max, .. }) => Some(CandidateReason::ArgCount {
+                min,
+                max,
+                supplied: args.len(),
+            }),
+            CallMismatch::UnknownName { .. }
+            | CallMismatch::PositionalAndNamed { .. }
+            | CallMismatch::Missing(_)
+            | CallMismatch::NotVariadic { .. }
+            | CallMismatch::UnlabeledVariadic { .. } => None,
+        }
     }
 
     fn candidate_args(&mut self, function: FunctionId) -> ErrorArgs {

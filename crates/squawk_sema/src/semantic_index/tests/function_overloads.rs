@@ -13,7 +13,10 @@ select lower('A'), lower(1, 2), lower(1, 2, 3);
     3 │ select lower('A'), lower(1, 2), lower(1, 2, 3);
       │                                 ━━━━━
       │
-      ├ note: candidates are `lower(anymultirange)`, `lower(anyrange)`, `lower(text)`, `lower(int4, int4)`
+      ├ note: `lower(anymultirange)` takes 1 argument but 3 were supplied
+      ├ note: `lower(anyrange)` takes 1 argument but 3 were supplied
+      ├ note: `lower(text)` takes 1 argument but 3 were supplied
+      ├ note: `lower(int4, int4)` takes 2 arguments but 3 were supplied
       ╰ hint: consider adding explicit type casts
     ");
 }
@@ -107,21 +110,28 @@ select to_char(true, 'x');
     7 │ select f(true);
       │        ━
       │
-      ├ note: candidates are `f(int4)`, `f(text, int4)`
+      ├ note: `f(int4)` expects `int4` for argument 1, found `bool`
+      ├ note: `f(text, int4)` expects `text` for argument 1, found `bool`
       ╰ hint: consider adding explicit type casts
     error: procedure `p(bool)` does not exist
       ╭▸ 
     8 │ call p(true);
       │      ━
       │
-      ├ note: candidates are `p(int4)`, `p(text, int4)`
+      ├ note: `p(int4)` expects `int4` for argument 1, found `bool`
+      ├ note: `p(text, int4)` takes 2 arguments but 1 was supplied
       ╰ hint: consider adding explicit type casts
     error: function `to_char(bool, unknown)` does not exist
       ╭▸ 
     9 │ select to_char(true, 'x');
       │        ━━━━━━━
       │
-      ├ note: candidates are `to_char(interval, text)`, `to_char(numeric, text)`, `to_char(float4, text)`, `to_char(timestamptz, text)`, `to_char(timestamp, text)`, and 3 others
+      ├ note: `to_char(interval, text)` expects `interval` for argument 1, found `bool`
+      ├ note: `to_char(numeric, text)` expects `numeric` for argument 1, found `bool`
+      ├ note: `to_char(float4, text)` expects `float4` for argument 1, found `bool`
+      ├ note: `to_char(timestamptz, text)` expects `timestamptz` for argument 1, found `bool`
+      ├ note: `to_char(timestamp, text)` expects `timestamp` for argument 1, found `bool`
+      ├ note: and 3 other candidates
       ╰ hint: consider adding explicit type casts
     ");
 }
@@ -142,21 +152,24 @@ call p(b => 1);
     6 │ select o(z => 1);
       │        ━
       │
-      ├ note: candidates are `o(int4)`, `o(text)`
+      ├ note: candidate `o(int4)`
+      ├ note: candidate `o(text)`
       ╰ hint: no function with that name accepts the given argument names
     error: function `o(x => bool)` does not exist
       ╭▸ 
     7 │ select o(x => true);
       │        ━
       │
-      ├ note: candidates are `o(int4)`, `o(text)`
+      ├ note: candidate `o(int4)`
+      ├ note: candidate `o(text)`
       ╰ hint: consider adding explicit type casts
     error: procedure `p(b => int4)` does not exist
       ╭▸ 
     8 │ call p(b => 1);
       │      ━
       │
-      ├ note: candidates are `p(int4)`, `p(text)`
+      ├ note: candidate `p(int4)`
+      ├ note: candidate `p(text)`
       ╰ hint: no procedure with that name accepts the given argument names
     ");
 }
