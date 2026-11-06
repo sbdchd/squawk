@@ -47,11 +47,11 @@ use crate::{
     sema_error::{
         ArgLabel, CandidateReason, ColumnDefListReason, Comparison, CompoundOp, ConflictAction,
         ConflictRuleEvent, ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs,
-        ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType, GeneratedKind, LookupKind,
-        ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
-        OutsideSearchPath, Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn,
-        SimilarType, TriggerFunctionKind, TruncateCascade, UniqueKind, ViewColumnRename,
-        WindowClause,
+        ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType, ForeignKeyPair,
+        GeneratedKind, LookupKind, ObjectKind, OperandName, OperatorReplacement,
+        OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
+        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
+        TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -520,6 +520,11 @@ struct ViewColumnDep {
 enum PartitionKey {
     Columns(IdxRange<Name>),
     Expressions,
+}
+
+struct ForeignKeyMismatch {
+    constraint: Name,
+    pairs: SmallVec<[ForeignKeyPair; 4]>,
 }
 
 struct ConflictRules {
@@ -21311,7 +21316,8 @@ impl Lowerer {
                 self.foreign_key_type_mismatch(referencing, table, key)
             }
         };
-        if let Some(error) = mismatch {
+        if let Some(mismatch) = mismatch {
+            let error = self.foreign_key_mismatch_error(mismatch);
             self.push_error_ptr(alter, error);
         }
     }
@@ -21345,8 +21351,8 @@ impl Lowerer {
                             return;
                         };
                         let mismatch = self.foreign_key_type_mismatch(referencing, table, key);
-                        if let Some(error) = mismatch {
-                            self.report_foreign_key_type_mismatch(referencing, error);
+                        if let Some(mismatch) = mismatch {
+                            self.report_foreign_key_type_mismatch(referencing, mismatch);
                         }
                         return;
                     }
@@ -21370,8 +21376,8 @@ impl Lowerer {
                             table,
                             columns.iter().copied(),
                         );
-                        if let Some(error) = mismatch {
-                            self.report_foreign_key_type_mismatch(referencing, error);
+                        if let Some(mismatch) = mismatch {
+                            self.report_foreign_key_type_mismatch(referencing, mismatch);
                         }
                         return;
                     }
@@ -21385,9 +21391,22 @@ impl Lowerer {
         self.push_error_ptr(ptr, error);
     }
 
-    fn report_foreign_key_type_mismatch(&mut self, referencing: &Referencing, error: SemaError) {
+    fn report_foreign_key_type_mismatch(
+        &mut self,
+        referencing: &Referencing,
+        mismatch: ForeignKeyMismatch,
+    ) {
         let ptr = self.index.constraints[referencing.constraint].ptr;
+        let error = self.foreign_key_mismatch_error(mismatch);
         self.push_error_ptr(ptr, error);
+    }
+
+    fn foreign_key_mismatch_error(&mut self, mismatch: ForeignKeyMismatch) -> SemaError {
+        let ForeignKeyMismatch { constraint, pairs } = mismatch;
+        SemaError::ForeignKeyTypeMismatch {
+            constraint,
+            pairs: self.index.errors.foreign_key_pairs.alloc_many(pairs),
+        }
     }
 
     fn foreign_key_type_mismatch(
@@ -21395,7 +21414,7 @@ impl Lowerer {
         referencing: &Referencing,
         table: TableId,
         referenced_columns: impl Iterator<Item = Name>,
-    ) -> Option<SemaError> {
+    ) -> Option<ForeignKeyMismatch> {
         let Referencing {
             table: referencing_table,
             columns,
@@ -21406,6 +21425,7 @@ impl Lowerer {
         }
         let referencing_range = self.index.tables[*referencing_table].columns.range;
         let referenced_range = self.index.tables[table].columns.range;
+        let mut pairs: SmallVec<[ForeignKeyPair; 4]> = smallvec![];
         for (column, referenced_column) in columns.iter().copied().zip(referenced_columns) {
             let (Some(ty), Some(referenced_ty)) = (
                 self.find_column_in(referencing_range, column)
@@ -21416,8 +21436,7 @@ impl Lowerer {
                 continue;
             };
             if !self.foreign_key_types_compatible(ty, referenced_ty) {
-                return Some(SemaError::ForeignKeyTypeMismatch {
-                    constraint: self.index.constraints[*constraint].name,
+                pairs.push(ForeignKeyPair {
                     column,
                     referenced_column,
                     ty: self.index.ty_name(ty),
@@ -21425,7 +21444,10 @@ impl Lowerer {
                 });
             }
         }
-        None
+        (!pairs.is_empty()).then(|| ForeignKeyMismatch {
+            constraint: self.index.constraints[*constraint].name,
+            pairs,
+        })
     }
 
     fn foreign_key_types_compatible(&self, ty: Ty, referenced_ty: Ty) -> bool {

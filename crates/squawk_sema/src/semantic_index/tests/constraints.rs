@@ -882,6 +882,18 @@ create table c2 (
   y int,
   foreign key (x, y) references p2
 );
+create table pk2 (
+  a int,
+  b int,
+  c int,
+  primary key (a, b, c)
+);
+create table fk2 (
+  a text,
+  b int,
+  c bool,
+  foreign key (a, b, c) references pk2
+);
 "), @"
     error: foreign key constraint `bad_e_fkey` cannot be implemented
        ╭▸ 
@@ -925,6 +937,13 @@ create table c2 (
        │   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        │
        ╰ note: key columns `y` and `b` are of incompatible types: `int4` and `text`
+    error: foreign key constraint `fk2_a_b_c_fkey` cannot be implemented
+       ╭▸ 
+    51 │   foreign key (a, b, c) references pk2
+       │   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+       │
+       ├ note: key columns `a` and `a` are of incompatible types: `text` and `int4`
+       ╰ note: key columns `c` and `c` are of incompatible types: `bool` and `int4`
     ");
 }
 
