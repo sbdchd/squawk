@@ -531,6 +531,12 @@ pub(crate) enum SemaError {
         left: TyName,
         right: TyName,
     },
+    RecursiveCteTypeMismatch {
+        name: Name,
+        column: usize,
+        non_recursive: TyName,
+        overall: TyName,
+    },
     ColumnListTooLong {
         what: &'static str,
         name: Name,
@@ -1435,7 +1441,9 @@ impl SemaError {
             | SemaError::TableRowTypeAlteredAsType { .. } => DiagnosticKind::WrongTypeKind,
             SemaError::TypedTableAlter { .. } => DiagnosticKind::TypedTableAlter,
             SemaError::InvalidDomainConstraint { .. } => DiagnosticKind::InvalidDomainConstraint,
-            SemaError::CompoundTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
+                DiagnosticKind::TypeMismatch
+            }
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
@@ -1926,6 +1934,9 @@ impl SemaError {
             } => copy_target(copy_from, kind).1,
             SemaError::CannotOpenIndex { .. } => {
                 Some("this operation is not supported for indexes")
+            }
+            SemaError::RecursiveCteTypeMismatch { .. } => {
+                Some("cast the output of the non-recursive term to the overall type")
             }
             SemaError::GeneratedColumnInsert { identity: true, .. } => {
                 Some("use `overriding system value` to override")
@@ -3066,6 +3077,18 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "each `{}` query must have the same number of columns",
                 op.keyword()
+            ),
+            SemaError::RecursiveCteTypeMismatch {
+                name,
+                column,
+                non_recursive,
+                overall,
+            } => write!(
+                f,
+                "recursive query `{}` column {column} has type `{}` in non-recursive term but type `{}` overall",
+                n(name),
+                self.ty(non_recursive),
+                self.ty(overall)
             ),
             SemaError::CompoundTypeMismatch { op, left, right } => write!(
                 f,

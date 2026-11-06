@@ -509,6 +509,12 @@ enum PartitionKey {
 }
 
 #[derive(Clone, Copy)]
+struct RecursiveCte {
+    id: CteId,
+    column_list: bool,
+}
+
+#[derive(Clone, Copy)]
 struct CompoundOperands<'a> {
     lhs: QueryId,
     rhs: QueryId,
@@ -13807,7 +13813,7 @@ impl Lowerer {
     fn lower_cte_query(
         &mut self,
         query: ast::SelectVariant,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         self.with_expr_context(ExprContext::Unrestricted, |this| {
             this.lower_cte_query_inner(query, recursive_cte)
@@ -13817,7 +13823,7 @@ impl Lowerer {
     fn lower_cte_query_inner(
         &mut self,
         query: ast::SelectVariant,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         match query {
             ast::SelectVariant::Select(select) => self.lower_simple_select(&select),
@@ -13869,7 +13875,7 @@ impl Lowerer {
     fn lower_paren_select(
         &mut self,
         paren: &ast::ParenSelect,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         let mark = self.ctes.len();
         if let Some(with_clause) = paren.with_clause() {
@@ -13951,7 +13957,7 @@ impl Lowerer {
     fn lower_compound(
         &mut self,
         compound: &ast::CompoundSelect,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         let mark = self.ctes.len();
         if !compound.is_nested()
@@ -13960,13 +13966,21 @@ impl Lowerer {
             self.lower_with(&with_clause);
         }
         let lhs = compound.lhs().map(|lhs| self.lower_query(lhs));
-        if let (Some(cte), Some(lhs)) = (recursive_cte, lhs)
+        if let (Some(recursive), Some(lhs)) = (recursive_cte, lhs)
             && matches!(compound.op(), Some(ast::CompoundOp::Union(_)))
         {
             let columns = self.index.queries[lhs].columns;
-            self.index.ctes[cte].columns = columns;
-            self.index
-                .set_column_owner(columns.range, ColumnOwner::Cte(cte));
+            let cte = recursive.id;
+            if recursive.column_list {
+                let list = self.index.ctes[cte].columns;
+                for (column, query_column) in list.range.iter().zip(columns.range) {
+                    self.index.columns[column].ty = self.index.columns[query_column].ty;
+                }
+            } else {
+                self.index.ctes[cte].columns = columns;
+                self.index
+                    .set_column_owner(columns.range, ColumnOwner::Cte(cte));
+            }
         }
         let mut columns = lhs.map(|lhs| self.index.queries[lhs].columns);
         if let Some(rhs) = compound.rhs() {
@@ -13982,6 +13996,13 @@ impl Lowerer {
                     rhs_node: &rhs,
                 };
                 columns = self.compound_columns(compound, operands);
+                if let Some(RecursiveCte { id: cte, .. }) = recursive_cte
+                    && let Some(resolved) = columns
+                    && matches!(compound.op(), Some(ast::CompoundOp::Union(_)))
+                {
+                    self.check_recursive_cte_types(cte, lhs, &lhs_node, resolved);
+                    columns = Some(self.index.queries[lhs].columns);
+                }
             }
         }
         let id = self.alloc_query(QueryKind::Compound, compound.syntax());
@@ -14016,6 +14037,44 @@ impl Lowerer {
             );
         }
         false
+    }
+
+    fn check_recursive_cte_types(
+        &mut self,
+        cte: CteId,
+        non_recursive: QueryId,
+        non_recursive_node: &ast::SelectVariant,
+        overall: Columns,
+    ) {
+        let columns = self.index.queries[non_recursive].columns;
+        for (position, (column, resolved)) in
+            columns.range.iter().zip(overall.range.iter()).enumerate()
+        {
+            let Column { ty, ptr, .. } = self.index.columns[column];
+            let (Some(ty), Some(overall)) = (ty, self.index.columns[resolved].ty) else {
+                continue;
+            };
+            if ty == overall || output_is_unknown_literal(non_recursive_node, position) {
+                continue;
+            }
+            let error = SemaError::RecursiveCteTypeMismatch {
+                name: self.index.ctes[cte].name,
+                column: position + 1,
+                non_recursive: self.index.ty_name(ty),
+                overall: self.index.ty_name(overall),
+            };
+            match output_expr(non_recursive_node, position) {
+                Some(expr) => self.push_error(expr.syntax(), error),
+                None => {
+                    let range = non_recursive_node.syntax().text_range();
+                    if ptr.file_id == self.file_id && range.contains_range(ptr.value.text_range()) {
+                        self.push_error_ptr(ptr, error);
+                    } else {
+                        self.push_error(non_recursive_node.syntax(), error);
+                    }
+                }
+            }
+        }
     }
 
     fn compound_columns(
@@ -15254,7 +15313,10 @@ impl Lowerer {
             .then(|| self.index.ctes[id].columns);
         if let Some(query) = with_table.query() {
             let recursive_cte = match kind {
-                CteKind::Recursive => column_list.is_none().then_some(id),
+                CteKind::Recursive => Some(RecursiveCte {
+                    id,
+                    column_list: column_list.is_some(),
+                }),
                 CteKind::NonRecursive => None,
             };
             let query = self.lower_with_query(&query, recursive_cte);
@@ -15346,7 +15408,7 @@ impl Lowerer {
     fn lower_with_query(
         &mut self,
         query: &ast::WithQuery,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         self.with_expr_context(ExprContext::Unrestricted, |this| {
             this.lower_with_query_inner(query, recursive_cte)
@@ -15356,7 +15418,7 @@ impl Lowerer {
     fn lower_with_query_inner(
         &mut self,
         query: &ast::WithQuery,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         let select = match query.clone() {
             ast::WithQuery::Delete(delete) => return self.lower_delete(&delete),
