@@ -4015,10 +4015,11 @@ impl Lowerer {
             return;
         };
         if kind == ColumnExprKind::Default
-            && self.index.errors.len() == errors
             && let Some(target) = self
                 .find_table_column(table, column)
                 .and_then(|id| self.index.columns[id].ty)
+            && !self.attach_empty_array_cast(target, expr)
+            && self.index.errors.len() == errors
         {
             let assignment = Assignment {
                 column,
@@ -15125,6 +15126,28 @@ impl Lowerer {
         }
     }
 
+    fn attach_empty_array_cast(&mut self, target: Ty, expr: &ast::Expr) -> bool {
+        let ast::Expr::ArrayExpr(array) = expr.unparen() else {
+            return false;
+        };
+        if array.select_variant().is_some() || array.exprs().next().is_some() {
+            return false;
+        }
+        if self
+            .index
+            .base_type(target)
+            .and_then(|base| self.index.element_type(base))
+            .is_some()
+        {
+            let range = self
+                .index
+                .range(InIrFile::new(self.file_id, array.syntax().text_range()));
+            let ty = self.index.ty_name(target);
+            self.index.errors.set_empty_array_cast(range, ty);
+        }
+        true
+    }
+
     fn check_assignment(&mut self, assignment: Assignment, expr: &ast::Expr) {
         let Assignment {
             column,
@@ -15132,6 +15155,9 @@ impl Lowerer {
             value,
             default,
         } = assignment;
+        if self.attach_empty_array_cast(target, expr) {
+            return;
+        }
         let ArgType::Known(ty) = value else {
             return;
         };
@@ -23315,7 +23341,7 @@ impl Lowerer {
                 let array_cast = std::mem::take(&mut self.array_cast);
                 if !array_cast && array.select_variant().is_none() && array.exprs().next().is_none()
                 {
-                    self.push_error(array.syntax(), SemaError::EmptyArrayType);
+                    self.push_error(array.syntax(), SemaError::EmptyArrayType { cast: None });
                 }
                 let mut element = None;
                 for expr in array.exprs() {

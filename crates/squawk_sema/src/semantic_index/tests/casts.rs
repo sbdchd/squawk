@@ -185,6 +185,10 @@ select array[array[1], array[]];
 select array[]::text;
 select array[f(array[])]::int[][];
 create table d (a int[] default array[]);
+create table td (a ia default array[], b int);
+insert into td values ((array[]), 1);
+update td set (b, a) = (1, array[]);
+insert into td (b) values (array[]);
 
 select array[]::int[];
 select cast(array[] as int[]);
@@ -206,14 +210,20 @@ select '{}'::int[];
       ╭▸ 
     9 │ insert into t values (array[]);
       │                       ━━━━━━━
-      │
-      ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+      ╰╴
+    help: cast the empty array to the column's type
+      ╭╴
+    9 │ insert into t values (array[]::int4[]);
+      ╰╴                             ++++++++
     error: cannot determine type of empty array
        ╭▸ 
     10 │ update t set a = array[];
        │                  ━━━━━━━
-       │
-       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+       ╰╴
+    help: cast the empty array to the column's type
+       ╭╴
+    10 │ update t set a = array[]::int4[];
+       ╰╴                        ++++++++
     error: cannot determine type of empty array
        ╭▸ 
     11 │ select a = array[] from t;
@@ -260,11 +270,47 @@ select '{}'::int[];
        ╭▸ 
     18 │ create table d (a int[] default array[]);
        │                                 ━━━━━━━
+       ╰╴
+    help: cast the empty array to the column's type
+       ╭╴
+    18 │ create table d (a int[] default array[]::int4[]);
+       ╰╴                                       ++++++++
+    error: cannot determine type of empty array
+       ╭▸ 
+    19 │ create table td (a ia default array[], b int);
+       │                               ━━━━━━━
+       ╰╴
+    help: cast the empty array to the column's type
+       ╭╴
+    19 │ create table td (a ia default array[]::ia, b int);
+       ╰╴                                     ++++
+    error: cannot determine type of empty array
+       ╭▸ 
+    20 │ insert into td values ((array[]), 1);
+       │                         ━━━━━━━
+       ╰╴
+    help: cast the empty array to the column's type
+       ╭╴
+    20 │ insert into td values ((array[]::ia), 1);
+       ╰╴                               ++++
+    error: cannot determine type of empty array
+       ╭▸ 
+    21 │ update td set (b, a) = (1, array[]);
+       │                            ━━━━━━━
+       ╰╴
+    help: cast the empty array to the column's type
+       ╭╴
+    21 │ update td set (b, a) = (1, array[]::ia);
+       ╰╴                                  ++++
+    error: cannot determine type of empty array
+       ╭▸ 
+    22 │ insert into td (b) values (array[]);
+       │                            ━━━━━━━
        │
        ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
     error: type `unknown_type` does not exist
        ╭▸ 
-    26 │ select array[]::unknown_type[];
+    30 │ select array[]::unknown_type[];
        ╰╴                ━━━━━━━━━━━━
     ");
 }
