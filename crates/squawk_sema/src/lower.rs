@@ -111,6 +111,7 @@ impl Lowerer {
             view_column_deps: vec![],
             view_bases: FxHashMap::default(),
             insert_values: vec![],
+            partition_bounds: FxHashMap::default(),
             next_column_expr: 0,
             dropped_operator_family_members: FxHashSet::default(),
             undo: vec![],
@@ -419,6 +420,7 @@ pub(crate) struct Lowerer {
     view_column_deps: Vec<ViewColumnDep>,
     view_bases: FxHashMap<TableId, TableId>,
     insert_values: Vec<InsertValue>,
+    partition_bounds: FxHashMap<TableId, PartitionBound>,
     next_column_expr: u32,
     dropped_operator_family_members: FxHashSet<OperatorFamilyMemberId>,
     undo: Vec<Undo>,
@@ -522,6 +524,42 @@ struct ViewColumnDep {
 enum PartitionKey {
     Columns(IdxRange<Name>),
     Expressions,
+}
+
+#[derive(Clone)]
+enum PartitionBound {
+    Default,
+    List(SmallVec<[ListValue; 4]>),
+    Range {
+        from: SmallVec<[RangeValue; 2]>,
+        to: SmallVec<[RangeValue; 2]>,
+    },
+    Hash {
+        modulus: u64,
+        remainder: u64,
+    },
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ListValue {
+    Int(i128),
+    Bool(bool),
+    Text(Name),
+    Null,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum RangeValue {
+    MinValue,
+    Int(i128),
+    MaxValue,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum BoundKeyType {
+    Int,
+    Bool,
+    Text,
 }
 
 struct InsertValue {
@@ -1580,7 +1618,7 @@ impl Lowerer {
                 TableKind::Table,
                 IfExists::from_if_not_exists(create_table.if_not_exists().as_ref()),
                 create_table.partition_of(),
-                create_table.partition_type(),
+                create_table.partition_type().as_ref(),
                 create_table.tablespace_clause(),
                 create_table.using_method(),
                 create_table.partition_by(),
@@ -5505,7 +5543,7 @@ impl Lowerer {
             TableKind::ForeignTable,
             IfExists::from_if_not_exists(create_table.if_not_exists().as_ref()),
             create_table.partition_of(),
-            create_table.partition_type(),
+            create_table.partition_type().as_ref(),
             None,
             None,
             None,
@@ -10956,14 +10994,14 @@ impl Lowerer {
         kind: TableKind,
         if_exists: IfExists,
         partition_of: Option<ast::PartitionOf>,
-        partition_type: Option<ast::PartitionType>,
+        partition_type: Option<&ast::PartitionType>,
         tablespace: Option<ast::TablespaceClause>,
         using_method: Option<ast::UsingMethod>,
         partition_by: Option<ast::PartitionBy>,
         of_type: Option<ast::OfType>,
     ) {
         if let Some(partition_type) = partition_type {
-            self.lower_partition_type(&partition_type);
+            self.lower_partition_type(partition_type);
         }
         if let Some(using_method) = using_method {
             self.lower_using_method(&using_method, AccessMethodKind::Table);
@@ -11105,8 +11143,14 @@ impl Lowerer {
         ) else {
             return;
         };
-        for parent in parents {
+        for &parent in &parents {
             self.add_inheritance(parent, table, inheritance_kind);
+        }
+        if let Some(partition_type) = partition_type
+            && let [parent] = parents[..]
+            && inheritance_kind == InheritanceKind::Partition
+        {
+            self.check_partition_bound(parent, table, partition_type);
         }
         for LikePrimaryKey { like, source } in like_primary_keys {
             let key = self.copy_primary_key(source);
@@ -11243,6 +11287,143 @@ impl Lowerer {
                 }
             }
         });
+    }
+
+    fn check_partition_bound(
+        &mut self,
+        parent: TableId,
+        partition: TableId,
+        partition_type: &ast::PartitionType,
+    ) {
+        let Some(bound) = self.partition_bound(parent, partition_type) else {
+            return;
+        };
+        let existing = self
+            .inheritances
+            .children(parent)
+            .iter()
+            .filter(|inheritance| {
+                inheritance.kind == InheritanceKind::Partition
+                    && inheritance.child != partition
+                    && self.is_live_child(inheritance.child)
+            })
+            .find_map(|inheritance| {
+                let other = self.partition_bounds.get(&inheritance.child)?;
+                partition_bounds_overlap(&bound, other).then_some(inheritance.child)
+            });
+        if let Some(existing) = existing {
+            let error = SemaError::OverlappingPartition {
+                partition: self.index.tables[partition].name,
+                existing: self.index.tables[existing].name,
+                default: matches!(bound, PartitionBound::Default),
+            };
+            self.push_error(partition_type.syntax(), error);
+            return;
+        }
+        self.partition_bounds.insert(partition, bound);
+    }
+
+    fn partition_bound(
+        &mut self,
+        parent: TableId,
+        partition_type: &ast::PartitionType,
+    ) -> Option<PartitionBound> {
+        if let ast::PartitionType::PartitionDefault(_) = partition_type {
+            return Some(PartitionBound::Default);
+        }
+        let PartitionKey::Columns(key) = *self.partition_keys.get(&parent)? else {
+            return None;
+        };
+        let range = self.index.tables[parent].columns.range;
+        let key_types: Option<SmallVec<[BoundKeyType; 2]>> = self
+            .index
+            .indexes
+            .key_names(key)
+            .map(|column| {
+                let ty = self
+                    .find_column_in(range, column)
+                    .and_then(|id| self.index.columns[id].ty)
+                    .and_then(|ty| self.index.base_type(ty))?;
+                self.bound_key_type(ty)
+            })
+            .collect();
+        let key_types = key_types?;
+        match partition_type {
+            ast::PartitionType::PartitionDefault(_) => Some(PartitionBound::Default),
+            ast::PartitionType::PartitionForValuesIn(values_in) => {
+                let [key_type] = key_types[..] else {
+                    return None;
+                };
+                let values: Option<SmallVec<[ListValue; 4]>> = values_in
+                    .exprs()
+                    .map(|expr| self.list_value(&expr, key_type))
+                    .collect();
+                Some(PartitionBound::List(values?))
+            }
+            ast::PartitionType::PartitionForValuesFrom(from_to) => {
+                if key_types.iter().any(|ty| *ty != BoundKeyType::Int) {
+                    return None;
+                }
+                let from = range_values(from_to.from()?.exprs(), key_types.len())?;
+                let to = range_values(from_to.to()?.exprs(), key_types.len())?;
+                Some(PartitionBound::Range { from, to })
+            }
+            ast::PartitionType::PartitionForValuesWith(with) => {
+                let mut modulus = None;
+                let mut remainder = None;
+                for bound in with.bounds() {
+                    let value = bound.literal()?.integer_value_u64()?;
+                    match bound.ident_token()?.text().to_ascii_lowercase().as_str() {
+                        "modulus" => modulus = Some(value),
+                        "remainder" => remainder = Some(value),
+                        _ => return None,
+                    }
+                }
+                Some(PartitionBound::Hash {
+                    modulus: modulus.filter(|modulus| *modulus > 0)?,
+                    remainder: remainder?,
+                })
+            }
+        }
+    }
+
+    fn bound_key_type(&self, ty: Ty) -> Option<BoundKeyType> {
+        let Ty::Type(id) = ty else {
+            return None;
+        };
+        if self.index.types.is_local(id) {
+            return None;
+        }
+        match self.index.names.resolve(self.index.types[id].name) {
+            "int2" | "int4" | "int8" => Some(BoundKeyType::Int),
+            "bool" => Some(BoundKeyType::Bool),
+            "text" | "varchar" => Some(BoundKeyType::Text),
+            _ => None,
+        }
+    }
+
+    fn list_value(&mut self, expr: &ast::Expr, key_type: BoundKeyType) -> Option<ListValue> {
+        if key_type == BoundKeyType::Int {
+            return match range_value(expr)? {
+                RangeValue::Int(value) => Some(ListValue::Int(value)),
+                RangeValue::MinValue | RangeValue::MaxValue => None,
+            };
+        }
+        let ast::Expr::Literal(literal) = expr else {
+            return None;
+        };
+        match literal.kind()? {
+            ast::LitKind::Null(_) => Some(ListValue::Null),
+            ast::LitKind::True(_) if key_type == BoundKeyType::Bool => Some(ListValue::Bool(true)),
+            ast::LitKind::False(_) if key_type == BoundKeyType::Bool => {
+                Some(ListValue::Bool(false))
+            }
+            kind if key_type == BoundKeyType::Text && kind.is_string() => {
+                let value = literal.string_value()?;
+                Some(ListValue::Text(self.intern(&value)))
+            }
+            _ => None,
+        }
     }
 
     fn lower_partition_type(&mut self, partition_type: &ast::PartitionType) {
@@ -17470,6 +17651,7 @@ impl Lowerer {
                     continue;
                 }
                 ast::AlterTableAction::AttachPartition(attach) => {
+                    let mut attached = None;
                     if let Some(path) = attach.table_name_ref().and_then(|name| name.path_ref())
                         && let Some(partition) = self.lower_table_ref(
                             &path,
@@ -17480,9 +17662,13 @@ impl Lowerer {
                         && !self.report_circular_inheritance(path.syntax(), table, partition)
                     {
                         self.add_inheritance(table, partition, InheritanceKind::Partition);
+                        attached = Some(partition);
                     }
                     if let Some(partition_type) = attach.partition_type() {
                         self.lower_partition_type(&partition_type);
+                        if let (Some(table), Some(partition)) = (table, attached) {
+                            self.check_partition_bound(table, partition, &partition_type);
+                        }
                     }
                     continue;
                 }
@@ -27777,6 +27963,87 @@ fn binds_tighter_than_cast(expr: &ast::Expr) -> bool {
             | ast::Expr::ArrayExpr(_)
             | ast::Expr::IndexExpr(_)
     )
+}
+
+fn range_values(
+    exprs: ast::AstChildren<ast::Expr>,
+    key_count: usize,
+) -> Option<SmallVec<[RangeValue; 2]>> {
+    let mut values = SmallVec::with_capacity(key_count);
+    for expr in exprs {
+        values.push(range_value(&expr)?);
+    }
+    if values.len() != key_count {
+        return None;
+    }
+    Some(values)
+}
+
+fn range_value(expr: &ast::Expr) -> Option<RangeValue> {
+    match expr {
+        ast::Expr::NameRef(name_ref) => match name_ref.range_bound_keyword()? {
+            ast::RangeBoundKeyword::MinValue => Some(RangeValue::MinValue),
+            ast::RangeBoundKeyword::MaxValue => Some(RangeValue::MaxValue),
+        },
+        ast::Expr::PrefixExpr(prefix) => {
+            let Some(ast::PrefixOp::Minus(_)) = prefix.op() else {
+                return None;
+            };
+            match range_value(&prefix.expr()?)? {
+                RangeValue::Int(value) => Some(RangeValue::Int(-value)),
+                RangeValue::MinValue | RangeValue::MaxValue => None,
+            }
+        }
+        ast::Expr::Literal(literal) => match literal.kind()? {
+            ast::LitKind::IntNumber(_) => {
+                Some(RangeValue::Int(i128::from(literal.integer_value_u64()?)))
+            }
+            ast::LitKind::String(token) => {
+                let text = token.text();
+                let value = text.get(1..text.len() - 1)?.trim().parse().ok()?;
+                Some(RangeValue::Int(value))
+            }
+            _ => None,
+        },
+        _ => None,
+    }
+}
+
+fn partition_bounds_overlap(new: &PartitionBound, existing: &PartitionBound) -> bool {
+    match (new, existing) {
+        (PartitionBound::Default, PartitionBound::Default) => true,
+        (PartitionBound::List(new), PartitionBound::List(existing)) => {
+            new.iter().any(|value| existing.contains(value))
+        }
+        (
+            PartitionBound::Range { from, to },
+            PartitionBound::Range {
+                from: existing_from,
+                to: existing_to,
+            },
+        ) => from < existing_to && existing_from < to,
+        (
+            PartitionBound::Hash { modulus, remainder },
+            PartitionBound::Hash {
+                modulus: existing_modulus,
+                remainder: existing_remainder,
+            },
+        ) => {
+            let (small, small_remainder, large_remainder) = if modulus <= existing_modulus {
+                (modulus, remainder, existing_remainder)
+            } else {
+                (existing_modulus, existing_remainder, remainder)
+            };
+            large_remainder % small == *small_remainder
+        }
+        (
+            PartitionBound::Default
+            | PartitionBound::List(_)
+            | PartitionBound::Range { .. }
+            | PartitionBound::Hash { .. },
+            _,
+        ) => false,
+    }
 }
 
 fn output_expr(query: &ast::SelectVariant, position: usize) -> Option<ast::Expr> {

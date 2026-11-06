@@ -795,6 +795,11 @@ pub(crate) enum SemaError {
         source: TyName,
         target: TyName,
     },
+    OverlappingPartition {
+        partition: Name,
+        existing: Name,
+        default: bool,
+    },
     AssignmentTypeMismatch {
         column: Name,
         column_ty: TyName,
@@ -1503,6 +1508,7 @@ impl SemaError {
             SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
                 DiagnosticKind::TypeMismatch
             }
+            SemaError::OverlappingPartition { .. } => DiagnosticKind::InvalidTableDefinition,
             SemaError::AlterColumnTypeWithoutUsing { .. }
             | SemaError::CannotCast { .. }
             | SemaError::AssignmentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
@@ -3125,6 +3131,26 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(column_ty),
                 if default { "default " } else { "" },
                 self.ty(expr_ty)
+            ),
+            SemaError::OverlappingPartition {
+                partition,
+                existing,
+                default: false,
+            } => write!(
+                f,
+                "partition `{}` would overlap partition `{}`",
+                n(partition),
+                n(existing)
+            ),
+            SemaError::OverlappingPartition {
+                partition,
+                existing,
+                default: true,
+            } => write!(
+                f,
+                "partition `{}` conflicts with existing default partition `{}`",
+                n(partition),
+                n(existing)
             ),
             SemaError::CannotCast { source, target } => write!(
                 f,
