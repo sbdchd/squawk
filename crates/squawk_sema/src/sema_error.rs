@@ -786,6 +786,10 @@ pub(crate) enum SemaError {
         column: Name,
         identity: bool,
     },
+    CannotCast {
+        source: TyName,
+        target: TyName,
+    },
     AlterColumnTypeWithoutUsing {
         column: Name,
         ty: TyName,
@@ -1487,7 +1491,9 @@ impl SemaError {
             SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
                 DiagnosticKind::TypeMismatch
             }
-            SemaError::AlterColumnTypeWithoutUsing { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::AlterColumnTypeWithoutUsing { .. } | SemaError::CannotCast { .. } => {
+                DiagnosticKind::TypeMismatch
+            }
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
@@ -3068,6 +3074,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 kind.label(),
                 n(table),
                 n(column)
+            ),
+            SemaError::CannotCast { source, target } => write!(
+                f,
+                "cannot cast type `{}` to `{}`",
+                self.ty(source),
+                self.ty(target)
             ),
             SemaError::AlterColumnTypeWithoutUsing { column, ty, .. } => write!(
                 f,

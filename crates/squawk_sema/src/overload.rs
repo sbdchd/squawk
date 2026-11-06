@@ -4,8 +4,9 @@ use smallvec::{SmallVec, smallvec};
 use crate::{
     interner::Name,
     ir::{
-        CastContext, CastId, CastTypes, Function, FunctionId, FunctionKind, Operand, Operator,
-        OperatorId, Param, ParamMode, Resolution, Ty, TypeCategory as Category, TypeId, TypeKind,
+        CastContext, CastId, CastMethod, CastTypes, Function, FunctionId, FunctionKind, Operand,
+        Operator, OperatorId, Param, ParamMode, Resolution, Ty, TypeCategory as Category, TypeId,
+        TypeKind,
     },
     semantic_index::IndexData,
 };
@@ -738,12 +739,13 @@ impl<'a> Overloads<'a> {
             .find(|cast| !self.dropped_casts.contains(cast))
         {
             let cast = &self.index.casts[cast];
-            return if cast_rank(cast.context) > cast_rank(context) {
-                CoercionPath::Missing
-            } else if cast.binary {
-                CoercionPath::Relabel
-            } else {
-                CoercionPath::Function
+            if cast_rank(cast.context) > cast_rank(context) {
+                return CoercionPath::Missing;
+            }
+            return match cast.method {
+                CastMethod::Function => CoercionPath::Function,
+                CastMethod::Binary => CoercionPath::Relabel,
+                CastMethod::InOut => CoercionPath::ViaIo,
             };
         }
         if !matches!(self.builtin_name(target), Some("int2vector" | "oidvector"))
@@ -1199,7 +1201,7 @@ impl<'a> Overloads<'a> {
             .find(|cast| !self.dropped_casts.contains(cast))
             .is_some_and(|cast| {
                 let cast = &self.index.casts[cast];
-                cast.context == CastContext::Implicit && cast.binary
+                cast.context == CastContext::Implicit && cast.method == CastMethod::Binary
             })
     }
 

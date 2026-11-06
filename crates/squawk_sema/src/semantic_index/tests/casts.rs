@@ -270,6 +270,45 @@ select '{}'::int[];
 }
 
 #[test]
+fn invalid_cast() {
+    assert_snapshot!(check("
+create type mood as enum ('a');
+create domain ints as int[];
+create table t (a int, b text, c int[], d bool, m mood, j json);
+select a::int[] from t;
+select cast(a as int[]) from t;
+select a::text, b::int, c::text[], c::bigint[], d::int, m::text, b::mood, j::jsonb from t;
+select c::ints, a::ints from t;
+select d::date from t;
+select a::mood from t;
+select '{1}'::int[], null::int[], array[1]::text[];
+select row(1)::t from t;
+select t::text from t;
+"), @"
+    error: cannot cast type `int4` to `int4[]`
+      ╭▸ 
+    5 │ select a::int[] from t;
+      ╰╴       ━━━━━━━━
+    error: cannot cast type `int4` to `int4[]`
+      ╭▸ 
+    6 │ select cast(a as int[]) from t;
+      ╰╴       ━━━━━━━━━━━━━━━━
+    error: cannot cast type `int4` to `ints`
+      ╭▸ 
+    8 │ select c::ints, a::ints from t;
+      ╰╴                ━━━━━━━
+    error: cannot cast type `bool` to `date`
+      ╭▸ 
+    9 │ select d::date from t;
+      ╰╴       ━━━━━━━
+    error: cannot cast type `int4` to `mood`
+       ╭▸ 
+    10 │ select a::mood from t;
+       ╰╴       ━━━━━━━
+    ");
+}
+
+#[test]
 fn function_style_cast() {
     assert_snapshot!(check("
 create table c (a int);
@@ -277,12 +316,13 @@ select text(1);
 select int4('1'::text);
 select regclass(1::oid);
 select int4('1');
+select jsonb('{}'::json);
 select int4(point(1, 1));
 select text(c) from c;
 "), @"
     error: function `int4(point)` does not exist
       ╭▸ 
-    7 │ select int4(point(1, 1));
+    8 │ select int4(point(1, 1));
       │        ━━━━
       │
       ├ note: `int4(float8)` expects `float8` for argument 1, found `point`
@@ -294,7 +334,7 @@ select text(c) from c;
       ╰ hint: consider adding explicit type casts
     error: function `text(c)` does not exist
       ╭▸ 
-    8 │ select text(c) from c;
+    9 │ select text(c) from c;
       │        ━━━━
       │
       ├ note: `text(bool)` expects `bool` for argument 1, found `c`

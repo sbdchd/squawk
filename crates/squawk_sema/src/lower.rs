@@ -24,25 +24,25 @@ use crate::keyed_index::GraphElementIndex;
 use crate::{
     ir::{
         AccessMethod, AccessMethodId, AccessMethodKind, Body, Case, Cast, CastContext, CastId,
-        CastTypes, Channel, ChannelId, Collation, CollationId, Column, ColumnId, ColumnOwner,
-        ColumnTypeRef, Columns, Constraint, ConstraintId, ConstraintKind, ConstraintOwner,
-        Conversion, ConversionId, Cte, CteId, Cursor, CursorId, Database, DatabaseId, EnumLabel,
-        EnumLabelId, EventTrigger, EventTriggerId, Extension, ExtensionId, ForeignDataWrapper,
-        ForeignDataWrapperId, Function, FunctionId, FunctionKind, GraphElement, GraphElementId,
-        GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId, IdentityKind,
-        Index, IndexId, Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId, MemberKind,
-        MemberOwner, Merge, Operand, Operands, Operator, OperatorClass, OperatorClassId,
-        OperatorFamily, OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId,
-        Param, ParamId, ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId,
-        PreparedTransaction, PreparedTransactionId, Publication, PublicationId, Query, QueryId,
-        QueryKind, RefId, Reference, ReferenceKind, Resolution, ReturnKind, Role, RoleId,
-        RoutineKind, Rule, RuleBehavior, RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint,
-        SavepointId, Schema, SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner, Server,
-        ServerId, Source, SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript,
-        Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
-        TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
-        TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
-        Window, WindowClauses, WindowId,
+        CastMethod, CastTypes, Channel, ChannelId, Collation, CollationId, Column, ColumnId,
+        ColumnOwner, ColumnTypeRef, Columns, Constraint, ConstraintId, ConstraintKind,
+        ConstraintOwner, Conversion, ConversionId, Cte, CteId, Cursor, CursorId, Database,
+        DatabaseId, EnumLabel, EnumLabelId, EventTrigger, EventTriggerId, Extension, ExtensionId,
+        ForeignDataWrapper, ForeignDataWrapperId, Function, FunctionId, FunctionKind, GraphElement,
+        GraphElementId, GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId,
+        IdentityKind, Index, IndexId, Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId,
+        MemberKind, MemberOwner, Merge, Operand, Operands, Operator, OperatorClass,
+        OperatorClassId, OperatorFamily, OperatorFamilyId, OperatorFamilyMember,
+        OperatorFamilyMemberId, OperatorId, Param, ParamId, ParamMode, Policy, PolicyId,
+        PreparedStatement, PreparedStatementId, PreparedTransaction, PreparedTransactionId,
+        Publication, PublicationId, Query, QueryId, QueryKind, RefId, Reference, ReferenceKind,
+        Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule, RuleBehavior, RuleEnabled,
+        RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId,
+        SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star,
+        Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
+        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
+        TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
+        TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
     },
     sema_error::{
         ArgLabel, CandidateReason, ColumnDefListReason, Comparison, CompoundOp, ConflictAction,
@@ -10114,16 +10114,17 @@ impl Lowerer {
         let types = create_cast
             .cast_sig()
             .and_then(|cast_sig| self.lower_cast_sig(&cast_sig, IfMissing::Error));
-        let cast_method = create_cast.cast_method();
-        let binary = matches!(cast_method, Some(ast::CastMethod::WithoutFunction(_)));
-        match cast_method {
+        let method = match create_cast.cast_method() {
             Some(ast::CastMethod::WithFunction(with_function)) => {
                 if let Some(function_sig) = with_function.function_sig() {
                     self.lower_function_sig(&function_sig);
                 }
+                CastMethod::Function
             }
-            Some(ast::CastMethod::WithInout(_) | ast::CastMethod::WithoutFunction(_)) | None => {}
-        }
+            Some(ast::CastMethod::WithoutFunction(_)) => CastMethod::Binary,
+            Some(ast::CastMethod::WithInout(_)) => CastMethod::InOut,
+            None => CastMethod::Function,
+        };
         let Some(types) = types else {
             return;
         };
@@ -10136,7 +10137,7 @@ impl Lowerer {
             source: types.source,
             target: types.target,
             context,
-            binary,
+            method,
             ptr: InIrFile::new(self.file_id, AstPtr::new(create_cast)),
         });
         self.depend_on_refs(refs, self.index.casts.range_from(start), Object::Cast);
@@ -23071,8 +23072,23 @@ impl Lowerer {
                                 .base_type(ty)
                                 .is_none_or(|ty| matches!(ty, Ty::Array(_)))
                         });
-                    self.lower_expr(&expr);
+                    let source = self.lower_expr(&expr);
                     self.array_cast = false;
+                    if let Some(source) = source
+                        && let Some(target) = ty
+                        && !is_unknown_literal_expr(&expr)
+                    {
+                        let coercion =
+                            self.overloads()
+                                .coercion(source, target, CastContext::Explicit);
+                        if coercion == Coercion::No {
+                            let error = SemaError::CannotCast {
+                                source: self.index.ty_name(source),
+                                target: self.index.ty_name(target),
+                            };
+                            self.push_error(cast.syntax(), error);
+                        }
+                    }
                 }
                 self.lower_exprs(cast.literal().map(ast::Expr::Literal));
                 let literal = cast
