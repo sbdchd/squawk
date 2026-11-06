@@ -109,6 +109,7 @@ pub enum DiagnosticKind {
     DuplicateConstraint,
     DuplicateTrigger,
     ReplaceConstraintTrigger,
+    IncompatibleReplacement,
     DuplicateRule,
     DropReturnRule,
     RenameSelectRule,

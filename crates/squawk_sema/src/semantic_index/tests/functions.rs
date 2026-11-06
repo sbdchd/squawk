@@ -1670,3 +1670,60 @@ select f();"), @"
        ╰╴       ━
     ");
 }
+
+#[test]
+fn create_or_replace_function_signature_changes() {
+    assert_snapshot!(check("
+create function f() returns int language sql as 'select 1';
+create or replace function f() returns text language sql as 'select 1';
+create or replace function f() returns setof int language sql as 'select 1';
+create or replace function f() returns int4 language sql as 'select 2';
+create function g(a int, b int default 1) returns int language sql return a;
+create or replace function g(x int, b int default 1) returns int language sql return x;
+create or replace function g(a int, b int) returns int language sql return a;
+create or replace function g(a int, b int default 2, out c int) returns int language sql return a;
+create function h(int, out a int, out b text) language sql as 'select 1, $$x$$';
+create or replace function h(x int, out a int, out b text) language sql as 'select 1, $$x$$';
+create or replace function h(x int, out a int) language sql as 'select 1';
+create function p(a int) returns table (x int) language sql as 'select 1';
+create or replace function p(a int) returns table (x int) language sql as 'select 2';
+create or replace function p(a int) returns int language sql as 'select 2';
+"), @"
+    error: cannot change return type of existing function from `int4` to `text`
+      ╭▸ 
+    3 │ create or replace function f() returns text language sql as 'select 1';
+      │                                ━━━━━━━━━━━━
+      │
+      ╰ hint: drop the existing function first, then create it again
+    error: cannot change return type of existing function from `int4` to `setof int4`
+      ╭▸ 
+    4 │ create or replace function f() returns setof int language sql as 'select 1';
+      │                                ━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: drop the existing function first, then create it again
+    error: cannot change name of input parameter `a`
+      ╭▸ 
+    7 │ create or replace function g(x int, b int default 1) returns int language sql return x;
+      │                              ━━━━━
+      │
+      ╰ hint: drop the existing function first, then create it again
+    error: cannot remove parameter defaults from existing function
+      ╭▸ 
+    8 │ create or replace function g(a int, b int) returns int language sql return a;
+      │                            ━
+      │
+      ╰ hint: drop the existing function first, then create it again
+    error: cannot change return type of existing function from `record` to `int4`
+       ╭▸ 
+    12 │ create or replace function h(x int, out a int) language sql as 'select 1';
+       │                            ━
+       │
+       ╰ hint: drop the existing function first, then create it again
+    error: cannot change return type of existing function from `setof int4` to `int4`
+       ╭▸ 
+    15 │ create or replace function p(a int) returns int language sql as 'select 2';
+       │                                     ━━━━━━━━━━━
+       │
+       ╰ hint: drop the existing function first, then create it again
+    ");
+}

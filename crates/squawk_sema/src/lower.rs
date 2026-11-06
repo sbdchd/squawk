@@ -35,19 +35,20 @@ use crate::{
         OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId, Param, ParamId,
         ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId, PreparedTransaction,
         PreparedTransactionId, Publication, PublicationId, Query, QueryId, QueryKind, RefId,
-        Reference, ReferenceKind, Resolution, Role, RoleId, RoutineKind, Rule, RuleBehavior,
-        RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope,
-        ScopeId, SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind,
-        Star, Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
-        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
-        TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
-        TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
+        Reference, ReferenceKind, Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule,
+        RuleBehavior, RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema,
+        SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner, Server, ServerId, Source,
+        SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript, Subscription,
+        SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId, TextSearch,
+        TextSearchId, TextSearchKind, Transaction, TransactionId, Transform, TransformId,
+        TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind, Window,
+        WindowClauses, WindowId,
     },
     sema_error::{
         ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
         ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates,
-        ErrorParam, GeneratedKind, LookupKind, ObjectKind, OperandName, OperatorReplacement,
-        OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
+        ErrorParam, ErrorReturnType, GeneratedKind, LookupKind, ObjectKind, OperandName,
+        OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
         SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
         TruncateCascade, ViewColumnRename, WindowClause,
     },
@@ -498,6 +499,19 @@ struct Snapshot {
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 struct ColumnExprId(u32);
+
+struct Replacement<'a> {
+    ret: Option<Ty>,
+    returns: ReturnKind,
+    params: IdxRange<Param>,
+    ret_clause: Option<&'a ast::RetType>,
+    segment: &'a ast::PathSegment,
+}
+
+struct RenamedParam {
+    name: Name,
+    new_param: Option<ParamId>,
+}
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum ColumnExprKind {
@@ -10610,7 +10624,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
-            returns_set,
+            returns,
             columns,
             ..
         } = self.index.functions[function];
@@ -10638,7 +10652,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
-            returns_set,
+            returns,
             columns,
         });
         self.index.set_param_function(params, id);
@@ -23240,7 +23254,9 @@ impl Lowerer {
         if let Some(construct) = construct {
             self.check_contained_set_returning(srf_calls, construct);
         }
-        if !function.is_some_and(|function| self.index.functions[function].returns_set) {
+        if !function
+            .is_some_and(|function| self.index.functions[function].returns == ReturnKind::Set)
+        {
             return;
         }
         let context = self.expr_context;
@@ -25203,10 +25219,7 @@ impl Lowerer {
                     self.push_error(segment.syntax(), error);
                 }
                 IfExists::Ignore => {}
-                IfExists::Replace => {
-                    self.drop_function(existing);
-                    replaced = Some(existing);
-                }
+                IfExists::Replace => replaced = Some(existing),
             }
         }
 
@@ -25232,12 +25245,34 @@ impl Lowerer {
             };
         }
 
-        let returns_set = ret_clause.is_some_and(|ret_clause| {
+        let returns = if ret_clause.is_some_and(|ret_clause| {
             ret_clause.return_table_arg_list().is_some()
                 || ret_clause
                     .func_type()
                     .is_some_and(|func_type| func_type.setof_token().is_some())
-        });
+        }) {
+            ReturnKind::Set
+        } else {
+            ReturnKind::Single
+        };
+        let mut rejected = false;
+        if let Some(existing) = replaced {
+            let replacement = Replacement {
+                ret,
+                returns,
+                params,
+                ret_clause,
+                segment: &segment,
+            };
+            if kind == FunctionKind::Function
+                && !self.check_function_replacement(existing, &replacement)
+            {
+                rejected = true;
+                replaced = None;
+            } else {
+                self.drop_function(existing);
+            }
+        }
         let id = self.index.functions.alloc(Function {
             kind,
             window: false,
@@ -25248,7 +25283,7 @@ impl Lowerer {
             params,
             direct_args,
             ret,
-            returns_set,
+            returns,
             columns,
         });
         self.index.set_param_function(params, id);
@@ -25256,12 +25291,90 @@ impl Lowerer {
             self.index
                 .set_column_owner(columns.range, ColumnOwner::Function(id));
         }
+        if rejected {
+            self.dropped_functions.insert(id);
+        }
         if let Some(replaced) = replaced {
             self.dependencies.add_replacement(replaced, id);
         }
         self.record_comment(node, Item::Function(id));
         self.add_item(segment.syntax(), Item::Function(id));
         Some(id)
+    }
+
+    fn check_function_replacement(&mut self, existing: FunctionId, new: &Replacement) -> bool {
+        let Function {
+            ret: old_ret,
+            returns: old_returns,
+            params: old_params,
+            ..
+        } = self.index.functions[existing];
+        if let Some(old_ret) = old_ret
+            && let Some(new_ret) = new.ret
+            && (old_ret != new_ret || old_returns != new.returns)
+        {
+            let error = SemaError::ReplaceFunctionReturnType {
+                from: ErrorReturnType {
+                    ty: self.index.ty_name(old_ret),
+                    kind: old_returns,
+                },
+                to: ErrorReturnType {
+                    ty: self.index.ty_name(new_ret),
+                    kind: new.returns,
+                },
+            };
+            match new.ret_clause {
+                Some(ret_clause) => self.push_error(ret_clause.syntax(), error),
+                None => self.push_error(new.segment.syntax(), error),
+            }
+            return false;
+        }
+        if let Some(renamed) = self.renamed_input_param(old_params, new.params) {
+            let error = SemaError::ReplaceFunctionParamName { name: renamed.name };
+            match renamed.new_param {
+                Some(id) => self.push_error_ptr(self.index.params[id].ptr, error),
+                None => self.push_error(new.segment.syntax(), error),
+            }
+            return false;
+        }
+        if self.default_param_count(new.params) < self.default_param_count(old_params) {
+            self.push_error(
+                new.segment.syntax(),
+                SemaError::ReplaceFunctionRemovesDefaults,
+            );
+            return false;
+        }
+        true
+    }
+
+    fn renamed_input_param(
+        &self,
+        old_params: IdxRange<Param>,
+        new_params: IdxRange<Param>,
+    ) -> Option<RenamedParam> {
+        let mut new_inputs = self.input_params(new_params);
+        for old in self.input_params(old_params) {
+            let new_param = new_inputs.next();
+            if let Some(name) = self.index.params[old].name
+                && new_param.is_none_or(|id| self.index.params[id].name != Some(name))
+            {
+                return Some(RenamedParam { name, new_param });
+            }
+        }
+        None
+    }
+
+    fn input_params(&self, params: IdxRange<Param>) -> impl Iterator<Item = ParamId> + '_ {
+        params
+            .iter()
+            .filter(|id| self.index.params[*id].mode != ParamMode::Out)
+    }
+
+    fn default_param_count(&self, params: IdxRange<Param>) -> usize {
+        params
+            .iter()
+            .filter(|id| self.index.params[*id].has_default)
+            .count()
     }
 
     fn check_out_param_result_type(

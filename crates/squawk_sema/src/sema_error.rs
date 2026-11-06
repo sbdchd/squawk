@@ -4,7 +4,8 @@ use std::fmt::{self, Write};
 use crate::arena::IdxRange;
 use crate::interner::{Interner, Name};
 use crate::ir::{
-    AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
+    AccessMethodKind, ReferenceKind, Resolution, ReturnKind, RoutineKind, TableKind,
+    TextSearchKind, TypeKind,
 };
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::{TextRange, TextSize};
@@ -96,6 +97,12 @@ pub(crate) enum ArgLabel {
 pub(crate) struct ErrorParam {
     pub(crate) name: Option<Name>,
     pub(crate) position: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorReturnType {
+    pub(crate) ty: TyName,
+    pub(crate) kind: ReturnKind,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -721,6 +728,14 @@ pub(crate) enum SemaError {
         from: TyName,
         to: TyName,
     },
+    ReplaceFunctionReturnType {
+        from: ErrorReturnType,
+        to: ErrorReturnType,
+    },
+    ReplaceFunctionParamName {
+        name: Name,
+    },
+    ReplaceFunctionRemovesDefaults,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1271,6 +1286,9 @@ impl SemaError {
             | SemaError::CannotRenameInheritedConstraint { .. } => {
                 DiagnosticKind::InvalidTableDefinition
             }
+            SemaError::ReplaceFunctionReturnType { .. }
+            | SemaError::ReplaceFunctionParamName { .. }
+            | SemaError::ReplaceFunctionRemovesDefaults => DiagnosticKind::IncompatibleReplacement,
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -1917,6 +1935,11 @@ impl SemaError {
             SemaError::CompositeTypeAlteredAsTable {
                 table_range: None, ..
             } => Some("use `alter type` instead"),
+            SemaError::ReplaceFunctionReturnType { .. }
+            | SemaError::ReplaceFunctionParamName { .. }
+            | SemaError::ReplaceFunctionRemovesDefaults => {
+                Some("drop the existing function first, then create it again")
+            }
             SemaError::ViewColumnRenamed { rename: None, .. } => Some(
                 "use `alter view ... rename column ...` to change the name of a view column instead",
             ),
@@ -2185,6 +2208,16 @@ impl ErrorMessage<'_> {
         fmt::from_fn(move |f| {
             let suffix = if ty.array { "[]" } else { "" };
             write!(f, "{}{suffix}", self.names.resolve(ty.name))
+        })
+    }
+
+    fn return_ty(&self, ret: ErrorReturnType) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            let prefix = match ret.kind {
+                ReturnKind::Single => "",
+                ReturnKind::Set => "setof ",
+            };
+            write!(f, "{prefix}{}", self.ty(ret.ty))
         })
     }
 
@@ -2822,6 +2855,18 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(function),
                 self.ty(ty)
             ),
+            SemaError::ReplaceFunctionReturnType { from, to } => write!(
+                f,
+                "cannot change return type of existing function from `{}` to `{}`",
+                self.return_ty(from),
+                self.return_ty(to)
+            ),
+            SemaError::ReplaceFunctionParamName { name } => {
+                write!(f, "cannot change name of input parameter `{}`", n(name))
+            }
+            SemaError::ReplaceFunctionRemovesDefaults => {
+                write!(f, "cannot remove parameter defaults from existing function")
+            }
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
                 f,
                 "cannot change type of view column `{}` from `{}` to `{}`",
