@@ -628,6 +628,10 @@ pub(crate) enum SemaError {
         expected: TyName,
         found: TyName,
     },
+    QuantifiedNonArray {
+        quantifier: Quantifier,
+        found: TyName,
+    },
     NoDefaultOperatorClass {
         ty: TyName,
         access_method: Name,
@@ -746,6 +750,23 @@ impl Comparison {
             Comparison::In => "`in` compares each element using `=`",
             Comparison::NotIn => "`not in` compares each element using `<>`",
             Comparison::Using => "`using` compares the joined columns using `=`",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Quantifier {
+    Any,
+    Some,
+    All,
+}
+
+impl Quantifier {
+    fn keyword(self) -> &'static str {
+        match self {
+            Quantifier::Any => "any",
+            Quantifier::Some => "some",
+            Quantifier::All => "all",
         }
     }
 }
@@ -1350,6 +1371,7 @@ impl SemaError {
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::NoDefaultOperatorClass { .. } => DiagnosticKind::MissingDefaultOperatorClass,
             SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::QuantifiedNonArray { .. } => DiagnosticKind::TypeMismatch,
             SemaError::NonBoolComparison { .. } => DiagnosticKind::TypeMismatch,
             SemaError::TriggerReturnType { .. } | SemaError::OutParamResultType { .. } => {
                 DiagnosticKind::WrongReturnType
@@ -2956,6 +2978,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "argument of `{keyword}` must be type `{}`, not type `{}`",
                 self.ty(expected),
+                self.ty(found)
+            ),
+            SemaError::QuantifiedNonArray { quantifier, found } => write!(
+                f,
+                "argument of `{}` must be an array, not type `{}`",
+                quantifier.keyword(),
                 self.ty(found)
             ),
             SemaError::NoDefaultOperatorClass { ty, access_method } => write!(

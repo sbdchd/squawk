@@ -310,6 +310,51 @@ select 1 from p where p in ('x');
 }
 
 #[test]
+fn quantified_non_array() {
+    assert_snapshot!(check("
+create domain ints as int[];
+create table t (
+  a int,
+  b int[],
+  c ints,
+  p point
+);
+select 1 = any(1);
+select 1 from t where a = any(a);
+select 1 from t where a = some(a + 1);
+select 1 from t where a <> all(a);
+select 1 from t where p = any(p);
+select 1 from t where a = any(b) and a = any(c) and a = all('{1}') and a = any(null);
+select 1 from t where a = any(array[1, 2]) and a = any(select a from t);
+"), @"
+    error: argument of `any` must be an array, not type `int4`
+      ╭▸ 
+    9 │ select 1 = any(1);
+      ╰╴               ━
+    error: argument of `any` must be an array, not type `int4`
+       ╭▸ 
+    10 │ select 1 from t where a = any(a);
+       ╰╴                              ━
+    error: argument of `some` must be an array, not type `int4`
+       ╭▸ 
+    11 │ select 1 from t where a = some(a + 1);
+       ╰╴                               ━━━━━
+    error: argument of `all` must be an array, not type `int4`
+       ╭▸ 
+    12 │ select 1 from t where a <> all(a);
+       ╰╴                               ━
+    error: operator `=` does not exist
+       ╭▸ 
+    13 │ select 1 from t where p = any(p);
+       ╰╴                        ━
+    error: argument of `any` must be an array, not type `point`
+       ╭▸ 
+    13 │ select 1 from t where p = any(p);
+       ╰╴                              ━
+    ");
+}
+
+#[test]
 fn join_using() {
     assert_snapshot!(check("
 create function eqi(int, text) returns int

@@ -47,8 +47,8 @@ use crate::{
         ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
         ConflictTargetKey, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates, ErrorParam,
         LookupKind, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
-        OutsideSearchPath, SemaError, SetReturningConstruct, Similar, SimilarColumn, SimilarType,
-        TriggerFunctionKind, TruncateCascade, ViewColumnRename, WindowClause,
+        OutsideSearchPath, Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn,
+        SimilarType, TriggerFunctionKind, TruncateCascade, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -19833,13 +19833,13 @@ impl Lowerer {
     }
 
     fn lower_quantified_operand(&mut self, call: &ast::CallExpr, width: usize) -> Option<ArgType> {
-        let (expr, query) = if let Some(any_fn) = call.any_fn() {
-            (any_fn.expr(), any_fn.select_variant())
+        let (quantifier, expr, query) = if let Some(any_fn) = call.any_fn() {
+            (Quantifier::Any, any_fn.expr(), any_fn.select_variant())
         } else if let Some(some_fn) = call.some_fn() {
-            (some_fn.expr(), some_fn.select_variant())
+            (Quantifier::Some, some_fn.expr(), some_fn.select_variant())
         } else {
             let all_fn = call.all_fn()?;
-            (all_fn.expr(), all_fn.select_variant())
+            (Quantifier::All, all_fn.expr(), all_fn.select_variant())
         };
         if let Some(query) = query {
             let query = self.lower_compared_sublink(query, width);
@@ -19855,11 +19855,20 @@ impl Lowerer {
         if is_unknown_literal_expr(&expr) {
             return Some(ArgType::UnknownLiteral);
         }
-        Some(
-            ty.and_then(|ty| self.index.base_type(ty))
-                .and_then(|base| self.index.element_type(base))
-                .map_or(ArgType::Untyped, ArgType::Known),
-        )
+        let Some(base) = ty.and_then(|ty| self.index.base_type(ty)) else {
+            return Some(ArgType::Untyped);
+        };
+        if let Some(element) = self.index.element_type(base) {
+            return Some(ArgType::Known(element));
+        }
+        if !self.overloads().is_pseudo(base) {
+            let error = SemaError::QuantifiedNonArray {
+                quantifier,
+                found: self.index.ty_name(base),
+            };
+            self.push_error(expr.syntax(), error);
+        }
+        Some(ArgType::Untyped)
     }
 
     fn single_column_type(&self, query: QueryId) -> Option<Ty> {
