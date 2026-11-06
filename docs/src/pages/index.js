@@ -449,6 +449,11 @@ const rules = [
     tags: ["backwards compatibility"],
     description: "Review extension updates and member removals (opt-in).",
   },
+  {
+    name: "ban-set-null-on-not-null-column",
+    tags: ["schema"],
+    description: "Prevent foreign keys that SET NULL a NOT NULL column.",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 
