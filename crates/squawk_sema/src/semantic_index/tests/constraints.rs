@@ -374,10 +374,8 @@ create table l6 (
 "), @"
     error: multiple primary keys for table `t` are not allowed
       ╭▸ 
-    4 │     b int primary key
-      │ ┏━━━━━━━━━┛
-    5 │ ┃ );
-      ╰╴┗━┛
+    4 │   b int primary key
+      ╰╴        ━━━━━━━━━━━
     error: multiple primary keys for table `u` are not allowed
        ╭▸ 
     10 │   primary key (b)

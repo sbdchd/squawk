@@ -1056,7 +1056,6 @@ SOURCE_FILE
         WHITESPACE " "
         UNIQUE_CONSTRAINT
           UNIQUE_KW "unique"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1344,8 +1343,7 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
-          WHITESPACE "\n"
-          INDEX_PARAMETERS
+      WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -4541,7 +4539,6 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          INDEX_PARAMETERS
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -4568,8 +4565,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          WHITESPACE " "
-          INDEX_PARAMETERS
+        WHITESPACE " "
         COLLATE
           COLLATE_KW "COLLATE"
           WHITESPACE " "
@@ -4614,7 +4610,6 @@ SOURCE_FILE
         WHITESPACE " "
         UNIQUE_CONSTRAINT
           UNIQUE_KW "UNIQUE"
-          INDEX_PARAMETERS
       R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

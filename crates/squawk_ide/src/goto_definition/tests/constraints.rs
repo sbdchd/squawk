@@ -431,13 +431,11 @@ alter table a_very_long_table_name_that_goes_on_and_on
     info: goto definition
       ╭▸ file0.sql:3:35
       │
-    3 │     a_very_long_column_name_too int unique
-      │ ┌───────────────────────────────────┘
-    4 │ │ );
-      │ └─┘ 2. destination
-    5 │   alter table a_very_long_table_name_that_goes_on_and_on
-    6 │     drop constraint a_very_long_table_name_that_goe_a_very_long_column_name_too_key;
-      ╰╴                    ─────────────────────────────────────────────────────────────── 1. source
+    3 │   a_very_long_column_name_too int unique
+      │                                   ────── 2. destination
+      ‡
+    6 │   drop constraint a_very_long_table_name_that_goe_a_very_long_column_name_too_key;
+      ╰╴                  ─────────────────────────────────────────────────────────────── 1. source
     ");
 }
 
