@@ -89,7 +89,7 @@ fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
 
     for error in semantic_diagnostics(db, file_id) {
         let mut message = error.message.into_owned();
-        if let Some(note) = error.note {
+        for note in error.notes {
             message.push_str("\nnote: ");
             message.push_str(&note);
         }

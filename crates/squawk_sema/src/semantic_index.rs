@@ -27,7 +27,7 @@ use crate::qualified_index::{
     CollationIndex, ConversionIndex, FunctionIndex, OperatorClassIndex, OperatorFamilyIndex,
     OperatorIndex, TextSearchIndex,
 };
-use crate::sema_error::{ErrorArg, ErrorArgs, ErrorParam, SemaError, TyName};
+use crate::sema_error::{ErrorArg, ErrorCandidate, ErrorParam, SemaError, TyName};
 use crate::statistics_index::StatisticsIndex;
 use crate::table_index::TableIndex;
 use crate::type_index::TypeIndex;
@@ -167,7 +167,7 @@ pub struct Diagnostic {
     pub kind: DiagnosticKind,
     pub message: Cow<'static, str>,
     pub hint: Option<Cow<'static, str>>,
-    pub note: Option<Cow<'static, str>>,
+    pub notes: Vec<Cow<'static, str>>,
     pub suggestion: Option<Suggestion>,
 }
 
@@ -187,7 +187,7 @@ struct ErrorEntry {
 pub(crate) struct Errors {
     entries: Vec<ErrorEntry>,
     pub(crate) args: LayeredArena<ErrorArg>,
-    pub(crate) candidates: LayeredArena<ErrorArgs>,
+    pub(crate) candidates: LayeredArena<ErrorCandidate>,
     pub(crate) params: LayeredArena<ErrorParam>,
     pub(crate) names: LayeredArena<Name>,
 }
@@ -533,7 +533,7 @@ impl IndexData {
                 range: entry.range,
                 message: entry.error.message(&self.names, &self.errors),
                 hint: entry.error.hint().map(Cow::Borrowed),
-                note: entry.error.note(&self.names, &self.errors),
+                notes: entry.error.notes(&self.names, &self.errors),
                 suggestion: entry
                     .error
                     .suggestion(entry.range.value, &self.names, &self.errors),

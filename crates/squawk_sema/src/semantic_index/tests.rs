@@ -99,7 +99,7 @@ fn check(sql: &str) -> String {
             let mut group = Level::ERROR
                 .primary_title(diagnostic.message.as_ref())
                 .element(snippet);
-            if let Some(note) = &diagnostic.note {
+            for note in &diagnostic.notes {
                 group = group.element(Level::NOTE.message(note.as_ref()));
             }
             if let Some(hint) = &diagnostic.hint {

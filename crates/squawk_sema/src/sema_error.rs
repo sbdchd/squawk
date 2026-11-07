@@ -1,5 +1,5 @@
 use std::borrow::Cow;
-use std::fmt::{self, Write};
+use std::fmt;
 
 use crate::arena::IdxRange;
 use crate::interner::{Interner, Name};
@@ -115,8 +115,28 @@ pub(crate) struct OutsideSearchPath {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ErrorCandidates {
-    pub(crate) shown: IdxRange<ErrorArgs>,
+    pub(crate) shown: IdxRange<ErrorCandidate>,
     pub(crate) total: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorCandidate {
+    pub(crate) args: ErrorArgs,
+    pub(crate) reason: Option<CandidateReason>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum CandidateReason {
+    ArgType {
+        position: usize,
+        expected: TyName,
+        found: TyName,
+    },
+    ArgCount {
+        min: usize,
+        max: usize,
+        supplied: usize,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -761,6 +781,15 @@ pub(crate) enum SemaError {
         column: Name,
         identity: bool,
     },
+    DropColumnWithDependents {
+        column: Name,
+        table: Name,
+        view: Name,
+    },
+    AlterColumnTypeWithDependents {
+        column: Name,
+        view: Name,
+    },
     GeneratedColumnUpdate {
         column: Name,
         identity: bool,
@@ -1394,7 +1423,11 @@ impl SemaError {
             SemaError::DuplicateAssignment { .. } => DiagnosticKind::DuplicateAssignment,
             SemaError::DuplicateWindow { .. } => DiagnosticKind::DuplicateWindow,
             SemaError::DuplicateParam { .. } => DiagnosticKind::DuplicateParam,
-            SemaError::DependentObjects { .. } => DiagnosticKind::DependentObjectsStillExist,
+            SemaError::DependentObjects { .. }
+            | SemaError::DropColumnWithDependents { .. }
+            | SemaError::AlterColumnTypeWithDependents { .. } => {
+                DiagnosticKind::DependentObjectsStillExist
+            }
             SemaError::TruncateReferenced { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::RequiredBySystem { .. } => DiagnosticKind::RequiredBySystem,
             SemaError::AccessMethodKindMismatch { .. } => DiagnosticKind::AccessMethodKindMismatch,
@@ -1935,6 +1968,9 @@ impl SemaError {
             SemaError::CannotOpenIndex { .. } => {
                 Some("this operation is not supported for indexes")
             }
+            SemaError::DropColumnWithDependents { .. } => {
+                Some("use `drop column ... cascade` to drop the dependent objects too")
+            }
             SemaError::RecursiveCteTypeMismatch { .. } => {
                 Some("cast the output of the non-recursive term to the overall type")
             }
@@ -2141,144 +2177,111 @@ impl SemaError {
         }
     }
 
-    pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
-        if let SemaError::NonBoolComparison { comparison, .. } = *self {
-            return Some(Cow::Borrowed(comparison.note()));
-        }
-        if let SemaError::GeneratedColumnInsert { column, identity }
-        | SemaError::GeneratedColumnUpdate { column, identity } = *self
-        {
-            let column = names.resolve(column);
-            return Some(Cow::Owned(if identity {
-                format!("`{column}` is an identity column defined as `generated always`")
-            } else {
-                format!("`{column}` is a generated column")
-            }));
-        }
-        if let SemaError::PseudoTypeColumn { .. } = *self {
-            return Some(Cow::Borrowed(
-                "pseudo-types can only be used for function arguments and return types",
-            ));
-        }
-        if let SemaError::NoConflictArbiter {
-            foreign_table: true,
-        } = *self
-        {
-            return Some(Cow::Borrowed(
-                "foreign tables can't have unique or exclusion constraints",
-            ));
-        }
-        if let SemaError::TruncateReferenced {
-            name, referencing, ..
-        } = *self
-        {
-            return Some(Cow::Owned(format!(
-                "table `{}` references `{}`",
-                names.resolve(referencing),
-                names.resolve(name)
-            )));
-        }
-        if let SemaError::CircularInheritance { child, parent } = *self {
-            return Some(Cow::Owned(format!(
-                "`{}` is already a child of `{}`",
-                names.resolve(child),
-                names.resolve(parent)
-            )));
-        }
-        if let SemaError::ConflictWithRules { table, rule, event } = *self {
-            return Some(Cow::Owned(format!(
-                "`{}` has an {} rule `{}`",
-                names.resolve(table),
-                event.label(),
-                names.resolve(rule)
-            )));
-        }
-        if let SemaError::UnresolvedRoutine {
-            kind,
-            name,
-            outside_search_path: Some(OutsideSearchPath { schema, others, .. }),
-            ..
-        } = *self
-        {
-            let label = kind.call_label();
-            let name = names.resolve(name);
-            let schema = names.resolve(schema);
-            let note = match others {
-                0 => format!(
-                    "a {label} named `{name}` exists in schema `{schema}`, which is not in the `search_path`"
-                ),
-                others => {
-                    let s = if others == 1 { "" } else { "s" };
-                    format!(
-                        "a {label} named `{name}` exists in schema `{schema}` and {others} other{s}, none of which are in the `search_path`"
-                    )
-                }
-            };
-            return Some(Cow::Owned(note));
-        }
-        if let SemaError::ForeignKeyTypeMismatch {
-            column,
-            referenced_column,
-            ty,
-            referenced_ty,
-            ..
-        } = *self
-        {
-            let message = ErrorMessage {
-                error: self,
-                names,
-                errors,
-            };
-            return Some(Cow::Owned(format!(
-                "key columns `{}` and `{}` are of incompatible types: `{}` and `{}`",
-                names.resolve(column),
-                names.resolve(referenced_column),
-                message.ty(ty),
-                message.ty(referenced_ty)
-            )));
-        }
-        if let SemaError::ArgumentCountMismatch { missing, .. } = *self
-            && !missing.is_empty()
-        {
-            let message = ErrorMessage {
-                error: self,
-                names,
-                errors,
-            };
-            return Some(Cow::Owned(format!("missing {}", message.params(missing))));
-        }
-        let SemaError::UnresolvedRoutine {
-            schema,
-            name,
-            candidates: Some(ErrorCandidates { shown, total }),
-            ..
-        } = *self
-        else {
-            return None;
-        };
+    pub(crate) fn notes(&self, names: &Interner, errors: &Errors) -> Vec<Cow<'static, str>> {
         let message = ErrorMessage {
             error: self,
             names,
             errors,
         };
-        let mut note = String::from("candidates are ");
-        for (i, candidate) in shown.iter().enumerate() {
-            if i > 0 {
-                note.push_str(", ");
+        let note = match *self {
+            SemaError::UnresolvedRoutine {
+                schema,
+                name,
+                candidates: Some(ErrorCandidates { shown, total }),
+                ..
+            } => {
+                let hidden = total - shown.len();
+                let mut notes = Vec::with_capacity(shown.len() + usize::from(hidden > 0));
+                notes.extend(shown.iter().map(|candidate| {
+                    let candidate = errors.candidates[candidate];
+                    Cow::Owned(message.candidate(schema, name, candidate).to_string())
+                }));
+                if hidden > 0 {
+                    let s = if hidden == 1 { "" } else { "s" };
+                    notes.push(Cow::Owned(format!("and {hidden} other candidate{s}")));
+                }
+                return notes;
             }
-            write!(
-                note,
-                "`{}`",
-                message.signature(schema, name, errors.candidates[candidate])
-            )
-            .unwrap();
-        }
-        let hidden = total - shown.len();
-        if hidden > 0 {
-            let s = if hidden == 1 { "" } else { "s" };
-            write!(note, ", and {hidden} other{s}").unwrap();
-        }
-        Some(Cow::Owned(note))
+            SemaError::UnresolvedRoutine {
+                kind,
+                name,
+                outside_search_path: Some(OutsideSearchPath { schema, others, .. }),
+                ..
+            } => {
+                let label = kind.call_label();
+                let name = names.resolve(name);
+                let schema = names.resolve(schema);
+                Cow::Owned(match others {
+                    0 => format!(
+                        "a {label} named `{name}` exists in schema `{schema}`, which is not in the `search_path`"
+                    ),
+                    others => {
+                        let s = if others == 1 { "" } else { "s" };
+                        format!(
+                            "a {label} named `{name}` exists in schema `{schema}` and {others} other{s}, none of which are in the `search_path`"
+                        )
+                    }
+                })
+            }
+            SemaError::NonBoolComparison { comparison, .. } => Cow::Borrowed(comparison.note()),
+            SemaError::DropColumnWithDependents { column, view, .. }
+            | SemaError::AlterColumnTypeWithDependents { column, view } => Cow::Owned(format!(
+                "view `{}` depends on column `{}`",
+                names.resolve(view),
+                names.resolve(column)
+            )),
+            SemaError::GeneratedColumnInsert { column, identity }
+            | SemaError::GeneratedColumnUpdate { column, identity } => {
+                let column = names.resolve(column);
+                Cow::Owned(if identity {
+                    format!("`{column}` is an identity column defined as `generated always`")
+                } else {
+                    format!("`{column}` is a generated column")
+                })
+            }
+            SemaError::PseudoTypeColumn { .. } => Cow::Borrowed(
+                "pseudo-types can only be used for function arguments and return types",
+            ),
+            SemaError::NoConflictArbiter {
+                foreign_table: true,
+            } => Cow::Borrowed("foreign tables can't have unique or exclusion constraints"),
+            SemaError::TruncateReferenced {
+                name, referencing, ..
+            } => Cow::Owned(format!(
+                "table `{}` references `{}`",
+                names.resolve(referencing),
+                names.resolve(name)
+            )),
+            SemaError::CircularInheritance { child, parent } => Cow::Owned(format!(
+                "`{}` is already a child of `{}`",
+                names.resolve(child),
+                names.resolve(parent)
+            )),
+            SemaError::ConflictWithRules { table, rule, event } => Cow::Owned(format!(
+                "`{}` has an {} rule `{}`",
+                names.resolve(table),
+                event.label(),
+                names.resolve(rule)
+            )),
+            SemaError::ForeignKeyTypeMismatch {
+                column,
+                referenced_column,
+                ty,
+                referenced_ty,
+                ..
+            } => Cow::Owned(format!(
+                "key columns `{}` and `{}` are of incompatible types: `{}` and `{}`",
+                names.resolve(column),
+                names.resolve(referenced_column),
+                message.ty(ty),
+                message.ty(referenced_ty)
+            )),
+            SemaError::ArgumentCountMismatch { missing, .. } if !missing.is_empty() => {
+                Cow::Owned(format!("missing {}", message.params(missing)))
+            }
+            _ => return vec![],
+        };
+        vec![note]
     }
 
     pub(crate) fn message(&self, names: &Interner, errors: &Errors) -> Cow<'static, str> {
@@ -2363,6 +2366,47 @@ impl ErrorMessage<'_> {
                 write!(f, "{}", self.operand(arg.ty))?;
             }
             f.write_str(")")
+        })
+    }
+
+    fn candidate(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        candidate: ErrorCandidate,
+    ) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            let ErrorCandidate { args, reason } = candidate;
+            let signature = self.signature(schema, name, args);
+            match reason {
+                Some(CandidateReason::ArgType {
+                    position,
+                    expected,
+                    found,
+                }) => write!(
+                    f,
+                    "`{signature}` expects `{}` for argument {}, found `{}`",
+                    self.ty(expected),
+                    position + 1,
+                    self.ty(found)
+                ),
+                Some(CandidateReason::ArgCount { min, max, supplied }) => {
+                    let (bound, count) = if min == max {
+                        ("", min)
+                    } else if supplied < min {
+                        ("at least ", min)
+                    } else {
+                        ("at most ", max)
+                    };
+                    write!(
+                        f,
+                        "`{signature}` takes {bound}{count} argument{} but {supplied} {} supplied",
+                        if count == 1 { "" } else { "s" },
+                        if supplied == 1 { "was" } else { "were" },
+                    )
+                }
+                None => write!(f, "candidate `{signature}`"),
+            }
         })
     }
 
@@ -2977,6 +3021,15 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(table),
                 n(column)
             ),
+            SemaError::DropColumnWithDependents { column, table, .. } => write!(
+                f,
+                "cannot drop column `{}` of table `{}` because other objects depend on it",
+                n(column),
+                n(table)
+            ),
+            SemaError::AlterColumnTypeWithDependents { .. } => {
+                write!(f, "cannot alter type of a column used by a view or rule")
+            }
             SemaError::GeneratedColumnInsert { column, .. } => write!(
                 f,
                 "cannot insert a non-default value into column `{}`",

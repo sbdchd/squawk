@@ -360,7 +360,7 @@ impl SquawkDatabase {
                     None => (None, None),
                 };
                 let messages = x
-                    .note
+                    .notes
                     .into_iter()
                     .chain(x.hint)
                     .chain(suggestion_message)

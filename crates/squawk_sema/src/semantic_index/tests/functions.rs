@@ -1017,7 +1017,9 @@ call p('a'::text);
     14 │ select lower(1);
        │        ━━━━━
        │
-       ├ note: candidates are `lower(anymultirange)`, `lower(anyrange)`, `lower(text)`
+       ├ note: candidate `lower(anymultirange)`
+       ├ note: candidate `lower(anyrange)`
+       ├ note: `lower(text)` expects `text` for argument 1, found `int4`
        ╰ hint: consider adding explicit type casts
     error: argument 1 of `p` has type `text`, expected `int4`
        ╭▸ 

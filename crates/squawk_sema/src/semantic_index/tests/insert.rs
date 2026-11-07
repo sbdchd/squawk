@@ -1060,3 +1060,89 @@ update t set b = 2;
       ╰ note: `b` is a generated column
     ");
 }
+
+#[test]
+fn on_conflict_with_rules_through_views() {
+    assert_snapshot!(check("
+create table t (a int primary key);
+create rule r as on update to t do instead nothing;
+create view v as select * from t;
+insert into v values (1) on conflict do nothing;
+create view v2 as select * from v where a > 0;
+insert into v2 values (1) on conflict do nothing;
+
+create table t2 (a int primary key);
+create view v3 as select * from t2;
+create rule r3 as on update to v3 do also notify x;
+insert into v3 values (1) on conflict do nothing;
+create function f() returns trigger
+  language plpgsql
+  as $$begin return new; end$$;
+create trigger tg instead of insert on v3 for each row execute function f();
+insert into v3 values (1) on conflict do nothing;
+
+create view v4 as select distinct * from t;
+insert into v4 values (1) on conflict do nothing;
+create view v5 as select t.a from t join t2 using (a);
+insert into v5 values (1) on conflict do nothing;
+create view v6 as
+  select count(*)::int as a from t;
+insert into v6 values (1) on conflict do nothing;
+create view v7 as
+  select row_number() over ()::int as a from t;
+insert into v7 values (1) on conflict do nothing;
+create view v8 as
+  select generate_series(1, a) as a from t;
+insert into v8 values (1) on conflict do nothing;
+create view v9 as
+  select * from t tablesample system (50);
+insert into v9 values (1) on conflict do nothing;
+create view v10 as
+  select * from t for update;
+insert into v10 values (1) on conflict do nothing;
+create table u (b int);
+create view v11 as
+  select (select max(t.a) from u) as a from t;
+insert into v11 values (1) on conflict do nothing;
+create view v12 as
+  select 1 as a from t;
+insert into v12 values (1) on conflict do nothing;
+create view v13 as
+  select t from t;
+insert into v13 default values on conflict do nothing;
+create view v14 as
+  select a + 0 as x, a from t;
+insert into v14 (a) values (1) on conflict do nothing;
+"), @"
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+      ╭▸ 
+    5 │ insert into v values (1) on conflict do nothing;
+      │                          ━━━━━━━━━━━
+      │
+      ╰ note: `t` has an `on update` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+      ╭▸ 
+    7 │ insert into v2 values (1) on conflict do nothing;
+      │                           ━━━━━━━━━━━
+      │
+      ╰ note: `t` has an `on update` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    17 │ insert into v3 values (1) on conflict do nothing;
+       │                           ━━━━━━━━━━━
+       │
+       ╰ note: `v3` has an `on update` rule `r3`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    37 │ insert into v10 values (1) on conflict do nothing;
+       │                            ━━━━━━━━━━━
+       │
+       ╰ note: `t` has an `on update` rule `r`
+    error: `insert` with `on conflict` cannot be used with table that has `insert` or `update` rules
+       ╭▸ 
+    50 │ insert into v14 (a) values (1) on conflict do nothing;
+       │                                ━━━━━━━━━━━
+       │
+       ╰ note: `t` has an `on update` rule `r`
+    ");
+}
