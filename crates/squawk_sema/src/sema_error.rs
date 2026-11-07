@@ -535,6 +535,10 @@ pub(crate) enum SemaError {
         value: Name,
         similar: Option<Name>,
     },
+    InvalidBoolValue {
+        value: Name,
+        similar: Option<&'static str>,
+    },
     NotEnum {
         name: Name,
     },
@@ -1499,6 +1503,7 @@ impl SemaError {
                 DiagnosticKind::UnresolvedRelation
             }
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
+            SemaError::InvalidBoolValue { .. } => DiagnosticKind::InvalidLiteral,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
             | SemaError::StarNotComposite { .. }
@@ -1634,6 +1639,14 @@ impl SemaError {
                 "an enum label with a similar name exists",
                 range,
                 quote_string_literal(names.resolve(label)),
+            ),
+            SemaError::InvalidBoolValue {
+                similar: Some(similar),
+                ..
+            } => replace_suggestion(
+                "a similar boolean value exists",
+                range,
+                quote_string_literal(similar),
             ),
             SemaError::UnresolvedQualifiedColumn {
                 similar: Some(similar),
@@ -2018,6 +2031,9 @@ impl SemaError {
         match *self {
             SemaError::NoDefaultOperatorClass { .. } => Some(
                 "specify an operator class for the index or define a default operator class for the data type",
+            ),
+            SemaError::InvalidBoolValue { similar: None, .. } => Some(
+                "expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`",
             ),
             SemaError::EmptyArrayType { cast: None } => Some(
                 "explicitly cast to the desired type, for example `array[]::integer[]`",
@@ -3260,6 +3276,9 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(ty),
                 n(value)
             ),
+            SemaError::InvalidBoolValue { value, similar: _ } => {
+                write!(f, "invalid input value for type `bool`: `{}`", n(value))
+            }
             SemaError::NotEnum { name } => write!(f, "`{}` is not an enum", n(name)),
             SemaError::NotComposite { name } => write!(f, "`{}` is not a composite type", n(name)),
             SemaError::StarNotComposite { ty } => {

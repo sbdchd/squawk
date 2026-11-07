@@ -1,5 +1,6 @@
 mod access_methods;
 mod aggregates;
+mod bools;
 mod builtins;
 mod casts;
 mod collations;

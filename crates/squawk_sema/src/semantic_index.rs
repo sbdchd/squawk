@@ -154,6 +154,7 @@ pub enum DiagnosticKind {
     IndeterminateType,
     MissingShellType,
     InvalidOrdinal,
+    InvalidLiteral,
     WrongReturnType,
     ConflictingNullability,
     FeatureNotSupported,
