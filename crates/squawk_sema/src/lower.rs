@@ -20,6 +20,7 @@ use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
 use crate::interner::Name;
 use crate::keyed_index::GraphElementIndex;
+use crate::postgres::{IntInputError, IntType};
 
 use crate::{
     ir::{
@@ -200,6 +201,7 @@ impl IndexData {
 enum LiteralTarget {
     Enum(TypeId),
     Bool,
+    Int(IntType),
 }
 
 struct QueryScope {
@@ -12313,26 +12315,53 @@ impl Lowerer {
         label
     }
 
-    fn enum_type(&self, ty: Ty) -> Option<TypeId> {
-        match self.index.base_type(ty)? {
-            Ty::Type(id) if self.index.types[id].kind == TypeKind::Enum => Some(id),
-            Ty::Type(_) | Ty::Table(_) | Ty::Cte(_) | Ty::Array(_) => None,
+    fn literal_target(&self, ty: Ty) -> Option<LiteralTarget> {
+        let Ty::Type(id) = self.index.base_type(ty)? else {
+            return None;
+        };
+        let ty = &self.index.types[id];
+        if ty.kind == TypeKind::Enum {
+            return Some(LiteralTarget::Enum(id));
         }
-    }
-
-    fn literal_target(&mut self, ty: Ty) -> Option<LiteralTarget> {
-        if let Some(ty) = self.enum_type(ty) {
-            return Some(LiteralTarget::Enum(ty));
+        if ty.schema != self.pg_catalog {
+            return None;
         }
-        let base = self.index.base_type(ty)?;
-        (Some(base) == self.builtin_type("bool")).then_some(LiteralTarget::Bool)
+        match self.index.names.resolve(ty.name) {
+            "bool" => Some(LiteralTarget::Bool),
+            "int2" => Some(LiteralTarget::Int(IntType::Int2)),
+            "int4" => Some(LiteralTarget::Int(IntType::Int4)),
+            "int8" => Some(LiteralTarget::Int(IntType::Int8)),
+            _ => None,
+        }
     }
 
     fn lower_literal_value(&mut self, target: LiteralTarget, literal: &ast::Literal) {
         match target {
             LiteralTarget::Enum(ty) => self.lower_enum_value(ty, literal),
             LiteralTarget::Bool => self.check_bool_value(literal),
+            LiteralTarget::Int(ty) => self.check_int_value(ty, literal),
         }
+    }
+
+    fn check_int_value(&mut self, ty: IntType, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        let error = match postgres::parse_int(&value, ty) {
+            Ok(_) => return,
+            Err(IntInputError::InvalidSyntax) => SemaError::InvalidIntValue {
+                ty,
+                value: self.intern(&value),
+            },
+            Err(IntInputError::OutOfRange) => SemaError::IntValueOutOfRange {
+                ty,
+                value: self.intern(&value),
+            },
+        };
+        self.push_error(literal.syntax(), error);
     }
 
     fn check_bool_value(&mut self, literal: &ast::Literal) {
