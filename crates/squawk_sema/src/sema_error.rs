@@ -9,6 +9,7 @@ use crate::ir::{
 };
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::{TextRange, TextSize};
+use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
@@ -523,7 +524,18 @@ pub(crate) enum SemaError {
         what: &'static str,
     },
     CompoundColumnCount {
-        op: &'static str,
+        op: CompoundOp,
+    },
+    CompoundTypeMismatch {
+        op: CompoundOp,
+        left: TyName,
+        right: TyName,
+    },
+    RecursiveCteTypeMismatch {
+        name: Name,
+        column: usize,
+        non_recursive: TyName,
+        overall: TyName,
     },
     ColumnListTooLong {
         what: &'static str,
@@ -745,6 +757,14 @@ pub(crate) enum SemaError {
         kind: UniqueKind,
         table: Name,
     },
+    GeneratedColumnInsert {
+        column: Name,
+        identity: bool,
+    },
+    GeneratedColumnUpdate {
+        column: Name,
+        identity: bool,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -831,6 +851,33 @@ impl Quantifier {
             Quantifier::Any => "any",
             Quantifier::Some => "some",
             Quantifier::All => "all",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum CompoundOp {
+    Union,
+    Intersect,
+    Except,
+}
+
+impl CompoundOp {
+    fn keyword(self) -> &'static str {
+        match self {
+            CompoundOp::Union => "union",
+            CompoundOp::Intersect => "intersect",
+            CompoundOp::Except => "except",
+        }
+    }
+}
+
+impl From<ast::CompoundOp> for CompoundOp {
+    fn from(op: ast::CompoundOp) -> CompoundOp {
+        match op {
+            ast::CompoundOp::Union(_) => CompoundOp::Union,
+            ast::CompoundOp::Intersect(_) => CompoundOp::Intersect,
+            ast::CompoundOp::Except(_) => CompoundOp::Except,
         }
     }
 }
@@ -1319,6 +1366,9 @@ impl SemaError {
             | SemaError::UniqueOnExpressionPartitionKey { .. } => {
                 DiagnosticKind::InvalidTableDefinition
             }
+            SemaError::GeneratedColumnInsert { .. } | SemaError::GeneratedColumnUpdate { .. } => {
+                DiagnosticKind::GeneratedColumnWrite
+            }
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -1391,6 +1441,9 @@ impl SemaError {
             | SemaError::TableRowTypeAlteredAsType { .. } => DiagnosticKind::WrongTypeKind,
             SemaError::TypedTableAlter { .. } => DiagnosticKind::TypedTableAlter,
             SemaError::InvalidDomainConstraint { .. } => DiagnosticKind::InvalidDomainConstraint,
+            SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
+                DiagnosticKind::TypeMismatch
+            }
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
@@ -1882,6 +1935,12 @@ impl SemaError {
             SemaError::CannotOpenIndex { .. } => {
                 Some("this operation is not supported for indexes")
             }
+            SemaError::RecursiveCteTypeMismatch { .. } => {
+                Some("cast the output of the non-recursive term to the overall type")
+            }
+            SemaError::GeneratedColumnInsert { identity: true, .. } => {
+                Some("use `overriding system value` to override")
+            }
             SemaError::IdentityColumnDefault {
                 change: DefaultChange::Drop,
                 ..
@@ -2085,6 +2144,16 @@ impl SemaError {
     pub(crate) fn note(&self, names: &Interner, errors: &Errors) -> Option<Cow<'static, str>> {
         if let SemaError::NonBoolComparison { comparison, .. } = *self {
             return Some(Cow::Borrowed(comparison.note()));
+        }
+        if let SemaError::GeneratedColumnInsert { column, identity }
+        | SemaError::GeneratedColumnUpdate { column, identity } = *self
+        {
+            let column = names.resolve(column);
+            return Some(Cow::Owned(if identity {
+                format!("`{column}` is an identity column defined as `generated always`")
+            } else {
+                format!("`{column}` is a generated column")
+            }));
         }
         if let SemaError::PseudoTypeColumn { .. } = *self {
             return Some(Cow::Borrowed(
@@ -2908,6 +2977,14 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(table),
                 n(column)
             ),
+            SemaError::GeneratedColumnInsert { column, .. } => write!(
+                f,
+                "cannot insert a non-default value into column `{}`",
+                n(column)
+            ),
+            SemaError::GeneratedColumnUpdate { column, .. } => {
+                write!(f, "column `{}` can only be updated to `default`", n(column))
+            }
             SemaError::UniqueOnExpressionPartitionKey { kind, table } => write!(
                 f,
                 "{} is not supported on partitioned table `{}` because its partition key contains expressions",
@@ -2996,9 +3073,30 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::InvalidDomainConstraint { what } => {
                 write!(f, "{what} not possible for domains")
             }
-            SemaError::CompoundColumnCount { op } => {
-                write!(f, "each `{op}` query must have the same number of columns")
-            }
+            SemaError::CompoundColumnCount { op } => write!(
+                f,
+                "each `{}` query must have the same number of columns",
+                op.keyword()
+            ),
+            SemaError::RecursiveCteTypeMismatch {
+                name,
+                column,
+                non_recursive,
+                overall,
+            } => write!(
+                f,
+                "recursive query `{}` column {column} has type `{}` in non-recursive term but type `{}` overall",
+                n(name),
+                self.ty(non_recursive),
+                self.ty(overall)
+            ),
+            SemaError::CompoundTypeMismatch { op, left, right } => write!(
+                f,
+                "`{}` types `{}` and `{}` cannot be matched",
+                op.keyword(),
+                self.ty(left),
+                self.ty(right)
+            ),
             SemaError::ColumnListTooLong {
                 what,
                 name,

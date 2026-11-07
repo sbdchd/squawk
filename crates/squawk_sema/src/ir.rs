@@ -105,7 +105,22 @@ pub struct Table {
 pub(crate) struct SequenceOwner {
     pub(crate) table: TableId,
     pub(crate) column: Name,
-    pub(crate) identity: bool,
+    pub(crate) identity: Option<IdentityKind>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum IdentityKind {
+    Always,
+    ByDefault,
+}
+
+impl From<ast::GeneratedWhen> for IdentityKind {
+    fn from(when: ast::GeneratedWhen) -> IdentityKind {
+        match when {
+            ast::GeneratedWhen::GeneratedAlways(_) => IdentityKind::Always,
+            ast::GeneratedWhen::GeneratedByDefault(_) => IdentityKind::ByDefault,
+        }
+    }
 }
 
 #[derive(Debug)]

@@ -122,6 +122,13 @@ impl CommonType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum CommonTypeResult {
+    Found(Ty),
+    Mismatch,
+    Unknown,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 enum Match {
     Exact,
     DomainBase,
@@ -819,6 +826,30 @@ impl<'a> Overloads<'a> {
             base: self.index.base_type(right)?,
         };
         self.common_type(&[left, right])
+    }
+
+    pub(crate) fn select_common_type_or_mismatch(&self, left: Ty, right: Ty) -> CommonTypeResult {
+        if left == right {
+            return CommonTypeResult::Found(left);
+        }
+        let (Some(left_base), Some(right_base)) =
+            (self.index.base_type(left), self.index.base_type(right))
+        else {
+            return CommonTypeResult::Unknown;
+        };
+        if self.is_pseudo(left_base) || self.is_pseudo(right_base) {
+            return CommonTypeResult::Unknown;
+        }
+        if let (Some(left_category), Some(right_category)) =
+            (self.category(left_base), self.category(right_base))
+            && left_category != right_category
+        {
+            return CommonTypeResult::Mismatch;
+        }
+        match self.select_common_type(left, right) {
+            Some(ty) => CommonTypeResult::Found(ty),
+            None => CommonTypeResult::Unknown,
+        }
     }
 
     fn common_type(&self, types: &[CompatibleType]) -> Option<Ty> {

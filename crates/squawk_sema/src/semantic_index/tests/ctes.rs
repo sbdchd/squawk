@@ -411,3 +411,46 @@ with recursive a as (
 )
 select x from a;"), @"no diagnostics");
 }
+
+#[test]
+fn recursive_cte_type_mismatch() {
+    assert_snapshot!(check("
+with recursive r (n) as (
+  select 1::int
+  union all
+  select n + 1::bigint from r
+)
+select * from r;
+with recursive r (n, m) as (
+  select 1, 'a'::text
+  union all
+  select n + 1, m || 'x' from r where n < 3
+)
+select * from r;
+with recursive r (n) as (
+  select 1
+  union all
+  select n + 1.5 from r where n < 3
+)
+select * from r;
+with recursive r (n) as (
+  select 'a'
+  union all
+  select n || 'b' from r where length(n) < 3
+)
+select * from r;
+"), @"
+    error: recursive query `r` column 1 has type `int4` in non-recursive term but type `int8` overall
+      ╭▸ 
+    3 │   select 1::int
+      │          ━━━━━━
+      │
+      ╰ hint: cast the output of the non-recursive term to the overall type
+    error: recursive query `r` column 1 has type `int4` in non-recursive term but type `numeric` overall
+       ╭▸ 
+    15 │   select 1
+       │          ━
+       │
+       ╰ hint: cast the output of the non-recursive term to the overall type
+    ");
+}

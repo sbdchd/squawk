@@ -29,23 +29,23 @@ use crate::{
         Conversion, ConversionId, Cte, CteId, Cursor, CursorId, Database, DatabaseId, EnumLabel,
         EnumLabelId, EventTrigger, EventTriggerId, Extension, ExtensionId, ForeignDataWrapper,
         ForeignDataWrapperId, Function, FunctionId, FunctionKind, GraphElement, GraphElementId,
-        GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId, Index, IndexId,
-        Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId, MemberKind, MemberOwner,
-        Merge, Operand, Operands, Operator, OperatorClass, OperatorClassId, OperatorFamily,
-        OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId, Param, ParamId,
-        ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId, PreparedTransaction,
-        PreparedTransactionId, Publication, PublicationId, Query, QueryId, QueryKind, RefId,
-        Reference, ReferenceKind, Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule,
-        RuleBehavior, RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema,
-        SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner, Server, ServerId, Source,
-        SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript, Subscription,
-        SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId, TextSearch,
-        TextSearchId, TextSearchKind, Transaction, TransactionId, Transform, TransformId,
-        TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind, Window,
-        WindowClauses, WindowId,
+        GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId, IdentityKind,
+        Index, IndexId, Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId, MemberKind,
+        MemberOwner, Merge, Operand, Operands, Operator, OperatorClass, OperatorClassId,
+        OperatorFamily, OperatorFamilyId, OperatorFamilyMember, OperatorFamilyMemberId, OperatorId,
+        Param, ParamId, ParamMode, Policy, PolicyId, PreparedStatement, PreparedStatementId,
+        PreparedTransaction, PreparedTransactionId, Publication, PublicationId, Query, QueryId,
+        QueryKind, RefId, Reference, ReferenceKind, Resolution, ReturnKind, Role, RoleId,
+        RoutineKind, Rule, RuleBehavior, RuleEnabled, RuleEvent, RuleId, RuleMode, Savepoint,
+        SavepointId, Schema, SchemaId, Scope, ScopeId, SearchPathChange, SequenceOwner, Server,
+        ServerId, Source, SourceId, SourceKind, Star, Statistics, StatisticsId, Subscript,
+        Subscription, SubscriptionId, Table, TableId, TableKind, Tablespace, TablespaceId,
+        TextSearch, TextSearchId, TextSearchKind, Transaction, TransactionId, Transform,
+        TransformId, TransformKey, Trigger, TriggerId, Ty, Type, TypeCategory, TypeId, TypeKind,
+        Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, ColumnDefListReason, Comparison, ConflictAction, ConflictRuleEvent,
+        ArgLabel, ColumnDefListReason, Comparison, CompoundOp, ConflictAction, ConflictRuleEvent,
         ConflictTargetKey, DefaultChange, DropRelation, ErrorArg, ErrorArgs, ErrorCandidates,
         ErrorParam, ErrorReturnType, GeneratedKind, LookupKind, ObjectKind, OperandName,
         OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
@@ -57,7 +57,7 @@ use crate::{
 use crate::{
     overload::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, CommonType,
-        MissingParam, Overloads,
+        CommonTypeResult, MissingParam, Overloads,
     },
     postgres,
 };
@@ -506,6 +506,27 @@ struct ColumnExprId(u32);
 enum PartitionKey {
     Columns(IdxRange<Name>),
     Expressions,
+}
+
+#[derive(Clone, Copy)]
+struct RecursiveCte {
+    id: CteId,
+    column_list: bool,
+}
+
+#[derive(Clone, Copy)]
+struct CompoundOperands<'a> {
+    lhs: QueryId,
+    rhs: QueryId,
+    lhs_node: &'a ast::SelectVariant,
+    rhs_node: &'a ast::SelectVariant,
+}
+
+struct InsertValues<'a> {
+    rows: Option<ast::RowList>,
+    width: usize,
+    source: &'a ast::SelectVariant,
+    overriding: bool,
 }
 
 struct Replacement<'a> {
@@ -2615,6 +2636,7 @@ impl Lowerer {
         &mut self,
         table: Option<TableId>,
         column: Option<Name>,
+        kind: IdentityKind,
         options: Option<ast::SequenceOptionList>,
         node: &SyntaxNode,
     ) {
@@ -2667,7 +2689,7 @@ impl Lowerer {
             Some(SequenceOwner {
                 table,
                 column,
-                identity: true,
+                identity: Some(kind),
             }),
         );
     }
@@ -2694,7 +2716,7 @@ impl Lowerer {
             Some(SequenceOwner {
                 table,
                 column,
-                identity: false,
+                identity: None,
             }),
         );
         self.add_not_null_constraint(table, column, node, None);
@@ -2836,7 +2858,7 @@ impl Lowerer {
                     Some(SequenceOwner {
                         table,
                         column: self.intern(&segment.text()),
-                        identity: false,
+                        identity: None,
                     })
                 }
                 Some(ast::OwnedByTarget::OwnedByNone(_)) | None => None,
@@ -13791,7 +13813,7 @@ impl Lowerer {
     fn lower_cte_query(
         &mut self,
         query: ast::SelectVariant,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         self.with_expr_context(ExprContext::Unrestricted, |this| {
             this.lower_cte_query_inner(query, recursive_cte)
@@ -13801,7 +13823,7 @@ impl Lowerer {
     fn lower_cte_query_inner(
         &mut self,
         query: ast::SelectVariant,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         match query {
             ast::SelectVariant::Select(select) => self.lower_simple_select(&select),
@@ -13853,7 +13875,7 @@ impl Lowerer {
     fn lower_paren_select(
         &mut self,
         paren: &ast::ParenSelect,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         let mark = self.ctes.len();
         if let Some(with_clause) = paren.with_clause() {
@@ -13935,7 +13957,7 @@ impl Lowerer {
     fn lower_compound(
         &mut self,
         compound: &ast::CompoundSelect,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         let mark = self.ctes.len();
         if !compound.is_nested()
@@ -13944,25 +13966,49 @@ impl Lowerer {
             self.lower_with(&with_clause);
         }
         let lhs = compound.lhs().map(|lhs| self.lower_query(lhs));
-        if let (Some(cte), Some(lhs)) = (recursive_cte, lhs)
+        if let (Some(recursive), Some(lhs)) = (recursive_cte, lhs)
             && matches!(compound.op(), Some(ast::CompoundOp::Union(_)))
         {
             let columns = self.index.queries[lhs].columns;
-            self.index.ctes[cte].columns = columns;
-            self.index
-                .set_column_owner(columns.range, ColumnOwner::Cte(cte));
+            let cte = recursive.id;
+            if recursive.column_list {
+                let list = self.index.ctes[cte].columns;
+                for (column, query_column) in list.range.iter().zip(columns.range) {
+                    self.index.columns[column].ty = self.index.columns[query_column].ty;
+                }
+            } else {
+                self.index.ctes[cte].columns = columns;
+                self.index
+                    .set_column_owner(columns.range, ColumnOwner::Cte(cte));
+            }
         }
+        let mut columns = lhs.map(|lhs| self.index.queries[lhs].columns);
         if let Some(rhs) = compound.rhs() {
             let rhs_query = self.lower_query(rhs.clone());
-            if let Some(lhs) = lhs {
-                self.check_compound_arity(compound, lhs, rhs_query, &rhs);
+            if let Some(lhs) = lhs
+                && self.check_compound_arity(compound, lhs, rhs_query, &rhs)
+                && let Some(lhs_node) = compound.lhs()
+            {
+                let operands = CompoundOperands {
+                    lhs,
+                    rhs: rhs_query,
+                    lhs_node: &lhs_node,
+                    rhs_node: &rhs,
+                };
+                columns = self.compound_columns(compound, operands);
+                if let Some(RecursiveCte { id: cte, .. }) = recursive_cte
+                    && let Some(resolved) = columns
+                    && matches!(compound.op(), Some(ast::CompoundOp::Union(_)))
+                {
+                    self.check_recursive_cte_types(cte, lhs, &lhs_node, resolved);
+                    columns = Some(self.index.queries[lhs].columns);
+                }
             }
         }
         let id = self.alloc_query(QueryKind::Compound, compound.syntax());
-        if let Some(lhs) = lhs {
-            self.index.queries[id].columns = self.index.queries[lhs].columns;
-        } else {
-            self.index.queries[id].columns.complete = false;
+        match columns {
+            Some(columns) => self.index.queries[id].columns = columns,
+            None => self.index.queries[id].columns.complete = false,
         }
         self.lower_tail_clauses_for_outputs(id, compound.tail_clauses());
         self.ctes.truncate(mark);
@@ -13975,19 +14021,145 @@ impl Lowerer {
         lhs: QueryId,
         rhs: QueryId,
         rhs_node: &ast::SelectVariant,
-    ) {
+    ) -> bool {
         let lhs = self.index.queries[lhs].columns;
         let rhs = self.index.queries[rhs].columns;
-        if !lhs.complete || !rhs.complete || lhs.range.len() == rhs.range.len() {
-            return;
+        if !lhs.complete || !rhs.complete {
+            return false;
         }
-        let op = match compound.op() {
-            Some(ast::CompoundOp::Union(_)) => "union",
-            Some(ast::CompoundOp::Intersect(_)) => "intersect",
-            Some(ast::CompoundOp::Except(_)) => "except",
-            None => return,
-        };
-        self.push_error(rhs_node.syntax(), SemaError::CompoundColumnCount { op });
+        if lhs.range.len() == rhs.range.len() {
+            return true;
+        }
+        if let Some(op) = compound.op() {
+            self.push_error(
+                rhs_node.syntax(),
+                SemaError::CompoundColumnCount { op: op.into() },
+            );
+        }
+        false
+    }
+
+    fn check_recursive_cte_types(
+        &mut self,
+        cte: CteId,
+        non_recursive: QueryId,
+        non_recursive_node: &ast::SelectVariant,
+        overall: Columns,
+    ) {
+        let columns = self.index.queries[non_recursive].columns;
+        for (position, (column, resolved)) in
+            columns.range.iter().zip(overall.range.iter()).enumerate()
+        {
+            let Column { ty, ptr, .. } = self.index.columns[column];
+            let (Some(ty), Some(overall)) = (ty, self.index.columns[resolved].ty) else {
+                continue;
+            };
+            if ty == overall || output_is_unknown_literal(non_recursive_node, position) {
+                continue;
+            }
+            let error = SemaError::RecursiveCteTypeMismatch {
+                name: self.index.ctes[cte].name,
+                column: position + 1,
+                non_recursive: self.index.ty_name(ty),
+                overall: self.index.ty_name(overall),
+            };
+            match output_expr(non_recursive_node, position) {
+                Some(expr) => self.push_error(expr.syntax(), error),
+                None => {
+                    let range = non_recursive_node.syntax().text_range();
+                    if ptr.file_id == self.file_id && range.contains_range(ptr.value.text_range()) {
+                        self.push_error_ptr(ptr, error);
+                    } else {
+                        self.push_error(non_recursive_node.syntax(), error);
+                    }
+                }
+            }
+        }
+    }
+
+    fn compound_columns(
+        &mut self,
+        compound: &ast::CompoundSelect,
+        operands: CompoundOperands,
+    ) -> Option<Columns> {
+        let lhs_columns = self.index.queries[operands.lhs].columns;
+        let rhs_columns = self.index.queries[operands.rhs].columns;
+        let op: CompoundOp = compound.op()?.into();
+        let mut resolved: SmallVec<[Option<Ty>; 8]> =
+            SmallVec::with_capacity(lhs_columns.range.len());
+        for (position, (left, right)) in lhs_columns
+            .range
+            .iter()
+            .zip(rhs_columns.range.iter())
+            .enumerate()
+        {
+            resolved.push(self.compound_column_type(&operands, op, position, left, right));
+        }
+        if lhs_columns
+            .range
+            .iter()
+            .zip(&resolved)
+            .all(|(column, ty)| self.index.columns[column].ty == *ty)
+        {
+            return Some(lhs_columns);
+        }
+        let range = self.index.columns.alloc_copies(lhs_columns.range);
+        for (column, ty) in range.iter().zip(resolved) {
+            self.index.columns[column].ty = ty;
+        }
+        Some(Columns {
+            range,
+            complete: lhs_columns.complete,
+        })
+    }
+
+    fn compound_column_type(
+        &mut self,
+        operands: &CompoundOperands,
+        op: CompoundOp,
+        position: usize,
+        left: ColumnId,
+        right: ColumnId,
+    ) -> Option<Ty> {
+        let left_ty = self.index.columns[left].ty;
+        let right_ty = self.index.columns[right].ty;
+        let left_unknown = output_is_unknown_literal(operands.lhs_node, position);
+        let right_unknown = output_is_unknown_literal(operands.rhs_node, position);
+        match (left_ty, right_ty) {
+            _ if left_unknown && right_unknown => left_ty,
+            (_, Some(right_ty)) if left_unknown => Some(right_ty),
+            (Some(left_ty), _) if right_unknown => Some(left_ty),
+            (Some(left_ty), Some(right_ty)) => {
+                Some(self.compound_common_type(op, left_ty, right_ty, operands.rhs_node, position))
+            }
+            (None, _) | (_, None) => left_ty,
+        }
+    }
+
+    fn compound_common_type(
+        &mut self,
+        op: CompoundOp,
+        left: Ty,
+        right: Ty,
+        rhs_node: &ast::SelectVariant,
+        position: usize,
+    ) -> Ty {
+        match self.overloads().select_common_type_or_mismatch(left, right) {
+            CommonTypeResult::Found(ty) => ty,
+            CommonTypeResult::Unknown => left,
+            CommonTypeResult::Mismatch => {
+                let error = SemaError::CompoundTypeMismatch {
+                    op,
+                    left: self.index.ty_name(left),
+                    right: self.index.ty_name(right),
+                };
+                match output_expr(rhs_node, position) {
+                    Some(expr) => self.push_error(expr.syntax(), error),
+                    None => self.push_error(rhs_node.syntax(), error),
+                }
+                left
+            }
+        }
     }
 
     fn lower_values(&mut self, values: &ast::Values) -> QueryId {
@@ -14339,6 +14511,11 @@ impl Lowerer {
         }
         if let Some((query, source)) = &source {
             self.check_insert_arity(insert, target, *query, source);
+            if let Some(target) = target
+                && let SourceKind::Table(table) = self.index.sources[target].kind
+            {
+                self.check_insert_generated_columns(insert, table, *query, source);
+            }
         }
         self.set_visible((0..self.index.queries[id].sources.len()).into());
 
@@ -14356,6 +14533,109 @@ impl Lowerer {
         self.scopes.pop();
         self.ctes.truncate(mark);
         id
+    }
+
+    fn check_insert_generated_columns(
+        &mut self,
+        insert: &ast::Insert,
+        table: TableId,
+        query: QueryId,
+        source: &ast::SelectVariant,
+    ) {
+        if self.index.tables[table].kind != TableKind::Table {
+            return;
+        }
+        let overriding = insert.overriding_clause().is_some();
+        let rows = match source {
+            ast::SelectVariant::Values(values) => values.row_list(),
+            ast::SelectVariant::CompoundSelect(_)
+            | ast::SelectVariant::ParenSelect(_)
+            | ast::SelectVariant::Select(_)
+            | ast::SelectVariant::SelectInto(_)
+            | ast::SelectVariant::Table(_) => None,
+        };
+        let values = InsertValues {
+            rows,
+            width: self.index.queries[query].columns.range.len(),
+            source,
+            overriding,
+        };
+        match insert.column_target_list() {
+            Some(list) => {
+                for (position, column_target) in list.column_targets().enumerate() {
+                    if let Some(name) = column_target.name() {
+                        let column = self.intern(&name.text());
+                        let node = Some(column_target.syntax());
+                        self.check_insert_generated_column(table, column, position, &values, node);
+                    }
+                }
+            }
+            None => {
+                let columns = self.index.tables[table].columns;
+                if !columns.complete {
+                    return;
+                }
+                for (position, id) in columns.range.iter().enumerate() {
+                    if let Some(column) = self.index.columns[id].name {
+                        self.check_insert_generated_column(table, column, position, &values, None);
+                    }
+                }
+            }
+        }
+    }
+
+    fn check_insert_generated_column(
+        &mut self,
+        table: TableId,
+        column: Name,
+        position: usize,
+        values: &InsertValues,
+        node: Option<&SyntaxNode>,
+    ) {
+        let identity = self.identity_kind_of(table, column) == Some(IdentityKind::Always);
+        let generated = !identity
+            && self
+                .column_exprs
+                .get(ColumnKey { table, column })
+                .is_some_and(|expression| {
+                    matches!(expression.kind, ColumnExprKind::Generated { .. })
+                });
+        if !(identity && !values.overriding || generated) {
+            return;
+        }
+        let value = match &values.rows {
+            Some(rows) => {
+                let Some(value) = rows
+                    .rows()
+                    .find_map(|row| row.exprs().nth(position).filter(|expr| !expr.is_default()))
+                else {
+                    return;
+                };
+                value.syntax().clone()
+            }
+            None if position < values.width => values.source.syntax().clone(),
+            None => return,
+        };
+        let error = SemaError::GeneratedColumnInsert { column, identity };
+        self.push_error(node.unwrap_or(&value), error);
+    }
+
+    fn check_generated_column_update(&mut self, table: TableId, column_target: &ast::ColumnTarget) {
+        let Some(name) = column_target.name() else {
+            return;
+        };
+        let column = self.intern(&name.text());
+        let identity = self.identity_kind_of(table, column) == Some(IdentityKind::Always);
+        let generated = self
+            .column_exprs
+            .get(ColumnKey { table, column })
+            .is_some_and(|expression| matches!(expression.kind, ColumnExprKind::Generated { .. }));
+        if identity || generated {
+            self.push_error(
+                column_target.syntax(),
+                SemaError::GeneratedColumnUpdate { column, identity },
+            );
+        }
     }
 
     fn check_insert_arity(
@@ -14517,6 +14797,22 @@ impl Lowerer {
     }
 
     fn lower_set_clause(&mut self, target: Option<SourceId>, set_clause: &ast::SetClause) {
+        let table = target
+            .and_then(|target| match self.index.sources[target].kind {
+                SourceKind::Table(table) => Some(table),
+                SourceKind::Cte(_)
+                | SourceKind::External
+                | SourceKind::Subquery(_)
+                | SourceKind::Function(_)
+                | SourceKind::Join
+                | SourceKind::UsingAlias
+                | SourceKind::Returning(_)
+                | SourceKind::Excluded(_)
+                | SourceKind::RuleRelation(_)
+                | SourceKind::ElementVariable
+                | SourceKind::Other => None,
+            })
+            .filter(|table| self.index.tables[*table].kind == TableKind::Table);
         let mut seen = smallvec![];
         for set_column in set_clause
             .set_column_list()
@@ -14530,12 +14826,23 @@ impl Lowerer {
                         if let Some(target) = target {
                             self.lower_column_target(ExprContext::Update, target, &column_target);
                         }
+                        if let Some(table) = table
+                            && single
+                                .set_expr()
+                                .is_some_and(|set_expr| set_expr.default_token().is_none())
+                        {
+                            self.check_generated_column_update(table, &column_target);
+                        }
                     }
                     if let Some(expr) = single.set_expr().and_then(|set_expr| set_expr.expr()) {
                         self.lower_expr_in(ExprContext::Update, &expr);
                     }
                 }
                 ast::SetColumn::SetMultipleColumns(multiple) => {
+                    let mut set_exprs = multiple
+                        .set_expr_list()
+                        .into_iter()
+                        .flat_map(|list| list.set_exprs());
                     for column_target in multiple
                         .column_target_list()
                         .into_iter()
@@ -14544,6 +14851,14 @@ impl Lowerer {
                         self.check_duplicate_assignment(&mut seen, &column_target);
                         if let Some(target) = target {
                             self.lower_column_target(ExprContext::Update, target, &column_target);
+                        }
+                        let default = set_exprs
+                            .next()
+                            .is_some_and(|set_expr| set_expr.default_token().is_some());
+                        if let Some(table) = table
+                            && !default
+                        {
+                            self.check_generated_column_update(table, &column_target);
                         }
                     }
                     if let Some(paren_select) = multiple.paren_select() {
@@ -14998,7 +15313,10 @@ impl Lowerer {
             .then(|| self.index.ctes[id].columns);
         if let Some(query) = with_table.query() {
             let recursive_cte = match kind {
-                CteKind::Recursive => column_list.is_none().then_some(id),
+                CteKind::Recursive => Some(RecursiveCte {
+                    id,
+                    column_list: column_list.is_some(),
+                }),
                 CteKind::NonRecursive => None,
             };
             let query = self.lower_with_query(&query, recursive_cte);
@@ -15090,7 +15408,7 @@ impl Lowerer {
     fn lower_with_query(
         &mut self,
         query: &ast::WithQuery,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         self.with_expr_context(ExprContext::Unrestricted, |this| {
             this.lower_with_query_inner(query, recursive_cte)
@@ -15100,7 +15418,7 @@ impl Lowerer {
     fn lower_with_query_inner(
         &mut self,
         query: &ast::WithQuery,
-        recursive_cte: Option<CteId>,
+        recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
         let select = match query.clone() {
             ast::WithQuery::Delete(delete) => return self.lower_delete(&delete),
@@ -17119,12 +17437,15 @@ impl Lowerer {
                 }
             }
             Some(ast::AlterColumnOption::AddGenerated(add_generated)) => {
-                self.lower_identity(
-                    table,
-                    Some(column),
-                    add_generated.sequence_option_list(),
-                    add_generated.syntax(),
-                );
+                if let Some(when) = add_generated.generated_when() {
+                    self.lower_identity(
+                        table,
+                        Some(column),
+                        when.into(),
+                        add_generated.sequence_option_list(),
+                        add_generated.syntax(),
+                    );
+                }
             }
             Some(ast::AlterColumnOption::SetSequenceOption(set_option)) => {
                 if let Some(option) = set_option.sequence_option() {
@@ -17139,9 +17460,22 @@ impl Lowerer {
                                 self.lower_sequence_option(&option);
                             }
                         }
-                        ast::SetGeneratedOption::Restart(_)
-                        | ast::SetGeneratedOption::SetGenerated(_) => {}
+                        ast::SetGeneratedOption::SetGenerated(set_generated) => {
+                            if let Some(table) = table
+                                && let Some(when) = set_generated.generated_when()
+                            {
+                                self.set_identity_kind(table, column, when.into());
+                            }
+                        }
+                        ast::SetGeneratedOption::Restart(_) => {}
                     }
+                }
+            }
+            Some(ast::AlterColumnOption::SetGenerated(set_generated)) => {
+                if let Some(table) = table
+                    && let Some(when) = set_generated.generated_when()
+                {
+                    self.set_identity_kind(table, column, when.into());
                 }
             }
             Some(ast::AlterColumnOption::DropIdentity(drop_identity)) => {
@@ -17169,7 +17503,6 @@ impl Lowerer {
                 | ast::AlterColumnOption::ResetOptions(_)
                 | ast::AlterColumnOption::Restart(_)
                 | ast::AlterColumnOption::SetCompression(_)
-                | ast::AlterColumnOption::SetGenerated(_)
                 | ast::AlterColumnOption::SetOptions(_)
                 | ast::AlterColumnOption::SetOptionsList(_)
                 | ast::AlterColumnOption::SetStatistics(_)
@@ -17177,6 +17510,30 @@ impl Lowerer {
             )
             | None => {}
         }
+    }
+
+    fn set_identity_kind(&mut self, table: TableId, column: Name, kind: IdentityKind) {
+        let Some(sequence) = self.identity_sequence(table, column) else {
+            return;
+        };
+        let Some(owner) = self.index.tables[sequence].sequence_owner else {
+            return;
+        };
+        self.index.tables.set_sequence_owner(
+            sequence,
+            Some(SequenceOwner {
+                identity: Some(kind),
+                ..owner
+            }),
+        );
+        if self.in_transaction() {
+            self.undo.push(Undo::SequenceOwner(sequence, owner));
+        }
+    }
+
+    fn identity_kind_of(&self, table: TableId, column: Name) -> Option<IdentityKind> {
+        let sequence = self.identity_sequence(table, column)?;
+        self.index.tables[sequence].sequence_owner?.identity
     }
 
     fn identity_sequence(&self, table: TableId, column: Name) -> Option<TableId> {
@@ -17187,7 +17544,7 @@ impl Lowerer {
             .find(|id| {
                 self.index.tables[*id]
                     .sequence_owner
-                    .is_some_and(|owner| owner.column == column && owner.identity)
+                    .is_some_and(|owner| owner.column == column && owner.identity.is_some())
                     && !self.dropped_tables.contains(id)
             })
     }
@@ -19485,12 +19842,15 @@ impl Lowerer {
                 }
             }
             Some(ast::GeneratedAs::GeneratedIdentity(identity)) => {
-                self.lower_identity(
-                    table,
-                    column,
-                    identity.sequence_option_list(),
-                    identity.syntax(),
-                );
+                if let Some(when) = identity.generated_when() {
+                    self.lower_identity(
+                        table,
+                        column,
+                        when.into(),
+                        identity.sequence_option_list(),
+                        identity.syntax(),
+                    );
+                }
             }
             None => {}
         }
@@ -26601,6 +26961,42 @@ fn call_field_base(base: &ast::Expr) -> Option<ast::CallExpr> {
         Some(call)
     } else {
         None
+    }
+}
+
+fn output_expr(query: &ast::SelectVariant, position: usize) -> Option<ast::Expr> {
+    match query {
+        ast::SelectVariant::Select(select) => select
+            .select_clause()?
+            .target_list()?
+            .targets()
+            .nth(position)?
+            .expr(),
+        ast::SelectVariant::Values(values) => {
+            values.row_list()?.rows().next()?.exprs().nth(position)
+        }
+        ast::SelectVariant::ParenSelect(paren) => output_expr(&paren.select()?, position),
+        ast::SelectVariant::CompoundSelect(_)
+        | ast::SelectVariant::SelectInto(_)
+        | ast::SelectVariant::Table(_) => None,
+    }
+}
+
+fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> bool {
+    match query {
+        ast::SelectVariant::Select(select) => select
+            .select_clause()
+            .and_then(|clause| clause.target_list())
+            .and_then(|list| list.targets().nth(position))
+            .and_then(|target| target.expr())
+            .is_some_and(|expr| is_unknown_literal_expr(&expr)),
+        ast::SelectVariant::ParenSelect(paren) => paren
+            .select()
+            .is_some_and(|inner| output_is_unknown_literal(&inner, position)),
+        ast::SelectVariant::Values(_)
+        | ast::SelectVariant::CompoundSelect(_)
+        | ast::SelectVariant::SelectInto(_)
+        | ast::SelectVariant::Table(_) => false,
     }
 }
 
