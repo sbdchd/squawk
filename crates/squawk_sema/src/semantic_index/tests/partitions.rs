@@ -10,7 +10,7 @@ create server s foreign data wrapper w;
 create table p (a int, b text) partition by range (a);
 create table c partition of p for values from (minvalue) to (10);
 select a, b, nope from c;
-create table d partition of p (b) for values from (10) to (MAXVALUE);
+create table d partition of p (b) for values from (10) to (20);
 select a, b, nope2 from d;
 create table e partition of nope3 default;
 select x from e;
@@ -419,4 +419,115 @@ alter table pt rename column kk to k2;
 rollback;
 alter table pt add unique (kk, v);
 "), @"no diagnostics");
+}
+
+#[test]
+fn overlapping_partitions() {
+    assert_snapshot!(check("
+create table pt (k int) partition by range (k);
+create table pc partition of pt for values from (1) to (10);
+create table pc2 partition of pt for values from (5) to (15);
+create table pc3 partition of pt for values from (10) to (20);
+create table pc4 partition of pt for values from (minvalue) to (1);
+create table pc5 partition of pt for values from (-5) to (0);
+create table pd partition of pt default;
+create table pd2 partition of pt default;
+create table pl (k int) partition by list (k);
+create table pl1 partition of pl for values in (1, 2);
+create table pl2 partition of pl for values in (2, '3');
+create table pl3 partition of pl for values in ('3');
+create table ph (k int) partition by hash (k);
+create table ph1 partition of ph for values with (modulus 4, remainder 1);
+create table ph2 partition of ph for values with (modulus 8, remainder 5);
+create table ph3 partition of ph for values with (modulus 8, remainder 3);
+create table ph4 partition of ph for values with (modulus 4, remainder 1);
+create table pt2 (k text) partition by list (k);
+create table pt2a partition of pt2 for values in ('a');
+create table pt2b partition of pt2 for values in ('a');
+create table pm (a int, b int) partition by range (a, b);
+create table pm1 partition of pm for values from (1, 1) to (1, 10);
+create table pm2 partition of pm for values from (1, 10) to (2, 0);
+create table pm3 partition of pm for values from (1, 5) to (1, 6);
+create table loose (k int);
+alter table pt attach partition loose for values from (12) to (13);
+alter table pt detach partition pc;
+create table pc6 partition of pt for values from (1) to (10);
+create table pr (k text) partition by range (k);
+create table pr1 partition of pr for values from ('a') to ('m');
+create table pr2 partition of pr for values from ('b') to ('c');
+"), @"
+    error: partition `pc2` would overlap partition `pc`
+      ╭▸ 
+    4 │ create table pc2 partition of pt for values from (5) to (15);
+      ╰╴                                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: partition `pc5` would overlap partition `pc4`
+      ╭▸ 
+    7 │ create table pc5 partition of pt for values from (-5) to (0);
+      ╰╴                                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: partition `pd2` conflicts with existing default partition `pd`
+      ╭▸ 
+    9 │ create table pd2 partition of pt default;
+      ╰╴                                 ━━━━━━━
+    error: partition `pl2` would overlap partition `pl1`
+       ╭▸ 
+    12 │ create table pl2 partition of pl for values in (2, '3');
+       ╰╴                                 ━━━━━━━━━━━━━━━━━━━━━━
+    error: partition `ph2` would overlap partition `ph1`
+       ╭▸ 
+    16 │ create table ph2 partition of ph for values with (modulus 8, remainder 5);
+       ╰╴                                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: partition `ph4` would overlap partition `ph1`
+       ╭▸ 
+    18 │ create table ph4 partition of ph for values with (modulus 4, remainder 1);
+       ╰╴                                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: partition `pt2b` would overlap partition `pt2a`
+       ╭▸ 
+    21 │ create table pt2b partition of pt2 for values in ('a');
+       ╰╴                                   ━━━━━━━━━━━━━━━━━━━
+    error: partition `pm3` would overlap partition `pm1`
+       ╭▸ 
+    25 │ create table pm3 partition of pm for values from (1, 5) to (1, 6);
+       ╰╴                                 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: partition `loose` would overlap partition `pc3`
+       ╭▸ 
+    27 │ alter table pt attach partition loose for values from (12) to (13);
+       ╰╴                                      ━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn overlapping_text_list_partitions() {
+    assert_snapshot!(check("
+create table tl (k text) partition by list (k);
+create table tl1
+  partition of tl
+  for values in (
+    'a'
+    'b'
+  );
+create table tl2
+  partition of tl
+  for values in ('a');
+create table tl3
+  partition of tl
+  for values in ('it''s');
+create table tl4
+  partition of tl
+  for values in ('it''s');
+create table tl5
+  partition of tl
+  for values in (e'x');
+create table tl6
+  partition of tl
+  for values in ('x');
+"), @"
+    error: partition `tl4` would overlap partition `tl3`
+       ╭▸ 
+    17 │   for values in ('it''s');
+       ╰╴  ━━━━━━━━━━━━━━━━━━━━━━━
+    error: partition `tl6` would overlap partition `tl5`
+       ╭▸ 
+    23 │   for values in ('x');
+       ╰╴  ━━━━━━━━━━━━━━━━━━━
+    ");
 }

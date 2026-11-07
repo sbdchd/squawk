@@ -288,7 +288,9 @@ pub(crate) enum SemaError {
         construct: SetReturningConstruct,
     },
     SetReturningFunctionNotTopLevel,
-    EmptyArrayType,
+    EmptyArrayType {
+        cast: Option<TyName>,
+    },
     TablesampleSetArgument,
     MisplacedSubquery {
         context: ExprContext,
@@ -794,6 +796,11 @@ pub(crate) enum SemaError {
     CannotCast {
         source: TyName,
         target: TyName,
+    },
+    OverlappingPartition {
+        partition: Name,
+        existing: Name,
+        default: bool,
     },
     AssignmentTypeMismatch {
         column: Name,
@@ -1399,7 +1406,7 @@ impl SemaError {
             | SemaError::SetReturningFunctionIn { .. }
             | SemaError::SetReturningFunctionNotTopLevel => DiagnosticKind::FeatureNotSupported,
             SemaError::TablesampleSetArgument => DiagnosticKind::TypeMismatch,
-            SemaError::EmptyArrayType => DiagnosticKind::IndeterminateType,
+            SemaError::EmptyArrayType { .. } => DiagnosticKind::IndeterminateType,
             SemaError::MisplacedSubquery { .. }
             | SemaError::DefaultColumnReference
             | SemaError::UnnestColumnDefList
@@ -1503,6 +1510,7 @@ impl SemaError {
             SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
                 DiagnosticKind::TypeMismatch
             }
+            SemaError::OverlappingPartition { .. } => DiagnosticKind::InvalidTableDefinition,
             SemaError::AlterColumnTypeWithoutUsing { .. }
             | SemaError::CannotCast { .. }
             | SemaError::AssignmentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
@@ -1758,6 +1766,17 @@ impl SemaError {
                     },
                 }
             }
+            SemaError::EmptyArrayType { cast: Some(ty) } => {
+                let suffix = if ty.array { "[]" } else { "" };
+                let ty = format!("{}{suffix}", names.resolve(ty.name));
+                Suggestion {
+                    message: "cast the empty array to the column's type".into(),
+                    fix: Fix {
+                        title: format!("Cast to `{ty}`").into(),
+                        edits: vec![Edit::insert(format!("::{ty}"), range.end())],
+                    },
+                }
+            }
             SemaError::AssignmentTypeMismatch {
                 column_ty,
                 cast: Some(AssignmentCast { parens }),
@@ -2000,7 +2019,7 @@ impl SemaError {
             SemaError::NoDefaultOperatorClass { .. } => Some(
                 "specify an operator class for the index or define a default operator class for the data type",
             ),
-            SemaError::EmptyArrayType => Some(
+            SemaError::EmptyArrayType { cast: None } => Some(
                 "explicitly cast to the desired type, for example `array[]::integer[]`",
             ),
             SemaError::SetReturningFunctionIn { .. } => Some(
@@ -2621,7 +2640,7 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::TablesampleSetArgument => {
                 f.write_str("argument of `tablesample` must not return a set")
             }
-            SemaError::EmptyArrayType => f.write_str("cannot determine type of empty array"),
+            SemaError::EmptyArrayType { .. } => f.write_str("cannot determine type of empty array"),
             SemaError::MisplacedSubquery { context } => write!(
                 f,
                 "cannot use subquery in {}",
@@ -3125,6 +3144,26 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(column_ty),
                 if default { "default " } else { "" },
                 self.ty(expr_ty)
+            ),
+            SemaError::OverlappingPartition {
+                partition,
+                existing,
+                default: false,
+            } => write!(
+                f,
+                "partition `{}` would overlap partition `{}`",
+                n(partition),
+                n(existing)
+            ),
+            SemaError::OverlappingPartition {
+                partition,
+                existing,
+                default: true,
+            } => write!(
+                f,
+                "partition `{}` conflicts with existing default partition `{}`",
+                n(partition),
+                n(existing)
             ),
             SemaError::CannotCast { source, target } => write!(
                 f,

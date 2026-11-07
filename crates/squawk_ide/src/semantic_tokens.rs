@@ -316,6 +316,12 @@ impl Highlighter<'_> {
         let Some(token_type) = lexical_token_type(token.kind()) else {
             return;
         };
+        let token_type = if token_type == SemanticTokenType::Keyword && keyword_used_as_name(token)
+        {
+            SemanticTokenType::NameRef
+        } else {
+            token_type
+        };
         let range = token.text_range();
         if let Some(body) = token
             .parent()
@@ -473,6 +479,24 @@ impl Highlighter<'_> {
     fn original_range(&self, file_id: IrFileId, range: TextRange) -> TextRange {
         self.index.range(InIrFile::new(file_id, range)).value
     }
+}
+
+fn keyword_used_as_name(token: &SyntaxToken) -> bool {
+    token.parent().is_some_and(|parent| {
+        matches!(
+            parent.kind(),
+            SyntaxKind::ATTRIBUTE_NAME
+                | SyntaxKind::ATTRIBUTE_NAMESPACE
+                | SyntaxKind::COPY_OPTION_KEY
+                | SyntaxKind::ELEMENT_TAG
+                | SyntaxKind::EXPLAIN_OPTION_NAME
+                | SyntaxKind::FOREIGN_OPTION_NAME
+                | SyntaxKind::GRANT_ROLE_OPTION_NAME
+                | SyntaxKind::OPTION_ITEM_KEY
+                | SyntaxKind::VACUUM_OPTION_NAME
+                | SyntaxKind::XML_PI_TARGET
+        )
+    })
 }
 
 fn lexical_token_type(kind: SyntaxKind) -> Option<SemanticTokenType> {

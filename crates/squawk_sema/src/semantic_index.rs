@@ -202,6 +202,14 @@ impl Errors {
         self.entries.len()
     }
 
+    pub(crate) fn set_empty_array_cast(&mut self, range: FileRange, ty: TyName) {
+        if let Some(entry) = self.entries.iter_mut().rev().find(|entry| {
+            entry.range == range && matches!(entry.error, SemaError::EmptyArrayType { .. })
+        }) {
+            entry.error = SemaError::EmptyArrayType { cast: Some(ty) };
+        }
+    }
+
     pub(crate) fn shrink_to_fit(&mut self) {
         self.entries.shrink_to_fit();
         self.args.shrink_to_fit();
