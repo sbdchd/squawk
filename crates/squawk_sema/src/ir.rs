@@ -742,8 +742,14 @@ pub struct Function {
     pub params: IdxRange<Param>,
     pub direct_args: Option<usize>,
     pub ret: Option<Ty>,
-    pub(crate) returns_set: bool,
+    pub(crate) returns: ReturnKind,
     pub columns: Option<Columns>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ReturnKind {
+    Single,
+    Set,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

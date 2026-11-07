@@ -5051,10 +5051,11 @@ fn opt_with_params(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 // [ INCLUDE ( column_name [, ... ] ) ]
 // [ WITH ( storage_parameter [= value] [, ... ] ) ]
 // [ USING INDEX TABLESPACE tablespace_name ]
-fn opt_index_parameters(p: &mut Parser<'_>) {
-    opt_include_columns(p);
-    opt_with_params(p);
-    if p.at(USING_KW) {
+fn opt_index_parameters(p: &mut Parser<'_>) -> bool {
+    let include = opt_include_columns(p).is_some();
+    let with = opt_with_params(p).is_some();
+    let using = p.at(USING_KW);
+    if using {
         let m = p.start();
         p.bump(USING_KW);
         p.expect(INDEX_KW);
@@ -5062,6 +5063,7 @@ fn opt_index_parameters(p: &mut Parser<'_>) {
         tablespace_ref(p);
         m.complete(p, CONSTRAINT_INDEX_TABLESPACE);
     }
+    include || with || using
 }
 
 // referential_action in a FOREIGN KEY/REFERENCES constraint is:
@@ -5237,9 +5239,12 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
         UNIQUE_KW => {
             p.bump(UNIQUE_KW);
             let m = p.start();
-            opt_nulls_not_distinct(p);
-            opt_index_parameters(p);
-            m.complete(p, INDEX_PARAMETERS);
+            let nulls = opt_nulls_not_distinct(p).is_some();
+            if opt_index_parameters(p) || nulls {
+                m.complete(p, INDEX_PARAMETERS);
+            } else {
+                m.abandon(p);
+            }
             UNIQUE_CONSTRAINT
         }
         // PRIMARY KEY index_parameters
@@ -5247,8 +5252,11 @@ fn opt_constraint_inner(p: &mut Parser<'_>) -> Option<SyntaxKind> {
             p.bump(PRIMARY_KW);
             p.expect(KEY_KW);
             let m = p.start();
-            opt_index_parameters(p);
-            m.complete(p, INDEX_PARAMETERS);
+            if opt_index_parameters(p) {
+                m.complete(p, INDEX_PARAMETERS);
+            } else {
+                m.abandon(p);
+            }
             PRIMARY_KEY_CONSTRAINT
         }
         // REFERENCES reftable [ ( refcolumn ) ] [ MATCH FULL | MATCH PARTIAL | MATCH SIMPLE ]
@@ -5735,7 +5743,7 @@ fn table_constraint(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, kind)
 }
 
-fn opt_nulls_not_distinct(p: &mut Parser<'_>) {
+fn opt_nulls_not_distinct(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if p.eat(NULLS_KW) {
         let kind = if p.eat(NOT_KW) {
@@ -5744,9 +5752,10 @@ fn opt_nulls_not_distinct(p: &mut Parser<'_>) {
             NULLS_DISTINCT
         };
         p.eat(DISTINCT_KW);
-        m.complete(p, kind);
+        Some(m.complete(p, kind))
     } else {
         m.abandon(p);
+        None
     }
 }
 

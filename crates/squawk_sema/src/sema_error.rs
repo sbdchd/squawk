@@ -4,7 +4,8 @@ use std::fmt::{self, Write};
 use crate::arena::IdxRange;
 use crate::interner::{Interner, Name};
 use crate::ir::{
-    AccessMethodKind, ReferenceKind, Resolution, RoutineKind, TableKind, TextSearchKind, TypeKind,
+    AccessMethodKind, ReferenceKind, Resolution, ReturnKind, RoutineKind, TableKind,
+    TextSearchKind, TypeKind,
 };
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::{TextRange, TextSize};
@@ -96,6 +97,12 @@ pub(crate) enum ArgLabel {
 pub(crate) struct ErrorParam {
     pub(crate) name: Option<Name>,
     pub(crate) position: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ErrorReturnType {
+    pub(crate) ty: TyName,
+    pub(crate) kind: ReturnKind,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -564,6 +571,17 @@ pub(crate) enum SemaError {
         column: Name,
         relation: Name,
     },
+    IdentityColumnDefault {
+        column: Name,
+        relation: Name,
+        change: DefaultChange,
+    },
+    GeneratedColumnDefault {
+        column: Name,
+        relation: Name,
+        change: DefaultChange,
+        kind: GeneratedKind,
+    },
     ConstraintTrigger {
         name: Name,
         relation: Name,
@@ -626,6 +644,10 @@ pub(crate) enum SemaError {
     KeywordArgType {
         keyword: &'static str,
         expected: TyName,
+        found: TyName,
+    },
+    QuantifiedNonArray {
+        quantifier: Quantifier,
         found: TyName,
     },
     NoDefaultOperatorClass {
@@ -706,6 +728,40 @@ pub(crate) enum SemaError {
         from: TyName,
         to: TyName,
     },
+    ReplaceFunctionReturnType {
+        from: ErrorReturnType,
+        to: ErrorReturnType,
+    },
+    ReplaceFunctionParamName {
+        name: Name,
+    },
+    ReplaceFunctionRemovesDefaults,
+    UniqueMissingPartitionColumn {
+        kind: UniqueKind,
+        table: Name,
+        column: Name,
+    },
+    UniqueOnExpressionPartitionKey {
+        kind: UniqueKind,
+        table: Name,
+    },
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum UniqueKind {
+    PrimaryKey,
+    Unique,
+    UniqueIndex,
+}
+
+impl UniqueKind {
+    fn label(self) -> &'static str {
+        match self {
+            UniqueKind::PrimaryKey => "primary key",
+            UniqueKind::Unique => "unique constraint",
+            UniqueKind::UniqueIndex => "unique index",
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -719,6 +775,18 @@ pub(crate) struct ViewColumnRename {
 pub(crate) enum TruncateCascade {
     Insert(TextSize),
     ReplaceRestrict(TextRange),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum DefaultChange {
+    Set,
+    Drop,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum GeneratedKind {
+    Stored,
+    Virtual,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -746,6 +814,23 @@ impl Comparison {
             Comparison::In => "`in` compares each element using `=`",
             Comparison::NotIn => "`not in` compares each element using `<>`",
             Comparison::Using => "`using` compares the joined columns using `=`",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Quantifier {
+    Any,
+    Some,
+    All,
+}
+
+impl Quantifier {
+    fn keyword(self) -> &'static str {
+        match self {
+            Quantifier::Any => "any",
+            Quantifier::Some => "some",
+            Quantifier::All => "all",
         }
     }
 }
@@ -1227,6 +1312,13 @@ impl SemaError {
             | SemaError::CannotRenameInheritedConstraint { .. } => {
                 DiagnosticKind::InvalidTableDefinition
             }
+            SemaError::ReplaceFunctionReturnType { .. }
+            | SemaError::ReplaceFunctionParamName { .. }
+            | SemaError::ReplaceFunctionRemovesDefaults => DiagnosticKind::IncompatibleReplacement,
+            SemaError::UniqueMissingPartitionColumn { .. }
+            | SemaError::UniqueOnExpressionPartitionKey { .. } => {
+                DiagnosticKind::InvalidTableDefinition
+            }
             SemaError::NestedWindow
             | SemaError::WindowWithoutOver { .. }
             | SemaError::MisplacedWindow { .. }
@@ -1314,6 +1406,9 @@ impl SemaError {
             | SemaError::CannotOpenIndex { .. }
             | SemaError::CannotCreateIndex { .. } => DiagnosticKind::WrongRelationKind,
             SemaError::NotIdentityColumn { .. } => DiagnosticKind::NotIdentityColumn,
+            SemaError::IdentityColumnDefault { .. } | SemaError::GeneratedColumnDefault { .. } => {
+                DiagnosticKind::ColumnDefaultNotAllowed
+            }
             SemaError::ConstraintTrigger { .. } => DiagnosticKind::ReplaceConstraintTrigger,
             SemaError::DropReturnRule { .. } => DiagnosticKind::DropReturnRule,
             SemaError::MultiplePrimaryKeys { .. } => DiagnosticKind::MultiplePrimaryKeys,
@@ -1350,6 +1445,7 @@ impl SemaError {
             SemaError::MissingArrayType { .. } => DiagnosticKind::MissingArrayType,
             SemaError::NoDefaultOperatorClass { .. } => DiagnosticKind::MissingDefaultOperatorClass,
             SemaError::KeywordArgType { .. } => DiagnosticKind::TypeMismatch,
+            SemaError::QuantifiedNonArray { .. } => DiagnosticKind::TypeMismatch,
             SemaError::NonBoolComparison { .. } => DiagnosticKind::TypeMismatch,
             SemaError::TriggerReturnType { .. } | SemaError::OutParamResultType { .. } => {
                 DiagnosticKind::WrongReturnType
@@ -1786,6 +1882,23 @@ impl SemaError {
             SemaError::CannotOpenIndex { .. } => {
                 Some("this operation is not supported for indexes")
             }
+            SemaError::IdentityColumnDefault {
+                change: DefaultChange::Drop,
+                ..
+            } => {
+                Some("use `drop identity` instead")
+            }
+            SemaError::GeneratedColumnDefault {
+                change: DefaultChange::Set,
+                ..
+            } => {
+                Some("use `set expression` instead")
+            }
+            SemaError::GeneratedColumnDefault {
+                change: DefaultChange::Drop,
+                kind: GeneratedKind::Stored,
+                ..
+            } => Some("use `drop expression` instead"),
             SemaError::WindowFrameCopy { hint, .. } => {
                 hint.then_some("omit the parentheses in this `over` clause")
             }
@@ -1852,6 +1965,11 @@ impl SemaError {
             SemaError::CompositeTypeAlteredAsTable {
                 table_range: None, ..
             } => Some("use `alter type` instead"),
+            SemaError::ReplaceFunctionReturnType { .. }
+            | SemaError::ReplaceFunctionParamName { .. }
+            | SemaError::ReplaceFunctionRemovesDefaults => {
+                Some("drop the existing function first, then create it again")
+            }
             SemaError::ViewColumnRenamed { rename: None, .. } => Some(
                 "use `alter view ... rename column ...` to change the name of a view column instead",
             ),
@@ -2120,6 +2238,16 @@ impl ErrorMessage<'_> {
         fmt::from_fn(move |f| {
             let suffix = if ty.array { "[]" } else { "" };
             write!(f, "{}{suffix}", self.names.resolve(ty.name))
+        })
+    }
+
+    fn return_ty(&self, ret: ErrorReturnType) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            let prefix = match ret.kind {
+                ReturnKind::Single => "",
+                ReturnKind::Set => "setof ",
+            };
+            write!(f, "{prefix}{}", self.ty(ret.ty))
         })
     }
 
@@ -2757,6 +2885,35 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(function),
                 self.ty(ty)
             ),
+            SemaError::ReplaceFunctionReturnType { from, to } => write!(
+                f,
+                "cannot change return type of existing function from `{}` to `{}`",
+                self.return_ty(from),
+                self.return_ty(to)
+            ),
+            SemaError::ReplaceFunctionParamName { name } => {
+                write!(f, "cannot change name of input parameter `{}`", n(name))
+            }
+            SemaError::ReplaceFunctionRemovesDefaults => {
+                write!(f, "cannot remove parameter defaults from existing function")
+            }
+            SemaError::UniqueMissingPartitionColumn {
+                kind,
+                table,
+                column,
+            } => write!(
+                f,
+                "{} on partitioned table `{}` must include partition key column `{}`",
+                kind.label(),
+                n(table),
+                n(column)
+            ),
+            SemaError::UniqueOnExpressionPartitionKey { kind, table } => write!(
+                f,
+                "{} is not supported on partitioned table `{}` because its partition key contains expressions",
+                kind.label(),
+                n(table)
+            ),
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
                 f,
                 "cannot change type of view column `{}` from `{}` to `{}`",
@@ -2891,6 +3048,22 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(relation),
                 n(column)
             ),
+            SemaError::IdentityColumnDefault {
+                column, relation, ..
+            } => write!(
+                f,
+                "column `{}.{}` is an identity column",
+                n(relation),
+                n(column)
+            ),
+            SemaError::GeneratedColumnDefault {
+                column, relation, ..
+            } => write!(
+                f,
+                "column `{}.{}` is a generated column",
+                n(relation),
+                n(column)
+            ),
             SemaError::ConstraintTrigger { name, relation } => write!(
                 f,
                 "trigger `{}` for relation `{}` is a constraint trigger",
@@ -2956,6 +3129,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "argument of `{keyword}` must be type `{}`, not type `{}`",
                 self.ty(expected),
+                self.ty(found)
+            ),
+            SemaError::QuantifiedNonArray { quantifier, found } => write!(
+                f,
+                "argument of `{}` must be an array, not type `{}`",
+                quantifier.keyword(),
                 self.ty(found)
             ),
             SemaError::NoDefaultOperatorClass { ty, access_method } => write!(

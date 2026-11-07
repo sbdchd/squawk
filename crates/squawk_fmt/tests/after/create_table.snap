@@ -149,8 +149,8 @@ create table collate_between_constraints (
 -- preserve comments when collate follows or occurs between constraints
 create table extraordinarily_long_collated_column_clause_order (
   first_identifier /* before type */ varchar
-    /* before primary */ primary /* before key */ key /* before collate */
-    collate /* before collation */ "C",
+    /* before primary */ primary /* before key */ key
+    /* before collate */ collate /* before collation */ "C",
   second_identifier varchar /* before not */ not /* before null */ null
     /* before second collate */ collate /* before second collation */ "POSIX"
     /* before unique */ unique

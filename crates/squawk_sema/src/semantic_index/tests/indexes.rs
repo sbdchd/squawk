@@ -435,6 +435,10 @@ create index on t (s text_pattern_ops);
 alter table t add primary key (x);
 create extension btree_gin;
 create index on t using gin (s);
+create table e1 (j json, exclude using gist (j with =));
+create table e2 (p point, exclude using gist (p with ~=));
+create table e3 (j json, exclude (j with =));
+alter table t add exclude using gist (j with =);
 "), @"
     error: data type `json` has no default operator class for access method `btree`
        ╭▸ 
@@ -484,5 +488,35 @@ create index on t using gin (s);
        │                   ━━━━━━━━━━━━━━━
        │
        ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: data type `json` has no default operator class for access method `gist`
+       ╭▸ 
+    41 │ create table e1 (j json, exclude using gist (j with =));
+       │                                              ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: operator `=` does not exist
+       ╭▸ 
+    41 │ create table e1 (j json, exclude using gist (j with =));
+       ╰╴                                                    ━
+    error: data type `json` has no default operator class for access method `btree`
+       ╭▸ 
+    43 │ create table e3 (j json, exclude (j with =));
+       │                                   ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: operator `=` does not exist
+       ╭▸ 
+    43 │ create table e3 (j json, exclude (j with =));
+       ╰╴                                         ━
+    error: data type `json` has no default operator class for access method `gist`
+       ╭▸ 
+    44 │ alter table t add exclude using gist (j with =);
+       │                                       ━
+       │
+       ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: operator `=` does not exist
+       ╭▸ 
+    44 │ alter table t add exclude using gist (j with =);
+       ╰╴                                             ━
     ");
 }

@@ -4121,7 +4121,6 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -4181,8 +4180,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          WHITESPACE " "
-          INDEX_PARAMETERS
+        WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "
@@ -4240,8 +4238,7 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          WHITESPACE " "
-          INDEX_PARAMETERS
+        WHITESPACE " "
         REFERENCES_CONSTRAINT
           REFERENCES_KW "REFERENCES"
           WHITESPACE " "

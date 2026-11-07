@@ -243,3 +243,180 @@ truncate p, only p;
       ╰╴
     ");
 }
+
+#[test]
+fn unique_index_on_partitioned_table_missing_partition_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by range (k);
+create unique index on pt (v);
+create unique index on only pt (v);
+"), @"
+    error: unique index on partitioned table `pt` must include partition key column `k`
+      ╭▸ 
+    7 │ create unique index on pt (v);
+      ╰╴                          ━━━
+    error: unique index on partitioned table `pt` must include partition key column `k`
+      ╭▸ 
+    8 │ create unique index on only pt (v);
+      ╰╴                               ━━━
+    ");
+}
+
+#[test]
+fn unique_index_on_partitioned_table_include_does_not_cover_partition_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by range (k);
+create unique index on pt (v) include (k);
+"), @"
+    error: unique index on partitioned table `pt` must include partition key column `k`
+      ╭▸ 
+    7 │ create unique index on pt (v) include (k);
+      ╰╴                          ━━━
+    ");
+}
+
+#[test]
+fn unique_index_on_partitioned_table_expression_does_not_cover_partition_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by range (k);
+create unique index on pt ((k + 1), v);
+"), @"
+    error: unique index on partitioned table `pt` must include partition key column `k`
+      ╭▸ 
+    7 │ create unique index on pt ((k + 1), v);
+      ╰╴                          ━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn partial_unique_index_on_partitioned_table() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by hash (k);
+create unique index on pt (k) where v > 0;
+"), @"no diagnostics");
+}
+
+#[test]
+fn primary_key_on_partitioned_table_missing_partition_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by range (k);
+alter table pt add primary key (v);
+create table pt2 (
+  k int,
+  v int,
+  primary key (v)
+)
+  partition by list (k);
+"), @"
+    error: primary key on partitioned table `pt` must include partition key column `k`
+      ╭▸ 
+    7 │ alter table pt add primary key (v);
+      ╰╴                   ━━━━━━━━━━━━━━━
+    error: primary key on partitioned table `pt2` must include partition key column `k`
+       ╭▸ 
+    11 │   primary key (v)
+       ╰╴  ━━━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn unique_constraint_on_partitioned_table_missing_partition_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int unique
+)
+  partition by range (k);
+"), @"
+    error: unique constraint on partitioned table `pt` must include partition key column `k`
+      ╭▸ 
+    4 │   v int unique
+      ╰╴        ━━━━━━
+    ");
+}
+
+#[test]
+fn unique_constraint_on_partitioned_table_with_partition_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by range (k);
+alter table pt add unique (v, k);
+create table plain (k int unique);
+"), @"no diagnostics");
+}
+
+#[test]
+fn unique_constraint_on_partitioned_table_with_multi_column_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  j int,
+  v int
+)
+  partition by range (k, j);
+alter table pt add unique (k);
+alter table pt add unique (j, v, k);
+"), @"
+    error: unique constraint on partitioned table `pt` must include partition key column `j`
+      ╭▸ 
+    8 │ alter table pt add unique (k);
+      ╰╴                   ━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn unique_constraint_on_partitioned_table_with_expression_key() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by range ((k + 1));
+alter table pt add unique (k);
+"), @"
+    error: unique constraint is not supported on partitioned table `pt` because its partition key contains expressions
+      ╭▸ 
+    7 │ alter table pt add unique (k);
+      ╰╴                   ━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn unique_constraint_on_partitioned_table_after_partition_key_rename() {
+    assert_snapshot!(check("
+create table pt (
+  k int,
+  v int
+)
+  partition by hash (k);
+alter table pt rename column k to kk;
+alter table pt add primary key (kk);
+begin;
+alter table pt rename column kk to k2;
+rollback;
+alter table pt add unique (kk, v);
+"), @"no diagnostics");
+}

@@ -702,6 +702,8 @@ insert into pg_class (oid) values (1) on conflict do nothing;
 insert into pg_catalog.pg_namespace (oid, nspname) values (1, 'x') on conflict (oid) do nothing;
 
 insert into information_schema.sql_features (feature_id) values ('x') on conflict do nothing;
+insert into information_schema.sql_features (feature_id) values ('x') on conflict (feature_id) do nothing;
+insert into pg_catalog.pg_namespace (oid, nspname) values (1, 'x') on conflict (nspowner) do nothing;
 
 create table pg_catalog.mine (a int);
 insert into pg_catalog.mine values (1) on conflict do nothing;
@@ -713,6 +715,14 @@ insert into pg_catalog.mine values (1) on conflict do nothing;
     error: `on conflict` is not supported with system catalog tables
       ╭▸ 
     4 │ insert into pg_catalog.pg_namespace (oid, nspname) values (1, 'x') on conflict (oid) do nothing;
+      ╰╴                                                                   ━━━━━━━━━━━
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+      ╭▸ 
+    7 │ insert into information_schema.sql_features (feature_id) values ('x') on conflict (feature_id) do nothing;
+      ╰╴                                                                                  ━━━━━━━━━━━━
+    error: `on conflict` is not supported with system catalog tables
+      ╭▸ 
+    8 │ insert into pg_catalog.pg_namespace (oid, nspname) values (1, 'x') on conflict (nspowner) do nothing;
       ╰╴                                                                   ━━━━━━━━━━━
     ");
 }

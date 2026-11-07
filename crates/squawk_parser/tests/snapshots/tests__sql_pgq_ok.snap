@@ -71,7 +71,6 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -120,7 +119,6 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -167,7 +165,6 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -208,7 +205,6 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -295,7 +291,6 @@ SOURCE_FILE
           PRIMARY_KW "PRIMARY"
           WHITESPACE " "
           KEY_KW "KEY"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n    "
       COLUMN
@@ -1190,7 +1185,6 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1248,7 +1242,6 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1288,7 +1281,6 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
@@ -1364,7 +1356,6 @@ SOURCE_FILE
           PRIMARY_KW "primary"
           WHITESPACE " "
           KEY_KW "key"
-          INDEX_PARAMETERS
       COMMA ","
       WHITESPACE "\n  "
       COLUMN
