@@ -123,66 +123,20 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 return Some((column, node));
             }
         }
-        ast::Type::BitType(bit_type) => {
-            return Some((
-                ColumnName::new_static("bit", unknown_column),
-                bit_type.syntax().clone(),
-            ));
-        }
-        ast::Type::BitVaryingType(bit_varying_type) => {
-            return Some((
-                ColumnName::new_static("varbit", unknown_column),
-                bit_varying_type.syntax().clone(),
-            ));
-        }
-        ast::Type::VarcharType(varchar_type) => {
-            return Some((
-                ColumnName::new_static("varchar", unknown_column),
-                varchar_type.syntax().clone(),
-            ));
-        }
-        ast::Type::CharacterType(character_type) => {
-            return Some((
-                ColumnName::new_static("bpchar", unknown_column),
-                character_type.syntax().clone(),
-            ));
-        }
-        ast::Type::DoubleType(double_type) => {
-            return Some((
-                ColumnName::new_static("float8", unknown_column),
-                double_type.syntax().clone(),
-            ));
-        }
-        ast::Type::IntervalType(interval_type) => {
-            return Some((
-                ColumnName::new_static("interval", unknown_column),
-                interval_type.syntax().clone(),
-            ));
-        }
-        ast::Type::TimeType(time_type) => {
-            let name = if matches!(time_type.timezone(), Some(ast::Timezone::WithTimezone(_))) {
-                "timetz"
-            } else {
-                "time"
-            };
-            return Some((
-                ColumnName::new_static(name, unknown_column),
-                time_type.syntax().clone(),
-            ));
-        }
-        ast::Type::TimestampType(timestamp_type) => {
-            let name = if matches!(
-                timestamp_type.timezone(),
-                Some(ast::Timezone::WithTimezone(_))
-            ) {
-                "timestamptz"
-            } else {
-                "timestamp"
-            };
-            return Some((
-                ColumnName::new_static(name, unknown_column),
-                timestamp_type.syntax().clone(),
-            ));
+        ast::Type::BitType(_)
+        | ast::Type::BitVaryingType(_)
+        | ast::Type::CharacterType(_)
+        | ast::Type::DoubleType(_)
+        | ast::Type::IntervalType(_)
+        | ast::Type::TimeType(_)
+        | ast::Type::TimestampType(_)
+        | ast::Type::VarcharType(_) => {
+            if let Some(name) = ty.builtin_type_name() {
+                return Some((
+                    ColumnName::new_static(name, unknown_column),
+                    ty.syntax().clone(),
+                ));
+            }
         }
         ast::Type::ArrayType(array_type) => {
             if let Some(inner_ty) = array_type.ty() {

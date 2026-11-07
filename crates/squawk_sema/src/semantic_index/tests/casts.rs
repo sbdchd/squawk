@@ -268,3 +268,71 @@ select '{}'::int[];
        ╰╴                ━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn function_style_cast() {
+    assert_snapshot!(check("
+create table c (a int);
+select text(1);
+select int4('1'::text);
+select regclass(1::oid);
+select int4('1');
+select int4(point(1, 1));
+select text(c) from c;
+"), @"
+    error: function `int4(point)` does not exist
+      ╭▸ 
+    7 │ select int4(point(1, 1));
+      │        ━━━━
+      │
+      ├ note: `int4(float8)` expects `float8` for argument 1, found `point`
+      ├ note: `int4(jsonb)` expects `jsonb` for argument 1, found `point`
+      ├ note: `int4(numeric)` expects `numeric` for argument 1, found `point`
+      ├ note: `int4(float4)` expects `float4` for argument 1, found `point`
+      ├ note: `int4(int2)` expects `int2` for argument 1, found `point`
+      ├ note: and 5 other candidates
+      ╰ hint: consider adding explicit type casts
+    error: function `text(c)` does not exist
+      ╭▸ 
+    8 │ select text(c) from c;
+      │        ━━━━
+      │
+      ├ note: `text(bool)` expects `bool` for argument 1, found `c`
+      ├ note: `text(bpchar)` expects `bpchar` for argument 1, found `c`
+      ├ note: `text(inet)` expects `inet` for argument 1, found `c`
+      ├ note: `text(name)` expects `name` for argument 1, found `c`
+      ├ note: `text(xml)` expects `xml` for argument 1, found `c`
+      ├ note: and 1 other candidate
+      ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn treat() {
+    assert_snapshot!(check("
+select treat(-5 as abs);
+select treat(1 as int4[]);
+select treat(1 as text);
+select treat(point(1, 1) as int4);
+select array_length(treat(1 as int4[]), 1);
+"), @"
+    error: function `pg_catalog.int4(point)` does not exist
+      ╭▸ 
+    5 │ select treat(point(1, 1) as int4);
+      │                             ━━━━
+      │
+      ├ note: `pg_catalog.int4(float8)` expects `float8` for argument 1, found `point`
+      ├ note: `pg_catalog.int4(jsonb)` expects `jsonb` for argument 1, found `point`
+      ├ note: `pg_catalog.int4(numeric)` expects `numeric` for argument 1, found `point`
+      ├ note: `pg_catalog.int4(float4)` expects `float4` for argument 1, found `point`
+      ├ note: `pg_catalog.int4(int2)` expects `int2` for argument 1, found `point`
+      ├ note: and 5 other candidates
+      ╰ hint: consider adding explicit type casts
+    error: argument 1 of `array_length` has type `int4`, expected `anyarray`
+      ╭▸ 
+    6 │ select array_length(treat(1 as int4[]), 1);
+      │                     ━━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}

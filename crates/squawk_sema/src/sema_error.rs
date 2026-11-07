@@ -120,6 +120,14 @@ pub(crate) struct ErrorCandidates {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ForeignKeyPair {
+    pub(crate) column: Name,
+    pub(crate) referenced_column: Name,
+    pub(crate) ty: TyName,
+    pub(crate) referenced_ty: TyName,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct ErrorCandidate {
     pub(crate) args: ErrorArgs,
     pub(crate) reason: Option<CandidateReason>,
@@ -688,10 +696,7 @@ pub(crate) enum SemaError {
     },
     ForeignKeyTypeMismatch {
         constraint: Name,
-        column: Name,
-        referenced_column: Name,
-        ty: TyName,
-        referenced_ty: TyName,
+        pairs: IdxRange<ForeignKeyPair>,
     },
     NonBoolComparison {
         comparison: Comparison,
@@ -780,6 +785,11 @@ pub(crate) enum SemaError {
     GeneratedColumnInsert {
         column: Name,
         identity: bool,
+    },
+    AlterColumnTypeWithoutUsing {
+        column: Name,
+        ty: TyName,
+        insert_at: Option<TextSize>,
     },
     DropColumnWithDependents {
         column: Name,
@@ -1477,6 +1487,7 @@ impl SemaError {
             SemaError::CompoundTypeMismatch { .. } | SemaError::RecursiveCteTypeMismatch { .. } => {
                 DiagnosticKind::TypeMismatch
             }
+            SemaError::AlterColumnTypeWithoutUsing { .. } => DiagnosticKind::TypeMismatch,
             SemaError::CompoundColumnCount { .. }
             | SemaError::ColumnListTooLong { .. }
             | SemaError::InsertMoreTargetsThanExpressions { .. }
@@ -1729,6 +1740,25 @@ impl SemaError {
                     },
                 }
             }
+            SemaError::AlterColumnTypeWithoutUsing {
+                column,
+                ty,
+                insert_at: Some(insert_at),
+            } => {
+                let suffix = if ty.array { "[]" } else { "" };
+                let using = format!(
+                    "using {}::{}{suffix}",
+                    quote_ident(names.resolve(column)),
+                    names.resolve(ty.name)
+                );
+                Suggestion {
+                    message: "convert the existing values with an explicit cast".into(),
+                    fix: Fix {
+                        title: format!("Insert `{using}`").into(),
+                        edits: vec![Edit::insert(format!(" {using}"), insert_at)],
+                    },
+                }
+            }
             SemaError::OrdinalityColumnDefList {
                 fix: Some(OrdinalityColumnDefListFix { call_range, alias }),
             } => {
@@ -1971,6 +2001,9 @@ impl SemaError {
             SemaError::DropColumnWithDependents { .. } => {
                 Some("use `drop column ... cascade` to drop the dependent objects too")
             }
+            SemaError::AlterColumnTypeWithoutUsing {
+                insert_at: None, ..
+            } => Some("add a `using` clause that converts the existing values"),
             SemaError::RecursiveCteTypeMismatch { .. } => {
                 Some("cast the output of the non-recursive term to the overall type")
             }
@@ -2263,19 +2296,15 @@ impl SemaError {
                 event.label(),
                 names.resolve(rule)
             )),
-            SemaError::ForeignKeyTypeMismatch {
-                column,
-                referenced_column,
-                ty,
-                referenced_ty,
-                ..
-            } => Cow::Owned(format!(
-                "key columns `{}` and `{}` are of incompatible types: `{}` and `{}`",
-                names.resolve(column),
-                names.resolve(referenced_column),
-                message.ty(ty),
-                message.ty(referenced_ty)
-            )),
+            SemaError::ForeignKeyTypeMismatch { pairs, .. } => {
+                return pairs
+                    .iter()
+                    .map(|pair| {
+                        let pair = errors.foreign_key_pairs[pair];
+                        Cow::Owned(message.foreign_key_pair(pair).to_string())
+                    })
+                    .collect();
+            }
             SemaError::ArgumentCountMismatch { missing, .. } if !missing.is_empty() => {
                 Cow::Owned(format!("missing {}", message.params(missing)))
             }
@@ -2366,6 +2395,25 @@ impl ErrorMessage<'_> {
                 write!(f, "{}", self.operand(arg.ty))?;
             }
             f.write_str(")")
+        })
+    }
+
+    fn foreign_key_pair(&self, pair: ForeignKeyPair) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            let ForeignKeyPair {
+                column,
+                referenced_column,
+                ty,
+                referenced_ty,
+            } = pair;
+            write!(
+                f,
+                "key columns `{}` and `{}` are of incompatible types: `{}` and `{}`",
+                self.names.resolve(column),
+                self.names.resolve(referenced_column),
+                self.ty(ty),
+                self.ty(referenced_ty)
+            )
         })
     }
 
@@ -3020,6 +3068,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 kind.label(),
                 n(table),
                 n(column)
+            ),
+            SemaError::AlterColumnTypeWithoutUsing { column, ty, .. } => write!(
+                f,
+                "column `{}` cannot be cast automatically to type `{}`",
+                n(column),
+                self.ty(ty)
             ),
             SemaError::DropColumnWithDependents { column, table, .. } => write!(
                 f,

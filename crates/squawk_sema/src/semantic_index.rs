@@ -27,7 +27,7 @@ use crate::qualified_index::{
     CollationIndex, ConversionIndex, FunctionIndex, OperatorClassIndex, OperatorFamilyIndex,
     OperatorIndex, TextSearchIndex,
 };
-use crate::sema_error::{ErrorArg, ErrorCandidate, ErrorParam, SemaError, TyName};
+use crate::sema_error::{ErrorArg, ErrorCandidate, ErrorParam, ForeignKeyPair, SemaError, TyName};
 use crate::statistics_index::StatisticsIndex;
 use crate::table_index::TableIndex;
 use crate::type_index::TypeIndex;
@@ -190,6 +190,7 @@ pub(crate) struct Errors {
     pub(crate) candidates: LayeredArena<ErrorCandidate>,
     pub(crate) params: LayeredArena<ErrorParam>,
     pub(crate) names: LayeredArena<Name>,
+    pub(crate) foreign_key_pairs: LayeredArena<ForeignKeyPair>,
 }
 
 impl Errors {
@@ -203,6 +204,7 @@ impl Errors {
         self.candidates.shrink_to_fit();
         self.params.shrink_to_fit();
         self.names.shrink_to_fit();
+        self.foreign_key_pairs.shrink_to_fit();
     }
 }
 
