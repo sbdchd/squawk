@@ -1209,3 +1209,46 @@ grant select on t to public;
     ";" @ 52..53: Punctuation
     "#);
 }
+
+#[test]
+fn keyword_option_names() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create type t (
+  input = textin,
+  output = textout
+);
+explain (
+  verbose, analyze
+)
+  select 1;
+set enable_seqscan = off;
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "type" @ 8..12: Keyword
+    "t" @ 13..14: Type (Definition)
+    "(" @ 15..16: Punctuation
+    "input" @ 19..24: NameRef
+    "=" @ 25..26: Operator
+    "textin" @ 27..33: Function
+    "," @ 33..34: Punctuation
+    "output" @ 37..43: NameRef
+    "=" @ 44..45: Operator
+    "textout" @ 46..53: Function
+    ")" @ 54..55: Punctuation
+    ";" @ 55..56: Punctuation
+    "explain" @ 57..64: Keyword
+    "(" @ 65..66: Punctuation
+    "verbose" @ 69..76: NameRef
+    "," @ 76..77: Punctuation
+    "analyze" @ 78..85: NameRef
+    ")" @ 86..87: Punctuation
+    "select" @ 90..96: Keyword
+    "1" @ 97..98: Number
+    ";" @ 98..99: Punctuation
+    "set" @ 100..103: Keyword
+    "enable_seqscan" @ 104..118: NameRef
+    "=" @ 119..120: Operator
+    "off" @ 121..124: Keyword
+    ";" @ 124..125: Punctuation
+    "#);
+}
