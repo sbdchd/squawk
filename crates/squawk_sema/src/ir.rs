@@ -504,6 +504,13 @@ pub(crate) enum CastContext {
     Explicit,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum CastMethod {
+    Function,
+    Binary,
+    InOut,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub(crate) struct CastTypes {
     pub(crate) source: Ty,
@@ -528,7 +535,7 @@ pub(crate) struct Cast {
     pub(crate) source: Ty,
     pub(crate) target: Ty,
     pub(crate) context: CastContext,
-    pub(crate) binary: bool,
+    pub(crate) method: CastMethod,
     #[expect(dead_code)]
     pub(crate) ptr: InIrFile<AstPtr<ast::CreateCast>>,
 }

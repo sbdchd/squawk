@@ -269,6 +269,15 @@ create operator = (
 );
 create table p (p point);
 select 1 from p where p in ('x');
+create function eqpp(point, point) returns int
+  language sql
+  return 1;
+create operator = (
+  leftarg = point,
+  rightarg = point,
+  function = eqpp
+);
+select 1 from p where p in (point '(1,1)', point '(2,2)');
 "), @"
     error: operator `int4 = text` must return type `bool`, not type `int4`
        ╭▸ 
@@ -304,6 +313,12 @@ select 1 from p where p in ('x');
        ╭▸ 
     33 │ select 1 from p where p in ('x');
        │                             ━━━
+       │
+       ╰ note: `in` compares each element using `=`
+    error: operator `point = point` must return type `bool`, not type `int4`
+       ╭▸ 
+    42 │ select 1 from p where p in (point '(1,1)', point '(2,2)');
+       │                            ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
        │
        ╰ note: `in` compares each element using `=`
     ");
