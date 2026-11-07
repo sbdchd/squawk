@@ -128,6 +128,16 @@ pub(crate) enum Coercion {
     Unknown,
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum CoercionPath {
+    Relabel,
+    Function,
+    ViaIo,
+    ArrayCoerce,
+    Missing,
+    Unknown,
+}
+
 fn cast_rank(context: CastContext) -> u8 {
     match context {
         CastContext::Implicit => 0,
@@ -661,19 +671,65 @@ impl<'a> Overloads<'a> {
     }
 
     pub(crate) fn coercion(&self, source: Ty, target: Ty, context: CastContext) -> Coercion {
+        match self.coercion_path(source, target, context) {
+            CoercionPath::Relabel
+            | CoercionPath::Function
+            | CoercionPath::ViaIo
+            | CoercionPath::ArrayCoerce => Coercion::Yes,
+            CoercionPath::Missing => Coercion::No,
+            CoercionPath::Unknown => Coercion::Unknown,
+        }
+    }
+
+    pub(crate) fn function_style_cast(&self, source: Ty, target: Ty) -> Coercion {
+        match self.coercion_path(source, target, CastContext::Explicit) {
+            CoercionPath::Relabel => Coercion::Yes,
+            CoercionPath::ViaIo => {
+                let composite_to_string = self.category(source) == Some(Category::Composite)
+                    && self.category(target) == Some(Category::String);
+                if composite_to_string {
+                    Coercion::No
+                } else {
+                    Coercion::Yes
+                }
+            }
+            CoercionPath::Function | CoercionPath::ArrayCoerce | CoercionPath::Missing => {
+                Coercion::No
+            }
+            CoercionPath::Unknown => Coercion::Unknown,
+        }
+    }
+
+    pub(crate) fn has_exact_match(
+        &self,
+        mut candidates: impl Iterator<Item = FunctionId>,
+        args: &[CallArg],
+    ) -> bool {
+        candidates.any(|id| {
+            self.bind(&self.index.functions[id], args)
+                .is_some_and(|params| {
+                    params.len() == args.len()
+                        && params.iter().zip(args).all(|(param, arg)| {
+                            matches!(arg.ty, ArgType::Known(ty) if *param == Some(ty))
+                        })
+                })
+        })
+    }
+
+    fn coercion_path(&self, source: Ty, target: Ty, context: CastContext) -> CoercionPath {
         if source == target {
-            return Coercion::Yes;
+            return CoercionPath::Relabel;
         }
         if self.pseudo(source).is_some() || self.pseudo(target).is_some() {
-            return Coercion::Unknown;
+            return CoercionPath::Unknown;
         }
         let (Some(source), Some(target)) =
             (self.index.base_type(source), self.index.base_type(target))
         else {
-            return Coercion::Unknown;
+            return CoercionPath::Unknown;
         };
         if source == target {
-            return Coercion::Yes;
+            return CoercionPath::Relabel;
         }
         if let Some(cast) = self
             .index
@@ -681,10 +737,13 @@ impl<'a> Overloads<'a> {
             .get(CastTypes { source, target })
             .find(|cast| !self.dropped_casts.contains(cast))
         {
-            return if cast_rank(self.index.casts[cast].context) <= cast_rank(context) {
-                Coercion::Yes
+            let cast = &self.index.casts[cast];
+            return if cast_rank(cast.context) > cast_rank(context) {
+                CoercionPath::Missing
+            } else if cast.binary {
+                CoercionPath::Relabel
             } else {
-                Coercion::No
+                CoercionPath::Function
             };
         }
         if !matches!(self.builtin_name(target), Some("int2vector" | "oidvector"))
@@ -693,16 +752,19 @@ impl<'a> Overloads<'a> {
                 self.index.element_type(target),
             )
         {
-            match self.coercion(source_element, target_element, context) {
-                Coercion::Yes => return Coercion::Yes,
-                Coercion::Unknown => return Coercion::Unknown,
-                Coercion::No => {}
+            match self.coercion_path(source_element, target_element, context) {
+                CoercionPath::Relabel
+                | CoercionPath::Function
+                | CoercionPath::ViaIo
+                | CoercionPath::ArrayCoerce => return CoercionPath::ArrayCoerce,
+                CoercionPath::Unknown => return CoercionPath::Unknown,
+                CoercionPath::Missing => {}
             }
         }
         let (Some(source_category), Some(target_category)) =
             (self.category(source), self.category(target))
         else {
-            return Coercion::Unknown;
+            return CoercionPath::Unknown;
         };
         let via_io = match context {
             CastContext::Implicit => false,
@@ -711,7 +773,11 @@ impl<'a> Overloads<'a> {
                 target_category == Category::String || source_category == Category::String
             }
         };
-        if via_io { Coercion::Yes } else { Coercion::No }
+        if via_io {
+            CoercionPath::ViaIo
+        } else {
+            CoercionPath::Missing
+        }
     }
 
     fn coerce(&self, arg: Ty, param: Ty) -> Option<Match> {

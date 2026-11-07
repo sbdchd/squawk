@@ -1614,6 +1614,27 @@ impl ast::Type {
         }
     }
 
+    pub fn builtin_type_name(&self) -> Option<&'static str> {
+        match self {
+            ast::Type::ArrayType(_) => None,
+            ast::Type::PathType(path_type) => path_type.keyword_type_name(),
+            ast::Type::BitType(_) => Some("bit"),
+            ast::Type::BitVaryingType(_) => Some("varbit"),
+            ast::Type::CharacterType(_) => Some("bpchar"),
+            ast::Type::DoubleType(_) => Some("float8"),
+            ast::Type::IntervalType(_) => Some("interval"),
+            ast::Type::TimeType(time) => match time.timezone() {
+                Some(ast::Timezone::WithTimezone(_)) => Some("timetz"),
+                Some(ast::Timezone::WithoutTimezone(_)) | None => Some("time"),
+            },
+            ast::Type::TimestampType(timestamp) => match timestamp.timezone() {
+                Some(ast::Timezone::WithTimezone(_)) => Some("timestamptz"),
+                Some(ast::Timezone::WithoutTimezone(_)) | None => Some("timestamp"),
+            },
+            ast::Type::VarcharType(_) => Some("varchar"),
+        }
+    }
+
     pub fn serial_type_name(&self) -> Option<&'static str> {
         let segment = self.path_ref()?.unqualified_segment()?;
         match segment.text().as_ref() {

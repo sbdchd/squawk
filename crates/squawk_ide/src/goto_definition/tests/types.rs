@@ -117,19 +117,43 @@ select mood$0 'happy';
 #[test]
 fn treat_type() {
     assert_snapshot!(goto("
+select treat(1 as text$0);
+"), @"
+    info: goto definition
+          ╭▸ file0.sql:2:19
+          │
+        2 │ select treat(1 as text);
+          │                   ──── 1. source
+          │
+          ⸬  builtins.sql:344:24
+          │
+      344 │ create type pg_catalog.text;
+          │                        ──── 2. destination
+          ‡
+    32396 │ create type pg_catalog.text (
+          ╰╴                       ──── 3. destination
+    ");
+}
+
+#[test]
+fn treat_function() {
+    assert_snapshot!(goto("
 create type mood as enum (
   'happy',
   'sad'
 );
+create function pg_catalog.mood(text) returns mood
+  language sql
+  as $$ select $1::mood $$;
 select treat('happy' as mood$0);
 "), @"
     info: goto definition
-      ╭▸ file0.sql:2:13
+      ╭▸ file0.sql:6:28
       │
-    2 │ create type mood as enum (
-      │             ──── 2. destination
+    6 │ create function pg_catalog.mood(text) returns mood
+      │                            ──── 2. destination
       ‡
-    6 │ select treat('happy' as mood);
+    9 │ select treat('happy' as mood);
       ╰╴                        ──── 1. source
     ");
 }

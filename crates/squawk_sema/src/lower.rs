@@ -869,6 +869,18 @@ impl LoweredCall {
 struct Callee {
     name: Name,
     resolution: Resolution,
+    ty: Option<Ty>,
+}
+
+struct TypeFunctionName {
+    node: SyntaxNode,
+    name: Name,
+}
+
+#[derive(Clone, Copy)]
+struct FunctionStyleCast {
+    resolution: Resolution,
+    ty: Ty,
 }
 
 struct CallArgs {
@@ -13307,26 +13319,19 @@ impl Lowerer {
                     }
                 };
             }
-            ast::Type::BitType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "bit"),
-            ast::Type::BitVaryingType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "varbit"),
-            ast::Type::CharacterType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "bpchar"),
-            ast::Type::DoubleType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "float8"),
-            ast::Type::IntervalType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "interval"),
-            ast::Type::TimeType(time) => {
-                let name = match time.timezone() {
-                    Some(ast::Timezone::WithTimezone(_)) => "timetz",
-                    Some(ast::Timezone::WithoutTimezone(_)) | None => "time",
+            ast::Type::BitType(_)
+            | ast::Type::BitVaryingType(_)
+            | ast::Type::CharacterType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::IntervalType(_)
+            | ast::Type::TimeType(_)
+            | ast::Type::TimestampType(_)
+            | ast::Type::VarcharType(_) => {
+                let Some(name) = ty.builtin_type_name() else {
+                    return TypeLookup::Unknown;
                 };
                 (ty.syntax().clone(), Some(self.pg_catalog), name)
             }
-            ast::Type::TimestampType(timestamp) => {
-                let name = match timestamp.timezone() {
-                    Some(ast::Timezone::WithTimezone(_)) => "timestamptz",
-                    Some(ast::Timezone::WithoutTimezone(_)) | None => "timestamp",
-                };
-                (ty.syntax().clone(), Some(self.pg_catalog), name)
-            }
-            ast::Type::VarcharType(_) => (ty.syntax().clone(), Some(self.pg_catalog), "varchar"),
         };
         self.lookup_type_name(&node, schema, name, if_missing)
     }
@@ -16685,7 +16690,11 @@ impl Lowerer {
         );
         let FunctionColumns { columns, scalar } = self.combine_function_columns(&items);
         FunctionSource {
-            callee: Some(Callee { name, resolution }),
+            callee: Some(Callee {
+                name,
+                resolution,
+                ty: None,
+            }),
             function: None,
             columns,
             scalar,
@@ -18280,6 +18289,7 @@ impl Lowerer {
         if let Some(Callee {
             name,
             resolution: Resolution::Function(function),
+            ..
         }) = self.lower_callee(callee, &[], None, CalleeKind::Plain, None)
             && let Some(ret) = self.index.functions[function].ret
             && let Some(expected) = self.builtin_type(kind.return_type())
@@ -23050,6 +23060,9 @@ impl Lowerer {
                 return common.resolve(&self.overloads());
             }
             ast::Expr::CastExpr(cast) => {
+                if cast.kind() == Some(ast::CastKind::Treat) {
+                    return self.lower_treat(cast);
+                }
                 let ty = cast.ty().and_then(|ty| self.lower_type(&ty));
                 if let Some(expr) = cast.expr() {
                     self.array_cast = matches!(expr.unparen(), ast::Expr::ArrayExpr(_))
@@ -24040,7 +24053,7 @@ impl Lowerer {
         self.lower_special_fn(call).unwrap_or(LoweredCall {
             args,
             callee: target,
-            ty: None,
+            ty: target.and_then(|target| target.ty),
         })
     }
 
@@ -24428,26 +24441,189 @@ impl Lowerer {
             (None, None) => {
                 let incomplete_row =
                     row_source.is_some_and(|source| !self.index.sources[source].columns.complete);
-                let resolution = match self.find_routine(schema, name, args, FunctionKind::Function)
-                {
-                    Resolution::Unresolved if kind == CalleeKind::OrderedSet || incomplete_row => {
-                        Resolution::Unknown
-                    }
-                    resolution => self.report_unresolved_routine(
-                        resolution,
-                        RoutineKind::Function,
-                        schema,
-                        name,
-                        args,
-                        arg_list,
-                        name_ref.syntax(),
-                    ),
-                };
-                (ReferenceKind::Function(RoutineKind::Function), resolution)
+                return Some(self.lower_function_name(
+                    schema,
+                    name,
+                    args,
+                    kind,
+                    incomplete_row,
+                    arg_list,
+                    name_ref.syntax(),
+                ));
             }
         };
         self.add_ref(name, kind, name_ref.syntax(), resolution);
-        Some(Callee { name, resolution })
+        Some(Callee {
+            name,
+            resolution,
+            ty: None,
+        })
+    }
+
+    fn lower_function_name(
+        &mut self,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+        kind: CalleeKind,
+        incomplete_row: bool,
+        arg_list: Option<&ast::ArgList>,
+        node: &SyntaxNode,
+    ) -> Callee {
+        if kind == CalleeKind::Plain
+            && let Some(FunctionStyleCast { resolution, ty }) =
+                self.function_style_cast(schema, name, args)
+        {
+            self.add_ref_from(
+                name,
+                node,
+                resolution,
+                RefSource::Type {
+                    schema,
+                    candidates: TypeCandidates::TypeName,
+                },
+            );
+            return Callee {
+                name,
+                resolution,
+                ty: Some(ty),
+            };
+        }
+        let resolution = match self.find_routine(schema, name, args, FunctionKind::Function) {
+            Resolution::Unresolved if kind == CalleeKind::OrderedSet || incomplete_row => {
+                Resolution::Unknown
+            }
+            resolution => self.report_unresolved_routine(
+                resolution,
+                RoutineKind::Function,
+                schema,
+                name,
+                args,
+                arg_list,
+                node,
+            ),
+        };
+        self.add_ref(
+            name,
+            ReferenceKind::Function(RoutineKind::Function),
+            node,
+            resolution,
+        );
+        Callee {
+            name,
+            resolution,
+            ty: None,
+        }
+    }
+
+    fn function_style_cast(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        args: &[CallArg],
+    ) -> Option<FunctionStyleCast> {
+        let [arg] = args else {
+            return None;
+        };
+        if arg.name.is_some() || arg.variadic {
+            return None;
+        }
+        let overloads = self.overloads();
+        if overloads.has_exact_match(
+            self.routine_candidates(schema, name, FunctionKind::Function),
+            args,
+        ) {
+            return None;
+        }
+        let (resolution, array) = match self.find_type_match(schema, name)? {
+            TypeMatch::Named(resolution) => (resolution, false),
+            TypeMatch::Array(owner) => (owner.resolution(), true),
+        };
+        let ty = if let Resolution::Type(ty) = resolution {
+            Ty::Type(ty)
+        } else if let Resolution::Table(table) = resolution {
+            Ty::Table(table)
+        } else {
+            return None;
+        };
+        let ty = if array { ty.array() } else { ty };
+        let coercion = match arg.ty {
+            ArgType::Known(source) => overloads.function_style_cast(source, ty),
+            ArgType::UnknownLiteral => Coercion::Yes,
+            ArgType::Untyped => Coercion::Unknown,
+        };
+        match coercion {
+            Coercion::Yes | Coercion::Unknown => Some(FunctionStyleCast { resolution, ty }),
+            Coercion::No => None,
+        }
+    }
+
+    fn type_function_name(&mut self, ty: &ast::Type) -> Option<TypeFunctionName> {
+        match ty {
+            ast::Type::ArrayType(array) => self.type_function_name(&array.ty()?),
+            ast::Type::PathType(path_type) => {
+                let segment = path_type.path_ref()?.segment()?;
+                let name = match path_type.keyword_type_name() {
+                    Some(name) => self.intern(name),
+                    None => self.intern(&segment.text()),
+                };
+                Some(TypeFunctionName {
+                    node: segment.syntax().clone(),
+                    name,
+                })
+            }
+            ast::Type::BitType(_)
+            | ast::Type::BitVaryingType(_)
+            | ast::Type::CharacterType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::IntervalType(_)
+            | ast::Type::TimeType(_)
+            | ast::Type::TimestampType(_)
+            | ast::Type::VarcharType(_) => {
+                let name = self.intern(ty.builtin_type_name()?);
+                Some(TypeFunctionName {
+                    node: ty.syntax().clone(),
+                    name,
+                })
+            }
+        }
+    }
+
+    fn lower_treat(&mut self, cast: &ast::CastExpr) -> Option<Ty> {
+        let ty = match cast.expr() {
+            Some(expr) => {
+                let ty = self.lower_expr(&expr);
+                match ty {
+                    _ if is_unknown_literal_expr(&expr) => ArgType::UnknownLiteral,
+                    Some(ty) => ArgType::Known(ty),
+                    None => ArgType::Untyped,
+                }
+            }
+            None => ArgType::Untyped,
+        };
+        let target = cast.ty()?;
+        let TypeFunctionName { node, name } = self.type_function_name(&target)?;
+        let args = [CallArg {
+            name: None,
+            ty,
+            variadic: false,
+        }];
+        let callee = self.lower_function_name(
+            Some(self.pg_catalog),
+            name,
+            &args,
+            CalleeKind::Plain,
+            false,
+            None,
+            &node,
+        );
+        if callee.ty.is_some() {
+            return callee.ty;
+        }
+        match callee.resolution {
+            Resolution::Function(function) => self.call_type(function, &args),
+            resolution => self.resolution_type(resolution),
+        }
     }
 
     fn misplaced_order_by(arg_list: &ast::ArgList) -> bool {
@@ -24610,7 +24786,11 @@ impl Lowerer {
             range,
             resolution,
         );
-        Callee { name, resolution }
+        Callee {
+            name,
+            resolution,
+            ty: None,
+        }
     }
 
     fn system_call_type(&mut self, function: &str, args: &[CallArg]) -> Option<Ty> {
