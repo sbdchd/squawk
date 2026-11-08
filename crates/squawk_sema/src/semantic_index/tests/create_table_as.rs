@@ -78,3 +78,26 @@ create table u (a) as select 1, 2;
       ╰╴                   ━
     ");
 }
+
+#[test]
+fn create_table_as_keeps_typmod() {
+    assert_snapshot!(check("
+create table t (a numeric(3, 0));
+create table u as
+  select a, '1'::numeric(3, 0) as b from t;
+insert into u values ('1000', '1000');
+"), @"
+    error: value `1000` is out of range for type `numeric(3, 0)`
+      ╭▸ 
+    5 │ insert into u values ('1000', '1000');
+      │                       ━━━━━━
+      │
+      ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
+    error: value `1000` is out of range for type `numeric(3, 0)`
+      ╭▸ 
+    5 │ insert into u values ('1000', '1000');
+      │                               ━━━━━━
+      │
+      ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
+    ");
+}

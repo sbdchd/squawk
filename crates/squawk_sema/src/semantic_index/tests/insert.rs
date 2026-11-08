@@ -1258,3 +1258,67 @@ insert into t (a) select '2';
 insert into t (a) (select '2');
 "), @"no diagnostics");
 }
+
+#[test]
+fn invalid_literal_assignments() {
+    assert_snapshot!(check("
+create type mood as enum (
+  'happy'
+);
+create table t (
+  a bool,
+  b int2,
+  c mood
+);
+insert into t values ('nope', '40000', 'sad');
+update t set a = 'x';
+"), @"
+    error: invalid input value for type `bool`: `nope`
+       ╭▸ 
+    10 │ insert into t values ('nope', '40000', 'sad');
+       │                       ━━━━━━
+       │
+       ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: value `40000` is out of range for type `int2`
+       ╭▸ 
+    10 │ insert into t values ('nope', '40000', 'sad');
+       │                               ━━━━━━━
+       │
+       ╰ hint: `int2` values range from `-32768` to `32767`
+    error: invalid input value for enum `mood`: `sad`
+       ╭▸ 
+    10 │ insert into t values ('nope', '40000', 'sad');
+       ╰╴                                       ━━━━━
+    error: invalid input value for type `bool`: `x`
+       ╭▸ 
+    11 │ update t set a = 'x';
+       │                  ━━━
+       │
+       ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    ");
+}
+
+#[test]
+fn insert_select_invalid_literals() {
+    assert_snapshot!(check("
+create table t (
+  a numeric(3, 0),
+  b bool
+);
+insert into t (a, b) select '1', 'x';
+insert into t (a) (values ('1'), ('1000'));
+"), @"
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    6 │ insert into t (a, b) select '1', 'x';
+      │                                  ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: value `1000` is out of range for type `numeric(3, 0)`
+      ╭▸ 
+    7 │ insert into t (a) (values ('1'), ('1000'));
+      │                                   ━━━━━━
+      │
+      ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
+    ");
+}

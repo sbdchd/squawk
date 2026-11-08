@@ -22,6 +22,7 @@ squawk-rowan.workspace = true
 la-arena.workspace = true
 smallvec.workspace = true
 smol_str.workspace = true
+num-bigint.workspace = true
 rustc-hash.workspace = true
 hashbrown.workspace = true
 

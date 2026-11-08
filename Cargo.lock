@@ -2582,6 +2582,7 @@ dependencies = [
  "hashbrown",
  "insta",
  "la-arena",
+ "num-bigint",
  "rustc-hash",
  "smallvec",
  "smol_str",

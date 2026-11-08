@@ -13,7 +13,7 @@ use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
-use crate::postgres::IntType;
+use crate::postgres::{IntType, NumericTypmod};
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -258,6 +258,13 @@ impl ObjectKind {
             ObjectKind::Table(_) => DiagnosticKind::DuplicateRelation,
         }
     }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum NumericOverflow {
+    Format,
+    Typmod(NumericTypmod),
+    Infinite(NumericTypmod),
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -547,6 +554,13 @@ pub(crate) enum SemaError {
     IntValueOutOfRange {
         ty: IntType,
         value: Name,
+    },
+    InvalidNumericValue {
+        value: Name,
+    },
+    NumericValueOutOfRange {
+        value: Name,
+        overflow: NumericOverflow,
     },
     NotEnum {
         name: Name,
@@ -1512,10 +1526,12 @@ impl SemaError {
                 DiagnosticKind::UnresolvedRelation
             }
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
-            SemaError::InvalidBoolValue { .. } | SemaError::InvalidIntValue { .. } => {
-                DiagnosticKind::InvalidLiteral
+            SemaError::InvalidBoolValue { .. }
+            | SemaError::InvalidIntValue { .. }
+            | SemaError::InvalidNumericValue { .. } => DiagnosticKind::InvalidLiteral,
+            SemaError::IntValueOutOfRange { .. } | SemaError::NumericValueOutOfRange { .. } => {
+                DiagnosticKind::ValueOutOfRange
             }
-            SemaError::IntValueOutOfRange { .. } => DiagnosticKind::ValueOutOfRange,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
             | SemaError::StarNotComposite { .. }
@@ -2358,6 +2374,26 @@ impl SemaError {
                 })
             }
             SemaError::NonBoolComparison { comparison, .. } => Cow::Borrowed(comparison.note()),
+            SemaError::NumericValueOutOfRange {
+                overflow: NumericOverflow::Typmod(typmod),
+                ..
+            } => {
+                let bound = match typmod.max_digits() {
+                    0 => "1".to_owned(),
+                    digits => format!("10^{digits}"),
+                };
+                Cow::Owned(format!(
+                    "a field with precision {} and scale {} must round to an absolute value less than `{bound}`",
+                    typmod.precision, typmod.scale
+                ))
+            }
+            SemaError::NumericValueOutOfRange {
+                overflow: NumericOverflow::Infinite(typmod),
+                ..
+            } => Cow::Owned(format!(
+                "a field with precision {} and scale {} cannot hold an infinite value",
+                typmod.precision, typmod.scale
+            )),
             SemaError::DropColumnWithDependents { column, view, .. }
             | SemaError::AlterColumnTypeWithDependents { column, view } => Cow::Owned(format!(
                 "view `{}` depends on column `{}`",
@@ -3314,6 +3350,23 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(value),
                 ty.name()
             ),
+            SemaError::InvalidNumericValue { value } => {
+                write!(f, "invalid input value for type `numeric`: `{}`", n(value))
+            }
+            SemaError::NumericValueOutOfRange {
+                value,
+                overflow:
+                    NumericOverflow::Typmod(NumericTypmod { precision, scale })
+                    | NumericOverflow::Infinite(NumericTypmod { precision, scale }),
+            } => write!(
+                f,
+                "value `{}` is out of range for type `numeric({precision}, {scale})`",
+                n(value)
+            ),
+            SemaError::NumericValueOutOfRange {
+                value,
+                overflow: NumericOverflow::Format,
+            } => write!(f, "value `{}` is out of range for type `numeric`", n(value)),
             SemaError::NotEnum { name } => write!(f, "`{}` is not an enum", n(name)),
             SemaError::NotComposite { name } => write!(f, "`{}` is not a composite type", n(name)),
             SemaError::StarNotComposite { ty } => {
