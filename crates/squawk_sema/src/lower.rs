@@ -20,7 +20,7 @@ use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
 use crate::interner::Name;
 use crate::keyed_index::GraphElementIndex;
-use crate::postgres::{IntInputError, IntType};
+use crate::postgres::{IntInputError, IntType, NumericInputError, NumericTypmod};
 
 use crate::{
     ir::{
@@ -43,7 +43,7 @@ use crate::{
         Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
         TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
         TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
-        TypeCategory, TypeId, TypeKind, Window, WindowClauses, WindowId,
+        TypeCategory, TypeId, TypeKind, Typmod, Window, WindowClauses, WindowId,
     },
     sema_error::{
         ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, Comparison, CompoundOp,
@@ -202,6 +202,13 @@ enum LiteralTarget {
     Enum(TypeId),
     Bool,
     Int(IntType),
+    Numeric(Option<NumericTypmod>),
+}
+
+#[derive(Clone, Copy)]
+struct ColumnType {
+    ty: Option<Ty>,
+    typmod: Option<Typmod>,
 }
 
 struct QueryScope {
@@ -580,6 +587,7 @@ struct InsertValue {
 struct Assignment {
     column: Name,
     target: Ty,
+    typmod: Option<Typmod>,
     value: ArgType,
     default: bool,
 }
@@ -2893,18 +2901,21 @@ impl Lowerer {
                 name: Some(self.intern("last_value")),
                 ptr,
                 ty: int8,
+                typmod: None,
                 merge: None,
             },
             Column {
                 name: Some(self.intern("log_cnt")),
                 ptr,
                 ty: int8,
+                typmod: None,
                 merge: None,
             },
             Column {
                 name: Some(self.intern("is_called")),
                 ptr,
                 ty: bool,
+                typmod: None,
                 merge: None,
             },
         ];
@@ -4023,18 +4034,12 @@ impl Lowerer {
             return;
         };
         if kind == ColumnExprKind::Default
-            && let Some(target) = self
-                .find_table_column(table, column)
-                .and_then(|id| self.index.columns[id].ty)
-            && !self.attach_empty_array_cast(target, expr)
+            && let Some(id) = self.find_table_column(table, column)
+            && let Some(assignment) =
+                self.column_assignment(column, id, expr_arg_type(Some(expr), ty), true)
+            && !self.attach_empty_array_cast(assignment.target, expr)
             && self.index.errors.len() == errors
         {
-            let assignment = Assignment {
-                column,
-                target,
-                value: expr_arg_type(Some(expr), ty),
-                default: true,
-            };
             self.check_assignment(assignment, expr);
         }
         let id = ColumnExprId(self.next_column_expr);
@@ -7952,6 +7957,7 @@ impl Lowerer {
                         name: Some(name),
                         ptr: this.ptr(name_node),
                         ty,
+                        typmod: None,
                         merge: None,
                     });
                     if let Some(property) =
@@ -8423,6 +8429,7 @@ impl Lowerer {
                 name: Some(name),
                 ptr: self.ptr(&node),
                 ty,
+                typmod: None,
                 merge: None,
             });
         }
@@ -11089,6 +11096,9 @@ impl Lowerer {
                     if let Some(column_name) = column.name() {
                         let def = Column {
                             ty,
+                            typmod: ty
+                                .zip(column.ty())
+                                .and_then(|(ty, ast_ty)| self.lower_typmod(ty, &ast_ty)),
                             ..self.column_def(&column_name)
                         };
                         if let Some(name) = def.name
@@ -11965,6 +11975,7 @@ impl Lowerer {
                             name: Some(self.intern(&name.text())),
                             ptr: self.ptr(name.syntax()),
                             ty,
+                            typmod: None,
                             merge: None,
                         };
                         let id = self.alloc_column_def(column);
@@ -12200,6 +12211,7 @@ impl Lowerer {
                 shell_name_ptr: Some(ty.name_ptr),
                 columns,
                 base: None,
+                typmod: None,
                 element: None,
                 subtype: None,
                 range: None,
@@ -12315,7 +12327,7 @@ impl Lowerer {
         label
     }
 
-    fn literal_target(&self, ty: Ty) -> Option<LiteralTarget> {
+    fn literal_target(&self, ty: Ty, typmod: Option<Typmod>) -> Option<LiteralTarget> {
         let Ty::Type(id) = self.index.base_type(ty)? else {
             return None;
         };
@@ -12331,6 +12343,23 @@ impl Lowerer {
             "int2" => Some(LiteralTarget::Int(IntType::Int2)),
             "int4" => Some(LiteralTarget::Int(IntType::Int4)),
             "int8" => Some(LiteralTarget::Int(IntType::Int8)),
+            "numeric" => Some(LiteralTarget::Numeric(
+                typmod.map(|Typmod::Numeric(typmod)| typmod),
+            )),
+            _ => None,
+        }
+    }
+
+    fn lower_typmod(&self, ty: Ty, ast_ty: &ast::Type) -> Option<Typmod> {
+        let Ty::Type(id) = ty else {
+            return None;
+        };
+        let ty = &self.index.types[id];
+        if ty.kind == TypeKind::Domain || ty.schema != self.pg_catalog {
+            return None;
+        }
+        match self.index.names.resolve(ty.name) {
+            "numeric" => numeric_typmod(ast_ty).map(Typmod::Numeric),
             _ => None,
         }
     }
@@ -12340,7 +12369,32 @@ impl Lowerer {
             LiteralTarget::Enum(ty) => self.lower_enum_value(ty, literal),
             LiteralTarget::Bool => self.check_bool_value(literal),
             LiteralTarget::Int(ty) => self.check_int_value(ty, literal),
+            LiteralTarget::Numeric(typmod) => self.check_numeric_value(typmod, literal),
         }
+    }
+
+    fn check_numeric_value(&mut self, typmod: Option<NumericTypmod>, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        let error = match postgres::check_numeric(&value, typmod) {
+            Ok(()) => return,
+            Err(NumericInputError::InvalidSyntax) => SemaError::InvalidNumericValue {
+                value: self.intern(&value),
+            },
+            Err(NumericInputError::FieldOverflow) => SemaError::NumericValueOutOfRange {
+                value: self.intern(&value),
+                typmod,
+            },
+            Err(NumericInputError::FormatOverflow) => SemaError::NumericValueOutOfRange {
+                value: self.intern(&value),
+                typmod: None,
+            },
+        };
+        self.push_error(literal.syntax(), error);
     }
 
     fn check_int_value(&mut self, ty: IntType, literal: &ast::Literal) {
@@ -12382,7 +12436,7 @@ impl Lowerer {
     }
 
     fn lower_literal_comparison(&mut self, other: Ty, expr: &ast::Expr) {
-        let Some(target) = self.literal_target(other) else {
+        let Some(target) = self.literal_target(other, None) else {
             return;
         };
         match expr {
@@ -12726,13 +12780,20 @@ impl Lowerer {
                     && let Some(tables) =
                         self.typed_tables_to_alter(ty, alter.drop_behavior().as_ref(), node)
                 {
+                    let column_ty = ColumnType {
+                        ty: column_ty,
+                        typmod: column_ty
+                            .zip(alter.ty())
+                            .and_then(|(ty, ast_ty)| self.lower_typmod(ty, &ast_ty)),
+                    };
                     for table in tables {
                         self.set_table_column_type(table, name, column_ty);
                     }
                     self.replace_type_attributes(ty, |columns, id| {
                         let mut copy = columns[id];
                         if id == column {
-                            copy.ty = column_ty;
+                            copy.ty = column_ty.ty;
+                            copy.typmod = column_ty.typmod;
                         }
                         Some(copy)
                     });
@@ -12876,17 +12937,19 @@ impl Lowerer {
             name: Some(name),
             ptr: self.ptr(name_node.syntax()),
             ty,
+            typmod: None,
             merge: None,
         });
         self.set_table_columns(table, self.index.columns.range_from(start));
     }
 
-    fn set_table_column_type(&mut self, table: TableId, column: Name, ty: Option<Ty>) {
+    fn set_table_column_type(&mut self, table: TableId, column: Name, ty: ColumnType) {
         let columns = self.index.tables[table].columns;
         let range = self.copy_columns(columns.range, |columns, id| {
             let mut copy = columns[id];
             if copy.name == Some(column) {
-                copy.ty = ty;
+                copy.ty = ty.ty;
+                copy.typmod = ty.typmod;
             }
             Some(copy)
         });
@@ -12964,6 +13027,7 @@ impl Lowerer {
             name: Some(name),
             ptr: self.ptr(name_node.syntax()),
             ty: column_ty,
+            typmod: None,
             merge: None,
         });
         let range = self.index.columns.range_from(start);
@@ -13169,6 +13233,9 @@ impl Lowerer {
     fn lower_create_domain(&mut self, create_domain: &ast::CreateDomain) {
         let refs = self.index.references.next_idx();
         let base = create_domain.ty().and_then(|ty| self.lower_type(&ty));
+        let typmod = base
+            .zip(create_domain.ty())
+            .and_then(|(ty, ast_ty)| self.lower_typmod(ty, &ast_ty));
         let domain = create_domain
             .domain()
             .and_then(|domain| domain.path())
@@ -13176,7 +13243,7 @@ impl Lowerer {
                 self.alloc_type(TypeKind::Domain, create_domain.syntax(), &path, None)
             });
         if let Some(domain) = domain {
-            self.index.types.set_base(domain, base);
+            self.index.types.set_base(domain, base, typmod);
             self.depend_on_refs(refs, IdxRange::single(domain), Object::Type);
         }
         for qualifier in create_domain.domain_qualifiers() {
@@ -13338,6 +13405,7 @@ impl Lowerer {
                     name: Some(name),
                     ptr: ty.name_ptr.map(|ptr| ptr.syntax_node_ptr()),
                     ty: ty.base,
+                    typmod: None,
                     merge: None,
                 };
                 Columns {
@@ -14311,6 +14379,7 @@ impl Lowerer {
                         .name_ptr
                         .map_or(param.ptr, |ptr| ptr.syntax_node_ptr()),
                     ty: param.ty,
+                    typmod: None,
                     merge: None,
                 }),
         );
@@ -14723,6 +14792,7 @@ impl Lowerer {
                         name: Some(name),
                         ptr: self.ptr(expr.syntax()),
                         ty,
+                        typmod: None,
                         merge: None,
                     });
                 }
@@ -15145,22 +15215,15 @@ impl Lowerer {
         {
             return;
         }
-        let target_ty = |this: &Self, position: usize| {
+        let target_column = |this: &Self, position: usize| {
             let column = (*targets.get(position)?)?;
-            let ty = this
-                .find_table_column(table, column)
-                .and_then(|id| this.index.columns[id].ty)?;
-            Some((column, ty))
+            Some((column, this.find_table_column(table, column)?))
         };
         if let ast::SelectVariant::Values(_) = source {
             for value in values {
-                if let Some((column, target)) = target_ty(self, value.position) {
-                    let assignment = Assignment {
-                        column,
-                        target,
-                        value: value.ty,
-                        default: false,
-                    };
+                if let Some((column, id)) = target_column(self, value.position)
+                    && let Some(assignment) = self.column_assignment(column, id, value.ty, false)
+                {
                     self.check_assignment(assignment, &value.expr);
                 }
             }
@@ -15171,7 +15234,7 @@ impl Lowerer {
             return;
         }
         for (position, id) in columns.range.iter().enumerate() {
-            let Some((column, target)) = target_ty(self, position) else {
+            let Some((column, target)) = target_column(self, position) else {
                 continue;
             };
             let Some(ty) = self.index.columns[id].ty else {
@@ -15183,11 +15246,10 @@ impl Lowerer {
             let Some(expr) = output_expr(source, position) else {
                 continue;
             };
-            let assignment = Assignment {
-                column,
-                target,
-                value: ArgType::Known(ty),
-                default: false,
+            let Some(assignment) =
+                self.column_assignment(column, target, ArgType::Known(ty), false)
+            else {
+                continue;
             };
             self.check_assignment(assignment, &expr);
         }
@@ -15215,15 +15277,41 @@ impl Lowerer {
         true
     }
 
+    fn column_assignment(
+        &self,
+        column: Name,
+        id: ColumnId,
+        value: ArgType,
+        default: bool,
+    ) -> Option<Assignment> {
+        let target = &self.index.columns[id];
+        Some(Assignment {
+            column,
+            target: target.ty?,
+            typmod: target.typmod,
+            value,
+            default,
+        })
+    }
+
     fn check_assignment(&mut self, assignment: Assignment, expr: &ast::Expr) {
         let Assignment {
             column,
             target,
+            typmod,
             value,
             default,
         } = assignment;
         if self.attach_empty_array_cast(target, expr) {
             return;
+        }
+        if value == ArgType::UnknownLiteral
+            && let Some(literal) = expr.unparen().as_literal()
+        {
+            let typmod = typmod.or_else(|| self.index.domain_typmod(target));
+            if let Some(target) = self.literal_target(target, typmod) {
+                self.lower_literal_value(target, &literal);
+            }
         }
         let ArgType::Known(ty) = value else {
             return;
@@ -15572,17 +15660,13 @@ impl Lowerer {
             return;
         };
         let column = self.intern(&name.text());
-        let Some(target) = self
-            .find_table_column(table, column)
-            .and_then(|id| self.index.columns[id].ty)
-        else {
+        let Some(id) = self.find_table_column(table, column) else {
             return;
         };
-        let assignment = Assignment {
-            column,
-            target,
-            value: expr_arg_type(Some(expr), ty),
-            default: false,
+        let Some(assignment) =
+            self.column_assignment(column, id, expr_arg_type(Some(expr), ty), false)
+        else {
+            return;
         };
         self.check_assignment(assignment, expr);
     }
@@ -17203,6 +17287,7 @@ impl Lowerer {
             name: Some(name),
             ptr,
             ty,
+            typmod: None,
             merge: None,
         }));
         FunctionColumns {
@@ -17292,6 +17377,7 @@ impl Lowerer {
             name: Some(name),
             ptr: self.ptr(with_ordinality.syntax()),
             ty,
+            typmod: None,
             merge: None,
         });
         Columns {
@@ -18104,6 +18190,12 @@ impl Lowerer {
                         self.push_error(column_ref.syntax(), error);
                         return;
                     }
+                    let ty = ColumnType {
+                        ty,
+                        typmod: ty
+                            .zip(set_type.ty())
+                            .and_then(|(ty, ast_ty)| self.lower_typmod(ty, &ast_ty)),
+                    };
                     self.set_table_column_type(table, column, ty);
                     self.revalidate_foreign_keys(table, column, alter_column.syntax());
                     self.set_inherited_column_type(table, column, ty, alter_column.syntax());
@@ -18392,6 +18484,9 @@ impl Lowerer {
                 self.index.columns.alloc_copies(columns.range);
                 let column = Column {
                     ty,
+                    typmod: ty
+                        .zip(add_column.ty())
+                        .and_then(|(ty, ast_ty)| self.lower_typmod(ty, &ast_ty)),
                     ..self.column_def(column_name)
                 };
                 self.alloc_column_def(column);
@@ -18517,7 +18612,7 @@ impl Lowerer {
         &mut self,
         parent: TableId,
         name: Name,
-        ty: Option<Ty>,
+        ty: ColumnType,
         node: &SyntaxNode,
     ) {
         let mut i = 0;
@@ -23146,6 +23241,7 @@ impl Lowerer {
                 name,
                 ptr: self.ptr(&node),
                 ty,
+                typmod: None,
                 merge: None,
             });
         }
@@ -23587,10 +23683,15 @@ impl Lowerer {
                     .literal()
                     .or_else(|| cast.expr().and_then(|expr| expr.as_literal()));
                 if let Some(ty) = ty
-                    && let Some(target) = self.literal_target(ty)
                     && let Some(literal) = literal
                 {
-                    self.lower_literal_value(target, &literal);
+                    let typmod = cast
+                        .ty()
+                        .and_then(|cast_ty| self.lower_typmod(ty, &cast_ty))
+                        .or_else(|| self.index.domain_typmod(ty));
+                    if let Some(target) = self.literal_target(ty, typmod) {
+                        self.lower_literal_value(target, &literal);
+                    }
                 }
                 return ty;
             }
@@ -26013,6 +26114,7 @@ impl Lowerer {
                 name: Some(self.intern(&format!("f{}", index + 1))),
                 ptr: self.ptr(expr.syntax()),
                 ty,
+                typmod: None,
                 merge: None,
             });
         }
@@ -26377,6 +26479,7 @@ impl Lowerer {
             name: Some(self.intern(&column_name.text())),
             ptr: self.ptr(column_name.syntax()),
             ty: None,
+            typmod: None,
             merge: None,
         }
     }
@@ -26635,6 +26738,7 @@ impl Lowerer {
                 shell_name_ptr: None,
                 columns: None,
                 base: None,
+                typmod: None,
                 element: None,
                 subtype: None,
                 range: Some(range_id),
@@ -26692,6 +26796,7 @@ impl Lowerer {
                 shell_name_ptr: None,
                 columns,
                 base: None,
+                typmod: None,
                 element: None,
                 subtype: None,
                 range: None,
@@ -27028,6 +27133,7 @@ impl Lowerer {
             name: Some(self.intern(&column_ref.text())),
             ptr: self.ptr(column_ref.syntax()),
             ty,
+            typmod: None,
             merge: None,
         };
         self.alloc_column_def(column);
@@ -27701,6 +27807,32 @@ fn call_function_like_keyword(call: &ast::CallExpr) -> Option<ast::FunctionLikeK
         | ast::Expr::SliceExpr(_)
         | ast::Expr::TupleExpr(_) => None,
     }
+}
+
+fn numeric_typmod(ty: &ast::Type) -> Option<NumericTypmod> {
+    let ast::Type::PathType(path_type) = ty else {
+        return None;
+    };
+    let mut args = path_type.arg_list()?.args();
+    let precision = typmod_value(&args.next()?.expr()?)?;
+    let scale = match args.next() {
+        Some(arg) => typmod_value(&arg.expr()?)?,
+        None => 0,
+    };
+    if args.next().is_some() {
+        return None;
+    }
+    NumericTypmod::new(precision, scale)
+}
+
+fn typmod_value(expr: &ast::Expr) -> Option<i64> {
+    if let ast::Expr::PrefixExpr(prefix) = expr
+        && let Some(ast::PrefixOp::Minus(_)) = prefix.op()
+    {
+        let value = prefix.expr()?.as_literal()?.integer_value_u64()?;
+        return i64::try_from(value).ok().map(|value| -value);
+    }
+    i64::try_from(expr.as_literal()?.integer_value_u64()?).ok()
 }
 
 fn similar_bool_input(value: &str) -> Option<&'static str> {

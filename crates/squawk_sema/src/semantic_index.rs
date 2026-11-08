@@ -15,7 +15,8 @@ use crate::ir::{
     Body, Case, Channel, Column, ColumnId, ColumnOwner, Cte, Cursor, ElementTy, EnumLabel,
     EnumLabelId, FunctionId, Item, ItemRange, JsonPath, Merge, Param, ParamId, PreparedStatement,
     PreparedTransaction, Query, RefId, Reference, Savepoint, Scope, SearchPathChange, Source,
-    SourceId, SourceKind, Star, Subscript, Transaction, Transform, Ty, TypeId, TypeKind, Window,
+    SourceId, SourceKind, Star, Subscript, Transaction, Transform, Ty, TypeId, TypeKind, Typmod,
+    Window,
 };
 use crate::keyed_index::{
     AccessMethodIndex, CastIndex, DatabaseIndex, EventTriggerIndex, ForeignDataWrapperIndex,
@@ -345,6 +346,17 @@ impl IndexData {
             ty = self.types[id].base?;
         }
         Some(ty)
+    }
+
+    pub(crate) fn domain_typmod(&self, mut ty: Ty) -> Option<Typmod> {
+        let mut typmod = None;
+        while let Ty::Type(id) = ty
+            && self.types[id].kind == TypeKind::Domain
+        {
+            typmod = self.types[id].typmod;
+            ty = self.types[id].base?;
+        }
+        typmod
     }
 
     pub(crate) fn is_collatable(&self, ty: Ty) -> Option<bool> {

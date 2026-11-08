@@ -8,6 +8,7 @@ use squawk_syntax::{AstPtr, SyntaxNodePtr, ast, sql_body::SqlBody};
 use crate::arena::{IdxRange, LayeredArena};
 use crate::file::{InIrFile, IrFileId, IrFileRange};
 use crate::interner::Name;
+use crate::postgres::NumericTypmod;
 
 pub(crate) type QueryId = Idx<Query>;
 pub type ScopeId = Idx<Scope>;
@@ -672,6 +673,11 @@ impl From<ElementTy> for Ty {
     }
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum Typmod {
+    Numeric(NumericTypmod),
+}
+
 #[derive(Debug)]
 pub struct Type {
     pub kind: TypeKind,
@@ -682,6 +688,7 @@ pub struct Type {
     pub shell_name_ptr: Option<InIrFile<AstPtr<ast::PathSegment>>>,
     pub columns: Option<Columns>,
     pub base: Option<Ty>,
+    pub(crate) typmod: Option<Typmod>,
     pub(crate) element: Option<Ty>,
     pub subtype: Option<Ty>,
     pub(crate) range: Option<TypeId>,
@@ -898,6 +905,7 @@ pub struct Column {
     pub name: Option<Name>,
     pub ptr: InIrFile<SyntaxNodePtr>,
     pub ty: Option<Ty>,
+    pub(crate) typmod: Option<Typmod>,
     pub(crate) merge: Option<MergeId>,
 }
 

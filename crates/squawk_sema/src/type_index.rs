@@ -5,7 +5,9 @@ use squawk_syntax::{AstPtr, ast};
 use crate::arena::{IdxRange, LayeredArena, LayeredMultimap};
 use crate::file::InIrFile;
 use crate::interner::{Name, QualifiedName};
-use crate::ir::{Column, ColumnTypeRef, Columns, Subscript, Ty, Type, TypeCategory, TypeId};
+use crate::ir::{
+    Column, ColumnTypeRef, Columns, Subscript, Ty, Type, TypeCategory, TypeId, Typmod,
+};
 
 type NamePtr = InIrFile<AstPtr<ast::PathSegment>>;
 
@@ -181,8 +183,10 @@ impl TypeIndex {
         }
     }
 
-    pub(crate) fn set_base(&mut self, id: TypeId, base: Option<Ty>) {
-        self.local_mut(id).base = base;
+    pub(crate) fn set_base(&mut self, id: TypeId, base: Option<Ty>, typmod: Option<Typmod>) {
+        let ty = self.local_mut(id);
+        ty.base = base;
+        ty.typmod = typmod;
     }
 
     pub(crate) fn set_element(&mut self, id: TypeId, element: Option<Ty>, subtype: Option<Ty>) {
