@@ -12,7 +12,6 @@ SOURCE_FILE
     WHITESPACE " "
     DATABASE
       IDENT "d"
-    DATABASE_OPTION_LIST
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- full"

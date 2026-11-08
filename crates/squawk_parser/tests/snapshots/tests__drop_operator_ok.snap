@@ -48,7 +48,6 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "foo"
             DOT "."
-            PATH_SEGMENT_REF
           CARET "^"
         WHITESPACE " "
         L_PAREN "("
@@ -328,7 +327,6 @@ SOURCE_FILE
               PATH_SEGMENT_REF
                 IDENT "bar"
             DOT "."
-            PATH_SEGMENT_REF
           CUSTOM_OP
             AT "@"
             AT "@"

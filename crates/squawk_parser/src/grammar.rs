@@ -5537,10 +5537,13 @@ fn opt_op_path(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 fn op_path_segment(p: &mut Parser<'_>) {
+    if !at_op_path_segment(p) {
+        return;
+    }
     let m = p.start();
     if p.at_ts(NAME_FIRST) {
         pg_name(p);
-    } else if at_op_path_segment(p) {
+    } else {
         p.err_and_bump("expected name");
     }
     m.complete(p, PATH_SEGMENT_REF);
@@ -10149,13 +10152,18 @@ fn set_tablespace(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn opt_database_option_list(p: &mut Parser<'_>) {
     let m = p.start();
-    p.eat(WITH_KW);
+    let mut found = p.eat(WITH_KW);
     while !p.at(EOF) {
         if !opt_database_option(p) {
             break;
         }
+        found = true;
     }
-    m.complete(p, DATABASE_OPTION_LIST);
+    if found {
+        m.complete(p, DATABASE_OPTION_LIST);
+    } else {
+        m.abandon(p);
+    }
 }
 
 // ALTER CONVERSION name RENAME TO new_name
@@ -11906,16 +11914,18 @@ fn graph_table_fn(p: &mut Parser<'_>) -> CompletedMarker {
 }
 
 fn path_pattern_list(p: &mut Parser<'_>) {
+    if !(p.at(L_PAREN) || p.at(MINUS) || p.at(L_ANGLE)) {
+        p.error("expected path pattern");
+        return;
+    }
     let m = p.start();
-    if p.at(L_PAREN) || p.at(MINUS) || p.at(L_ANGLE) {
-        path_pattern(p);
-        while p.eat(COMMA) {
-            if !p.at_ts(PATH_FACTOR_FIRST) {
-                p.error("expected path pattern after comma");
-                break;
-            }
-            path_pattern(p);
+    path_pattern(p);
+    while p.eat(COMMA) {
+        if !p.at_ts(PATH_FACTOR_FIRST) {
+            p.error("expected path pattern after comma");
+            break;
         }
+        path_pattern(p);
     }
     m.complete(p, PATH_PATTERN_LIST);
 }

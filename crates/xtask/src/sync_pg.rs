@@ -118,6 +118,7 @@ const IGNORED_LINES: &[&str] = &[
     "create table foo (with baz);",
     "create table foo (with ordinality);",
     "SELECT customer_name FROM GRAPH_TABLE (myshop MATCH (c IS customers WHERE c.address = 'US')-[IS customer_orders] COLUMNS (c.name AS customer_name));  -- error",
+    "SELECT * FROM GRAPH_TABLE (myshop MATCH COLUMNS (1 AS col));  -- error, empty match clause",
     ":show_data;",
     "alter trigger a on only grandparent rename to b;	-- ONLY not supported",
     "CREATE SUBSCRIPTION regress_testsub CONNECTION 'foo';",

@@ -19955,16 +19955,31 @@ fn build_prefix_expr<'a>(ctx: &Ctx, prefix_expr: &ast::PrefixExpr) -> Doc<'a> {
 fn build_operator<'a>(op: &ast::Op) -> Doc<'a> {
     let path_ref = op.path_ref();
     let mut doc = Doc::nil();
+    let mut after_path = false;
 
     for element in op.syntax().children_with_tokens() {
         match element {
             squawk_rowan::NodeOrToken::Node(node) => {
+                if after_path {
+                    after_path = false;
+                    doc = doc.append(leading_comments(&node));
+                }
                 doc = doc.append(match path_ref.as_ref() {
-                    Some(path) if path.syntax() == &node => build_path_ref(path),
+                    Some(path) if path.syntax() == &node => {
+                        after_path = true;
+                        build_path_ref(path)
+                    }
                     _ => build_operator_part(&node),
                 });
             }
             squawk_rowan::NodeOrToken::Token(token) => {
+                if after_path {
+                    if matches!(token.kind(), SyntaxKind::WHITESPACE | SyntaxKind::COMMENT) {
+                        continue;
+                    }
+                    after_path = false;
+                    doc = doc.append(leading_comments(&token));
+                }
                 doc = doc.append(build_operator_token(&token));
             }
         }

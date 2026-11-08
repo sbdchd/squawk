@@ -17,7 +17,6 @@ SOURCE_FILE
             PATH_SEGMENT_REF
               IDENT "p"
           DOT "."
-          PATH_SEGMENT_REF
         PLUS "+"
       WHITESPACE " "
       L_PAREN "("

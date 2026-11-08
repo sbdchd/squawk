@@ -372,7 +372,6 @@ SOURCE_FILE
                       ERROR
                         BINARY_KW "binary"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "
@@ -400,7 +399,6 @@ SOURCE_FILE
                       ERROR
                         LEFT_KW "left"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "
@@ -428,7 +426,6 @@ SOURCE_FILE
                       ERROR
                         COLLATION_KW "collation"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "
@@ -460,7 +457,6 @@ SOURCE_FILE
                       ERROR
                         BINARY_KW "binary"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "
@@ -480,7 +476,6 @@ SOURCE_FILE
             ERROR
               BINARY_KW "binary"
         DOT "."
-        PATH_SEGMENT_REF
       PLUS "+"
     WHITESPACE " "
     ATTRIBUTE_LIST
@@ -600,7 +595,6 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "pg_catalog"
                 DOT "."
-                PATH_SEGMENT_REF
               L_ANGLE "<"
     SEMICOLON ";"
   WHITESPACE "\n\n"
@@ -700,7 +694,6 @@ SOURCE_FILE
                     ERROR
                       BINARY_KW "binary"
                 DOT "."
-                PATH_SEGMENT_REF
               EQ "="
           R_PAREN ")"
       R_PAREN ")"

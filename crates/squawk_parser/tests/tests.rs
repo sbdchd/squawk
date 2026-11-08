@@ -3,7 +3,7 @@ use annotate_snippets::{AnnotationKind, Level, Renderer, Snippet, renderer::Deco
 use camino::Utf8Path;
 use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
-use squawk_parser::{EntryPoint, LexedStr};
+use squawk_parser::{EntryPoint, LexedStr, SyntaxKind};
 use std::fmt::Write;
 
 #[dir_test(
@@ -80,9 +80,21 @@ fn regression_suite(fixture: Fixture<&str>) {
         .and_then(|x| x.strip_suffix(".sql"))
         .unwrap();
 
-    let (_parsed, errors) = parse_text(content);
+    let Parsed {
+        errors,
+        empty_nodes,
+        ..
+    } = parse(content);
 
     let expect_errors = test_name == "errors";
+
+    if !expect_errors {
+        assert!(
+            empty_nodes.is_empty(),
+            "syntax nodes without children:\n{}",
+            empty_nodes.join("\n")
+        );
+    }
 
     let snapshot_name = format!("regression_{test_name}");
 
@@ -136,6 +148,18 @@ fn bom_after_start_is_an_ident_char() {
 
 #[must_use]
 fn parse_text(text: &str) -> (String, Option<String>) {
+    let Parsed { tree, errors, .. } = parse(text);
+    (tree, errors)
+}
+
+struct Parsed {
+    tree: String,
+    errors: Option<String>,
+    empty_nodes: Vec<String>,
+}
+
+#[must_use]
+fn parse(text: &str) -> Parsed {
     let lexed = LexedStr::new(text);
     let input = lexed.to_input();
     let output = EntryPoint::SourceFile.parse(&input);
@@ -145,20 +169,41 @@ fn parse_text(text: &str) -> (String, Option<String>) {
     let mut indent = String::new();
     let mut depth = 0;
     let mut len = 0;
+    let mut open_nodes: Vec<OpenNode> = vec![];
+    let mut empty_nodes = vec![];
     lexed.intersperse_trivia(&output, &mut |step| match step {
         squawk_parser::StrStep::Token { kind, text } => {
             assert!(depth > 0);
+            if !kind.is_trivia()
+                && let Some(parent) = open_nodes.last_mut()
+            {
+                parent.has_children = true;
+            }
             len += text.len();
             writeln!(buf, "{indent}{kind:?} {text:?}").unwrap();
         }
         squawk_parser::StrStep::Enter { kind } => {
             assert!(depth > 0 || len == 0);
+            if let Some(parent) = open_nodes.last_mut() {
+                parent.has_children = true;
+            }
+            open_nodes.push(OpenNode {
+                kind,
+                start: len,
+                has_children: false,
+            });
             depth += 1;
             writeln!(buf, "{indent}{kind:?}").unwrap();
             indent.push_str("  ");
         }
         squawk_parser::StrStep::Exit => {
             assert!(depth > 0);
+            if let Some(node) = open_nodes.pop()
+                && !node.has_children
+                && !open_nodes.is_empty()
+            {
+                empty_nodes.push(format!("{:?}@{}", node.kind, node.start));
+            }
             depth -= 1;
             indent.pop();
             indent.pop();
@@ -215,5 +260,15 @@ fn parse_text(text: &str) -> (String, Option<String>) {
         buf.push_str(&error_message);
     }
 
-    (buf, error_message)
+    Parsed {
+        tree: buf,
+        errors: error_message,
+        empty_nodes,
+    }
+}
+
+struct OpenNode {
+    kind: SyntaxKind,
+    start: usize,
+    has_children: bool,
 }

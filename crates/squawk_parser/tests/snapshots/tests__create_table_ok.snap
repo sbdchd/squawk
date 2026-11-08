@@ -2090,7 +2090,6 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "buzz"
                 DOT "."
-                PATH_SEGMENT_REF
               R_ANGLE ">"
           WHITESPACE " "
           R_PAREN ")"
@@ -2165,7 +2164,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT_REF
                 EQ "="
               R_PAREN ")"
           R_PAREN ")"
@@ -2389,7 +2387,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT_REF
                 EQ "="
               R_PAREN ")"
           R_PAREN ")"
@@ -2567,7 +2564,6 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "buzz"
                 DOT "."
-                PATH_SEGMENT_REF
               R_ANGLE ">"
           COMMA ","
           WHITESPACE " "
@@ -2997,7 +2993,6 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "buzz"
                 DOT "."
-                PATH_SEGMENT_REF
               R_ANGLE ">"
           WHITESPACE " "
           R_PAREN ")"

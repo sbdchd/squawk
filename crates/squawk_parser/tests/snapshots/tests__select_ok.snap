@@ -6666,7 +6666,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT_REF
                 L_ANGLE "<"
               R_PAREN ")"
     SEMICOLON ";"

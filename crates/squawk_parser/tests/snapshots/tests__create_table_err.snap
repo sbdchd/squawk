@@ -629,7 +629,6 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "buzz"
                 DOT "."
-                PATH_SEGMENT_REF
               R_ANGLE ">"
           WHITESPACE " "
           CONSTRAINT_EXCLUSION

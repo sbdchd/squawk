@@ -32,3 +32,6 @@ select * from graph_table(
 select * from graph_table (g match (a), columns (a));
 
 select * from graph_table (g match (a), where true columns (a));
+
+-- match requires a path pattern
+select * from graph_table (g match columns (a));
