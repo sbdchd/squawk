@@ -77,7 +77,6 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "bar"
         DOT "."
-        PATH_SEGMENT_REF
       CUSTOM_OP
         R_ANGLE ">"
         R_ANGLE ">"
@@ -422,7 +421,6 @@ SOURCE_FILE
                   PATH_SEGMENT_REF
                     IDENT "pg_catalog"
                 DOT "."
-                PATH_SEGMENT_REF
               PLUS "+"
             R_PAREN ")"
       COMMA ","

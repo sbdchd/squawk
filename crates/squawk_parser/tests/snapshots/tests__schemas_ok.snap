@@ -722,7 +722,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "
@@ -755,7 +754,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "
@@ -803,7 +801,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "a"
                   DOT "."
-                  PATH_SEGMENT_REF
                 CUSTOM_OP
                   AMP "&"
                   AMP "&"
@@ -831,7 +828,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "pg_catalog"
                   DOT "."
-                  PATH_SEGMENT_REF
                 MINUS "-"
               R_PAREN ")"
             WHITESPACE " "
@@ -877,7 +873,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       IDENT "b"
                   DOT "."
-                  PATH_SEGMENT_REF
                 MINUS "-"
               R_PAREN ")"
             WHITESPACE " "
@@ -906,7 +901,6 @@ SOURCE_FILE
                     PATH_SEGMENT_REF
                       DOMAIN_KW "domain"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "
@@ -937,7 +931,6 @@ SOURCE_FILE
                       WHITESPACE " "
                       STRING "'!'"
                   DOT "."
-                  PATH_SEGMENT_REF
                 PLUS "+"
               R_PAREN ")"
             WHITESPACE " "

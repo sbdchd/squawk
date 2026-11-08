@@ -445,6 +445,42 @@ SOURCE_FILE
             R_PAREN ")"
           R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- match requires a path pattern"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      GRAPH_TABLE_FROM_ITEM
+        GRAPH_TABLE_FN
+          GRAPH_TABLE_KW "graph_table"
+          WHITESPACE " "
+          L_PAREN "("
+          PROPERTY_GRAPH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "g"
+          WHITESPACE " "
+          MATCH_KW "match"
+          WHITESPACE " "
+          COLUMNS_KW "columns"
+          WHITESPACE " "
+          EXPR_AS_COLUMN_NAME_LIST
+            L_PAREN "("
+            EXPR_AS_COLUMN_NAME
+              NAME_REF
+                IDENT "a"
+            R_PAREN ")"
+          R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected `,`
@@ -499,3 +535,7 @@ error[syntax-error]: expected path pattern after comma
    ╭▸ 
 34 │ select * from graph_table (g match (a), where true columns (a));
    ╰╴                                       ━
+error[syntax-error]: expected path pattern
+   ╭▸ 
+37 │ select * from graph_table (g match columns (a));
+   ╰╴                                  ━
