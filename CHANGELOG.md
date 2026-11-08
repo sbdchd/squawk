@@ -7,6 +7,46 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.72.0 - 2026-11-07
+
+### Added
+
+- sema: checks for truncate (#1459)
+- sema: validate string literals (#1467, #1466)
+- sema: check for partitions, cast suggestion (#1465)
+- sema: casts check, insert/update check, in checks (#1464)
+- sema: fk check, alter type cast check, fix lowering treat (#1463)
+- sema: improve view checks, on conflict rules, and overload error messages (#1462)
+- sema: check generated columns, union & co, recursive cte types (#1461)
+- sema: misc checks continue + fix empty column constraint parsing (#1460)
+- sema: bool condition & constraint validation (#1453)
+- sema: col & return type validation (#1452)
+- sema: add more checks around `on conflict` (#1451)
+- sema: improve function error messages (#1450)
+- sema: operator error message improvements (#1448)
+- sema: improve errors for DDL (#1447)
+- sema: improve errors around functions/procedures/aggregates + fix array names (#1446)
+
+### Changed
+
+- fmt: improve perf + sema perf improvements (#1458)
+- parser/syntax/fmt: improve perf (27.6% for fmt) (#1455)
+
+### Fixed
+
+- parser: prevent empty nodes from showing up (#1468)
+- playground: surface sema errors & quick fixes (#1441)
+- linter: fix various bugs and gaps (#1457, #1456)
+- ide: fix highlighting bug (#1465)
+- sema: fix lowering for builtin functions (#1449)
+
+### Internal
+
+- syntax: vendor rowan from rust-glancer + perf improvements (#1454)
+- internal: refactor code actions into own crate (#1445)
+- internal: refactor sema into own crate (#1444)
+- internal: refactor diagnostics into own crate (#1442)
+
 ## v2.71.0 - 2026-10-29
 
 ### Added
