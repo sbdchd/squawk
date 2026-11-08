@@ -253,3 +253,35 @@ merge into t using t on true when matched then do nothing;
       ╰╴                   ━
     ");
 }
+
+#[test]
+fn merge_insert_invalid_literals() {
+    assert_snapshot!(check("
+create table t (
+  a numeric(3, 0),
+  b bool
+);
+create table u (x int);
+merge into t
+using u on false
+when not matched then
+  insert (b) values ('x');
+merge into t
+using u on false
+when not matched then
+  insert values ('1000', 't');
+"), @"
+    error: invalid input value for type `bool`: `x`
+       ╭▸ 
+    10 │   insert (b) values ('x');
+       │                      ━━━
+       │
+       ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: value `1000` is out of range for type `numeric(3, 0)`
+       ╭▸ 
+    14 │   insert values ('1000', 't');
+       │                  ━━━━━━
+       │
+       ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
+    ");
+}

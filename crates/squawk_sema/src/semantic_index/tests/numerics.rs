@@ -75,7 +75,7 @@ select
     6 │   'Infinity'::numeric(3, 1),
       │   ━━━━━━━━━━
       │
-      ╰ note: a field with precision 3 and scale 1 must round to an absolute value less than `10^2`
+      ╰ note: a field with precision 3 and scale 1 cannot hold an infinite value
     error: value `1000` is out of range for type `numeric(3, 0)`
       ╭▸ 
     7 │   '1000'::numeric(3);
@@ -165,5 +165,19 @@ insert into t (b) values ('1000');
        │                           ━━━━━━
        │
        ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
+    ");
+}
+
+#[test]
+fn numeric_string_typmod() {
+    assert_snapshot!(check("
+select '1000'::numeric('3', '0');
+"), @"
+    error: value `1000` is out of range for type `numeric(3, 0)`
+      ╭▸ 
+    2 │ select '1000'::numeric('3', '0');
+      │        ━━━━━━
+      │
+      ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
     ");
 }

@@ -1,4 +1,4 @@
-use std::{borrow::Cow, fmt, fmt::Write};
+use std::{borrow::Cow, cmp::Ordering, fmt, fmt::Write};
 
 use num_bigint::BigUint;
 use squawk_rowan::{TextRange, TextSize};
@@ -284,7 +284,8 @@ pub(crate) fn parse_int(text: &str, ty: IntType) -> Result<i64, IntInputError> {
 
 const DEC_DIGITS: i64 = 4;
 const NUMERIC_DSCALE_MAX: i64 = 0x3FFF;
-const NUMERIC_WEIGHT_MAX: i64 = 0x7FFF;
+const NUMERIC_MAX_DECIMAL_DIGITS: u32 = 131_072;
+const NUMERIC_MAX_DECIMAL_BITS: u64 = 435_412;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) struct NumericTypmod {
@@ -312,6 +313,7 @@ impl NumericTypmod {
 pub(crate) enum NumericInputError {
     InvalidSyntax,
     FieldOverflow,
+    InfiniteOverflow,
     FormatOverflow,
 }
 
@@ -402,7 +404,7 @@ pub(crate) fn check_numeric(
             return Err(NumericInputError::InvalidSyntax);
         }
         if infinite && typmod.is_some() {
-            return Err(NumericInputError::FieldOverflow);
+            return Err(NumericInputError::InfiniteOverflow);
         }
         return Ok(());
     }
@@ -412,7 +414,7 @@ pub(crate) fn check_numeric(
         [b'0', b'b' | b'B', ..] => 2,
         _ => 10,
     };
-    let mut buf = [0u8; 39];
+    let mut buf;
     let decimal = if radix == 10 {
         let (decimal, rest) = parse_decimal(unsigned)?;
         if !is_blank(rest) {
@@ -425,7 +427,10 @@ pub(crate) fn check_numeric(
             return Err(NumericInputError::InvalidSyntax);
         }
         match value {
-            NonDecimal::Small(value) => decimal_from_u128(value, &mut buf),
+            NonDecimal::Small(value) => {
+                buf = [0u8; 39];
+                decimal_from_u128(value, &mut buf)
+            }
             NonDecimal::Big(digits) => return check_big_integer(digits, radix, typmod),
         }
     };
@@ -582,9 +587,12 @@ fn check_big_integer(
     );
     let value = BigUint::from_radix_be(&values, radix).ok_or(NumericInputError::InvalidSyntax)?;
     let ten = BigUint::from(10u32);
-    let max_weight_digits = u32::try_from((NUMERIC_WEIGHT_MAX + 1) * DEC_DIGITS)
-        .map_err(|_| NumericInputError::FormatOverflow)?;
-    if value >= ten.pow(max_weight_digits) {
+    let overflows = match value.bits().cmp(&NUMERIC_MAX_DECIMAL_BITS) {
+        Ordering::Less => false,
+        Ordering::Equal => value >= ten.pow(NUMERIC_MAX_DECIMAL_DIGITS),
+        Ordering::Greater => true,
+    };
+    if overflows {
         return Err(NumericInputError::FormatOverflow);
     }
     let Some(typmod) = typmod else {
@@ -662,10 +670,13 @@ fn clip_to_char_boundary(text: &str, mut len: usize) -> &str {
 
 #[cfg(test)]
 mod tests {
+    use num_bigint::BigUint;
+
     use super::{
-        IntInputError, IntType, NumericInputError, NumericTypmod, check_numeric,
-        make_array_type_name, make_multirange_type_name, parse_bool, parse_int,
-        split_identifier_string, truncate_identifier,
+        IntInputError, IntType, NUMERIC_MAX_DECIMAL_BITS, NUMERIC_MAX_DECIMAL_DIGITS,
+        NumericInputError, NumericTypmod, check_numeric, make_array_type_name,
+        make_multirange_type_name, parse_bool, parse_int, split_identifier_string,
+        truncate_identifier,
     };
 
     #[track_caller]
@@ -840,7 +851,7 @@ mod tests {
 
     #[test]
     fn check_numerics() {
-        use NumericInputError::{FieldOverflow, FormatOverflow, InvalidSyntax};
+        use NumericInputError::{FieldOverflow, FormatOverflow, InfiniteOverflow, InvalidSyntax};
 
         let typmod = |precision, scale| NumericTypmod::new(precision, scale);
 
@@ -886,7 +897,10 @@ mod tests {
         assert_eq!(check_numeric("0xFF", typmod(3, 0)), Ok(()));
         assert_eq!(check_numeric("0xFF", typmod(2, 0)), Err(FieldOverflow));
         assert_eq!(check_numeric("NaN", typmod(3, 1)), Ok(()));
-        assert_eq!(check_numeric("Infinity", typmod(3, 1)), Err(FieldOverflow));
+        assert_eq!(
+            check_numeric("Infinity", typmod(3, 1)),
+            Err(InfiniteOverflow)
+        );
 
         let big = "0x1FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF";
         assert_eq!(check_numeric(big, None), Ok(()));
@@ -900,6 +914,14 @@ mod tests {
         assert_eq!(
             check_numeric(&format!("0x{}", "F".repeat(108_854)), None),
             Err(FormatOverflow)
+        );
+        assert_eq!(
+            check_numeric(&format!("0x8{}", "0".repeat(108_852)), None),
+            Ok(())
+        );
+        assert_eq!(
+            BigUint::from(10u32).pow(NUMERIC_MAX_DECIMAL_DIGITS).bits(),
+            NUMERIC_MAX_DECIMAL_BITS
         );
     }
 }

@@ -49,8 +49,8 @@ use crate::{
         ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, Comparison, CompoundOp,
         ConflictAction, ConflictRuleEvent, ConflictTargetKey, DefaultChange, DropRelation,
         ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType,
-        ForeignKeyPair, GeneratedKind, LookupKind, ObjectKind, OperandName, OperatorReplacement,
-        OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
+        ForeignKeyPair, GeneratedKind, LookupKind, NumericOverflow, ObjectKind, OperandName,
+        OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
         SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
         TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
     },
@@ -11975,7 +11975,9 @@ impl Lowerer {
                             name: Some(self.intern(&name.text())),
                             ptr: self.ptr(name.syntax()),
                             ty,
-                            typmod: None,
+                            typmod: ty
+                                .zip(field.ty())
+                                .and_then(|(ty, ast_ty)| self.lower_typmod(ty, &ast_ty)),
                             merge: None,
                         };
                         let id = self.alloc_column_def(column);
@@ -12373,6 +12375,41 @@ impl Lowerer {
         }
     }
 
+    fn check_unknown_literal(
+        &mut self,
+        target: Ty,
+        typmod: Option<Typmod>,
+        literal: &ast::Literal,
+    ) {
+        let typmod = typmod.or_else(|| self.index.domain_typmod(target));
+        if let Some(target) = self.literal_target(target, typmod) {
+            self.lower_literal_value(target, literal);
+        }
+    }
+
+    fn check_row_literals(&mut self, target: Ty, tuple: &ast::TupleExpr) {
+        let Some(&columns) = self.ty_columns(target) else {
+            return;
+        };
+        if !columns.complete || tuple.exprs().count() != columns.range.len() {
+            return;
+        }
+        for (expr, id) in tuple.exprs().zip(columns.range.iter()) {
+            let column = self.index.columns[id];
+            let Some(ty) = column.ty else {
+                continue;
+            };
+            let expr = expr.unparen();
+            if let ast::Expr::TupleExpr(tuple) = &expr {
+                self.check_row_literals(ty, tuple);
+            } else if is_unknown_literal_expr(&expr)
+                && let Some(literal) = expr.as_literal()
+            {
+                self.check_unknown_literal(ty, column.typmod, &literal);
+            }
+        }
+    }
+
     fn check_numeric_value(&mut self, typmod: Option<NumericTypmod>, literal: &ast::Literal) {
         if !literal.is_string() {
             return;
@@ -12380,21 +12417,30 @@ impl Lowerer {
         let Some(value) = literal.string_value() else {
             return;
         };
-        let error = match postgres::check_numeric(&value, typmod) {
-            Ok(()) => return,
-            Err(NumericInputError::InvalidSyntax) => SemaError::InvalidNumericValue {
-                value: self.intern(&value),
-            },
-            Err(NumericInputError::FieldOverflow) => SemaError::NumericValueOutOfRange {
-                value: self.intern(&value),
-                typmod,
-            },
-            Err(NumericInputError::FormatOverflow) => SemaError::NumericValueOutOfRange {
-                value: self.intern(&value),
-                typmod: None,
-            },
+        let overflow = match (postgres::check_numeric(&value, typmod), typmod) {
+            (Ok(()), _)
+            | (Err(NumericInputError::FieldOverflow | NumericInputError::InfiniteOverflow), None) =>
+            {
+                return;
+            }
+            (Err(NumericInputError::InvalidSyntax), _) => {
+                let value = self.intern(&value);
+                self.push_error(literal.syntax(), SemaError::InvalidNumericValue { value });
+                return;
+            }
+            (Err(NumericInputError::FormatOverflow), _) => NumericOverflow::Format,
+            (Err(NumericInputError::FieldOverflow), Some(typmod)) => {
+                NumericOverflow::Typmod(typmod)
+            }
+            (Err(NumericInputError::InfiniteOverflow), Some(typmod)) => {
+                NumericOverflow::Infinite(typmod)
+            }
         };
-        self.push_error(literal.syntax(), error);
+        let value = self.intern(&value);
+        self.push_error(
+            literal.syntax(),
+            SemaError::NumericValueOutOfRange { value, overflow },
+        );
     }
 
     fn check_int_value(&mut self, ty: IntType, literal: &ast::Literal) {
@@ -12742,6 +12788,12 @@ impl Lowerer {
                     && let Some(tables) =
                         self.typed_tables_to_alter(ty, add.drop_behavior().as_ref(), node)
                 {
+                    let column_ty = ColumnType {
+                        ty: column_ty,
+                        typmod: column_ty
+                            .zip(add.ty())
+                            .and_then(|(ty, ast_ty)| self.lower_typmod(ty, &ast_ty)),
+                    };
                     for table in tables {
                         self.add_typed_table_column(table, &field, column_ty);
                     }
@@ -12924,7 +12976,7 @@ impl Lowerer {
         &mut self,
         table: TableId,
         name_node: &impl NameLike,
-        ty: Option<Ty>,
+        ty: ColumnType,
     ) {
         let name = self.intern(&name_node.text());
         let columns = self.index.tables[table].columns;
@@ -12936,8 +12988,8 @@ impl Lowerer {
         self.index.columns.alloc(Column {
             name: Some(name),
             ptr: self.ptr(name_node.syntax()),
-            ty,
-            typmod: None,
+            ty: ty.ty,
+            typmod: ty.typmod,
             merge: None,
         });
         self.set_table_columns(table, self.index.columns.range_from(start));
@@ -13012,7 +13064,7 @@ impl Lowerer {
         self.push_error(name_node, SemaError::DuplicateColumn { name, relation });
     }
 
-    fn add_type_attribute(&mut self, ty: TypeId, name_node: &impl NameLike, column_ty: Option<Ty>) {
+    fn add_type_attribute(&mut self, ty: TypeId, name_node: &impl NameLike, column_ty: ColumnType) {
         let name = self.intern(&name_node.text());
         if self.type_attribute_exists(ty, name) {
             self.report_duplicate_column(self.index.types[ty].name, name_node.syntax(), name);
@@ -13026,8 +13078,8 @@ impl Lowerer {
         self.alloc_column_def(Column {
             name: Some(name),
             ptr: self.ptr(name_node.syntax()),
-            ty: column_ty,
-            typmod: None,
+            ty: column_ty.ty,
+            typmod: column_ty.typmod,
             merge: None,
         });
         let range = self.index.columns.range_from(start);
@@ -15043,14 +15095,23 @@ impl Lowerer {
                         self.lower_column_target(ExprContext::Insert, target, &column_target);
                     }
                 }
-                for expr in insert
+                let targets = self.target_table(target).and_then(|table| {
+                    let targets = self.insert_targets(insert.column_target_list(), table)?;
+                    Some((table, targets))
+                });
+                for row in insert
                     .values()
                     .and_then(|values| values.row_list())
                     .into_iter()
                     .flat_map(|list| list.rows())
-                    .flat_map(|row| row.exprs())
                 {
-                    self.lower_expr_in(ExprContext::ValuesSingle, &expr);
+                    for (position, expr) in row.exprs().enumerate() {
+                        let ty = self.lower_expr_in(ExprContext::ValuesSingle, &expr);
+                        if let Some((table, targets)) = &targets {
+                            let column = targets.get(position).copied().flatten();
+                            self.check_merge_insert_value(*table, column, &expr, ty);
+                        }
+                    }
                 }
             }
             ast::MergeAction::MergeUpdate(update) => {
@@ -15186,35 +15247,9 @@ impl Lowerer {
         source: &ast::SelectVariant,
         values: &[InsertValue],
     ) {
-        let targets: SmallVec<[Option<Name>; 8]> = match insert.column_target_list() {
-            Some(list) => list
-                .column_targets()
-                .map(|target| {
-                    if target.accessors().next().is_some() {
-                        return None;
-                    }
-                    target.name().map(|name| self.intern(&name.text()))
-                })
-                .collect(),
-            None => {
-                let columns = self.index.tables[table].columns;
-                if !columns.complete {
-                    return;
-                }
-                columns
-                    .range
-                    .iter()
-                    .map(|id| self.index.columns[id].name)
-                    .collect()
-            }
-        };
-        if targets
-            .iter()
-            .enumerate()
-            .any(|(i, target)| target.is_some() && targets[..i].contains(target))
-        {
+        let Some(targets) = self.insert_targets(insert.column_target_list(), table) else {
             return;
-        }
+        };
         let target_column = |this: &Self, position: usize| {
             let column = (*targets.get(position)?)?;
             Some((column, this.find_table_column(table, column)?))
@@ -15237,12 +15272,17 @@ impl Lowerer {
             let Some((column, target)) = target_column(self, position) else {
                 continue;
             };
+            if insert_output_is_unknown_literal(source, position) {
+                if let Some(assignment) =
+                    self.column_assignment(column, target, ArgType::UnknownLiteral, false)
+                {
+                    self.check_insert_output_literals(assignment, source, position);
+                }
+                continue;
+            }
             let Some(ty) = self.index.columns[id].ty else {
                 continue;
             };
-            if insert_output_is_unknown_literal(source, position) {
-                continue;
-            }
             let Some(expr) = output_expr(source, position) else {
                 continue;
             };
@@ -15252,6 +15292,92 @@ impl Lowerer {
                 continue;
             };
             self.check_assignment(assignment, &expr);
+        }
+    }
+
+    fn insert_targets(
+        &mut self,
+        list: Option<ast::ColumnTargetList>,
+        table: TableId,
+    ) -> Option<SmallVec<[Option<Name>; 8]>> {
+        let targets: SmallVec<[Option<Name>; 8]> = match list {
+            Some(list) => list
+                .column_targets()
+                .map(|target| {
+                    if target.accessors().next().is_some() {
+                        return None;
+                    }
+                    target.name().map(|name| self.intern(&name.text()))
+                })
+                .collect(),
+            None => {
+                let columns = self.index.tables[table].columns;
+                if !columns.complete {
+                    return None;
+                }
+                columns
+                    .range
+                    .iter()
+                    .map(|id| self.index.columns[id].name)
+                    .collect()
+            }
+        };
+        if targets
+            .iter()
+            .enumerate()
+            .any(|(i, target)| target.is_some() && targets[..i].contains(target))
+        {
+            return None;
+        }
+        Some(targets)
+    }
+
+    fn check_merge_insert_value(
+        &mut self,
+        table: TableId,
+        column: Option<Name>,
+        expr: &ast::Expr,
+        ty: Option<Ty>,
+    ) {
+        if let Some(column) = column
+            && let Some(id) = self.find_table_column(table, column)
+            && let Some(assignment) =
+                self.column_assignment(column, id, expr_arg_type(Some(expr), ty), false)
+        {
+            self.check_assignment(assignment, expr);
+        }
+    }
+
+    fn check_insert_output_literals(
+        &mut self,
+        assignment: Assignment,
+        source: &ast::SelectVariant,
+        position: usize,
+    ) {
+        match source {
+            ast::SelectVariant::Values(values) => {
+                for expr in values
+                    .row_list()
+                    .into_iter()
+                    .flat_map(|list| list.rows())
+                    .filter_map(|row| row.exprs().nth(position))
+                {
+                    self.check_assignment(assignment, &expr);
+                }
+            }
+            ast::SelectVariant::ParenSelect(paren) => {
+                if let Some(inner) = paren.select() {
+                    self.check_insert_output_literals(assignment, &inner, position);
+                }
+            }
+            ast::SelectVariant::Select(_) => {
+                if let Some(expr) = output_expr(source, position) {
+                    self.check_assignment(assignment, &expr);
+                }
+            }
+            ast::SelectVariant::CompoundSelect(_)
+            | ast::SelectVariant::SelectInto(_)
+            | ast::SelectVariant::Table(_) => {}
         }
     }
 
@@ -15305,13 +15431,13 @@ impl Lowerer {
         if self.attach_empty_array_cast(target, expr) {
             return;
         }
-        if value == ArgType::UnknownLiteral
-            && let Some(literal) = expr.unparen().as_literal()
+        let unparen = expr.unparen();
+        if let ast::Expr::TupleExpr(tuple) = &unparen {
+            self.check_row_literals(target, tuple);
+        } else if value == ArgType::UnknownLiteral
+            && let Some(literal) = unparen.as_literal()
         {
-            let typmod = typmod.or_else(|| self.index.domain_typmod(target));
-            if let Some(target) = self.literal_target(target, typmod) {
-                self.lower_literal_value(target, &literal);
-            }
+            self.check_unknown_literal(target, typmod, &literal);
         }
         let ArgType::Known(ty) = value else {
             return;
@@ -15548,22 +15674,26 @@ impl Lowerer {
         self.set_visible((0..len).into());
     }
 
+    fn target_table(&self, target: Option<SourceId>) -> Option<TableId> {
+        match self.index.sources[target?].kind {
+            SourceKind::Table(table) => Some(table),
+            SourceKind::Cte(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::Returning(_)
+            | SourceKind::Excluded(_)
+            | SourceKind::RuleRelation(_)
+            | SourceKind::ElementVariable
+            | SourceKind::Other => None,
+        }
+    }
+
     fn lower_set_clause(&mut self, target: Option<SourceId>, set_clause: &ast::SetClause) {
-        let table = target
-            .and_then(|target| match self.index.sources[target].kind {
-                SourceKind::Table(table) => Some(table),
-                SourceKind::Cte(_)
-                | SourceKind::External
-                | SourceKind::Subquery(_)
-                | SourceKind::Function(_)
-                | SourceKind::Join
-                | SourceKind::UsingAlias
-                | SourceKind::Returning(_)
-                | SourceKind::Excluded(_)
-                | SourceKind::RuleRelation(_)
-                | SourceKind::ElementVariable
-                | SourceKind::Other => None,
-            })
+        let table = self
+            .target_table(target)
             .filter(|table| self.index.tables[*table].kind == TableKind::Table);
         let mut seen = smallvec![];
         for set_column in set_clause
@@ -23237,11 +23367,12 @@ impl Lowerer {
             if target.as_name().is_some() {
                 explicit.push(columns.len());
             }
+            let typmod = ty.and_then(|ty| self.expr_typmod(ty, &expr));
             columns.push(Column {
                 name,
                 ptr: self.ptr(&node),
                 ty,
-                typmod: None,
+                typmod,
                 merge: None,
             });
         }
@@ -23253,6 +23384,20 @@ impl Lowerer {
             self.add_item_range(ptr.file_range(), Item::Column(id));
         }
         Columns { range, complete }
+    }
+
+    fn expr_typmod(&mut self, ty: Ty, expr: &ast::Expr) -> Option<Typmod> {
+        let expr = expr.unparen();
+        if let ast::Expr::CastExpr(cast) = &expr {
+            return self.lower_typmod(ty, &cast.ty()?);
+        }
+        if let ast::Expr::NameRef(name_ref) = &expr
+            && let Some(name) = self.name_ref_name(name_ref)
+            && let Resolution::Column { column, .. } = self.resolve_column(name)
+        {
+            return self.index.columns[column].typmod;
+        }
+        None
     }
 
     fn lower_field_star(&mut self, field_expr: &ast::FieldExpr, star: &SyntaxToken) -> FieldStar {
@@ -23682,15 +23827,16 @@ impl Lowerer {
                 let literal = cast
                     .literal()
                     .or_else(|| cast.expr().and_then(|expr| expr.as_literal()));
-                if let Some(ty) = ty
-                    && let Some(literal) = literal
-                {
-                    let typmod = cast
-                        .ty()
-                        .and_then(|cast_ty| self.lower_typmod(ty, &cast_ty))
-                        .or_else(|| self.index.domain_typmod(ty));
-                    if let Some(target) = self.literal_target(ty, typmod) {
-                        self.lower_literal_value(target, &literal);
+                if let Some(ty) = ty {
+                    if let Some(literal) = literal {
+                        let typmod = cast
+                            .ty()
+                            .and_then(|cast_ty| self.lower_typmod(ty, &cast_ty));
+                        self.check_unknown_literal(ty, typmod, &literal);
+                    } else if let Some(ast::Expr::TupleExpr(tuple)) =
+                        cast.expr().map(|expr| expr.unparen())
+                    {
+                        self.check_row_literals(ty, &tuple);
                     }
                 }
                 return ty;
@@ -27832,7 +27978,11 @@ fn typmod_value(expr: &ast::Expr) -> Option<i64> {
         let value = prefix.expr()?.as_literal()?.integer_value_u64()?;
         return i64::try_from(value).ok().map(|value| -value);
     }
-    i64::try_from(expr.as_literal()?.integer_value_u64()?).ok()
+    let literal = expr.as_literal()?;
+    if literal.is_string() {
+        return postgres::parse_int(&literal.string_value()?, IntType::Int4).ok();
+    }
+    i64::try_from(literal.integer_value_u64()?).ok()
 }
 
 fn similar_bool_input(value: &str) -> Option<&'static str> {

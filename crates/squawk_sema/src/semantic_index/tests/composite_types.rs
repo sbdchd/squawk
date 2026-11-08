@@ -573,3 +573,51 @@ select (null::t).b, (null::m1).c;"), @"
        ╰╴                               ━
     ");
 }
+
+#[test]
+fn composite_invalid_field_literals() {
+    assert_snapshot!(check("
+create type c as (
+  a numeric(3, 0),
+  b bool
+);
+create table t of c;
+create table u (c c);
+insert into t values ('1000', 'x');
+insert into u values (row('1000', 't'));
+select row('1', 'x')::c;
+alter type c add attribute d numeric(2, 1) cascade;
+select row('1', 't', '9.96')::c;
+"), @"
+    error: value `1000` is out of range for type `numeric(3, 0)`
+      ╭▸ 
+    8 │ insert into t values ('1000', 'x');
+      │                       ━━━━━━
+      │
+      ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    8 │ insert into t values ('1000', 'x');
+      │                               ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: value `1000` is out of range for type `numeric(3, 0)`
+      ╭▸ 
+    9 │ insert into u values (row('1000', 't'));
+      │                           ━━━━━━
+      │
+      ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
+    error: invalid input value for type `bool`: `x`
+       ╭▸ 
+    10 │ select row('1', 'x')::c;
+       │                 ━━━
+       │
+       ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: value `9.96` is out of range for type `numeric(2, 1)`
+       ╭▸ 
+    12 │ select row('1', 't', '9.96')::c;
+       │                      ━━━━━━
+       │
+       ╰ note: a field with precision 2 and scale 1 must round to an absolute value less than `10^1`
+    ");
+}

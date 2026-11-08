@@ -261,6 +261,13 @@ impl ObjectKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum NumericOverflow {
+    Format,
+    Typmod(NumericTypmod),
+    Infinite(NumericTypmod),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum SemaError {
     CannotChangeDatabase,
     ValuesLengthMismatch,
@@ -553,7 +560,7 @@ pub(crate) enum SemaError {
     },
     NumericValueOutOfRange {
         value: Name,
-        typmod: Option<NumericTypmod>,
+        overflow: NumericOverflow,
     },
     NotEnum {
         name: Name,
@@ -2368,7 +2375,7 @@ impl SemaError {
             }
             SemaError::NonBoolComparison { comparison, .. } => Cow::Borrowed(comparison.note()),
             SemaError::NumericValueOutOfRange {
-                typmod: Some(typmod),
+                overflow: NumericOverflow::Typmod(typmod),
                 ..
             } => {
                 let bound = match typmod.max_digits() {
@@ -2380,6 +2387,13 @@ impl SemaError {
                     typmod.precision, typmod.scale
                 ))
             }
+            SemaError::NumericValueOutOfRange {
+                overflow: NumericOverflow::Infinite(typmod),
+                ..
+            } => Cow::Owned(format!(
+                "a field with precision {} and scale {} cannot hold an infinite value",
+                typmod.precision, typmod.scale
+            )),
             SemaError::DropColumnWithDependents { column, view, .. }
             | SemaError::AlterColumnTypeWithDependents { column, view } => Cow::Owned(format!(
                 "view `{}` depends on column `{}`",
@@ -3341,7 +3355,9 @@ impl fmt::Display for ErrorMessage<'_> {
             }
             SemaError::NumericValueOutOfRange {
                 value,
-                typmod: Some(NumericTypmod { precision, scale }),
+                overflow:
+                    NumericOverflow::Typmod(NumericTypmod { precision, scale })
+                    | NumericOverflow::Infinite(NumericTypmod { precision, scale }),
             } => write!(
                 f,
                 "value `{}` is out of range for type `numeric({precision}, {scale})`",
@@ -3349,7 +3365,7 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::NumericValueOutOfRange {
                 value,
-                typmod: None,
+                overflow: NumericOverflow::Format,
             } => write!(f, "value `{}` is out of range for type `numeric`", n(value)),
             SemaError::NotEnum { name } => write!(f, "`{}` is not an enum", n(name)),
             SemaError::NotComposite { name } => write!(f, "`{}` is not a composite type", n(name)),
