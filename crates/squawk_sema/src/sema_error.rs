@@ -13,6 +13,7 @@ use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::lower::{ExprContext, OutputClause, TableLookup};
+use crate::postgres::IntType;
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -534,6 +535,18 @@ pub(crate) enum SemaError {
         ty: Name,
         value: Name,
         similar: Option<Name>,
+    },
+    InvalidBoolValue {
+        value: Name,
+        similar: Option<&'static str>,
+    },
+    InvalidIntValue {
+        ty: IntType,
+        value: Name,
+    },
+    IntValueOutOfRange {
+        ty: IntType,
+        value: Name,
     },
     NotEnum {
         name: Name,
@@ -1499,6 +1512,10 @@ impl SemaError {
                 DiagnosticKind::UnresolvedRelation
             }
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
+            SemaError::InvalidBoolValue { .. } | SemaError::InvalidIntValue { .. } => {
+                DiagnosticKind::InvalidLiteral
+            }
+            SemaError::IntValueOutOfRange { .. } => DiagnosticKind::ValueOutOfRange,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
             | SemaError::StarNotComposite { .. }
@@ -1634,6 +1651,14 @@ impl SemaError {
                 "an enum label with a similar name exists",
                 range,
                 quote_string_literal(names.resolve(label)),
+            ),
+            SemaError::InvalidBoolValue {
+                similar: Some(similar),
+                ..
+            } => replace_suggestion(
+                "a similar boolean value exists",
+                range,
+                quote_string_literal(similar),
             ),
             SemaError::UnresolvedQualifiedColumn {
                 similar: Some(similar),
@@ -2018,6 +2043,20 @@ impl SemaError {
         match *self {
             SemaError::NoDefaultOperatorClass { .. } => Some(
                 "specify an operator class for the index or define a default operator class for the data type",
+            ),
+            SemaError::IntValueOutOfRange {
+                ty: IntType::Int2, ..
+            } => Some("`int2` values range from `-32768` to `32767`"),
+            SemaError::IntValueOutOfRange {
+                ty: IntType::Int4, ..
+            } => Some("`int4` values range from `-2147483648` to `2147483647`"),
+            SemaError::IntValueOutOfRange {
+                ty: IntType::Int8, ..
+            } => Some(
+                "`int8` values range from `-9223372036854775808` to `9223372036854775807`",
+            ),
+            SemaError::InvalidBoolValue { similar: None, .. } => Some(
+                "expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`",
             ),
             SemaError::EmptyArrayType { cast: None } => Some(
                 "explicitly cast to the desired type, for example `array[]::integer[]`",
@@ -3259,6 +3298,21 @@ impl fmt::Display for ErrorMessage<'_> {
                 "invalid input value for enum `{}`: `{}`",
                 n(ty),
                 n(value)
+            ),
+            SemaError::InvalidBoolValue { value, similar: _ } => {
+                write!(f, "invalid input value for type `bool`: `{}`", n(value))
+            }
+            SemaError::InvalidIntValue { ty, value } => write!(
+                f,
+                "invalid input value for type `{}`: `{}`",
+                ty.name(),
+                n(value)
+            ),
+            SemaError::IntValueOutOfRange { ty, value } => write!(
+                f,
+                "value `{}` is out of range for type `{}`",
+                n(value),
+                ty.name()
             ),
             SemaError::NotEnum { name } => write!(f, "`{}` is not an enum", n(name)),
             SemaError::NotComposite { name } => write!(f, "`{}` is not a composite type", n(name)),

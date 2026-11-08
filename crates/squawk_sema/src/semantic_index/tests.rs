@@ -1,5 +1,6 @@
 mod access_methods;
 mod aggregates;
+mod bools;
 mod builtins;
 mod casts;
 mod collations;
@@ -27,6 +28,7 @@ mod functions;
 mod indexes;
 mod inheritance;
 mod insert;
+mod ints;
 mod items;
 mod joins;
 mod languages;

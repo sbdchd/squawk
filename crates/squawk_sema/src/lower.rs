@@ -20,6 +20,7 @@ use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
 use crate::interner::Name;
 use crate::keyed_index::GraphElementIndex;
+use crate::postgres::{IntInputError, IntType};
 
 use crate::{
     ir::{
@@ -194,6 +195,13 @@ impl IndexData {
             self.param_functions.insert(param, function);
         }
     }
+}
+
+#[derive(Clone, Copy)]
+enum LiteralTarget {
+    Enum(TypeId),
+    Bool,
+    Int(IntType),
 }
 
 struct QueryScope {
@@ -12307,29 +12315,88 @@ impl Lowerer {
         label
     }
 
-    fn enum_type(&self, ty: Option<Ty>) -> Option<TypeId> {
-        match self.index.base_type(ty?)? {
-            Ty::Type(id) if self.index.types[id].kind == TypeKind::Enum => Some(id),
-            Ty::Type(_) | Ty::Table(_) | Ty::Cte(_) | Ty::Array(_) => None,
+    fn literal_target(&self, ty: Ty) -> Option<LiteralTarget> {
+        let Ty::Type(id) = self.index.base_type(ty)? else {
+            return None;
+        };
+        let ty = &self.index.types[id];
+        if ty.kind == TypeKind::Enum {
+            return Some(LiteralTarget::Enum(id));
+        }
+        if ty.schema != self.pg_catalog {
+            return None;
+        }
+        match self.index.names.resolve(ty.name) {
+            "bool" => Some(LiteralTarget::Bool),
+            "int2" => Some(LiteralTarget::Int(IntType::Int2)),
+            "int4" => Some(LiteralTarget::Int(IntType::Int4)),
+            "int8" => Some(LiteralTarget::Int(IntType::Int8)),
+            _ => None,
         }
     }
 
-    fn lower_enum_comparison(&mut self, other: Option<Ty>, expr: &ast::Expr) {
-        let Some(ty) = self.enum_type(other) else {
+    fn lower_literal_value(&mut self, target: LiteralTarget, literal: &ast::Literal) {
+        match target {
+            LiteralTarget::Enum(ty) => self.lower_enum_value(ty, literal),
+            LiteralTarget::Bool => self.check_bool_value(literal),
+            LiteralTarget::Int(ty) => self.check_int_value(ty, literal),
+        }
+    }
+
+    fn check_int_value(&mut self, ty: IntType, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        let error = match postgres::parse_int(&value, ty) {
+            Ok(_) => return,
+            Err(IntInputError::InvalidSyntax) => SemaError::InvalidIntValue {
+                ty,
+                value: self.intern(&value),
+            },
+            Err(IntInputError::OutOfRange) => SemaError::IntValueOutOfRange {
+                ty,
+                value: self.intern(&value),
+            },
+        };
+        self.push_error(literal.syntax(), error);
+    }
+
+    fn check_bool_value(&mut self, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        if postgres::parse_bool(&value).is_some() {
+            return;
+        }
+        let error = SemaError::InvalidBoolValue {
+            value: self.intern(&value),
+            similar: similar_bool_input(&value),
+        };
+        self.push_error(literal.syntax(), error);
+    }
+
+    fn lower_literal_comparison(&mut self, other: Ty, expr: &ast::Expr) {
+        let Some(target) = self.literal_target(other) else {
             return;
         };
         match expr {
-            ast::Expr::Literal(literal) => self.lower_enum_value(ty, literal),
+            ast::Expr::Literal(literal) => self.lower_literal_value(target, literal),
             ast::Expr::TupleExpr(tuple) => {
                 for expr in tuple.exprs() {
                     if let ast::Expr::Literal(literal) = expr {
-                        self.lower_enum_value(ty, &literal);
+                        self.lower_literal_value(target, &literal);
                     }
                 }
             }
             ast::Expr::ParenExpr(paren) => {
                 if let Some(literal) = paren.expr().and_then(|expr| expr.as_literal()) {
-                    self.lower_enum_value(ty, &literal);
+                    self.lower_literal_value(target, &literal);
                 }
             }
             ast::Expr::ArrayExpr(_)
@@ -21004,9 +21071,11 @@ impl Lowerer {
             elements.push(arg);
         }
         let common = common.finish();
-        self.lower_enum_comparison(lhs_ty, rhs);
+        if let Some(lhs_ty) = lhs_ty {
+            self.lower_literal_comparison(lhs_ty, rhs);
+        }
         if let ArgType::Known(ty) = common {
-            self.lower_enum_comparison(Some(ty), lhs);
+            self.lower_literal_comparison(ty, lhs);
         }
         if elements.len() > 1 && common != ArgType::Untyped {
             let found =
@@ -23442,11 +23511,15 @@ impl Lowerer {
                     .as_ref()
                     .and_then(|op| self.lower_bin_operator(op, left, right));
                 if op.is_some_and(|op| is_comparison(&op)) {
-                    if let Some(rhs) = &rhs {
-                        self.lower_enum_comparison(lhs_ty, rhs);
+                    if let Some(rhs) = &rhs
+                        && let Some(lhs_ty) = lhs_ty
+                    {
+                        self.lower_literal_comparison(lhs_ty, rhs);
                     }
-                    if let Some(lhs) = &lhs {
-                        self.lower_enum_comparison(rhs_ty, lhs);
+                    if let Some(lhs) = &lhs
+                        && let Some(rhs_ty) = rhs_ty
+                    {
+                        self.lower_literal_comparison(rhs_ty, lhs);
                     }
                 }
                 return ty;
@@ -23513,10 +23586,11 @@ impl Lowerer {
                 let literal = cast
                     .literal()
                     .or_else(|| cast.expr().and_then(|expr| expr.as_literal()));
-                if let Some(enum_ty) = self.enum_type(ty)
+                if let Some(ty) = ty
+                    && let Some(target) = self.literal_target(ty)
                     && let Some(literal) = literal
                 {
-                    self.lower_enum_value(enum_ty, &literal);
+                    self.lower_literal_value(target, &literal);
                 }
                 return ty;
             }
@@ -27627,6 +27701,18 @@ fn call_function_like_keyword(call: &ast::CallExpr) -> Option<ast::FunctionLikeK
         | ast::Expr::SliceExpr(_)
         | ast::Expr::TupleExpr(_) => None,
     }
+}
+
+fn similar_bool_input(value: &str) -> Option<&'static str> {
+    if value.len() < 2 {
+        return None;
+    }
+    find_best_match_for_name(
+        postgres::BOOL_INPUTS.iter().copied(),
+        |candidate| candidate,
+        &value.to_ascii_lowercase_smolstr(),
+        None,
+    )
 }
 
 fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
