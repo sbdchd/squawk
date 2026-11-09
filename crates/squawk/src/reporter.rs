@@ -5,6 +5,7 @@ use log::info;
 use rayon::prelude::*;
 use serde::Serialize;
 use squawk_diagnostics::Fix;
+use squawk_lexer::BOM;
 use squawk_line_index::LineIndex;
 use squawk_line_index::TextRange;
 use squawk_linter::{Linter, Rule, Version};
@@ -36,6 +37,7 @@ fn check_sql(
         linter.settings.pg_version = pg_version;
     }
     linter.settings.assume_in_transaction = assume_in_transaction;
+    let sql = sql.strip_prefix(BOM).unwrap_or(sql);
     let parse = SourceFile::parse(sql);
     let parse_errors = parse.errors();
     let line_index = LineIndex::new(sql);
@@ -768,6 +770,29 @@ SELECT 1;
         main.sql:1:23: warning: adding-required-field adding a new column that is `not null` and has no default value to an existing table effectively makes it required
         main.sql:1:23: warning: prefer-robust-stmts missing `if not exists`, the migration can't be rerun if it fails part way through
         main.sql:1:40: warning: prefer-bigint-over-int using 32-bit integer fields can result in hitting the max `int` limit
+        ");
+    }
+
+    #[test]
+    fn leading_bom_is_not_a_column() {
+        assert_snapshot!(report("\u{feff}select (;\n", Reporter::Gcc), @"
+        main.sql:0:8: error: syntax-error expected an expression, found `;`
+        main.sql:0:8: error: syntax-error expected `)`
+        ");
+        assert_snapshot!(report("\u{feff}select (;\n", Reporter::Tty), @r"
+        error[]8;;https://squawkhq.com/docs/syntax-error\syntax-error]8;;\]: expected an expression, found `;`
+          ╭▸ main.sql:1:9
+          │
+        1 │ select (;
+          ╰╴        ━
+        error[]8;;https://squawkhq.com/docs/syntax-error\syntax-error]8;;\]: expected `)`
+          ╭▸ main.sql:1:9
+          │
+        1 │ select (;
+          ╰╴        ━
+
+        Find detailed examples and solutions for each rule at https://squawkhq.com/docs/rules
+        Found 2 issues in 1 file (checked 1 source file)
         ");
     }
 
