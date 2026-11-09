@@ -22,6 +22,7 @@ squawk-rowan.workspace = true
 salsa.workspace = true
 smallvec.workspace = true
 etcetera.workspace = true
+rustc-hash.workspace = true
 url.workspace = true
 
 [lints]

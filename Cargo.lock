@@ -2507,6 +2507,7 @@ name = "squawk-ide-db"
 version = "2.72.0"
 dependencies = [
  "etcetera",
+ "rustc-hash",
  "salsa",
  "smallvec",
  "squawk-line-index",
