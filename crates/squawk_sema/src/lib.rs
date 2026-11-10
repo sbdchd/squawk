@@ -8,6 +8,7 @@ pub mod extensions;
 pub mod file;
 mod generated;
 pub mod index_index;
+mod inheritance_graph;
 pub mod interner;
 pub mod ir;
 pub mod keyed_index;
