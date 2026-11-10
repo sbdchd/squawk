@@ -1,6 +1,7 @@
 use rustc_hash::FxHashSet;
 
 use squawk_rowan::{NodeOrToken, TextRange, TextSize};
+use squawk_syntax::ast::{self, AstToken};
 use squawk_syntax::{SyntaxKind, SyntaxNode, SyntaxToken};
 
 use crate::{Linter, Rule, Violation};
@@ -17,28 +18,6 @@ pub struct Ignore {
     pub violation_names: FxHashSet<Rule>,
     pub ignore_all: bool,
     pub kind: IgnoreKind,
-}
-
-pub(crate) fn comment_body(token: &SyntaxToken) -> Option<(&str, TextRange)> {
-    let range = token.text_range();
-    if token.kind() == SyntaxKind::COMMENT {
-        let text = token.text();
-        if let Some(trimmed) = text.strip_prefix("--")
-            && let Some(start) = range.start().checked_add(2.into())
-        {
-            let end = range.end();
-            let updated_range = TextRange::new(start, end);
-            return Some((trimmed, updated_range));
-        }
-        if let Some(trimmed) = text.strip_prefix("/*").and_then(|x| x.strip_suffix("*/"))
-            && let Some(start) = range.start().checked_add(2.into())
-            && let Some(end) = range.end().checked_sub(2.into())
-        {
-            let updated_range = TextRange::new(start, end);
-            return Some((trimmed, updated_range));
-        }
-    }
-    None
 }
 
 /// ```sql
@@ -60,7 +39,10 @@ pub const IGNORE_LINE_TEXT: &str = "squawk-ignore";
 pub const IGNORE_FILE_TEXT: &str = "squawk-ignore-file";
 
 pub fn ignore_rule_info(token: &SyntaxToken) -> Option<(&str, TextRange, IgnoreKind)> {
-    if let Some((comment_body, range)) = comment_body(token) {
+    let comment = ast::Comment::cast(token.clone())?;
+    if let Some(range) = comment.content_range() {
+        let relative_range = range - token.text_range().start();
+        let comment_body = &token.text()[std::ops::Range::<usize>::from(relative_range)];
         let without_start = comment_body.trim_start();
         let trim_start_size = comment_body.len() - without_start.len();
 
@@ -152,7 +134,8 @@ pub fn has_disable_assume_in_transaction(file: &SyntaxNode) -> bool {
             squawk_rowan::WalkEvent::Enter(NodeOrToken::Token(token))
                 if token.kind() == SyntaxKind::COMMENT =>
             {
-                if let Some((body, _range)) = comment_body(&token)
+                if let Some(comment) = ast::Comment::cast(token)
+                    && let Some(body) = comment.content()
                     && trim_trailing_comment(body) == DISABLE_ASSUME_IN_TRANSACTION
                 {
                     return true;

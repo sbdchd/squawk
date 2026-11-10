@@ -1,6 +1,6 @@
 use squawk_syntax::ast::NameLike;
 
-use crate::rules::identifier_too_long::MAX_IDENT_BYTES;
+use squawk_syntax::identifier::truncate_identifier;
 
 #[derive(Debug, Clone, Eq, Hash, PartialEq)]
 pub(crate) struct Name(String);
@@ -11,7 +11,7 @@ impl Name {
     }
 
     pub(crate) fn from_string(mut text: String) -> Self {
-        text.truncate(text.floor_char_boundary(MAX_IDENT_BYTES));
+        text.truncate(truncate_identifier(&text).len());
         Self(text)
     }
 
