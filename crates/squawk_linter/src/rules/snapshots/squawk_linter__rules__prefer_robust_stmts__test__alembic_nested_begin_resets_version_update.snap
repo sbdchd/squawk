@@ -1,0 +1,11 @@
+---
+source: crates/squawk_linter/src/rules/prefer_robust_stmts.rs
+expression: "lint_errors(\"\nbegin;\nupdate alembic_version set version_num = 'v2';\nbegin;\nalter table t add column a int;\ncommit;\nbegin;\nupdate alembic_version set version_num = 'v3';\ncommit;\n\")"
+---
+warning[prefer-robust-stmts]: missing `if not exists`, the migration can't be rerun if it fails part way through
+  ╭▸ 
+5 │ alter table t add column a int;
+  │               ━━━━━━━━━━━━━━━━
+  ╭╴
+5 │ alter table t add column if not exists a int;
+  ╰╴                         +++++++++++++

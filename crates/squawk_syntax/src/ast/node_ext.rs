@@ -288,6 +288,10 @@ impl ast::FuncArgExpr {
             ast::FuncArgExpr::NamedArg(named_arg) => named_arg.expr(),
         }
     }
+
+    pub fn is_unknown_literal(&self) -> bool {
+        self.expr().is_some_and(|expr| expr.is_unknown_literal())
+    }
 }
 
 impl ast::Expr {
@@ -327,6 +331,43 @@ impl ast::Expr {
         match self {
             ast::Expr::Literal(literal) => matches!(literal.kind(), Some(LitKind::Default(_))),
             _ => false,
+        }
+    }
+
+    pub fn is_unknown_literal(&self) -> bool {
+        let Some(literal) = self.unparen().as_literal() else {
+            return false;
+        };
+        matches!(
+            literal.kind(),
+            Some(
+                LitKind::String(_)
+                    | LitKind::DollarQuotedString(_)
+                    | LitKind::EscString(_)
+                    | LitKind::UnicodeEscString(_)
+                    | LitKind::Null(_)
+            )
+        )
+    }
+
+    pub fn binds_tighter_than_cast(&self) -> bool {
+        matches!(
+            self,
+            ast::Expr::Literal(_)
+                | ast::Expr::NameRef(_)
+                | ast::Expr::FieldExpr(_)
+                | ast::Expr::CallExpr(_)
+                | ast::Expr::ParenExpr(_)
+                | ast::Expr::CastExpr(_)
+                | ast::Expr::ArrayExpr(_)
+                | ast::Expr::IndexExpr(_)
+        )
+    }
+
+    pub fn row_width(&self) -> Option<usize> {
+        match self {
+            ast::Expr::TupleExpr(tuple) => Some(tuple.exprs().count()),
+            _ => None,
         }
     }
 
@@ -458,6 +499,30 @@ enum StringDecoding {
 }
 
 impl ast::Literal {
+    pub fn type_name(&self) -> Option<&'static str> {
+        let name = match self.kind()? {
+            ast::LitKind::IntNumber(_) => match self.integer_value_u64() {
+                Some(value) if i32::try_from(value).is_ok() => "int4",
+                Some(value) if i64::try_from(value).is_ok() => "int8",
+                Some(_) | None => "numeric",
+            },
+            ast::LitKind::NumericNumber(_) => "numeric",
+            ast::LitKind::String(_)
+            | ast::LitKind::DollarQuotedString(_)
+            | ast::LitKind::EscString(_)
+            | ast::LitKind::NationalString(_)
+            | ast::LitKind::UnicodeEscString(_) => "text",
+            ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => "bit",
+            ast::LitKind::True(_) | ast::LitKind::False(_) => "bool",
+            ast::LitKind::Default(_)
+            | ast::LitKind::Null(_)
+            | ast::LitKind::Off(_)
+            | ast::LitKind::On(_)
+            | ast::LitKind::PositionalParam(_) => return None,
+        };
+        Some(name)
+    }
+
     pub fn is_string(&self) -> bool {
         self.kind().is_some_and(|kind| kind.is_string())
     }
@@ -561,6 +626,124 @@ impl ast::Literal {
     }
 }
 
+impl ast::BinOp {
+    pub fn is_comparison(&self) -> bool {
+        match self {
+            ast::BinOp::Eq(_)
+            | ast::BinOp::Neq(_)
+            | ast::BinOp::Neqb(_)
+            | ast::BinOp::LAngle(_)
+            | ast::BinOp::RAngle(_)
+            | ast::BinOp::Lteq(_)
+            | ast::BinOp::Gteq(_)
+            | ast::BinOp::IsDistinctFrom(_)
+            | ast::BinOp::IsNotDistinctFrom(_)
+            | ast::BinOp::In(_)
+            | ast::BinOp::NotIn(_) => true,
+            ast::BinOp::And(_)
+            | ast::BinOp::AtTimeZone(_)
+            | ast::BinOp::Caret(_)
+            | ast::BinOp::ColonColon(_)
+            | ast::BinOp::ColonEq(_)
+            | ast::BinOp::CustomOp(_)
+            | ast::BinOp::Escape(_)
+            | ast::BinOp::FatArrow(_)
+            | ast::BinOp::Ilike(_)
+            | ast::BinOp::Is(_)
+            | ast::BinOp::IsNot(_)
+            | ast::BinOp::Like(_)
+            | ast::BinOp::Minus(_)
+            | ast::BinOp::NotIlike(_)
+            | ast::BinOp::NotLike(_)
+            | ast::BinOp::NotSimilarTo(_)
+            | ast::BinOp::OperatorCall(_)
+            | ast::BinOp::Or(_)
+            | ast::BinOp::Overlaps(_)
+            | ast::BinOp::Percent(_)
+            | ast::BinOp::Plus(_)
+            | ast::BinOp::SimilarTo(_)
+            | ast::BinOp::Slash(_)
+            | ast::BinOp::Star(_) => false,
+        }
+    }
+}
+
+impl ast::CallExpr {
+    pub fn function_like_keyword(&self) -> Option<ast::FunctionLikeKeyword> {
+        match self.expr()? {
+            ast::Expr::NameRef(name_ref) => name_ref.function_like_keyword(),
+            ast::Expr::ArrayExpr(_)
+            | ast::Expr::BetweenExpr(_)
+            | ast::Expr::BinExpr(_)
+            | ast::Expr::CallExpr(_)
+            | ast::Expr::CaseExpr(_)
+            | ast::Expr::CastExpr(_)
+            | ast::Expr::Collate(_)
+            | ast::Expr::FieldExpr(_)
+            | ast::Expr::IndexExpr(_)
+            | ast::Expr::Literal(_)
+            | ast::Expr::ParenExpr(_)
+            | ast::Expr::PostfixExpr(_)
+            | ast::Expr::PrefixExpr(_)
+            | ast::Expr::SliceExpr(_)
+            | ast::Expr::TupleExpr(_) => None,
+        }
+    }
+}
+
+impl ast::LikeClause {
+    pub fn includes_indexes(&self) -> bool {
+        let mut includes = false;
+        for option in self.like_options() {
+            let (property, including) = match option {
+                ast::LikeOption::IncludingProperty(property) => (property.table_property(), true),
+                ast::LikeOption::ExcludingProperty(property) => (property.table_property(), false),
+            };
+            match property {
+                Some(
+                    ast::TableProperty::PropertyAll(_) | ast::TableProperty::PropertyIndexes(_),
+                ) => {
+                    includes = including;
+                }
+                Some(
+                    ast::TableProperty::PropertyComments(_)
+                    | ast::TableProperty::PropertyCompression(_)
+                    | ast::TableProperty::PropertyConstraints(_)
+                    | ast::TableProperty::PropertyDefaults(_)
+                    | ast::TableProperty::PropertyGenerated(_)
+                    | ast::TableProperty::PropertyIdentity(_)
+                    | ast::TableProperty::PropertyStatistics(_)
+                    | ast::TableProperty::PropertyStorage(_),
+                )
+                | None => {}
+            }
+        }
+        includes
+    }
+}
+
+impl ast::ConstraintOption {
+    pub fn is_deferrable(&self) -> bool {
+        match self {
+            ast::ConstraintOption::DeferrableConstraintOption(_)
+            | ast::ConstraintOption::InitiallyDeferredConstraintOption(_) => true,
+            ast::ConstraintOption::NotDeferrableConstraintOption(_)
+            | ast::ConstraintOption::InitiallyImmediateConstraintOption(_)
+            | ast::ConstraintOption::NotValid(_)
+            | ast::ConstraintOption::NoInherit(_)
+            | ast::ConstraintOption::Inherit(_)
+            | ast::ConstraintOption::NotEnforced(_)
+            | ast::ConstraintOption::Enforced(_) => false,
+        }
+    }
+}
+
+impl ast::RoleNameRef {
+    pub fn is_public(&self) -> bool {
+        self.text() == "public"
+    }
+}
+
 impl ast::Constraint {
     #[inline]
     pub fn constraint_name(&self) -> Option<ast::ConstraintName> {
@@ -582,6 +765,24 @@ impl ast::Constraint {
             ast::Constraint::ReferencesConstraint(it) => it.constraint_options(),
             ast::Constraint::UniqueConstraint(it) => it.constraint_options(),
         }
+    }
+
+    pub fn is_no_inherit(&self) -> bool {
+        let options = match self {
+            ast::Constraint::CheckConstraint(it) => it.constraint_options(),
+            ast::Constraint::NotNullConstraint(it) => it.constraint_options(),
+            ast::Constraint::DefaultConstraint(_)
+            | ast::Constraint::ExcludeConstraint(_)
+            | ast::Constraint::ForeignKeyConstraint(_)
+            | ast::Constraint::GeneratedConstraint(_)
+            | ast::Constraint::NullConstraint(_)
+            | ast::Constraint::PrimaryKeyConstraint(_)
+            | ast::Constraint::ReferencesConstraint(_)
+            | ast::Constraint::UniqueConstraint(_) => return false,
+        };
+        options
+            .into_iter()
+            .any(|option| matches!(option, ast::ConstraintOption::NoInherit(_)))
     }
 
     pub fn is_not_valid(&self) -> bool {
@@ -2261,6 +2462,24 @@ impl ast::CreateTableAsQuery {
 }
 
 impl ast::SelectVariant {
+    pub fn nth_output_expr(&self, position: usize) -> Option<ast::Expr> {
+        match self {
+            ast::SelectVariant::Select(select) => select
+                .select_clause()?
+                .target_list()?
+                .targets()
+                .nth(position)?
+                .expr(),
+            ast::SelectVariant::Values(values) => {
+                values.row_list()?.rows().next()?.exprs().nth(position)
+            }
+            ast::SelectVariant::ParenSelect(paren) => paren.select()?.nth_output_expr(position),
+            ast::SelectVariant::CompoundSelect(_)
+            | ast::SelectVariant::SelectInto(_)
+            | ast::SelectVariant::Table(_) => None,
+        }
+    }
+
     #[inline]
     pub fn target_list(&self) -> Option<ast::TargetList> {
         match self {

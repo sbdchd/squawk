@@ -87,6 +87,12 @@ impl TableKind {
     }
 }
 
+impl std::fmt::Display for TableKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.label())
+    }
+}
+
 #[derive(Debug)]
 pub struct Table {
     pub kind: TableKind,
@@ -353,14 +359,14 @@ pub enum TextSearchKind {
     Configuration,
 }
 
-impl TextSearchKind {
-    pub fn label(self) -> &'static str {
-        match self {
+impl std::fmt::Display for TextSearchKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
             TextSearchKind::Parser => "text search parser",
             TextSearchKind::Template => "text search template",
             TextSearchKind::Dictionary => "text search dictionary",
             TextSearchKind::Configuration => "text search configuration",
-        }
+        })
     }
 }
 
@@ -555,6 +561,27 @@ pub enum TypeKind {
 pub(crate) enum Subscript {
     Array,
     RawArray,
+}
+
+#[derive(Clone, Copy)]
+pub(crate) struct SubscriptResults {
+    pub(crate) result: Option<Ty>,
+    pub(crate) slice: Option<Ty>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ArrayOwner {
+    Type(TypeId),
+    Table(TableId),
+}
+
+impl ArrayOwner {
+    pub(crate) fn resolution(self) -> Resolution {
+        match self {
+            ArrayOwner::Type(ty) => Resolution::Type(ty),
+            ArrayOwner::Table(table) => Resolution::Table(table),
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

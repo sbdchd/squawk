@@ -1,10 +1,10 @@
-use smallvec::SmallVec;
-use squawk_line_index::UniversalNewlines;
-use squawk_rowan::{Direction, NodeOrToken};
-use squawk_syntax::{
+use crate::{
     SyntaxNode, SyntaxToken,
     ast::{self, AstToken},
 };
+use smallvec::SmallVec;
+use squawk_line_index::UniversalNewlines;
+use squawk_rowan::{Direction, NodeOrToken};
 
 pub fn line_comment_content(comment: &str) -> Option<&str> {
     comment.strip_prefix("--").map(str::trim)
@@ -68,7 +68,7 @@ fn adjacent_token(token: &SyntaxToken, direction: Direction) -> Option<SyntaxTok
     }
 }
 
-pub(crate) fn preceding_comment(node: &SyntaxNode) -> Option<String> {
+pub fn preceding_comment(node: &SyntaxNode) -> Option<String> {
     let mut comments: SmallVec<[String; 2]> = SmallVec::new();
     for element in node.siblings_with_tokens(Direction::Prev).skip(1) {
         let NodeOrToken::Token(token) = element else {

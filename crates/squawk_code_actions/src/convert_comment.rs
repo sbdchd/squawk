@@ -4,14 +4,12 @@ use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     SyntaxToken,
     ast::{self, AstNode, AstToken},
-};
-
-use squawk_sema::{
     comments::{
         block_comment_content, line_comment_content, line_comment_group, strip_block_decoration,
     },
-    file::InFile,
 };
+
+use squawk_sema::file::InFile;
 
 use super::{ActionKind, CodeAction};
 

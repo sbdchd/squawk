@@ -13,14 +13,25 @@ use squawk_syntax::{
 };
 
 use crate::arena::{IdxRange, LayeredArena};
-use crate::comments::preceding_comment;
+use crate::column_exprs::{ColumnExpr, ColumnExprId, ColumnExprKind, ColumnExprs, ColumnKey};
+use crate::dependency_graph::{DependencyGraph, Object, rename_schema_objects, set_object_schema};
 use crate::edit_distance::{find_best_match_for_name, find_best_match_for_name_with_substrings};
+use crate::expr_context::{ConditionKind, ExprContext};
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
+use crate::inheritance_graph::{Inheritance, InheritanceGraph, InheritanceKind};
 use crate::interner::Name;
+use crate::ir::{ArrayOwner, SubscriptResults};
 use crate::keyed_index::GraphElementIndex;
+use crate::lookup::{Lookup, RefSource, RelationLookup, TableLookup, TypeCandidates};
+use crate::partition_bound::{
+    BoundKeyType, ListValue, PartitionBound, PartitionKey, RangeValue, partition_bounds_overlap,
+    range_value, range_values,
+};
 use crate::postgres::{IntInputError, IntType, NumericInputError, NumericTypmod};
+use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
+use squawk_syntax::comments::preceding_comment;
 
 use crate::{
     ir::{
@@ -38,10 +49,10 @@ use crate::{
         PreparedStatement, PreparedStatementId, PreparedTransaction, PreparedTransactionId,
         Publication, PublicationId, Query, QueryId, QueryKind, RefId, Reference, ReferenceKind,
         Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule, RuleBehavior, RuleEnabled,
-        RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId,
-        SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star,
-        Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
-        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
+        RuleEvent, RuleId, RuleMode, Savepoint, Schema, SchemaId, Scope, ScopeId, SearchPathChange,
+        SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star, Statistics,
+        StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId, TableKind,
+        Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
         TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
         TypeCategory, TypeId, TypeKind, Typmod, Window, WindowClauses, WindowId,
     },
@@ -224,21 +235,6 @@ enum LabelPosition {
     End,
     Before(EnumLabelId),
     After(EnumLabelId),
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ArrayOwner {
-    Type(TypeId),
-    Table(TableId),
-}
-
-impl ArrayOwner {
-    fn resolution(self) -> Resolution {
-        match self {
-            ArrayOwner::Type(ty) => Resolution::Type(ty),
-            ArrayOwner::Table(table) => Resolution::Table(table),
-        }
-    }
 }
 
 #[derive(Clone, Copy)]
@@ -474,107 +470,11 @@ pub(crate) struct Lowerer {
     transforms: FxHashMap<TransformKey, TransformId>,
 }
 
-struct OpenTransaction {
-    id: Option<TransactionId>,
-    snapshot: Snapshot,
-}
-
-struct OpenSavepoint {
-    id: SavepointId,
-    snapshot: Snapshot,
-}
-
-struct Snapshot {
-    search_path: SmallVec<[Name; 4]>,
-    session_search_path: SmallVec<[Name; 4]>,
-    undo_len: usize,
-    tables: TableId,
-    types: TypeId,
-    indexes: IndexId,
-    constraints: ConstraintId,
-    triggers: TriggerId,
-    rules: RuleId,
-    roles: RoleId,
-    policies: PolicyId,
-    access_methods: AccessMethodId,
-    event_triggers: EventTriggerId,
-    languages: LanguageId,
-    foreign_data_wrappers: ForeignDataWrapperId,
-    servers: ServerId,
-    conversions: ConversionId,
-    operator_families: OperatorFamilyId,
-    operator_classes: OperatorClassId,
-    statistics: StatisticsId,
-    text_search: TextSearchId,
-    publications: PublicationId,
-    subscriptions: SubscriptionId,
-    graph_elements: GraphElementId,
-    graph_labels: GraphLabelId,
-    enum_labels: EnumLabelId,
-    graph_properties: GraphPropertyId,
-    collations: CollationId,
-    tablespaces: TablespaceId,
-    databases: DatabaseId,
-    schemas: SchemaId,
-    extensions: ExtensionId,
-    operators: OperatorId,
-    functions: FunctionId,
-    casts: CastId,
-    transforms: TransformId,
-    cursors: CursorId,
-    operator_family_members: OperatorFamilyMemberId,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct ColumnExprId(u32);
-
 #[derive(Clone, Copy)]
 struct ViewColumnDep {
     view: TableId,
     table: TableId,
     column: Name,
-}
-
-#[derive(Clone, Copy)]
-enum PartitionKey {
-    Columns(IdxRange<Name>),
-    Expressions,
-}
-
-#[derive(Clone)]
-enum PartitionBound {
-    Default,
-    List(SmallVec<[ListValue; 4]>),
-    Range {
-        from: SmallVec<[RangeValue; 2]>,
-        to: SmallVec<[RangeValue; 2]>,
-    },
-    Hash {
-        modulus: u64,
-        remainder: u64,
-    },
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ListValue {
-    Int(i128),
-    Bool(bool),
-    Text(Name),
-    Null,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-enum RangeValue {
-    MinValue,
-    Int(i128),
-    MaxValue,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum BoundKeyType {
-    Int,
-    Bool,
-    Text,
 }
 
 struct InsertValue {
@@ -651,54 +551,6 @@ struct Replacement<'a> {
 struct RenamedParam {
     name: Name,
     new_param: Option<ParamId>,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ColumnExprKind {
-    Default,
-    Generated { kind: GeneratedKind },
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-struct ColumnExpr {
-    id: ColumnExprId,
-    kind: ColumnExprKind,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-struct ColumnKey {
-    table: TableId,
-    column: Name,
-}
-
-#[derive(Default)]
-struct ColumnExprs {
-    by_column: FxHashMap<ColumnKey, ColumnExpr>,
-    by_id: FxHashMap<ColumnExprId, ColumnKey>,
-}
-
-impl ColumnExprs {
-    fn get(&self, key: ColumnKey) -> Option<ColumnExpr> {
-        self.by_column.get(&key).copied()
-    }
-
-    fn column_of(&self, id: ColumnExprId) -> Option<ColumnKey> {
-        self.by_id.get(&id).copied()
-    }
-
-    fn set(&mut self, key: ColumnKey, expression: Option<ColumnExpr>) -> Option<ColumnExpr> {
-        let previous = match expression {
-            Some(expression) => self.by_column.insert(key, expression),
-            None => self.by_column.remove(&key),
-        };
-        if let Some(previous) = previous {
-            self.by_id.remove(&previous.id);
-        }
-        if let Some(expression) = expression {
-            self.by_id.insert(expression.id, key);
-        }
-        previous
-    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]
@@ -969,338 +821,9 @@ struct NameResolution {
     resolution: Resolution,
 }
 
-#[derive(Clone, Copy)]
-struct SubscriptResults {
-    result: Option<Ty>,
-    slice: Option<Ty>,
-}
-
 struct IdentPart<'a> {
     ident: Cow<'a, str>,
     rest: &'a str,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum InheritanceKind {
-    Inherits,
-    Partition,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-struct Inheritance {
-    parent: TableId,
-    child: TableId,
-    kind: InheritanceKind,
-}
-
-#[derive(Default)]
-struct InheritanceGraph {
-    by_parent: FxHashMap<TableId, SmallVec<[Inheritance; 2]>>,
-    by_child: FxHashMap<TableId, SmallVec<[Inheritance; 2]>>,
-}
-
-impl InheritanceGraph {
-    fn add(&mut self, inheritance: Inheritance) -> bool {
-        let parents = self.by_child.entry(inheritance.child).or_default();
-        if parents.contains(&inheritance) {
-            return false;
-        }
-        parents.push(inheritance);
-        self.by_parent
-            .entry(inheritance.parent)
-            .or_default()
-            .push(inheritance);
-        true
-    }
-
-    fn remove(&mut self, inheritance: Inheritance) -> bool {
-        Self::remove_from(&mut self.by_child, inheritance.child, inheritance)
-            && Self::remove_from(&mut self.by_parent, inheritance.parent, inheritance)
-    }
-
-    fn remove_from(
-        map: &mut FxHashMap<TableId, SmallVec<[Inheritance; 2]>>,
-        table: TableId,
-        inheritance: Inheritance,
-    ) -> bool {
-        let Entry::Occupied(mut entry) = map.entry(table) else {
-            return false;
-        };
-        let Some(position) = entry
-            .get()
-            .iter()
-            .position(|&existing| existing == inheritance)
-        else {
-            return false;
-        };
-        entry.get_mut().remove(position);
-        if entry.get().is_empty() {
-            entry.remove();
-        }
-        true
-    }
-
-    fn children(&self, parent: TableId) -> &[Inheritance] {
-        self.by_parent
-            .get(&parent)
-            .map_or(&[], |children| children.as_slice())
-    }
-
-    fn parents(&self, child: TableId) -> &[Inheritance] {
-        self.by_child
-            .get(&child)
-            .map_or(&[], |parents| parents.as_slice())
-    }
-
-    fn descendants(
-        &self,
-        table: TableId,
-        is_live: impl Fn(TableId) -> bool,
-    ) -> SmallVec<[TableId; 8]> {
-        Self::walk(table, is_live, |table| {
-            self.children(table)
-                .iter()
-                .map(|inheritance| inheritance.child)
-        })
-    }
-
-    fn ancestors(
-        &self,
-        table: TableId,
-        is_live: impl Fn(TableId) -> bool,
-    ) -> SmallVec<[TableId; 8]> {
-        Self::walk(table, is_live, |table| {
-            self.parents(table)
-                .iter()
-                .map(|inheritance| inheritance.parent)
-        })
-    }
-
-    fn walk<I: Iterator<Item = TableId>>(
-        table: TableId,
-        is_live: impl Fn(TableId) -> bool,
-        next: impl Fn(TableId) -> I,
-    ) -> SmallVec<[TableId; 8]> {
-        let mut found: SmallVec<[TableId; 8]> = smallvec![];
-        let mut stack: SmallVec<[TableId; 8]> = smallvec![table];
-        while let Some(current) = stack.pop() {
-            for related in next(current) {
-                if related != table && is_live(related) && !found.contains(&related) {
-                    found.push(related);
-                    stack.push(related);
-                }
-            }
-        }
-        found
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-enum Object {
-    Function(FunctionId),
-    ColumnExpr(ColumnExprId),
-    OperatorFamilyMember(OperatorFamilyMemberId),
-    Table(TableId),
-    Type(TypeId),
-    Trigger(TriggerId),
-    EventTrigger(EventTriggerId),
-    Index(IndexId),
-    Constraint(ConstraintId),
-    Policy(PolicyId),
-    Rule(RuleId),
-    Cast(CastId),
-    Transform(TransformId),
-    Operator(OperatorId),
-    AccessMethod(AccessMethodId),
-    Language(LanguageId),
-    ForeignDataWrapper(ForeignDataWrapperId),
-    Conversion(ConversionId),
-    TextSearch(TextSearchId),
-    Collation(CollationId),
-    OperatorFamily(OperatorFamilyId),
-    OperatorClass(OperatorClassId),
-    Statistics(StatisticsId),
-    Extension(ExtensionId),
-    Schema(SchemaId),
-    Server(ServerId),
-    Publication(PublicationId),
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-struct Dependency {
-    dependent: Object,
-    referenced: Object,
-}
-
-#[derive(Default)]
-struct DependencyGraph {
-    edges: FxHashSet<Dependency>,
-    by_referenced: FxHashMap<Object, SmallVec<[Object; 2]>>,
-    moved_from: FxHashMap<Object, SmallVec<[Object; 1]>>,
-    moved_to: FxHashMap<Object, SmallVec<[Object; 1]>>,
-    replaced: FxHashMap<FunctionId, SmallVec<[FunctionId; 1]>>,
-}
-
-impl DependencyGraph {
-    fn add_dependency(&mut self, dependent: Object, referenced: Object) {
-        if !self.edges.insert(Dependency {
-            dependent,
-            referenced,
-        }) {
-            return;
-        }
-        self.by_referenced
-            .entry(referenced)
-            .or_default()
-            .push(dependent);
-    }
-
-    fn remove_dependency(&mut self, dependent: Object, referenced: Object) -> bool {
-        if !self.edges.remove(&Dependency {
-            dependent,
-            referenced,
-        }) {
-            return false;
-        }
-        let Entry::Occupied(mut entry) = self.by_referenced.entry(referenced) else {
-            return false;
-        };
-        let Some(position) = entry
-            .get()
-            .iter()
-            .position(|&existing| existing == dependent)
-        else {
-            return false;
-        };
-        entry.get_mut().remove(position);
-        if entry.get().is_empty() {
-            entry.remove();
-        }
-        true
-    }
-
-    fn add_move(&mut self, from: Object, to: Object) {
-        debug_assert!(from < to);
-        self.moved_from.entry(to).or_default().push(from);
-        self.moved_to.entry(from).or_default().push(to);
-    }
-
-    fn add_replacement(&mut self, old: FunctionId, new: FunctionId) {
-        self.replaced.entry(new).or_default().push(old);
-    }
-
-    fn dependents_of(&self, referenced: Object) -> &[Object] {
-        self.by_referenced
-            .get(&referenced)
-            .map_or(&[], |dependents| dependents.as_slice())
-    }
-
-    fn moved_from(&self, to: Object) -> &[Object] {
-        self.moved_from.get(&to).map_or(&[], |from| from.as_slice())
-    }
-
-    fn moved_to(&self, from: Object) -> &[Object] {
-        self.moved_to.get(&from).map_or(&[], |to| to.as_slice())
-    }
-
-    fn replaced_by(&self, new: FunctionId) -> &[FunctionId] {
-        self.replaced.get(&new).map_or(&[], |old| old.as_slice())
-    }
-}
-
-impl Object {
-    fn item(self) -> Option<Item> {
-        match self {
-            Object::Function(id) => Some(Item::Function(id)),
-            Object::Table(id) => Some(Item::Table(id)),
-            Object::Type(id) => Some(Item::Type(id)),
-            Object::Trigger(id) => Some(Item::Trigger(id)),
-            Object::EventTrigger(id) => Some(Item::EventTrigger(id)),
-            Object::Index(id) => Some(Item::Index(id)),
-            Object::Constraint(id) => Some(Item::Constraint(id)),
-            Object::Policy(id) => Some(Item::Policy(id)),
-            Object::Rule(id) => Some(Item::Rule(id)),
-            Object::Operator(id) => Some(Item::Operator(id)),
-            Object::AccessMethod(id) => Some(Item::AccessMethod(id)),
-            Object::Language(id) => Some(Item::Language(id)),
-            Object::ForeignDataWrapper(id) => Some(Item::ForeignDataWrapper(id)),
-            Object::Conversion(id) => Some(Item::Conversion(id)),
-            Object::TextSearch(id) => Some(Item::TextSearch(id)),
-            Object::Collation(id) => Some(Item::Collation(id)),
-            Object::OperatorFamily(id) => Some(Item::OperatorFamily(id)),
-            Object::OperatorClass(id) => Some(Item::OperatorClass(id)),
-            Object::Statistics(id) => Some(Item::Statistics(id)),
-            Object::Extension(id) => Some(Item::Extension(id)),
-            Object::Schema(id) => Some(Item::Schema(id)),
-            Object::Server(id) => Some(Item::Server(id)),
-            Object::Publication(id) => Some(Item::Publication(id)),
-            Object::ColumnExpr(_)
-            | Object::OperatorFamilyMember(_)
-            | Object::Cast(_)
-            | Object::Transform(_) => None,
-        }
-    }
-}
-
-enum Undo {
-    DropTable(TableId),
-    DropType(TypeId),
-    DropIndex(IndexId),
-    DropConstraint(ConstraintId),
-    DropTrigger(TriggerId),
-    DropRule(RuleId),
-    RuleEnabled(RuleId, RuleEnabled),
-    DropRole(RoleId),
-    DropPolicy(PolicyId),
-    DropAccessMethod(AccessMethodId),
-    DropEventTrigger(EventTriggerId),
-    DropLanguage(LanguageId),
-    DropForeignDataWrapper(ForeignDataWrapperId),
-    DropServer(ServerId),
-    DropConversion(ConversionId),
-    DropFunction(FunctionId),
-    DropSchema(SchemaId),
-    RenameSchema(Name, Name),
-    DropOperatorFamily(OperatorFamilyId),
-    DropOperatorClass(OperatorClassId),
-    DropStatistics(StatisticsId),
-    DropTextSearch(TextSearchId),
-    DropPublication(PublicationId),
-    DropSubscription(SubscriptionId),
-    DropGraphElement(GraphElementId),
-    DropGraphLabel(GraphLabelId),
-    DropGraphProperty(GraphPropertyId),
-    DropCollation(CollationId),
-    DropTablespace(TablespaceId),
-    DropDatabase(DatabaseId),
-    DropExtension(ExtensionId),
-    DropOperator(OperatorId),
-    DropCast(CastId),
-    DropTransform(TransformKey, TransformId),
-    TableColumns(TableId, Columns),
-    ColumnExpr(ColumnKey, Option<ColumnExpr>),
-    DropOperatorFamilyMember(OperatorFamilyMemberId),
-    MemberOwner(OperatorFamilyMemberId, MemberOwner),
-    MoveTable(TableId, Name, Name, InIrFile<SyntaxNodePtr>),
-    MoveIndex(IndexId, Name, Name, InIrFile<SyntaxNodePtr>),
-    MoveEnumLabel(EnumLabelId, Name, InIrFile<SyntaxNodePtr>),
-    MoveExtension(ExtensionId, Name),
-    MoveObjectSchema(Object, Name),
-    RemoveDependency(Object, Object),
-    AddInheritance(Inheritance),
-    RemoveInheritance(Inheritance),
-    SequenceOwner(TableId, SequenceOwner),
-    ConstraintKind(ConstraintId, ConstraintKind),
-    IndexKey(IndexId, Option<IdxRange<Name>>),
-    PartitionKey(TableId, PartitionKey),
-    ViewColumnDep(usize, Name),
-    IndexColumns(IndexId, IdxRange<Name>),
-    TypeColumns(TypeId, Columns),
-    TableOfType(TableId, Option<TypeId>),
-    TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
-    FinishShellType(TypeId, Box<Type>),
-    MoveType(TypeId, Name, Name, InIrFile<AstPtr<ast::PathSegment>>),
-    ArrayName(ArrayOwner, Option<Name>),
 }
 
 enum FieldBase {
@@ -1313,132 +836,6 @@ enum FieldBase {
 struct FieldStar {
     ty: Option<Ty>,
     columns: Option<Columns>,
-}
-
-#[derive(Clone, Copy)]
-enum Lookup {
-    Relation,
-    Type,
-    Function,
-    Operator,
-    Collation,
-    Conversion,
-    OperatorClass,
-    Statistics,
-    TextSearch,
-}
-
-impl Lookup {
-    fn searches_temp(self) -> bool {
-        match self {
-            Lookup::Relation | Lookup::Type | Lookup::Statistics => true,
-            Lookup::Function
-            | Lookup::Operator
-            | Lookup::Collation
-            | Lookup::Conversion
-            | Lookup::OperatorClass
-            | Lookup::TextSearch => false,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum TableLookup {
-    Table,
-    ForeignTable,
-    TableOrForeignTable,
-    TableOrView,
-    TableOrMaterializedView,
-    Any,
-    FromItem,
-    Like,
-    View,
-    MaterializedView,
-    Sequence,
-    PropertyGraph,
-    CopyTo,
-    CopyFrom,
-    Truncate,
-}
-
-impl TableLookup {
-    fn accepts(self, kind: TableKind) -> bool {
-        match self {
-            TableLookup::Table => kind == TableKind::Table,
-            TableLookup::ForeignTable => kind == TableKind::ForeignTable,
-            TableLookup::TableOrForeignTable => {
-                matches!(kind, TableKind::Table | TableKind::ForeignTable)
-            }
-            TableLookup::TableOrView => matches!(kind, TableKind::Table | TableKind::View),
-            TableLookup::TableOrMaterializedView => {
-                matches!(kind, TableKind::Table | TableKind::MaterializedView)
-            }
-            TableLookup::Any | TableLookup::FromItem => true,
-            TableLookup::Like => matches!(
-                kind,
-                TableKind::Table
-                    | TableKind::View
-                    | TableKind::MaterializedView
-                    | TableKind::ForeignTable
-            ),
-            TableLookup::View => kind == TableKind::View,
-            TableLookup::MaterializedView => kind == TableKind::MaterializedView,
-            TableLookup::Sequence => kind == TableKind::Sequence,
-            TableLookup::PropertyGraph => kind == TableKind::PropertyGraph,
-            TableLookup::CopyTo => matches!(kind, TableKind::Table | TableKind::MaterializedView),
-            TableLookup::CopyFrom | TableLookup::Truncate => {
-                matches!(kind, TableKind::Table | TableKind::ForeignTable)
-            }
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-enum RefSource {
-    Column,
-    /// table name, alias, CTE, or subquery alias
-    /// ```sql
-    /// -- x is the qualifier
-    /// select x.a, x.*
-    /// ```
-    Qualifier,
-    Table {
-        schema: Option<Name>,
-        lookup: TableLookup,
-    },
-    Type {
-        schema: Option<Name>,
-        candidates: TypeCandidates,
-    },
-    Window,
-    EnumLabel {
-        ty: TypeId,
-    },
-}
-
-impl RefSource {
-    fn kind(self) -> ReferenceKind {
-        match self {
-            RefSource::Column => ReferenceKind::Column,
-            RefSource::Qualifier => ReferenceKind::Relation,
-            RefSource::Table { .. } => ReferenceKind::Table,
-            RefSource::Type { .. } => ReferenceKind::Type,
-            RefSource::Window => ReferenceKind::Window,
-            RefSource::EnumLabel { .. } => ReferenceKind::EnumLabel,
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-enum TypeCandidates {
-    TypeName,
-    Types(Option<TypeKind>),
-}
-
-#[derive(Clone, Copy)]
-enum RelationLookup {
-    Any,
-    OnlyTable,
 }
 
 #[derive(Clone, Copy)]
@@ -1517,68 +914,6 @@ pub(crate) enum OutputClause {
     OrderBy,
     GroupBy,
     DistinctOn,
-}
-
-#[derive(Clone, Copy)]
-enum Condition {
-    Where,
-    Having,
-    On,
-    Check,
-    Filter,
-    Policy,
-    TriggerWhen,
-    MergeWhen,
-    IndexPredicate,
-    CopyWhere,
-    PublicationWhere,
-    CaseWhen,
-    And,
-    Or,
-    Not,
-    GraphWhere,
-}
-
-impl Condition {
-    fn context(self) -> Option<ExprContext> {
-        match self {
-            Condition::Where => Some(ExprContext::Where),
-            Condition::Having => Some(ExprContext::Having),
-            Condition::On => Some(ExprContext::JoinCondition),
-            Condition::Check => Some(ExprContext::CheckConstraint),
-            Condition::Filter => Some(ExprContext::Filter),
-            Condition::Policy => Some(ExprContext::Policy),
-            Condition::TriggerWhen => Some(ExprContext::TriggerWhen),
-            Condition::MergeWhen => Some(ExprContext::MergeWhen),
-            Condition::IndexPredicate => Some(ExprContext::IndexPredicate),
-            Condition::CopyWhere => Some(ExprContext::CopyWhere),
-            Condition::PublicationWhere
-            | Condition::CaseWhen
-            | Condition::And
-            | Condition::Or
-            | Condition::Not
-            | Condition::GraphWhere => None,
-        }
-    }
-
-    fn keyword(self) -> &'static str {
-        match self {
-            Condition::Where
-            | Condition::IndexPredicate
-            | Condition::CopyWhere
-            | Condition::PublicationWhere
-            | Condition::GraphWhere => "where",
-            Condition::Having => "having",
-            Condition::On => "on",
-            Condition::Check => "check",
-            Condition::Filter => "filter",
-            Condition::Policy => "policy",
-            Condition::TriggerWhen | Condition::MergeWhen | Condition::CaseWhen => "when",
-            Condition::And => "and",
-            Condition::Or => "or",
-            Condition::Not => "not",
-        }
-    }
 }
 
 enum InList {
@@ -5372,7 +4707,7 @@ impl Lowerer {
 
     fn lower_grantee_role_ref(&mut self, role_ref: &ast::RoleRef) {
         if let Some(ast::RoleRefValue::RoleNameRef(name_ref)) = role_ref.role_ref_value()
-            && is_public_role(&name_ref)
+            && name_ref.is_public()
         {
             return;
         }
@@ -5391,10 +4726,10 @@ impl Lowerer {
         }
         self.with_table_scope(QueryKind::Policy, table, node, |this| {
             if let Some(expr) = using.and_then(|clause| clause.expr()) {
-                this.lower_condition(Condition::Policy, &expr);
+                this.lower_condition(ConditionKind::Policy, &expr);
             }
             if let Some(expr) = with_check.and_then(|clause| clause.expr()) {
-                this.lower_condition(Condition::Policy, &expr);
+                this.lower_condition(ConditionKind::Policy, &expr);
             }
         });
     }
@@ -7361,7 +6696,7 @@ impl Lowerer {
                         table,
                         table_object.syntax(),
                         |this| {
-                            this.lower_condition(Condition::PublicationWhere, &expr);
+                            this.lower_condition(ConditionKind::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -7379,7 +6714,7 @@ impl Lowerer {
                         None,
                         schema_object.syntax(),
                         |this| {
-                            this.lower_condition(Condition::PublicationWhere, &expr);
+                            this.lower_condition(ConditionKind::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -8187,12 +7522,12 @@ impl Lowerer {
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
             visit_path_primaries(&pattern, &mut |primary| {
                 if let Some(expr) = primary.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_condition(Condition::GraphWhere, &expr);
+                    self.lower_condition(ConditionKind::GraphWhere, &expr);
                 }
             });
         }
         if let Some(expr) = graph_table.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::GraphWhere, &expr);
+            self.lower_condition(ConditionKind::GraphWhere, &expr);
         }
         let columns = match graph_table.expr_as_column_name_list() {
             Some(list) => self.lower_graph_table_columns(&list),
@@ -11124,7 +10459,7 @@ impl Lowerer {
                         complete = false;
                         continue;
                     };
-                    if like_includes_indexes(&like) && self.has_primary_key(source) {
+                    if like.includes_indexes() && self.has_primary_key(source) {
                         like_primary_keys.push(LikePrimaryKey {
                             like: like.clone(),
                             source,
@@ -12402,7 +11737,7 @@ impl Lowerer {
             let expr = expr.unparen();
             if let ast::Expr::TupleExpr(tuple) = &expr {
                 self.check_row_literals(ty, tuple);
-            } else if is_unknown_literal_expr(&expr)
+            } else if expr.is_unknown_literal()
                 && let Some(literal) = expr.as_literal()
             {
                 self.check_unknown_literal(ty, column.typmod, &literal);
@@ -13422,7 +12757,7 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
             self.with_domain_scope(domain, check.syntax(), |this| {
-                this.lower_condition(Condition::Check, &expr);
+                this.lower_condition(ConditionKind::Check, &expr);
             });
         }
         let Some(domain) = domain else {
@@ -13835,7 +13170,7 @@ impl Lowerer {
     }
 
     fn literal_type(&mut self, literal: &ast::Literal) -> Option<Ty> {
-        self.builtin_type(literal_type_name(literal)?)
+        self.builtin_type(literal.type_name()?)
     }
 
     fn lower_func_type(&mut self, func_type: Option<ast::FuncType>) -> Option<Ty> {
@@ -14564,7 +13899,7 @@ impl Lowerer {
         }
 
         if let Some(expr) = parts.where_clause.and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Where, &expr);
+            self.lower_condition(ConditionKind::Where, &expr);
         }
         if let Some(list) = parts
             .group_by_clause
@@ -14577,7 +13912,7 @@ impl Lowerer {
             });
         }
         if let Some(expr) = parts.having_clause.and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Having, &expr);
+            self.lower_condition(ConditionKind::Having, &expr);
         }
         for clause in parts.tail_clauses {
             self.lower_tail_clause(clause, &columns);
@@ -14698,7 +14033,7 @@ impl Lowerer {
                 non_recursive: self.index.ty_name(ty),
                 overall: self.index.ty_name(overall),
             };
-            match output_expr(non_recursive_node, position) {
+            match non_recursive_node.nth_output_expr(position) {
                 Some(expr) => self.push_error(expr.syntax(), error),
                 None => {
                     let range = non_recursive_node.syntax().text_range();
@@ -14788,7 +14123,7 @@ impl Lowerer {
                     left: self.index.ty_name(left),
                     right: self.index.ty_name(right),
                 };
-                match output_expr(rhs_node, position) {
+                match rhs_node.nth_output_expr(position) {
                     Some(expr) => self.push_error(expr.syntax(), error),
                     None => self.push_error(rhs_node.syntax(), error),
                 }
@@ -14925,7 +14260,7 @@ impl Lowerer {
         match delete.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_condition(Condition::Where, &expr);
+                    self.lower_condition(ConditionKind::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -14984,7 +14319,7 @@ impl Lowerer {
         match update.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_condition(Condition::Where, &expr);
+                    self.lower_condition(ConditionKind::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -15040,7 +14375,7 @@ impl Lowerer {
             .and_then(|using_on| using_on.on_clause())
             .and_then(|on_clause| on_clause.expr())
         {
-            self.lower_condition(Condition::On, &expr);
+            self.lower_condition(ConditionKind::On, &expr);
         }
 
         for when_clause in merge.merge_when_clauses() {
@@ -15063,7 +14398,7 @@ impl Lowerer {
                 self.push_hidden(hidden);
             }
             if let Some(expr) = condition.and_then(|condition| condition.expr()) {
-                self.lower_condition(Condition::MergeWhen, &expr);
+                self.lower_condition(ConditionKind::MergeWhen, &expr);
             }
             if let Some(action) = action {
                 self.lower_merge_action(target, &action);
@@ -15283,7 +14618,7 @@ impl Lowerer {
             let Some(ty) = self.index.columns[id].ty else {
                 continue;
             };
-            let Some(expr) = output_expr(source, position) else {
+            let Some(expr) = source.nth_output_expr(position) else {
                 continue;
             };
             let Some(assignment) =
@@ -15371,7 +14706,7 @@ impl Lowerer {
                 }
             }
             ast::SelectVariant::Select(_) => {
-                if let Some(expr) = output_expr(source, position) {
+                if let Some(expr) = source.nth_output_expr(position) {
                     self.check_assignment(assignment, &expr);
                 }
             }
@@ -15449,7 +14784,7 @@ impl Lowerer {
         let cast =
             (overloads.coercion(ty, target, CastContext::Explicit) == Coercion::Yes).then(|| {
                 AssignmentCast {
-                    parens: !binds_tighter_than_cast(expr),
+                    parens: !expr.binds_tighter_than_cast(),
                 }
             });
         let error = SemaError::AssignmentTypeMismatch {
@@ -15560,7 +14895,7 @@ impl Lowerer {
                 column_targets.and_then(|list| list.column_targets().nth(source_len))
         {
             let row_hint = source_len == 1
-                && single_source_expr(source).is_some_and(|expr| {
+                && source.nth_output_expr(0).is_some_and(|expr| {
                     matches!(expr, ast::Expr::TupleExpr(tuple) if tuple.exprs().count() == target_len)
                 });
             self.push_error(
@@ -15612,7 +14947,7 @@ impl Lowerer {
                     }
                 }
                 if let Some(expr) = on_index.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_condition(Condition::IndexPredicate, &expr);
+                    self.lower_condition(ConditionKind::IndexPredicate, &expr);
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
@@ -15668,7 +15003,7 @@ impl Lowerer {
             }
         };
         if let Some(expr) = where_clause.and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Where, &expr);
+            self.lower_condition(ConditionKind::Where, &expr);
         }
         self.index.queries[query].sources.truncate(len);
         self.set_visible((0..len).into());
@@ -18827,7 +18162,7 @@ impl Lowerer {
             }
         }
         if let Some(expr) = create_index.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::IndexPredicate, &expr);
+            self.lower_condition(ConditionKind::IndexPredicate, &expr);
         }
         self.scopes.pop();
         let columns = self.alloc_referenced_columns(refs);
@@ -19058,7 +18393,7 @@ impl Lowerer {
             .when_condition()
             .and_then(|condition| condition.expr())
         {
-            self.lower_condition(Condition::TriggerWhen, &expr);
+            self.lower_condition(ConditionKind::TriggerWhen, &expr);
         }
         self.scopes.pop();
 
@@ -19304,7 +18639,7 @@ impl Lowerer {
             }
             self.set_visible((0..2).into());
             if let Some(expr) = rule_on.where_clause().and_then(|clause| clause.expr()) {
-                self.lower_condition(Condition::Where, &expr);
+                self.lower_condition(ConditionKind::Where, &expr);
             }
             for (index, name) in names.into_iter().enumerate() {
                 let target = self.index.queries[query].sources[index];
@@ -20284,7 +19619,7 @@ impl Lowerer {
         }
         if let Some(expr) = copy.where_clause().and_then(|clause| clause.expr()) {
             self.with_table_scope(QueryKind::Copy, table, copy.syntax(), |this| {
-                this.lower_condition(Condition::CopyWhere, &expr);
+                this.lower_condition(ConditionKind::CopyWhere, &expr);
             });
         }
     }
@@ -20703,37 +20038,44 @@ impl Lowerer {
         column: Name,
         constraints: impl Iterator<Item = ast::Constraint>,
     ) {
-        let mut seen_nullable = false;
-        let mut not_null = false;
-        let mut needs_not_null = false;
+        #[derive(PartialEq, Eq)]
+        enum Nullability {
+            Unspecified,
+            Required,
+            Nullable,
+            NotNull,
+        }
+
+        let mut nullability = Nullability::Unspecified;
         for constraint in constraints {
             let conflict = match &constraint {
                 ast::Constraint::NullConstraint(_) => {
-                    let conflict = seen_nullable && not_null || needs_not_null;
-                    seen_nullable = true;
-                    not_null = false;
+                    let conflict =
+                        matches!(nullability, Nullability::NotNull | Nullability::Required);
+                    nullability = Nullability::Nullable;
                     conflict
                 }
                 ast::Constraint::NotNullConstraint(_) => {
-                    let conflict = seen_nullable && !not_null;
-                    if !not_null {
-                        seen_nullable = true;
-                        not_null = true;
-                        needs_not_null = false;
-                    }
+                    let conflict = nullability == Nullability::Nullable;
+                    nullability = Nullability::NotNull;
                     conflict
                 }
                 ast::Constraint::PrimaryKeyConstraint(_) => {
-                    needs_not_null = true;
-                    seen_nullable && !not_null
+                    let conflict = nullability == Nullability::Nullable;
+                    if nullability == Nullability::Unspecified {
+                        nullability = Nullability::Required;
+                    }
+                    conflict
                 }
                 ast::Constraint::GeneratedConstraint(generated) => {
                     let identity = matches!(
                         generated.generated_as(),
                         Some(ast::GeneratedAs::GeneratedIdentity(_))
                     );
-                    needs_not_null |= identity && !seen_nullable;
-                    identity && seen_nullable && !not_null
+                    if identity && nullability == Nullability::Unspecified {
+                        nullability = Nullability::Required;
+                    }
+                    identity && nullability == Nullability::Nullable
                 }
                 ast::Constraint::CheckConstraint(_)
                 | ast::Constraint::DefaultConstraint(_)
@@ -20794,7 +20136,7 @@ impl Lowerer {
     fn lower_check_constraint(&mut self, table: Option<TableId>, check: &ast::CheckConstraint) {
         let start = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
-            self.lower_condition(Condition::Check, &expr);
+            self.lower_condition(ConditionKind::Check, &expr);
         }
         let Some(table) = table else {
             return;
@@ -20979,7 +20321,9 @@ impl Lowerer {
             index,
             key,
             index_columns,
-            is_deferrable(primary_key.constraint_options()),
+            primary_key
+                .constraint_options()
+                .any(|option| option.is_deferrable()),
             None,
             "pkey",
         );
@@ -21063,7 +20407,9 @@ impl Lowerer {
             index,
             key,
             index_columns,
-            is_deferrable(unique.constraint_options()),
+            unique
+                .constraint_options()
+                .any(|option| option.is_deferrable()),
             Some(&addition),
             "key",
         );
@@ -21199,7 +20545,8 @@ impl Lowerer {
             return self.lower_in_list(tuple, left);
         }
         if let ast::Expr::CallExpr(call) = rhs
-            && let Some(operand) = self.lower_quantified_operand(call, row_width(lhs).unwrap_or(1))
+            && let Some(operand) = self
+                .lower_quantified_operand(call, lhs.and_then(|lhs| lhs.row_width()).unwrap_or(1))
         {
             return operand;
         }
@@ -21433,7 +20780,7 @@ impl Lowerer {
             return Some(ArgType::Untyped);
         };
         let ty = self.lower_expr(&expr);
-        if is_unknown_literal_expr(&expr) {
+        if expr.is_unknown_literal() {
             return Some(ArgType::UnknownLiteral);
         }
         let Some(base) = ty.and_then(|ty| self.index.base_type(ty)) else {
@@ -21831,7 +21178,7 @@ impl Lowerer {
             .where_condition_clause()
             .and_then(|clause| clause.expr())
         {
-            self.lower_condition(Condition::IndexPredicate, &expr);
+            self.lower_condition(ConditionKind::IndexPredicate, &expr);
         }
         let Some(table) = table else {
             return;
@@ -21848,7 +21195,9 @@ impl Lowerer {
             None,
             None,
             columns,
-            is_deferrable(exclude.constraint_options()),
+            exclude
+                .constraint_options()
+                .any(|option| option.is_deferrable()),
             Some(&addition),
             "excl",
         );
@@ -23028,7 +22377,7 @@ impl Lowerer {
         self.with_visible_sources(visible, |this| match condition {
             ast::JoinCondition::OnClause(on_clause) => {
                 if let Some(expr) = on_clause.expr() {
-                    this.lower_condition(Condition::On, &expr);
+                    this.lower_condition(ConditionKind::On, &expr);
                 }
             }
             ast::JoinCondition::JoinUsingClause(using_clause) => {
@@ -23630,7 +22979,7 @@ impl Lowerer {
             }
             ast::Expr::CallExpr(call) => {
                 let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
-                if let Some(keyword) = call_function_like_keyword(call) {
+                if let Some(keyword) = call.function_like_keyword() {
                     return self.keyword_call_type(call, keyword, &args);
                 }
                 if ty.is_some() {
@@ -23734,9 +23083,9 @@ impl Lowerer {
                     self.check_row_lengths(op, lhs, rhs);
                 }
                 let condition = if let Some(ast::BinOp::And(_)) = &op {
-                    Some(Condition::And)
+                    Some(ConditionKind::And)
                 } else if let Some(ast::BinOp::Or(_)) = &op {
-                    Some(Condition::Or)
+                    Some(ConditionKind::Or)
                 } else {
                     None
                 };
@@ -23751,7 +23100,7 @@ impl Lowerer {
                 let ty = op
                     .as_ref()
                     .and_then(|op| self.lower_bin_operator(op, left, right));
-                if op.is_some_and(|op| is_comparison(&op)) {
+                if op.is_some_and(|op| op.is_comparison()) {
                     if let Some(rhs) = &rhs
                         && let Some(lhs_ty) = lhs_ty
                     {
@@ -23780,7 +23129,7 @@ impl Lowerer {
                         if operand.is_some() {
                             self.lower_expr(&condition);
                         } else {
-                            self.lower_condition(Condition::CaseWhen, &condition);
+                            self.lower_condition(ConditionKind::CaseWhen, &condition);
                         }
                     }
                     if let Some(then) = when.then() {
@@ -23809,7 +23158,7 @@ impl Lowerer {
                     self.array_cast = false;
                     if let Some(source) = source
                         && let Some(target) = ty
-                        && !is_unknown_literal_expr(&expr)
+                        && !expr.is_unknown_literal()
                     {
                         let coercion =
                             self.overloads()
@@ -23906,7 +23255,7 @@ impl Lowerer {
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
-                    self.check_condition(Condition::Not, expr.syntax(), ty);
+                    self.check_condition(ConditionKind::Not, expr.syntax(), ty);
                 }
                 return self.lower_prefix_operator(&op, expr_arg_type(expr.as_ref(), ty));
             }
@@ -24664,7 +24013,7 @@ impl Lowerer {
                 Some(expr) => {
                     let ty = self.lower_expr(&expr);
                     match ty {
-                        _ if is_unknown_literal_expr(&expr) => ArgType::UnknownLiteral,
+                        _ if expr.is_unknown_literal() => ArgType::UnknownLiteral,
                         Some(ty) => ArgType::Known(ty),
                         None => ArgType::Untyped,
                     }
@@ -24784,7 +24133,7 @@ impl Lowerer {
         self.check_set_returning_call(call, function, srf_calls);
         self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Filter, &expr);
+            self.lower_condition(ConditionKind::Filter, &expr);
         }
         if call.over_clause().is_some()
             && let Some(arg_list) = call.arg_list()
@@ -24825,7 +24174,7 @@ impl Lowerer {
             .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
         {
             Some(SetReturningConstruct::Aggregate)
-        } else if call_function_like_keyword(call) == Some(ast::FunctionLikeKeyword::Coalesce) {
+        } else if call.function_like_keyword() == Some(ast::FunctionLikeKeyword::Coalesce) {
             Some(SetReturningConstruct::Coalesce)
         } else {
             None
@@ -25012,7 +24361,7 @@ impl Lowerer {
         self.with_expr_context(context, |this| this.lower_expr(expr))
     }
 
-    fn lower_condition(&mut self, condition: Condition, expr: &ast::Expr) {
+    fn lower_condition(&mut self, condition: ConditionKind, expr: &ast::Expr) {
         let found = match condition.context() {
             Some(context) => self.lower_expr_in(context, expr),
             None => self.lower_expr(expr),
@@ -25042,7 +24391,7 @@ impl Lowerer {
         }
     }
 
-    fn check_condition(&mut self, condition: Condition, node: &SyntaxNode, found: Option<Ty>) {
+    fn check_condition(&mut self, condition: ConditionKind, node: &SyntaxNode, found: Option<Ty>) {
         if let Some(found) = found
             && let Some(bool) = self.builtin_type("bool")
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
@@ -25077,7 +24426,7 @@ impl Lowerer {
                 Some(arg_expr) => {
                     let ty = self.lower_func_arg_expr(arg_expr);
                     match ty {
-                        _ if is_unknown_literal(arg_expr) => ArgType::UnknownLiteral,
+                        _ if arg_expr.is_unknown_literal() => ArgType::UnknownLiteral,
                         Some(ty) => ArgType::Known(ty),
                         None => ArgType::Untyped,
                     }
@@ -25350,7 +24699,7 @@ impl Lowerer {
             Some(expr) => {
                 let ty = self.lower_expr(&expr);
                 match ty {
-                    _ if is_unknown_literal_expr(&expr) => ArgType::UnknownLiteral,
+                    _ if expr.is_unknown_literal() => ArgType::UnknownLiteral,
                     Some(ty) => ArgType::Known(ty),
                     None => ArgType::Untyped,
                 }
@@ -25452,7 +24801,7 @@ impl Lowerer {
     ) -> SmallVec<[CallArg; 4]> {
         args.map(|arg| {
             let ty = match self.lower_func_arg_expr(&arg) {
-                _ if is_unknown_literal(&arg) => ArgType::UnknownLiteral,
+                _ if arg.is_unknown_literal() => ArgType::UnknownLiteral,
                 Some(ty) => ArgType::Known(ty),
                 None => ArgType::Untyped,
             };
@@ -25503,7 +24852,7 @@ impl Lowerer {
             return CallArg::default();
         };
         let ty = match self.lower_expr(&expr) {
-            _ if is_unknown_literal_expr(&expr) => ArgType::UnknownLiteral,
+            _ if expr.is_unknown_literal() => ArgType::UnknownLiteral,
             Some(ty) => ArgType::Known(ty),
             None => ArgType::Untyped,
         };
@@ -26163,7 +25512,7 @@ impl Lowerer {
 
     fn lower_field_base(&mut self, field_expr: &ast::FieldExpr) -> Option<FieldBase> {
         let base = field_expr.base()?;
-        if let Some(call) = call_field_base(&base) {
+        if let ast::Expr::CallExpr(call) = base.unparen() {
             return Some(self.lower_call_field_base(&call));
         }
         if let ast::Expr::TupleExpr(tuple) = base.unparen() {
@@ -26242,7 +25591,7 @@ impl Lowerer {
             Some(qualifier) => FieldBase::Source(self.lower_qualifier(&qualifier)),
             None => {
                 let ty = self.lower_expr(&base);
-                let ty = if is_unknown_literal_expr(&base) {
+                let ty = if base.is_unknown_literal() {
                     self.builtin_type("unknown")
                 } else {
                     ty
@@ -26316,7 +25665,7 @@ impl Lowerer {
 
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
         let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
-        if let Some(keyword) = call_function_like_keyword(call) {
+        if let Some(keyword) = call.function_like_keyword() {
             let ty = self.keyword_call_type(call, keyword, &args);
             return self.expr_field_base(ty);
         }
@@ -27390,7 +26739,8 @@ impl Lowerer {
             name: name_id,
             owner,
             index,
-            no_inherit: constraint_no_inherit(node),
+            no_inherit: ast::Constraint::cast(node.clone())
+                .is_some_and(|constraint| constraint.is_no_inherit()),
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.as_ref().map_or(node, |name| name.syntax())),
         });
@@ -27717,94 +27067,6 @@ impl Lowerer {
     }
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ExprContext {
-    Unrestricted,
-    Where,
-    JoinCondition,
-    GroupBy,
-    Having,
-    Filter,
-    WindowDefinition,
-    WindowRange,
-    WindowRows,
-    WindowGroups,
-    Limit,
-    Offset,
-    Values,
-    ValuesSingle,
-    Returning,
-    Insert,
-    Update,
-    FromFunction,
-    MergeWhen,
-    CheckConstraint,
-    Default,
-    GeneratedColumn,
-    IndexExpression,
-    IndexPredicate,
-    StatisticsExpression,
-    PartitionKey,
-    PartitionBound,
-    Policy,
-    TriggerWhen,
-    CallArgument,
-    Transform,
-    CopyWhere,
-    ExecuteParameter,
-}
-
-impl ExprContext {
-    fn allows_aggregates(self) -> bool {
-        matches!(
-            self,
-            ExprContext::Unrestricted | ExprContext::Having | ExprContext::WindowDefinition
-        )
-    }
-
-    fn allows_windows(self) -> bool {
-        self == ExprContext::Unrestricted
-    }
-
-    fn allows_set_returning(self) -> bool {
-        match self {
-            ExprContext::Unrestricted
-            | ExprContext::GroupBy
-            | ExprContext::WindowDefinition
-            | ExprContext::ValuesSingle
-            | ExprContext::Insert
-            | ExprContext::FromFunction => true,
-            ExprContext::Where
-            | ExprContext::JoinCondition
-            | ExprContext::Having
-            | ExprContext::Filter
-            | ExprContext::WindowRange
-            | ExprContext::WindowRows
-            | ExprContext::WindowGroups
-            | ExprContext::Limit
-            | ExprContext::Offset
-            | ExprContext::Values
-            | ExprContext::Returning
-            | ExprContext::Update
-            | ExprContext::MergeWhen
-            | ExprContext::CheckConstraint
-            | ExprContext::Default
-            | ExprContext::GeneratedColumn
-            | ExprContext::IndexExpression
-            | ExprContext::IndexPredicate
-            | ExprContext::StatisticsExpression
-            | ExprContext::PartitionKey
-            | ExprContext::PartitionBound
-            | ExprContext::Policy
-            | ExprContext::TriggerWhen
-            | ExprContext::CallArgument
-            | ExprContext::Transform
-            | ExprContext::CopyWhere
-            | ExprContext::ExecuteParameter => false,
-        }
-    }
-}
-
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum AggregateCallKind {
     Aggregate,
@@ -27912,14 +27174,9 @@ fn regclass_literal(expr: &ast::Expr) -> Option<ast::Literal> {
     None
 }
 
-fn is_unknown_literal(arg: &ast::FuncArgExpr) -> bool {
-    arg.expr()
-        .is_some_and(|expr| is_unknown_literal_expr(&expr))
-}
-
 fn expr_arg_type(expr: Option<&ast::Expr>, ty: Option<Ty>) -> ArgType {
     match ty {
-        _ if expr.is_some_and(is_unknown_literal_expr) => ArgType::UnknownLiteral,
+        _ if expr.is_some_and(ast::Expr::is_unknown_literal) => ArgType::UnknownLiteral,
         Some(ty) => ArgType::Known(ty),
         None => ArgType::Untyped,
     }
@@ -27931,27 +27188,6 @@ fn operand_ty(arg: ArgType, declared: Operand) -> Option<Ty> {
             Some(ty)
         }
         (ArgType::UnknownLiteral | ArgType::Untyped, Operand::None | Operand::Unknown) => None,
-    }
-}
-
-fn call_function_like_keyword(call: &ast::CallExpr) -> Option<ast::FunctionLikeKeyword> {
-    match call.expr()? {
-        ast::Expr::NameRef(name_ref) => name_ref.function_like_keyword(),
-        ast::Expr::ArrayExpr(_)
-        | ast::Expr::BetweenExpr(_)
-        | ast::Expr::BinExpr(_)
-        | ast::Expr::CallExpr(_)
-        | ast::Expr::CaseExpr(_)
-        | ast::Expr::CastExpr(_)
-        | ast::Expr::Collate(_)
-        | ast::Expr::FieldExpr(_)
-        | ast::Expr::IndexExpr(_)
-        | ast::Expr::Literal(_)
-        | ast::Expr::ParenExpr(_)
-        | ast::Expr::PostfixExpr(_)
-        | ast::Expr::PrefixExpr(_)
-        | ast::Expr::SliceExpr(_)
-        | ast::Expr::TupleExpr(_) => None,
     }
 }
 
@@ -27994,22 +27230,6 @@ fn similar_bool_input(value: &str) -> Option<&'static str> {
         |candidate| candidate,
         &value.to_ascii_lowercase_smolstr(),
         None,
-    )
-}
-
-fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
-    let Some(literal) = expr.unparen().as_literal() else {
-        return false;
-    };
-    matches!(
-        literal.kind(),
-        Some(
-            ast::LitKind::String(_)
-                | ast::LitKind::DollarQuotedString(_)
-                | ast::LitKind::EscString(_)
-                | ast::LitKind::UnicodeEscString(_)
-                | ast::LitKind::Null(_)
-        )
     )
 }
 
@@ -28071,10 +27291,6 @@ enum ConstraintName {
     Generated(Name),
 }
 
-pub fn is_public_role(name_ref: &ast::RoleNameRef) -> bool {
-    name_ref.text() == "public"
-}
-
 fn attribute_name(option: &ast::AttributeOption) -> Option<SmolStr> {
     Some(option.name()?.text().to_ascii_lowercase_smolstr())
 }
@@ -28115,53 +27331,6 @@ fn graph_element_kind(vertex_or_edge: Option<&ast::VertexOrEdge>) -> GraphElemen
         Some(ast::VertexOrEdgeKind::Edge) => GraphElementKind::Edge,
         Some(ast::VertexOrEdgeKind::Vertex) | None => GraphElementKind::Vertex,
     }
-}
-
-fn set_object_schema(index: &mut IndexData, object: Object, schema: Name) -> bool {
-    match object {
-        Object::Table(table) => index.tables.set_schema(table, schema),
-        Object::Index(idx) => index.indexes.set_schema(idx, schema),
-        Object::Type(ty) => index.types.set_schema(ty, schema),
-        Object::Function(function) => index.functions.set_schema(function, schema),
-        Object::Operator(operator) => index.operators.set_schema(operator, schema),
-        Object::Collation(collation) => index.collations.set_schema(collation, schema),
-        Object::Conversion(conversion) => index.conversions.set_schema(conversion, schema),
-        Object::OperatorFamily(family) => index.operator_families.set_schema(family, schema),
-        Object::OperatorClass(class) => index.operator_classes.set_schema(class, schema),
-        Object::Statistics(statistics) => index.statistics.set_schema(statistics, schema),
-        Object::Extension(extension) => index.extensions.set_schema(extension, schema),
-        Object::TextSearch(text_search) => index.text_search.set_schema(text_search, schema),
-        Object::Trigger(_)
-        | Object::EventTrigger(_)
-        | Object::Constraint(_)
-        | Object::Policy(_)
-        | Object::Rule(_)
-        | Object::Cast(_)
-        | Object::Transform(_)
-        | Object::AccessMethod(_)
-        | Object::Language(_)
-        | Object::ForeignDataWrapper(_)
-        | Object::ColumnExpr(_)
-        | Object::OperatorFamilyMember(_)
-        | Object::Schema(_)
-        | Object::Server(_)
-        | Object::Publication(_) => false,
-    }
-}
-
-fn rename_schema_objects(index: &mut IndexData, from: Name, to: Name) {
-    index.tables.rename_schema(from, to);
-    index.extensions.rename_schema(from, to);
-    index.indexes.rename_schema(from, to);
-    index.types.rename_schema(from, to);
-    index.functions.rename_schema(from, to);
-    index.operators.rename_schema(from, to);
-    index.collations.rename_schema(from, to);
-    index.conversions.rename_schema(from, to);
-    index.operator_families.rename_schema(from, to);
-    index.operator_classes.rename_schema(from, to);
-    index.statistics.rename_schema(from, to);
-    index.text_search.rename_schema(from, to);
 }
 
 fn attribute_path(option: &ast::AttributeOption) -> Option<ast::PathRef> {
@@ -28230,16 +27399,11 @@ fn member_number(literal: Option<&ast::Literal>) -> Option<u16> {
     u16::try_from(literal?.integer_value_u64()?).ok()
 }
 
-fn row_width(expr: Option<&ast::Expr>) -> Option<usize> {
-    match expr {
-        Some(ast::Expr::TupleExpr(tuple)) => Some(tuple.exprs().count()),
-        _ => None,
-    }
-}
-
 fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usize> {
     match op? {
-        ast::BinOp::In(_) | ast::BinOp::NotIn(_) => Some(row_width(lhs).unwrap_or(1)),
+        ast::BinOp::In(_) | ast::BinOp::NotIn(_) => {
+            Some(lhs.and_then(|lhs| lhs.row_width()).unwrap_or(1))
+        }
         ast::BinOp::Caret(_)
         | ast::BinOp::CustomOp(_)
         | ast::BinOp::Eq(_)
@@ -28260,7 +27424,7 @@ fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usi
         | ast::BinOp::RAngle(_)
         | ast::BinOp::SimilarTo(_)
         | ast::BinOp::Slash(_)
-        | ast::BinOp::Star(_) => row_width(lhs),
+        | ast::BinOp::Star(_) => lhs.and_then(|lhs| lhs.row_width()),
         ast::BinOp::And(_)
         | ast::BinOp::AtTimeZone(_)
         | ast::BinOp::ColonColon(_)
@@ -28273,46 +27437,6 @@ fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usi
         | ast::BinOp::IsNotDistinctFrom(_)
         | ast::BinOp::Or(_)
         | ast::BinOp::Overlaps(_) => None,
-    }
-}
-
-fn is_comparison(op: &ast::BinOp) -> bool {
-    match op {
-        ast::BinOp::Eq(_)
-        | ast::BinOp::Neq(_)
-        | ast::BinOp::Neqb(_)
-        | ast::BinOp::LAngle(_)
-        | ast::BinOp::RAngle(_)
-        | ast::BinOp::Lteq(_)
-        | ast::BinOp::Gteq(_)
-        | ast::BinOp::IsDistinctFrom(_)
-        | ast::BinOp::IsNotDistinctFrom(_)
-        | ast::BinOp::In(_)
-        | ast::BinOp::NotIn(_) => true,
-        ast::BinOp::And(_)
-        | ast::BinOp::AtTimeZone(_)
-        | ast::BinOp::Caret(_)
-        | ast::BinOp::ColonColon(_)
-        | ast::BinOp::ColonEq(_)
-        | ast::BinOp::CustomOp(_)
-        | ast::BinOp::Escape(_)
-        | ast::BinOp::FatArrow(_)
-        | ast::BinOp::Ilike(_)
-        | ast::BinOp::Is(_)
-        | ast::BinOp::IsNot(_)
-        | ast::BinOp::Like(_)
-        | ast::BinOp::Minus(_)
-        | ast::BinOp::NotIlike(_)
-        | ast::BinOp::NotLike(_)
-        | ast::BinOp::NotSimilarTo(_)
-        | ast::BinOp::OperatorCall(_)
-        | ast::BinOp::Or(_)
-        | ast::BinOp::Overlaps(_)
-        | ast::BinOp::Percent(_)
-        | ast::BinOp::Plus(_)
-        | ast::BinOp::SimilarTo(_)
-        | ast::BinOp::Slash(_)
-        | ast::BinOp::Star(_) => false,
     }
 }
 
@@ -28337,134 +27461,13 @@ fn subscript_results(
     }
 }
 
-fn call_field_base(base: &ast::Expr) -> Option<ast::CallExpr> {
-    if let ast::Expr::CallExpr(call) = base.unparen() {
-        Some(call)
-    } else {
-        None
-    }
-}
-
-fn binds_tighter_than_cast(expr: &ast::Expr) -> bool {
-    matches!(
-        expr,
-        ast::Expr::Literal(_)
-            | ast::Expr::NameRef(_)
-            | ast::Expr::FieldExpr(_)
-            | ast::Expr::CallExpr(_)
-            | ast::Expr::ParenExpr(_)
-            | ast::Expr::CastExpr(_)
-            | ast::Expr::ArrayExpr(_)
-            | ast::Expr::IndexExpr(_)
-    )
-}
-
-fn range_values(
-    exprs: ast::AstChildren<ast::Expr>,
-    key_count: usize,
-) -> Option<SmallVec<[RangeValue; 2]>> {
-    let mut values = SmallVec::with_capacity(key_count);
-    for expr in exprs {
-        values.push(range_value(&expr)?);
-    }
-    if values.len() != key_count {
-        return None;
-    }
-    Some(values)
-}
-
-fn range_value(expr: &ast::Expr) -> Option<RangeValue> {
-    match expr {
-        ast::Expr::NameRef(name_ref) => match name_ref.range_bound_keyword()? {
-            ast::RangeBoundKeyword::MinValue => Some(RangeValue::MinValue),
-            ast::RangeBoundKeyword::MaxValue => Some(RangeValue::MaxValue),
-        },
-        ast::Expr::PrefixExpr(prefix) => {
-            let Some(ast::PrefixOp::Minus(_)) = prefix.op() else {
-                return None;
-            };
-            match range_value(&prefix.expr()?)? {
-                RangeValue::Int(value) => Some(RangeValue::Int(-value)),
-                RangeValue::MinValue | RangeValue::MaxValue => None,
-            }
-        }
-        ast::Expr::Literal(literal) => match literal.kind()? {
-            ast::LitKind::IntNumber(_) => {
-                Some(RangeValue::Int(i128::from(literal.integer_value_u64()?)))
-            }
-            ast::LitKind::String(token) => {
-                let text = token.text();
-                let value = text.get(1..text.len() - 1)?.trim().parse().ok()?;
-                Some(RangeValue::Int(value))
-            }
-            _ => None,
-        },
-        _ => None,
-    }
-}
-
-fn partition_bounds_overlap(new: &PartitionBound, existing: &PartitionBound) -> bool {
-    match (new, existing) {
-        (PartitionBound::Default, PartitionBound::Default) => true,
-        (PartitionBound::List(new), PartitionBound::List(existing)) => {
-            new.iter().any(|value| existing.contains(value))
-        }
-        (
-            PartitionBound::Range { from, to },
-            PartitionBound::Range {
-                from: existing_from,
-                to: existing_to,
-            },
-        ) => from < existing_to && existing_from < to,
-        (
-            PartitionBound::Hash { modulus, remainder },
-            PartitionBound::Hash {
-                modulus: existing_modulus,
-                remainder: existing_remainder,
-            },
-        ) => {
-            let (small, small_remainder, large_remainder) = if modulus <= existing_modulus {
-                (modulus, remainder, existing_remainder)
-            } else {
-                (existing_modulus, existing_remainder, remainder)
-            };
-            large_remainder % small == *small_remainder
-        }
-        (
-            PartitionBound::Default
-            | PartitionBound::List(_)
-            | PartitionBound::Range { .. }
-            | PartitionBound::Hash { .. },
-            _,
-        ) => false,
-    }
-}
-
-fn output_expr(query: &ast::SelectVariant, position: usize) -> Option<ast::Expr> {
-    match query {
-        ast::SelectVariant::Select(select) => select
-            .select_clause()?
-            .target_list()?
-            .targets()
-            .nth(position)?
-            .expr(),
-        ast::SelectVariant::Values(values) => {
-            values.row_list()?.rows().next()?.exprs().nth(position)
-        }
-        ast::SelectVariant::ParenSelect(paren) => output_expr(&paren.select()?, position),
-        ast::SelectVariant::CompoundSelect(_)
-        | ast::SelectVariant::SelectInto(_)
-        | ast::SelectVariant::Table(_) => None,
-    }
-}
-
 fn insert_output_is_unknown_literal(source: &ast::SelectVariant, position: usize) -> bool {
     match source {
         ast::SelectVariant::Values(values) => values.row_list().is_some_and(|list| {
             list.rows().all(|row| {
                 row.exprs()
                     .nth(position)
-                    .is_some_and(|expr| is_unknown_literal_expr(&expr))
+                    .is_some_and(|expr| expr.is_unknown_literal())
             })
         }),
         ast::SelectVariant::ParenSelect(paren) => paren
@@ -28484,7 +27487,7 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
             .and_then(|clause| clause.target_list())
             .and_then(|list| list.targets().nth(position))
             .and_then(|target| target.expr())
-            .is_some_and(|expr| is_unknown_literal_expr(&expr)),
+            .is_some_and(|expr| expr.is_unknown_literal()),
         ast::SelectVariant::ParenSelect(paren) => paren
             .select()
             .is_some_and(|inner| output_is_unknown_literal(&inner, position)),
@@ -28492,22 +27495,6 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
         | ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => false,
-    }
-}
-
-fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {
-    match source {
-        ast::SelectVariant::Values(values) => values.row_list()?.rows().next()?.exprs().next(),
-        ast::SelectVariant::Select(select) => select
-            .select_clause()?
-            .target_list()?
-            .targets()
-            .next()?
-            .expr(),
-        ast::SelectVariant::SelectInto(_)
-        | ast::SelectVariant::ParenSelect(_)
-        | ast::SelectVariant::CompoundSelect(_)
-        | ast::SelectVariant::Table(_) => None,
     }
 }
 
@@ -28529,84 +27516,6 @@ fn index_column_names(create_index: &ast::CreateIndex) -> String {
             }
         },
     ))
-}
-
-fn constraint_no_inherit(node: &SyntaxNode) -> bool {
-    let options = if let Some(check) = ast::CheckConstraint::cast(node.clone()) {
-        check.constraint_options()
-    } else if let Some(not_null) = ast::NotNullConstraint::cast(node.clone()) {
-        not_null.constraint_options()
-    } else {
-        return false;
-    };
-    options
-        .into_iter()
-        .any(|option| matches!(option, ast::ConstraintOption::NoInherit(_)))
-}
-
-fn is_deferrable(mut options: ast::AstChildren<ast::ConstraintOption>) -> bool {
-    options.any(|option| match option {
-        ast::ConstraintOption::DeferrableConstraintOption(_)
-        | ast::ConstraintOption::InitiallyDeferredConstraintOption(_) => true,
-        ast::ConstraintOption::NotDeferrableConstraintOption(_)
-        | ast::ConstraintOption::InitiallyImmediateConstraintOption(_)
-        | ast::ConstraintOption::NotValid(_)
-        | ast::ConstraintOption::NoInherit(_)
-        | ast::ConstraintOption::Inherit(_)
-        | ast::ConstraintOption::NotEnforced(_)
-        | ast::ConstraintOption::Enforced(_) => false,
-    })
-}
-
-fn like_includes_indexes(like: &ast::LikeClause) -> bool {
-    let mut includes = false;
-    for option in like.like_options() {
-        let (property, including) = match option {
-            ast::LikeOption::IncludingProperty(property) => (property.table_property(), true),
-            ast::LikeOption::ExcludingProperty(property) => (property.table_property(), false),
-        };
-        match property {
-            Some(ast::TableProperty::PropertyAll(_) | ast::TableProperty::PropertyIndexes(_)) => {
-                includes = including;
-            }
-            Some(
-                ast::TableProperty::PropertyComments(_)
-                | ast::TableProperty::PropertyCompression(_)
-                | ast::TableProperty::PropertyConstraints(_)
-                | ast::TableProperty::PropertyDefaults(_)
-                | ast::TableProperty::PropertyGenerated(_)
-                | ast::TableProperty::PropertyIdentity(_)
-                | ast::TableProperty::PropertyStatistics(_)
-                | ast::TableProperty::PropertyStorage(_),
-            )
-            | None => {}
-        }
-    }
-    includes
-}
-
-pub fn literal_type_name(literal: &ast::Literal) -> Option<&'static str> {
-    let name = match literal.kind()? {
-        ast::LitKind::IntNumber(_) => match literal.integer_value_u64() {
-            Some(value) if i32::try_from(value).is_ok() => "int4",
-            Some(value) if i64::try_from(value).is_ok() => "int8",
-            Some(_) | None => "numeric",
-        },
-        ast::LitKind::NumericNumber(_) => "numeric",
-        ast::LitKind::String(_)
-        | ast::LitKind::DollarQuotedString(_)
-        | ast::LitKind::EscString(_)
-        | ast::LitKind::NationalString(_)
-        | ast::LitKind::UnicodeEscString(_) => "text",
-        ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => "bit",
-        ast::LitKind::True(_) | ast::LitKind::False(_) => "bool",
-        ast::LitKind::Default(_)
-        | ast::LitKind::Null(_)
-        | ast::LitKind::Off(_)
-        | ast::LitKind::On(_)
-        | ast::LitKind::PositionalParam(_) => return None,
-    };
-    Some(name)
 }
 
 fn standalone_select_keyword(call: &ast::CallExpr) -> Option<SyntaxToken> {

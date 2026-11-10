@@ -1,0 +1,24 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/source_file.sql
+---
+﻿/* leading */ select 1;
+select 2; select 3;
+
+; select 4;; select 5;
+
+select 6; /* between */ select 7;
+select 8; -- trailing
+select 9;
+
+/* own line */
+
+select
+  'a string that is intentionally long enough to make this statement wrap across multiple lines';
+
+\echo before
+select 10;
+\echo after
+;
+
+/* trailing */

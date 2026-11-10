@@ -12,7 +12,9 @@ use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
-use crate::lower::{ExprContext, OutputClause, TableLookup};
+use crate::expr_context::ExprContext;
+use crate::lookup::TableLookup;
+use crate::lower::OutputClause;
 use crate::postgres::{IntType, NumericTypmod};
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
@@ -192,9 +194,9 @@ pub(crate) enum ObjectKind {
     Table(TableKind),
 }
 
-impl ObjectKind {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for ObjectKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             ObjectKind::Relation => "relation",
             ObjectKind::Type => "type",
             ObjectKind::Role => "role",
@@ -221,11 +223,13 @@ impl ObjectKind {
             ObjectKind::PreparedStatement => "prepared statement",
             ObjectKind::EnumLabel => "enum label",
             ObjectKind::Function => "function",
-            ObjectKind::TextSearch(kind) => kind.label(),
-            ObjectKind::Table(kind) => kind.label(),
-        }
+            ObjectKind::TextSearch(kind) => return write!(f, "{kind}"),
+            ObjectKind::Table(kind) => return write!(f, "{kind}"),
+        })
     }
+}
 
+impl ObjectKind {
     fn duplicate_kind(self) -> DiagnosticKind {
         match self {
             ObjectKind::Relation => DiagnosticKind::DuplicateRelation,
@@ -863,13 +867,13 @@ pub(crate) enum UniqueKind {
     UniqueIndex,
 }
 
-impl UniqueKind {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for UniqueKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             UniqueKind::PrimaryKey => "primary key",
             UniqueKind::Unique => "unique constraint",
             UniqueKind::UniqueIndex => "unique index",
-        }
+        })
     }
 }
 
@@ -934,13 +938,13 @@ pub(crate) enum Quantifier {
     All,
 }
 
-impl Quantifier {
-    fn keyword(self) -> &'static str {
-        match self {
+impl fmt::Display for Quantifier {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             Quantifier::Any => "any",
             Quantifier::Some => "some",
             Quantifier::All => "all",
-        }
+        })
     }
 }
 
@@ -951,13 +955,13 @@ pub(crate) enum CompoundOp {
     Except,
 }
 
-impl CompoundOp {
-    fn keyword(self) -> &'static str {
-        match self {
+impl fmt::Display for CompoundOp {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             CompoundOp::Union => "union",
             CompoundOp::Intersect => "intersect",
             CompoundOp::Except => "except",
-        }
+        })
     }
 }
 
@@ -991,21 +995,21 @@ pub(crate) enum ConflictRuleEvent {
     Update,
 }
 
-impl ConflictRuleEvent {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for ConflictRuleEvent {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             ConflictRuleEvent::Insert => "`on insert`",
             ConflictRuleEvent::Update => "`on update`",
-        }
+        })
     }
 }
 
-impl ConflictAction {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for ConflictAction {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             ConflictAction::DoUpdate => "`on conflict do update`",
             ConflictAction::DoSelect => "`on conflict do select`",
-        }
+        })
     }
 }
 
@@ -1015,12 +1019,12 @@ pub(crate) enum WindowClause {
     OrderBy,
 }
 
-impl WindowClause {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for WindowClause {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             WindowClause::PartitionBy => "`partition by`",
             WindowClause::OrderBy => "`order by`",
-        }
+        })
     }
 }
 
@@ -1182,6 +1186,12 @@ fn ambiguous_kind(kind: ReferenceKind) -> DiagnosticKind {
     }
 }
 
+impl fmt::Display for RoutineKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(self.label())
+    }
+}
+
 impl RoutineKind {
     fn label(self) -> &'static str {
         match self {
@@ -1277,22 +1287,22 @@ impl ExprContext {
     }
 }
 
-impl TypeKind {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for TypeKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             TypeKind::Shell => "shell type",
             TypeKind::Type => "type",
             TypeKind::Domain => "domain",
             TypeKind::Enum => "enum",
             TypeKind::Range => "range type",
             TypeKind::Multirange => "multirange type",
-        }
+        })
     }
 }
 
-impl TableLookup {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for TableLookup {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             TableLookup::Table => "table",
             TableLookup::ForeignTable => "foreign table",
             TableLookup::TableOrForeignTable => "table or foreign table",
@@ -1307,17 +1317,17 @@ impl TableLookup {
             TableLookup::CopyTo => "table or materialized view",
             TableLookup::CopyFrom => "table or foreign table",
             TableLookup::Truncate => "table",
-        }
+        })
     }
 }
 
-impl OutputClause {
-    fn label(self) -> &'static str {
-        match self {
+impl fmt::Display for OutputClause {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             OutputClause::OrderBy => "`order by`",
             OutputClause::GroupBy => "`group by`",
             OutputClause::DistinctOn => "`distinct on`",
-        }
+        })
     }
 }
 
@@ -1721,7 +1731,7 @@ impl SemaError {
             } => Suggestion {
                 message: alter_relation_hint(kind).into(),
                 fix: Fix {
-                    title: format!("Replace with `{}`", kind.label()).into(),
+                    title: format!("Replace with `{kind}`").into(),
                     edits: vec![Edit::replace(type_range, kind.label())],
                 },
             },
@@ -1783,7 +1793,7 @@ impl SemaError {
             } => Suggestion {
                 message: drop_hint(kind).into(),
                 fix: Fix {
-                    title: format!("Replace with `{}`", kind.label()).into(),
+                    title: format!("Replace with `{kind}`").into(),
                     edits: vec![Edit::replace(keyword_range, kind.label())],
                 },
             },
@@ -2430,7 +2440,7 @@ impl SemaError {
             SemaError::ConflictWithRules { table, rule, event } => Cow::Owned(format!(
                 "`{}` has an {} rule `{}`",
                 names.resolve(table),
-                event.label(),
+                event,
                 names.resolve(rule)
             )),
             SemaError::ForeignKeyTypeMismatch { pairs, .. } => {
@@ -2665,13 +2675,11 @@ impl fmt::Display for ErrorMessage<'_> {
                 f.write_str(self.error.static_message().unwrap_or_default())
             }
             SemaError::MissingConflictTarget { action, .. } => {
-                write!(f, "{} requires a conflict target", action.label())
+                write!(f, "{action} requires a conflict target")
             }
-            SemaError::ExclusionConflictArbiter { action } => write!(
-                f,
-                "{} not supported with exclusion constraints",
-                action.label()
-            ),
+            SemaError::ExclusionConflictArbiter { action } => {
+                write!(f, "{action} not supported with exclusion constraints")
+            }
             SemaError::MisplacedAggregate { context } => write!(
                 f,
                 "aggregate functions are not allowed in {}",
@@ -2730,7 +2738,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 write!(f, "window function `{}` requires an `over` clause", n(name))
             }
             SemaError::Duplicate { object, name } => {
-                write!(f, "{} `{}` already exists", object.label(), n(name))
+                write!(f, "{object} `{}` already exists", n(name))
             }
             SemaError::DuplicateInSchema {
                 object,
@@ -2739,7 +2747,7 @@ impl fmt::Display for ErrorMessage<'_> {
             } => write!(
                 f,
                 "{} `{}` already exists in schema `{}`",
-                object.label(),
+                object,
                 n(name),
                 n(schema)
             ),
@@ -2748,7 +2756,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 name,
                 access_method,
             } => {
-                write!(f, "{} `{}`", object.label(), n(name))?;
+                write!(f, "{object} `{}`", n(name))?;
                 if let Some(access_method) = access_method {
                     write!(f, " for access method `{}`", n(access_method))?;
                 }
@@ -2838,7 +2846,7 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::DependentObjects { object, name } => write!(
                 f,
                 "cannot drop {} `{}` because other objects depend on it",
-                object.label(),
+                object,
                 n(name)
             ),
             SemaError::RequiredBySystem { schema } => write!(
@@ -2868,7 +2876,7 @@ impl fmt::Display for ErrorMessage<'_> {
                     ReferenceKind::Table => write!(f, "relation `{name}` does not exist"),
                     ReferenceKind::Column => write!(f, "column `{name}` does not exist"),
                     ReferenceKind::Function(kind) => {
-                        write!(f, "{} `{name}` does not exist", kind.label())
+                        write!(f, "{kind} `{name}` does not exist")
                     }
                     ReferenceKind::Type => write!(f, "type `{name}` does not exist"),
                     ReferenceKind::Window => write!(f, "window `{name}` does not exist"),
@@ -2901,7 +2909,7 @@ impl fmt::Display for ErrorMessage<'_> {
                         write!(f, "statistics object `{name}` does not exist")
                     }
                     ReferenceKind::TextSearch(kind) => {
-                        write!(f, "{} `{name}` does not exist", kind.label())
+                        write!(f, "{kind} `{name}` does not exist")
                     }
                     ReferenceKind::Publication => write!(f, "publication `{name}` does not exist"),
                     ReferenceKind::Subscription => {
@@ -2935,7 +2943,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 let name = n(name);
                 match kind {
                     ReferenceKind::Function(kind) => {
-                        write!(f, "{} `{name}` is not unique", kind.label())
+                        write!(f, "{kind} `{name}` is not unique")
                     }
                     ReferenceKind::Operator => write!(f, "operator `{name}` is not unique"),
                     ReferenceKind::Column
@@ -3147,7 +3155,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.signature(schema, name, args)
             ),
             SemaError::TableRowTypeAlteredAsType { name, kind, .. } => {
-                write!(f, "`{}` is a {}'s row type", n(name), kind.label())
+                write!(f, "`{}` is a {kind}'s row type", n(name))
             }
             SemaError::CompositeTypeAlteredAsTable { name, .. } => {
                 write!(f, "`{}` is a composite type", n(name))
@@ -3201,8 +3209,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 column,
             } => write!(
                 f,
-                "{} on partitioned table `{}` must include partition key column `{}`",
-                kind.label(),
+                "{kind} on partitioned table `{}` must include partition key column `{}`",
                 n(table),
                 n(column)
             ),
@@ -3271,8 +3278,7 @@ impl fmt::Display for ErrorMessage<'_> {
             }
             SemaError::UniqueOnExpressionPartitionKey { kind, table } => write!(
                 f,
-                "{} is not supported on partitioned table `{}` because its partition key contains expressions",
-                kind.label(),
+                "{kind} is not supported on partitioned table `{}` because its partition key contains expressions",
                 n(table)
             ),
             SemaError::ViewColumnTypeChanged { column, from, to } => write!(
@@ -3338,18 +3344,12 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::InvalidBoolValue { value, similar: _ } => {
                 write!(f, "invalid input value for type `bool`: `{}`", n(value))
             }
-            SemaError::InvalidIntValue { ty, value } => write!(
-                f,
-                "invalid input value for type `{}`: `{}`",
-                ty.name(),
-                n(value)
-            ),
-            SemaError::IntValueOutOfRange { ty, value } => write!(
-                f,
-                "value `{}` is out of range for type `{}`",
-                n(value),
-                ty.name()
-            ),
+            SemaError::InvalidIntValue { ty, value } => {
+                write!(f, "invalid input value for type `{ty}`: `{}`", n(value))
+            }
+            SemaError::IntValueOutOfRange { ty, value } => {
+                write!(f, "value `{}` is out of range for type `{ty}`", n(value))
+            }
             SemaError::InvalidNumericValue { value } => {
                 write!(f, "invalid input value for type `numeric`: `{}`", n(value))
             }
@@ -3379,7 +3379,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(ty)
             ),
             SemaError::WrongTypeKind { name, expected } => {
-                write!(f, "`{}` is not a {}", n(name), expected.label())
+                write!(f, "`{}` is not a {expected}", n(name))
             }
             SemaError::TypedTableAlter { name } => write!(
                 f,
@@ -3389,11 +3389,9 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::InvalidDomainConstraint { what } => {
                 write!(f, "{what} not possible for domains")
             }
-            SemaError::CompoundColumnCount { op } => write!(
-                f,
-                "each `{}` query must have the same number of columns",
-                op.keyword()
-            ),
+            SemaError::CompoundColumnCount { op } => {
+                write!(f, "each `{op}` query must have the same number of columns")
+            }
             SemaError::RecursiveCteTypeMismatch {
                 name,
                 column,
@@ -3408,8 +3406,7 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::CompoundTypeMismatch { op, left, right } => write!(
                 f,
-                "`{}` types `{}` and `{}` cannot be matched",
-                op.keyword(),
+                "`{op}` types `{}` and `{}` cannot be matched",
                 self.ty(left),
                 self.ty(right)
             ),
@@ -3426,7 +3423,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 plural_columns(specified),
             ),
             SemaError::WrongRelationKind { name, expected, .. } => {
-                write!(f, "`{}` is not a {}", n(name), expected.label())
+                write!(f, "`{}` is not a {expected}", n(name))
             }
             SemaError::CannotOpenIndex { name } => {
                 write!(f, "cannot open relation `{}`", n(name))
@@ -3446,7 +3443,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 write!(f, "cannot copy {direction} {what} `{}`", n(name))
             }
             SemaError::CannotCreateIndex { name, kind } => {
-                write!(f, "cannot create index on {} `{}`", kind.label(), n(name))
+                write!(f, "cannot create index on {kind} `{}`", n(name))
             }
             SemaError::TruncateOnlyPartitioned { name, .. } => {
                 write!(f, "cannot truncate only partitioned table `{}`", n(name))
@@ -3485,11 +3482,10 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(relation)
             ),
             SemaError::DropReturnRule { name, kind, table } => {
-                let what = kind.label();
                 let table = n(table);
                 write!(
                     f,
-                    "cannot drop rule `{}` on {what} `{table}` because {what} `{table}` requires it",
+                    "cannot drop rule `{}` on {kind} `{table}` because {kind} `{table}` requires it",
                     n(name)
                 )
             }
@@ -3529,11 +3525,7 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(access_method)
             ),
             SemaError::InvalidOrdinal { clause, position } => {
-                write!(
-                    f,
-                    "{} position {position} is not in select list",
-                    clause.label()
-                )
+                write!(f, "{clause} position {position} is not in select list")
             }
             SemaError::KeywordArgType {
                 keyword,
@@ -3547,8 +3539,7 @@ impl fmt::Display for ErrorMessage<'_> {
             ),
             SemaError::QuantifiedNonArray { quantifier, found } => write!(
                 f,
-                "argument of `{}` must be an array, not type `{}`",
-                quantifier.keyword(),
+                "argument of `{quantifier}` must be an array, not type `{}`",
                 self.ty(found)
             ),
             SemaError::NoDefaultOperatorClass { ty, access_method } => write!(
@@ -3578,12 +3569,9 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::MissingArrayType { ty } => {
                 write!(f, "could not find array type for type `{}`", self.ty(ty))
             }
-            SemaError::WindowOverride { name, clause } => write!(
-                f,
-                "cannot override {} clause of window `{}`",
-                clause.label(),
-                n(name)
-            ),
+            SemaError::WindowOverride { name, clause } => {
+                write!(f, "cannot override {clause} clause of window `{}`", n(name))
+            }
             SemaError::WindowFrameCopy { name, .. } => write!(
                 f,
                 "cannot copy window `{}` because it has a frame clause",

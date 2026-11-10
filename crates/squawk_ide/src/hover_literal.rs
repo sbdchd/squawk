@@ -3,15 +3,13 @@ use std::fmt::{self, Write as _};
 use squawk_rowan::TextSize;
 use squawk_syntax::ast::{self, AstNode, LitKind};
 
-use squawk_sema::lower::literal_type_name;
-
 pub(crate) struct LiteralHover {
     pub(crate) snippet: &'static str,
     pub(crate) comment: Option<String>,
 }
 
 pub(crate) fn hover_literal(literal: &ast::Literal) -> Option<LiteralHover> {
-    let snippet = literal_type_name(literal)?;
+    let snippet = literal.type_name()?;
     let comment = match literal.kind()? {
         LitKind::String(_)
         | LitKind::EscString(_)
