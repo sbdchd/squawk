@@ -13,6 +13,7 @@ use squawk_syntax::{
 };
 
 use crate::arena::{IdxRange, LayeredArena};
+use crate::column_exprs::{ColumnExpr, ColumnExprId, ColumnExprKind, ColumnExprs, ColumnKey};
 use crate::comments::preceding_comment;
 use crate::edit_distance::{find_best_match_for_name, find_best_match_for_name_with_substrings};
 use crate::extensions::BundledExtension;
@@ -526,9 +527,6 @@ struct Snapshot {
     operator_family_members: OperatorFamilyMemberId,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct ColumnExprId(u32);
-
 #[derive(Clone, Copy)]
 struct ViewColumnDep {
     view: TableId,
@@ -652,54 +650,6 @@ struct Replacement<'a> {
 struct RenamedParam {
     name: Name,
     new_param: Option<ParamId>,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ColumnExprKind {
-    Default,
-    Generated { kind: GeneratedKind },
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-struct ColumnExpr {
-    id: ColumnExprId,
-    kind: ColumnExprKind,
-}
-
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
-struct ColumnKey {
-    table: TableId,
-    column: Name,
-}
-
-#[derive(Default)]
-struct ColumnExprs {
-    by_column: FxHashMap<ColumnKey, ColumnExpr>,
-    by_id: FxHashMap<ColumnExprId, ColumnKey>,
-}
-
-impl ColumnExprs {
-    fn get(&self, key: ColumnKey) -> Option<ColumnExpr> {
-        self.by_column.get(&key).copied()
-    }
-
-    fn column_of(&self, id: ColumnExprId) -> Option<ColumnKey> {
-        self.by_id.get(&id).copied()
-    }
-
-    fn set(&mut self, key: ColumnKey, expression: Option<ColumnExpr>) -> Option<ColumnExpr> {
-        let previous = match expression {
-            Some(expression) => self.by_column.insert(key, expression),
-            None => self.by_column.remove(&key),
-        };
-        if let Some(previous) = previous {
-            self.by_id.remove(&previous.id);
-        }
-        if let Some(expression) = expression {
-            self.by_id.insert(expression.id, key);
-        }
-        previous
-    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

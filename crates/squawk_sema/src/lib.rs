@@ -1,5 +1,6 @@
 pub mod arena;
 pub mod builtins;
+mod column_exprs;
 pub mod comments;
 pub mod constraint_index;
 pub mod edit_distance;
