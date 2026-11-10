@@ -5,6 +5,7 @@ pub mod comments;
 pub mod constraint_index;
 mod dependency_graph;
 pub mod edit_distance;
+mod expr_context;
 pub mod extension_index;
 pub mod extensions;
 pub mod file;

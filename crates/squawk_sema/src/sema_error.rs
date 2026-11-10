@@ -12,7 +12,8 @@ use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
-use crate::lower::{ExprContext, OutputClause, TableLookup};
+use crate::expr_context::ExprContext;
+use crate::lower::{OutputClause, TableLookup};
 use crate::postgres::{IntType, NumericTypmod};
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 

@@ -17,6 +17,7 @@ use crate::column_exprs::{ColumnExpr, ColumnExprId, ColumnExprKind, ColumnExprs,
 use crate::comments::preceding_comment;
 use crate::dependency_graph::{DependencyGraph, Object, rename_schema_objects, set_object_schema};
 use crate::edit_distance::{find_best_match_for_name, find_best_match_for_name_with_substrings};
+use crate::expr_context::{ConditionKind, ExprContext};
 use crate::extensions::BundledExtension;
 use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
@@ -1169,68 +1170,6 @@ pub(crate) enum OutputClause {
     OrderBy,
     GroupBy,
     DistinctOn,
-}
-
-#[derive(Clone, Copy)]
-enum Condition {
-    Where,
-    Having,
-    On,
-    Check,
-    Filter,
-    Policy,
-    TriggerWhen,
-    MergeWhen,
-    IndexPredicate,
-    CopyWhere,
-    PublicationWhere,
-    CaseWhen,
-    And,
-    Or,
-    Not,
-    GraphWhere,
-}
-
-impl Condition {
-    fn context(self) -> Option<ExprContext> {
-        match self {
-            Condition::Where => Some(ExprContext::Where),
-            Condition::Having => Some(ExprContext::Having),
-            Condition::On => Some(ExprContext::JoinCondition),
-            Condition::Check => Some(ExprContext::CheckConstraint),
-            Condition::Filter => Some(ExprContext::Filter),
-            Condition::Policy => Some(ExprContext::Policy),
-            Condition::TriggerWhen => Some(ExprContext::TriggerWhen),
-            Condition::MergeWhen => Some(ExprContext::MergeWhen),
-            Condition::IndexPredicate => Some(ExprContext::IndexPredicate),
-            Condition::CopyWhere => Some(ExprContext::CopyWhere),
-            Condition::PublicationWhere
-            | Condition::CaseWhen
-            | Condition::And
-            | Condition::Or
-            | Condition::Not
-            | Condition::GraphWhere => None,
-        }
-    }
-
-    fn keyword(self) -> &'static str {
-        match self {
-            Condition::Where
-            | Condition::IndexPredicate
-            | Condition::CopyWhere
-            | Condition::PublicationWhere
-            | Condition::GraphWhere => "where",
-            Condition::Having => "having",
-            Condition::On => "on",
-            Condition::Check => "check",
-            Condition::Filter => "filter",
-            Condition::Policy => "policy",
-            Condition::TriggerWhen | Condition::MergeWhen | Condition::CaseWhen => "when",
-            Condition::And => "and",
-            Condition::Or => "or",
-            Condition::Not => "not",
-        }
-    }
 }
 
 enum InList {
@@ -5043,10 +4982,10 @@ impl Lowerer {
         }
         self.with_table_scope(QueryKind::Policy, table, node, |this| {
             if let Some(expr) = using.and_then(|clause| clause.expr()) {
-                this.lower_condition(Condition::Policy, &expr);
+                this.lower_condition(ConditionKind::Policy, &expr);
             }
             if let Some(expr) = with_check.and_then(|clause| clause.expr()) {
-                this.lower_condition(Condition::Policy, &expr);
+                this.lower_condition(ConditionKind::Policy, &expr);
             }
         });
     }
@@ -7013,7 +6952,7 @@ impl Lowerer {
                         table,
                         table_object.syntax(),
                         |this| {
-                            this.lower_condition(Condition::PublicationWhere, &expr);
+                            this.lower_condition(ConditionKind::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -7031,7 +6970,7 @@ impl Lowerer {
                         None,
                         schema_object.syntax(),
                         |this| {
-                            this.lower_condition(Condition::PublicationWhere, &expr);
+                            this.lower_condition(ConditionKind::PublicationWhere, &expr);
                         },
                     );
                 }
@@ -7839,12 +7778,12 @@ impl Lowerer {
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
             visit_path_primaries(&pattern, &mut |primary| {
                 if let Some(expr) = primary.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_condition(Condition::GraphWhere, &expr);
+                    self.lower_condition(ConditionKind::GraphWhere, &expr);
                 }
             });
         }
         if let Some(expr) = graph_table.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::GraphWhere, &expr);
+            self.lower_condition(ConditionKind::GraphWhere, &expr);
         }
         let columns = match graph_table.expr_as_column_name_list() {
             Some(list) => self.lower_graph_table_columns(&list),
@@ -13074,7 +13013,7 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
             self.with_domain_scope(domain, check.syntax(), |this| {
-                this.lower_condition(Condition::Check, &expr);
+                this.lower_condition(ConditionKind::Check, &expr);
             });
         }
         let Some(domain) = domain else {
@@ -14216,7 +14155,7 @@ impl Lowerer {
         }
 
         if let Some(expr) = parts.where_clause.and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Where, &expr);
+            self.lower_condition(ConditionKind::Where, &expr);
         }
         if let Some(list) = parts
             .group_by_clause
@@ -14229,7 +14168,7 @@ impl Lowerer {
             });
         }
         if let Some(expr) = parts.having_clause.and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Having, &expr);
+            self.lower_condition(ConditionKind::Having, &expr);
         }
         for clause in parts.tail_clauses {
             self.lower_tail_clause(clause, &columns);
@@ -14577,7 +14516,7 @@ impl Lowerer {
         match delete.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_condition(Condition::Where, &expr);
+                    self.lower_condition(ConditionKind::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -14636,7 +14575,7 @@ impl Lowerer {
         match update.where_clause_or_current_of() {
             Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
                 if let Some(expr) = where_clause.expr() {
-                    self.lower_condition(Condition::Where, &expr);
+                    self.lower_condition(ConditionKind::Where, &expr);
                 }
             }
             Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
@@ -14692,7 +14631,7 @@ impl Lowerer {
             .and_then(|using_on| using_on.on_clause())
             .and_then(|on_clause| on_clause.expr())
         {
-            self.lower_condition(Condition::On, &expr);
+            self.lower_condition(ConditionKind::On, &expr);
         }
 
         for when_clause in merge.merge_when_clauses() {
@@ -14715,7 +14654,7 @@ impl Lowerer {
                 self.push_hidden(hidden);
             }
             if let Some(expr) = condition.and_then(|condition| condition.expr()) {
-                self.lower_condition(Condition::MergeWhen, &expr);
+                self.lower_condition(ConditionKind::MergeWhen, &expr);
             }
             if let Some(action) = action {
                 self.lower_merge_action(target, &action);
@@ -15264,7 +15203,7 @@ impl Lowerer {
                     }
                 }
                 if let Some(expr) = on_index.where_clause().and_then(|clause| clause.expr()) {
-                    self.lower_condition(Condition::IndexPredicate, &expr);
+                    self.lower_condition(ConditionKind::IndexPredicate, &expr);
                 }
             }
             Some(ast::ConflictTarget::ConflictOnConstraint(on_constraint)) => {
@@ -15320,7 +15259,7 @@ impl Lowerer {
             }
         };
         if let Some(expr) = where_clause.and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Where, &expr);
+            self.lower_condition(ConditionKind::Where, &expr);
         }
         self.index.queries[query].sources.truncate(len);
         self.set_visible((0..len).into());
@@ -18479,7 +18418,7 @@ impl Lowerer {
             }
         }
         if let Some(expr) = create_index.where_clause().and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::IndexPredicate, &expr);
+            self.lower_condition(ConditionKind::IndexPredicate, &expr);
         }
         self.scopes.pop();
         let columns = self.alloc_referenced_columns(refs);
@@ -18710,7 +18649,7 @@ impl Lowerer {
             .when_condition()
             .and_then(|condition| condition.expr())
         {
-            self.lower_condition(Condition::TriggerWhen, &expr);
+            self.lower_condition(ConditionKind::TriggerWhen, &expr);
         }
         self.scopes.pop();
 
@@ -18956,7 +18895,7 @@ impl Lowerer {
             }
             self.set_visible((0..2).into());
             if let Some(expr) = rule_on.where_clause().and_then(|clause| clause.expr()) {
-                self.lower_condition(Condition::Where, &expr);
+                self.lower_condition(ConditionKind::Where, &expr);
             }
             for (index, name) in names.into_iter().enumerate() {
                 let target = self.index.queries[query].sources[index];
@@ -19936,7 +19875,7 @@ impl Lowerer {
         }
         if let Some(expr) = copy.where_clause().and_then(|clause| clause.expr()) {
             self.with_table_scope(QueryKind::Copy, table, copy.syntax(), |this| {
-                this.lower_condition(Condition::CopyWhere, &expr);
+                this.lower_condition(ConditionKind::CopyWhere, &expr);
             });
         }
     }
@@ -20453,7 +20392,7 @@ impl Lowerer {
     fn lower_check_constraint(&mut self, table: Option<TableId>, check: &ast::CheckConstraint) {
         let start = self.index.references.next_idx();
         if let Some(expr) = check.expr() {
-            self.lower_condition(Condition::Check, &expr);
+            self.lower_condition(ConditionKind::Check, &expr);
         }
         let Some(table) = table else {
             return;
@@ -21490,7 +21429,7 @@ impl Lowerer {
             .where_condition_clause()
             .and_then(|clause| clause.expr())
         {
-            self.lower_condition(Condition::IndexPredicate, &expr);
+            self.lower_condition(ConditionKind::IndexPredicate, &expr);
         }
         let Some(table) = table else {
             return;
@@ -22687,7 +22626,7 @@ impl Lowerer {
         self.with_visible_sources(visible, |this| match condition {
             ast::JoinCondition::OnClause(on_clause) => {
                 if let Some(expr) = on_clause.expr() {
-                    this.lower_condition(Condition::On, &expr);
+                    this.lower_condition(ConditionKind::On, &expr);
                 }
             }
             ast::JoinCondition::JoinUsingClause(using_clause) => {
@@ -23393,9 +23332,9 @@ impl Lowerer {
                     self.check_row_lengths(op, lhs, rhs);
                 }
                 let condition = if let Some(ast::BinOp::And(_)) = &op {
-                    Some(Condition::And)
+                    Some(ConditionKind::And)
                 } else if let Some(ast::BinOp::Or(_)) = &op {
-                    Some(Condition::Or)
+                    Some(ConditionKind::Or)
                 } else {
                     None
                 };
@@ -23439,7 +23378,7 @@ impl Lowerer {
                         if operand.is_some() {
                             self.lower_expr(&condition);
                         } else {
-                            self.lower_condition(Condition::CaseWhen, &condition);
+                            self.lower_condition(ConditionKind::CaseWhen, &condition);
                         }
                     }
                     if let Some(then) = when.then() {
@@ -23565,7 +23504,7 @@ impl Lowerer {
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
-                    self.check_condition(Condition::Not, expr.syntax(), ty);
+                    self.check_condition(ConditionKind::Not, expr.syntax(), ty);
                 }
                 return self.lower_prefix_operator(&op, expr_arg_type(expr.as_ref(), ty));
             }
@@ -24443,7 +24382,7 @@ impl Lowerer {
         self.check_set_returning_call(call, function, srf_calls);
         self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
-            self.lower_condition(Condition::Filter, &expr);
+            self.lower_condition(ConditionKind::Filter, &expr);
         }
         if call.over_clause().is_some()
             && let Some(arg_list) = call.arg_list()
@@ -24671,7 +24610,7 @@ impl Lowerer {
         self.with_expr_context(context, |this| this.lower_expr(expr))
     }
 
-    fn lower_condition(&mut self, condition: Condition, expr: &ast::Expr) {
+    fn lower_condition(&mut self, condition: ConditionKind, expr: &ast::Expr) {
         let found = match condition.context() {
             Some(context) => self.lower_expr_in(context, expr),
             None => self.lower_expr(expr),
@@ -24701,7 +24640,7 @@ impl Lowerer {
         }
     }
 
-    fn check_condition(&mut self, condition: Condition, node: &SyntaxNode, found: Option<Ty>) {
+    fn check_condition(&mut self, condition: ConditionKind, node: &SyntaxNode, found: Option<Ty>) {
         if let Some(found) = found
             && let Some(bool) = self.builtin_type("bool")
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
@@ -27373,94 +27312,6 @@ impl Lowerer {
 
     fn ast_ptr<N: AstNode>(&self, node: &N) -> InIrFile<AstPtr<N>> {
         InIrFile::new(self.file_id, AstPtr::new(node))
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum ExprContext {
-    Unrestricted,
-    Where,
-    JoinCondition,
-    GroupBy,
-    Having,
-    Filter,
-    WindowDefinition,
-    WindowRange,
-    WindowRows,
-    WindowGroups,
-    Limit,
-    Offset,
-    Values,
-    ValuesSingle,
-    Returning,
-    Insert,
-    Update,
-    FromFunction,
-    MergeWhen,
-    CheckConstraint,
-    Default,
-    GeneratedColumn,
-    IndexExpression,
-    IndexPredicate,
-    StatisticsExpression,
-    PartitionKey,
-    PartitionBound,
-    Policy,
-    TriggerWhen,
-    CallArgument,
-    Transform,
-    CopyWhere,
-    ExecuteParameter,
-}
-
-impl ExprContext {
-    fn allows_aggregates(self) -> bool {
-        matches!(
-            self,
-            ExprContext::Unrestricted | ExprContext::Having | ExprContext::WindowDefinition
-        )
-    }
-
-    fn allows_windows(self) -> bool {
-        self == ExprContext::Unrestricted
-    }
-
-    fn allows_set_returning(self) -> bool {
-        match self {
-            ExprContext::Unrestricted
-            | ExprContext::GroupBy
-            | ExprContext::WindowDefinition
-            | ExprContext::ValuesSingle
-            | ExprContext::Insert
-            | ExprContext::FromFunction => true,
-            ExprContext::Where
-            | ExprContext::JoinCondition
-            | ExprContext::Having
-            | ExprContext::Filter
-            | ExprContext::WindowRange
-            | ExprContext::WindowRows
-            | ExprContext::WindowGroups
-            | ExprContext::Limit
-            | ExprContext::Offset
-            | ExprContext::Values
-            | ExprContext::Returning
-            | ExprContext::Update
-            | ExprContext::MergeWhen
-            | ExprContext::CheckConstraint
-            | ExprContext::Default
-            | ExprContext::GeneratedColumn
-            | ExprContext::IndexExpression
-            | ExprContext::IndexPredicate
-            | ExprContext::StatisticsExpression
-            | ExprContext::PartitionKey
-            | ExprContext::PartitionBound
-            | ExprContext::Policy
-            | ExprContext::TriggerWhen
-            | ExprContext::CallArgument
-            | ExprContext::Transform
-            | ExprContext::CopyWhere
-            | ExprContext::ExecuteParameter => false,
-        }
     }
 }
 
