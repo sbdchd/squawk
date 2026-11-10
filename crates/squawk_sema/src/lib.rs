@@ -16,6 +16,7 @@ pub mod ir;
 pub mod keyed_index;
 pub mod lower;
 pub mod overload;
+mod partition_bound;
 pub mod postgres;
 pub mod qualified_index;
 pub mod sema_error;
