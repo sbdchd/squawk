@@ -10715,7 +10715,7 @@ impl Lowerer {
                         complete = false;
                         continue;
                     };
-                    if like_includes_indexes(&like) && self.has_primary_key(source) {
+                    if like.includes_indexes() && self.has_primary_key(source) {
                         like_primary_keys.push(LikePrimaryKey {
                             like: like.clone(),
                             source,
@@ -11993,7 +11993,7 @@ impl Lowerer {
             let expr = expr.unparen();
             if let ast::Expr::TupleExpr(tuple) = &expr {
                 self.check_row_literals(ty, tuple);
-            } else if is_unknown_literal_expr(&expr)
+            } else if expr.is_unknown_literal()
                 && let Some(literal) = expr.as_literal()
             {
                 self.check_unknown_literal(ty, column.typmod, &literal);
@@ -14289,7 +14289,7 @@ impl Lowerer {
                 non_recursive: self.index.ty_name(ty),
                 overall: self.index.ty_name(overall),
             };
-            match output_expr(non_recursive_node, position) {
+            match non_recursive_node.nth_output_expr(position) {
                 Some(expr) => self.push_error(expr.syntax(), error),
                 None => {
                     let range = non_recursive_node.syntax().text_range();
@@ -14379,7 +14379,7 @@ impl Lowerer {
                     left: self.index.ty_name(left),
                     right: self.index.ty_name(right),
                 };
-                match output_expr(rhs_node, position) {
+                match rhs_node.nth_output_expr(position) {
                     Some(expr) => self.push_error(expr.syntax(), error),
                     None => self.push_error(rhs_node.syntax(), error),
                 }
@@ -14874,7 +14874,7 @@ impl Lowerer {
             let Some(ty) = self.index.columns[id].ty else {
                 continue;
             };
-            let Some(expr) = output_expr(source, position) else {
+            let Some(expr) = source.nth_output_expr(position) else {
                 continue;
             };
             let Some(assignment) =
@@ -14962,7 +14962,7 @@ impl Lowerer {
                 }
             }
             ast::SelectVariant::Select(_) => {
-                if let Some(expr) = output_expr(source, position) {
+                if let Some(expr) = source.nth_output_expr(position) {
                     self.check_assignment(assignment, &expr);
                 }
             }
@@ -15040,7 +15040,7 @@ impl Lowerer {
         let cast =
             (overloads.coercion(ty, target, CastContext::Explicit) == Coercion::Yes).then(|| {
                 AssignmentCast {
-                    parens: !binds_tighter_than_cast(expr),
+                    parens: !expr.binds_tighter_than_cast(),
                 }
             });
         let error = SemaError::AssignmentTypeMismatch {
@@ -15151,7 +15151,7 @@ impl Lowerer {
                 column_targets.and_then(|list| list.column_targets().nth(source_len))
         {
             let row_hint = source_len == 1
-                && single_source_expr(source).is_some_and(|expr| {
+                && source.nth_output_expr(0).is_some_and(|expr| {
                     matches!(expr, ast::Expr::TupleExpr(tuple) if tuple.exprs().count() == target_len)
                 });
             self.push_error(
@@ -20577,7 +20577,9 @@ impl Lowerer {
             index,
             key,
             index_columns,
-            is_deferrable(primary_key.constraint_options()),
+            primary_key
+                .constraint_options()
+                .any(|option| option.is_deferrable()),
             None,
             "pkey",
         );
@@ -20661,7 +20663,9 @@ impl Lowerer {
             index,
             key,
             index_columns,
-            is_deferrable(unique.constraint_options()),
+            unique
+                .constraint_options()
+                .any(|option| option.is_deferrable()),
             Some(&addition),
             "key",
         );
@@ -20797,7 +20801,8 @@ impl Lowerer {
             return self.lower_in_list(tuple, left);
         }
         if let ast::Expr::CallExpr(call) = rhs
-            && let Some(operand) = self.lower_quantified_operand(call, row_width(lhs).unwrap_or(1))
+            && let Some(operand) = self
+                .lower_quantified_operand(call, lhs.and_then(|lhs| lhs.row_width()).unwrap_or(1))
         {
             return operand;
         }
@@ -21031,7 +21036,7 @@ impl Lowerer {
             return Some(ArgType::Untyped);
         };
         let ty = self.lower_expr(&expr);
-        if is_unknown_literal_expr(&expr) {
+        if expr.is_unknown_literal() {
             return Some(ArgType::UnknownLiteral);
         }
         let Some(base) = ty.and_then(|ty| self.index.base_type(ty)) else {
@@ -21446,7 +21451,9 @@ impl Lowerer {
             None,
             None,
             columns,
-            is_deferrable(exclude.constraint_options()),
+            exclude
+                .constraint_options()
+                .any(|option| option.is_deferrable()),
             Some(&addition),
             "excl",
         );
@@ -23228,7 +23235,7 @@ impl Lowerer {
             }
             ast::Expr::CallExpr(call) => {
                 let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
-                if let Some(keyword) = call_function_like_keyword(call) {
+                if let Some(keyword) = call.function_like_keyword() {
                     return self.keyword_call_type(call, keyword, &args);
                 }
                 if ty.is_some() {
@@ -23349,7 +23356,7 @@ impl Lowerer {
                 let ty = op
                     .as_ref()
                     .and_then(|op| self.lower_bin_operator(op, left, right));
-                if op.is_some_and(|op| is_comparison(&op)) {
+                if op.is_some_and(|op| op.is_comparison()) {
                     if let Some(rhs) = &rhs
                         && let Some(lhs_ty) = lhs_ty
                     {
@@ -23407,7 +23414,7 @@ impl Lowerer {
                     self.array_cast = false;
                     if let Some(source) = source
                         && let Some(target) = ty
-                        && !is_unknown_literal_expr(&expr)
+                        && !expr.is_unknown_literal()
                     {
                         let coercion =
                             self.overloads()
@@ -24262,7 +24269,7 @@ impl Lowerer {
                 Some(expr) => {
                     let ty = self.lower_expr(&expr);
                     match ty {
-                        _ if is_unknown_literal_expr(&expr) => ArgType::UnknownLiteral,
+                        _ if expr.is_unknown_literal() => ArgType::UnknownLiteral,
                         Some(ty) => ArgType::Known(ty),
                         None => ArgType::Untyped,
                     }
@@ -24423,7 +24430,7 @@ impl Lowerer {
             .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
         {
             Some(SetReturningConstruct::Aggregate)
-        } else if call_function_like_keyword(call) == Some(ast::FunctionLikeKeyword::Coalesce) {
+        } else if call.function_like_keyword() == Some(ast::FunctionLikeKeyword::Coalesce) {
             Some(SetReturningConstruct::Coalesce)
         } else {
             None
@@ -24675,7 +24682,7 @@ impl Lowerer {
                 Some(arg_expr) => {
                     let ty = self.lower_func_arg_expr(arg_expr);
                     match ty {
-                        _ if is_unknown_literal(arg_expr) => ArgType::UnknownLiteral,
+                        _ if arg_expr.is_unknown_literal() => ArgType::UnknownLiteral,
                         Some(ty) => ArgType::Known(ty),
                         None => ArgType::Untyped,
                     }
@@ -24948,7 +24955,7 @@ impl Lowerer {
             Some(expr) => {
                 let ty = self.lower_expr(&expr);
                 match ty {
-                    _ if is_unknown_literal_expr(&expr) => ArgType::UnknownLiteral,
+                    _ if expr.is_unknown_literal() => ArgType::UnknownLiteral,
                     Some(ty) => ArgType::Known(ty),
                     None => ArgType::Untyped,
                 }
@@ -25050,7 +25057,7 @@ impl Lowerer {
     ) -> SmallVec<[CallArg; 4]> {
         args.map(|arg| {
             let ty = match self.lower_func_arg_expr(&arg) {
-                _ if is_unknown_literal(&arg) => ArgType::UnknownLiteral,
+                _ if arg.is_unknown_literal() => ArgType::UnknownLiteral,
                 Some(ty) => ArgType::Known(ty),
                 None => ArgType::Untyped,
             };
@@ -25101,7 +25108,7 @@ impl Lowerer {
             return CallArg::default();
         };
         let ty = match self.lower_expr(&expr) {
-            _ if is_unknown_literal_expr(&expr) => ArgType::UnknownLiteral,
+            _ if expr.is_unknown_literal() => ArgType::UnknownLiteral,
             Some(ty) => ArgType::Known(ty),
             None => ArgType::Untyped,
         };
@@ -25761,7 +25768,7 @@ impl Lowerer {
 
     fn lower_field_base(&mut self, field_expr: &ast::FieldExpr) -> Option<FieldBase> {
         let base = field_expr.base()?;
-        if let Some(call) = call_field_base(&base) {
+        if let ast::Expr::CallExpr(call) = base.unparen() {
             return Some(self.lower_call_field_base(&call));
         }
         if let ast::Expr::TupleExpr(tuple) = base.unparen() {
@@ -25840,7 +25847,7 @@ impl Lowerer {
             Some(qualifier) => FieldBase::Source(self.lower_qualifier(&qualifier)),
             None => {
                 let ty = self.lower_expr(&base);
-                let ty = if is_unknown_literal_expr(&base) {
+                let ty = if base.is_unknown_literal() {
                     self.builtin_type("unknown")
                 } else {
                     ty
@@ -25914,7 +25921,7 @@ impl Lowerer {
 
     fn lower_call_field_base(&mut self, call: &ast::CallExpr) -> FieldBase {
         let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
-        if let Some(keyword) = call_function_like_keyword(call) {
+        if let Some(keyword) = call.function_like_keyword() {
             let ty = self.keyword_call_type(call, keyword, &args);
             return self.expr_field_base(ty);
         }
@@ -26988,7 +26995,8 @@ impl Lowerer {
             name: name_id,
             owner,
             index,
-            no_inherit: constraint_no_inherit(node),
+            no_inherit: ast::Constraint::cast(node.clone())
+                .is_some_and(|constraint| constraint.is_no_inherit()),
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.as_ref().map_or(node, |name| name.syntax())),
         });
@@ -27422,14 +27430,9 @@ fn regclass_literal(expr: &ast::Expr) -> Option<ast::Literal> {
     None
 }
 
-fn is_unknown_literal(arg: &ast::FuncArgExpr) -> bool {
-    arg.expr()
-        .is_some_and(|expr| is_unknown_literal_expr(&expr))
-}
-
 fn expr_arg_type(expr: Option<&ast::Expr>, ty: Option<Ty>) -> ArgType {
     match ty {
-        _ if expr.is_some_and(is_unknown_literal_expr) => ArgType::UnknownLiteral,
+        _ if expr.is_some_and(ast::Expr::is_unknown_literal) => ArgType::UnknownLiteral,
         Some(ty) => ArgType::Known(ty),
         None => ArgType::Untyped,
     }
@@ -27441,27 +27444,6 @@ fn operand_ty(arg: ArgType, declared: Operand) -> Option<Ty> {
             Some(ty)
         }
         (ArgType::UnknownLiteral | ArgType::Untyped, Operand::None | Operand::Unknown) => None,
-    }
-}
-
-fn call_function_like_keyword(call: &ast::CallExpr) -> Option<ast::FunctionLikeKeyword> {
-    match call.expr()? {
-        ast::Expr::NameRef(name_ref) => name_ref.function_like_keyword(),
-        ast::Expr::ArrayExpr(_)
-        | ast::Expr::BetweenExpr(_)
-        | ast::Expr::BinExpr(_)
-        | ast::Expr::CallExpr(_)
-        | ast::Expr::CaseExpr(_)
-        | ast::Expr::CastExpr(_)
-        | ast::Expr::Collate(_)
-        | ast::Expr::FieldExpr(_)
-        | ast::Expr::IndexExpr(_)
-        | ast::Expr::Literal(_)
-        | ast::Expr::ParenExpr(_)
-        | ast::Expr::PostfixExpr(_)
-        | ast::Expr::PrefixExpr(_)
-        | ast::Expr::SliceExpr(_)
-        | ast::Expr::TupleExpr(_) => None,
     }
 }
 
@@ -27504,22 +27486,6 @@ fn similar_bool_input(value: &str) -> Option<&'static str> {
         |candidate| candidate,
         &value.to_ascii_lowercase_smolstr(),
         None,
-    )
-}
-
-fn is_unknown_literal_expr(expr: &ast::Expr) -> bool {
-    let Some(literal) = expr.unparen().as_literal() else {
-        return false;
-    };
-    matches!(
-        literal.kind(),
-        Some(
-            ast::LitKind::String(_)
-                | ast::LitKind::DollarQuotedString(_)
-                | ast::LitKind::EscString(_)
-                | ast::LitKind::UnicodeEscString(_)
-                | ast::LitKind::Null(_)
-        )
     )
 }
 
@@ -27689,16 +27655,11 @@ fn member_number(literal: Option<&ast::Literal>) -> Option<u16> {
     u16::try_from(literal?.integer_value_u64()?).ok()
 }
 
-fn row_width(expr: Option<&ast::Expr>) -> Option<usize> {
-    match expr {
-        Some(ast::Expr::TupleExpr(tuple)) => Some(tuple.exprs().count()),
-        _ => None,
-    }
-}
-
 fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usize> {
     match op? {
-        ast::BinOp::In(_) | ast::BinOp::NotIn(_) => Some(row_width(lhs).unwrap_or(1)),
+        ast::BinOp::In(_) | ast::BinOp::NotIn(_) => {
+            Some(lhs.and_then(|lhs| lhs.row_width()).unwrap_or(1))
+        }
         ast::BinOp::Caret(_)
         | ast::BinOp::CustomOp(_)
         | ast::BinOp::Eq(_)
@@ -27719,7 +27680,7 @@ fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usi
         | ast::BinOp::RAngle(_)
         | ast::BinOp::SimilarTo(_)
         | ast::BinOp::Slash(_)
-        | ast::BinOp::Star(_) => row_width(lhs),
+        | ast::BinOp::Star(_) => lhs.and_then(|lhs| lhs.row_width()),
         ast::BinOp::And(_)
         | ast::BinOp::AtTimeZone(_)
         | ast::BinOp::ColonColon(_)
@@ -27732,46 +27693,6 @@ fn sublink_width(op: Option<&ast::BinOp>, lhs: Option<&ast::Expr>) -> Option<usi
         | ast::BinOp::IsNotDistinctFrom(_)
         | ast::BinOp::Or(_)
         | ast::BinOp::Overlaps(_) => None,
-    }
-}
-
-fn is_comparison(op: &ast::BinOp) -> bool {
-    match op {
-        ast::BinOp::Eq(_)
-        | ast::BinOp::Neq(_)
-        | ast::BinOp::Neqb(_)
-        | ast::BinOp::LAngle(_)
-        | ast::BinOp::RAngle(_)
-        | ast::BinOp::Lteq(_)
-        | ast::BinOp::Gteq(_)
-        | ast::BinOp::IsDistinctFrom(_)
-        | ast::BinOp::IsNotDistinctFrom(_)
-        | ast::BinOp::In(_)
-        | ast::BinOp::NotIn(_) => true,
-        ast::BinOp::And(_)
-        | ast::BinOp::AtTimeZone(_)
-        | ast::BinOp::Caret(_)
-        | ast::BinOp::ColonColon(_)
-        | ast::BinOp::ColonEq(_)
-        | ast::BinOp::CustomOp(_)
-        | ast::BinOp::Escape(_)
-        | ast::BinOp::FatArrow(_)
-        | ast::BinOp::Ilike(_)
-        | ast::BinOp::Is(_)
-        | ast::BinOp::IsNot(_)
-        | ast::BinOp::Like(_)
-        | ast::BinOp::Minus(_)
-        | ast::BinOp::NotIlike(_)
-        | ast::BinOp::NotLike(_)
-        | ast::BinOp::NotSimilarTo(_)
-        | ast::BinOp::OperatorCall(_)
-        | ast::BinOp::Or(_)
-        | ast::BinOp::Overlaps(_)
-        | ast::BinOp::Percent(_)
-        | ast::BinOp::Plus(_)
-        | ast::BinOp::SimilarTo(_)
-        | ast::BinOp::Slash(_)
-        | ast::BinOp::Star(_) => false,
     }
 }
 
@@ -27796,53 +27717,13 @@ fn subscript_results(
     }
 }
 
-fn call_field_base(base: &ast::Expr) -> Option<ast::CallExpr> {
-    if let ast::Expr::CallExpr(call) = base.unparen() {
-        Some(call)
-    } else {
-        None
-    }
-}
-
-fn binds_tighter_than_cast(expr: &ast::Expr) -> bool {
-    matches!(
-        expr,
-        ast::Expr::Literal(_)
-            | ast::Expr::NameRef(_)
-            | ast::Expr::FieldExpr(_)
-            | ast::Expr::CallExpr(_)
-            | ast::Expr::ParenExpr(_)
-            | ast::Expr::CastExpr(_)
-            | ast::Expr::ArrayExpr(_)
-            | ast::Expr::IndexExpr(_)
-    )
-}
-
-fn output_expr(query: &ast::SelectVariant, position: usize) -> Option<ast::Expr> {
-    match query {
-        ast::SelectVariant::Select(select) => select
-            .select_clause()?
-            .target_list()?
-            .targets()
-            .nth(position)?
-            .expr(),
-        ast::SelectVariant::Values(values) => {
-            values.row_list()?.rows().next()?.exprs().nth(position)
-        }
-        ast::SelectVariant::ParenSelect(paren) => output_expr(&paren.select()?, position),
-        ast::SelectVariant::CompoundSelect(_)
-        | ast::SelectVariant::SelectInto(_)
-        | ast::SelectVariant::Table(_) => None,
-    }
-}
-
 fn insert_output_is_unknown_literal(source: &ast::SelectVariant, position: usize) -> bool {
     match source {
         ast::SelectVariant::Values(values) => values.row_list().is_some_and(|list| {
             list.rows().all(|row| {
                 row.exprs()
                     .nth(position)
-                    .is_some_and(|expr| is_unknown_literal_expr(&expr))
+                    .is_some_and(|expr| expr.is_unknown_literal())
             })
         }),
         ast::SelectVariant::ParenSelect(paren) => paren
@@ -27862,7 +27743,7 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
             .and_then(|clause| clause.target_list())
             .and_then(|list| list.targets().nth(position))
             .and_then(|target| target.expr())
-            .is_some_and(|expr| is_unknown_literal_expr(&expr)),
+            .is_some_and(|expr| expr.is_unknown_literal()),
         ast::SelectVariant::ParenSelect(paren) => paren
             .select()
             .is_some_and(|inner| output_is_unknown_literal(&inner, position)),
@@ -27870,22 +27751,6 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
         | ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => false,
-    }
-}
-
-fn single_source_expr(source: &ast::SelectVariant) -> Option<ast::Expr> {
-    match source {
-        ast::SelectVariant::Values(values) => values.row_list()?.rows().next()?.exprs().next(),
-        ast::SelectVariant::Select(select) => select
-            .select_clause()?
-            .target_list()?
-            .targets()
-            .next()?
-            .expr(),
-        ast::SelectVariant::SelectInto(_)
-        | ast::SelectVariant::ParenSelect(_)
-        | ast::SelectVariant::CompoundSelect(_)
-        | ast::SelectVariant::Table(_) => None,
     }
 }
 
@@ -27907,60 +27772,6 @@ fn index_column_names(create_index: &ast::CreateIndex) -> String {
             }
         },
     ))
-}
-
-fn constraint_no_inherit(node: &SyntaxNode) -> bool {
-    let options = if let Some(check) = ast::CheckConstraint::cast(node.clone()) {
-        check.constraint_options()
-    } else if let Some(not_null) = ast::NotNullConstraint::cast(node.clone()) {
-        not_null.constraint_options()
-    } else {
-        return false;
-    };
-    options
-        .into_iter()
-        .any(|option| matches!(option, ast::ConstraintOption::NoInherit(_)))
-}
-
-fn is_deferrable(mut options: ast::AstChildren<ast::ConstraintOption>) -> bool {
-    options.any(|option| match option {
-        ast::ConstraintOption::DeferrableConstraintOption(_)
-        | ast::ConstraintOption::InitiallyDeferredConstraintOption(_) => true,
-        ast::ConstraintOption::NotDeferrableConstraintOption(_)
-        | ast::ConstraintOption::InitiallyImmediateConstraintOption(_)
-        | ast::ConstraintOption::NotValid(_)
-        | ast::ConstraintOption::NoInherit(_)
-        | ast::ConstraintOption::Inherit(_)
-        | ast::ConstraintOption::NotEnforced(_)
-        | ast::ConstraintOption::Enforced(_) => false,
-    })
-}
-
-fn like_includes_indexes(like: &ast::LikeClause) -> bool {
-    let mut includes = false;
-    for option in like.like_options() {
-        let (property, including) = match option {
-            ast::LikeOption::IncludingProperty(property) => (property.table_property(), true),
-            ast::LikeOption::ExcludingProperty(property) => (property.table_property(), false),
-        };
-        match property {
-            Some(ast::TableProperty::PropertyAll(_) | ast::TableProperty::PropertyIndexes(_)) => {
-                includes = including;
-            }
-            Some(
-                ast::TableProperty::PropertyComments(_)
-                | ast::TableProperty::PropertyCompression(_)
-                | ast::TableProperty::PropertyConstraints(_)
-                | ast::TableProperty::PropertyDefaults(_)
-                | ast::TableProperty::PropertyGenerated(_)
-                | ast::TableProperty::PropertyIdentity(_)
-                | ast::TableProperty::PropertyStatistics(_)
-                | ast::TableProperty::PropertyStorage(_),
-            )
-            | None => {}
-        }
-    }
-    includes
 }
 
 fn standalone_select_keyword(call: &ast::CallExpr) -> Option<SyntaxToken> {
