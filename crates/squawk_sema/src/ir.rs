@@ -87,6 +87,12 @@ impl TableKind {
     }
 }
 
+impl std::fmt::Display for TableKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(self.label())
+    }
+}
+
 #[derive(Debug)]
 pub struct Table {
     pub kind: TableKind,
@@ -353,14 +359,14 @@ pub enum TextSearchKind {
     Configuration,
 }
 
-impl TextSearchKind {
-    pub fn label(self) -> &'static str {
-        match self {
+impl std::fmt::Display for TextSearchKind {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str(match self {
             TextSearchKind::Parser => "text search parser",
             TextSearchKind::Template => "text search template",
             TextSearchKind::Dictionary => "text search dictionary",
             TextSearchKind::Configuration => "text search configuration",
-        }
+        })
     }
 }
 

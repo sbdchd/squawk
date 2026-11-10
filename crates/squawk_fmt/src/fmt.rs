@@ -43,48 +43,58 @@ struct Ctx {
 }
 
 fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a> {
+    enum Position {
+        Start,
+        AfterStatement,
+        Inline,
+        AfterNewline,
+    }
+
     let mut doc = Doc::nil();
-    let mut previous_was_stmt = false;
-    let mut needs_space = false;
-    let mut at_start = true;
+    let mut position = Position::Start;
     for el in source_file.syntax().children_with_tokens() {
         match el {
             squawk_rowan::NodeOrToken::Node(node) => {
                 if let Some(stmt) = ast::Stmt::cast(node.clone()) {
                     let is_empty_stmt = matches!(&stmt, ast::Stmt::EmptyStmt(_));
-                    if previous_was_stmt && !is_empty_stmt {
+                    if matches!(position, Position::AfterStatement) && !is_empty_stmt {
                         doc = doc.append(Doc::empty_line());
-                    } else if needs_space && !is_empty_stmt {
+                    } else if matches!(position, Position::Inline) && !is_empty_stmt {
                         doc = doc.append(Doc::space());
                     }
                     doc = doc.append(build_stmt(ctx, stmt));
-                    previous_was_stmt = !is_empty_stmt;
+                    position = if is_empty_stmt {
+                        Position::Inline
+                    } else {
+                        Position::AfterStatement
+                    };
                 } else if let Some(command) = ast::PsqlCommand::cast(node) {
-                    if needs_space {
+                    if matches!(position, Position::AfterStatement | Position::Inline) {
                         doc = doc.append(Doc::space());
                     }
                     doc = doc.append(Doc::text(
                         command.syntax().text().to_string().trim_end().to_string(),
                     ));
-                    previous_was_stmt = false;
+                    position = Position::Inline;
                 } else {
-                    previous_was_stmt = false;
+                    position = Position::Inline;
                 }
-                needs_space = true;
-                at_start = false;
             }
             squawk_rowan::NodeOrToken::Token(token) => {
-                previous_was_stmt = false;
+                if matches!(position, Position::AfterStatement) {
+                    position = Position::Inline;
+                }
                 if token.kind() == SyntaxKind::COMMENT {
-                    if needs_space {
+                    if matches!(position, Position::Inline) {
                         doc = doc.append(Doc::space());
                     }
                     doc = doc.append(build_comment(&token));
-                    needs_space = true;
-                    at_start = false;
+                    position = Position::Inline;
                 } else if token.text() == BOM {
                     doc = doc.append(Doc::text(BOM));
-                } else if token.kind() == SyntaxKind::WHITESPACE && !at_start {
+                } else if token.kind() == SyntaxKind::WHITESPACE
+                    && !matches!(position, Position::Start)
+                {
                     let newlines = token
                         .text()
                         .universal_newlines()
@@ -93,7 +103,7 @@ fn build_source_file<'a>(ctx: &Ctx, source_file: &'a ast::SourceFile) -> Doc<'a>
                     if newlines == 0 {
                         continue;
                     }
-                    needs_space = false;
+                    position = Position::AfterNewline;
                     doc = doc.append(Doc::empty_line());
                     if newlines >= 2 && token.next_sibling_or_token().is_some() {
                         doc = doc.append(Doc::empty_line());
@@ -2703,25 +2713,30 @@ fn build_table_and_columns<'a>(ctx: &Ctx, table: &ast::TableAndColumns) -> Doc<'
 }
 
 fn build_do<'a>(ctx: &Ctx, do_stmt: &ast::Do) -> Doc<'a> {
+    enum PreviousPart {
+        None,
+        Language,
+        Body,
+    }
+
     let mut doc = Doc::text("do");
-    let mut is_first_part = true;
-    let mut previous_was_body = false;
+    let mut previous = PreviousPart::None;
     for part in do_stmt.language_and_body() {
-        let part_is_body = matches!(&part, Either::Right(_));
-        let separator = if is_first_part || previous_was_body {
-            Doc::space()
-        } else {
-            Doc::line_or_space()
+        let separator = match previous {
+            PreviousPart::None | PreviousPart::Body => Doc::space(),
+            PreviousPart::Language => Doc::line_or_space(),
         };
         let part_doc = match part {
             Either::Left(language) => {
+                previous = PreviousPart::Language;
                 leading_comments(language.syntax()).append(build_do_language(&language))
             }
-            Either::Right(body) => leading_comments(body.syntax()).append(build_literal(&body)),
+            Either::Right(body) => {
+                previous = PreviousPart::Body;
+                leading_comments(body.syntax()).append(build_literal(&body))
+            }
         };
         doc = doc.append(separator.append(part_doc).nest(ctx.indent));
-        is_first_part = false;
-        previous_was_body = part_is_body;
     }
 
     doc.group()

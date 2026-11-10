@@ -292,7 +292,7 @@ fn item_hover(index: &SemanticIndex, item: Item) -> Option<String> {
             let text_search = &index.text_search[text_search];
             format!(
                 "{} {}",
-                text_search.kind.label(),
+                text_search.kind,
                 hover.qualified(text_search.schema, text_search.name)
             )
         }
@@ -432,7 +432,7 @@ impl<'a> Hovers<'a> {
 
     fn table(self, table: TableId) -> String {
         let data = &self.index.tables[table];
-        let kind = data.kind.label();
+        let kind = data.kind;
         let name = self.table_name(table);
         match data.kind {
             TableKind::Table

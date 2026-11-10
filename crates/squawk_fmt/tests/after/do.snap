@@ -27,3 +27,8 @@ BEGIN
     PERFORM refresh_materialized_view_with_an_intentionally_long_name_and_arguments();
 END;
 $body$ language 'plpgsql';
+
+do language /* a long language name separator */ plpgsql
+  /* body separator */ $$begin perform refresh_materialized_view_with_an_intentionally_long_name(); end$$;
+
+do /* body separator */ $$begin perform refresh_materialized_view_with_an_intentionally_long_name(); end$$ /* language separator */ language /* name separator */ plpgsql;

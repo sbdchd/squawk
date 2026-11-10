@@ -194,15 +194,17 @@ pub(crate) enum IntType {
     Int8,
 }
 
-impl IntType {
-    pub(crate) fn name(self) -> &'static str {
-        match self {
+impl fmt::Display for IntType {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
             IntType::Int2 => "int2",
             IntType::Int4 => "int4",
             IntType::Int8 => "int8",
-        }
+        })
     }
+}
 
+impl IntType {
     fn bits(self) -> u32 {
         match self {
             IntType::Int2 => 16,

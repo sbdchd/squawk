@@ -24,28 +24,36 @@ fn is_alembic_version_update(stmt: &ast::Stmt) -> bool {
 fn alembic_version_commit_tx_indices(
     stmts: impl Iterator<Item = ast::Stmt>,
 ) -> Option<FxHashSet<usize>> {
+    enum Transaction {
+        Outside,
+        Open { start: usize },
+        OpenWithVersionUpdate { start: usize },
+    }
+
     let mut indices = FxHashSet::default();
-    let mut tx_start = None;
-    let mut has_alembic_version_update = false;
+    let mut transaction = Transaction::Outside;
     for (i, stmt) in stmts.enumerate() {
         match TransactionControl::from_stmt(&stmt) {
             Some(TransactionControl::Begin) => {
-                tx_start = Some(i);
-                has_alembic_version_update = false;
+                transaction = Transaction::Open { start: i };
             }
             Some(TransactionControl::End { and_chain }) => {
-                if let Some(start) = tx_start.take()
-                    && has_alembic_version_update
-                {
+                if let Transaction::OpenWithVersionUpdate { start } = transaction {
                     indices.extend(start..=i);
                 }
-                if and_chain {
-                    tx_start = Some(i);
-                }
-                has_alembic_version_update = false;
+                transaction = if and_chain {
+                    Transaction::Open { start: i }
+                } else {
+                    Transaction::Outside
+                };
             }
-            None if tx_start.is_some() && is_alembic_version_update(&stmt) => {
-                has_alembic_version_update = true;
+            None if is_alembic_version_update(&stmt) => {
+                transaction = match transaction {
+                    Transaction::Outside => Transaction::Outside,
+                    Transaction::Open { start } | Transaction::OpenWithVersionUpdate { start } => {
+                        Transaction::OpenWithVersionUpdate { start }
+                    }
+                };
             }
             None => {}
         }
@@ -288,6 +296,99 @@ mod test {
 
     fn lint_ok_with(sql: &str, settings: LinterSettings) {
         crate::test_utils::lint_ok_with(sql, settings, Rule::PreferRobustStmts);
+    }
+
+    #[test]
+    fn alembic_version_update_outside_transaction() {
+        assert_snapshot!(lint_errors(
+            "
+update alembic_version set version_num = 'v2';
+alter table t add column a int;
+commit;
+"
+        ));
+    }
+
+    #[test]
+    fn alembic_uncommitted_version_transaction() {
+        lint_ok(
+            "
+begin;
+alter table t add column a int;
+update alembic_version set version_num = 'v2';
+",
+        );
+    }
+
+    #[test]
+    fn alembic_nested_begin_resets_version_update() {
+        assert_snapshot!(lint_errors(
+            "
+begin;
+update alembic_version set version_num = 'v2';
+begin;
+alter table t add column a int;
+commit;
+begin;
+update alembic_version set version_num = 'v3';
+commit;
+"
+        ));
+    }
+
+    #[test]
+    fn alembic_commit_chain_resets_version_update() {
+        assert_snapshot!(lint_errors(
+            "
+begin;
+alter table t add column a int;
+update alembic_version set version_num = 'v2';
+commit and chain;
+alter table t add column b int;
+commit;
+"
+        ));
+    }
+
+    #[test]
+    fn alembic_version_update_in_chained_transaction() {
+        assert_snapshot!(lint_errors(
+            "
+begin;
+alter table t add column a int;
+commit and chain;
+alter table t add column b int;
+update alembic_version set version_num = 'v2';
+commit;
+"
+        ));
+    }
+
+    #[test]
+    fn alembic_rollback_chain_with_version_updates() {
+        lint_ok(
+            "
+begin;
+alter table t add column a int;
+update alembic_version set version_num = 'v2';
+rollback and chain;
+alter table t add column b int;
+update alembic_version set version_num = 'v3';
+rollback;
+",
+        );
+    }
+
+    #[test]
+    fn alembic_commit_chain_without_begin() {
+        lint_ok(
+            "
+commit and chain;
+alter table t add column a int;
+update alembic_version set version_num = 'v2';
+commit;
+",
+        );
     }
 
     #[test]

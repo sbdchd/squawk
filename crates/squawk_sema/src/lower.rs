@@ -20703,37 +20703,44 @@ impl Lowerer {
         column: Name,
         constraints: impl Iterator<Item = ast::Constraint>,
     ) {
-        let mut seen_nullable = false;
-        let mut not_null = false;
-        let mut needs_not_null = false;
+        #[derive(PartialEq, Eq)]
+        enum Nullability {
+            Unspecified,
+            Required,
+            Nullable,
+            NotNull,
+        }
+
+        let mut nullability = Nullability::Unspecified;
         for constraint in constraints {
             let conflict = match &constraint {
                 ast::Constraint::NullConstraint(_) => {
-                    let conflict = seen_nullable && not_null || needs_not_null;
-                    seen_nullable = true;
-                    not_null = false;
+                    let conflict =
+                        matches!(nullability, Nullability::NotNull | Nullability::Required);
+                    nullability = Nullability::Nullable;
                     conflict
                 }
                 ast::Constraint::NotNullConstraint(_) => {
-                    let conflict = seen_nullable && !not_null;
-                    if !not_null {
-                        seen_nullable = true;
-                        not_null = true;
-                        needs_not_null = false;
-                    }
+                    let conflict = nullability == Nullability::Nullable;
+                    nullability = Nullability::NotNull;
                     conflict
                 }
                 ast::Constraint::PrimaryKeyConstraint(_) => {
-                    needs_not_null = true;
-                    seen_nullable && !not_null
+                    let conflict = nullability == Nullability::Nullable;
+                    if nullability == Nullability::Unspecified {
+                        nullability = Nullability::Required;
+                    }
+                    conflict
                 }
                 ast::Constraint::GeneratedConstraint(generated) => {
                     let identity = matches!(
                         generated.generated_as(),
                         Some(ast::GeneratedAs::GeneratedIdentity(_))
                     );
-                    needs_not_null |= identity && !seen_nullable;
-                    identity && seen_nullable && !not_null
+                    if identity && nullability == Nullability::Unspecified {
+                        nullability = Nullability::Required;
+                    }
+                    identity && nullability == Nullability::Nullable
                 }
                 ast::Constraint::CheckConstraint(_)
                 | ast::Constraint::DefaultConstraint(_)

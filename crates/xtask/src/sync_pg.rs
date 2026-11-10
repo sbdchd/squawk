@@ -483,7 +483,7 @@ fn preprocess_sql_variables(sql: &str, template_vars_regex: &Regex) -> String {
         for &(from, to) in VARIABLE_REPLACEMENTS {
             sql = sql.replace(from, to);
         }
-        replace_template_vars(&sql, template_vars_regex)
+        sql
     };
 
     let mut result = String::new();
@@ -510,75 +510,46 @@ fn preprocess_sql_variables(sql: &str, template_vars_regex: &Regex) -> String {
         offset = end;
     }
     result.push_str(&replace_sql(&sql[sql_start..]));
-    result
+    replace_template_vars(&result, template_vars_regex)
 }
 
-fn replace_template_vars(line: &str, template_vars_regex: &Regex) -> String {
-    let mut result = String::new();
-    let mut char_indices = line.char_indices().peekable();
-    let mut in_single_quote = false;
-    let mut in_double_quote = false;
-    let mut in_array = false;
+fn replace_template_vars(sql: &str, template_vars_regex: &Regex) -> String {
+    let mut result = String::with_capacity(sql.len());
+    let mut offset = 0;
+    let mut consumed_until = 0;
+    let mut bracket_depth = 0usize;
 
-    while let Some((byte_pos, c)) = char_indices.next() {
-        match c {
-            '\'' => {
-                result.push(c);
-                in_single_quote = !in_single_quote;
-            }
-            '"' => {
-                result.push(c);
-                in_double_quote = !in_double_quote;
-            }
-            '[' => {
-                result.push(c);
-                in_array = true;
-            }
-            ']' => {
-                result.push(c);
-                in_array = false;
-            }
-            ':' if !in_single_quote && !in_double_quote && !in_array => {
-                if let Some(&(_, next_c)) = char_indices.peek() {
-                    if next_c == ':' {
-                        result.push_str("::");
-                        char_indices.next();
-                        continue;
-                    }
-                    if next_c == '=' {
-                        result.push_str(":=");
-                        char_indices.next();
-                        continue;
-                    }
-                }
-
-                let remaining = &line[byte_pos..];
-                if let Some(caps) = template_vars_regex.captures(remaining) {
-                    let full = caps.get(0).unwrap();
-                    let m = caps.get(1).or_else(|| caps.get(2)).unwrap();
-                    let matched_var = &remaining[m.start()..m.end()];
-
-                    result.push('\'');
-                    result.push_str(matched_var);
-                    result.push('\'');
-
-                    let skip_bytes = full.end() - c.len_utf8();
-                    let mut skipped = 0;
-                    while skipped < skip_bytes {
-                        if let Some((_, ch)) = char_indices.next() {
-                            skipped += ch.len_utf8();
-                        } else {
-                            break;
-                        }
-                    }
-                    continue;
-                }
-                result.push(c);
-            }
-            _ => result.push(c),
+    for token in squawk_lexer::tokenize(sql) {
+        let start = offset;
+        offset += token.len as usize;
+        if start < consumed_until {
+            continue;
         }
+        if token.kind == squawk_lexer::TokenKind::OpenBracket {
+            bracket_depth += 1;
+        } else if token.kind == squawk_lexer::TokenKind::CloseBracket {
+            bracket_depth = bracket_depth.saturating_sub(1);
+        } else if token.kind == squawk_lexer::TokenKind::Colon && bracket_depth == 0 {
+            let remaining = &sql[start..];
+            if remaining.starts_with("::") || remaining.starts_with(":=") {
+                result.push_str(&remaining[..2]);
+                consumed_until = start + 2;
+                continue;
+            }
+            if let Some(caps) = template_vars_regex.captures(remaining) {
+                let full = caps.get(0).unwrap();
+                let name = caps.get(1).or_else(|| caps.get(2)).unwrap();
+                result.push('\'');
+                result.push_str(name.as_str());
+                result.push('\'');
+                consumed_until = start + full.end();
+                continue;
+            }
+        }
+        result.push_str(&sql[start..offset]);
     }
 
+    result.shrink_to_fit();
     result
 }
 
@@ -675,6 +646,38 @@ mod tests {
                 "TRUNCATE TABLE conflict_log_table;",
             ),
             ("DROP TABLE :clt1;", "DROP TABLE clt1;"),
+            (r#"select '"', :foo;"#, r#"select '"', 'foo';"#),
+            (r#"select "'", :foo;"#, r#"select "'", 'foo';"#),
+            ("select '[', :foo;", "select '[', 'foo';"),
+            ("select ']', :foo;", "select ']', 'foo';"),
+            (
+                r#"select 'it''s "quoted"', :foo;"#,
+                r#"select 'it''s "quoted"', 'foo';"#,
+            ),
+            (
+                r#"select e'it\'s :hidden', :foo;"#,
+                r#"select e'it\'s :hidden', 'foo';"#,
+            ),
+            (
+                "select a[b[1]:upper], :foo;",
+                "select a[b[1]:upper], 'foo';",
+            ),
+            (
+                "select\n  a[-- bounds\n  1:upper],\n  :foo;",
+                "select\n  a[-- bounds\n  1:upper],\n  'foo';",
+            ),
+            (
+                "select /* ' [ :hidden */ :foo;",
+                "select /* ' [ :hidden */ 'foo';",
+            ),
+            (
+                "select $$' [ :hidden$$, :foo;",
+                "select $$' [ :hidden$$, 'foo';",
+            ),
+            (
+                "select :'ὀδυσσεύς', :foo::text;",
+                "select 'ὀδυσσεύς', 'foo'::text;",
+            ),
             (
                 "ALTER TABLE :clt ADD COLUMN extra_info text;",
                 "ALTER TABLE clt ADD COLUMN extra_info text;",

@@ -540,6 +540,43 @@ alter table n7 add column e int not null null;
 }
 
 #[test]
+fn nullability_transitions() {
+    assert_snapshot!(check("
+create table n (
+  a int primary key not null,
+  b int not null generated always as identity,
+  c int generated always as identity not null
+);
+create table m (a int);
+alter table m add column b int primary key not null;
+"), @"no diagnostics");
+
+    assert_snapshot!(check("
+create table n1 (a int primary key not null null);
+create table n2 (a int not null primary key null);
+create table n3 (a int generated always as identity not null null);
+create table n4 (a int not null generated always as identity null);
+"), @"
+    error: conflicting `null`/`not null` declarations for column `a` of table `n1`
+      ╭▸ 
+    2 │ create table n1 (a int primary key not null null);
+      ╰╴                                            ━━━━
+    error: conflicting `null`/`not null` declarations for column `a` of table `n2`
+      ╭▸ 
+    3 │ create table n2 (a int not null primary key null);
+      ╰╴                                            ━━━━
+    error: conflicting `null`/`not null` declarations for column `a` of table `n3`
+      ╭▸ 
+    4 │ create table n3 (a int generated always as identity not null null);
+      ╰╴                                                             ━━━━
+    error: conflicting `null`/`not null` declarations for column `a` of table `n4`
+      ╭▸ 
+    5 │ create table n4 (a int not null generated always as identity null);
+      ╰╴                                                             ━━━━
+    ");
+}
+
+#[test]
 fn default_column_reference() {
     assert_snapshot!(check("
 create table t (
