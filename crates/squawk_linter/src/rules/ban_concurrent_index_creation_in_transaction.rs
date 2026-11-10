@@ -1,6 +1,5 @@
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::rules::require_concurrent_reindex::concurrently_range;
 use crate::{Linter, Rule, Violation, transactions::TransactionState};
 
 pub(crate) fn ban_concurrent_index_creation_in_transaction(
@@ -39,7 +38,7 @@ pub(crate) fn ban_concurrent_index_creation_in_transaction(
                 }
             }
             ast::Stmt::Reindex(reindex) => {
-                if let Some(concurrently) = concurrently_range(&reindex) {
+                if let Some(concurrently) = reindex.concurrently_range() {
                     errors.push(
                         Violation::for_range(
                             Rule::BanConcurrentIndexCreationInTransaction,

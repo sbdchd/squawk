@@ -1,10 +1,21 @@
 use squawk_diagnostics::{Edit, Fix};
-use squawk_rowan::TextRange;
 use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation, transactions::TransactionState};
 
 fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
+    if let Some(options) = reindex.reindex_option_list()
+        && let Some(literal) = options.reindex_options().find_map(|option| match option {
+            ast::ReindexOption::ReindexOptionConcurrently(option) => option.literal(),
+            ast::ReindexOption::ReindexOptionTablespace(_)
+            | ast::ReindexOption::ReindexOptionVerbose(_) => None,
+        })
+    {
+        return Some(Fix::new(
+            "Enable `concurrently`",
+            vec![Edit::replace(literal.syntax().text_range(), "true")],
+        ));
+    }
     let kw_token = match reindex.reindex_target()? {
         ast::ReindexTarget::ReindexTargetDatabase(it) => it.database_token(),
         ast::ReindexTarget::ReindexTargetIndex(it) => it.index_token(),
@@ -15,25 +26,6 @@ fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
     let at = kw_token.text_range().end();
     let edit = Edit::insert(" concurrently", at);
     Some(Fix::new("Add `concurrently`", vec![edit]))
-}
-
-pub(crate) fn concurrently_range(reindex: &ast::Reindex) -> Option<TextRange> {
-    if let Some(token) = reindex
-        .reindex_target()
-        .and_then(|target| target.concurrently_token())
-    {
-        return Some(token.text_range());
-    }
-    reindex
-        .reindex_option_list()?
-        .reindex_options()
-        .find_map(|option| match option {
-            ast::ReindexOption::ReindexOptionConcurrently(concurrently) => {
-                Some(concurrently.syntax().text_range())
-            }
-            ast::ReindexOption::ReindexOptionTablespace(_)
-            | ast::ReindexOption::ReindexOptionVerbose(_) => None,
-        })
 }
 
 pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, file: &ast::SourceFile) {
@@ -48,7 +40,7 @@ pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, file: &ast::SourceFil
             ) {
                 continue;
             }
-            if concurrently_range(&reindex).is_none() {
+            if !reindex.is_concurrently() {
                 let violation = Violation::for_node(
                     Rule::RequireConcurrentReindex,
                     "reindexing a table or index without `concurrently` blocks reads and writes"

@@ -30,6 +30,7 @@ pub mod column_name;
 pub mod comments;
 pub mod decoded_text;
 mod generated;
+pub mod identifier;
 mod parsing;
 pub mod plpgsql;
 mod ptr;

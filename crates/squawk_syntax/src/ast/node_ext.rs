@@ -1946,15 +1946,25 @@ impl ast::ReindexTarget {
 
 impl ast::Reindex {
     pub fn is_concurrently(&self) -> bool {
-        self.reindex_target()
-            .is_some_and(|target| target.concurrently_token().is_some())
-            || self.reindex_option_list().is_some_and(|options| {
-                options.reindex_options().any(|option| match option {
-                    ast::ReindexOption::ReindexOptionConcurrently(option) => option
-                        .literal()
-                        .is_none_or(|literal| literal.bool_value() != Some(false)),
-                    _ => false,
-                })
+        self.concurrently_range().is_some()
+    }
+
+    pub fn concurrently_range(&self) -> Option<TextRange> {
+        if let Some(token) = self
+            .reindex_target()
+            .and_then(|target| target.concurrently_token())
+        {
+            return Some(token.text_range());
+        }
+        self.reindex_option_list()?
+            .reindex_options()
+            .find_map(|option| match option {
+                ast::ReindexOption::ReindexOptionConcurrently(option) => option
+                    .literal()
+                    .is_none_or(|literal| literal.bool_value() != Some(false))
+                    .then(|| option.syntax().text_range()),
+                ast::ReindexOption::ReindexOptionTablespace(_)
+                | ast::ReindexOption::ReindexOptionVerbose(_) => None,
             })
     }
 }
