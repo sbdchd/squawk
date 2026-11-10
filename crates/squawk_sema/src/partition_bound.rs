@@ -79,9 +79,8 @@ pub(crate) fn range_value(expr: &ast::Expr) -> Option<RangeValue> {
             ast::LitKind::IntNumber(_) => {
                 Some(RangeValue::Int(i128::from(literal.integer_value_u64()?)))
             }
-            ast::LitKind::String(token) => {
-                let text = token.text();
-                let value = text.get(1..text.len() - 1)?.trim().parse().ok()?;
+            ast::LitKind::String(_) => {
+                let value = literal.decoded_value()?.text().trim().parse().ok()?;
                 Some(RangeValue::Int(value))
             }
             _ => None,
