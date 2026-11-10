@@ -22,12 +22,15 @@ use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
 use crate::inheritance_graph::{Inheritance, InheritanceGraph, InheritanceKind};
 use crate::interner::Name;
+use crate::ir::{ArrayOwner, SubscriptResults};
 use crate::keyed_index::GraphElementIndex;
+use crate::lookup::{Lookup, RefSource, RelationLookup, TableLookup, TypeCandidates};
 use crate::partition_bound::{
     BoundKeyType, ListValue, PartitionBound, PartitionKey, RangeValue, partition_bounds_overlap,
     range_value, range_values,
 };
 use crate::postgres::{IntInputError, IntType, NumericInputError, NumericTypmod};
+use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
 
 use crate::{
@@ -46,10 +49,10 @@ use crate::{
         PreparedStatement, PreparedStatementId, PreparedTransaction, PreparedTransactionId,
         Publication, PublicationId, Query, QueryId, QueryKind, RefId, Reference, ReferenceKind,
         Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule, RuleBehavior, RuleEnabled,
-        RuleEvent, RuleId, RuleMode, Savepoint, SavepointId, Schema, SchemaId, Scope, ScopeId,
-        SearchPathChange, SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star,
-        Statistics, StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId,
-        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
+        RuleEvent, RuleId, RuleMode, Savepoint, Schema, SchemaId, Scope, ScopeId, SearchPathChange,
+        SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star, Statistics,
+        StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId, TableKind,
+        Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
         TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
         TypeCategory, TypeId, TypeKind, Typmod, Window, WindowClauses, WindowId,
     },
@@ -232,21 +235,6 @@ enum LabelPosition {
     End,
     Before(EnumLabelId),
     After(EnumLabelId),
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-enum ArrayOwner {
-    Type(TypeId),
-    Table(TableId),
-}
-
-impl ArrayOwner {
-    fn resolution(self) -> Resolution {
-        match self {
-            ArrayOwner::Type(ty) => Resolution::Type(ty),
-            ArrayOwner::Table(table) => Resolution::Table(table),
-        }
-    }
 }
 
 #[derive(Clone, Copy)]
@@ -480,57 +468,6 @@ pub(crate) struct Lowerer {
     dropped_functions: FxHashSet<FunctionId>,
     builtin_types: BuiltinTypes,
     transforms: FxHashMap<TransformKey, TransformId>,
-}
-
-struct OpenTransaction {
-    id: Option<TransactionId>,
-    snapshot: Snapshot,
-}
-
-struct OpenSavepoint {
-    id: SavepointId,
-    snapshot: Snapshot,
-}
-
-struct Snapshot {
-    search_path: SmallVec<[Name; 4]>,
-    session_search_path: SmallVec<[Name; 4]>,
-    undo_len: usize,
-    tables: TableId,
-    types: TypeId,
-    indexes: IndexId,
-    constraints: ConstraintId,
-    triggers: TriggerId,
-    rules: RuleId,
-    roles: RoleId,
-    policies: PolicyId,
-    access_methods: AccessMethodId,
-    event_triggers: EventTriggerId,
-    languages: LanguageId,
-    foreign_data_wrappers: ForeignDataWrapperId,
-    servers: ServerId,
-    conversions: ConversionId,
-    operator_families: OperatorFamilyId,
-    operator_classes: OperatorClassId,
-    statistics: StatisticsId,
-    text_search: TextSearchId,
-    publications: PublicationId,
-    subscriptions: SubscriptionId,
-    graph_elements: GraphElementId,
-    graph_labels: GraphLabelId,
-    enum_labels: EnumLabelId,
-    graph_properties: GraphPropertyId,
-    collations: CollationId,
-    tablespaces: TablespaceId,
-    databases: DatabaseId,
-    schemas: SchemaId,
-    extensions: ExtensionId,
-    operators: OperatorId,
-    functions: FunctionId,
-    casts: CastId,
-    transforms: TransformId,
-    cursors: CursorId,
-    operator_family_members: OperatorFamilyMemberId,
 }
 
 #[derive(Clone, Copy)]
@@ -884,76 +821,9 @@ struct NameResolution {
     resolution: Resolution,
 }
 
-#[derive(Clone, Copy)]
-struct SubscriptResults {
-    result: Option<Ty>,
-    slice: Option<Ty>,
-}
-
 struct IdentPart<'a> {
     ident: Cow<'a, str>,
     rest: &'a str,
-}
-
-enum Undo {
-    DropTable(TableId),
-    DropType(TypeId),
-    DropIndex(IndexId),
-    DropConstraint(ConstraintId),
-    DropTrigger(TriggerId),
-    DropRule(RuleId),
-    RuleEnabled(RuleId, RuleEnabled),
-    DropRole(RoleId),
-    DropPolicy(PolicyId),
-    DropAccessMethod(AccessMethodId),
-    DropEventTrigger(EventTriggerId),
-    DropLanguage(LanguageId),
-    DropForeignDataWrapper(ForeignDataWrapperId),
-    DropServer(ServerId),
-    DropConversion(ConversionId),
-    DropFunction(FunctionId),
-    DropSchema(SchemaId),
-    RenameSchema(Name, Name),
-    DropOperatorFamily(OperatorFamilyId),
-    DropOperatorClass(OperatorClassId),
-    DropStatistics(StatisticsId),
-    DropTextSearch(TextSearchId),
-    DropPublication(PublicationId),
-    DropSubscription(SubscriptionId),
-    DropGraphElement(GraphElementId),
-    DropGraphLabel(GraphLabelId),
-    DropGraphProperty(GraphPropertyId),
-    DropCollation(CollationId),
-    DropTablespace(TablespaceId),
-    DropDatabase(DatabaseId),
-    DropExtension(ExtensionId),
-    DropOperator(OperatorId),
-    DropCast(CastId),
-    DropTransform(TransformKey, TransformId),
-    TableColumns(TableId, Columns),
-    ColumnExpr(ColumnKey, Option<ColumnExpr>),
-    DropOperatorFamilyMember(OperatorFamilyMemberId),
-    MemberOwner(OperatorFamilyMemberId, MemberOwner),
-    MoveTable(TableId, Name, Name, InIrFile<SyntaxNodePtr>),
-    MoveIndex(IndexId, Name, Name, InIrFile<SyntaxNodePtr>),
-    MoveEnumLabel(EnumLabelId, Name, InIrFile<SyntaxNodePtr>),
-    MoveExtension(ExtensionId, Name),
-    MoveObjectSchema(Object, Name),
-    RemoveDependency(Object, Object),
-    AddInheritance(Inheritance),
-    RemoveInheritance(Inheritance),
-    SequenceOwner(TableId, SequenceOwner),
-    ConstraintKind(ConstraintId, ConstraintKind),
-    IndexKey(IndexId, Option<IdxRange<Name>>),
-    PartitionKey(TableId, PartitionKey),
-    ViewColumnDep(usize, Name),
-    IndexColumns(IndexId, IdxRange<Name>),
-    TypeColumns(TypeId, Columns),
-    TableOfType(TableId, Option<TypeId>),
-    TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
-    FinishShellType(TypeId, Box<Type>),
-    MoveType(TypeId, Name, Name, InIrFile<AstPtr<ast::PathSegment>>),
-    ArrayName(ArrayOwner, Option<Name>),
 }
 
 enum FieldBase {
@@ -966,132 +836,6 @@ enum FieldBase {
 struct FieldStar {
     ty: Option<Ty>,
     columns: Option<Columns>,
-}
-
-#[derive(Clone, Copy)]
-enum Lookup {
-    Relation,
-    Type,
-    Function,
-    Operator,
-    Collation,
-    Conversion,
-    OperatorClass,
-    Statistics,
-    TextSearch,
-}
-
-impl Lookup {
-    fn searches_temp(self) -> bool {
-        match self {
-            Lookup::Relation | Lookup::Type | Lookup::Statistics => true,
-            Lookup::Function
-            | Lookup::Operator
-            | Lookup::Collation
-            | Lookup::Conversion
-            | Lookup::OperatorClass
-            | Lookup::TextSearch => false,
-        }
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum TableLookup {
-    Table,
-    ForeignTable,
-    TableOrForeignTable,
-    TableOrView,
-    TableOrMaterializedView,
-    Any,
-    FromItem,
-    Like,
-    View,
-    MaterializedView,
-    Sequence,
-    PropertyGraph,
-    CopyTo,
-    CopyFrom,
-    Truncate,
-}
-
-impl TableLookup {
-    fn accepts(self, kind: TableKind) -> bool {
-        match self {
-            TableLookup::Table => kind == TableKind::Table,
-            TableLookup::ForeignTable => kind == TableKind::ForeignTable,
-            TableLookup::TableOrForeignTable => {
-                matches!(kind, TableKind::Table | TableKind::ForeignTable)
-            }
-            TableLookup::TableOrView => matches!(kind, TableKind::Table | TableKind::View),
-            TableLookup::TableOrMaterializedView => {
-                matches!(kind, TableKind::Table | TableKind::MaterializedView)
-            }
-            TableLookup::Any | TableLookup::FromItem => true,
-            TableLookup::Like => matches!(
-                kind,
-                TableKind::Table
-                    | TableKind::View
-                    | TableKind::MaterializedView
-                    | TableKind::ForeignTable
-            ),
-            TableLookup::View => kind == TableKind::View,
-            TableLookup::MaterializedView => kind == TableKind::MaterializedView,
-            TableLookup::Sequence => kind == TableKind::Sequence,
-            TableLookup::PropertyGraph => kind == TableKind::PropertyGraph,
-            TableLookup::CopyTo => matches!(kind, TableKind::Table | TableKind::MaterializedView),
-            TableLookup::CopyFrom | TableLookup::Truncate => {
-                matches!(kind, TableKind::Table | TableKind::ForeignTable)
-            }
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-enum RefSource {
-    Column,
-    /// table name, alias, CTE, or subquery alias
-    /// ```sql
-    /// -- x is the qualifier
-    /// select x.a, x.*
-    /// ```
-    Qualifier,
-    Table {
-        schema: Option<Name>,
-        lookup: TableLookup,
-    },
-    Type {
-        schema: Option<Name>,
-        candidates: TypeCandidates,
-    },
-    Window,
-    EnumLabel {
-        ty: TypeId,
-    },
-}
-
-impl RefSource {
-    fn kind(self) -> ReferenceKind {
-        match self {
-            RefSource::Column => ReferenceKind::Column,
-            RefSource::Qualifier => ReferenceKind::Relation,
-            RefSource::Table { .. } => ReferenceKind::Table,
-            RefSource::Type { .. } => ReferenceKind::Type,
-            RefSource::Window => ReferenceKind::Window,
-            RefSource::EnumLabel { .. } => ReferenceKind::EnumLabel,
-        }
-    }
-}
-
-#[derive(Clone, Copy)]
-enum TypeCandidates {
-    TypeName,
-    Types(Option<TypeKind>),
-}
-
-#[derive(Clone, Copy)]
-enum RelationLookup {
-    Any,
-    OnlyTable,
 }
 
 #[derive(Clone, Copy)]

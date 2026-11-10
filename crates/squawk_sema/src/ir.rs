@@ -563,6 +563,27 @@ pub(crate) enum Subscript {
     RawArray,
 }
 
+#[derive(Clone, Copy)]
+pub(crate) struct SubscriptResults {
+    pub(crate) result: Option<Ty>,
+    pub(crate) slice: Option<Ty>,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ArrayOwner {
+    Type(TypeId),
+    Table(TableId),
+}
+
+impl ArrayOwner {
+    pub(crate) fn resolution(self) -> Resolution {
+        match self {
+            ArrayOwner::Type(ty) => Resolution::Type(ty),
+            ArrayOwner::Table(table) => Resolution::Table(table),
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum TypeCategory {
     Array,

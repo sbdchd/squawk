@@ -13,7 +13,8 @@ use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
 use crate::expr_context::ExprContext;
-use crate::lower::{OutputClause, TableLookup};
+use crate::lookup::TableLookup;
+use crate::lower::OutputClause;
 use crate::postgres::{IntType, NumericTypmod};
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
