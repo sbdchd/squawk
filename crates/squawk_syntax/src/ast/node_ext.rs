@@ -458,6 +458,30 @@ enum StringDecoding {
 }
 
 impl ast::Literal {
+    pub fn type_name(&self) -> Option<&'static str> {
+        let name = match self.kind()? {
+            ast::LitKind::IntNumber(_) => match self.integer_value_u64() {
+                Some(value) if i32::try_from(value).is_ok() => "int4",
+                Some(value) if i64::try_from(value).is_ok() => "int8",
+                Some(_) | None => "numeric",
+            },
+            ast::LitKind::NumericNumber(_) => "numeric",
+            ast::LitKind::String(_)
+            | ast::LitKind::DollarQuotedString(_)
+            | ast::LitKind::EscString(_)
+            | ast::LitKind::NationalString(_)
+            | ast::LitKind::UnicodeEscString(_) => "text",
+            ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => "bit",
+            ast::LitKind::True(_) | ast::LitKind::False(_) => "bool",
+            ast::LitKind::Default(_)
+            | ast::LitKind::Null(_)
+            | ast::LitKind::Off(_)
+            | ast::LitKind::On(_)
+            | ast::LitKind::PositionalParam(_) => return None,
+        };
+        Some(name)
+    }
+
     pub fn is_string(&self) -> bool {
         self.kind().is_some_and(|kind| kind.is_string())
     }
@@ -558,6 +582,12 @@ impl ast::Literal {
             }
         }
         '\\'
+    }
+}
+
+impl ast::RoleNameRef {
+    pub fn is_public(&self) -> bool {
+        self.text() == "public"
     }
 }
 

@@ -7,7 +7,6 @@ use squawk_syntax::{
 
 use squawk_sema::file::{FileId, InFile, InIrFile, IrFileId};
 use squawk_sema::ir::{Item, Resolution, TableId, TableKind};
-use squawk_sema::lower::is_public_role;
 use squawk_sema::semantic_index::SemanticIndex;
 
 use squawk_ide_db::{Db, parse, semantic_index};
@@ -294,7 +293,7 @@ impl Highlighter<'_> {
                     self.keyword(file_id, partition_for_values_in.in_token());
                 },
                 ast::RoleNameRef(name_ref) => {
-                    if is_public_role(&name_ref) {
+                    if name_ref.is_public() {
                         self.keyword(file_id, name_ref.ident_token());
                     }
                 },

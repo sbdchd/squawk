@@ -27,6 +27,7 @@
 pub mod ast;
 pub mod body;
 pub mod column_name;
+pub mod comments;
 pub mod decoded_text;
 mod generated;
 mod parsing;

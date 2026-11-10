@@ -34,8 +34,8 @@ use squawk_rowan::{NodeOrToken, SyntaxText, TextRange};
 use squawk_syntax::SyntaxKind;
 use squawk_syntax::ast::{self, AstNode, AstToken};
 
-use squawk_sema::comments::line_comment_group;
 use squawk_sema::file::FileId;
+use squawk_syntax::comments::line_comment_group;
 
 use squawk_ide_db::{Db, parse};
 

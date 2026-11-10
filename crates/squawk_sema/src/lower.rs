@@ -14,7 +14,6 @@ use squawk_syntax::{
 
 use crate::arena::{IdxRange, LayeredArena};
 use crate::column_exprs::{ColumnExpr, ColumnExprId, ColumnExprKind, ColumnExprs, ColumnKey};
-use crate::comments::preceding_comment;
 use crate::dependency_graph::{DependencyGraph, Object, rename_schema_objects, set_object_schema};
 use crate::edit_distance::{find_best_match_for_name, find_best_match_for_name_with_substrings};
 use crate::expr_context::{ConditionKind, ExprContext};
@@ -29,6 +28,7 @@ use crate::partition_bound::{
     range_value, range_values,
 };
 use crate::postgres::{IntInputError, IntType, NumericInputError, NumericTypmod};
+use squawk_syntax::comments::preceding_comment;
 
 use crate::{
     ir::{
@@ -4963,7 +4963,7 @@ impl Lowerer {
 
     fn lower_grantee_role_ref(&mut self, role_ref: &ast::RoleRef) {
         if let Some(ast::RoleRefValue::RoleNameRef(name_ref)) = role_ref.role_ref_value()
-            && is_public_role(&name_ref)
+            && name_ref.is_public()
         {
             return;
         }
@@ -13426,7 +13426,7 @@ impl Lowerer {
     }
 
     fn literal_type(&mut self, literal: &ast::Literal) -> Option<Ty> {
-        self.builtin_type(literal_type_name(literal)?)
+        self.builtin_type(literal.type_name()?)
     }
 
     fn lower_func_type(&mut self, func_type: Option<ast::FuncType>) -> Option<Ty> {
@@ -27581,10 +27581,6 @@ enum ConstraintName {
     Generated(Name),
 }
 
-pub fn is_public_role(name_ref: &ast::RoleNameRef) -> bool {
-    name_ref.text() == "public"
-}
-
 fn attribute_name(option: &ast::AttributeOption) -> Option<SmolStr> {
     Some(option.name()?.text().to_ascii_lowercase_smolstr())
 }
@@ -27965,30 +27961,6 @@ fn like_includes_indexes(like: &ast::LikeClause) -> bool {
         }
     }
     includes
-}
-
-pub fn literal_type_name(literal: &ast::Literal) -> Option<&'static str> {
-    let name = match literal.kind()? {
-        ast::LitKind::IntNumber(_) => match literal.integer_value_u64() {
-            Some(value) if i32::try_from(value).is_ok() => "int4",
-            Some(value) if i64::try_from(value).is_ok() => "int8",
-            Some(_) | None => "numeric",
-        },
-        ast::LitKind::NumericNumber(_) => "numeric",
-        ast::LitKind::String(_)
-        | ast::LitKind::DollarQuotedString(_)
-        | ast::LitKind::EscString(_)
-        | ast::LitKind::NationalString(_)
-        | ast::LitKind::UnicodeEscString(_) => "text",
-        ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => "bit",
-        ast::LitKind::True(_) | ast::LitKind::False(_) => "bool",
-        ast::LitKind::Default(_)
-        | ast::LitKind::Null(_)
-        | ast::LitKind::Off(_)
-        | ast::LitKind::On(_)
-        | ast::LitKind::PositionalParam(_) => return None,
-    };
-    Some(name)
 }
 
 fn standalone_select_keyword(call: &ast::CallExpr) -> Option<SyntaxToken> {
