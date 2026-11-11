@@ -27248,30 +27248,8 @@ fn single_rows_from_function(rows_from_item: &ast::RowsFromItem) -> bool {
 }
 
 fn expanded_unnest(call: &ast::CallExpr) -> Option<ast::NameRef> {
-    let name_ref = call.expr()?.as_name_ref()?;
-    let arg_list = call.arg_list()?;
-    if call.over_clause().is_some()
-        || call.filter_clause().is_some()
-        || call.within_clause().is_some()
-        || arg_list.star_token().is_some()
-        || matches!(
-            arg_list.all_or_distinct(),
-            Some(ast::AllOrDistinct::Distinct(_))
-        )
-    {
-        return None;
-    }
-    let mut count = 0;
-    for arg in arg_list.args() {
-        if arg.variadic_token().is_some()
-            || arg.order_by_clause().is_some()
-            || matches!(arg.func_arg_expr(), Some(ast::FuncArgExpr::NamedArg(_)))
-        {
-            return None;
-        }
-        count += 1;
-    }
-    (count > 1 && name_ref.text() == "unnest").then_some(name_ref)
+    let mut unnest = call.as_unnest()?;
+    unnest.args.nth(1).is_some().then_some(unnest.name_ref)
 }
 
 fn is_regclass(ty: &ast::Type) -> bool {

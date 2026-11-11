@@ -725,6 +725,46 @@ impl ast::CallExpr {
             | ast::Expr::TupleExpr(_) => None,
         }
     }
+
+    pub fn as_unnest(&self) -> Option<UnnestCall> {
+        let name_ref = self.expr()?.as_name_ref()?;
+        if name_ref.text() != "unnest"
+            || self.over_clause().is_some()
+            || self.filter_clause().is_some()
+            || self.within_clause().is_some()
+            || self.null_treatment().is_some()
+        {
+            return None;
+        }
+        let arg_list = self.arg_list()?;
+        if arg_list.star_token().is_some()
+            || matches!(
+                arg_list.all_or_distinct(),
+                Some(ast::AllOrDistinct::Distinct(_))
+            )
+        {
+            return None;
+        }
+        let mut has_args = false;
+        for arg in arg_list.args() {
+            if arg.variadic_token().is_some()
+                || arg.order_by_clause().is_some()
+                || matches!(arg.func_arg_expr(), Some(ast::FuncArgExpr::NamedArg(_)))
+            {
+                return None;
+            }
+            has_args = true;
+        }
+        has_args.then(|| UnnestCall {
+            name_ref,
+            args: arg_list.args(),
+        })
+    }
+}
+
+pub struct UnnestCall {
+    pub name_ref: ast::NameRef,
+    pub args: ast::AstChildren<ast::Arg>,
 }
 
 impl ast::LikeClause {
@@ -1841,9 +1881,33 @@ impl ast::PathRef {
         }
         self.segment()
     }
+
+    pub fn segments(&self) -> impl Iterator<Item = ast::PathSegmentRef> + use<> {
+        let last = self.syntax().clone();
+        let mut first = self.clone();
+        while let Some(qualifier) = first.qualifier() {
+            first = qualifier;
+        }
+        std::iter::successors(Some(first), move |path| {
+            if path.syntax() == &last {
+                None
+            } else {
+                path.syntax().parent().and_then(ast::PathRef::cast)
+            }
+        })
+        .filter_map(|path| path.segment())
+    }
 }
 
 impl ast::Type {
+    pub fn element_type(&self) -> Option<ast::Type> {
+        let mut ty = self.clone();
+        while let ast::Type::ArrayType(array_type) = ty {
+            ty = array_type.ty()?;
+        }
+        Some(ty)
+    }
+
     pub fn path_ref(&self) -> Option<ast::PathRef> {
         match self {
             ast::Type::PathType(path_type) => path_type.path_ref(),
@@ -3313,4 +3377,23 @@ fn decoded_value_maps_dollar_quoted() {
       1 -> 13 Some('b')
       2 -> 14 Some('$')
     "#);
+}
+
+#[test]
+fn path_ref_segments() {
+    let parsed = ast::SourceFile::parse("alter table a.b.c rename to d;");
+    assert!(parsed.errors().is_empty());
+    let segments: Vec<_> = parsed
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(ast::PathRef::cast)
+        .map(|path| {
+            path.segments()
+                .map(|segment| segment.text().into_owned())
+                .collect::<Vec<_>>()
+                .join(".")
+        })
+        .collect();
+    assert_eq!(segments, ["a.b.c", "a.b", "a"]);
 }

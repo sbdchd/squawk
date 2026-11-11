@@ -6,37 +6,10 @@ mod ban_detach_inheritance;
 mod ban_new_write_restriction;
 
 use rustc_hash::FxHashSet;
-use smallvec::SmallVec;
 use squawk_syntax::ast;
 
-use crate::{Linter, Rule, name::Name};
-
-fn object_name(path: &ast::Path) -> SmallVec<[Name; 2]> {
-    let mut name = path.qualifier().map(object_name_ref).unwrap_or_default();
-    if let Some(segment) = path.segment() {
-        name.push(Name::from_node(&segment));
-    }
-    strip_public_schema(&mut name);
-    name
-}
-
-fn strip_public_schema(name: &mut SmallVec<[Name; 2]>) {
-    if let [schema, _] = name.as_slice()
-        && schema.is_public_schema()
-    {
-        name.remove(0);
-    }
-}
-
-fn object_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
-    let mut name = std::iter::successors(Some(path), |path| path.qualifier())
-        .filter_map(|path| path.segment())
-        .map(|segment| Name::from_node(&segment))
-        .collect::<SmallVec<[Name; 2]>>();
-    name.reverse();
-    strip_public_schema(&mut name);
-    name
-}
+use crate::name::{path_name, path_ref_name};
+use crate::{Linter, Rule};
 
 // Only unconditional CREATE statements establish that an object is new to this file.
 pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::SourceFile) {
@@ -50,21 +23,21 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::Source
                 if table.if_not_exists().is_none()
                     && let Some(name) = table.table_name().and_then(|n| n.path())
                 {
-                    tables.insert(object_name(&name));
+                    tables.insert(path_name(&name));
                 }
             }
             ast::Stmt::CreateForeignTable(table) => {
                 if table.if_not_exists().is_none()
                     && let Some(name) = table.table_name().and_then(|n| n.path())
                 {
-                    tables.insert(object_name(&name));
+                    tables.insert(path_name(&name));
                 }
             }
             ast::Stmt::CreateTableAs(table) => {
                 if table.if_not_exists().is_none()
                     && let Some(name) = table.table_name().and_then(|n| n.path())
                 {
-                    tables.insert(object_name(&name));
+                    tables.insert(path_name(&name));
                 }
             }
             ast::Stmt::SelectInto(select) => {
@@ -73,19 +46,19 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::Source
                     .and_then(|into| into.table_name())
                     .and_then(|n| n.path())
                 {
-                    tables.insert(object_name(&name));
+                    tables.insert(path_name(&name));
                 }
             }
             ast::Stmt::CreateType(ty) => {
                 if let Some(name) = ty.type_name().and_then(|n| n.path()) {
-                    types.insert(object_name(&name));
+                    types.insert(path_name(&name));
                 }
             }
             ast::Stmt::CreateSequence(seq) => {
                 if seq.if_not_exists().is_none()
                     && let Some(name) = seq.sequence().and_then(|n| n.path())
                 {
-                    sequences.insert(object_name(&name));
+                    sequences.insert(path_name(&name));
                 }
             }
             ast::Stmt::AlterTable(table) => {
@@ -93,7 +66,7 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::Source
                     .table_relation_name()
                     .and_then(|n| n.table_name_ref())
                     .and_then(|n| n.path_ref())
-                    .is_some_and(|n| tables.contains(&object_name_ref(n)));
+                    .is_some_and(|n| tables.contains(&path_ref_name(&n)));
                 for action in table.actions() {
                     if !new_table {
                         if ctx.rules.contains(&Rule::BanAddColumn) {
@@ -116,7 +89,7 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::Source
                     .table_relation_name()
                     .and_then(|n| n.table_name_ref())
                     .and_then(|n| n.path_ref())
-                    .is_some_and(|n| tables.contains(&object_name_ref(n)));
+                    .is_some_and(|n| tables.contains(&path_ref_name(&n)));
                 if new_table {
                     continue;
                 }
@@ -137,7 +110,7 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::Source
                     .table_relation_name()
                     .and_then(|n| n.table_name_ref())
                     .and_then(|n| n.path_ref())
-                    .is_none_or(|n| !tables.contains(&object_name_ref(n)))
+                    .is_none_or(|n| !tables.contains(&path_ref_name(&n)))
                 {
                     ban_new_write_restriction::check_index(ctx, &index);
                 }
@@ -146,7 +119,7 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::Source
                 let new_type = ty
                     .type_name_ref()
                     .and_then(|n| n.path_ref())
-                    .is_some_and(|n| types.contains(&object_name_ref(n)));
+                    .is_some_and(|n| types.contains(&path_ref_name(&n)));
                 if !new_type {
                     if ctx.rules.contains(&Rule::BanAddEnumValue) {
                         ban_add_enum_value::check(ctx, &ty);
@@ -160,7 +133,7 @@ pub(crate) fn existing_object_compatibility(ctx: &mut Linter, file: &ast::Source
                 let new_sequence = seq
                     .sequence_ref()
                     .and_then(|n| n.path_ref())
-                    .is_some_and(|n| sequences.contains(&object_name_ref(n)));
+                    .is_some_and(|n| sequences.contains(&path_ref_name(&n)));
                 if !new_sequence {
                     ban_alter_sequence_values::check_sequence(ctx, &seq);
                 }

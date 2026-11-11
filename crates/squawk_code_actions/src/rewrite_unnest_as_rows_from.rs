@@ -6,7 +6,6 @@ use squawk_syntax::ast::{self, AstNode};
 use squawk_ide_db::offsets::token_from_offset;
 use squawk_ide_db::{Db, semantic_index};
 
-use super::unnest::unnest_call;
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_unnest_as_rows_from(
@@ -20,10 +19,8 @@ pub(super) fn rewrite_unnest_as_rows_from(
         .find_map(ast::FunctionFromItem::cast)?;
 
     let call_expr = from_item.call_expr()?;
-    let call = unnest_call(&call_expr)?;
-    if call.args.len() < 2 {
-        return None;
-    }
+    let call = call_expr.as_unnest()?;
+    call.args.clone().nth(1)?;
 
     if from_item
         .alias()
@@ -54,10 +51,9 @@ pub(super) fn rewrite_unnest_as_rows_from(
 
     let call_range = call_expr.syntax().text_range();
 
-    let name = call.name.syntax().text();
+    let name = call.name_ref.syntax().text();
     let calls = call
         .args
-        .iter()
         .map(|arg| format!("{name}({})", arg.syntax().text()))
         .collect::<Vec<_>>()
         .join(", ");

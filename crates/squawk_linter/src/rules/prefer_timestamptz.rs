@@ -5,34 +5,32 @@ use crate::visitors::check_not_allowed_types;
 use crate::{Linter, Rule, Violation};
 
 pub(crate) fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
-    match ty {
-        ast::Type::ArrayType(array_type) => {
-            if let Some(ty) = array_type.ty() {
-                is_not_allowed_timestamp(&ty)
-            } else {
-                false
-            }
-        }
-        ast::Type::PathType(path_type) => {
-            let Some(segment) = path_type.path_ref().and_then(|x| x.segment()) else {
-                return false;
-            };
-            segment.text() == "timestamp"
-        }
-        ast::Type::VarcharType(_) | ast::Type::CharacterType(_) => false,
-        ast::Type::BitType(_) | ast::Type::BitVaryingType(_) => false,
-        ast::Type::DoubleType(_) => false,
-        ast::Type::TimeType(_) => false,
-        ast::Type::TimestampType(timestamp_type) => !matches!(
+    match ty.element_type() {
+        Some(ast::Type::PathType(path_type)) => path_type
+            .path_ref()
+            .and_then(|x| x.segment())
+            .is_some_and(|segment| segment.text() == "timestamp"),
+        Some(ast::Type::TimestampType(timestamp_type)) => !matches!(
             timestamp_type.timezone(),
             Some(ast::Timezone::WithTimezone(_))
         ),
-        ast::Type::IntervalType(_) => false,
+        Some(
+            ast::Type::ArrayType(_)
+            | ast::Type::VarcharType(_)
+            | ast::Type::CharacterType(_)
+            | ast::Type::BitType(_)
+            | ast::Type::BitVaryingType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::TimeType(_)
+            | ast::Type::IntervalType(_),
+        )
+        | None => false,
     }
 }
 
 fn fix_timestamp(ty: &ast::Type) -> Option<Fix> {
-    match ty {
+    let ty = ty.element_type()?;
+    match &ty {
         ast::Type::TimestampType(_) => {
             let range = ty.syntax().text_range();
             let edit = Edit::replace(range, "timestamptz");
@@ -42,13 +40,6 @@ fn fix_timestamp(ty: &ast::Type) -> Option<Fix> {
             let segment = path_type.path_ref()?.segment()?;
             let edit = Edit::replace(segment.syntax().text_range(), "timestamptz");
             Some(Fix::new("Replace with `timestamptz`", vec![edit]))
-        }
-        ast::Type::ArrayType(array_type) => {
-            if let Some(inner_ty) = array_type.ty() {
-                fix_timestamp(&inner_ty)
-            } else {
-                None
-            }
         }
         _ => None,
     }

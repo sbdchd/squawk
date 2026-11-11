@@ -44,7 +44,7 @@ pub use self::{
     node_ext::{
         BinOp, CastKind, FunctionLikeKeyword, IntegerRadix, LitKind, OpSigOperand,
         PartitionStrategyKind, PostfixOp, PrefixOp, RangeBoundKeyword, RoleKind, RuleEventKind,
-        SqlValueFunction, VertexOrEdgeKind,
+        SqlValueFunction, UnnestCall, VertexOrEdgeKind,
     },
     nodes::*,
     traits::{HasCreateTable, HasPathRef, HasSelectTail, HasWithClause, NameLike},

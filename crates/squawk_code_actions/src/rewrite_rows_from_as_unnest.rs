@@ -9,7 +9,6 @@ use squawk_syntax::ast::{self, AstNode};
 use squawk_ide_db::offsets::token_from_offset;
 use squawk_ide_db::{Db, semantic_index};
 
-use super::unnest::unnest_call;
 use super::{ActionKind, CodeAction};
 
 pub(super) fn rewrite_rows_from_as_unnest(
@@ -33,12 +32,15 @@ pub(super) fn rewrite_rows_from_as_unnest(
         if rows_from_arg.column_def_list().is_some() {
             return None;
         }
-        calls.push(unnest_call(&rows_from_arg.call_expr()?)?);
+        calls.push(rows_from_arg.call_expr()?.as_unnest()?);
     }
     if calls.len() > 1 {
         let index = semantic_index(db, position.file_id);
-        for call in calls.iter().filter(|call| call.args.len() == 1) {
-            let range = position.with_value(call.name.syntax().text_range());
+        for call in calls
+            .iter()
+            .filter(|call| call.args.clone().nth(1).is_none())
+        {
+            let range = position.with_value(call.name_ref.syntax().text_range());
             let Item::Reference(reference) = index.item_at_range(range)?.value.item else {
                 return None;
             };
@@ -59,7 +61,7 @@ pub(super) fn rewrite_rows_from_as_unnest(
 
     let args = calls
         .iter()
-        .flat_map(|call| &call.args)
+        .flat_map(|call| call.args.clone())
         .map(|arg| arg.syntax().text().to_string())
         .collect::<Vec<_>>()
         .join(", ");
@@ -68,7 +70,7 @@ pub(super) fn rewrite_rows_from_as_unnest(
         title: "Rewrite as `unnest`".to_owned(),
         edits: vec![Edit::replace(
             rows_from_range,
-            format!("{}({args})", first.name.syntax().text()),
+            format!("{}({args})", first.name_ref.syntax().text()),
         )],
         kind: ActionKind::RefactorRewrite,
     });
