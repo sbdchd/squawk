@@ -9,6 +9,7 @@ use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode, NameLike},
     column_name::{ColumnName, ColumnNameValue},
+    identifier::{split_identifier_string, truncate_identifier},
     sql_body::SqlBody,
 };
 
@@ -13614,7 +13615,7 @@ impl Lowerer {
         };
         let Some(path) = value
             .string_value()
-            .and_then(|value| postgres::split_identifier_string(&value, ','))
+            .and_then(|value| split_identifier_string(&value, ','))
         else {
             return;
         };
@@ -13646,7 +13647,7 @@ impl Lowerer {
     }
 
     fn intern(&mut self, text: &str) -> Name {
-        self.index.names.intern(postgres::truncate_identifier(text))
+        self.index.names.intern(truncate_identifier(text))
     }
 
     fn intern_multirange_name(&mut self, range_name: Name) -> Name {
@@ -25277,7 +25278,7 @@ impl Lowerer {
         let Some(decoded) = literal.decoded_value() else {
             return;
         };
-        let Some(parts) = postgres::split_identifier_string(decoded.text(), '.') else {
+        let Some(parts) = split_identifier_string(decoded.text(), '.') else {
             return;
         };
         let (schema, name) = match parts.as_slice() {
@@ -26892,7 +26893,7 @@ impl Lowerer {
                 .any(|cte_name| {
                     self.index
                         .names
-                        .lookup(postgres::truncate_identifier(&cte_name.text()))
+                        .lookup(truncate_identifier(&cte_name.text()))
                         == Some(name)
                 })
         })?;

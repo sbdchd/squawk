@@ -627,6 +627,42 @@ impl ast::Literal {
 }
 
 impl ast::BinOp {
+    pub fn precedence(&self) -> Option<u8> {
+        match self {
+            ast::BinOp::Or(_) => Some(1),
+            ast::BinOp::And(_) => Some(2),
+            ast::BinOp::Is(_)
+            | ast::BinOp::IsNot(_)
+            | ast::BinOp::IsDistinctFrom(_)
+            | ast::BinOp::IsNotDistinctFrom(_) => Some(4),
+            ast::BinOp::Eq(_)
+            | ast::BinOp::Gteq(_)
+            | ast::BinOp::LAngle(_)
+            | ast::BinOp::Lteq(_)
+            | ast::BinOp::Neq(_)
+            | ast::BinOp::Neqb(_)
+            | ast::BinOp::RAngle(_) => Some(5),
+            ast::BinOp::In(_)
+            | ast::BinOp::NotIn(_)
+            | ast::BinOp::Like(_)
+            | ast::BinOp::NotLike(_)
+            | ast::BinOp::Ilike(_)
+            | ast::BinOp::NotIlike(_)
+            | ast::BinOp::SimilarTo(_)
+            | ast::BinOp::NotSimilarTo(_) => Some(6),
+            ast::BinOp::CustomOp(_)
+            | ast::BinOp::OperatorCall(_)
+            | ast::BinOp::Overlaps(_)
+            | ast::BinOp::Escape(_) => Some(7),
+            ast::BinOp::Plus(_) | ast::BinOp::Minus(_) => Some(8),
+            ast::BinOp::Star(_) | ast::BinOp::Slash(_) | ast::BinOp::Percent(_) => Some(9),
+            ast::BinOp::Caret(_) => Some(10),
+            ast::BinOp::AtTimeZone(_) => Some(11),
+            ast::BinOp::ColonColon(_) => Some(15),
+            ast::BinOp::ColonEq(_) | ast::BinOp::FatArrow(_) => None,
+        }
+    }
+
     pub fn is_comparison(&self) -> bool {
         match self {
             ast::BinOp::Eq(_)
@@ -3253,6 +3289,20 @@ fn decoded_value_maps_string_continuation() {
       3 -> 14 Some('d')
       4 -> 15 Some('\'')
     "#);
+}
+
+#[test]
+fn binary_operator_precedence() {
+    let parsed = ast::SourceFile::parse("select a or b and c = d + e * f;");
+    assert!(parsed.errors().is_empty());
+    let precedences: Vec<_> = parsed
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(ast::BinExpr::cast)
+        .map(|expr| expr.op().unwrap().precedence())
+        .collect();
+    assert_eq!(precedences, [Some(1), Some(2), Some(5), Some(8), Some(9)]);
 }
 
 #[test]

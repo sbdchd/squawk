@@ -1,6 +1,10 @@
 use squawk_diagnostics::Edit;
 use squawk_rowan::TextSize;
-use squawk_syntax::{SyntaxKind, ast::AstNode, quote::quote_string_literal};
+use squawk_syntax::{
+    SyntaxKind,
+    ast::AstNode,
+    quote::{quote_string_literal, strip_dollar_quotes},
+};
 
 use squawk_sema::file::InFile;
 
@@ -32,32 +36,7 @@ pub(super) fn rewrite_as_regular_string(
 }
 
 fn dollar_quoted_to_string(text: &str) -> Option<String> {
-    debug_assert!(text.starts_with('$'));
-    let (delimiter, content) = split_dollar_quoted(text)?;
-    let boundary = format!("${delimiter}$");
-
-    if !text.starts_with(&boundary) || !text.ends_with(&boundary) {
-        return None;
-    }
-
-    Some(quote_string_literal(content))
-}
-
-fn split_dollar_quoted(text: &str) -> Option<(String, &str)> {
-    debug_assert!(text.starts_with('$'));
-    let second_dollar = text[1..].find('$')?;
-    // the `foo` in `select $foo$bar$foo$`
-    let delimiter = &text[1..=second_dollar];
-    let boundary = format!("${delimiter}$");
-
-    if !text.ends_with(&boundary) {
-        return None;
-    }
-
-    let start = boundary.len();
-    let end = text.len().checked_sub(boundary.len())?;
-    let content = text.get(start..end)?;
-    Some((delimiter.to_owned(), content))
+    Some(quote_string_literal(strip_dollar_quotes(text)?))
 }
 
 #[cfg(test)]

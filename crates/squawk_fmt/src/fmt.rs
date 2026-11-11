@@ -19448,47 +19448,11 @@ fn build_logical_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, logical: LogicalOp
         .append(rhs_doc)
 }
 
-fn binary_precedence(op: &ast::BinOp) -> Option<u8> {
-    match op {
-        ast::BinOp::Or(_) => Some(1),
-        ast::BinOp::And(_) => Some(2),
-        ast::BinOp::Is(_)
-        | ast::BinOp::IsNot(_)
-        | ast::BinOp::IsDistinctFrom(_)
-        | ast::BinOp::IsNotDistinctFrom(_) => Some(4),
-        ast::BinOp::Eq(_)
-        | ast::BinOp::Gteq(_)
-        | ast::BinOp::LAngle(_)
-        | ast::BinOp::Lteq(_)
-        | ast::BinOp::Neq(_)
-        | ast::BinOp::Neqb(_)
-        | ast::BinOp::RAngle(_) => Some(5),
-        ast::BinOp::In(_)
-        | ast::BinOp::NotIn(_)
-        | ast::BinOp::Like(_)
-        | ast::BinOp::NotLike(_)
-        | ast::BinOp::Ilike(_)
-        | ast::BinOp::NotIlike(_)
-        | ast::BinOp::SimilarTo(_)
-        | ast::BinOp::NotSimilarTo(_) => Some(6),
-        ast::BinOp::CustomOp(_)
-        | ast::BinOp::OperatorCall(_)
-        | ast::BinOp::Overlaps(_)
-        | ast::BinOp::Escape(_) => Some(7),
-        ast::BinOp::Plus(_) | ast::BinOp::Minus(_) => Some(8),
-        ast::BinOp::Star(_) | ast::BinOp::Slash(_) | ast::BinOp::Percent(_) => Some(9),
-        ast::BinOp::Caret(_) => Some(10),
-        ast::BinOp::AtTimeZone(_) => Some(11),
-        ast::BinOp::ColonColon(_) => Some(15),
-        ast::BinOp::ColonEq(_) | ast::BinOp::FatArrow(_) => None,
-    }
-}
-
 fn build_bin_expr_operand<'a>(ctx: &Ctx, expr: ast::Expr, precedence: Option<u8>) -> Doc<'a> {
     match expr {
         ast::Expr::BinExpr(inner)
             if precedence.is_some()
-                && inner.op().as_ref().and_then(binary_precedence) == precedence =>
+                && inner.op().as_ref().and_then(ast::BinOp::precedence) == precedence =>
         {
             build_bin_expr_chain(ctx, &inner, true)
         }
@@ -19527,7 +19491,7 @@ fn build_bin_expr_chain<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, flattened: bool)
         Doc::line_or_space()
     };
     let before_op = comment_run_after(lhs.syntax()).between_nodes(separator);
-    let precedence = bin_expr.op().as_ref().and_then(binary_precedence);
+    let precedence = bin_expr.op().as_ref().and_then(ast::BinOp::precedence);
     let tail = before_op
         .append(build_op(bin_expr.op().unwrap()))
         .append(after_op)

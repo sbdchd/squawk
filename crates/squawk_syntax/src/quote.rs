@@ -158,6 +158,36 @@ pub fn strip_unicode_esc_prefix(text: &str) -> Option<&str> {
     strip_quotes(text.strip_prefix(['u', 'U'])?.strip_prefix('&')?)
 }
 
+pub fn quote_dollar_string_literal(content: &str) -> Option<String> {
+    let tag = if !content.contains("$$") && !content.ends_with('$') {
+        String::new()
+    } else {
+        let mut tag = String::with_capacity(11);
+        tag.push('q');
+        let mut found = false;
+        for idx in 0..10 {
+            if !content.contains(&format!("${tag}$")) {
+                found = true;
+                break;
+            }
+            tag.push(char::from(b'0' + idx));
+        }
+        if !found {
+            return None;
+        }
+        tag
+    };
+    let mut quoted = String::with_capacity(content.len() + 2 * (tag.len() + 2));
+    quoted.push('$');
+    quoted.push_str(&tag);
+    quoted.push('$');
+    quoted.push_str(content);
+    quoted.push('$');
+    quoted.push_str(&tag);
+    quoted.push('$');
+    Some(quoted)
+}
+
 pub fn dollar_quote_tag(text: &str) -> Option<&str> {
     text.strip_prefix('$')?.split_once('$').map(|(tag, _)| tag)
 }
@@ -174,6 +204,27 @@ mod tests {
     use insta::assert_snapshot;
 
     use super::*;
+
+    #[test]
+    fn dollar_quoted_strings_round_trip() {
+        for content in [
+            "",
+            "hello",
+            "it's",
+            "$$",
+            "$q$",
+            "trailing $",
+            "$$ $q$ $q0$",
+        ] {
+            let quoted = quote_dollar_string_literal(content).unwrap();
+            assert_eq!(strip_dollar_quotes(&quoted), Some(content));
+        }
+        assert_eq!(
+            quote_dollar_string_literal("hello").as_deref(),
+            Some("$$hello$$")
+        );
+        assert_eq!(quote_dollar_string_literal("$").as_deref(), Some("$q$$$q$"));
+    }
 
     #[test]
     fn keyword_checks_are_ascii_case_insensitive() {

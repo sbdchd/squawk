@@ -1,9 +1,7 @@
 use std::{borrow::Cow, cmp::Ordering, fmt, fmt::Write};
 
 use num_bigint::BigUint;
-use squawk_rowan::{TextRange, TextSize};
-
-const MAX_IDENTIFIER_LEN: usize = 63;
+use squawk_syntax::identifier::{MAX_IDENT_BYTES, truncate_identifier};
 
 // see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/commands/indexcmds.c#L2644
 pub(crate) fn choose_relation_name(
@@ -60,7 +58,7 @@ fn choose_name(
 // see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/commands/indexcmds.c#L2556
 fn make_object_name(name1: &str, name2: Option<&str>, label: Option<&str>) -> String {
     let overhead = usize::from(name2.is_some()) + label.map_or(0, |label| label.len() + 1);
-    let available = MAX_IDENTIFIER_LEN.saturating_sub(overhead);
+    let available = MAX_IDENT_BYTES.saturating_sub(overhead);
     let mut len1 = name1.len();
     let mut len2 = name2.map_or(0, str::len);
     while len1 + len2 > available {
@@ -70,7 +68,7 @@ fn make_object_name(name1: &str, name2: Option<&str>, label: Option<&str>) -> St
             len2 -= 1;
         }
     }
-    let mut name = String::with_capacity(MAX_IDENTIFIER_LEN);
+    let mut name = String::with_capacity(MAX_IDENT_BYTES);
     name.push_str(clip_to_char_boundary(name1, len1));
     if let Some(name2) = name2 {
         name.push('_');
@@ -104,60 +102,6 @@ pub(crate) fn join_names(names: impl Iterator<Item = impl fmt::Display>) -> Stri
         let _ = write!(joined, "{name}");
     }
     joined
-}
-
-pub(crate) struct Identifier {
-    pub(crate) name: String,
-    pub(crate) range: TextRange,
-}
-
-// see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/utils/adt/varlena.c#L2870
-pub(crate) fn split_identifier_string(text: &str, separator: char) -> Option<Vec<Identifier>> {
-    let mut names = vec![];
-    let mut chars = text.char_indices().peekable();
-    let offset = |chars: &mut std::iter::Peekable<std::str::CharIndices>| {
-        TextSize::try_from(chars.peek().map_or(text.len(), |(i, _)| *i)).ok()
-    };
-    while chars.next_if(|(_, c)| is_scanner_space(*c)).is_some() {}
-    if chars.peek().is_none() {
-        return Some(names);
-    }
-    loop {
-        let start = offset(&mut chars)?;
-        let mut name = String::new();
-        if chars.next_if(|(_, c)| *c == '"').is_some() {
-            loop {
-                match chars.next()?.1 {
-                    '"' if chars.next_if(|(_, c)| *c == '"').is_some() => name.push('"'),
-                    '"' => break,
-                    c => name.push(c),
-                }
-            }
-        } else {
-            while let Some((_, c)) =
-                chars.next_if(|(_, c)| *c != separator && !is_scanner_space(*c))
-            {
-                name.push(c.to_ascii_lowercase());
-            }
-            if name.is_empty() {
-                return None;
-            }
-        }
-        let end = offset(&mut chars)?;
-        while chars.next_if(|(_, c)| is_scanner_space(*c)).is_some() {}
-        name.truncate(truncate_identifier(&name).len());
-        names.push(Identifier {
-            name,
-            range: TextRange::new(start, end),
-        });
-        match chars.next() {
-            Some((_, c)) if c == separator => {
-                while chars.next_if(|(_, c)| is_scanner_space(*c)).is_some() {}
-            }
-            None => return Some(names),
-            Some(_) => return None,
-        }
-    }
 }
 
 // see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/parser/scansup.c#L105
@@ -636,15 +580,6 @@ fn is_blank(text: &[u8]) -> bool {
     text.iter().all(|&byte| is_scanner_space(char::from(byte)))
 }
 
-// see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/parser/scansup.c#L81
-pub(crate) fn truncate_identifier(text: &str) -> &str {
-    if text.len() > MAX_IDENTIFIER_LEN {
-        clip_to_char_boundary(text, MAX_IDENTIFIER_LEN)
-    } else {
-        text
-    }
-}
-
 // see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/catalog/pg_type.c#L948
 pub(crate) fn make_multirange_type_name(range_type_name: &str) -> String {
     const SUFFIX: &str = "_multirange";
@@ -655,7 +590,7 @@ pub(crate) fn make_multirange_type_name(range_type_name: &str) -> String {
             &range_type_name[start..]
         ),
         None => {
-            let len = range_type_name.len().min(MAX_IDENTIFIER_LEN - SUFFIX.len());
+            let len = range_type_name.len().min(MAX_IDENT_BYTES - SUFFIX.len());
             format!("{}{SUFFIX}", clip_to_char_boundary(range_type_name, len))
         }
     };
@@ -677,87 +612,8 @@ mod tests {
     use super::{
         IntInputError, IntType, NUMERIC_MAX_DECIMAL_BITS, NUMERIC_MAX_DECIMAL_DIGITS,
         NumericInputError, NumericTypmod, check_numeric, make_array_type_name,
-        make_multirange_type_name, parse_bool, parse_int, split_identifier_string,
-        truncate_identifier,
+        make_multirange_type_name, parse_bool, parse_int,
     };
-
-    #[track_caller]
-    fn split(text: &str) -> Option<Vec<String>> {
-        split_identifier_string(text, ',').map(|names| {
-            names
-                .into_iter()
-                .map(|identifier| identifier.name)
-                .collect()
-        })
-    }
-
-    #[test]
-    fn split_identifier_ranges() {
-        let text = r#" app . "My""Seq" "#;
-        let ranges: Vec<&str> = split_identifier_string(text, '.')
-            .unwrap()
-            .into_iter()
-            .map(|identifier| &text[identifier.range])
-            .collect();
-        assert_eq!(ranges, vec!["app", r#""My""Seq""#]);
-    }
-
-    #[test]
-    fn split_identifiers() {
-        assert_eq!(split(""), Some(vec![]));
-        assert_eq!(split("  "), Some(vec![]));
-        assert_eq!(
-            split(r#" App , "My""Schema",public "#),
-            Some(vec![
-                "app".to_string(),
-                r#"My"Schema"#.to_string(),
-                "public".to_string()
-            ])
-        );
-        assert_eq!(
-            split("a,\t\x0bb"),
-            Some(vec!["a".to_string(), "b".to_string()])
-        );
-    }
-
-    #[test]
-    fn split_identifiers_empty_quoted_name() {
-        assert_eq!(
-            split(r#""", a"#),
-            Some(vec![String::new(), "a".to_string()])
-        );
-    }
-
-    #[test]
-    fn split_identifiers_non_scanner_whitespace() {
-        assert_eq!(
-            split("a,\u{a0}b"),
-            Some(vec!["a".to_string(), "\u{a0}b".to_string()])
-        );
-    }
-
-    #[test]
-    fn split_identifiers_invalid() {
-        assert_eq!(split("a,"), None);
-        assert_eq!(split(",a"), None);
-        assert_eq!(split("a b"), None);
-        assert_eq!(split(r#""a"#), None);
-    }
-
-    #[test]
-    fn split_identifiers_truncated() {
-        let long = "a".repeat(70);
-        assert_eq!(split(&long), Some(vec!["a".repeat(63)]));
-    }
-
-    #[test]
-    fn truncate_identifiers() {
-        assert_eq!(truncate_identifier("t"), "t");
-        assert_eq!(truncate_identifier(&"a".repeat(63)), "a".repeat(63));
-        assert_eq!(truncate_identifier(&"a".repeat(64)), "a".repeat(63));
-        let multibyte = format!("{}é", "a".repeat(62));
-        assert_eq!(truncate_identifier(&multibyte), "a".repeat(62));
-    }
 
     #[test]
     fn array_type_names() {
