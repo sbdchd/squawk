@@ -12520,11 +12520,7 @@ impl Lowerer {
                 }
                 option @ ("input" | "output" | "receive" | "send" | "typmod_in" | "typmod_out"
                 | "analyze" | "subscript") => {
-                    if value.as_ref().is_some_and(|v| {
-                        v.syntax()
-                            .first_token()
-                            .is_some_and(|token| token.kind() == SyntaxKind::NONE_KW)
-                    }) {
+                    if value.as_ref().is_some_and(|v| v.none_token().is_some()) {
                         if option == "subscript" {
                             subscript = SubscriptOption::Untyped;
                         }
