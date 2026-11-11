@@ -28,8 +28,9 @@ use std::borrow::Cow;
 
 use either::Either;
 #[cfg(test)]
-use insta::assert_snapshot;
+use insta::{assert_debug_snapshot, assert_snapshot};
 use num_bigint::BigUint;
+use smallvec::SmallVec;
 use smol_str::SmolStr;
 use squawk_line_index::{LineEnding, find_newline};
 use squawk_rowan::{GreenNodeRef, GreenTokenRef, Language, NodeOrToken, TextRange, TextSize};
@@ -131,6 +132,25 @@ pub enum SqlValueFunction {
     User,
 }
 
+impl SqlValueFunction {
+    pub fn keyword(self) -> &'static str {
+        match self {
+            SqlValueFunction::CurrentCatalog => "current_catalog",
+            SqlValueFunction::CurrentDate => "current_date",
+            SqlValueFunction::CurrentRole => "current_role",
+            SqlValueFunction::CurrentSchema => "current_schema",
+            SqlValueFunction::CurrentTime => "current_time",
+            SqlValueFunction::CurrentTimestamp => "current_timestamp",
+            SqlValueFunction::CurrentUser => "current_user",
+            SqlValueFunction::Localtime => "localtime",
+            SqlValueFunction::Localtimestamp => "localtimestamp",
+            SqlValueFunction::SessionUser => "session_user",
+            SqlValueFunction::SystemUser => "system_user",
+            SqlValueFunction::User => "user",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FunctionLikeKeyword {
     Coalesce,
@@ -169,6 +189,24 @@ impl IntegerRadix {
             Self::Decimal => 10,
             Self::Hexadecimal => 16,
             Self::Octal => 8,
+        }
+    }
+
+    pub fn prefix(self) -> &'static str {
+        match self {
+            Self::Binary => "0b",
+            Self::Decimal => "",
+            Self::Hexadecimal => "0x",
+            Self::Octal => "0o",
+        }
+    }
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Binary => "binary",
+            Self::Decimal => "decimal",
+            Self::Hexadecimal => "hexadecimal",
+            Self::Octal => "octal",
         }
     }
 }
@@ -627,6 +665,42 @@ impl ast::Literal {
 }
 
 impl ast::BinOp {
+    pub fn precedence(&self) -> Option<u8> {
+        match self {
+            ast::BinOp::Or(_) => Some(1),
+            ast::BinOp::And(_) => Some(2),
+            ast::BinOp::Is(_)
+            | ast::BinOp::IsNot(_)
+            | ast::BinOp::IsDistinctFrom(_)
+            | ast::BinOp::IsNotDistinctFrom(_) => Some(4),
+            ast::BinOp::Eq(_)
+            | ast::BinOp::Gteq(_)
+            | ast::BinOp::LAngle(_)
+            | ast::BinOp::Lteq(_)
+            | ast::BinOp::Neq(_)
+            | ast::BinOp::Neqb(_)
+            | ast::BinOp::RAngle(_) => Some(5),
+            ast::BinOp::In(_)
+            | ast::BinOp::NotIn(_)
+            | ast::BinOp::Like(_)
+            | ast::BinOp::NotLike(_)
+            | ast::BinOp::Ilike(_)
+            | ast::BinOp::NotIlike(_)
+            | ast::BinOp::SimilarTo(_)
+            | ast::BinOp::NotSimilarTo(_) => Some(6),
+            ast::BinOp::CustomOp(_)
+            | ast::BinOp::OperatorCall(_)
+            | ast::BinOp::Overlaps(_)
+            | ast::BinOp::Escape(_) => Some(7),
+            ast::BinOp::Plus(_) | ast::BinOp::Minus(_) => Some(8),
+            ast::BinOp::Star(_) | ast::BinOp::Slash(_) | ast::BinOp::Percent(_) => Some(9),
+            ast::BinOp::Caret(_) => Some(10),
+            ast::BinOp::AtTimeZone(_) => Some(11),
+            ast::BinOp::ColonColon(_) => Some(15),
+            ast::BinOp::ColonEq(_) | ast::BinOp::FatArrow(_) => None,
+        }
+    }
+
     pub fn is_comparison(&self) -> bool {
         match self {
             ast::BinOp::Eq(_)
@@ -689,6 +763,46 @@ impl ast::CallExpr {
             | ast::Expr::TupleExpr(_) => None,
         }
     }
+
+    pub fn as_unnest(&self) -> Option<UnnestCall> {
+        let name_ref = self.expr()?.as_name_ref()?;
+        if name_ref.text() != "unnest"
+            || self.over_clause().is_some()
+            || self.filter_clause().is_some()
+            || self.within_clause().is_some()
+            || self.null_treatment().is_some()
+        {
+            return None;
+        }
+        let arg_list = self.arg_list()?;
+        if arg_list.star_token().is_some()
+            || matches!(
+                arg_list.all_or_distinct(),
+                Some(ast::AllOrDistinct::Distinct(_))
+            )
+        {
+            return None;
+        }
+        let mut has_args = false;
+        for arg in arg_list.args() {
+            if arg.variadic_token().is_some()
+                || arg.order_by_clause().is_some()
+                || matches!(arg.func_arg_expr(), Some(ast::FuncArgExpr::NamedArg(_)))
+            {
+                return None;
+            }
+            has_args = true;
+        }
+        has_args.then(|| UnnestCall {
+            name_ref,
+            args: arg_list.args(),
+        })
+    }
+}
+
+pub struct UnnestCall {
+    pub name_ref: ast::NameRef,
+    pub args: ast::AstChildren<ast::Arg>,
 }
 
 impl ast::LikeClause {
@@ -989,7 +1103,42 @@ pub enum PrefixOp {
     Plus(SyntaxToken),
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum InList {
+    Single(ast::Expr),
+    Tuple(ast::TupleExpr),
+}
+
+impl InList {
+    pub fn exprs(&self) -> impl Iterator<Item = ast::Expr> + '_ {
+        let (single, tuple) = match self {
+            InList::Single(expr) => (Some(expr.clone()), None),
+            InList::Tuple(tuple) => (None, Some(tuple)),
+        };
+        single
+            .into_iter()
+            .chain(tuple.into_iter().flat_map(ast::TupleExpr::exprs))
+    }
+}
+
 impl ast::BinExpr {
+    pub fn in_list(&self) -> Option<InList> {
+        if !matches!(self.op(), Some(BinOp::In(_) | BinOp::NotIn(_))) {
+            return None;
+        }
+        let rhs = self.rhs()?;
+        if let ast::Expr::TupleExpr(tuple) = rhs {
+            return Some(InList::Tuple(tuple));
+        }
+        if let ast::Expr::ParenExpr(paren) = rhs
+            && paren.select_variant().is_none()
+            && let Some(expr) = paren.expr()
+        {
+            return Some(InList::Single(expr));
+        }
+        None
+    }
+
     #[inline]
     pub fn lhs(&self) -> Option<ast::Expr> {
         support::children(self.syntax()).next()
@@ -1798,6 +1947,16 @@ fn option_bool_value(token: &SyntaxToken) -> Option<bool> {
     }
 }
 
+impl ast::Path {
+    pub fn segments(&self) -> impl Iterator<Item = ast::AnyName> + use<> {
+        self.qualifier()
+            .into_iter()
+            .flat_map(|qualifier| qualifier.segments())
+            .map(ast::AnyName::PathSegmentRef)
+            .chain(self.segment().map(ast::AnyName::PathSegment))
+    }
+}
+
 impl ast::PathRef {
     pub fn unqualified_segment(&self) -> Option<ast::PathSegmentRef> {
         if self.qualifier().is_some() {
@@ -1805,9 +1964,33 @@ impl ast::PathRef {
         }
         self.segment()
     }
+
+    pub fn segments(&self) -> impl Iterator<Item = ast::PathSegmentRef> + use<> {
+        let last = self.syntax().clone();
+        let mut first = self.clone();
+        while let Some(qualifier) = first.qualifier() {
+            first = qualifier;
+        }
+        std::iter::successors(Some(first), move |path| {
+            if path.syntax() == &last {
+                None
+            } else {
+                path.syntax().parent().and_then(ast::PathRef::cast)
+            }
+        })
+        .filter_map(|path| path.segment())
+    }
 }
 
 impl ast::Type {
+    pub fn element_type(&self) -> Option<ast::Type> {
+        let mut ty = self.clone();
+        while let ast::Type::ArrayType(array_type) = ty {
+            ty = array_type.ty()?;
+        }
+        Some(ty)
+    }
+
     pub fn path_ref(&self) -> Option<ast::PathRef> {
         match self {
             ast::Type::PathType(path_type) => path_type.path_ref(),
@@ -1882,6 +2065,31 @@ impl ast::PathType {
             _ => return None,
         };
         Some(name)
+    }
+}
+
+impl ast::PathPattern {
+    pub fn primaries(&self) -> impl Iterator<Item = ast::PathPrimary> + use<> {
+        let mut stack = SmallVec::<[ast::AstChildren<ast::PathFactor>; 1]>::new();
+        stack.push(self.path_factors());
+        std::iter::from_fn(move || {
+            loop {
+                let factors = stack.last_mut()?;
+                let Some(factor) = factors.next() else {
+                    stack.pop();
+                    continue;
+                };
+                let Some(primary) = factor.path_primary() else {
+                    continue;
+                };
+                if let ast::PathPrimary::ParenGraphPattern(paren) = &primary
+                    && let Some(inner) = paren.path_pattern()
+                {
+                    stack.push(inner.path_factors());
+                }
+                return Some(primary);
+            }
+        })
     }
 }
 
@@ -3256,6 +3464,20 @@ fn decoded_value_maps_string_continuation() {
 }
 
 #[test]
+fn binary_operator_precedence() {
+    let parsed = ast::SourceFile::parse("select a or b and c = d + e * f;");
+    assert!(parsed.errors().is_empty());
+    let precedences: Vec<_> = parsed
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(ast::BinExpr::cast)
+        .map(|expr| expr.op().unwrap().precedence())
+        .collect();
+    assert_eq!(precedences, [Some(1), Some(2), Some(5), Some(8), Some(9)]);
+}
+
+#[test]
 fn decoded_value_maps_dollar_quoted() {
     assert_snapshot!(decode_literal("select $tag$ab$tag$;"), @r#"
     "ab"
@@ -3263,4 +3485,128 @@ fn decoded_value_maps_dollar_quoted() {
       1 -> 13 Some('b')
       2 -> 14 Some('$')
     "#);
+}
+
+#[test]
+fn in_list() {
+    let parsed = ast::SourceFile::parse(
+        "select x in (1);
+select x not in (1, 2);
+select x in ((1));
+select x in (select y from t);
+select x = (1, 2);",
+    );
+    assert!(parsed.errors().is_empty());
+    let lists: Vec<_> = parsed
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(ast::BinExpr::cast)
+        .map(|bin| {
+            bin.in_list().map(|list| {
+                list.exprs()
+                    .map(|expr| expr.syntax().text().to_string())
+                    .collect::<Vec<_>>()
+            })
+        })
+        .collect();
+    assert_debug_snapshot!(lists, @r#"
+    [
+        Some(
+            [
+                "1",
+            ],
+        ),
+        Some(
+            [
+                "1",
+                "2",
+            ],
+        ),
+        Some(
+            [
+                "(1)",
+            ],
+        ),
+        None,
+        None,
+    ]
+    "#);
+}
+
+#[test]
+fn path_pattern_primaries() {
+    let parsed = ast::SourceFile::parse(
+        "select *
+from graph_table(g match (a)-[e]->((b)-[f]->(c))-[h]->(d) columns (a.id));",
+    );
+    assert!(parsed.errors().is_empty());
+    let pattern = parsed
+        .tree()
+        .syntax()
+        .descendants()
+        .find_map(ast::PathPattern::cast)
+        .unwrap();
+    let primaries: Vec<_> = pattern
+        .primaries()
+        .map(|primary| primary.syntax().text().to_string())
+        .collect();
+    assert_debug_snapshot!(primaries, @r#"
+    [
+        "(a)",
+        "-[e]->",
+        "((b)-[f]->(c))",
+        "(b)",
+        "-[f]->",
+        "(c)",
+        "-[h]->",
+        "(d)",
+    ]
+    "#);
+}
+
+#[test]
+fn path_segments() {
+    let parsed = ast::SourceFile::parse(
+        "create table a.b.c (id int);
+create table t (id int);",
+    );
+    assert!(parsed.errors().is_empty());
+    let segments: Vec<_> = parsed
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(ast::Path::cast)
+        .map(|path| {
+            path.segments()
+                .map(|segment| segment.text().into_owned())
+                .collect::<Vec<_>>()
+                .join(".")
+        })
+        .collect();
+    assert_debug_snapshot!(segments, @r#"
+    [
+        "a.b.c",
+        "t",
+    ]
+    "#);
+}
+
+#[test]
+fn path_ref_segments() {
+    let parsed = ast::SourceFile::parse("alter table a.b.c rename to d;");
+    assert!(parsed.errors().is_empty());
+    let segments: Vec<_> = parsed
+        .tree()
+        .syntax()
+        .descendants()
+        .filter_map(ast::PathRef::cast)
+        .map(|path| {
+            path.segments()
+                .map(|segment| segment.text().into_owned())
+                .collect::<Vec<_>>()
+                .join(".")
+        })
+        .collect();
+    assert_eq!(segments, ["a.b.c", "a.b", "a"]);
 }

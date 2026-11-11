@@ -24,22 +24,7 @@ fn format_integer(radix: ast::IntegerRadix, value: &BigUint) -> String {
     if radix == ast::IntegerRadix::Hexadecimal {
         digits.make_ascii_uppercase();
     }
-    let prefix = match radix {
-        ast::IntegerRadix::Binary => "0b",
-        ast::IntegerRadix::Decimal => "",
-        ast::IntegerRadix::Hexadecimal => "0x",
-        ast::IntegerRadix::Octal => "0o",
-    };
-    format!("{prefix}{digits}")
-}
-
-fn integer_radix_name(radix: ast::IntegerRadix) -> &'static str {
-    match radix {
-        ast::IntegerRadix::Binary => "binary",
-        ast::IntegerRadix::Decimal => "decimal",
-        ast::IntegerRadix::Hexadecimal => "hexadecimal",
-        ast::IntegerRadix::Octal => "octal",
-    }
+    format!("{}{digits}", radix.prefix())
 }
 
 pub(super) fn rewrite_integer_radix(
@@ -62,7 +47,7 @@ pub(super) fn rewrite_integer_radix(
 
         let replacement = format_integer(target_radix, &value);
         actions.push(CodeAction {
-            title: format!("Rewrite integer as {}", integer_radix_name(target_radix)),
+            title: format!("Rewrite integer as {}", target_radix.name()),
             edits: vec![Edit::replace(token.text_range(), replacement)],
             kind: ActionKind::RefactorRewrite,
         });

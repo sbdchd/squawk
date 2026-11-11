@@ -23,10 +23,7 @@ fn smallint_to_bigint(smallint_type: &str) -> BigintType {
 }
 
 fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
-    if let ast::Type::ArrayType(array_type) = ty {
-        return create_bigint_fix(&array_type.ty()?);
-    }
-    let name = ty.path_ref()?.segment()?;
+    let name = ty.element_type()?.path_ref()?.segment()?;
     let i64 = smallint_to_bigint(&name.text());
     let edit = Edit::replace(name.syntax().text_range(), i64.name());
     Some(Fix::new(i64.fix_title(), vec![edit]))

@@ -46,16 +46,7 @@ fn check_character_type(ctx: &mut Linter, character_type: &ast::CharacterType) {
 }
 
 fn check_ty(ctx: &mut Linter, ty: Option<ast::Type>) {
-    match ty {
-        Some(ast::Type::ArrayType(array_type)) => match array_type.ty() {
-            Some(ast::Type::CharacterType(character_type)) => {
-                check_character_type(ctx, &character_type);
-            }
-            Some(ast::Type::PathType(path_type)) => {
-                check_path_type(ctx, &path_type);
-            }
-            _ => (),
-        },
+    match ty.and_then(|ty| ty.element_type()) {
         Some(ast::Type::PathType(path_type)) => {
             check_path_type(ctx, &path_type);
         }

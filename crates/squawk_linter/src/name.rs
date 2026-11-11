@@ -1,4 +1,5 @@
-use squawk_syntax::ast::NameLike;
+use smallvec::SmallVec;
+use squawk_syntax::ast::{self, NameLike};
 
 use squawk_syntax::identifier::truncate_identifier;
 
@@ -21,5 +22,31 @@ impl Name {
 
     pub(crate) fn is_public_schema(&self) -> bool {
         self.0 == "public"
+    }
+}
+
+pub(crate) fn path_name(path: &ast::Path) -> SmallVec<[Name; 2]> {
+    let mut name = path
+        .segments()
+        .map(|segment| Name::from_node(&segment))
+        .collect();
+    strip_public_schema(&mut name);
+    name
+}
+
+pub(crate) fn path_ref_name(path: &ast::PathRef) -> SmallVec<[Name; 2]> {
+    let mut name = path
+        .segments()
+        .map(|segment| Name::from_node(&segment))
+        .collect();
+    strip_public_schema(&mut name);
+    name
+}
+
+fn strip_public_schema(name: &mut SmallVec<[Name; 2]>) {
+    if let [schema, _] = name.as_slice()
+        && schema.is_public_schema()
+    {
+        name.remove(0);
     }
 }

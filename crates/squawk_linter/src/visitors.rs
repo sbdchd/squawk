@@ -2,38 +2,11 @@ use squawk_syntax::ast;
 
 use crate::Linter;
 
-fn is_serial_name(name: &str) -> bool {
-    matches!(
-        name,
-        "serial" | "serial2" | "serial4" | "serial8" | "smallserial" | "bigserial"
-    )
-}
-
-pub(crate) fn is_serial_type(ty: &ast::Type) -> bool {
-    is_not_valid_int_type(ty, is_serial_name)
-}
-
 pub(crate) fn is_not_valid_int_type(ty: &ast::Type, is_invalid_name: fn(&str) -> bool) -> bool {
-    match ty {
-        ast::Type::ArrayType(array_type) => {
-            if let Some(ty) = array_type.ty() {
-                is_not_valid_int_type(&ty, is_invalid_name)
-            } else {
-                false
-            }
-        }
-        ast::Type::PathType(path_type) => {
-            let Some(segment) = path_type.path_ref().and_then(|x| x.segment()) else {
-                return false;
-            };
-            is_invalid_name(&segment.text())
-        }
-        ast::Type::VarcharType(_) | ast::Type::CharacterType(_) => false,
-        ast::Type::BitType(_) | ast::Type::BitVaryingType(_) => false,
-        ast::Type::DoubleType(_) => false,
-        ast::Type::TimeType(_) | ast::Type::TimestampType(_) => false,
-        ast::Type::IntervalType(_) => false,
-    }
+    ty.element_type()
+        .and_then(|ty| ty.path_ref())
+        .and_then(|path| path.segment())
+        .is_some_and(|segment| is_invalid_name(&segment.text()))
 }
 
 pub(crate) fn check_not_allowed_types(

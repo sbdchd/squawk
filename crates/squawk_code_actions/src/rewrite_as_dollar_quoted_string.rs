@@ -1,6 +1,10 @@
 use squawk_diagnostics::Edit;
 use squawk_rowan::TextSize;
-use squawk_syntax::{SyntaxKind, ast::AstNode};
+use squawk_syntax::{
+    SyntaxKind,
+    ast::{self, AstNode},
+    quote::quote_dollar_string_literal,
+};
 
 use squawk_sema::file::InFile;
 
@@ -21,7 +25,8 @@ pub(super) fn rewrite_as_dollar_quoted_string(
         .token_at_offset(offset)
         .find(|token| token.kind() == SyntaxKind::STRING)?;
 
-    let replacement = string_to_dollar_quoted(string.text())?;
+    let literal = ast::Literal::cast(string.parent()?)?;
+    let replacement = quote_dollar_string_literal(&literal.string_value()?)?;
     actions.push(CodeAction {
         title: "Rewrite as dollar-quoted string".to_owned(),
         edits: vec![Edit::replace(string.text_range(), replacement)],
@@ -29,36 +34,6 @@ pub(super) fn rewrite_as_dollar_quoted_string(
     });
 
     Some(())
-}
-
-fn string_to_dollar_quoted(text: &str) -> Option<String> {
-    let normalized = normalize_single_quoted_string(text)?;
-    let delimiter = dollar_delimiter(&normalized)?;
-    let boundary = format!("${delimiter}$");
-    Some(format!("{boundary}{normalized}{boundary}"))
-}
-
-fn normalize_single_quoted_string(text: &str) -> Option<String> {
-    let body = text.strip_prefix('\'')?.strip_suffix('\'')?;
-    return Some(body.replace("''", "'"));
-}
-
-fn dollar_delimiter(content: &str) -> Option<String> {
-    // We can't safely transform a trailing `$` i.e., `select 'foo $'` with an
-    // empty delim, because we'll  `select $$foo $$$` which isn't valid.
-    if !content.contains("$$") && !content.ends_with('$') {
-        return Some(String::new());
-    }
-
-    let mut delim = "q".to_owned();
-    // don't want to just loop forever
-    for idx in 0..10 {
-        if !content.contains(&format!("${delim}$")) {
-            return Some(delim);
-        }
-        delim.push_str(&idx.to_string());
-    }
-    None
 }
 
 #[cfg(test)]

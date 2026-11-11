@@ -190,20 +190,19 @@ impl CompletionContext {
 
     fn alias(alias: &SyntaxNode) -> Option<CompletionContext> {
         let parent = alias.parent()?;
-        let has_as = parent
-            .children_with_tokens()
-            .chain(alias.children_with_tokens())
-            .any(|element| element.kind() == SyntaxKind::AS_KW);
-        if has_as {
-            return None;
+        if let Some(alias) = ast::FromAlias::cast(parent.clone()) {
+            return alias
+                .as_token()
+                .is_none()
+                .then_some(CompletionContext::SelectClause);
         }
-        match parent.kind() {
-            SyntaxKind::FROM_ALIAS => Some(CompletionContext::SelectClause),
-            SyntaxKind::OPTIONAL_AS_ALIAS if parent.parent()?.kind() == SyntaxKind::DELETE => {
-                Some(CompletionContext::DeleteClause)
-            }
-            _ => None,
+        if let Some(alias) = ast::OptionalAsAlias::cast(parent)
+            && alias.as_token().is_none()
+            && ast::Delete::cast(alias.syntax().parent()?).is_some()
+        {
+            return Some(CompletionContext::DeleteClause);
         }
+        None
     }
 
     fn expr(name_ref: &ast::NameRef) -> Option<CompletionContext> {

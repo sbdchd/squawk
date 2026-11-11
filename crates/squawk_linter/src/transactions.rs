@@ -2,7 +2,7 @@ use rustc_hash::FxHashSet;
 use smallvec::SmallVec;
 use squawk_syntax::ast;
 
-use crate::name::Name;
+use crate::name::{Name, path_name, path_ref_name};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum TransactionControl {
@@ -55,23 +55,6 @@ pub(crate) struct TablesCreatedInTransaction {
     transaction: TransactionState,
 }
 
-pub(crate) fn table_name_ref(path: ast::PathRef) -> SmallVec<[Name; 2]> {
-    let mut name: SmallVec<[Name; 2]> = std::iter::successors(Some(path), |path| path.qualifier())
-        .filter_map(|path| path.segment())
-        .map(|segment| Name::from_node(&segment))
-        .collect();
-    strip_public_schema(&mut name);
-    name
-}
-
-fn strip_public_schema(name: &mut SmallVec<[Name; 2]>) {
-    if let [_, schema] = name.as_slice()
-        && schema.is_public_schema()
-    {
-        name.pop();
-    }
-}
-
 impl TablesCreatedInTransaction {
     pub(crate) fn new(assume_in_transaction: bool) -> Self {
         Self {
@@ -99,21 +82,13 @@ impl TablesCreatedInTransaction {
             _ => None,
         };
         if let Some(path) = table.and_then(|table| table.path())
-            && let Some(segment) = path.segment()
+            && path.segment().is_some()
         {
-            let mut name = std::iter::once(Name::from_node(&segment))
-                .chain(
-                    std::iter::successors(path.qualifier(), |path| path.qualifier())
-                        .filter_map(|path| path.segment())
-                        .map(|segment| Name::from_node(&segment)),
-                )
-                .collect();
-            strip_public_schema(&mut name);
-            self.names.insert(name);
+            self.names.insert(path_name(&path));
         }
     }
 
     pub(crate) fn contains(&self, path: &ast::PathRef) -> bool {
-        !self.names.is_empty() && self.names.contains(&table_name_ref(path.clone()))
+        !self.names.is_empty() && self.names.contains(&path_ref_name(path))
     }
 }

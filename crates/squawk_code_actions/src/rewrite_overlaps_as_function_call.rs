@@ -1,10 +1,7 @@
 use squawk_diagnostics::Edit;
 use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::file::InFile;
-use squawk_syntax::{
-    SyntaxKind, SyntaxNode,
-    ast::{self, AstNode},
-};
+use squawk_syntax::ast::{self, AstNode};
 
 use squawk_ide_db::Db;
 use squawk_ide_db::offsets::token_from_offset;
@@ -55,21 +52,10 @@ fn pair_tuple_ranges(expr: ast::Expr) -> Option<TupleRanges> {
         return None;
     }
 
-    tuple_ranges(tuple.syntax())
-}
-
-fn tuple_ranges(tuple: &SyntaxNode) -> Option<TupleRanges> {
-    let l_paren = tuple
-        .children_with_tokens()
-        .find(|element| element.kind() == SyntaxKind::L_PAREN)?;
-    let r_paren = tuple
-        .children_with_tokens()
-        .find(|element| element.kind() == SyntaxKind::R_PAREN)?;
-
     Some(TupleRanges {
-        outer: tuple.text_range(),
-        l_paren: l_paren.text_range(),
-        r_paren: r_paren.text_range(),
+        outer: tuple.syntax().text_range(),
+        l_paren: tuple.l_paren_token()?.text_range(),
+        r_paren: tuple.r_paren_token()?.text_range(),
     })
 }
 

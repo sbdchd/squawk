@@ -9,6 +9,7 @@ use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
     ast::{self, AstNode, NameLike},
     column_name::{ColumnName, ColumnNameValue},
+    identifier::{split_identifier_string, truncate_identifier},
     sql_body::SqlBody,
 };
 
@@ -914,36 +915,6 @@ pub(crate) enum OutputClause {
     OrderBy,
     GroupBy,
     DistinctOn,
-}
-
-enum InList {
-    Single(ast::Expr),
-    Tuple(ast::TupleExpr),
-}
-
-impl InList {
-    fn new(rhs: &ast::Expr) -> Option<InList> {
-        if let ast::Expr::TupleExpr(tuple) = rhs {
-            return Some(InList::Tuple(tuple.clone()));
-        }
-        if let ast::Expr::ParenExpr(paren) = rhs
-            && paren.select_variant().is_none()
-            && let Some(expr) = paren.expr()
-        {
-            return Some(InList::Single(expr));
-        }
-        None
-    }
-
-    fn exprs(&self) -> impl Iterator<Item = ast::Expr> + '_ {
-        let (single, tuple) = match self {
-            InList::Single(expr) => (Some(expr.clone()), None),
-            InList::Tuple(tuple) => (None, Some(tuple)),
-        };
-        single
-            .into_iter()
-            .chain(tuple.into_iter().flat_map(ast::TupleExpr::exprs))
-    }
 }
 
 struct SelectParts {
@@ -7514,17 +7485,17 @@ impl Lowerer {
         self.push_scope(query);
         let patterns = graph_table.path_pattern_list();
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
-            visit_path_primaries(&pattern, &mut |primary| {
-                self.declare_element_variable(graph, query, primary);
-            });
+            for primary in pattern.primaries() {
+                self.declare_element_variable(graph, query, &primary);
+            }
         }
         self.set_visible((0..self.scope_sources_len()).into());
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
-            visit_path_primaries(&pattern, &mut |primary| {
+            for primary in pattern.primaries() {
                 if let Some(expr) = primary.where_clause().and_then(|clause| clause.expr()) {
                     self.lower_condition(ConditionKind::GraphWhere, &expr);
                 }
-            });
+            }
         }
         if let Some(expr) = graph_table.where_clause().and_then(|clause| clause.expr()) {
             self.lower_condition(ConditionKind::GraphWhere, &expr);
@@ -12549,11 +12520,7 @@ impl Lowerer {
                 }
                 option @ ("input" | "output" | "receive" | "send" | "typmod_in" | "typmod_out"
                 | "analyze" | "subscript") => {
-                    if value.as_ref().is_some_and(|v| {
-                        v.syntax()
-                            .first_token()
-                            .is_some_and(|token| token.kind() == SyntaxKind::NONE_KW)
-                    }) {
+                    if value.as_ref().is_some_and(|v| v.none_token().is_some()) {
                         if option == "subscript" {
                             subscript = SubscriptOption::Untyped;
                         }
@@ -13614,7 +13581,7 @@ impl Lowerer {
         };
         let Some(path) = value
             .string_value()
-            .and_then(|value| postgres::split_identifier_string(&value, ','))
+            .and_then(|value| split_identifier_string(&value, ','))
         else {
             return;
         };
@@ -13646,7 +13613,7 @@ impl Lowerer {
     }
 
     fn intern(&mut self, text: &str) -> Name {
-        self.index.names.intern(postgres::truncate_identifier(text))
+        self.index.names.intern(truncate_identifier(text))
     }
 
     fn intern_multirange_name(&mut self, range_name: Name) -> Name {
@@ -20629,7 +20596,7 @@ impl Lowerer {
         op_range: TextRange,
         lhs: &ast::Expr,
         rhs: &ast::Expr,
-        list: &InList,
+        list: &ast::InList,
     ) -> Option<Ty> {
         let operator = comparison.operator();
         let lhs_ty = self.lower_expr(lhs);
@@ -23063,7 +23030,7 @@ impl Lowerer {
                     && let Some(lhs) = bin.lhs()
                     && !matches!(lhs, ast::Expr::TupleExpr(_))
                     && let Some(rhs) = bin.rhs()
-                    && let Some(list) = InList::new(&rhs)
+                    && let Some(list) = bin.in_list()
                 {
                     return self.lower_in_comparison(comparison, op_range, &lhs, &rhs, &list);
                 }
@@ -25277,7 +25244,7 @@ impl Lowerer {
         let Some(decoded) = literal.decoded_value() else {
             return;
         };
-        let Some(parts) = postgres::split_identifier_string(decoded.text(), '.') else {
+        let Some(parts) = split_identifier_string(decoded.text(), '.') else {
             return;
         };
         let (schema, name) = match parts.as_slice() {
@@ -26892,7 +26859,7 @@ impl Lowerer {
                 .any(|cte_name| {
                     self.index
                         .names
-                        .lookup(postgres::truncate_identifier(&cte_name.text()))
+                        .lookup(truncate_identifier(&cte_name.text()))
                         == Some(name)
                 })
         })?;
@@ -27247,30 +27214,8 @@ fn single_rows_from_function(rows_from_item: &ast::RowsFromItem) -> bool {
 }
 
 fn expanded_unnest(call: &ast::CallExpr) -> Option<ast::NameRef> {
-    let name_ref = call.expr()?.as_name_ref()?;
-    let arg_list = call.arg_list()?;
-    if call.over_clause().is_some()
-        || call.filter_clause().is_some()
-        || call.within_clause().is_some()
-        || arg_list.star_token().is_some()
-        || matches!(
-            arg_list.all_or_distinct(),
-            Some(ast::AllOrDistinct::Distinct(_))
-        )
-    {
-        return None;
-    }
-    let mut count = 0;
-    for arg in arg_list.args() {
-        if arg.variadic_token().is_some()
-            || arg.order_by_clause().is_some()
-            || matches!(arg.func_arg_expr(), Some(ast::FuncArgExpr::NamedArg(_)))
-        {
-            return None;
-        }
-        count += 1;
-    }
-    (count > 1 && name_ref.text() == "unnest").then_some(name_ref)
+    let mut unnest = call.as_unnest()?;
+    unnest.args.nth(1).is_some().then_some(unnest.name_ref)
 }
 
 fn is_regclass(ty: &ast::Type) -> bool {
@@ -27310,20 +27255,6 @@ fn graph_element_live(
             .into_iter()
             .flatten()
             .all(|vertex| graph_element_live(elements, dropped_elements, dropped_tables, vertex))
-}
-
-fn visit_path_primaries(pattern: &ast::PathPattern, f: &mut impl FnMut(&ast::PathPrimary)) {
-    for primary in pattern
-        .path_factors()
-        .filter_map(|factor| factor.path_primary())
-    {
-        f(&primary);
-        if let ast::PathPrimary::ParenGraphPattern(paren) = &primary
-            && let Some(inner) = paren.path_pattern()
-        {
-            visit_path_primaries(&inner, f);
-        }
-    }
 }
 
 fn graph_element_kind(vertex_or_edge: Option<&ast::VertexOrEdge>) -> GraphElementKind {

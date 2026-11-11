@@ -50,10 +50,7 @@ impl BigintType {
 }
 
 fn create_bigint_fix(ty: &ast::Type) -> Option<Fix> {
-    if let ast::Type::ArrayType(array_type) = ty {
-        return create_bigint_fix(&array_type.ty()?);
-    }
-    let name = ty.path_ref()?.segment()?;
+    let name = ty.element_type()?.path_ref()?.segment()?;
     let int_type = name.text();
     let i64 = int_to_bigint_replacement(&int_type);
     let edit = Edit::replace(name.syntax().text_range(), i64.name());

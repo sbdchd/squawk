@@ -49,7 +49,6 @@ mod rewrite_trim_as_function_call;
 mod rewrite_unnest_as_rows_from;
 mod rewrite_values_as_select;
 mod rewrite_xmlexists_as_function_call;
-mod unnest;
 mod unquote_identifier;
 
 #[cfg(test)]

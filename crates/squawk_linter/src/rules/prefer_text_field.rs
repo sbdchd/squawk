@@ -6,32 +6,31 @@ use crate::{Linter, Rule, Violation};
 use crate::visitors::check_not_allowed_types;
 
 fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
-    match ty {
-        ast::Type::ArrayType(array_type) => {
-            if let Some(ty) = array_type.ty() {
-                is_not_allowed_varchar(&ty)
-            } else {
-                false
-            }
-        }
-        ast::Type::PathType(path_type) => {
+    match ty.element_type() {
+        Some(ast::Type::PathType(path_type)) => {
             let Some(segment) = path_type.path_ref().and_then(|x| x.segment()) else {
                 return false;
             };
             // if we don't have any args, then it's the same as `text`
             segment.text() == "varchar" && path_type.arg_list().is_some()
         }
-        ast::Type::VarcharType(varchar_type) => varchar_type.arg_list().is_some(),
-        ast::Type::CharacterType(_) => false,
-        ast::Type::BitType(_) | ast::Type::BitVaryingType(_) => false,
-        ast::Type::DoubleType(_) => false,
-        ast::Type::TimeType(_) | ast::Type::TimestampType(_) => false,
-        ast::Type::IntervalType(_) => false,
+        Some(ast::Type::VarcharType(varchar_type)) => varchar_type.arg_list().is_some(),
+        Some(
+            ast::Type::ArrayType(_)
+            | ast::Type::CharacterType(_)
+            | ast::Type::BitType(_)
+            | ast::Type::BitVaryingType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::TimeType(_)
+            | ast::Type::TimestampType(_)
+            | ast::Type::IntervalType(_),
+        )
+        | None => false,
     }
 }
 
 fn create_varchar_to_text_fix(ty: &ast::Type) -> Option<Fix> {
-    let range = match ty {
+    let range = match ty.element_type()? {
         ast::Type::PathType(path_type) => {
             // we'll replace the entire path type, including args
             // so: `"varchar"(100)` becomes `text`
@@ -41,10 +40,6 @@ fn create_varchar_to_text_fix(ty: &ast::Type) -> Option<Fix> {
             // we'll replace the entire varchar type, including args
             // so: `varchar(100)` becomes `text`
             varchar_type.syntax().text_range()
-        }
-        ast::Type::ArrayType(array_type) => {
-            let ty = array_type.ty()?;
-            ty.syntax().text_range()
         }
         _ => return None,
     };

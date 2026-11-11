@@ -1250,7 +1250,7 @@ fn validate_array_expr(array_expr: &ast::ArrayExpr, acc: &mut Vec<SyntaxError>) 
         let range = TextRange::new(expr_range.start(), expr_range.start());
         acc.push(SyntaxError::new("array missing `array` keyword", range));
     }
-    if array_expr.l_paren_token().is_some() && !has_select_variant(array_expr.syntax()) {
+    if array_expr.l_paren_token().is_some() && !array_has_select_variant(array_expr) {
         let range = match array_expr.exprs().next() {
             Some(expr) => expr.syntax().text_range(),
             None => array_expr.syntax().text_range(),
@@ -1259,19 +1259,20 @@ fn validate_array_expr(array_expr: &ast::ArrayExpr, acc: &mut Vec<SyntaxError>) 
     }
 }
 
-fn has_select_variant(node: &SyntaxNode) -> bool {
-    node.children().any(|child| {
-        ast::SelectVariant::can_cast(child.kind())
-            || (child.kind() == PAREN_EXPR && has_select_variant(&child))
-    })
+fn array_has_select_variant(array_expr: &ast::ArrayExpr) -> bool {
+    array_expr.select_variant().is_some()
+        || array_expr.exprs().any(
+            |expr| matches!(expr, ast::Expr::ParenExpr(paren) if paren_has_select_variant(&paren)),
+        )
+}
+
+fn paren_has_select_variant(paren_expr: &ast::ParenExpr) -> bool {
+    paren_expr.select_variant().is_some()
+        || matches!(paren_expr.expr(), Some(ast::Expr::ParenExpr(paren)) if paren_has_select_variant(&paren))
 }
 
 fn validate_prefix_expr(prefix_expr: &ast::PrefixExpr, acc: &mut Vec<SyntaxError>) {
-    let Some(op) = prefix_expr
-        .syntax()
-        .children()
-        .find_map(ast::CustomOp::cast)
-    else {
+    let Some(ast::PrefixOp::CustomOp(op)) = prefix_expr.op() else {
         return;
     };
     validate_custom_op(&op, acc);

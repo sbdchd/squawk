@@ -5,7 +5,6 @@ use rustc_hash::FxHashSet;
 use squawk_syntax::ast;
 use squawk_syntax::ast::AstNode;
 
-use crate::visitors::is_serial_type;
 use crate::{Linter, Rule, Version, Violation};
 
 static NON_VOLATILE_FUNCS: LazyLock<FxHashSet<&'static str>> = LazyLock::new(|| {
@@ -103,7 +102,7 @@ pub(crate) fn adding_field_with_default(ctx: &mut Linter, file: &ast::SourceFile
             for action in alter_table.actions() {
                 if let ast::AlterTableAction::AddColumn(add_column) = action {
                     if let Some(ty) = add_column.ty()
-                        && is_serial_type(&ty)
+                        && ty.serial_type_name().is_some()
                     {
                         ctx.report(
                             Violation::for_node(
