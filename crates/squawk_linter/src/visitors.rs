@@ -2,17 +2,6 @@ use squawk_syntax::ast;
 
 use crate::Linter;
 
-fn is_serial_name(name: &str) -> bool {
-    matches!(
-        name,
-        "serial" | "serial2" | "serial4" | "serial8" | "smallserial" | "bigserial"
-    )
-}
-
-pub(crate) fn is_serial_type(ty: &ast::Type) -> bool {
-    is_not_valid_int_type(ty, is_serial_name)
-}
-
 pub(crate) fn is_not_valid_int_type(ty: &ast::Type, is_invalid_name: fn(&str) -> bool) -> bool {
     ty.element_type()
         .and_then(|ty| ty.path_ref())

@@ -1,7 +1,7 @@
 use std::{borrow::Cow, cmp::Ordering, fmt, fmt::Write};
 
 use num_bigint::BigUint;
-use squawk_syntax::identifier::{MAX_IDENT_BYTES, truncate_identifier};
+use squawk_syntax::identifier::{MAX_IDENT_BYTES, is_scanner_space, truncate_identifier};
 
 // see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/commands/indexcmds.c#L2644
 pub(crate) fn choose_relation_name(
@@ -102,11 +102,6 @@ pub(crate) fn join_names(names: impl Iterator<Item = impl fmt::Display>) -> Stri
         let _ = write!(joined, "{name}");
     }
     joined
-}
-
-// see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/parser/scansup.c#L105
-fn is_scanner_space(c: char) -> bool {
-    matches!(c, ' ' | '\t' | '\n' | '\r' | '\x0b' | '\x0c')
 }
 
 pub(crate) const BOOL_INPUTS: [&str; 6] = ["true", "false", "yes", "no", "on", "off"];

@@ -60,7 +60,8 @@ pub fn split_identifier_string(text: &str, separator: char) -> Option<Vec<Identi
     }
 }
 
-fn is_scanner_space(c: char) -> bool {
+// see: https://github.com/postgres/postgres/blob/b82d69abf64fc0c2fc6fdd491d7cecb8244680c2/src/backend/parser/scansup.c#L105
+pub fn is_scanner_space(c: char) -> bool {
     matches!(c, ' ' | '\t' | '\n' | '\r' | '\x0b' | '\x0c')
 }
 

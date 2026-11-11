@@ -132,6 +132,25 @@ pub enum SqlValueFunction {
     User,
 }
 
+impl SqlValueFunction {
+    pub fn keyword(self) -> &'static str {
+        match self {
+            SqlValueFunction::CurrentCatalog => "current_catalog",
+            SqlValueFunction::CurrentDate => "current_date",
+            SqlValueFunction::CurrentRole => "current_role",
+            SqlValueFunction::CurrentSchema => "current_schema",
+            SqlValueFunction::CurrentTime => "current_time",
+            SqlValueFunction::CurrentTimestamp => "current_timestamp",
+            SqlValueFunction::CurrentUser => "current_user",
+            SqlValueFunction::Localtime => "localtime",
+            SqlValueFunction::Localtimestamp => "localtimestamp",
+            SqlValueFunction::SessionUser => "session_user",
+            SqlValueFunction::SystemUser => "system_user",
+            SqlValueFunction::User => "user",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum FunctionLikeKeyword {
     Coalesce,
@@ -170,6 +189,24 @@ impl IntegerRadix {
             Self::Decimal => 10,
             Self::Hexadecimal => 16,
             Self::Octal => 8,
+        }
+    }
+
+    pub fn prefix(self) -> &'static str {
+        match self {
+            Self::Binary => "0b",
+            Self::Decimal => "",
+            Self::Hexadecimal => "0x",
+            Self::Octal => "0o",
+        }
+    }
+
+    pub fn name(self) -> &'static str {
+        match self {
+            Self::Binary => "binary",
+            Self::Decimal => "decimal",
+            Self::Hexadecimal => "hexadecimal",
+            Self::Octal => "octal",
         }
     }
 }

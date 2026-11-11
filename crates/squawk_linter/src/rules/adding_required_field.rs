@@ -1,6 +1,5 @@
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::visitors::is_serial_type;
 use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
 
 pub(crate) fn adding_required_field(ctx: &mut Linter, file: &ast::SourceFile) {
@@ -21,7 +20,10 @@ pub(crate) fn adding_required_field(ctx: &mut Linter, file: &ast::SourceFile) {
                     if has_generated_constrait(add_column.constraints()) {
                         continue;
                     }
-                    if add_column.ty().is_some_and(|ty| is_serial_type(&ty)) {
+                    if add_column
+                        .ty()
+                        .is_some_and(|ty| ty.serial_type_name().is_some())
+                    {
                         continue;
                     }
                     if has_not_null_and_no_default_constraint(add_column.constraints()) {

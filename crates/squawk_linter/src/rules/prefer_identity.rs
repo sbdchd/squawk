@@ -3,7 +3,7 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-use crate::visitors::{check_not_allowed_types, is_serial_type};
+use crate::visitors::check_not_allowed_types;
 
 fn replace_serial(serial_type: &str) -> &'static str {
     match serial_type {
@@ -23,7 +23,7 @@ fn create_identity_fix(ty: &ast::Type) -> Option<Fix> {
 
 fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
     if let Some(ty) = ty
-        && is_serial_type(&ty)
+        && ty.serial_type_name().is_some()
     {
         let fix = create_identity_fix(&ty);
 

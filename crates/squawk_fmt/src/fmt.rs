@@ -16609,20 +16609,7 @@ fn build_expr_name_ref<'a>(name_ref: &ast::NameRef) -> Doc<'a> {
     let Some(function) = name_ref.sql_value_function() else {
         return build_name(name_ref.syntax());
     };
-    Doc::text(match function {
-        ast::SqlValueFunction::CurrentCatalog => "current_catalog",
-        ast::SqlValueFunction::CurrentDate => "current_date",
-        ast::SqlValueFunction::CurrentRole => "current_role",
-        ast::SqlValueFunction::CurrentSchema => "current_schema",
-        ast::SqlValueFunction::CurrentTime => "current_time",
-        ast::SqlValueFunction::CurrentTimestamp => "current_timestamp",
-        ast::SqlValueFunction::CurrentUser => "current_user",
-        ast::SqlValueFunction::Localtime => "localtime",
-        ast::SqlValueFunction::Localtimestamp => "localtimestamp",
-        ast::SqlValueFunction::SessionUser => "session_user",
-        ast::SqlValueFunction::SystemUser => "system_user",
-        ast::SqlValueFunction::User => "user",
-    })
+    Doc::text(function.keyword())
 }
 
 fn build_array_expr<'a>(ctx: &Ctx, array_expr: &ast::ArrayExpr) -> Doc<'a> {
