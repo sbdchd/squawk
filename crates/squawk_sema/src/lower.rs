@@ -917,36 +917,6 @@ pub(crate) enum OutputClause {
     DistinctOn,
 }
 
-enum InList {
-    Single(ast::Expr),
-    Tuple(ast::TupleExpr),
-}
-
-impl InList {
-    fn new(rhs: &ast::Expr) -> Option<InList> {
-        if let ast::Expr::TupleExpr(tuple) = rhs {
-            return Some(InList::Tuple(tuple.clone()));
-        }
-        if let ast::Expr::ParenExpr(paren) = rhs
-            && paren.select_variant().is_none()
-            && let Some(expr) = paren.expr()
-        {
-            return Some(InList::Single(expr));
-        }
-        None
-    }
-
-    fn exprs(&self) -> impl Iterator<Item = ast::Expr> + '_ {
-        let (single, tuple) = match self {
-            InList::Single(expr) => (Some(expr.clone()), None),
-            InList::Tuple(tuple) => (None, Some(tuple)),
-        };
-        single
-            .into_iter()
-            .chain(tuple.into_iter().flat_map(ast::TupleExpr::exprs))
-    }
-}
-
 struct SelectParts {
     with_clause: Option<ast::WithClause>,
     select_clause: Option<ast::SelectClause>,
@@ -7515,17 +7485,17 @@ impl Lowerer {
         self.push_scope(query);
         let patterns = graph_table.path_pattern_list();
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
-            visit_path_primaries(&pattern, &mut |primary| {
-                self.declare_element_variable(graph, query, primary);
-            });
+            for primary in pattern.primaries() {
+                self.declare_element_variable(graph, query, &primary);
+            }
         }
         self.set_visible((0..self.scope_sources_len()).into());
         for pattern in patterns.iter().flat_map(|list| list.path_patterns()) {
-            visit_path_primaries(&pattern, &mut |primary| {
+            for primary in pattern.primaries() {
                 if let Some(expr) = primary.where_clause().and_then(|clause| clause.expr()) {
                     self.lower_condition(ConditionKind::GraphWhere, &expr);
                 }
-            });
+            }
         }
         if let Some(expr) = graph_table.where_clause().and_then(|clause| clause.expr()) {
             self.lower_condition(ConditionKind::GraphWhere, &expr);
@@ -20630,7 +20600,7 @@ impl Lowerer {
         op_range: TextRange,
         lhs: &ast::Expr,
         rhs: &ast::Expr,
-        list: &InList,
+        list: &ast::InList,
     ) -> Option<Ty> {
         let operator = comparison.operator();
         let lhs_ty = self.lower_expr(lhs);
@@ -23064,7 +23034,7 @@ impl Lowerer {
                     && let Some(lhs) = bin.lhs()
                     && !matches!(lhs, ast::Expr::TupleExpr(_))
                     && let Some(rhs) = bin.rhs()
-                    && let Some(list) = InList::new(&rhs)
+                    && let Some(list) = bin.in_list()
                 {
                     return self.lower_in_comparison(comparison, op_range, &lhs, &rhs, &list);
                 }
@@ -27289,20 +27259,6 @@ fn graph_element_live(
             .into_iter()
             .flatten()
             .all(|vertex| graph_element_live(elements, dropped_elements, dropped_tables, vertex))
-}
-
-fn visit_path_primaries(pattern: &ast::PathPattern, f: &mut impl FnMut(&ast::PathPrimary)) {
-    for primary in pattern
-        .path_factors()
-        .filter_map(|factor| factor.path_primary())
-    {
-        f(&primary);
-        if let ast::PathPrimary::ParenGraphPattern(paren) = &primary
-            && let Some(inner) = paren.path_pattern()
-        {
-            visit_path_primaries(&inner, f);
-        }
-    }
 }
 
 fn graph_element_kind(vertex_or_edge: Option<&ast::VertexOrEdge>) -> GraphElementKind {

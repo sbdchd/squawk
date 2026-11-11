@@ -24,7 +24,7 @@ pub(super) fn rewrite_in_as_expression(
     })?;
 
     let lhs = in_expr.lhs()?;
-    let ast::Expr::TupleExpr(tuple) = in_expr.rhs()? else {
+    let ast::InList::Tuple(tuple) = in_expr.in_list()? else {
         return None;
     };
     let items = tuple

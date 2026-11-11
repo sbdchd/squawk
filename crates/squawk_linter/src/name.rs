@@ -26,15 +26,10 @@ impl Name {
 }
 
 pub(crate) fn path_name(path: &ast::Path) -> SmallVec<[Name; 2]> {
-    let mut name: SmallVec<[Name; 2]> = path
-        .qualifier()
-        .into_iter()
-        .flat_map(|qualifier| qualifier.segments())
+    let mut name = path
+        .segments()
         .map(|segment| Name::from_node(&segment))
         .collect();
-    if let Some(segment) = path.segment() {
-        name.push(Name::from_node(&segment));
-    }
     strip_public_schema(&mut name);
     name
 }

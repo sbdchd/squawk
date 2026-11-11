@@ -42,7 +42,7 @@ pub use self::node_ext::{
 pub use self::{
     generated::tokens::*,
     node_ext::{
-        BinOp, CastKind, FunctionLikeKeyword, IntegerRadix, LitKind, OpSigOperand,
+        BinOp, CastKind, FunctionLikeKeyword, InList, IntegerRadix, LitKind, OpSigOperand,
         PartitionStrategyKind, PostfixOp, PrefixOp, RangeBoundKeyword, RoleKind, RuleEventKind,
         SqlValueFunction, UnnestCall, VertexOrEdgeKind,
     },
