@@ -16,7 +16,6 @@ doctest = false
 [dependencies]
 anyhow.workspace = true
 log.workspace = true
-simplelog.workspace = true
 lsp-server.workspace = true
 gen-lsp-types.workspace = true
 url.workspace = true

@@ -58,13 +58,14 @@ impl SyntaxNode {
         }
     }
 
+    #[must_use]
     pub fn clone_subtree(&self) -> SyntaxNode {
         let mut builder = GreenNodeBuilder::with_text_capacity(self.text_range().len().into());
         for event in self.preorder_with_tokens() {
             match event {
                 WalkEvent::Enter(NodeOrToken::Node(node)) => builder.start_node(node.kind()),
                 WalkEvent::Enter(NodeOrToken::Token(token)) => {
-                    builder.token(token.kind(), token.text())
+                    builder.token(token.kind(), token.text());
                 }
                 WalkEvent::Leave(NodeOrToken::Node(_)) => builder.finish_node(),
                 WalkEvent::Leave(NodeOrToken::Token(_)) => (),
@@ -130,6 +131,7 @@ impl SyntaxNode {
     }
 
     #[inline]
+    #[must_use]
     pub fn tree_top(&self) -> SyntaxNode {
         self.ancestors().last().unwrap()
     }
@@ -292,9 +294,7 @@ impl SyntaxNode {
         let range = self.text_range();
         assert!(
             range.start() <= offset && offset <= range.end(),
-            "Bad offset: range {:?} offset {:?}",
-            range,
-            offset
+            "Bad offset: range {range:?} offset {offset:?}"
         );
         if range.is_empty() {
             return TokenAtOffset::None;
@@ -704,7 +704,7 @@ impl Preorder {
                 WalkEvent::Leave(green.node_parent(first_child).unwrap())
             }
             WalkEvent::Leave(parent) => WalkEvent::Leave(parent),
-        })
+        });
     }
 
     #[inline]
@@ -779,7 +779,7 @@ impl PreorderWithTokens {
                 WalkEvent::Leave(ElementId::Node(element_parent(green, first_child).unwrap()))
             }
             WalkEvent::Leave(parent) => WalkEvent::Leave(parent),
-        })
+        });
     }
 
     #[inline]

@@ -37,8 +37,8 @@ impl<L: Language> fmt::Debug for SyntaxNode<L> {
                             write!(f, "  ")?;
                         }
                         match element {
-                            NodeOrToken::Node(node) => writeln!(f, "{:?}", node)?,
-                            NodeOrToken::Token(token) => writeln!(f, "{:?}", token)?,
+                            NodeOrToken::Node(node) => writeln!(f, "{node:?}")?,
+                            NodeOrToken::Token(token) => writeln!(f, "{token:?}")?,
                         }
                         level += 1;
                     }
@@ -69,7 +69,7 @@ impl<L: Language> fmt::Debug for SyntaxToken<L> {
         for idx in 21..25 {
             if text.is_char_boundary(idx) {
                 let text = format!("{} ...", &text[..idx]);
-                return write!(f, " {:?}", text);
+                return write!(f, " {text:?}");
             }
         }
         unreachable!()
@@ -126,6 +126,7 @@ impl<L: Language> SyntaxNode<L> {
         self.raw.ancestors().map(SyntaxNode::from)
     }
 
+    #[must_use]
     pub fn tree_top(&self) -> SyntaxNode<L> {
         SyntaxNode::from(self.raw.tree_top())
     }
@@ -263,6 +264,7 @@ impl<L: Language> SyntaxNode<L> {
     ///
     /// The parent of the returned node will be `None`, the start offset will be
     /// zero, but, otherwise, it'll be equivalent to the source node.
+    #[must_use]
     pub fn clone_subtree(&self) -> SyntaxNode<L> {
         SyntaxNode::from(self.raw.clone_subtree())
     }
@@ -426,7 +428,7 @@ pub struct Preorder<L: Language> {
 
 impl<L: Language> Preorder<L> {
     pub fn skip_subtree(&mut self) {
-        self.raw.skip_subtree()
+        self.raw.skip_subtree();
     }
 }
 
@@ -445,7 +447,7 @@ pub struct PreorderWithTokens<L: Language> {
 
 impl<L: Language> PreorderWithTokens<L> {
     pub fn skip_subtree(&mut self) {
-        self.raw.skip_subtree()
+        self.raw.skip_subtree();
     }
 }
 

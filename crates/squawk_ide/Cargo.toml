@@ -23,7 +23,6 @@ squawk-diagnostics.workspace = true
 squawk-rowan.workspace = true
 squawk-line-index.workspace = true
 annotate-snippets.workspace = true
-log.workspace = true
 smallvec.workspace = true
 rustc-hash.workspace = true
 

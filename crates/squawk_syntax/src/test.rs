@@ -34,7 +34,7 @@ pub(crate) fn render_errors(sql: &str, errors: &[SyntaxError]) -> String {
         if let Some(hint) = syntax_error.hint() {
             group = group.element(Level::HELP.with_name("hint").message(hint));
         }
-        let rendered_error = renderer.render(&[group]).clone();
+        let rendered_error = renderer.render(&[group]);
 
         rendered.push_str(&rendered_error);
         rendered.push('\n');
