@@ -10,7 +10,7 @@ mod reporter;
 use crate::cmd::Cmd;
 use crate::reporter::LintArgs;
 use anyhow::{Context, Result};
-use clap::{CommandFactory, Parser, Subcommand, ValueEnum};
+use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use debug::debug;
 use reporter::lint_and_report;
 use simplelog::CombinedLogger;
@@ -57,8 +57,35 @@ pub struct UploadToGithubArgs {
     github_pr_number: i64,
 }
 
+#[derive(Args, Debug)]
+pub struct CheckArgs {
+    /// Paths or patterns to search
+    #[arg(value_name = "path")]
+    path_patterns: Vec<String>,
+    /// Output debug format
+    #[arg(long, value_name = "format", ignore_case = true)]
+    debug: Option<DebugOption>,
+    /// Style of error reporting
+    #[arg(long, ignore_case = true)]
+    reporter: Option<Reporter>,
+    #[arg(long, value_name = "filepath")]
+    /// Path to use in reporting for stdin
+    stdin_filepath: Option<String>,
+}
+
+impl CheckArgs {
+    fn is_empty(&self) -> bool {
+        self.path_patterns.is_empty()
+            && self.debug.is_none()
+            && self.reporter.is_none()
+            && self.stdin_filepath.is_none()
+    }
+}
+
 #[derive(Subcommand, Debug)]
 pub enum Command {
+    /// Lint SQL files
+    Check(CheckArgs),
     /// Run the language server
     Server,
     /// Comment on a PR with Squawk's results.
@@ -86,9 +113,8 @@ pub enum Reporter {
 #[derive(Parser, Debug)]
 #[command(version)]
 struct Opts {
-    /// Paths or patterns to search
-    #[arg(value_name = "path")]
-    path_patterns: Vec<String>,
+    #[command(flatten)]
+    check: CheckArgs,
     /// Paths to exclude
     ///
     /// For example:
@@ -130,15 +156,6 @@ struct Opts {
     /// --pg-version=13.0
     #[arg(long, global = true)]
     pg_version: Option<Version>,
-    /// Output debug format
-    #[arg(long, value_name = "format", ignore_case = true)]
-    debug: Option<DebugOption>,
-    /// Style of error reporting
-    #[arg(long, ignore_case = true)]
-    reporter: Option<Reporter>,
-    #[arg(long, value_name = "filepath")]
-    /// Path to use in reporting for stdin
-    stdin_filepath: Option<String>,
     #[command(subcommand)]
     cmd: Option<Command>,
     /// Enable debug logging output
