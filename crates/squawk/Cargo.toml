@@ -35,6 +35,7 @@ squawk-server.workspace = true
 squawk-thread.workspace = true
 toml.workspace = true
 glob.workspace = true
+ignore.workspace = true
 rayon.workspace = true
 anyhow.workspace = true
 annotate-snippets.workspace = true
