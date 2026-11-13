@@ -13,6 +13,7 @@ import {
   semantic_tokens,
   semantic_tokens_legend,
   formatted_semantic_tokens,
+  wasmReady,
   DocumentSymbol,
   LocationRange,
 } from "./squawk"
@@ -361,7 +362,8 @@ export const semanticTokensProvider: monaco.languages.DocumentSemanticTokensProv
     getLegend() {
       return semantic_tokens_legend()
     },
-    provideDocumentSemanticTokens(model) {
+    async provideDocumentSemanticTokens(model) {
+      await wasmReady()
       // TODO: figure out if we can make this faster, it currently takes like
       // 10+ seconds on the builtins.sql
       if (model.getLineCount() > 2000) return null
@@ -385,7 +387,8 @@ export const formattedSemanticTokensProvider: monaco.languages.DocumentSemanticT
     getLegend() {
       return semantic_tokens_legend()
     },
-    provideDocumentSemanticTokens(model) {
+    async provideDocumentSemanticTokens(model) {
+      await wasmReady()
       if (model.getLineCount() > 2000) return null
       const content = model.getValue()
       if (!content) return null
