@@ -200,6 +200,11 @@ let isStartingAlready: { promise: Promise<unknown>; start: number } | null =
 
 export function init() {
   isStartingAlready = { promise: initWasm(), start: performance.now() }
+  return isStartingAlready.promise
+}
+
+export function wasmReady(): Promise<unknown> {
+  return isStartingAlready?.promise ?? init()
 }
 
 function useWasmStatus() {
