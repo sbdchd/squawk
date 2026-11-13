@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use clap::{CommandFactory, error::ErrorKind};
 use log::info;
 use serde::Deserialize;
 use squawk_linter::{Rule, Version};
@@ -9,7 +10,7 @@ use std::{
     process,
 };
 
-use crate::{Command, DebugOption, Opts, Reporter, UploadToGithubArgs};
+use crate::{CheckArgs, Command, DebugOption, Opts, Reporter, UploadToGithubArgs};
 
 const FILE_NAME: &str = ".squawk.toml";
 
@@ -133,21 +134,36 @@ impl Config {
 
         let is_stdin = !io::stdin().is_terminal();
 
+        let (check_args, upload_to_github_args) = match opts.cmd {
+            Some(Command::Check(args)) => {
+                if !opts.check.is_empty() {
+                    Opts::command()
+                        .error(
+                            ErrorKind::ArgumentConflict,
+                            "paths, `--debug`, `--reporter`, and `--stdin-filepath` must come after `check`",
+                        )
+                        .exit();
+                }
+                (args, None)
+            }
+            Some(Command::UploadToGithub(args)) => (opts.check, Some(*args)),
+            Some(Command::Server) | None => (opts.check, None),
+        };
+
         // TODO: we should support all of these in the config file as well
-        let debug = opts.debug;
         let verbose = opts.verbose;
-        let path_patterns = opts.path_patterns;
-        let reporter = opts.reporter.unwrap_or_default();
+        let CheckArgs {
+            path_patterns,
+            debug,
+            reporter,
+            stdin_filepath,
+        } = check_args;
+        let reporter = reporter.unwrap_or_default();
         // Don't want to corrupt the other reporters, see issue#1186
         let github_annotations = matches!(reporter, Reporter::Tty)
             && std::env::var("GITHUB_ACTIONS").is_ok()
             && std::env::var("SQUAWK_DISABLE_GITHUB_ANNOTATIONS").is_err();
-        let stdin_filepath = opts.stdin_filepath;
         let upload_to_github = conf.upload_to_github;
-        let upload_to_github_args = match opts.cmd {
-            Some(Command::UploadToGithub(args)) => Some(*args),
-            _ => None,
-        };
 
         Config {
             excluded_paths,
