@@ -5,7 +5,7 @@ resolver = "2"
 [workspace.package]
 version = "2.72.0"
 edition = "2024"
-rust-version = "1.99"
+rust-version = "1.100"
 authors = ["Squawk Team & Contributors"]
 license = "Apache-2.0 OR MIT"
 description = "Linter for Postgres migrations & SQL"
@@ -32,8 +32,6 @@ reqwest = { version = "0.11.27", features = [
 la-arena = "0.3.1"
 serde = { version = "1.0.215", features = ["derive"] }
 serde_json = "1.0"
-serde_plain = "1.0"
-serde_repr = "0.1"
 regex = "1.11.1"
 simplelog = "0.12.0"
 tempfile = "3.21.0"

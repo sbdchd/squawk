@@ -2,7 +2,7 @@ use std::{fmt, hash::Hash, iter::FusedIterator, ops::Range, slice, sync::Arc};
 
 use crate::{NodeOrToken, TextRange, TextSize};
 
-/// SyntaxKind is a type tag for each token or node.
+/// `SyntaxKind` is a type tag for each token or node.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct SyntaxKind(pub u16);
 
@@ -649,10 +649,8 @@ mod tests {
     }
 
     #[test]
-    fn test_size_of() {
-        use std::mem::size_of;
-
-        eprintln!("GreenNode          {}", size_of::<GreenNode>());
-        eprintln!("GreenNodeRef       {}", size_of::<GreenNodeRef<'_>>());
+    fn size_of() {
+        assert_eq!(std::mem::size_of::<GreenNode>(), 8);
+        assert_eq!(std::mem::size_of::<GreenNodeRef<'_>>(), 16);
     }
 }

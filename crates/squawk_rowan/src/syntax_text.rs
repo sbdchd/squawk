@@ -32,13 +32,15 @@ impl SyntaxText {
 
     pub fn find_char(&self, c: char) -> Option<TextSize> {
         let pos = self.as_str().find(c)?;
-        Some(TextSize::new(pos as u32))
+        TextSize::try_from(pos).ok()
     }
 
     pub fn char_at(&self, offset: TextSize) -> Option<char> {
         self.as_str().get(usize::from(offset)..)?.chars().next()
     }
 
+    #[must_use]
+    #[allow(clippy::needless_pass_by_value)]
     pub fn slice<R: private::SyntaxTextRange>(&self, range: R) -> SyntaxText {
         let start = range.start().unwrap_or_default();
         let end = range.end().unwrap_or(self.len());
@@ -80,7 +82,7 @@ impl SyntaxText {
     }
 
     pub fn for_each_chunk<F: FnMut(&str)>(&self, mut f: F) {
-        f(self.as_str())
+        f(self.as_str());
     }
 }
 
@@ -199,8 +201,8 @@ mod tests {
     fn build_tree(chunks: &[&str]) -> SyntaxNode {
         let mut builder = GreenNodeBuilder::new();
         builder.start_node(SyntaxKind(62));
-        for &chunk in chunks.iter() {
-            builder.token(SyntaxKind(92), chunk)
+        for &chunk in chunks {
+            builder.token(SyntaxKind(92), chunk);
         }
         builder.finish_node();
         SyntaxNode::new_root(builder.finish())
@@ -213,17 +215,13 @@ mod tests {
             let t2 = build_tree(t2).text();
             let expected = t1.to_string() == t2.to_string();
             let actual = t1 == t2;
-            assert_eq!(
-                expected, actual,
-                "`{}` (SyntaxText) `{}` (SyntaxText)",
-                t1, t2
-            );
+            assert_eq!(expected, actual, "`{t1}` (SyntaxText) `{t2}` (SyntaxText)");
             let actual = t1 == *t2.to_string();
-            assert_eq!(expected, actual, "`{}` (SyntaxText) `{}` (&str)", t1, t2);
+            assert_eq!(expected, actual, "`{t1}` (SyntaxText) `{t2}` (&str)");
         }
         fn check(t1: &[&str], t2: &[&str]) {
             do_check(t1, t2);
-            do_check(t2, t1)
+            do_check(t2, t1);
         }
 
         check(&[""], &[""]);

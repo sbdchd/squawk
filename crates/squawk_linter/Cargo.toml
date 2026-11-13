@@ -21,7 +21,6 @@ squawk-rowan.workspace = true
 serde.workspace = true
 enum-iterator.workspace = true
 squawk-line-index.workspace = true
-serde_plain.workspace = true
 annotate-snippets.workspace = true
 rustc-hash.workspace = true
 smallvec.workspace = true

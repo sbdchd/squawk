@@ -558,7 +558,7 @@ mod tests {
             if let Some(hint) = error.hint() {
                 group = group.element(Level::HELP.with_name("hint").message(hint));
             }
-            res.push_str(&renderer.render(&[group]).clone());
+            res.push_str(&renderer.render(&[group]));
             res.push('\n');
         }
 

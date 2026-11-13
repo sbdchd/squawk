@@ -39,6 +39,7 @@ pub trait AstNode {
 
     fn syntax(&self) -> &SyntaxNode<Self::Language>;
 
+    #[must_use]
     fn clone_subtree(&self) -> Self
     where
         Self: Sized,
@@ -172,7 +173,7 @@ impl<N: AstNode> Eq for AstPtr<N> {}
 
 impl<N: AstNode> Hash for AstPtr<N> {
     fn hash<H: Hasher>(&self, state: &mut H) {
-        self.raw.hash(state)
+        self.raw.hash(state);
     }
 }
 

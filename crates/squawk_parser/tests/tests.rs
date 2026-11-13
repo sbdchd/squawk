@@ -246,7 +246,7 @@ fn parse(text: &str) -> Parsed {
                     .fold(true)
                     .annotation(AnnotationKind::Primary.span(range.clone())),
             );
-            let rendered = renderer.render(&[group]).clone();
+            let rendered = renderer.render(&[group]);
 
             out.push_str(&rendered);
             out.push('\n');
