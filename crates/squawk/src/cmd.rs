@@ -1,5 +1,7 @@
 use std::{path::PathBuf, process};
 
+use clap::{CommandFactory, error::ErrorKind};
+
 use crate::{
     Command, config::Config, debug::DebugArgs, file_finding::find_paths, reporter::LintArgs,
 };
@@ -77,6 +79,26 @@ impl Cmd {
     }
 
     pub(crate) fn from(opts: crate::Opts) -> Cmd {
+        if !opts.check.is_empty() {
+            let message = match &opts.cmd {
+                Some(Command::Check(_)) => Some(
+                    "paths, `--debug`, `--reporter`, and `--stdin-filepath` must come after `check`",
+                ),
+                Some(Command::Server) => Some(
+                    "paths, `--debug`, `--reporter`, and `--stdin-filepath` cannot be used with `server`",
+                ),
+                Some(Command::UploadToGithub(_)) => Some(
+                    "paths, `--debug`, `--reporter`, and `--stdin-filepath` cannot be used with `upload-to-github`",
+                ),
+                None => None,
+            };
+            if let Some(message) = message {
+                crate::Opts::command()
+                    .error(ErrorKind::ArgumentConflict, message)
+                    .exit();
+            }
+        }
+
         match opts.cmd {
             Some(Command::Check(_)) | None => Cmd::check(Config::from(opts)),
             Some(Command::Server) => Cmd::Server,

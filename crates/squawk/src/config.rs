@@ -1,5 +1,4 @@
 use anyhow::{Context, Result};
-use clap::{CommandFactory, error::ErrorKind};
 use log::info;
 use serde::Deserialize;
 use squawk_linter::{Rule, Version};
@@ -135,17 +134,7 @@ impl Config {
         let is_stdin = !io::stdin().is_terminal();
 
         let (check_args, upload_to_github_args) = match opts.cmd {
-            Some(Command::Check(args)) => {
-                if !opts.check.is_empty() {
-                    Opts::command()
-                        .error(
-                            ErrorKind::ArgumentConflict,
-                            "paths, `--debug`, `--reporter`, and `--stdin-filepath` must come after `check`",
-                        )
-                        .exit();
-                }
-                (args, None)
-            }
+            Some(Command::Check(args)) => (args, None),
             Some(Command::UploadToGithub(args)) => (opts.check, Some(*args)),
             Some(Command::Server) | None => (opts.check, None),
         };
