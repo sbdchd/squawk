@@ -31,8 +31,8 @@ use crate::partition_bound::{
     range_value, range_values,
 };
 use crate::pg_float::{FloatInputError, FloatType};
+use crate::pg_int::{IntInputError, IntType};
 use crate::pg_numeric::{NumericInputError, NumericTypmod};
-use crate::postgres::{IntInputError, IntType};
 use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
 
@@ -75,7 +75,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    pg_bool, pg_float, pg_numeric, postgres,
+    pg_bool, pg_float, pg_int, pg_numeric, postgres,
 };
 
 impl Lowerer {
@@ -11762,7 +11762,7 @@ impl Lowerer {
         let Some(value) = literal.string_value() else {
             return;
         };
-        let error = match postgres::parse_int(&value, ty) {
+        let error = match pg_int::parse_int(&value, ty) {
             Ok(_) => return,
             Err(IntInputError::InvalidSyntax) => SemaError::InvalidIntValue {
                 ty,
@@ -27210,7 +27210,7 @@ fn typmod_value(expr: &ast::Expr) -> Option<i64> {
     }
     let literal = expr.as_literal()?;
     if literal.is_string() {
-        return postgres::parse_int(&literal.string_value()?, IntType::Int4).ok();
+        return pg_int::parse_int(&literal.string_value()?, IntType::Int4).ok();
     }
     i64::try_from(literal.integer_value_u64()?).ok()
 }

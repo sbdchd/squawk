@@ -16,8 +16,8 @@ use crate::expr_context::ExprContext;
 use crate::lookup::TableLookup;
 use crate::lower::OutputClause;
 use crate::pg_float::FloatType;
+use crate::pg_int::IntType;
 use crate::pg_numeric::NumericTypmod;
-use crate::postgres::IntType;
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
