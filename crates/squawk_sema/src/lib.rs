@@ -18,6 +18,7 @@ mod lookup;
 pub mod lower;
 pub mod overload;
 mod partition_bound;
+pub mod pg_bool;
 pub mod pg_float;
 pub mod pg_numeric;
 pub mod postgres;

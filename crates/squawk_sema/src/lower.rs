@@ -75,7 +75,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    pg_float, pg_numeric, postgres,
+    pg_bool, pg_float, pg_numeric, postgres,
 };
 
 impl Lowerer {
@@ -11804,7 +11804,7 @@ impl Lowerer {
         let Some(value) = literal.string_value() else {
             return;
         };
-        if postgres::parse_bool(&value).is_some() {
+        if pg_bool::parse_bool(&value).is_some() {
             return;
         }
         let error = SemaError::InvalidBoolValue {
@@ -27220,7 +27220,7 @@ fn similar_bool_input(value: &str) -> Option<&'static str> {
         return None;
     }
     find_best_match_for_name(
-        postgres::BOOL_INPUTS.iter().copied(),
+        pg_bool::BOOL_INPUTS.iter().copied(),
         |candidate| candidate,
         &value.to_ascii_lowercase_smolstr(),
         None,
