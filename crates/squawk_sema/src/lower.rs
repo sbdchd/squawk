@@ -75,7 +75,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    pg_bool, pg_float, pg_int, pg_numeric, postgres,
+    pg_bool, pg_float, pg_int, pg_names, pg_numeric,
 };
 
 impl Lowerer {
@@ -2172,7 +2172,7 @@ impl Lowerer {
         node: &SyntaxNode,
     ) -> TableId {
         let schema = self.index.tables[table].schema;
-        let name = postgres::choose_relation_name(
+        let name = pg_names::choose_relation_name(
             self.index.names.resolve(self.index.tables[table].name),
             Some(self.index.names.resolve(column)),
             "seq",
@@ -5938,7 +5938,7 @@ impl Lowerer {
                         addition.push_str("expr");
                     }
                 }
-                let name = postgres::choose_extended_statistic_name(
+                let name = pg_names::choose_extended_statistic_name(
                     self.index.names.resolve(table_name),
                     &addition,
                     |name| {
@@ -13275,7 +13275,7 @@ impl Lowerer {
 
     fn choose_array_name(&mut self, schema: Name, type_name: Name) -> Name {
         let name =
-            postgres::make_array_type_name(self.index.names.resolve(type_name), |candidate| {
+            pg_names::make_array_type_name(self.index.names.resolve(type_name), |candidate| {
                 self.index
                     .names
                     .lookup(candidate)
@@ -13644,7 +13644,7 @@ impl Lowerer {
     }
 
     fn intern_multirange_name(&mut self, range_name: Name) -> Name {
-        let name = postgres::make_multirange_type_name(self.index.names.resolve(range_name));
+        let name = pg_names::make_multirange_type_name(self.index.names.resolve(range_name));
         self.intern(&name)
     }
 
@@ -18242,7 +18242,7 @@ impl Lowerer {
                 };
                 let Table { schema, name, .. } = self.index.tables[table];
                 let addition = index_column_names(create_index);
-                let name = postgres::choose_relation_name(
+                let name = pg_names::choose_relation_name(
                     self.index.names.resolve(name),
                     Some(&addition),
                     "idx",
@@ -20382,7 +20382,7 @@ impl Lowerer {
         let name = unique
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
-        let addition = postgres::join_names(
+        let addition = pg_names::join_names(
             columns
                 .iter()
                 .map(|column| self.index.names.resolve(*column)),
@@ -21222,7 +21222,7 @@ impl Lowerer {
         {
             Some(name) => ConstraintName::Explicit(name),
             None => {
-                let addition = postgres::join_names(
+                let addition = pg_names::join_names(
                     columns
                         .iter()
                         .map(|column| self.index.names.resolve(*column)),
@@ -22179,7 +22179,7 @@ impl Lowerer {
         label: &str,
     ) -> Name {
         let schema = self.constraint_owner_schema(owner);
-        let name = postgres::choose_constraint_name(
+        let name = pg_names::choose_constraint_name(
             self.index.names.resolve(self.constraint_owner_name(owner)),
             addition,
             label,
@@ -26656,7 +26656,7 @@ impl Lowerer {
             (Some(name), _) => ConstraintName::Explicit(name),
             (None, Some(index)) => ConstraintName::Generated(self.index.indexes[index].name),
             (None, None) => {
-                let name = postgres::choose_relation_name(
+                let name = pg_names::choose_relation_name(
                     self.index.names.resolve(self.index.tables[table].name),
                     addition,
                     label,
@@ -27466,7 +27466,7 @@ fn index_column_names(create_index: &ast::CreateIndex) -> String {
                 .and_then(|include| include.partition_item_list()),
         )
         .flat_map(|list| list.partition_items());
-    postgres::join_names(items.map(
+    pg_names::join_names(items.map(
         |item| match item.expr().and_then(ColumnName::inferred_from_expr) {
             Some(ColumnName::Column(name) | ColumnName::UnknownColumn(Some(name))) => name,
             Some(ColumnName::UnknownColumn(None) | ColumnName::Star) | None => {
