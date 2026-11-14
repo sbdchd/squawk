@@ -572,6 +572,9 @@ pub(crate) enum SemaError {
     InvalidNumericValue {
         value: Name,
     },
+    InvalidUuidValue {
+        value: Name,
+    },
     NumericValueOutOfRange {
         value: Name,
         overflow: NumericOverflow,
@@ -1549,7 +1552,8 @@ impl SemaError {
             SemaError::InvalidBoolValue { .. }
             | SemaError::InvalidIntValue { .. }
             | SemaError::InvalidFloatValue { .. }
-            | SemaError::InvalidNumericValue { .. } => DiagnosticKind::InvalidLiteral,
+            | SemaError::InvalidNumericValue { .. }
+            | SemaError::InvalidUuidValue { .. } => DiagnosticKind::InvalidLiteral,
             SemaError::IntValueOutOfRange { .. }
             | SemaError::FloatValueOutOfRange { .. }
             | SemaError::NumericValueOutOfRange { .. } => DiagnosticKind::ValueOutOfRange,
@@ -3369,6 +3373,9 @@ impl fmt::Display for ErrorMessage<'_> {
             }
             SemaError::InvalidNumericValue { value } => {
                 write!(f, "invalid input value for type `numeric`: `{}`", n(value))
+            }
+            SemaError::InvalidUuidValue { value } => {
+                write!(f, "invalid input value for type `uuid`: `{}`", n(value))
             }
             SemaError::NumericValueOutOfRange {
                 value,

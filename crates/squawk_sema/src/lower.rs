@@ -75,7 +75,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    pg_bool, pg_float, pg_int, pg_names, pg_numeric,
+    pg_bool, pg_float, pg_int, pg_names, pg_numeric, pg_uuid,
 };
 
 impl Lowerer {
@@ -218,6 +218,7 @@ enum LiteralTarget {
     Int(IntType),
     Float(FloatType),
     Numeric(Option<NumericTypmod>),
+    Uuid,
 }
 
 #[derive(Clone, Copy)]
@@ -11659,6 +11660,7 @@ impl Lowerer {
             "numeric" => Some(LiteralTarget::Numeric(
                 typmod.map(|Typmod::Numeric(typmod)| typmod),
             )),
+            "uuid" => Some(LiteralTarget::Uuid),
             _ => None,
         }
     }
@@ -11684,6 +11686,7 @@ impl Lowerer {
             LiteralTarget::Int(ty) => self.check_int_value(ty, literal),
             LiteralTarget::Float(ty) => self.check_float_value(ty, literal),
             LiteralTarget::Numeric(typmod) => self.check_numeric_value(typmod, literal),
+            LiteralTarget::Uuid => self.check_uuid_value(literal),
         }
     }
 
@@ -11793,6 +11796,22 @@ impl Lowerer {
                 ty,
                 value: self.intern(&value),
             },
+        };
+        self.push_error(literal.syntax(), error);
+    }
+
+    fn check_uuid_value(&mut self, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        if pg_uuid::is_valid_uuid(&value) {
+            return;
+        }
+        let error = SemaError::InvalidUuidValue {
+            value: self.intern(&value),
         };
         self.push_error(literal.syntax(), error);
     }

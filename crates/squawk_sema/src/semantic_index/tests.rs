@@ -64,6 +64,7 @@ mod transforms;
 mod triggers;
 mod types;
 mod update;
+mod uuids;
 mod views;
 mod windows;
 

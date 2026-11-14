@@ -23,6 +23,7 @@ pub mod pg_float;
 pub mod pg_int;
 pub mod pg_names;
 pub mod pg_numeric;
+pub mod pg_uuid;
 pub mod qualified_index;
 pub mod sema_error;
 pub mod semantic_index;
