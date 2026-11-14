@@ -80,6 +80,7 @@ rayon = "1"
 libc = "0.2.171"
 tracing = "0.1.40"
 rustc-hash = "2.1.1"
+similar = "2.7.0"
 
 # local
 # we have to make the versions explicit otherwise `cargo publish` won't work
