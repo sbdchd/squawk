@@ -30,6 +30,7 @@ use crate::partition_bound::{
     BoundKeyType, ListValue, PartitionBound, PartitionKey, RangeValue, partition_bounds_overlap,
     range_value, range_values,
 };
+use crate::pg_float::{FloatInputError, FloatType};
 use crate::postgres::{IntInputError, IntType, NumericInputError, NumericTypmod};
 use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
@@ -73,7 +74,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    postgres,
+    pg_float, postgres,
 };
 
 impl Lowerer {
@@ -214,6 +215,7 @@ enum LiteralTarget {
     Enum(TypeId),
     Bool,
     Int(IntType),
+    Float(FloatType),
     Numeric(Option<NumericTypmod>),
 }
 
@@ -11651,6 +11653,8 @@ impl Lowerer {
             "int2" => Some(LiteralTarget::Int(IntType::Int2)),
             "int4" => Some(LiteralTarget::Int(IntType::Int4)),
             "int8" => Some(LiteralTarget::Int(IntType::Int8)),
+            "float4" => Some(LiteralTarget::Float(FloatType::Float4)),
+            "float8" => Some(LiteralTarget::Float(FloatType::Float8)),
             "numeric" => Some(LiteralTarget::Numeric(
                 typmod.map(|Typmod::Numeric(typmod)| typmod),
             )),
@@ -11677,6 +11681,7 @@ impl Lowerer {
             LiteralTarget::Enum(ty) => self.lower_enum_value(ty, literal),
             LiteralTarget::Bool => self.check_bool_value(literal),
             LiteralTarget::Int(ty) => self.check_int_value(ty, literal),
+            LiteralTarget::Float(ty) => self.check_float_value(ty, literal),
             LiteralTarget::Numeric(typmod) => self.check_numeric_value(typmod, literal),
         }
     }
@@ -11763,6 +11768,27 @@ impl Lowerer {
                 value: self.intern(&value),
             },
             Err(IntInputError::OutOfRange) => SemaError::IntValueOutOfRange {
+                ty,
+                value: self.intern(&value),
+            },
+        };
+        self.push_error(literal.syntax(), error);
+    }
+
+    fn check_float_value(&mut self, ty: FloatType, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        let error = match pg_float::check_float(&value, ty) {
+            Ok(()) => return,
+            Err(FloatInputError::InvalidSyntax) => SemaError::InvalidFloatValue {
+                ty,
+                value: self.intern(&value),
+            },
+            Err(FloatInputError::OutOfRange) => SemaError::FloatValueOutOfRange {
                 ty,
                 value: self.intern(&value),
             },

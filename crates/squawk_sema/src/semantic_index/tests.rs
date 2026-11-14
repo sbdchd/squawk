@@ -22,6 +22,7 @@ mod event_triggers;
 mod explain;
 mod extensions;
 mod field_selection;
+mod floats;
 mod foreign_data;
 mod function_overloads;
 mod functions;

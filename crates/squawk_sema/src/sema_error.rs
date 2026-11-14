@@ -15,6 +15,7 @@ use squawk_syntax::quote::{quote_ident, quote_string_literal};
 use crate::expr_context::ExprContext;
 use crate::lookup::TableLookup;
 use crate::lower::OutputClause;
+use crate::pg_float::FloatType;
 use crate::postgres::{IntType, NumericTypmod};
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
@@ -557,6 +558,14 @@ pub(crate) enum SemaError {
     },
     IntValueOutOfRange {
         ty: IntType,
+        value: Name,
+    },
+    InvalidFloatValue {
+        ty: FloatType,
+        value: Name,
+    },
+    FloatValueOutOfRange {
+        ty: FloatType,
         value: Name,
     },
     InvalidNumericValue {
@@ -1538,10 +1547,11 @@ impl SemaError {
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::InvalidBoolValue { .. }
             | SemaError::InvalidIntValue { .. }
+            | SemaError::InvalidFloatValue { .. }
             | SemaError::InvalidNumericValue { .. } => DiagnosticKind::InvalidLiteral,
-            SemaError::IntValueOutOfRange { .. } | SemaError::NumericValueOutOfRange { .. } => {
-                DiagnosticKind::ValueOutOfRange
-            }
+            SemaError::IntValueOutOfRange { .. }
+            | SemaError::FloatValueOutOfRange { .. }
+            | SemaError::NumericValueOutOfRange { .. } => DiagnosticKind::ValueOutOfRange,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
             | SemaError::StarNotComposite { .. }
@@ -3348,6 +3358,12 @@ impl fmt::Display for ErrorMessage<'_> {
                 write!(f, "invalid input value for type `{ty}`: `{}`", n(value))
             }
             SemaError::IntValueOutOfRange { ty, value } => {
+                write!(f, "value `{}` is out of range for type `{ty}`", n(value))
+            }
+            SemaError::InvalidFloatValue { ty, value } => {
+                write!(f, "invalid input value for type `{ty}`: `{}`", n(value))
+            }
+            SemaError::FloatValueOutOfRange { ty, value } => {
                 write!(f, "value `{}` is out of range for type `{ty}`", n(value))
             }
             SemaError::InvalidNumericValue { value } => {

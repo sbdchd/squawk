@@ -18,6 +18,7 @@ mod lookup;
 pub mod lower;
 pub mod overload;
 mod partition_bound;
+pub mod pg_float;
 pub mod postgres;
 pub mod qualified_index;
 pub mod sema_error;
