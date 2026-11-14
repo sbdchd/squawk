@@ -31,7 +31,8 @@ use crate::partition_bound::{
     range_value, range_values,
 };
 use crate::pg_float::{FloatInputError, FloatType};
-use crate::postgres::{IntInputError, IntType, NumericInputError, NumericTypmod};
+use crate::pg_numeric::{NumericInputError, NumericTypmod};
+use crate::postgres::{IntInputError, IntType};
 use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
 
@@ -74,7 +75,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    pg_float, postgres,
+    pg_float, pg_numeric, postgres,
 };
 
 impl Lowerer {
@@ -11728,7 +11729,7 @@ impl Lowerer {
         let Some(value) = literal.string_value() else {
             return;
         };
-        let overflow = match (postgres::check_numeric(&value, typmod), typmod) {
+        let overflow = match (pg_numeric::check_numeric(&value, typmod), typmod) {
             (Ok(()), _)
             | (Err(NumericInputError::FieldOverflow | NumericInputError::InfiniteOverflow), None) =>
             {
