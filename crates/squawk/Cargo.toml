@@ -27,6 +27,7 @@ simplelog.workspace = true
 log.workspace = true
 enum-iterator.workspace = true
 squawk-syntax.workspace = true
+squawk-fmt.workspace = true
 squawk-diagnostics.workspace = true
 squawk-linter.workspace = true
 squawk-lexer.workspace = true
@@ -41,6 +42,7 @@ anyhow.workspace = true
 annotate-snippets.workspace = true
 squawk-line-index.workspace = true
 lsp-server.workspace = true
+similar.workspace = true
 
 [dev-dependencies]
 insta.workspace = true

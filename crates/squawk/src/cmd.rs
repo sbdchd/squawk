@@ -2,8 +2,15 @@ use std::{path::PathBuf, process};
 
 use clap::{CommandFactory, error::ErrorKind};
 
+use squawk_fmt::FormatOptions;
+
 use crate::{
-    Command, config::Config, debug::DebugArgs, file_finding::find_paths, reporter::LintArgs,
+    Command, FormatArgs,
+    config::Config,
+    debug::DebugArgs,
+    file_finding::find_paths,
+    format::{FormatConfig, FormatMode},
+    reporter::LintArgs,
 };
 
 pub(crate) struct Stdin {
@@ -17,6 +24,7 @@ pub(crate) enum Input {
 
 pub(crate) enum Cmd {
     Debug(DebugArgs),
+    Format(FormatConfig),
     Lint(LintArgs),
     Help,
     None,
@@ -78,11 +86,52 @@ impl Cmd {
         }
     }
 
+    fn format(args: FormatArgs, mut conf: Config) -> Cmd {
+        let FormatArgs {
+            path_patterns,
+            check,
+            diff,
+            line_length,
+            exit_non_zero_on_format,
+            stdin_filepath,
+        } = args;
+        let mode = if diff {
+            FormatMode::Diff
+        } else if check {
+            FormatMode::Check
+        } else {
+            FormatMode::Write
+        };
+        let options = FormatOptions {
+            width: line_length,
+            ..FormatOptions::default()
+        };
+
+        conf.path_patterns = path_patterns;
+        conf.stdin_filepath = stdin_filepath;
+        let Some(input) = Cmd::read_input(&mut conf) else {
+            if conf.no_error_on_unmatched_pattern {
+                return Cmd::None;
+            }
+            return Cmd::Help;
+        };
+
+        Cmd::Format(FormatConfig {
+            input,
+            mode,
+            options,
+            exit_non_zero_on_format,
+        })
+    }
+
     pub(crate) fn from(opts: crate::Opts) -> Cmd {
         if !opts.check.is_empty() {
             let message = match &opts.cmd {
                 Some(Command::Check(_)) => Some(
                     "paths, `--debug`, `--reporter`, and `--stdin-filepath` must come after `check`",
+                ),
+                Some(Command::Format(_)) => Some(
+                    "paths, `--debug`, `--reporter`, and `--stdin-filepath` cannot be used before `format`",
                 ),
                 Some(Command::Server) => Some(
                     "paths, `--debug`, `--reporter`, and `--stdin-filepath` cannot be used with `server`",
@@ -101,6 +150,9 @@ impl Cmd {
 
         match opts.cmd {
             Some(Command::Check(_)) | None => Cmd::check(Config::from(opts)),
+            Some(Command::Format(args)) => {
+                Cmd::format(args, Config::from(crate::Opts { cmd: None, ..opts }))
+            }
             Some(Command::Server) => Cmd::Server,
             Some(Command::UploadToGithub(_)) => Cmd::UploadToGithub(Box::new(Config::from(opts))),
         }

@@ -5,6 +5,7 @@ mod config;
 mod debug;
 mod file;
 mod file_finding;
+mod format;
 mod github;
 mod reporter;
 use crate::cmd::Cmd;
@@ -14,6 +15,7 @@ use clap::{Args, CommandFactory, Parser, Subcommand, ValueEnum};
 use debug::debug;
 use reporter::lint_and_report;
 use simplelog::CombinedLogger;
+use squawk_fmt::FormatOptions;
 use squawk_linter::{Rule, Version};
 use squawk_thread::ThreadIntent;
 use std::io;
@@ -82,10 +84,37 @@ impl CheckArgs {
     }
 }
 
+#[derive(Args, Debug)]
+pub struct FormatArgs {
+    /// Paths or patterns to format
+    #[arg(value_name = "path")]
+    path_patterns: Vec<String>,
+    /// Don't write formatted files. Exit with a non-zero status code if any files
+    /// would have been modified
+    #[arg(long)]
+    check: bool,
+    /// Don't write formatted files. Print a diff of the changes and exit with a
+    /// non-zero status code if any files would have been modified
+    #[arg(long)]
+    diff: bool,
+    /// The line length where Squawk will try wrapping.
+    #[arg(long, default_value_t = FormatOptions::default().width)]
+    line_length: usize,
+    /// Exit with a non-zero status code if any files were modified via format, even if all files
+    /// were formatted successfully
+    #[arg(long)]
+    exit_non_zero_on_format: bool,
+    /// Path to use in reporting for stdin
+    #[arg(long, value_name = "filepath")]
+    stdin_filepath: Option<String>,
+}
+
 #[derive(Subcommand, Debug)]
 pub enum Command {
     /// Lint SQL files
     Check(CheckArgs),
+    /// Format SQL files
+    Format(FormatArgs),
     /// Run the language server
     Server,
     /// Comment on a PR with Squawk's results.
@@ -257,6 +286,9 @@ Please open an issue at https://github.com/sbdchd/squawk/issues/new with the log
             let stdout = io::stdout();
             let mut handle = stdout.lock();
             return lint_and_report(&mut handle, &lint_args);
+        }
+        Cmd::Format(format_config) => {
+            return format::format(&format_config);
         }
         Cmd::Help => {
             Opts::command().print_long_help()?;

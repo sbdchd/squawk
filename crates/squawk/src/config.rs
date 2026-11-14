@@ -136,7 +136,7 @@ impl Config {
         let (check_args, upload_to_github_args) = match opts.cmd {
             Some(Command::Check(args)) => (args, None),
             Some(Command::UploadToGithub(args)) => (opts.check, Some(*args)),
-            Some(Command::Server) | None => (opts.check, None),
+            Some(Command::Format(_) | Command::Server) | None => (opts.check, None),
         };
 
         // TODO: we should support all of these in the config file as well
