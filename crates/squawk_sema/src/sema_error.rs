@@ -17,6 +17,7 @@ use crate::lookup::TableLookup;
 use crate::lower::OutputClause;
 use crate::pg_float::FloatType;
 use crate::pg_int::IntType;
+use crate::pg_json::JsonType;
 use crate::pg_numeric::NumericTypmod;
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
@@ -575,6 +576,10 @@ pub(crate) enum SemaError {
     InvalidUuidValue {
         value: Name,
     },
+    InvalidJsonValue {
+        ty: JsonType,
+    },
+    UnsupportedJsonEscape,
     NumericValueOutOfRange {
         value: Name,
         overflow: NumericOverflow,
@@ -1553,7 +1558,9 @@ impl SemaError {
             | SemaError::InvalidIntValue { .. }
             | SemaError::InvalidFloatValue { .. }
             | SemaError::InvalidNumericValue { .. }
-            | SemaError::InvalidUuidValue { .. } => DiagnosticKind::InvalidLiteral,
+            | SemaError::InvalidUuidValue { .. }
+            | SemaError::InvalidJsonValue { .. }
+            | SemaError::UnsupportedJsonEscape => DiagnosticKind::InvalidLiteral,
             SemaError::IntValueOutOfRange { .. }
             | SemaError::FloatValueOutOfRange { .. }
             | SemaError::NumericValueOutOfRange { .. } => DiagnosticKind::ValueOutOfRange,
@@ -3376,6 +3383,10 @@ impl fmt::Display for ErrorMessage<'_> {
             }
             SemaError::InvalidUuidValue { value } => {
                 write!(f, "invalid input value for type `uuid`: `{}`", n(value))
+            }
+            SemaError::InvalidJsonValue { ty } => write!(f, "invalid input value for type `{ty}`"),
+            SemaError::UnsupportedJsonEscape => {
+                write!(f, r"unsupported Unicode escape `\u0000` for type `jsonb`")
             }
             SemaError::NumericValueOutOfRange {
                 value,

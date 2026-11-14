@@ -32,6 +32,7 @@ mod insert;
 mod ints;
 mod items;
 mod joins;
+mod jsons;
 mod languages;
 mod merge;
 mod numerics;

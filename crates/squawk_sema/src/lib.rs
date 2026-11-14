@@ -21,6 +21,7 @@ mod partition_bound;
 pub mod pg_bool;
 pub mod pg_float;
 pub mod pg_int;
+pub mod pg_json;
 pub mod pg_names;
 pub mod pg_numeric;
 pub mod pg_uuid;

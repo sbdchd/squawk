@@ -32,6 +32,7 @@ use crate::partition_bound::{
 };
 use crate::pg_float::{FloatInputError, FloatType};
 use crate::pg_int::{IntInputError, IntType};
+use crate::pg_json::{JsonInputError, JsonType};
 use crate::pg_numeric::{NumericInputError, NumericTypmod};
 use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
@@ -75,7 +76,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    pg_bool, pg_float, pg_int, pg_names, pg_numeric, pg_uuid,
+    pg_bool, pg_float, pg_int, pg_json, pg_names, pg_numeric, pg_uuid,
 };
 
 impl Lowerer {
@@ -219,6 +220,7 @@ enum LiteralTarget {
     Float(FloatType),
     Numeric(Option<NumericTypmod>),
     Uuid,
+    Json(JsonType),
 }
 
 #[derive(Clone, Copy)]
@@ -11661,6 +11663,8 @@ impl Lowerer {
                 typmod.map(|Typmod::Numeric(typmod)| typmod),
             )),
             "uuid" => Some(LiteralTarget::Uuid),
+            "json" => Some(LiteralTarget::Json(JsonType::Json)),
+            "jsonb" => Some(LiteralTarget::Json(JsonType::Jsonb)),
             _ => None,
         }
     }
@@ -11687,6 +11691,7 @@ impl Lowerer {
             LiteralTarget::Float(ty) => self.check_float_value(ty, literal),
             LiteralTarget::Numeric(typmod) => self.check_numeric_value(typmod, literal),
             LiteralTarget::Uuid => self.check_uuid_value(literal),
+            LiteralTarget::Json(ty) => self.check_json_value(ty, literal),
         }
     }
 
@@ -11814,6 +11819,38 @@ impl Lowerer {
             value: self.intern(&value),
         };
         self.push_error(literal.syntax(), error);
+    }
+
+    fn check_json_value(&mut self, ty: JsonType, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.decoded_value() else {
+            return;
+        };
+        let (range, error) = match pg_json::check_json(value.text(), ty) {
+            Ok(()) => return,
+            Err(JsonInputError::InvalidSyntax { range }) => {
+                (range, SemaError::InvalidJsonValue { ty })
+            }
+            Err(JsonInputError::UnsupportedEscape { range }) => {
+                (Some(range), SemaError::UnsupportedJsonEscape)
+            }
+            Err(JsonInputError::NumericOverflow { range }) => (
+                Some(range),
+                SemaError::NumericValueOutOfRange {
+                    value: self.intern(&value.text()[range]),
+                    overflow: NumericOverflow::Format,
+                },
+            ),
+        };
+        match range {
+            Some(range) => self.push_error_at(
+                InIrFile::new(self.file_id, value.source_range(range)),
+                error,
+            ),
+            None => self.push_error(literal.syntax(), error),
+        }
     }
 
     fn check_bool_value(&mut self, literal: &ast::Literal) {

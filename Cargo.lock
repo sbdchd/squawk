@@ -2616,6 +2616,8 @@ dependencies = [
  "la-arena",
  "num-bigint",
  "rustc-hash",
+ "serde",
+ "serde_json",
  "smallvec",
  "smol_str",
  "squawk-diagnostics",
