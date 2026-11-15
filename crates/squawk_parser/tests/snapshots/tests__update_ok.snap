@@ -77,7 +77,7 @@ SOURCE_FILE
                 NUMERIC_NUMBER "1.10"
     SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMENT "-- set muliple"
+  COMMENT "-- set multiple"
   WHITESPACE "\n"
   UPDATE
     UPDATE_KW "update"

@@ -194,7 +194,7 @@ as ''
 language sql;
 
 
--- suport
+-- support
 create function f()
 returns void
 support foo.bar

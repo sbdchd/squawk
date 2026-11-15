@@ -236,7 +236,7 @@ impl<L: Language> SyntaxNode<L> {
     }
 
     /// Find a token in the subtree corresponding to this node, which covers the offset.
-    /// Precondition: offset must be withing node's range.
+    /// Precondition: offset must be within node's range.
     pub fn token_at_offset(&self, offset: TextSize) -> TokenAtOffset<SyntaxToken<L>> {
         self.raw.token_at_offset(offset).map(SyntaxToken::from)
     }
@@ -244,7 +244,7 @@ impl<L: Language> SyntaxNode<L> {
     /// Return the deepest node or token in the current subtree that fully
     /// contains the range. If the range is empty and is contained in two leaf
     /// nodes, either one can be returned. Precondition: range must be contained
-    /// withing the current node
+    /// within the current node
     pub fn covering_element(&self, range: TextRange) -> SyntaxElement<L> {
         NodeOrToken::from(self.raw.covering_element(range))
     }
@@ -252,7 +252,7 @@ impl<L: Language> SyntaxNode<L> {
     /// Finds a [`SyntaxElement`] which intersects with a given `range`. If
     /// there are several intersecting elements, any one can be returned.
     ///
-    /// The method uses binary search internally, so it's complexity is
+    /// The method uses binary search internally, so its complexity is
     /// `O(log(N))` where `N = self.children_with_tokens().count()`.
     pub fn child_or_token_at_range(&self, range: TextRange) -> Option<SyntaxElement<L>> {
         self.raw
@@ -326,11 +326,11 @@ impl<L: Language> SyntaxToken<L> {
             .map(SyntaxElement::from)
     }
 
-    /// Next token in the tree (i.e, not necessary a sibling).
+    /// Next token in the tree (i.e., not necessarily a sibling).
     pub fn next_token(&self) -> Option<SyntaxToken<L>> {
         self.raw.next_token().map(SyntaxToken::from)
     }
-    /// Previous token in the tree (i.e, not necessary a sibling).
+    /// Previous token in the tree (i.e., not necessarily a sibling).
     pub fn prev_token(&self) -> Option<SyntaxToken<L>> {
         self.raw.prev_token().map(SyntaxToken::from)
     }

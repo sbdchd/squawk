@@ -284,7 +284,7 @@ function initialMode(): Mode | null {
 
 // pulling this into its own function due to gap in react compiler
 // https://github.com/facebook/react/issues/34761
-// this avoid a de-opt
+// this avoids a de-opt
 function saveMode(mode: Mode | null) {
   try {
     localStorage.setItem("play-mode-v1", mode ?? "none")

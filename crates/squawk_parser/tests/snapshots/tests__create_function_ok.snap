@@ -1463,7 +1463,7 @@ SOURCE_FILE
           SQL_KW "sql"
     SEMICOLON ";"
   WHITESPACE "\n\n\n"
-  COMMENT "-- suport"
+  COMMENT "-- support"
   WHITESPACE "\n"
   CREATE_FUNCTION
     CREATE_KW "create"

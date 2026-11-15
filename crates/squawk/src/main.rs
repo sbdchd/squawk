@@ -213,9 +213,9 @@ struct Opts {
 const STACK_SIZE: usize = 1024 * 1024 * 8;
 
 // rust-analyzer and ty both spawn an extra latency sensitive thread to run the
-// language server. This is approach is taken directly from rust-analyzer.
+// language server. This approach is taken directly from rust-analyzer.
 //
-/// Parts of server can use a lot of stack space, and some operating systems only
+/// Parts of the server can use a lot of stack space, and some operating systems only
 /// give us 1 MB by default (for example Windows), so this spawns a new thread
 /// with a larger stack for the LSP server loop.
 fn with_extra_thread(
@@ -240,7 +240,7 @@ fn main() -> Result<ExitCode> {
         // Don't use `eprintln` because `eprintln` itself may panic if the pipe is broken.
         let mut stderr = std::io::stderr().lock();
         let open_an_issue = format!(
-            r#"An internal error has occured with Squawk v{version}!
+            r#"An internal error has occurred with Squawk v{version}!
 Please open an issue at https://github.com/sbdchd/squawk/issues/new with the logs above!
 "#
         );

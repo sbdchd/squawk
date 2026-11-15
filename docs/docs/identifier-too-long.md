@@ -7,7 +7,7 @@ title: identifier-too-long
 
 Postgres will truncate identifiers longer than 63 bytes and return a notice.
 
-This can result in suprising behavior as the names you provide aren't the names that Postgres uses.
+This can result in surprising behavior as the names you provide aren't the names that Postgres uses.
 
 ```sql
 -- table name is 65 bytes and will be silently truncated to 63

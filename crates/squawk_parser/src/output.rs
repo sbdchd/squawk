@@ -33,14 +33,14 @@ use crate::SyntaxKind;
 /// Use the [`Output::iter`] method to iterate over traversal steps and consume
 /// a syntax tree.
 ///
-/// In a sense, this is just a sequence of [`SyntaxKind`]-colored parenthesis
+/// In a sense, this is just a sequence of [`SyntaxKind`]-colored parentheses
 /// interspersed into the original [`crate::Input`]. The output is fundamentally
 /// coordinated with the input and `n_input_tokens` refers to the number of
 /// times [`crate::Input::push`] was called.
 #[derive(Default)]
 pub struct Output {
     /// 32-bit encoding of events. If LSB is zero, then that's an index into the
-    /// error vector. Otherwise, it's one of the thee other variants, with data encoded as
+    /// error vector. Otherwise, it's one of the three other variants, with data encoded as
     ///
     ///     |16 bit kind|8 bit n_input_tokens|4 bit tag|4 bit leftover|
     ///

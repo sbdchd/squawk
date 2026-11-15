@@ -68,7 +68,7 @@ impl<F: FnMut(StrStep<'_>)> Builder<'_, '_, F> {
         match mem::replace(&mut self.state, State::Normal) {
             State::PendingEnter => {
                 (self.sink)(StrStep::Enter { kind });
-                // No need to attach trivias to previous node: there is no
+                // No need to attach trivia to previous node: there is no
                 // previous node.
                 return;
             }
@@ -113,7 +113,7 @@ impl LexedStr<'_> {
             let kind = self.kind(i);
             if kind.is_trivia() {
                 was_joint = false;
-                // skip over any triva since the parser shouldn't have to deal
+                // skip over any trivia since the parser shouldn't have to deal
                 // with it
             } else {
                 if was_joint {

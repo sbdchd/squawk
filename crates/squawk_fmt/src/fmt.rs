@@ -17003,7 +17003,7 @@ fn build_path_pattern<'a>(ctx: &Ctx, pattern: &ast::PathPattern) -> Doc<'a> {
                 Some(ast::PathPrimary::EdgeAny(_) | ast::PathPrimary::EdgeRight(_))
             );
             doc = doc.append(if prev_ends_with_minus && starts_with_minus {
-                // avoid accidently making a line comment
+                // avoid accidentally making a line comment
                 Doc::line_or_space()
             } else {
                 Doc::line_or_nil()

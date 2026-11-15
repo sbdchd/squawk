@@ -179,7 +179,7 @@ impl Cursor<'_> {
                 TokenKind::Literal { kind }
             }
 
-            // Quoted indentifiers
+            // Quoted identifiers
             '"' => {
                 let terminated = self.double_quoted_string();
                 TokenKind::QuotedIdent {
@@ -575,7 +575,7 @@ impl Cursor<'_> {
             }
         }
 
-        // we have a dollar quoted string deliminated with `$$`
+        // we have a dollar quoted string delimited with `$$`
         if start.is_empty() {
             loop {
                 self.eat_until(b'$');

@@ -5,7 +5,7 @@ update products set price = 10 where price = 5;
 -- no where
 UPDATE products SET price = price * 1.10;
 
--- set muliple
+-- set multiple
 update mytable set a = 5, b = 3, c = 1 where a > 0;
 
 -- sub_select

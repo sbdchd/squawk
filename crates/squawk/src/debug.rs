@@ -46,7 +46,7 @@ pub(crate) fn debug<W: io::Write>(f: &mut W, args: DebugArgs) -> Result<()> {
                     for syntax_error in &errors {
                         let range = syntax_error.range();
                         let text = syntax_error.message();
-                        // split into there own lines so that we can just grep
+                        // split into their own lines so that we can just grep
                         // for error without hitting this part
                         snap += "\n";
                         snap += "ERROR";

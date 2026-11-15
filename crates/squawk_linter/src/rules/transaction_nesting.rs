@@ -146,7 +146,7 @@ BEGIN;
 SELECT 1;
 COMMIT;
 -- This probably shouldn't be done in a migration. However, Squawk may be linting several
--- migrations that are concatentated, so don't raise a warning here.
+-- migrations that are concatenated, so don't raise a warning here.
 BEGIN;
 SELECT 2;
 COMMIT;
