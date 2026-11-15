@@ -8,7 +8,7 @@ use squawk_syntax::{AstPtr, SyntaxNodePtr, ast, sql_body::SqlBody};
 use crate::arena::{IdxRange, LayeredArena};
 use crate::file::{InIrFile, IrFileId, IrFileRange};
 use crate::interner::Name;
-use crate::postgres::NumericTypmod;
+use crate::pg_numeric::NumericTypmod;
 
 pub(crate) type QueryId = Idx<Query>;
 pub type ScopeId = Idx<Scope>;

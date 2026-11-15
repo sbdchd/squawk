@@ -30,7 +30,10 @@ use crate::partition_bound::{
     BoundKeyType, ListValue, PartitionBound, PartitionKey, RangeValue, partition_bounds_overlap,
     range_value, range_values,
 };
-use crate::postgres::{IntInputError, IntType, NumericInputError, NumericTypmod};
+use crate::pg_float::{FloatInputError, FloatType};
+use crate::pg_int::{IntInputError, IntType};
+use crate::pg_json::{JsonInputError, JsonType};
+use crate::pg_numeric::{NumericInputError, NumericTypmod};
 use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
 
@@ -73,7 +76,7 @@ use crate::{
         ArgCount, ArgMismatch, ArgType, BuiltinTypes, CallArg, CallMismatch, Coercion, CommonType,
         CommonTypeResult, MissingParam, Overloads,
     },
-    postgres,
+    pg_bool, pg_float, pg_int, pg_json, pg_names, pg_numeric, pg_uuid,
 };
 
 impl Lowerer {
@@ -214,7 +217,10 @@ enum LiteralTarget {
     Enum(TypeId),
     Bool,
     Int(IntType),
+    Float(FloatType),
     Numeric(Option<NumericTypmod>),
+    Uuid,
+    Json(JsonType),
 }
 
 #[derive(Clone, Copy)]
@@ -2169,7 +2175,7 @@ impl Lowerer {
         node: &SyntaxNode,
     ) -> TableId {
         let schema = self.index.tables[table].schema;
-        let name = postgres::choose_relation_name(
+        let name = pg_names::choose_relation_name(
             self.index.names.resolve(self.index.tables[table].name),
             Some(self.index.names.resolve(column)),
             "seq",
@@ -5935,7 +5941,7 @@ impl Lowerer {
                         addition.push_str("expr");
                     }
                 }
-                let name = postgres::choose_extended_statistic_name(
+                let name = pg_names::choose_extended_statistic_name(
                     self.index.names.resolve(table_name),
                     &addition,
                     |name| {
@@ -11651,9 +11657,14 @@ impl Lowerer {
             "int2" => Some(LiteralTarget::Int(IntType::Int2)),
             "int4" => Some(LiteralTarget::Int(IntType::Int4)),
             "int8" => Some(LiteralTarget::Int(IntType::Int8)),
+            "float4" => Some(LiteralTarget::Float(FloatType::Float4)),
+            "float8" => Some(LiteralTarget::Float(FloatType::Float8)),
             "numeric" => Some(LiteralTarget::Numeric(
                 typmod.map(|Typmod::Numeric(typmod)| typmod),
             )),
+            "uuid" => Some(LiteralTarget::Uuid),
+            "json" => Some(LiteralTarget::Json(JsonType::Json)),
+            "jsonb" => Some(LiteralTarget::Json(JsonType::Jsonb)),
             _ => None,
         }
     }
@@ -11677,7 +11688,10 @@ impl Lowerer {
             LiteralTarget::Enum(ty) => self.lower_enum_value(ty, literal),
             LiteralTarget::Bool => self.check_bool_value(literal),
             LiteralTarget::Int(ty) => self.check_int_value(ty, literal),
+            LiteralTarget::Float(ty) => self.check_float_value(ty, literal),
             LiteralTarget::Numeric(typmod) => self.check_numeric_value(typmod, literal),
+            LiteralTarget::Uuid => self.check_uuid_value(literal),
+            LiteralTarget::Json(ty) => self.check_json_value(ty, literal),
         }
     }
 
@@ -11723,7 +11737,7 @@ impl Lowerer {
         let Some(value) = literal.string_value() else {
             return;
         };
-        let overflow = match (postgres::check_numeric(&value, typmod), typmod) {
+        let overflow = match (pg_numeric::check_numeric(&value, typmod), typmod) {
             (Ok(()), _)
             | (Err(NumericInputError::FieldOverflow | NumericInputError::InfiniteOverflow), None) =>
             {
@@ -11756,7 +11770,7 @@ impl Lowerer {
         let Some(value) = literal.string_value() else {
             return;
         };
-        let error = match postgres::parse_int(&value, ty) {
+        let error = match pg_int::parse_int(&value, ty) {
             Ok(_) => return,
             Err(IntInputError::InvalidSyntax) => SemaError::InvalidIntValue {
                 ty,
@@ -11770,6 +11784,75 @@ impl Lowerer {
         self.push_error(literal.syntax(), error);
     }
 
+    fn check_float_value(&mut self, ty: FloatType, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        let error = match pg_float::check_float(&value, ty) {
+            Ok(()) => return,
+            Err(FloatInputError::InvalidSyntax) => SemaError::InvalidFloatValue {
+                ty,
+                value: self.intern(&value),
+            },
+            Err(FloatInputError::OutOfRange) => SemaError::FloatValueOutOfRange {
+                ty,
+                value: self.intern(&value),
+            },
+        };
+        self.push_error(literal.syntax(), error);
+    }
+
+    fn check_uuid_value(&mut self, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.string_value() else {
+            return;
+        };
+        if pg_uuid::is_valid_uuid(&value) {
+            return;
+        }
+        let error = SemaError::InvalidUuidValue {
+            value: self.intern(&value),
+        };
+        self.push_error(literal.syntax(), error);
+    }
+
+    fn check_json_value(&mut self, ty: JsonType, literal: &ast::Literal) {
+        if !literal.is_string() {
+            return;
+        }
+        let Some(value) = literal.decoded_value() else {
+            return;
+        };
+        let (range, error) = match pg_json::check_json(value.text(), ty) {
+            Ok(()) => return,
+            Err(JsonInputError::InvalidSyntax { range }) => {
+                (range, SemaError::InvalidJsonValue { ty })
+            }
+            Err(JsonInputError::UnsupportedEscape { range }) => {
+                (Some(range), SemaError::UnsupportedJsonEscape)
+            }
+            Err(JsonInputError::NumericOverflow { range }) => (
+                Some(range),
+                SemaError::NumericValueOutOfRange {
+                    value: self.intern(&value.text()[range]),
+                    overflow: NumericOverflow::Format,
+                },
+            ),
+        };
+        match range {
+            Some(range) => self.push_error_at(
+                InIrFile::new(self.file_id, value.source_range(range)),
+                error,
+            ),
+            None => self.push_error(literal.syntax(), error),
+        }
+    }
+
     fn check_bool_value(&mut self, literal: &ast::Literal) {
         if !literal.is_string() {
             return;
@@ -11777,7 +11860,7 @@ impl Lowerer {
         let Some(value) = literal.string_value() else {
             return;
         };
-        if postgres::parse_bool(&value).is_some() {
+        if pg_bool::parse_bool(&value).is_some() {
             return;
         }
         let error = SemaError::InvalidBoolValue {
@@ -13248,7 +13331,7 @@ impl Lowerer {
 
     fn choose_array_name(&mut self, schema: Name, type_name: Name) -> Name {
         let name =
-            postgres::make_array_type_name(self.index.names.resolve(type_name), |candidate| {
+            pg_names::make_array_type_name(self.index.names.resolve(type_name), |candidate| {
                 self.index
                     .names
                     .lookup(candidate)
@@ -13617,7 +13700,7 @@ impl Lowerer {
     }
 
     fn intern_multirange_name(&mut self, range_name: Name) -> Name {
-        let name = postgres::make_multirange_type_name(self.index.names.resolve(range_name));
+        let name = pg_names::make_multirange_type_name(self.index.names.resolve(range_name));
         self.intern(&name)
     }
 
@@ -18215,7 +18298,7 @@ impl Lowerer {
                 };
                 let Table { schema, name, .. } = self.index.tables[table];
                 let addition = index_column_names(create_index);
-                let name = postgres::choose_relation_name(
+                let name = pg_names::choose_relation_name(
                     self.index.names.resolve(name),
                     Some(&addition),
                     "idx",
@@ -20355,7 +20438,7 @@ impl Lowerer {
         let name = unique
             .constraint_name_clause()
             .and_then(|clause| clause.constraint_name());
-        let addition = postgres::join_names(
+        let addition = pg_names::join_names(
             columns
                 .iter()
                 .map(|column| self.index.names.resolve(*column)),
@@ -21195,7 +21278,7 @@ impl Lowerer {
         {
             Some(name) => ConstraintName::Explicit(name),
             None => {
-                let addition = postgres::join_names(
+                let addition = pg_names::join_names(
                     columns
                         .iter()
                         .map(|column| self.index.names.resolve(*column)),
@@ -22152,7 +22235,7 @@ impl Lowerer {
         label: &str,
     ) -> Name {
         let schema = self.constraint_owner_schema(owner);
-        let name = postgres::choose_constraint_name(
+        let name = pg_names::choose_constraint_name(
             self.index.names.resolve(self.constraint_owner_name(owner)),
             addition,
             label,
@@ -26629,7 +26712,7 @@ impl Lowerer {
             (Some(name), _) => ConstraintName::Explicit(name),
             (None, Some(index)) => ConstraintName::Generated(self.index.indexes[index].name),
             (None, None) => {
-                let name = postgres::choose_relation_name(
+                let name = pg_names::choose_relation_name(
                     self.index.names.resolve(self.index.tables[table].name),
                     addition,
                     label,
@@ -27183,7 +27266,7 @@ fn typmod_value(expr: &ast::Expr) -> Option<i64> {
     }
     let literal = expr.as_literal()?;
     if literal.is_string() {
-        return postgres::parse_int(&literal.string_value()?, IntType::Int4).ok();
+        return pg_int::parse_int(&literal.string_value()?, IntType::Int4).ok();
     }
     i64::try_from(literal.integer_value_u64()?).ok()
 }
@@ -27193,7 +27276,7 @@ fn similar_bool_input(value: &str) -> Option<&'static str> {
         return None;
     }
     find_best_match_for_name(
-        postgres::BOOL_INPUTS.iter().copied(),
+        pg_bool::BOOL_INPUTS.iter().copied(),
         |candidate| candidate,
         &value.to_ascii_lowercase_smolstr(),
         None,
@@ -27439,7 +27522,7 @@ fn index_column_names(create_index: &ast::CreateIndex) -> String {
                 .and_then(|include| include.partition_item_list()),
         )
         .flat_map(|list| list.partition_items());
-    postgres::join_names(items.map(
+    pg_names::join_names(items.map(
         |item| match item.expr().and_then(ColumnName::inferred_from_expr) {
             Some(ColumnName::Column(name) | ColumnName::UnknownColumn(Some(name))) => name,
             Some(ColumnName::UnknownColumn(None) | ColumnName::Star) | None => {

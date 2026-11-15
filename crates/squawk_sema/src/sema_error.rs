@@ -15,7 +15,10 @@ use squawk_syntax::quote::{quote_ident, quote_string_literal};
 use crate::expr_context::ExprContext;
 use crate::lookup::TableLookup;
 use crate::lower::OutputClause;
-use crate::postgres::{IntType, NumericTypmod};
+use crate::pg_float::FloatType;
+use crate::pg_int::IntType;
+use crate::pg_json::JsonType;
+use crate::pg_numeric::NumericTypmod;
 use crate::semantic_index::{DiagnosticKind, Errors, Suggestion};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -559,9 +562,24 @@ pub(crate) enum SemaError {
         ty: IntType,
         value: Name,
     },
+    InvalidFloatValue {
+        ty: FloatType,
+        value: Name,
+    },
+    FloatValueOutOfRange {
+        ty: FloatType,
+        value: Name,
+    },
     InvalidNumericValue {
         value: Name,
     },
+    InvalidUuidValue {
+        value: Name,
+    },
+    InvalidJsonValue {
+        ty: JsonType,
+    },
+    UnsupportedJsonEscape,
     NumericValueOutOfRange {
         value: Name,
         overflow: NumericOverflow,
@@ -1538,10 +1556,14 @@ impl SemaError {
             SemaError::InvalidEnumValue { .. } => DiagnosticKind::UnresolvedEnumLabel,
             SemaError::InvalidBoolValue { .. }
             | SemaError::InvalidIntValue { .. }
-            | SemaError::InvalidNumericValue { .. } => DiagnosticKind::InvalidLiteral,
-            SemaError::IntValueOutOfRange { .. } | SemaError::NumericValueOutOfRange { .. } => {
-                DiagnosticKind::ValueOutOfRange
-            }
+            | SemaError::InvalidFloatValue { .. }
+            | SemaError::InvalidNumericValue { .. }
+            | SemaError::InvalidUuidValue { .. }
+            | SemaError::InvalidJsonValue { .. }
+            | SemaError::UnsupportedJsonEscape => DiagnosticKind::InvalidLiteral,
+            SemaError::IntValueOutOfRange { .. }
+            | SemaError::FloatValueOutOfRange { .. }
+            | SemaError::NumericValueOutOfRange { .. } => DiagnosticKind::ValueOutOfRange,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
             | SemaError::StarNotComposite { .. }
@@ -3350,8 +3372,21 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::IntValueOutOfRange { ty, value } => {
                 write!(f, "value `{}` is out of range for type `{ty}`", n(value))
             }
+            SemaError::InvalidFloatValue { ty, value } => {
+                write!(f, "invalid input value for type `{ty}`: `{}`", n(value))
+            }
+            SemaError::FloatValueOutOfRange { ty, value } => {
+                write!(f, "value `{}` is out of range for type `{ty}`", n(value))
+            }
             SemaError::InvalidNumericValue { value } => {
                 write!(f, "invalid input value for type `numeric`: `{}`", n(value))
+            }
+            SemaError::InvalidUuidValue { value } => {
+                write!(f, "invalid input value for type `uuid`: `{}`", n(value))
+            }
+            SemaError::InvalidJsonValue { ty } => write!(f, "invalid input value for type `{ty}`"),
+            SemaError::UnsupportedJsonEscape => {
+                write!(f, r"unsupported Unicode escape `\u0000` for type `jsonb`")
             }
             SemaError::NumericValueOutOfRange {
                 value,
