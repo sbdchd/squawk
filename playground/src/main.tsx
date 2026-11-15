@@ -31,7 +31,7 @@ const styles = stylex.create({
   },
 })
 
-// we want to kick of the wasm load as early as possible, but we still have to
+// we want to kick off the wasm load as early as possible, but we still have to
 // check that it's loaded later on when we try to call a wasm powered function
 init()
 
@@ -42,7 +42,7 @@ createRoot(document.getElementById("root")!).render(
         return (
           <div {...stylex.props(styles.fallback)}>
             <div {...stylex.props(styles.message)}>
-              <div>An internal error with Squawk has occured.</div>
+              <div>An internal error with Squawk has occurred.</div>
               <div>
                 Please open an issue at{" "}
                 <a

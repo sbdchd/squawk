@@ -97,7 +97,7 @@ impl WideChar {
 /// Maps flat [`TextSize`] offsets to/from `(line, column)` representation.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct LineIndex {
-    /// Offset the beginning of each line (except the first, which always has offset 0).
+    /// Offset of the beginning of each line (except the first, which always has offset 0).
     newlines: Box<[TextSize]>,
     /// List of non-ASCII characters on each line.
     line_wide_chars: IntMap<u32, Box<[WideChar]>>,
@@ -365,7 +365,7 @@ unsafe fn analyze_source_file_sse2(
         }
 
         // The slow path.
-        // There are control chars in here, fallback to generic decoding.
+        // There are control chars in here, fall back to generic decoding.
         let scan_start = chunk_index * CHUNK_SIZE + intra_chunk_offset;
         intra_chunk_offset = analyze_source_file_generic(
             &src[scan_start..],
@@ -509,7 +509,7 @@ fn analyze_source_file_dispatch(
 }
 
 // `scan_len` determines the number of bytes in `src` to scan. Note that the
-// function can read past `scan_len` if a multi-byte character start within the
+// function can read past `scan_len` if a multi-byte character starts within the
 // range but extends past it. The overflow is returned by the function.
 fn analyze_source_file_generic(
     src: &str,

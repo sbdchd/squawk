@@ -12,7 +12,7 @@ pub(crate) struct AssociatedDiagnosticData {
     /// Edits to fix the diagnostic. If this is empty, a fix
     /// does not exist.
     pub(crate) edits: Vec<gen_lsp_types::TextEdit>,
-    /// Edit to ignore the rule the line
+    /// Edit to ignore the rule for the line
     pub(crate) ignore_line_edit: Option<gen_lsp_types::TextEdit>,
     /// Edit to ignore the rule for the file
     pub(crate) ignore_file_edit: Option<gen_lsp_types::TextEdit>,

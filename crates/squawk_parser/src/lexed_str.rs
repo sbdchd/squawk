@@ -35,7 +35,7 @@ impl LexError {
 
 impl<'a> LexedStr<'a> {
     // TODO: rust-analyzer has an edition thing to specify things that are only
-    // available in certain version, we can do that later
+    // available in certain versions, we can do that later
     pub fn new(text: &'a str) -> LexedStr<'a> {
         let mut conv = Converter::new(text);
 

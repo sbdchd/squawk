@@ -182,7 +182,7 @@ pub(crate) fn folding_range(line_index: &LineIndex, fold: &Fold) -> FoldingRange
     }
 }
 
-// base on rust-analyzer's
+// based on rust-analyzer's
 // see: https://github.com/rust-lang/rust-analyzer/blob/3816d0ae53c19fe75532a8b41d8c546d94246b53/crates/rust-analyzer/src/lsp/utils.rs#L168C1-L168C1
 pub(crate) fn apply_incremental_changes(
     content: &str,

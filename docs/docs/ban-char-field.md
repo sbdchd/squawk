@@ -23,7 +23,7 @@ See the [`prefer-text-field`](./prefer-text-field.md) rule for info on the advan
 
 ## solution
 
-Use `text` or `varchar` instad of `character`.
+Use `text` or `varchar` instead of `character`.
 
 Instead of:
 

@@ -226,7 +226,7 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     // These are found in a single pass. An edit distance of 0 implies a case insensitive match,
     // so returning on the first case insensitive match keeps the priority.
 
-    // `fn edit_distance()` use `chars()` to calculate edit distance, so we must
+    // `fn edit_distance()` uses `chars()` to calculate edit distance, so we must
     // also use `chars()` (and not `str::len()`) to calculate length here.
     let lookup_len = lookup.chars().count();
     let lookup_sorted_by_words = sort_by_words(lookup);
@@ -234,7 +234,7 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
     let mut dist = dist.unwrap_or_else(|| cmp::max(lookup_len, 3) / 3);
     let mut best = None;
     let mut sorted_words_match = None;
-    // store the candidates with the same distance, only for `use_substring_score` current.
+    // store the candidates with the same distance, currently only for `use_substring_score`.
     let mut next_candidates = vec![];
     for c in candidates {
         let candidate_name = name(c);
@@ -271,7 +271,7 @@ fn find_best_match_for_name_impl<'a, T: Copy, F: Fn(T) -> &'a str>(
 
     // We have a tie among several candidates, try to select the best among them ignoring substrings.
     // For example, the candidates list `force_capture`, `capture`, and user inputted `forced_capture`,
-    // we select `force_capture` with a extra round of edit distance calculation.
+    // we select `force_capture` with an extra round of edit distance calculation.
     if next_candidates.len() > 1 {
         debug_assert!(use_substring_score);
         best = find_best_match_for_name_impl(

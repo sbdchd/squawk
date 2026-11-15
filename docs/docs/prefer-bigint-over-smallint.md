@@ -41,4 +41,4 @@ create table posts (id bigint primary key)
 
 ## related
 
-See ["prefer-bigint-over-int"](./prefer-bigint-over-int.md) for a simliar lint rule against 32 bit integers.
+See ["prefer-bigint-over-int"](./prefer-bigint-over-int.md) for a similar lint rule against 32 bit integers.

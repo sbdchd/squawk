@@ -74,7 +74,7 @@ impl<L: Language> SyntaxNodePtr<L> {
     /// "Dereferences" the pointer to get the [`SyntaxNode`] it points to.
     ///
     /// Returns `None` if the node is not found, so make sure that the `root`
-    /// syntax tree is equivalent to (i.e. is build from the same text from) the
+    /// syntax tree is equivalent to (i.e. is built from the same text) the
     /// tree which was originally used to get this [`SyntaxNodePtr`].
     ///
     /// Also returns `None` if `root` is not actually a root (i.e. it has a

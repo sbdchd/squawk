@@ -19,7 +19,7 @@ pub(super) fn rewrite_values_as_select(
 
     let value_token_start = values.values_token().map(|x| x.text_range().start())?;
     let values_end = values.syntax().text_range().end();
-    // `values` but we skip over the possibly preceeding CTE
+    // `values` but we skip over the possibly preceding CTE
     let values_range = TextRange::new(value_token_start, values_end);
     let line_ending = line_ending(db, position.file_id);
 

@@ -89,7 +89,7 @@ pub(crate) enum Event {
     /// Produce a single leaf-element.
     /// `n_raw_tokens` is used to glue complex contextual tokens.
     /// For example, lexer tokenizes `>>` as `>`, `>`, and
-    /// `n_raw_tokens = 2` is used to produced a single `>>`.
+    /// `n_raw_tokens = 2` is used to produce a single `>>`.
     Token {
         kind: SyntaxKind,
         n_raw_tokens: u8,

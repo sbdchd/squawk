@@ -170,7 +170,7 @@ fn shallowest_node(node: &SyntaxNode) -> SyntaxNode {
         .unwrap()
 }
 
-/// Expand to the current word instead the full text range of the node.
+/// Expand to the current word instead of the full text range of the node.
 fn extend_single_word_in_comment_or_string(
     leaf: &SyntaxToken,
     offset: TextSize,

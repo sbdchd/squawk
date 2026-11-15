@@ -113,7 +113,7 @@ select a,
   end
 from test;
 
--- ommitted else
+-- omitted else
 select a,
   case when a = 1 then 'one'
     when a = 2 then 'two'

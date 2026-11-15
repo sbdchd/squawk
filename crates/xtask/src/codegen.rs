@@ -128,7 +128,7 @@ const LITERAL_TOKEN: &str = "@";
 const PUNCTUATION: &[&str] = &[";", ",", "(", ")", "[", "]", "{", "}", ".", ".."];
 
 const PUNCT: &[(&str, &str)] = &[
-    // KEEP THE DOLLAR AT THE TOP ITS SPECIAL
+    // KEEP THE DOLLAR AT THE TOP IT'S SPECIAL
     ("$", "DOLLAR"),
     (";", "SEMICOLON"),
     (",", "COMMA"),
@@ -231,7 +231,7 @@ fn generate_kind_src(
     let contextual_keywords = Vec::leak(contextual_keywords);
 
     // we leak things here for simplicity, that way we don't have to deal with lifetimes
-    // The execution is a one shot job so thats fine
+    // The execution is a one shot job so that's fine
     let nodes = nodes
         .iter()
         .map(|it| &it.name)
@@ -862,7 +862,7 @@ fn deduplicate_fields(ast: &mut AstSrc) {
     }
 }
 
-// If two fields have the same type then `support::child`` won't work so drop
+// If two fields have the same type then `support::child` won't work so drop
 // the fields.
 fn drop_ambiguous_fields(ast: &mut AstSrc) {
     for node in &mut ast.nodes {

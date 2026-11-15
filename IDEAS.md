@@ -643,11 +643,11 @@ create aggregate foo(int) (
 -- Query 1 ERROR at Line 1: : ERROR:  function "foo" already exists with same argument types
 ```
 
-### Rule: order direction is redundent
+### Rule: order direction is redundant
 
 ```sql
 select * from t order by a asc;
---                         ^^^ order direction is redundent. asc is the default.
+--                         ^^^ order direction is redundant. asc is the default.
 
 -- quick fix to:
 select * from t order by a;

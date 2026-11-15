@@ -30,4 +30,4 @@ Done!
 
 ### Jump from snapshot to source file
 
-### Jump from soruce file to snapshot
+### Jump from source file to snapshot

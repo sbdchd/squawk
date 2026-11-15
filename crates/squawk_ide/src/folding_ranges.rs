@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-// NOTE: pretty much copied as is but simplfied a fair bit. I don't use folding
+// NOTE: pretty much copied as is but simplified a fair bit. I don't use folding
 // much so not sure if this is optimal.
 
 use rustc_hash::FxHashSet;

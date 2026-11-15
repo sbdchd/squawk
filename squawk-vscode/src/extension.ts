@@ -452,7 +452,7 @@ class TokensProvider implements vscode.TextDocumentContentProvider {
 
   _onDidChangeTextDocument(event: vscode.TextDocumentChangeEvent) {
     if (isSqlDocument(event.document)) {
-      // via rust-analzyer:
+      // via rust-analyzer:
       // We need to order this after language server updates, but there's no API for that.
       // Hence, good old sleep().
       void sleep(10).then(() => this._eventEmitter.fire(this._uri))

@@ -211,7 +211,7 @@ fn api_walkthrough() {
     assert!(parse.errors().is_empty());
 
     // The `tree` method returns an owned syntax node of type `SourceFile`.
-    // Owned nodes are cheap: inside, they are `Rc` handles to the underling data.
+    // Owned nodes are cheap: inside, they are `Rc` handles to the underlying data.
     let file: SourceFile = parse.tree();
 
     // `SourceFile` is the root of the syntax tree. We can iterate file's items.
@@ -285,7 +285,7 @@ fn api_walkthrough() {
         None => unreachable!(),
     };
 
-    // The two properties each syntax node has is a `SyntaxKind`:
+    // Each syntax node has two properties: a `SyntaxKind`:
     assert_eq!(func_option_syntax.kind(), SyntaxKind::AS_FUNC_OPTION);
 
     // And text range:
@@ -379,7 +379,7 @@ fn api_walkthrough() {
     // 2. use descendants and `AstNode::cast`.
     // 3. use descendants and `match_ast!`.
     //
-    // Here's how the first one looks like:
+    // Here's what the first one looks like:
     let exprs_cast: Vec<String> = file
         .syntax()
         .descendants()

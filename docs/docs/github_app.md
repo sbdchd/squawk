@@ -84,7 +84,7 @@ To use Squawk as a GitHub App, Squawk needs a corresponding GitHub App so it can
 
    The key should automatically download after a couple seconds. Hold onto this key, we'll need it later.
 
-   We now have an `App ID` and a `Private Key`, which is everything we neeed to install the GitHub App.
+   We now have an `App ID` and a `Private Key`, which is everything we need to install the GitHub App.
 
 3. Install the GitHub App & get the Install ID
 
@@ -114,7 +114,7 @@ To use Squawk as a GitHub App, Squawk needs a corresponding GitHub App so it can
    example: `https://github.com/recipeyak/recipeyak/pull/567`
 
    Now we need to split this to get the repo name, repo owner, and pull
-   requeset id.
+   request id.
 
    With a bit of help from
 

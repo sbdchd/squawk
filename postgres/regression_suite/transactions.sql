@@ -373,7 +373,7 @@ drop function inverse(int);
 
 
 -- verify that cursors created during an aborted subtransaction are
--- closed, but that we do not rollback the effect of any FETCHs
+-- closed, but that we do not rollback the effect of any FETCHes
 -- performed in the aborted subtransaction
 begin;
 

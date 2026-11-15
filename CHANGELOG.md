@@ -20,8 +20,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - linter: update file finding to allow passing directories (#1477)
 - linter: error when passing invalid top level flags with subcommand (#1479)
 
-### Removed
-
 ### Fixed
 
 - linter: fix BOM handling for offsets + writing builtins.sql to cache (#1470)
@@ -849,7 +847,7 @@ Attempt to fix npm install method
 
 - ide: code actions create table as <-> select into + parser fix (#1113)
 
-  Create table and select into are roughly interchangable, so this code action
+  Create table and select into are roughly interchangeable, so this code action
   supports switching between.
 
 - ide: show comments for types and columns (#1110)
@@ -1679,7 +1677,7 @@ Attempt to fix npm install method
 
 - parser: pg18 `like` clause in `create foreign table` now parses (#666)
 
-- cli: parsing rule alises i.e., prefer-timestamptz and prefer-timestamp-tz both work. (#668)
+- cli: parsing rule aliases i.e., prefer-timestamptz and prefer-timestamp-tz both work. (#668)
 
 ## v2.27.0 - 2025-09-23
 
@@ -1990,7 +1988,7 @@ github: fix api calls failing with 403. (#643)
 
 - The last of the pg regression suite errors. (#543), (#542)
 
-- Precendence when parsing compound select statements. (#544)
+- Precedence when parsing compound select statements. (#544)
 
   ```sql
   SELECT foo UNION SELECT bar ORDER BY baz;
@@ -2014,7 +2012,7 @@ github: fix api calls failing with 403. (#643)
   );
   ```
 
-- join parsing to be more error resilent: (#538)
+- join parsing to be more error resilient: (#538)
 
   ```
   error[syntax-error]: Join missing condition.
@@ -2415,7 +2413,7 @@ github: fix api calls failing with 403. (#643)
 ### Fixed
 
 - Fixed building Squawk on platforms where `c_char` is unsigned. Thanks @ods! (#285)
-- Fixed Squawk compatiblity with Nix. Thanks @andrewsmith! (#287)
+- Fixed Squawk compatibility with Nix. Thanks @andrewsmith! (#287)
 - Fixed regression in parsing union queries. Fixed parsing call statement. (#293)
 
 ## v0.21.0 - 2023-02-14
@@ -2646,7 +2644,7 @@ github: fix api calls failing with 403. (#643)
 
 ### Fixed
 
-- run `prefer-text-field` on alter table statments
+- run `prefer-text-field` on alter table statements
 
 ## v0.5.0 - 2020-09-08
 
@@ -2719,7 +2717,7 @@ github: fix api calls failing with 403. (#643)
 
 ### Added
 
-- `upload-to-github` subcommand for outputing squawk results in a GitHub PR
+- `upload-to-github` subcommand for outputting squawk results in a GitHub PR
   comment.
 - print help menu when no options provided
 - automatically detect stdin instead of using the `-` path

@@ -1386,7 +1386,7 @@ SOURCE_FILE
               IDENT "test"
     SEMICOLON ";"
   WHITESPACE "\n\n"
-  COMMENT "-- ommitted else"
+  COMMENT "-- omitted else"
   WHITESPACE "\n"
   SELECT
     SELECT_CLAUSE

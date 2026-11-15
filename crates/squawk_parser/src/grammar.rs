@@ -123,7 +123,7 @@ fn opt_paren_select(
     }
     while !p.at(EOF) && !p.at(R_PAREN) {
         // saw_expr = true;
-        // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
+        // we want to check for select stuff before we get the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
         if p.at_ts(SELECT_FIRST)
             && (select(p, None, &SelectRestrictions::default()).is_none()
@@ -185,7 +185,7 @@ fn tuple_expr(p: &mut Parser<'_>, items: ListItems) -> (CompletedMarker, ExprKin
     }
     while !p.at(EOF) && !p.at(R_PAREN) {
         saw_expr = true;
-        // we want to check for select stuff before we get the the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
+        // we want to check for select stuff before we get the expr stuff maybe? Although select is an expr so maybe fine? but it's not prefix or postfix so maybe right here is good?
         //
         if p.at_ts(SELECT_FIRST) {
             let select = select(p, None, &SelectRestrictions::default());
@@ -671,7 +671,7 @@ fn json_object_fn_arg_list(p: &mut Parser<'_>) {
         if opt_named_arg(p).is_none() {
             expr_or_json_key_value(p);
         }
-        // if we're at a the end of the params or the start of the optional
+        // if we're at the end of the params or the start of the optional
         // null_clause break
         if p.at_ts(JSON_OBJECT_FN_ARG_FOLLOW) {
             break;
@@ -990,7 +990,7 @@ fn json_array_fn(p: &mut Parser<'_>) -> CompletedMarker {
 fn some_any_all_fn(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(SOME_KW) || p.at(ANY_KW) || p.at(ALL_KW));
     let m = p.start();
-    // TODO: this can only be in the conext of a binary expression, so we should
+    // TODO: this can only be in the context of a binary expression, so we should
     // have some validation for that.
     // SOME | ANY | ALL
     let kind = match p.current() {
@@ -2218,7 +2218,7 @@ impl std::fmt::Display for ListItem {
     }
 }
 
-/// The `parser` passed this is required to at least consume one token if it returns `true`.
+/// The `parser` passed to this is required to at least consume one token if it returns `true`.
 /// If the `parser` returns false, parsing will stop.
 pub(crate) fn delimited(
     p: &mut Parser<'_>,
@@ -3239,7 +3239,7 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
     }
 }
 
-// tokens thare in bin expr and also in bare_labels
+// tokens that are in bin expr and also in bare_labels
 const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLATE_KW]);
 
 #[derive(Default, Clone, Copy)]
@@ -8033,7 +8033,7 @@ fn opt_null_literal(p: &mut Parser<'_>) -> bool {
 
 fn opt_bool_literal(p: &mut Parser<'_>) -> bool {
     let m = p.start();
-    // TOOD: add validation to check for `1` or `0` inside the INT_NUMBER
+    // TODO: add validation to check for `1` or `0` inside the INT_NUMBER
     // https://www.postgresql.org/docs/current/sql-explain.html
     if p.at_ts(BOOL_FIRST) {
         p.bump_any();
@@ -16456,7 +16456,7 @@ fn opt_vacuum_option_list(p: &mut Parser<'_>) {
 }
 
 // [ table_and_columns [, ...] ]
-// where table_and_coumns is:
+// where table_and_columns is:
 //  table_name [ ( column_name [, ...] ) ]
 fn opt_table_and_columns_list(p: &mut Parser<'_>) {
     let m = p.start();
@@ -18001,7 +18001,7 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
             let maybe_name =
                 p.at(IDENT) || p.at_ts(UNRESERVED_KEYWORDS) || p.at_ts(TYPE_FUNC_NAME_KEYWORDS);
             if maybe_name {
-                // Could have either parsed a name or a type, we know if it it's a type if:
+                // Could have either parsed a name or a type, we know it's a type if:
                 let at_type = match p.nth(1) {
                     // foo.bar%type
                     //    ^

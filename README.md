@@ -199,7 +199,7 @@ Rule violations can be ignored via the `squawk-ignore` comment:
 alter table t drop column c cascade;
 ```
 
-You can also ignore multiple rules by making a comma seperated list:
+You can also ignore multiple rules by making a comma separated list:
 
 ```sql
 -- squawk-ignore ban-drop-column, renaming-column,ban-drop-database

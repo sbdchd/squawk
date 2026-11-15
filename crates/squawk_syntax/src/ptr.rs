@@ -31,7 +31,7 @@
 //! for a long time is ill-advisable, as that keeps the whole tree resident.
 //!
 //! Instead, we provide a [`SyntaxNodePtr`] type, which stores information about
-//! *location* of a particular syntax node in a tree. Its a small type which can
+//! *location* of a particular syntax node in a tree. It's a small type which can
 //! be cheaply stored, and which can be resolved to a real [`SyntaxNode`] when
 //! necessary.
 

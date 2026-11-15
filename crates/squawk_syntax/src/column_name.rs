@@ -58,7 +58,7 @@ impl ColumnName {
         Self::inferred_from_target(target)
     }
 
-    // Ignore any aliases, just infer the what the column name.
+    // Ignore any aliases, just infer the column name.
     pub fn inferred_from_target(target: &ast::Target) -> Option<(ColumnName, SyntaxNode)> {
         if let Some(expr) = target.expr()
             && let Some(name) = name_from_expr(expr, false)

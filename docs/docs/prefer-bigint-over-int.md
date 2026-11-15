@@ -41,4 +41,4 @@ create table posts (id bigint primary key)
 
 ## related
 
-See ["prefer-bigint-over-smallint"](./prefer-bigint-over-smallint.md)for a simliar lint rule against 16 bit integers.
+See ["prefer-bigint-over-smallint"](./prefer-bigint-over-smallint.md) for a similar lint rule against 16 bit integers.

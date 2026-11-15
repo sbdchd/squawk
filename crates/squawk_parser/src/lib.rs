@@ -68,7 +68,7 @@ impl Marker {
     }
 
     /// Finishes the syntax tree node and assigns `kind` to it,
-    /// and mark the create a `CompletedMarker` for possible future
+    /// and creates a `CompletedMarker` for possible future
     /// operation like `.precede()` to deal with `forward_parent`.
     pub(crate) fn complete(mut self, p: &mut Parser<'_>, kind: SyntaxKind) -> CompletedMarker {
         self.bomb.defuse();
@@ -110,18 +110,18 @@ impl CompletedMarker {
         CompletedMarker { pos, kind }
     }
 
-    /// This method allows to create a new node which starts
+    /// This method allows creating a new node which starts
     /// *before* the current one. That is, parser could start
     /// node `A`, then complete it, and then after parsing the
     /// whole `A`, decide that it should have started some node
-    /// `B` before starting `A`. `precede` allows to do exactly
+    /// `B` before starting `A`. `precede` allows doing exactly
     /// that. See also docs about
     /// [`Event::Start::forward_parent`](crate::event::Event::Start::forward_parent).
     ///
     /// Given completed events `[START, FINISH]` and its corresponding
     /// `CompletedMarker(pos: 0, _)`.
-    /// Append a new `START` events as `[START, FINISH, NEWSTART]`,
-    /// then mark `NEWSTART` as `START`'s parent with saving its relative
+    /// Append a new `START` event as `[START, FINISH, NEWSTART]`,
+    /// then mark `NEWSTART` as `START`'s parent while saving its relative
     /// distance to `NEWSTART` into `forward_parent`(=2 in this case);
     pub(crate) fn precede(self, p: &mut Parser<'_>) -> Marker {
         let new_pos = p.start();
@@ -187,7 +187,7 @@ pub(crate) struct Parser<'t> {
 const PARSER_STEP_LIMIT: usize = 15_000_000;
 
 #[derive(Clone, Copy)]
-enum TrivaBetween {
+enum TriviaBetween {
     NotAllowed,
     Allowed,
 }
@@ -507,13 +507,19 @@ impl<'t> Parser<'t> {
         true
     }
 
-    fn at_composite2(&self, n: usize, k1: SyntaxKind, k2: SyntaxKind, triva: TrivaBetween) -> bool {
+    fn at_composite2(
+        &self,
+        n: usize,
+        k1: SyntaxKind,
+        k2: SyntaxKind,
+        trivia: TriviaBetween,
+    ) -> bool {
         let tokens_match = self.kind_at(self.pos + n) == k1 && self.kind_at(self.pos + n + 1) == k2;
         // We need to do this so we can say that:
         // 1 > > 2, is not the same as 1 >> 2
-        match triva {
-            TrivaBetween::Allowed => tokens_match,
-            TrivaBetween::NotAllowed => {
+        match trivia {
+            TriviaBetween::Allowed => tokens_match,
+            TriviaBetween::NotAllowed => {
                 return tokens_match
                     && self.is_joint_at(self.pos + n)
                     && self.next_not_joined_op_at(n, n + 1);
@@ -727,63 +733,63 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::EQ,
                 SyntaxKind::R_ANGLE,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // :=
             SyntaxKind::COLON_EQ => self.at_composite2(
                 n,
                 SyntaxKind::COLON,
                 SyntaxKind::EQ,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // ::
             SyntaxKind::COLON_COLON => self.at_composite2(
                 n,
                 SyntaxKind::COLON,
                 SyntaxKind::COLON,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // !=
             SyntaxKind::NEQ => self.at_composite2(
                 n,
                 SyntaxKind::BANG,
                 SyntaxKind::EQ,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // <>
             SyntaxKind::NEQB => self.at_composite2(
                 n,
                 SyntaxKind::L_ANGLE,
                 SyntaxKind::R_ANGLE,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // is not
             SyntaxKind::IS_NOT => self.at_composite2(
                 n,
                 SyntaxKind::IS_KW,
                 SyntaxKind::NOT_KW,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // not like
             SyntaxKind::NOT_LIKE => self.at_composite2(
                 n,
                 SyntaxKind::NOT_KW,
                 SyntaxKind::LIKE_KW,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // not ilike
             SyntaxKind::NOT_ILIKE => self.at_composite2(
                 n,
                 SyntaxKind::NOT_KW,
                 SyntaxKind::ILIKE_KW,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // not in
             SyntaxKind::NOT_IN => self.at_composite2(
                 n,
                 SyntaxKind::NOT_KW,
                 SyntaxKind::IN_KW,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // at time zone
             SyntaxKind::AT_TIME_ZONE => self.at_composite3(
@@ -797,7 +803,7 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::AT_KW,
                 SyntaxKind::LOCAL_KW,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // is distinct from
             SyntaxKind::IS_DISTINCT_FROM => self.at_composite3(
@@ -865,7 +871,7 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::SIMILAR_KW,
                 SyntaxKind::TO_KW,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // https://www.postgresql.org/docs/17/sql-expressions.html#SQL-EXPRESSIONS-OPERATOR-CALLS
             // TODO: is this right?
@@ -873,14 +879,14 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::OPERATOR_KW,
                 SyntaxKind::L_PAREN,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // is json
             SyntaxKind::IS_JSON => self.at_composite2(
                 n,
                 SyntaxKind::IS_KW,
                 SyntaxKind::JSON_KW,
-                TrivaBetween::Allowed,
+                TriviaBetween::Allowed,
             ),
             // is not json
             SyntaxKind::IS_NOT_JSON => self.at_composite3(
@@ -954,28 +960,28 @@ impl<'t> Parser<'t> {
                 n,
                 SyntaxKind::L_ANGLE,
                 SyntaxKind::EQ,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // <=
             SyntaxKind::GTEQ => self.at_composite2(
                 n,
                 SyntaxKind::R_ANGLE,
                 SyntaxKind::EQ,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // << used for PL/pgSQL
             SyntaxKind::LESS_LESS => self.at_composite2(
                 n,
                 SyntaxKind::L_ANGLE,
                 SyntaxKind::L_ANGLE,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             // >>
             SyntaxKind::GREATER_GREATER => self.at_composite2(
                 n,
                 SyntaxKind::R_ANGLE,
                 SyntaxKind::R_ANGLE,
-                TrivaBetween::NotAllowed,
+                TriviaBetween::NotAllowed,
             ),
             SyntaxKind::CUSTOM_OP => {
                 // TODO: is this right?
