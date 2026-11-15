@@ -7,6 +7,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.73.0 - 2026-11-15
+
+### Added
+
+- fmt: add format command to squawk cli (#1480)
+- linter: add check subcommand (#1476)
+- ide: validate float, uuid & json string literals (#1481)
+
+### Changed
+
+- linter: update file finding to allow passing directories (#1477)
+- linter: error when passing invalid top level flags with subcommand (#1479)
+
+### Removed
+
+### Fixed
+
+- linter: fix BOM handling for offsets + writing builtins.sql to cache (#1470)
+- playground: fix semantic syntax highlighting initial load (#1475)
+
+### Internal
+
+- internal: upgrade to rust 1.100 (#1478)
+- syntax: refactor move of sema & linter into syntax (#1474, #1473, #1471)
+
 ## v2.72.0 - 2026-11-07
 
 ### Added
