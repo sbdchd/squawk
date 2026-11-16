@@ -15832,6 +15832,7 @@ impl Lowerer {
             .and_then(|repeatable| repeatable.expr())
         {
             self.lower_tablesample_arg(&expr);
+            self.check_unknown_literal_expr(LiteralTarget::Float(FloatType::Float8), &expr);
         }
         let (schema, name_ref) = match call.expr() {
             Some(ast::Expr::NameRef(name_ref)) => (None, name_ref),
@@ -15874,6 +15875,22 @@ impl Lowerer {
             name_ref.syntax(),
             resolution,
         );
+        if function.is_some_and(|function| self.is_builtin_tablesample_method(function)) {
+            for arg in call.arg_list().iter().flat_map(|list| list.args()) {
+                if let Some(expr) = arg.func_arg_expr().and_then(|expr| expr.expr()) {
+                    self.check_unknown_literal_expr(LiteralTarget::Float(FloatType::Float4), &expr);
+                }
+            }
+        }
+    }
+
+    fn is_builtin_tablesample_method(&self, function: FunctionId) -> bool {
+        let function = &self.index.functions[function];
+        function.schema == self.pg_catalog
+            && matches!(
+                self.index.names.resolve(function.name),
+                "bernoulli" | "system"
+            )
     }
 
     fn lower_from_item(&mut self, from_item: &ast::FromItem) {
@@ -22892,10 +22909,14 @@ impl Lowerer {
 
     fn lower_limit_expr(&mut self, context: ExprContext, expr: &ast::Expr) {
         self.lower_expr_in(context, expr);
+        self.check_unknown_literal_expr(LiteralTarget::Int(IntType::Int8), expr);
+    }
+
+    fn check_unknown_literal_expr(&mut self, target: LiteralTarget, expr: &ast::Expr) {
         if expr.is_unknown_literal()
             && let Some(literal) = expr.unparen().as_literal()
         {
-            self.check_int_value(IntType::Int8, &literal);
+            self.lower_literal_value(target, &literal);
         }
     }
 
@@ -23657,11 +23678,8 @@ impl Lowerer {
             return;
         };
         self.lower_expr(&expr);
-        if let Some(target) = offset_target
-            && expr.is_unknown_literal()
-            && let Some(literal) = expr.unparen().as_literal()
-        {
-            self.lower_literal_value(target, &literal);
+        if let Some(target) = offset_target {
+            self.check_unknown_literal_expr(target, &expr);
         }
     }
 
