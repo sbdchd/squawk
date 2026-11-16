@@ -23130,7 +23130,12 @@ impl Lowerer {
                 let rhs = bin.rhs();
                 let lhs_ty = lhs.as_ref().and_then(|lhs| self.lower_expr(lhs));
                 let left = expr_arg_type(lhs.as_ref(), lhs_ty);
+                let bool_test = op
+                    .as_ref()
+                    .zip(rhs.as_ref())
+                    .and_then(|(op, rhs)| bool_test_condition(op, rhs));
                 let right = match &rhs {
+                    Some(_) if bool_test.is_some() => ArgType::Untyped,
                     Some(rhs) => self.lower_bin_rhs(op.as_ref(), lhs.as_ref(), rhs, left),
                     None => ArgType::Untyped,
                 };
@@ -23155,6 +23160,11 @@ impl Lowerer {
                     if let Some(rhs) = &rhs {
                         self.check_condition(condition, rhs, rhs_ty);
                     }
+                }
+                if let Some(condition) = bool_test
+                    && let Some(lhs) = &lhs
+                {
+                    self.check_condition(condition, lhs, lhs_ty);
                 }
                 let ty = op
                     .as_ref()
@@ -27582,4 +27592,25 @@ fn standalone_select_keyword(call: &ast::CallExpr) -> Option<SyntaxToken> {
         return None;
     }
     select_clause.select_token()
+}
+
+fn bool_test_condition(op: &ast::BinOp, rhs: &ast::Expr) -> Option<ConditionKind> {
+    let (is, is_not) = match rhs {
+        ast::Expr::Literal(literal) => match literal.kind()? {
+            ast::LitKind::True(_) => (ConditionKind::IsTrue, ConditionKind::IsNotTrue),
+            ast::LitKind::False(_) => (ConditionKind::IsFalse, ConditionKind::IsNotFalse),
+            _ => return None,
+        },
+        ast::Expr::NameRef(name_ref)
+            if name_ref.syntax().first_token()?.kind() == SyntaxKind::UNKNOWN_KW =>
+        {
+            (ConditionKind::IsUnknown, ConditionKind::IsNotUnknown)
+        }
+        _ => return None,
+    };
+    match op {
+        ast::BinOp::Is(_) => Some(is),
+        ast::BinOp::IsNot(_) => Some(is_not),
+        _ => None,
+    }
 }

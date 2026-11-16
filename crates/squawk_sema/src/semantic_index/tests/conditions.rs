@@ -470,3 +470,61 @@ select count(*) filter (where 'x') from t;
       ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
     ");
 }
+
+#[test]
+fn bool_tests() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b bool
+);
+select a is true, a is not false, a is unknown from t;
+select b is true, b is not unknown, null is false from t;
+select 'x' is true, 'yes' is not true, 'nope' is unknown;
+"), @"
+    error: argument of `is true` must be type `bool`, not type `int4`
+      ╭▸ 
+    6 │ select a is true, a is not false, a is unknown from t;
+      ╰╴       ━
+    error: argument of `is not false` must be type `bool`, not type `int4`
+      ╭▸ 
+    6 │ select a is true, a is not false, a is unknown from t;
+      ╰╴                  ━
+    error: argument of `is unknown` must be type `bool`, not type `int4`
+      ╭▸ 
+    6 │ select a is true, a is not false, a is unknown from t;
+      ╰╴                                  ━
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    8 │ select 'x' is true, 'yes' is not true, 'nope' is unknown;
+      │        ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `nope`
+      ╭▸ 
+    8 │ select 'x' is true, 'yes' is not true, 'nope' is unknown;
+      │                                        ━━━━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    ");
+}
+
+#[test]
+fn string_literal_rhs_conditions() {
+    assert_snapshot!(check("
+select true or 'x', 1 = 1 and ('x');
+"), @"
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    2 │ select true or 'x', 1 = 1 and ('x');
+      │                ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    2 │ select true or 'x', 1 = 1 and ('x');
+      │                                ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    ");
+}
