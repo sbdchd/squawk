@@ -22871,22 +22871,31 @@ impl Lowerer {
             }
             ast::SelectTailClause::LimitClause(limit) => {
                 if let Some(ast::LimitValue::Expr(expr)) = limit.limit_value() {
-                    self.lower_expr_in(ExprContext::Limit, &expr);
+                    self.lower_limit_expr(ExprContext::Limit, &expr);
                 }
             }
             ast::SelectTailClause::OffsetClause(offset) => {
                 if let Some(expr) = offset.expr() {
-                    self.lower_expr_in(ExprContext::Offset, &expr);
+                    self.lower_limit_expr(ExprContext::Offset, &expr);
                 }
             }
             ast::SelectTailClause::FetchClause(fetch) => {
                 if let Some(expr) = fetch.expr() {
-                    self.lower_expr_in(ExprContext::Limit, &expr);
+                    self.lower_limit_expr(ExprContext::Limit, &expr);
                 }
             }
             ast::SelectTailClause::LockingClause(locking) => {
                 self.lower_locking_clause(&locking);
             }
+        }
+    }
+
+    fn lower_limit_expr(&mut self, context: ExprContext, expr: &ast::Expr) {
+        self.lower_expr_in(context, expr);
+        if expr.is_unknown_literal()
+            && let Some(literal) = expr.unparen().as_literal()
+        {
+            self.check_int_value(IntType::Int8, &literal);
         }
     }
 
@@ -23141,10 +23150,10 @@ impl Lowerer {
                 };
                 if let Some(condition) = condition {
                     if let Some(lhs) = &lhs {
-                        self.check_condition(condition, lhs.syntax(), lhs_ty);
+                        self.check_condition(condition, lhs, lhs_ty);
                     }
                     if let Some(rhs) = &rhs {
-                        self.check_condition(condition, rhs.syntax(), rhs_ty);
+                        self.check_condition(condition, rhs, rhs_ty);
                     }
                 }
                 let ty = op
@@ -23305,7 +23314,7 @@ impl Lowerer {
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
-                    self.check_condition(ConditionKind::Not, expr.syntax(), ty);
+                    self.check_condition(ConditionKind::Not, expr, ty);
                 }
                 return self.lower_prefix_operator(&op, expr_arg_type(expr.as_ref(), ty));
             }
@@ -24416,7 +24425,7 @@ impl Lowerer {
             Some(context) => self.lower_expr_in(context, expr),
             None => self.lower_expr(expr),
         };
-        self.check_condition(condition, expr.syntax(), found);
+        self.check_condition(condition, expr, found);
     }
 
     fn check_comparison(
@@ -24441,7 +24450,13 @@ impl Lowerer {
         }
     }
 
-    fn check_condition(&mut self, condition: ConditionKind, node: &SyntaxNode, found: Option<Ty>) {
+    fn check_condition(&mut self, condition: ConditionKind, expr: &ast::Expr, found: Option<Ty>) {
+        if expr.is_unknown_literal() {
+            if let Some(literal) = expr.unparen().as_literal() {
+                self.check_bool_value(&literal);
+            }
+            return;
+        }
         if let Some(found) = found
             && let Some(bool) = self.builtin_type("bool")
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
@@ -24451,7 +24466,7 @@ impl Lowerer {
                 expected: self.index.ty_name(bool),
                 found: self.index.ty_name(found),
             };
-            self.push_error(node, error);
+            self.push_error(expr.syntax(), error);
         }
     }
 

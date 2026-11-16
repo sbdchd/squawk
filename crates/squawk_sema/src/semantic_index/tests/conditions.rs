@@ -426,3 +426,47 @@ from graph_table(
        ╰╴        ━━━━━━
     ");
 }
+
+#[test]
+fn string_literal_conditions() {
+    assert_snapshot!(check("
+create table t (a int);
+select 1 where 'yes';
+select 1 from t where 'x';
+select count(*) from t having ('nope');
+select 'on' and true, 'x' or true, not 'f';
+select case when 'x' then 1 end;
+select count(*) filter (where 'x') from t;
+"), @"
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    4 │ select 1 from t where 'x';
+      │                       ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `nope`
+      ╭▸ 
+    5 │ select count(*) from t having ('nope');
+      │                                ━━━━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    6 │ select 'on' and true, 'x' or true, not 'f';
+      │                       ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    7 │ select case when 'x' then 1 end;
+      │                  ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    8 │ select count(*) filter (where 'x') from t;
+      │                               ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    ");
+}

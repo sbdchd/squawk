@@ -70,3 +70,28 @@ select * from t where a = 'x' or a in ('0x10', '40000');
       ╰ hint: `int2` values range from `-32768` to `32767`
     ");
 }
+
+#[test]
+fn limit_offset_fetch_string_literals() {
+    assert_snapshot!(check("
+select 1 limit '1' offset '2';
+select 1 limit 'a';
+select 1 offset ('1.5');
+select 1 fetch first '99999999999999999999' rows only;
+"), @"
+    error: invalid input value for type `int8`: `a`
+      ╭▸ 
+    3 │ select 1 limit 'a';
+      ╰╴               ━━━
+    error: invalid input value for type `int8`: `1.5`
+      ╭▸ 
+    4 │ select 1 offset ('1.5');
+      ╰╴                 ━━━━━
+    error: value `99999999999999999999` is out of range for type `int8`
+      ╭▸ 
+    5 │ select 1 fetch first '99999999999999999999' rows only;
+      │                      ━━━━━━━━━━━━━━━━━━━━━━
+      │
+      ╰ hint: `int8` values range from `-9223372036854775808` to `9223372036854775807`
+    ");
+}
