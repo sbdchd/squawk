@@ -555,6 +555,41 @@ impl<'a> Overloads<'a> {
         }
     }
 
+    pub(crate) fn arg_types(
+        &self,
+        function: &Function,
+        args: &[CallArg],
+    ) -> Option<SmallVec<[Option<Ty>; 4]>> {
+        let mut params = self.bind(function, args)?;
+        if params
+            .iter()
+            .flatten()
+            .all(|param| self.pseudo(*param).is_none())
+        {
+            return Some(params);
+        }
+        let solution = self.solve(&params, args)?;
+        for param in &mut params {
+            let Some(pseudo) = param.and_then(|ty| self.pseudo(ty)) else {
+                continue;
+            };
+            *param = match pseudo {
+                _ if solution.uncertain => None,
+                Pseudo::AnyElement | Pseudo::AnyNonArray | Pseudo::AnyEnum => solution.element,
+                Pseudo::AnyCompatible | Pseudo::AnyCompatibleNonArray => solution.compatible,
+                Pseudo::Any
+                | Pseudo::Record
+                | Pseudo::AnyArray
+                | Pseudo::AnyRange
+                | Pseudo::AnyMultirange
+                | Pseudo::AnyCompatibleArray
+                | Pseudo::AnyCompatibleRange
+                | Pseudo::AnyCompatibleMultirange => None,
+            };
+        }
+        Some(params)
+    }
+
     fn candidate<Id>(
         &self,
         id: Id,

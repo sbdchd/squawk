@@ -24170,7 +24170,6 @@ impl Lowerer {
         let target = callee.as_ref().and_then(|callee| {
             self.lower_callee(callee, &args, row_source, kind, arg_list.as_ref())
         });
-        args.truncate(direct_args);
         let function = match target.map(|target| target.resolution) {
             Some(Resolution::Function(function)) => Some(function),
             Some(
@@ -24221,6 +24220,10 @@ impl Lowerer {
             )
             | None => None,
         };
+        if let Some(function) = function {
+            self.check_literal_args(function, call, &args);
+        }
+        args.truncate(direct_args);
         if let Some(function) = function
             && let Some(callee) = &callee
             && let Some(element) = self
@@ -24295,6 +24298,40 @@ impl Lowerer {
             callee: target,
             ty: target.and_then(|target| target.ty),
         })
+    }
+
+    fn check_literal_args(&mut self, function: FunctionId, call: &ast::CallExpr, args: &[CallArg]) {
+        let Some(params) = self
+            .overloads()
+            .arg_types(&self.index.functions[function], args)
+        else {
+            return;
+        };
+        let direct_args = call
+            .arg_list()
+            .into_iter()
+            .flat_map(|list| list.args())
+            .map(|arg| match arg.func_arg_expr() {
+                Some(ast::FuncArgExpr::Expr(expr)) => Some(expr),
+                Some(ast::FuncArgExpr::NamedArg(named_arg)) => named_arg.expr(),
+                None => None,
+            });
+        let within_args = call
+            .within_clause()
+            .and_then(|clause| clause.order_by_clause())
+            .and_then(|clause| clause.sort_by_list())
+            .into_iter()
+            .flat_map(|list| list.sort_bys())
+            .map(|sort_by| sort_by.expr());
+        for (expr, param) in direct_args.chain(within_args).zip(params) {
+            if let Some(expr) = expr
+                && let Some(param) = param
+                && expr.is_unknown_literal()
+                && let Some(literal) = expr.unparen().as_literal()
+            {
+                self.check_unknown_literal(param, None, &literal);
+            }
+        }
     }
 
     fn check_set_returning_call(

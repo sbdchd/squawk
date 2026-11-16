@@ -43,17 +43,17 @@ fn polymorphic_args_must_agree() {
 create domain posint as int;
 create function f(x anyelement, y anyelement) returns int language sql return 1;
 create table t (a int, b text, c posint);
-select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
+select f(a, a), f(a, b), f(a, '1'), f(a, c) from t;
 "), @"
     error: function `f(int4, text)` does not exist
       ╭▸ 
-    5 │ select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
+    5 │ select f(a, a), f(a, b), f(a, '1'), f(a, c) from t;
       │                 ━
       │
       ╰ hint: consider adding explicit type casts
     error: function `f(int4, posint)` does not exist
       ╭▸ 
-    5 │ select f(a, a), f(a, b), f(a, 'x'), f(a, c) from t;
+    5 │ select f(a, a), f(a, b), f(a, '1'), f(a, c) from t;
       │                                     ━
       │
       ╰ hint: consider adding explicit type casts
@@ -128,11 +128,11 @@ fn variadic_polymorphic_conflict() {
     assert_snapshot!(check("
 create function f(variadic x anyarray) returns int language sql return 1;
 create table t (a int, b text);
-select f(a, a), f(a, b), f(a, 'x') from t;
+select f(a, a), f(a, b), f(a, '1') from t;
 "), @"
     error: function `f(int4, text)` does not exist
       ╭▸ 
-    4 │ select f(a, a), f(a, b), f(a, 'x') from t;
+    4 │ select f(a, a), f(a, b), f(a, '1') from t;
       │                 ━
       │
       ╰ hint: consider adding explicit type casts
@@ -146,23 +146,23 @@ create function f(x anycompatible, y anycompatible) returns int language sql ret
 create function g(x anycompatiblearray, y anycompatible) returns int language sql return 1;
 create function h(x anycompatiblenonarray, y anycompatible) returns int language sql return 1;
 create table t (a int, b bigint, c text, d int[], e int[]);
-select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
+select f(a, b), f(a, c), f(a, '1'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
 "), @"
     error: function `f(int4, text)` does not exist
       ╭▸ 
-    6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
+    6 │ select f(a, b), f(a, c), f(a, '1'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
       │                 ━
       │
       ╰ hint: consider adding explicit type casts
     error: function `g(int4[], text)` does not exist
       ╭▸ 
-    6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
+    6 │ select f(a, b), f(a, c), f(a, '1'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
       │                                              ━
       │
       ╰ hint: consider adding explicit type casts
     error: argument 1 of `h` has type `int4[]`, expected `anycompatiblenonarray`
       ╭▸ 
-    6 │ select f(a, b), f(a, c), f(a, 'x'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
+    6 │ select f(a, b), f(a, c), f(a, '1'), g(d, b), g(d, c), h(a, b), h(d, e) from t;
       │                                                                  ━
       │
       ╰ hint: consider adding explicit type casts
