@@ -528,3 +528,36 @@ select true or 'x', 1 = 1 and ('x');
       ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
     ");
 }
+
+#[test]
+fn simple_case_string_literals() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b bool
+);
+select case a when '1' then 1 when 'x' then 2 when ('y') then 3 end from t;
+select case b when 'x' then 1 end from t;
+select case 'x' when 'y' then 1 end;
+select case 1 when 'x' then 1 end;
+"), @"
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    6 │ select case a when '1' then 1 when 'x' then 2 when ('y') then 3 end from t;
+      ╰╴                                   ━━━
+    error: invalid input value for type `int4`: `y`
+      ╭▸ 
+    6 │ select case a when '1' then 1 when 'x' then 2 when ('y') then 3 end from t;
+      ╰╴                                                    ━━━
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    7 │ select case b when 'x' then 1 end from t;
+      │                    ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    9 │ select case 1 when 'x' then 1 end;
+      ╰╴                   ━━━
+    ");
+}

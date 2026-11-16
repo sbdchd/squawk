@@ -23208,7 +23208,12 @@ impl Lowerer {
                 let srf_calls = self.srf_calls.len();
                 self.lower_case_keywords(case);
                 let operand = case.expr();
-                self.lower_exprs(operand.clone());
+                let operand_ty = match &operand {
+                    Some(operand) => self
+                        .lower_expr(operand)
+                        .filter(|_| !operand.is_unknown_literal()),
+                    None => None,
+                };
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
                 for when in case
                     .when_clause_list()
@@ -23218,6 +23223,9 @@ impl Lowerer {
                     if let Some(condition) = when.condition() {
                         if operand.is_some() {
                             self.lower_expr(&condition);
+                            if let Some(operand_ty) = operand_ty {
+                                self.lower_literal_comparison(operand_ty, &condition);
+                            }
                         } else {
                             self.lower_condition(ConditionKind::CaseWhen, &condition);
                         }
