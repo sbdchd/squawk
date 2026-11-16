@@ -1729,3 +1729,53 @@ create or replace function p(a int) returns int language sql as 'select 2';
        ╰ hint: drop the existing function first, then create it again
     ");
 }
+
+#[test]
+fn string_literal_args() {
+    assert_snapshot!(check("
+create function f(a int, b bool default true) returns int
+  language sql
+  return 1;
+select f('1'), f('x'), f(1, 'nope'), f(b => 'x', a => '2');
+select make_date(2020, 'x', 1), sqrt('x'), round(1.5, 'x'), length('x');
+select array_append(array[1], 'x'), num_nulls(1, 'x');
+select percentile_cont('x') within group (order by 1);
+"), @"
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    5 │ select f('1'), f('x'), f(1, 'nope'), f(b => 'x', a => '2');
+      ╰╴                 ━━━
+    error: invalid input value for type `bool`: `nope`
+      ╭▸ 
+    5 │ select f('1'), f('x'), f(1, 'nope'), f(b => 'x', a => '2');
+      │                             ━━━━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    5 │ select f('1'), f('x'), f(1, 'nope'), f(b => 'x', a => '2');
+      │                                             ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    6 │ select make_date(2020, 'x', 1), sqrt('x'), round(1.5, 'x'), length('x');
+      ╰╴                       ━━━
+    error: invalid input value for type `float8`: `x`
+      ╭▸ 
+    6 │ select make_date(2020, 'x', 1), sqrt('x'), round(1.5, 'x'), length('x');
+      ╰╴                                     ━━━
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    6 │ select make_date(2020, 'x', 1), sqrt('x'), round(1.5, 'x'), length('x');
+      ╰╴                                                      ━━━
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    7 │ select array_append(array[1], 'x'), num_nulls(1, 'x');
+      ╰╴                              ━━━
+    error: invalid input value for type `float8`: `x`
+      ╭▸ 
+    8 │ select percentile_cont('x') within group (order by 1);
+      ╰╴                       ━━━
+    ");
+}

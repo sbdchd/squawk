@@ -15832,6 +15832,7 @@ impl Lowerer {
             .and_then(|repeatable| repeatable.expr())
         {
             self.lower_tablesample_arg(&expr);
+            self.check_unknown_literal_expr(LiteralTarget::Float(FloatType::Float8), &expr);
         }
         let (schema, name_ref) = match call.expr() {
             Some(ast::Expr::NameRef(name_ref)) => (None, name_ref),
@@ -15874,6 +15875,22 @@ impl Lowerer {
             name_ref.syntax(),
             resolution,
         );
+        if function.is_some_and(|function| self.is_builtin_tablesample_method(function)) {
+            for arg in call.arg_list().iter().flat_map(|list| list.args()) {
+                if let Some(expr) = arg.func_arg_expr().and_then(|expr| expr.expr()) {
+                    self.check_unknown_literal_expr(LiteralTarget::Float(FloatType::Float4), &expr);
+                }
+            }
+        }
+    }
+
+    fn is_builtin_tablesample_method(&self, function: FunctionId) -> bool {
+        let function = &self.index.functions[function];
+        function.schema == self.pg_catalog
+            && matches!(
+                self.index.names.resolve(function.name),
+                "bernoulli" | "system"
+            )
     }
 
     fn lower_from_item(&mut self, from_item: &ast::FromItem) {
@@ -22871,22 +22888,35 @@ impl Lowerer {
             }
             ast::SelectTailClause::LimitClause(limit) => {
                 if let Some(ast::LimitValue::Expr(expr)) = limit.limit_value() {
-                    self.lower_expr_in(ExprContext::Limit, &expr);
+                    self.lower_limit_expr(ExprContext::Limit, &expr);
                 }
             }
             ast::SelectTailClause::OffsetClause(offset) => {
                 if let Some(expr) = offset.expr() {
-                    self.lower_expr_in(ExprContext::Offset, &expr);
+                    self.lower_limit_expr(ExprContext::Offset, &expr);
                 }
             }
             ast::SelectTailClause::FetchClause(fetch) => {
                 if let Some(expr) = fetch.expr() {
-                    self.lower_expr_in(ExprContext::Limit, &expr);
+                    self.lower_limit_expr(ExprContext::Limit, &expr);
                 }
             }
             ast::SelectTailClause::LockingClause(locking) => {
                 self.lower_locking_clause(&locking);
             }
+        }
+    }
+
+    fn lower_limit_expr(&mut self, context: ExprContext, expr: &ast::Expr) {
+        self.lower_expr_in(context, expr);
+        self.check_unknown_literal_expr(LiteralTarget::Int(IntType::Int8), expr);
+    }
+
+    fn check_unknown_literal_expr(&mut self, target: LiteralTarget, expr: &ast::Expr) {
+        if expr.is_unknown_literal()
+            && let Some(literal) = expr.unparen().as_literal()
+        {
+            self.lower_literal_value(target, &literal);
         }
     }
 
@@ -23121,7 +23151,12 @@ impl Lowerer {
                 let rhs = bin.rhs();
                 let lhs_ty = lhs.as_ref().and_then(|lhs| self.lower_expr(lhs));
                 let left = expr_arg_type(lhs.as_ref(), lhs_ty);
+                let bool_test = op
+                    .as_ref()
+                    .zip(rhs.as_ref())
+                    .and_then(|(op, rhs)| bool_test_condition(op, rhs));
                 let right = match &rhs {
+                    Some(_) if bool_test.is_some() => ArgType::Untyped,
                     Some(rhs) => self.lower_bin_rhs(op.as_ref(), lhs.as_ref(), rhs, left),
                     None => ArgType::Untyped,
                 };
@@ -23141,11 +23176,16 @@ impl Lowerer {
                 };
                 if let Some(condition) = condition {
                     if let Some(lhs) = &lhs {
-                        self.check_condition(condition, lhs.syntax(), lhs_ty);
+                        self.check_condition(condition, lhs, lhs_ty);
                     }
                     if let Some(rhs) = &rhs {
-                        self.check_condition(condition, rhs.syntax(), rhs_ty);
+                        self.check_condition(condition, rhs, rhs_ty);
                     }
+                }
+                if let Some(condition) = bool_test
+                    && let Some(lhs) = &lhs
+                {
+                    self.check_condition(condition, lhs, lhs_ty);
                 }
                 let ty = op
                     .as_ref()
@@ -23168,7 +23208,12 @@ impl Lowerer {
                 let srf_calls = self.srf_calls.len();
                 self.lower_case_keywords(case);
                 let operand = case.expr();
-                self.lower_exprs(operand.clone());
+                let operand_ty = match &operand {
+                    Some(operand) => self
+                        .lower_expr(operand)
+                        .filter(|_| !operand.is_unknown_literal()),
+                    None => None,
+                };
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
                 for when in case
                     .when_clause_list()
@@ -23178,6 +23223,9 @@ impl Lowerer {
                     if let Some(condition) = when.condition() {
                         if operand.is_some() {
                             self.lower_expr(&condition);
+                            if let Some(operand_ty) = operand_ty {
+                                self.lower_literal_comparison(operand_ty, &condition);
+                            }
                         } else {
                             self.lower_condition(ConditionKind::CaseWhen, &condition);
                         }
@@ -23305,7 +23353,7 @@ impl Lowerer {
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
-                    self.check_condition(ConditionKind::Not, expr.syntax(), ty);
+                    self.check_condition(ConditionKind::Not, expr, ty);
                 }
                 return self.lower_prefix_operator(&op, expr_arg_type(expr.as_ref(), ty));
             }
@@ -23561,40 +23609,85 @@ impl Lowerer {
             clauses.partition_by |= base_clauses.partition_by;
             clauses.order_by |= base_clauses.order_by;
         }
-        self.with_expr_context(ExprContext::WindowDefinition, |this| {
+        let order_by_ty = self.with_expr_context(ExprContext::WindowDefinition, |this| {
             if let Some(partition_by) = window_spec.partition_by_clause() {
                 this.lower_exprs(partition_by.exprs());
             }
-            this.lower_order_by(window_spec.order_by_clause());
+            this.lower_window_order_by(window_spec.order_by_clause())
         });
         let Some(frame_clause) = window_spec.frame_clause() else {
             return clauses;
         };
-        let context = match frame_clause.frame_units() {
-            Some(ast::FrameUnits::FrameRange(_)) => ExprContext::WindowRange,
-            Some(ast::FrameUnits::FrameRows(_)) => ExprContext::WindowRows,
-            Some(ast::FrameUnits::FrameGroups(_)) => ExprContext::WindowGroups,
-            None => ExprContext::WindowDefinition,
+        let (context, offset_target) = match frame_clause.frame_units() {
+            Some(ast::FrameUnits::FrameRange(_)) => (
+                ExprContext::WindowRange,
+                order_by_ty.and_then(|ty| self.range_offset_target(ty)),
+            ),
+            Some(ast::FrameUnits::FrameRows(_)) => (
+                ExprContext::WindowRows,
+                Some(LiteralTarget::Int(IntType::Int8)),
+            ),
+            Some(ast::FrameUnits::FrameGroups(_)) => (
+                ExprContext::WindowGroups,
+                Some(LiteralTarget::Int(IntType::Int8)),
+            ),
+            None => (ExprContext::WindowDefinition, None),
         };
         self.with_expr_context(context, |this| match frame_clause.frame_extent() {
             Some(ast::FrameExtent::FrameBetween(between)) => {
                 for bound in [between.start(), between.end()].into_iter().flatten() {
-                    this.lower_frame_bound(&bound);
+                    this.lower_frame_bound(&bound, offset_target);
                 }
             }
-            Some(ast::FrameExtent::FrameBound(bound)) => this.lower_frame_bound(&bound),
+            Some(ast::FrameExtent::FrameBound(bound)) => {
+                this.lower_frame_bound(&bound, offset_target);
+            }
             None => {}
         });
         clauses
     }
 
-    fn lower_frame_bound(&mut self, bound: &ast::FrameBound) {
-        match bound {
-            ast::FrameBound::ExprPreceding(preceding) => self.lower_exprs(preceding.expr()),
-            ast::FrameBound::ExprFollowing(following) => self.lower_exprs(following.expr()),
+    fn lower_window_order_by(&mut self, order_by: Option<ast::OrderByClause>) -> Option<Ty> {
+        let mut sort_bys = order_by
+            .and_then(|clause| clause.sort_by_list())
+            .into_iter()
+            .flat_map(|list| list.sort_bys());
+        let first = sort_bys.next()?;
+        let ty = first.expr().and_then(|expr| self.lower_expr(&expr));
+        let mut single = true;
+        for sort_by in sort_bys {
+            single = false;
+            self.lower_exprs(sort_by.expr());
+        }
+        ty.filter(|_| single)
+    }
+
+    fn range_offset_target(&self, ty: Ty) -> Option<LiteralTarget> {
+        match self.literal_target(ty, None)? {
+            LiteralTarget::Int(ty) => Some(LiteralTarget::Int(ty)),
+            LiteralTarget::Float(_) => Some(LiteralTarget::Float(FloatType::Float8)),
+            LiteralTarget::Numeric(_) => Some(LiteralTarget::Numeric(None)),
+            LiteralTarget::Enum(_)
+            | LiteralTarget::Bool
+            | LiteralTarget::Uuid
+            | LiteralTarget::Json(_) => None,
+        }
+    }
+
+    fn lower_frame_bound(&mut self, bound: &ast::FrameBound, offset_target: Option<LiteralTarget>) {
+        let expr = match bound {
+            ast::FrameBound::ExprPreceding(preceding) => preceding.expr(),
+            ast::FrameBound::ExprFollowing(following) => following.expr(),
             ast::FrameBound::CurrentRow(_)
             | ast::FrameBound::UnboundedPreceding(_)
-            | ast::FrameBound::UnboundedFollowing(_) => {}
+            | ast::FrameBound::UnboundedFollowing(_) => None,
+        };
+        let Some(expr) = expr else {
+            return;
+        };
+        self.lower_expr(&expr);
+        if let Some(target) = offset_target {
+            self.check_unknown_literal_expr(target, &expr);
         }
     }
 
@@ -24085,7 +24178,6 @@ impl Lowerer {
         let target = callee.as_ref().and_then(|callee| {
             self.lower_callee(callee, &args, row_source, kind, arg_list.as_ref())
         });
-        args.truncate(direct_args);
         let function = match target.map(|target| target.resolution) {
             Some(Resolution::Function(function)) => Some(function),
             Some(
@@ -24136,6 +24228,10 @@ impl Lowerer {
             )
             | None => None,
         };
+        if let Some(function) = function {
+            self.check_literal_args(function, call, &args);
+        }
+        args.truncate(direct_args);
         if let Some(function) = function
             && let Some(callee) = &callee
             && let Some(element) = self
@@ -24210,6 +24306,40 @@ impl Lowerer {
             callee: target,
             ty: target.and_then(|target| target.ty),
         })
+    }
+
+    fn check_literal_args(&mut self, function: FunctionId, call: &ast::CallExpr, args: &[CallArg]) {
+        let Some(params) = self
+            .overloads()
+            .arg_types(&self.index.functions[function], args)
+        else {
+            return;
+        };
+        let direct_args = call
+            .arg_list()
+            .into_iter()
+            .flat_map(|list| list.args())
+            .map(|arg| match arg.func_arg_expr() {
+                Some(ast::FuncArgExpr::Expr(expr)) => Some(expr),
+                Some(ast::FuncArgExpr::NamedArg(named_arg)) => named_arg.expr(),
+                None => None,
+            });
+        let within_args = call
+            .within_clause()
+            .and_then(|clause| clause.order_by_clause())
+            .and_then(|clause| clause.sort_by_list())
+            .into_iter()
+            .flat_map(|list| list.sort_bys())
+            .map(|sort_by| sort_by.expr());
+        for (expr, param) in direct_args.chain(within_args).zip(params) {
+            if let Some(expr) = expr
+                && let Some(param) = param
+                && expr.is_unknown_literal()
+                && let Some(literal) = expr.unparen().as_literal()
+            {
+                self.check_unknown_literal(param, None, &literal);
+            }
+        }
     }
 
     fn check_set_returning_call(
@@ -24416,7 +24546,7 @@ impl Lowerer {
             Some(context) => self.lower_expr_in(context, expr),
             None => self.lower_expr(expr),
         };
-        self.check_condition(condition, expr.syntax(), found);
+        self.check_condition(condition, expr, found);
     }
 
     fn check_comparison(
@@ -24441,7 +24571,13 @@ impl Lowerer {
         }
     }
 
-    fn check_condition(&mut self, condition: ConditionKind, node: &SyntaxNode, found: Option<Ty>) {
+    fn check_condition(&mut self, condition: ConditionKind, expr: &ast::Expr, found: Option<Ty>) {
+        if expr.is_unknown_literal() {
+            if let Some(literal) = expr.unparen().as_literal() {
+                self.check_bool_value(&literal);
+            }
+            return;
+        }
         if let Some(found) = found
             && let Some(bool) = self.builtin_type("bool")
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
@@ -24451,7 +24587,7 @@ impl Lowerer {
                 expected: self.index.ty_name(bool),
                 found: self.index.ty_name(found),
             };
-            self.push_error(node, error);
+            self.push_error(expr.syntax(), error);
         }
     }
 
@@ -27567,4 +27703,25 @@ fn standalone_select_keyword(call: &ast::CallExpr) -> Option<SyntaxToken> {
         return None;
     }
     select_clause.select_token()
+}
+
+fn bool_test_condition(op: &ast::BinOp, rhs: &ast::Expr) -> Option<ConditionKind> {
+    let (is, is_not) = match rhs {
+        ast::Expr::Literal(literal) => match literal.kind()? {
+            ast::LitKind::True(_) => (ConditionKind::IsTrue, ConditionKind::IsNotTrue),
+            ast::LitKind::False(_) => (ConditionKind::IsFalse, ConditionKind::IsNotFalse),
+            _ => return None,
+        },
+        ast::Expr::NameRef(name_ref)
+            if name_ref.syntax().first_token()?.kind() == SyntaxKind::UNKNOWN_KW =>
+        {
+            (ConditionKind::IsUnknown, ConditionKind::IsNotUnknown)
+        }
+        _ => return None,
+    };
+    match op {
+        ast::BinOp::Is(_) => Some(is),
+        ast::BinOp::IsNot(_) => Some(is_not),
+        _ => None,
+    }
 }

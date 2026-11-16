@@ -426,3 +426,138 @@ from graph_table(
        ╰╴        ━━━━━━
     ");
 }
+
+#[test]
+fn string_literal_conditions() {
+    assert_snapshot!(check("
+create table t (a int);
+select 1 where 'yes';
+select 1 from t where 'x';
+select count(*) from t having ('nope');
+select 'on' and true, 'x' or true, not 'f';
+select case when 'x' then 1 end;
+select count(*) filter (where 'x') from t;
+"), @"
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    4 │ select 1 from t where 'x';
+      │                       ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `nope`
+      ╭▸ 
+    5 │ select count(*) from t having ('nope');
+      │                                ━━━━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    6 │ select 'on' and true, 'x' or true, not 'f';
+      │                       ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    7 │ select case when 'x' then 1 end;
+      │                  ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    8 │ select count(*) filter (where 'x') from t;
+      │                               ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    ");
+}
+
+#[test]
+fn bool_tests() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b bool
+);
+select a is true, a is not false, a is unknown from t;
+select b is true, b is not unknown, null is false from t;
+select 'x' is true, 'yes' is not true, 'nope' is unknown;
+"), @"
+    error: argument of `is true` must be type `bool`, not type `int4`
+      ╭▸ 
+    6 │ select a is true, a is not false, a is unknown from t;
+      ╰╴       ━
+    error: argument of `is not false` must be type `bool`, not type `int4`
+      ╭▸ 
+    6 │ select a is true, a is not false, a is unknown from t;
+      ╰╴                  ━
+    error: argument of `is unknown` must be type `bool`, not type `int4`
+      ╭▸ 
+    6 │ select a is true, a is not false, a is unknown from t;
+      ╰╴                                  ━
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    8 │ select 'x' is true, 'yes' is not true, 'nope' is unknown;
+      │        ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `nope`
+      ╭▸ 
+    8 │ select 'x' is true, 'yes' is not true, 'nope' is unknown;
+      │                                        ━━━━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    ");
+}
+
+#[test]
+fn string_literal_rhs_conditions() {
+    assert_snapshot!(check("
+select true or 'x', 1 = 1 and ('x');
+"), @"
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    2 │ select true or 'x', 1 = 1 and ('x');
+      │                ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    2 │ select true or 'x', 1 = 1 and ('x');
+      │                                ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    ");
+}
+
+#[test]
+fn simple_case_string_literals() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b bool
+);
+select case a when '1' then 1 when 'x' then 2 when ('y') then 3 end from t;
+select case b when 'x' then 1 end from t;
+select case 'x' when 'y' then 1 end;
+select case 1 when 'x' then 1 end;
+"), @"
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    6 │ select case a when '1' then 1 when 'x' then 2 when ('y') then 3 end from t;
+      ╰╴                                   ━━━
+    error: invalid input value for type `int4`: `y`
+      ╭▸ 
+    6 │ select case a when '1' then 1 when 'x' then 2 when ('y') then 3 end from t;
+      ╰╴                                                    ━━━
+    error: invalid input value for type `bool`: `x`
+      ╭▸ 
+    7 │ select case b when 'x' then 1 end from t;
+      │                    ━━━
+      │
+      ╰ hint: expected one of `true`, `false`, `yes`, `no`, `on`, `off`, `1`, or `0`
+    error: invalid input value for type `int4`: `x`
+      ╭▸ 
+    9 │ select case 1 when 'x' then 1 end;
+      ╰╴                   ━━━
+    ");
+}

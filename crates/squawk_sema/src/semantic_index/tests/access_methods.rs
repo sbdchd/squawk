@@ -146,3 +146,32 @@ select x.a from t as x tablesample system (1 + 2) repeatable (nope2);
       ╰╴                                                              ━━━━━
     ");
 }
+
+#[test]
+fn tablesample_string_literals() {
+    assert_snapshot!(check("
+create table t (a int);
+select a from t tablesample bernoulli ('10');
+select a from t tablesample bernoulli ('x');
+select a from t tablesample pg_catalog.system (('1e40'));
+select a from t tablesample system (1) repeatable ('1e400');
+select a from t tablesample nope ('x');
+"), @"
+    error: invalid input value for type `float4`: `x`
+      ╭▸ 
+    4 │ select a from t tablesample bernoulli ('x');
+      ╰╴                                       ━━━
+    error: value `1e40` is out of range for type `float4`
+      ╭▸ 
+    5 │ select a from t tablesample pg_catalog.system (('1e40'));
+      ╰╴                                                ━━━━━━
+    error: value `1e400` is out of range for type `float8`
+      ╭▸ 
+    6 │ select a from t tablesample system (1) repeatable ('1e400');
+      ╰╴                                                   ━━━━━━━
+    error: function `nope` does not exist
+      ╭▸ 
+    7 │ select a from t tablesample nope ('x');
+      ╰╴                            ━━━━
+    ");
+}

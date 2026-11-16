@@ -103,6 +103,12 @@ pub(crate) enum ConditionKind {
     And,
     Or,
     Not,
+    IsTrue,
+    IsNotTrue,
+    IsFalse,
+    IsNotFalse,
+    IsUnknown,
+    IsNotUnknown,
     GraphWhere,
 }
 
@@ -124,6 +130,12 @@ impl ConditionKind {
             | ConditionKind::And
             | ConditionKind::Or
             | ConditionKind::Not
+            | ConditionKind::IsTrue
+            | ConditionKind::IsNotTrue
+            | ConditionKind::IsFalse
+            | ConditionKind::IsNotFalse
+            | ConditionKind::IsUnknown
+            | ConditionKind::IsNotUnknown
             | ConditionKind::GraphWhere => None,
         }
     }
@@ -146,6 +158,12 @@ impl ConditionKind {
             ConditionKind::And => "and",
             ConditionKind::Or => "or",
             ConditionKind::Not => "not",
+            ConditionKind::IsTrue => "is true",
+            ConditionKind::IsNotTrue => "is not true",
+            ConditionKind::IsFalse => "is false",
+            ConditionKind::IsNotFalse => "is not false",
+            ConditionKind::IsUnknown => "is unknown",
+            ConditionKind::IsNotUnknown => "is not unknown",
         }
     }
 }
