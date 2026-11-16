@@ -303,3 +303,51 @@ select array_agg(a order by b), count(distinct a) from t;
       ╰╴             ━━━━━━━━
     ");
 }
+
+#[test]
+fn frame_offset_string_literals() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b numeric,
+  c float4,
+  d date,
+  e text
+);
+select count(*) over (rows 'a' preceding) from t;
+select count(*) over (
+  order by a groups between '1' preceding and ('b') following
+)
+from t;
+select count(*) over (order by a range '1.5' preceding) from t;
+select count(*) over (order by b range 'x' preceding) from t;
+select count(*) over (
+  order by c range between current row and '1e400' following
+)
+from t;
+select count(*) over (order by d range '1 day' preceding) from t;
+select count(*) over (order by a, b rows '1' preceding) from t;
+select count(*) over (order by a range '1' preceding) from t;
+"), @"
+    error: invalid input value for type `int8`: `a`
+      ╭▸ 
+    9 │ select count(*) over (rows 'a' preceding) from t;
+      ╰╴                           ━━━
+    error: invalid input value for type `int8`: `b`
+       ╭▸ 
+    11 │   order by a groups between '1' preceding and ('b') following
+       ╰╴                                               ━━━
+    error: invalid input value for type `int4`: `1.5`
+       ╭▸ 
+    14 │ select count(*) over (order by a range '1.5' preceding) from t;
+       ╰╴                                       ━━━━━
+    error: invalid input value for type `numeric`: `x`
+       ╭▸ 
+    15 │ select count(*) over (order by b range 'x' preceding) from t;
+       ╰╴                                       ━━━
+    error: value `1e400` is out of range for type `float8`
+       ╭▸ 
+    17 │   order by c range between current row and '1e400' following
+       ╰╴                                           ━━━━━━━
+    ");
+}

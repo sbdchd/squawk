@@ -23580,40 +23580,88 @@ impl Lowerer {
             clauses.partition_by |= base_clauses.partition_by;
             clauses.order_by |= base_clauses.order_by;
         }
-        self.with_expr_context(ExprContext::WindowDefinition, |this| {
+        let order_by_ty = self.with_expr_context(ExprContext::WindowDefinition, |this| {
             if let Some(partition_by) = window_spec.partition_by_clause() {
                 this.lower_exprs(partition_by.exprs());
             }
-            this.lower_order_by(window_spec.order_by_clause());
+            this.lower_window_order_by(window_spec.order_by_clause())
         });
         let Some(frame_clause) = window_spec.frame_clause() else {
             return clauses;
         };
-        let context = match frame_clause.frame_units() {
-            Some(ast::FrameUnits::FrameRange(_)) => ExprContext::WindowRange,
-            Some(ast::FrameUnits::FrameRows(_)) => ExprContext::WindowRows,
-            Some(ast::FrameUnits::FrameGroups(_)) => ExprContext::WindowGroups,
-            None => ExprContext::WindowDefinition,
+        let (context, offset_target) = match frame_clause.frame_units() {
+            Some(ast::FrameUnits::FrameRange(_)) => (
+                ExprContext::WindowRange,
+                order_by_ty.and_then(|ty| self.range_offset_target(ty)),
+            ),
+            Some(ast::FrameUnits::FrameRows(_)) => (
+                ExprContext::WindowRows,
+                Some(LiteralTarget::Int(IntType::Int8)),
+            ),
+            Some(ast::FrameUnits::FrameGroups(_)) => (
+                ExprContext::WindowGroups,
+                Some(LiteralTarget::Int(IntType::Int8)),
+            ),
+            None => (ExprContext::WindowDefinition, None),
         };
         self.with_expr_context(context, |this| match frame_clause.frame_extent() {
             Some(ast::FrameExtent::FrameBetween(between)) => {
                 for bound in [between.start(), between.end()].into_iter().flatten() {
-                    this.lower_frame_bound(&bound);
+                    this.lower_frame_bound(&bound, offset_target);
                 }
             }
-            Some(ast::FrameExtent::FrameBound(bound)) => this.lower_frame_bound(&bound),
+            Some(ast::FrameExtent::FrameBound(bound)) => {
+                this.lower_frame_bound(&bound, offset_target);
+            }
             None => {}
         });
         clauses
     }
 
-    fn lower_frame_bound(&mut self, bound: &ast::FrameBound) {
-        match bound {
-            ast::FrameBound::ExprPreceding(preceding) => self.lower_exprs(preceding.expr()),
-            ast::FrameBound::ExprFollowing(following) => self.lower_exprs(following.expr()),
+    fn lower_window_order_by(&mut self, order_by: Option<ast::OrderByClause>) -> Option<Ty> {
+        let mut sort_bys = order_by
+            .and_then(|clause| clause.sort_by_list())
+            .into_iter()
+            .flat_map(|list| list.sort_bys());
+        let first = sort_bys.next()?;
+        let ty = first.expr().and_then(|expr| self.lower_expr(&expr));
+        let mut single = true;
+        for sort_by in sort_bys {
+            single = false;
+            self.lower_exprs(sort_by.expr());
+        }
+        ty.filter(|_| single)
+    }
+
+    fn range_offset_target(&self, ty: Ty) -> Option<LiteralTarget> {
+        match self.literal_target(ty, None)? {
+            LiteralTarget::Int(ty) => Some(LiteralTarget::Int(ty)),
+            LiteralTarget::Float(_) => Some(LiteralTarget::Float(FloatType::Float8)),
+            LiteralTarget::Numeric(_) => Some(LiteralTarget::Numeric(None)),
+            LiteralTarget::Enum(_)
+            | LiteralTarget::Bool
+            | LiteralTarget::Uuid
+            | LiteralTarget::Json(_) => None,
+        }
+    }
+
+    fn lower_frame_bound(&mut self, bound: &ast::FrameBound, offset_target: Option<LiteralTarget>) {
+        let expr = match bound {
+            ast::FrameBound::ExprPreceding(preceding) => preceding.expr(),
+            ast::FrameBound::ExprFollowing(following) => following.expr(),
             ast::FrameBound::CurrentRow(_)
             | ast::FrameBound::UnboundedPreceding(_)
-            | ast::FrameBound::UnboundedFollowing(_) => {}
+            | ast::FrameBound::UnboundedFollowing(_) => None,
+        };
+        let Some(expr) = expr else {
+            return;
+        };
+        self.lower_expr(&expr);
+        if let Some(target) = offset_target
+            && expr.is_unknown_literal()
+            && let Some(literal) = expr.unparen().as_literal()
+        {
+            self.lower_literal_value(target, &literal);
         }
     }
 
