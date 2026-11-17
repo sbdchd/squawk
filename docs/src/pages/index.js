@@ -30,7 +30,7 @@ const features = [
         <a href="https://marketplace.visualstudio.com/items?itemName=squawk.squawk-vscode">
           VSCode extension
         </a>{" "}
-        provides linting in your editor.
+        provides code formatting & linting in your editor.
       </>
     ),
   },
@@ -461,7 +461,7 @@ function Home() {
         <div className="container">
           <h1 className="hero__title">Squawk</h1>
           <p className="hero__subtitle">
-            A linter and language server for Postgres migrations & SQL
+            A linter, code formatter, and language server for Postgres migrations & SQL
           </p>
           <div
             className={styles.buttons}

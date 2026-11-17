@@ -271,7 +271,27 @@ const styles = stylex.create({
   },
 })
 
+const MODE_PARAM = "mode"
+
+function modeToParam(mode: Mode | null): string {
+  return mode == null ? "none" : mode.toLowerCase().replace(" ", "-")
+}
+
+function modeFromParam(param: string): Mode | null | undefined {
+  if (param === "none") {
+    return null
+  }
+  return modes.find((mode) => modeToParam(mode) === param)
+}
+
 function initialMode(): Mode | null {
+  const param = new URLSearchParams(window.location.search).get(MODE_PARAM)
+  if (param != null) {
+    const mode = modeFromParam(param)
+    if (mode !== undefined) {
+      return mode
+    }
+  }
   const mode = localStorage.getItem("play-mode-v1")
   if (modes.includes(mode as Mode)) {
     return mode as Mode
@@ -291,6 +311,9 @@ function saveMode(mode: Mode | null) {
   } catch {
     // pass
   }
+  const url = new URL(window.location.href)
+  url.searchParams.set(MODE_PARAM, modeToParam(mode))
+  window.history.replaceState(window.history.state, "", url)
 }
 
 function useMode() {

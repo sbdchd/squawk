@@ -1,6 +1,6 @@
 # squawk [![npm](https://img.shields.io/npm/v/squawk-cli)](https://www.npmjs.com/package/squawk-cli)
 
-> Linter for Postgres migrations & SQL
+> A linter, code formatter, and language server for Postgres migrations & SQL
 
 [Quick Start](https://squawkhq.com/docs/) | [Playground](https://play.squawkhq.com) | [Rules Documentation](https://squawkhq.com/docs/rules) | [GitHub Action](https://github.com/sbdchd/squawk-action) | [DIY GitHub Integration](https://squawkhq.com/docs/github_app)
 
@@ -245,6 +245,21 @@ excluded_rules = [
 ```
 
 See the [Squawk website](https://squawkhq.com/docs/rules) for documentation on each rule with examples and reasoning.
+
+## Code Formatting
+
+```shell
+# format files in place
+squawk format 'migrations/*.sql'
+
+# exit with a non-zero status code if any files aren't formatted
+squawk format --check 'migrations/*.sql'
+
+# print a diff of the changes instead of writing them
+squawk format --diff 'migrations/*.sql'
+```
+
+See the [code formatting docs](https://squawkhq.com/docs/code-formatter) for more information.
 
 ## Bot Setup
 
