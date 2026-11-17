@@ -4,6 +4,7 @@ module.exports = {
       "quick_start",
       "safe_migrations",
       "cli",
+      "code-formatter",
       "github_app",
       "web-frameworks",
       "postgres-locks",
