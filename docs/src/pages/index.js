@@ -461,7 +461,8 @@ function Home() {
         <div className="container">
           <h1 className="hero__title">Squawk</h1>
           <p className="hero__subtitle">
-            A linter, code formatter, and language server for Postgres migrations & SQL
+            A linter, code formatter, and language server for Postgres
+            migrations & SQL
           </p>
           <div
             className={styles.buttons}
