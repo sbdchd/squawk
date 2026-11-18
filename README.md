@@ -113,8 +113,10 @@ Find problems in your SQL
 Usage: squawk [OPTIONS] [path]... [COMMAND]
 
 Commands:
+  check             Lint SQL files
+  format            Format SQL files
   server            Run the language server
-  upload-to-github  Comment on a PR with Squawk's results
+  upload-to-github  Comment on a PR with lint results
   help              Print this message or the help of the given subcommand(s)
 
 Arguments:
@@ -122,6 +124,19 @@ Arguments:
           Paths or patterns to search
 
 Options:
+      --debug <format>
+          Output debug format
+
+          [possible values: lex, parse, ast]
+
+      --reporter <REPORTER>
+          Style of error reporting
+
+          [possible values: tty, gcc, json, gitlab]
+
+      --stdin-filepath <filepath>
+          Path to use in reporting for stdin
+
       --exclude-path <EXCLUDED_PATH>
           Paths to exclude
 
@@ -147,19 +162,6 @@ Options:
           Specify postgres version
 
           For example: --pg-version=13.0
-
-      --debug <format>
-          Output debug format
-
-          [possible values: lex, parse, ast]
-
-      --reporter <REPORTER>
-          Style of error reporting
-
-          [possible values: tty, gcc, json, gitlab]
-
-      --stdin-filepath <filepath>
-          Path to use in reporting for stdin
 
       --verbose
           Enable debug logging output
