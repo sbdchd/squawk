@@ -91,6 +91,7 @@ module.exports = {
       "ban-alter-sequence-values",
       "ban-alter-system-options",
       "ban-alter-extension",
+      "ban-set-null-on-not-null-column",
       // xtask:new-rule:error-name
     ],
   },
