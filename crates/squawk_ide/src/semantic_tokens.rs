@@ -1,7 +1,7 @@
 use squawk_rowan::{NodeOrToken, TextRange, TextSize, WalkEvent};
 use squawk_syntax::{
     SyntaxKind, SyntaxNode, SyntaxToken,
-    ast::{self, AstNode},
+    ast::{self, AstNode, NameLike},
     match_ast,
 };
 
@@ -297,6 +297,37 @@ impl Highlighter<'_> {
                         self.keyword(file_id, name_ref.ident_token());
                     }
                 },
+                ast::ParallelFuncOption(option) => {
+                    self.contextual_keyword(file_id, option.ident_token(), PARALLEL_MODES);
+                },
+                ast::AttributeOption(option) => {
+                    if let Some(name) = option.name()
+                        && let Some(words) = attribute_option_values(&name.text())
+                        && let Some(ast::Type::PathType(path_type)) =
+                            option.attribute_value().and_then(|value| value.ty())
+                        && path_type.arg_list().is_none()
+                        && let Some(path) = path_type.path_ref()
+                        && path.qualifier().is_none()
+                        && let Some(segment) = path.segment()
+                    {
+                        self.contextual_keyword(file_id, segment.ident_token(), words);
+                    }
+                },
+                ast::StorageMode(mode) => {
+                    self.contextual_keyword(file_id, mode.ident_token(), STORAGE_MODES);
+                },
+                ast::StatisticsKind(kind) => {
+                    self.contextual_keyword(file_id, kind.ident_token(), STATISTICS_KINDS);
+                },
+                ast::AsPolicyType(policy_type) => {
+                    self.contextual_keyword(file_id, policy_type.ident_token(), POLICY_TYPES);
+                },
+                ast::RoleOptionGeneric(option) => {
+                    self.contextual_keyword(file_id, option.ident_token(), ROLE_OPTIONS);
+                },
+                ast::JsonEncoding(encoding) => {
+                    self.contextual_keyword(file_id, encoding.ident_token(), JSON_ENCODINGS);
+                },
                 _ => (),
             }
         }
@@ -440,6 +471,21 @@ impl Highlighter<'_> {
         }
     }
 
+    fn contextual_keyword(
+        &mut self,
+        file_id: IrFileId,
+        token: Option<SyntaxToken>,
+        words: &[&str],
+    ) {
+        if let Some(token) = token
+            && words
+                .iter()
+                .any(|word| token.text().eq_ignore_ascii_case(word))
+        {
+            self.keyword(file_id, Some(token));
+        }
+    }
+
     fn keyword(&mut self, file_id: IrFileId, token: Option<SyntaxToken>) {
         if let Some(token) = token {
             self.push(
@@ -479,6 +525,46 @@ impl Highlighter<'_> {
         self.index.range(InIrFile::new(file_id, range)).value
     }
 }
+
+const PARALLEL_MODES: &[&str] = &["safe", "restricted", "unsafe"];
+
+const STORAGE_MODES: &[&str] = &["plain", "external", "extended", "main"];
+
+const FINALFUNC_MODIFY_MODES: &[&str] = &["read_only", "shareable", "read_write"];
+
+const COLLATION_PROVIDERS: &[&str] = &["builtin", "icu", "libc"];
+
+const STATISTICS_KINDS: &[&str] = &["ndistinct", "dependencies", "mcv"];
+
+fn attribute_option_values(name: &str) -> Option<&'static [&'static str]> {
+    match name {
+        "parallel" => Some(PARALLEL_MODES),
+        "storage" => Some(STORAGE_MODES),
+        "finalfunc_modify" | "mfinalfunc_modify" => Some(FINALFUNC_MODIFY_MODES),
+        "provider" => Some(COLLATION_PROVIDERS),
+        _ => None,
+    }
+}
+
+const POLICY_TYPES: &[&str] = &["permissive", "restrictive"];
+
+const ROLE_OPTIONS: &[&str] = &[
+    "superuser",
+    "nosuperuser",
+    "createrole",
+    "nocreaterole",
+    "replication",
+    "noreplication",
+    "createdb",
+    "nocreatedb",
+    "login",
+    "nologin",
+    "bypassrls",
+    "nobypassrls",
+    "noinherit",
+];
+
+const JSON_ENCODINGS: &[&str] = &["utf8", "utf16", "utf32"];
 
 fn keyword_used_as_name(token: &SyntaxToken) -> bool {
     token.parent().is_some_and(|parent| {

@@ -1211,6 +1211,134 @@ grant select on t to public;
 }
 
 #[test]
+fn parallel_func_option() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create function f() returns int
+  as 'select 1'
+  language sql
+  parallel safe;
+create function g() returns int
+  as 'select 1'
+  language sql
+  parallel bogus;
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "function" @ 8..16: Keyword
+    "f" @ 17..18: Function (Definition)
+    "(" @ 18..19: Punctuation
+    ")" @ 19..20: Punctuation
+    "returns" @ 21..28: Keyword
+    "int" @ 29..32: Type
+    "as" @ 35..37: Keyword
+    "'" @ 38..39: String
+    "select" @ 39..45: Keyword
+    "1" @ 46..47: Number
+    "'" @ 47..48: String
+    "language" @ 51..59: Keyword
+    "sql" @ 60..63: Language
+    "parallel" @ 66..74: Keyword
+    "safe" @ 75..79: Keyword
+    ";" @ 79..80: Punctuation
+    "create" @ 81..87: Keyword
+    "function" @ 88..96: Keyword
+    "g" @ 97..98: Function (Definition)
+    "(" @ 98..99: Punctuation
+    ")" @ 99..100: Punctuation
+    "returns" @ 101..108: Keyword
+    "int" @ 109..112: Type
+    "as" @ 115..117: Keyword
+    "'" @ 118..119: String
+    "select" @ 119..125: Keyword
+    "1" @ 126..127: Number
+    "'" @ 127..128: String
+    "language" @ 131..139: Keyword
+    "sql" @ 140..143: Language
+    "parallel" @ 146..154: Keyword
+    "bogus" @ 155..160: NameRef
+    ";" @ 160..161: Punctuation
+    "#);
+}
+
+#[test]
+fn policy_type() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create policy p on t as restrictive;
+create policy q on t as bogus;
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "policy" @ 8..14: Keyword
+    "p" @ 15..16: NameRef
+    "on" @ 17..19: Keyword
+    "t" @ 20..21: NameRef
+    "as" @ 22..24: Keyword
+    "restrictive" @ 25..36: Keyword
+    ";" @ 36..37: Punctuation
+    "create" @ 38..44: Keyword
+    "policy" @ 45..51: Keyword
+    "q" @ 52..53: NameRef
+    "on" @ 54..56: Keyword
+    "t" @ 57..58: NameRef
+    "as" @ 59..61: Keyword
+    "bogus" @ 62..67: NameRef
+    ";" @ 67..68: Punctuation
+    "#);
+}
+
+#[test]
+fn role_options() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create role r with superuser nologin inherit bogus;
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "role" @ 8..12: Keyword
+    "r" @ 13..14: Role (Definition)
+    "with" @ 15..19: Keyword
+    "superuser" @ 20..29: Keyword
+    "nologin" @ 30..37: Keyword
+    "inherit" @ 38..45: Keyword
+    "bogus" @ 46..51: NameRef
+    ";" @ 51..52: Punctuation
+    "#);
+}
+
+#[test]
+fn json_encoding() {
+    assert_snapshot!(check_semantic_tokens(r#"
+select json_object('a': 1 returning bytea format json encoding utf8);
+select json_object('a': 1 returning bytea format json encoding latin1);
+"#), @r#"
+    "select" @ 1..7: Keyword
+    "json_object" @ 8..19: Keyword
+    "(" @ 19..20: Punctuation
+    "'a'" @ 20..23: String
+    ":" @ 23..24: Operator
+    "1" @ 25..26: Number
+    "returning" @ 27..36: Keyword
+    "bytea" @ 37..42: Type
+    "format" @ 43..49: Keyword
+    "json" @ 50..54: Keyword
+    "encoding" @ 55..63: Keyword
+    "utf8" @ 64..68: Keyword
+    ")" @ 68..69: Punctuation
+    ";" @ 69..70: Punctuation
+    "select" @ 71..77: Keyword
+    "json_object" @ 78..89: Keyword
+    "(" @ 89..90: Punctuation
+    "'a'" @ 90..93: String
+    ":" @ 93..94: Operator
+    "1" @ 95..96: Number
+    "returning" @ 97..106: Keyword
+    "bytea" @ 107..112: Type
+    "format" @ 113..119: Keyword
+    "json" @ 120..124: Keyword
+    "encoding" @ 125..133: Keyword
+    "latin1" @ 134..140: NameRef
+    ")" @ 140..141: Punctuation
+    ";" @ 141..142: Punctuation
+    "#);
+}
+
+#[test]
 fn keyword_option_names() {
     assert_snapshot!(check_semantic_tokens(r#"
 create type t (
@@ -1250,5 +1378,227 @@ set enable_seqscan = off;
     "=" @ 119..120: Operator
     "off" @ 121..124: Keyword
     ";" @ 124..125: Punctuation
+    "#);
+}
+
+#[test]
+fn aggregate_parallel_option() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create aggregate a(numeric) (
+  sfunc = numeric_larger,
+  stype = numeric,
+  parallel = safe
+);
+create aggregate b(numeric) (
+  sfunc = numeric_larger,
+  stype = numeric,
+  parallel = bogus
+);
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "aggregate" @ 8..17: Keyword
+    "a" @ 18..19: Function (Definition)
+    "(" @ 19..20: Punctuation
+    "numeric" @ 20..27: Type
+    ")" @ 27..28: Punctuation
+    "(" @ 29..30: Punctuation
+    "sfunc" @ 33..38: NameRef
+    "=" @ 39..40: Operator
+    "numeric_larger" @ 41..55: Function
+    "," @ 55..56: Punctuation
+    "stype" @ 59..64: NameRef
+    "=" @ 65..66: Operator
+    "numeric" @ 67..74: Type
+    "," @ 74..75: Punctuation
+    "parallel" @ 78..86: NameRef
+    "=" @ 87..88: Operator
+    "safe" @ 89..93: Keyword
+    ")" @ 94..95: Punctuation
+    ";" @ 95..96: Punctuation
+    "create" @ 97..103: Keyword
+    "aggregate" @ 104..113: Keyword
+    "b" @ 114..115: Function (Definition)
+    "(" @ 115..116: Punctuation
+    "numeric" @ 116..123: Type
+    ")" @ 123..124: Punctuation
+    "(" @ 125..126: Punctuation
+    "sfunc" @ 129..134: NameRef
+    "=" @ 135..136: Operator
+    "numeric_larger" @ 137..151: Function
+    "," @ 151..152: Punctuation
+    "stype" @ 155..160: NameRef
+    "=" @ 161..162: Operator
+    "numeric" @ 163..170: Type
+    "," @ 170..171: Punctuation
+    "parallel" @ 174..182: NameRef
+    "=" @ 183..184: Operator
+    "bogus" @ 185..190: NameRef
+    ")" @ 191..192: Punctuation
+    ";" @ 192..193: Punctuation
+    "#);
+}
+
+#[test]
+fn storage_modes() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create table u (a text storage plain);
+alter table u alter column a set storage main;
+create type t (
+  input = i,
+  output = o,
+  storage = extended
+);
+alter type t set (storage = bogus);
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "table" @ 8..13: Keyword
+    "u" @ 14..15: Table (Definition)
+    "(" @ 16..17: Punctuation
+    "a" @ 17..18: Column (Definition)
+    "text" @ 19..23: Type
+    "storage" @ 24..31: Keyword
+    "plain" @ 32..37: Keyword
+    ")" @ 37..38: Punctuation
+    ";" @ 38..39: Punctuation
+    "alter" @ 40..45: Keyword
+    "table" @ 46..51: Keyword
+    "u" @ 52..53: Table
+    "alter" @ 54..59: Keyword
+    "column" @ 60..66: Keyword
+    "a" @ 67..68: Column
+    "set" @ 69..72: Keyword
+    "storage" @ 73..80: Keyword
+    "main" @ 81..85: Keyword
+    ";" @ 85..86: Punctuation
+    "create" @ 87..93: Keyword
+    "type" @ 94..98: Keyword
+    "t" @ 99..100: Type (Definition)
+    "(" @ 101..102: Punctuation
+    "input" @ 105..110: NameRef
+    "=" @ 111..112: Operator
+    "i" @ 113..114: NameRef
+    "," @ 114..115: Punctuation
+    "output" @ 118..124: NameRef
+    "=" @ 125..126: Operator
+    "o" @ 127..128: NameRef
+    "," @ 128..129: Punctuation
+    "storage" @ 132..139: NameRef
+    "=" @ 140..141: Operator
+    "extended" @ 142..150: Keyword
+    ")" @ 151..152: Punctuation
+    ";" @ 152..153: Punctuation
+    "alter" @ 154..159: Keyword
+    "type" @ 160..164: Keyword
+    "t" @ 165..166: Type
+    "set" @ 167..170: Keyword
+    "(" @ 171..172: Punctuation
+    "storage" @ 172..179: NameRef
+    "=" @ 180..181: Operator
+    "bogus" @ 182..187: NameRef
+    ")" @ 187..188: Punctuation
+    ";" @ 188..189: Punctuation
+    "#);
+}
+
+#[test]
+fn aggregate_finalfunc_modify() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create aggregate a(int) (
+  sfunc = f,
+  stype = int,
+  finalfunc_modify = read_only,
+  mfinalfunc_modify = bogus
+);
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "aggregate" @ 8..17: Keyword
+    "a" @ 18..19: Function (Definition)
+    "(" @ 19..20: Punctuation
+    "int" @ 20..23: Type
+    ")" @ 23..24: Punctuation
+    "(" @ 25..26: Punctuation
+    "sfunc" @ 29..34: NameRef
+    "=" @ 35..36: Operator
+    "f" @ 37..38: NameRef
+    "," @ 38..39: Punctuation
+    "stype" @ 42..47: NameRef
+    "=" @ 48..49: Operator
+    "int" @ 50..53: Type
+    "," @ 53..54: Punctuation
+    "finalfunc_modify" @ 57..73: NameRef
+    "=" @ 74..75: Operator
+    "read_only" @ 76..85: Keyword
+    "," @ 85..86: Punctuation
+    "mfinalfunc_modify" @ 89..106: NameRef
+    "=" @ 107..108: Operator
+    "bogus" @ 109..114: NameRef
+    ")" @ 115..116: Punctuation
+    ";" @ 116..117: Punctuation
+    "#);
+}
+
+#[test]
+fn collation_provider() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create collation c (
+  provider = icu,
+  locale = 'und'
+);
+create collation d (
+  provider = bogus,
+  locale = 'und'
+);
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "collation" @ 8..17: Keyword
+    "c" @ 18..19: Collation (Definition)
+    "(" @ 20..21: Punctuation
+    "provider" @ 24..32: NameRef
+    "=" @ 33..34: Operator
+    "icu" @ 35..38: Keyword
+    "," @ 38..39: Punctuation
+    "locale" @ 42..48: NameRef
+    "=" @ 49..50: Operator
+    "'und'" @ 51..56: String
+    ")" @ 57..58: Punctuation
+    ";" @ 58..59: Punctuation
+    "create" @ 60..66: Keyword
+    "collation" @ 67..76: Keyword
+    "d" @ 77..78: Collation (Definition)
+    "(" @ 79..80: Punctuation
+    "provider" @ 83..91: NameRef
+    "=" @ 92..93: Operator
+    "bogus" @ 94..99: NameRef
+    "," @ 99..100: Punctuation
+    "locale" @ 103..109: NameRef
+    "=" @ 110..111: Operator
+    "'und'" @ 112..117: String
+    ")" @ 118..119: Punctuation
+    ";" @ 119..120: Punctuation
+    "#);
+}
+
+#[test]
+fn statistics_kinds() {
+    assert_snapshot!(check_semantic_tokens(r#"
+create statistics s (ndistinct, mcv, bogus) on a, b from u;
+"#), @r#"
+    "create" @ 1..7: Keyword
+    "statistics" @ 8..18: Keyword
+    "s" @ 19..20: Statistics (Definition)
+    "(" @ 21..22: Punctuation
+    "ndistinct" @ 22..31: Keyword
+    "," @ 31..32: Punctuation
+    "mcv" @ 33..36: Keyword
+    "," @ 36..37: Punctuation
+    "bogus" @ 38..43: NameRef
+    ")" @ 43..44: Punctuation
+    "on" @ 45..47: Keyword
+    "a" @ 48..49: NameRef
+    "," @ 49..50: Punctuation
+    "b" @ 51..52: NameRef
+    "from" @ 53..57: Keyword
+    "u" @ 58..59: NameRef
+    ";" @ 59..60: Punctuation
     "#);
 }

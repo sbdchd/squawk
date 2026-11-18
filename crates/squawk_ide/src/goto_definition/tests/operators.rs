@@ -537,6 +537,33 @@ create operator === (
 }
 
 #[test]
+fn operator_commutator_forward_ref() {
+    assert_snapshot!(goto("
+create operator <<< (
+  leftarg = int4,
+  rightarg = int8,
+  function = int48lt,
+  commutator = operator(public.>>>$0)
+);
+create operator >>> (
+  leftarg = int8,
+  rightarg = int4,
+  function = int84gt,
+  commutator = operator(<<<)
+);
+"), @"
+    info: goto definition
+      ╭▸ file0.sql:6:32
+      │
+    6 │   commutator = operator(public.>>>)
+      │                                ─── 1. source
+    7 │ );
+    8 │ create operator >>> (
+      ╰╴                ─── 2. destination
+    ");
+}
+
+#[test]
 fn operator_builtin() {
     assert_snapshot!(goto("
 drop operator pg_catalog.=$0 (int, int);

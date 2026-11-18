@@ -879,3 +879,22 @@ select xmlserialize(content '<a/>'::xml as d$0);
       ╰╴                                           ─ 1. source
     ");
 }
+
+#[test]
+fn implicit_shell_type_reference_goes_to_shell_and_full_definition() {
+    assert_snapshot!(goto("
+create function t_in(cstring) returns t language internal as 'int4in';
+create function t_out(t$0) returns cstring language internal as 'int4out';
+create type t (input = t_in, output = t_out);
+"), @"
+    info: goto definition
+      ╭▸ file0.sql:2:39
+      │
+    2 │ create function t_in(cstring) returns t language internal as 'int4in';
+      │                                       ─ 2. destination
+    3 │ create function t_out(t) returns cstring language internal as 'int4out';
+      │                       ─ 1. source
+    4 │ create type t (input = t_in, output = t_out);
+      ╰╴            ─ 3. destination
+    ");
+}
