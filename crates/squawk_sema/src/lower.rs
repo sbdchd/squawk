@@ -3,7 +3,7 @@ use std::{borrow::Cow, cmp::Ordering, collections::hash_map::Entry, range::Range
 use la_arena::Idx;
 use rustc_hash::{FxBuildHasher, FxHashMap, FxHashSet};
 use smallvec::{SmallVec, smallvec};
-use smol_str::{SmolStr, StrExt, format_smolstr};
+use smol_str::{StrExt, format_smolstr};
 use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::{
     AstPtr, SyntaxKind, SyntaxNode, SyntaxNodePtr, SyntaxToken,
@@ -39,16 +39,16 @@ use squawk_syntax::comments::preceding_comment;
 
 use crate::{
     ir::{
-        AccessMethod, AccessMethodId, AccessMethodKind, Body, Case, Cast, CastContext, CastId,
-        CastMethod, CastTypes, Channel, ChannelId, Collation, CollationId, Column, ColumnId,
-        ColumnOwner, ColumnTypeRef, Columns, Constraint, ConstraintId, ConstraintKind,
-        ConstraintOwner, Conversion, ConversionId, Cte, CteId, Cursor, CursorId, Database,
-        DatabaseId, EnumLabel, EnumLabelId, EventTrigger, EventTriggerId, Extension, ExtensionId,
-        ForeignDataWrapper, ForeignDataWrapperId, Function, FunctionId, FunctionKind, GraphElement,
-        GraphElementId, GraphElementKind, GraphLabel, GraphLabelId, GraphProperty, GraphPropertyId,
-        IdentityKind, Index, IndexId, Item, ItemRange, JsonPath, JsonPathId, Language, LanguageId,
-        MemberKind, MemberOwner, Merge, Operand, Operands, Operator, OperatorClass,
-        OperatorClassId, OperatorFamily, OperatorFamilyId, OperatorFamilyMember,
+        AccessMethod, AccessMethodId, AccessMethodKind, AggregateKind, Body, Case, Cast,
+        CastContext, CastId, CastMethod, CastTypes, Channel, ChannelId, Collation, CollationId,
+        Column, ColumnId, ColumnOwner, ColumnTypeRef, Columns, Constraint, ConstraintId,
+        ConstraintKind, ConstraintOwner, Conversion, ConversionId, Cte, CteId, Cursor, CursorId,
+        Database, DatabaseId, EnumLabel, EnumLabelId, EventTrigger, EventTriggerId, Extension,
+        ExtensionId, ForeignDataWrapper, ForeignDataWrapperId, Function, FunctionId, FunctionKind,
+        GraphElement, GraphElementId, GraphElementKind, GraphLabel, GraphLabelId, GraphProperty,
+        GraphPropertyId, IdentityKind, Index, IndexId, Item, ItemRange, JsonPath, JsonPathId,
+        Language, LanguageId, MemberKind, MemberOwner, Merge, Operand, Operands, Operator,
+        OperatorClass, OperatorClassId, OperatorFamily, OperatorFamilyId, OperatorFamilyMember,
         OperatorFamilyMemberId, OperatorId, Param, ParamId, ParamMode, Policy, PolicyId,
         PreparedStatement, PreparedStatementId, PreparedTransaction, PreparedTransactionId,
         Publication, PublicationId, Query, QueryId, QueryKind, RefId, Reference, ReferenceKind,
@@ -62,12 +62,12 @@ use crate::{
     },
     sema_error::{
         ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, Comparison, CompoundOp,
-        ConflictAction, ConflictRuleEvent, ConflictTargetKey, DefaultChange, DropRelation,
-        ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType,
-        ForeignKeyPair, GeneratedKind, LookupKind, NumericOverflow, ObjectKind, OperandName,
-        OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath, Quantifier, SemaError,
-        SetReturningConstruct, Similar, SimilarColumn, SimilarType, TriggerFunctionKind,
-        TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
+        ConflictAction, ConflictRuleEvent, ConflictTargetKey, DefaultChange, DirectArgs,
+        DropRelation, ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam,
+        ErrorReturnType, ForeignKeyPair, GeneratedKind, LookupKind, NumericOverflow, ObjectKind,
+        OperandName, OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath,
+        Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn, SimilarType,
+        TriggerFunctionKind, TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -575,7 +575,7 @@ struct TypedColumn {
 #[derive(Clone, Copy)]
 struct FunctionParams {
     params: IdxRange<Param>,
-    direct_args: Option<usize>,
+    aggregate_kind: Option<AggregateKind>,
 }
 
 #[derive(Clone, Copy)]
@@ -776,6 +776,12 @@ struct FunctionSource {
 struct FunctionColumns {
     columns: Columns,
     scalar: Option<Ty>,
+}
+
+#[derive(Clone, Copy)]
+struct OrderedSetArgs {
+    direct: usize,
+    aggregated: usize,
 }
 
 struct LoweredCall {
@@ -2402,13 +2408,23 @@ impl Lowerer {
         let param_list = create_aggregate.param_list();
         let attributes = create_aggregate.attribute_list();
         let old_style = param_list.is_none();
-        let params = match param_list {
+        let mut params = match param_list {
             Some(param_list) => self.alloc_params(Some(param_list)),
             None => FunctionParams {
                 params: self.alloc_basetype_param(attributes.as_ref()),
-                direct_args: None,
+                aggregate_kind: None,
             },
         };
+        if let Some(AggregateKind::OrderedSet { direct }) = params.aggregate_kind
+            && let Some(attributes) = &attributes
+            && attributes.attribute_options().any(|option| {
+                option
+                    .name()
+                    .is_some_and(|name| name.text() == "hypothetical")
+            })
+        {
+            params.aggregate_kind = Some(AggregateKind::Hypothetical { direct });
+        }
         let function = create_aggregate
             .aggregate_name()
             .and_then(|name| name.path())
@@ -2424,7 +2440,7 @@ impl Lowerer {
             });
         let FunctionParams {
             params,
-            direct_args,
+            aggregate_kind,
         } = params;
         let inputs: SmallVec<[Option<Ty>; 4]> = params
             .iter()
@@ -2433,8 +2449,12 @@ impl Lowerer {
             .map(|param| param.ty)
             .collect();
         if let Some(attributes) = attributes {
-            let ret =
-                self.lower_aggregate_attributes(&attributes, &inputs, direct_args, !old_style);
+            let ret = self.lower_aggregate_attributes(
+                &attributes,
+                &inputs,
+                aggregate_kind.map(AggregateKind::direct),
+                !old_style,
+            );
             if let Some(function) = function {
                 self.index.functions.set_ret(function, ret);
             }
@@ -2466,11 +2486,12 @@ impl Lowerer {
         let mut mfinalfunc_extra = false;
         let mut finalfunc_ret = None;
         for option in attributes.attribute_options() {
-            let Some(name) = attribute_name(&option) else {
+            let Some(name) = option.name() else {
                 continue;
             };
+            let name = name.text();
             let ty = option.attribute_value().and_then(|value| value.ty());
-            match name.as_str() {
+            match name.as_ref() {
                 "stype" => stype = ty.and_then(|ty| self.lower_type(&ty)),
                 "mstype" => mstype = ty.and_then(|ty| self.lower_type(&ty)),
                 "basetype" if lower_basetype => {
@@ -2491,11 +2512,11 @@ impl Lowerer {
             None => (&[][..], inputs),
         };
         for option in attributes.attribute_options() {
-            let (Some(name), Some(value)) = (attribute_name(&option), option.attribute_value())
-            else {
+            let (Some(name), Some(value)) = (option.name(), option.attribute_value()) else {
                 continue;
             };
-            let (state, rest): (Option<Ty>, &[Option<Ty>]) = match name.as_str() {
+            let name = name.text();
+            let (state, rest): (Option<Ty>, &[Option<Ty>]) = match name.as_ref() {
                 "sfunc" => (stype, inputs),
                 "msfunc" | "minvfunc" => (mstype, inputs),
                 "finalfunc" if finalfunc_extra => (stype, final_extra_inputs),
@@ -6170,7 +6191,7 @@ impl Lowerer {
             .iter()
             .flat_map(|list| list.attribute_options())
         {
-            if attribute_name(&option).as_deref() == Some("template")
+            if option.name().is_some_and(|name| name.text() == "template")
                 && let Some(path) = attribute_path(&option)
             {
                 self.lower_text_search_ref(TextSearchKind::Template, &path, IfMissing::Error);
@@ -6197,9 +6218,13 @@ impl Lowerer {
             .iter()
             .flat_map(|list| list.attribute_options())
         {
-            let kind = match attribute_name(&option).as_deref() {
-                Some("parser") => TextSearchKind::Parser,
-                Some("copy") => TextSearchKind::Configuration,
+            let Some(name) = option.name() else {
+                continue;
+            };
+            let name = name.text();
+            let kind = match name.as_ref() {
+                "parser" => TextSearchKind::Parser,
+                "copy" => TextSearchKind::Configuration,
                 _ => continue,
             };
             if let Some(path) = attribute_path(&option) {
@@ -9168,10 +9193,11 @@ impl Lowerer {
             .iter()
             .flat_map(|list| list.attribute_options())
         {
-            let Some(name) = attribute_name(&option) else {
+            let Some(name) = option.name() else {
                 continue;
             };
-            let operand = match name.as_str() {
+            let name = name.text();
+            let operand = match name.as_ref() {
                 "leftarg" => &mut left,
                 "rightarg" => &mut right,
                 _ => continue,
@@ -9350,11 +9376,11 @@ impl Lowerer {
     ) -> Option<FunctionId> {
         let mut function = None;
         for option in attributes.attribute_options() {
-            let (Some(name), Some(value)) = (attribute_name(&option), option.attribute_value())
-            else {
+            let (Some(name), Some(value)) = (option.name(), option.attribute_value()) else {
                 continue;
             };
-            match name.as_str() {
+            let name = name.text();
+            match name.as_ref() {
                 "function" | "procedure" => {
                     if let Some(ast::Type::PathType(path_type)) = value.ty()
                         && let Some(path) = path_type.path_ref()
@@ -10134,7 +10160,7 @@ impl Lowerer {
             kind,
             window,
             params,
-            direct_args,
+            aggregate_kind,
             ret,
             returns,
             columns,
@@ -10162,7 +10188,7 @@ impl Lowerer {
             ptr: self.ptr(node),
             name_ptr,
             params,
-            direct_args,
+            aggregate_kind,
             ret,
             returns,
             columns,
@@ -11311,11 +11337,12 @@ impl Lowerer {
                     .into_iter()
                     .flat_map(|list| list.attribute_options())
                 {
-                    let Some(name) = attribute_name(&option) else {
+                    let Some(name) = option.name() else {
                         continue;
                     };
+                    let name = name.text();
                     let ty = option.attribute_value().and_then(|value| value.ty());
-                    match name.as_str() {
+                    match name.as_ref() {
                         "subtype" => {
                             subtype = ty.and_then(|ty| self.lower_type(&ty));
                         }
@@ -12586,11 +12613,12 @@ impl Lowerer {
         let mut preferred = false;
         let mut collatable = false;
         for option in options {
-            let Some(name) = attribute_name(&option) else {
+            let Some(name) = option.name() else {
                 continue;
             };
+            let name = name.text();
             let value = option.attribute_value();
-            match name.as_str() {
+            match name.as_ref() {
                 "element" => {
                     element = value
                         .and_then(|value| value.ty())
@@ -24230,6 +24258,17 @@ impl Lowerer {
         };
         if let Some(function) = function {
             self.check_literal_args(function, call, &args);
+            if let Some(callee) = &callee {
+                self.check_ordered_set_args(
+                    call,
+                    callee,
+                    function,
+                    OrderedSetArgs {
+                        direct: direct_args,
+                        aggregated: args.len() - direct_args,
+                    },
+                );
+            }
         }
         args.truncate(direct_args);
         if let Some(function) = function
@@ -24306,6 +24345,116 @@ impl Lowerer {
             callee: target,
             ty: target.and_then(|target| target.ty),
         })
+    }
+
+    fn check_ordered_set_args(
+        &mut self,
+        call: &ast::CallExpr,
+        callee: &ast::Expr,
+        function: FunctionId,
+        supplied: OrderedSetArgs,
+    ) {
+        let Function {
+            kind: FunctionKind::Aggregate,
+            name,
+            params,
+            aggregate_kind: Some(aggregate_kind),
+            ..
+        } = self.index.functions[function]
+        else {
+            return;
+        };
+        let declared = aggregate_kind.direct();
+        let direct_args = if declared
+            .checked_sub(1)
+            .and_then(|last| params.iter().nth(last))
+            .is_some_and(|param| self.index.params[param].mode == ParamMode::Variadic)
+        {
+            DirectArgs::Variadic
+        } else {
+            DirectArgs::Fixed
+        };
+        let fixed = match direct_args {
+            DirectArgs::Fixed => declared,
+            DirectArgs::Variadic => declared - 1,
+        };
+        if call.within_clause().is_none() {
+            let direct = match (direct_args, aggregate_kind) {
+                (DirectArgs::Fixed, _) => Some(fixed),
+                (DirectArgs::Variadic, AggregateKind::Hypothetical { .. }) => supplied
+                    .direct
+                    .checked_sub(fixed)
+                    .filter(|rest| rest % 2 == 0)
+                    .map(|rest| fixed + rest / 2),
+                (DirectArgs::Variadic, AggregateKind::OrderedSet { .. }) => None,
+            };
+            let within_at = direct
+                .filter(|direct| *direct < supplied.direct)
+                .and_then(|direct| self.within_group_range(call, direct));
+            self.push_error(
+                callee.syntax(),
+                SemaError::MissingWithinGroup { name, within_at },
+            );
+            return;
+        }
+        let error = match (direct_args, aggregate_kind) {
+            (DirectArgs::Fixed, _) if supplied.direct != declared => {
+                SemaError::OrderedSetDirectArgCount {
+                    name,
+                    expected: declared,
+                    direct_args,
+                    supplied: supplied.direct,
+                }
+            }
+            (DirectArgs::Variadic, AggregateKind::OrderedSet { .. })
+                if supplied.direct < declared =>
+            {
+                SemaError::OrderedSetDirectArgCount {
+                    name,
+                    expected: declared,
+                    direct_args,
+                    supplied: supplied.direct,
+                }
+            }
+            (DirectArgs::Variadic, AggregateKind::Hypothetical { .. })
+                if supplied.direct < fixed || supplied.direct - fixed != supplied.aggregated =>
+            {
+                SemaError::HypotheticalArgCount {
+                    name,
+                    hypothetical: supplied.direct.saturating_sub(fixed),
+                    ordering: supplied.aggregated,
+                }
+            }
+            (
+                DirectArgs::Fixed | DirectArgs::Variadic,
+                AggregateKind::OrderedSet { .. } | AggregateKind::Hypothetical { .. },
+            ) => return,
+        };
+        self.push_error(callee.syntax(), error);
+    }
+
+    fn within_group_range(&self, call: &ast::CallExpr, direct: usize) -> Option<TextRange> {
+        if call.over_clause().is_some() {
+            return None;
+        }
+        let arg_list = call.arg_list()?;
+        if arg_list.all_or_distinct().is_some() || arg_list.star_token().is_some() {
+            return None;
+        }
+        if arg_list.args().any(|arg| {
+            arg.order_by_clause().is_some()
+                || arg.variadic_token().is_some()
+                || matches!(arg.func_arg_expr(), Some(ast::FuncArgExpr::NamedArg(_)))
+        }) {
+            return None;
+        }
+        let start = match direct.checked_sub(1) {
+            Some(last) => arg_list.args().nth(last)?.syntax().text_range().end(),
+            None => arg_list.l_paren_token()?.text_range().end(),
+        };
+        let end = arg_list.args().nth(direct)?.syntax().text_range().start();
+        let range = InIrFile::new(self.file_id, TextRange::new(start, end));
+        Some(self.index.range(range).value)
     }
 
     fn check_literal_args(&mut self, function: FunctionId, call: &ast::CallExpr, args: &[CallArg]) {
@@ -24781,9 +24930,7 @@ impl Lowerer {
             };
         }
         let resolution = match self.find_routine(schema, name, args, FunctionKind::Function) {
-            Resolution::Unresolved if kind == CalleeKind::OrderedSet || incomplete_row => {
-                Resolution::Unknown
-            }
+            Resolution::Unresolved if incomplete_row => Resolution::Unknown,
             resolution => self.report_unresolved_routine(
                 resolution,
                 RoutineKind::Function,
@@ -26508,7 +26655,7 @@ impl Lowerer {
         path: &ast::Path,
         FunctionParams {
             params,
-            direct_args,
+            aggregate_kind,
         }: FunctionParams,
         ret_clause: Option<&ast::RetType>,
     ) -> Option<FunctionId> {
@@ -26610,7 +26757,7 @@ impl Lowerer {
             ptr: self.ptr(node),
             name_ptr: self.ast_ptr(&segment),
             params,
-            direct_args,
+            aggregate_kind,
             ret,
             returns,
             columns,
@@ -26748,19 +26895,21 @@ impl Lowerer {
         let order_by = param_list
             .as_ref()
             .and_then(|list| list.aggregate_order_by());
-        let mut direct_args = None;
+        let mut aggregate_kind = None;
         for param in param_list.into_iter().flat_map(|list| list.params()) {
             self.alloc_param_def(start, &param);
         }
         if let Some(order_by) = order_by {
-            direct_args = Some(self.index.params.range_from(start).len());
+            aggregate_kind = Some(AggregateKind::OrderedSet {
+                direct: self.index.params.range_from(start).len(),
+            });
             for param in order_by.params() {
                 self.alloc_param_def(start, &param);
             }
         }
         FunctionParams {
             params: self.index.params.range_from(start),
-            direct_args,
+            aggregate_kind,
         }
     }
 
@@ -26769,7 +26918,7 @@ impl Lowerer {
         let basetype = attributes
             .into_iter()
             .flat_map(|list| list.attribute_options())
-            .find(|option| attribute_name(option).as_deref() == Some("basetype"));
+            .find(|option| option.name().is_some_and(|name| name.text() == "basetype"));
         if let Some(ty) = basetype
             .and_then(|option| option.attribute_value())
             .and_then(|value| value.ty())
@@ -27453,10 +27602,6 @@ fn is_regclass(ty: &ast::Type) -> bool {
 enum ConstraintName {
     Explicit(ast::ConstraintName),
     Generated(Name),
-}
-
-fn attribute_name(option: &ast::AttributeOption) -> Option<SmolStr> {
-    Some(option.name()?.text().to_ascii_lowercase_smolstr())
 }
 
 fn graph_element_live(

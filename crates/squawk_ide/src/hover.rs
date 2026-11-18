@@ -2,9 +2,9 @@ use squawk_sema::arena::IdxRange;
 use squawk_sema::file::{FilePosition, FileRange, InFile};
 use squawk_sema::interner::Name;
 use squawk_sema::ir::{
-    Column, ColumnId, ColumnOwner, ConstraintOwner, FunctionId, FunctionKind, GraphElementKind,
-    Item, Operand, ParamId, ParamMode, SourceId, SourceKind, StarId, TableId, TableKind, TypeId,
-    TypeKind,
+    AggregateKind, Column, ColumnId, ColumnOwner, ConstraintOwner, FunctionId, FunctionKind,
+    GraphElementKind, Item, Operand, ParamId, ParamMode, SourceId, SourceKind, StarId, TableId,
+    TableKind, TypeId, TypeKind,
 };
 use squawk_sema::semantic_index::SemanticIndex;
 use std::fmt::{self, Write as _};
@@ -691,9 +691,10 @@ impl fmt::Display for ParamList<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         let index = self.index;
         let function = &index.functions[self.function];
+        let order_by_at = function.aggregate_kind.map(AggregateKind::direct);
         f.write_str("(")?;
         for (i, param) in function.params.iter().enumerate() {
-            match (i, function.direct_args == Some(i)) {
+            match (i, order_by_at == Some(i)) {
                 (0, true) => f.write_str("order by ")?,
                 (_, true) => f.write_str(" order by ")?,
                 (0, false) => {}

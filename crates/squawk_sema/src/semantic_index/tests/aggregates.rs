@@ -711,3 +711,174 @@ drop aggregate a(int);
        ╰ hint: use `drop aggregate` to drop aggregate functions
     ");
 }
+
+#[test]
+fn ordered_set_aggregate_without_within_group() {
+    assert_snapshot!(check("
+create function sfn(internal, int) returns internal
+  language c
+  as 'x';
+create function ffn(internal, int, int) returns int
+  language c
+  as 'x';
+create aggregate a2(int, int order by int) (
+  sfunc = sfn,
+  stype = internal,
+  finalfunc = ffn
+);
+select a2(1, 2, 3);
+select a2(1, 2, 3) filter (where true);
+select a2(1, 2, 3) over ();
+select percentile_cont(0.5, 1.0);
+select mode(1);
+select rank(1, 2);
+select rank(1, 2, 3);
+"), @"
+    error: ordered-set aggregate `a2` requires a `within group` clause
+       ╭▸ 
+    13 │ select a2(1, 2, 3);
+       │        ━━
+       ╰╴
+    help: move the aggregated arguments into `within group`
+       ╭╴
+    13 - select a2(1, 2, 3);
+    13 + select a2(1, 2) within group (order by 3);
+       ╰╴
+    error: ordered-set aggregate `a2` requires a `within group` clause
+       ╭▸ 
+    14 │ select a2(1, 2, 3) filter (where true);
+       │        ━━
+       ╰╴
+    help: move the aggregated arguments into `within group`
+       ╭╴
+    14 - select a2(1, 2, 3) filter (where true);
+    14 + select a2(1, 2) within group (order by 3) filter (where true);
+       ╰╴
+    error: ordered-set aggregate `a2` requires a `within group` clause
+       ╭▸ 
+    15 │ select a2(1, 2, 3) over ();
+       │        ━━
+       │
+       ╰ hint: pass the aggregated arguments in `within group (order by ...)`
+    error: ordered-set aggregate `percentile_cont` requires a `within group` clause
+       ╭▸ 
+    16 │ select percentile_cont(0.5, 1.0);
+       │        ━━━━━━━━━━━━━━━
+       ╰╴
+    help: move the aggregated arguments into `within group`
+       ╭╴
+    16 - select percentile_cont(0.5, 1.0);
+    16 + select percentile_cont(0.5) within group (order by 1.0);
+       ╰╴
+    error: ordered-set aggregate `mode` requires a `within group` clause
+       ╭▸ 
+    17 │ select mode(1);
+       │        ━━━━
+       ╰╴
+    help: move the aggregated arguments into `within group`
+       ╭╴
+    17 │ select mode() within group (order by 1);
+       ╰╴            ++++++++++++++++++++++++
+    error: ordered-set aggregate `rank` requires a `within group` clause
+       ╭▸ 
+    18 │ select rank(1, 2);
+       │        ━━━━
+       ╰╴
+    help: move the aggregated arguments into `within group`
+       ╭╴
+    18 - select rank(1, 2);
+    18 + select rank(1) within group (order by 2);
+       ╰╴
+    error: ordered-set aggregate `rank` requires a `within group` clause
+       ╭▸ 
+    19 │ select rank(1, 2, 3);
+       │        ━━━━
+       │
+       ╰ hint: pass the aggregated arguments in `within group (order by ...)`
+    ");
+}
+
+#[test]
+fn ordered_set_aggregate_arg_counts() {
+    assert_snapshot!(check("
+create function sfn(internal, int) returns internal
+  language c
+  as 'x';
+create function ffn(internal, int, int) returns int
+  language c
+  as 'x';
+create aggregate a2(int, int order by int) (
+  sfunc = sfn,
+  stype = internal,
+  finalfunc = ffn
+);
+select a2(1) within group (order by 1, 2);
+select rank(1, 2) within group (order by 1);
+select rank(1) within group (order by 1, 2);
+select percentile_disc(0.5) within group (order by 1, 2);
+select
+  a2(1, 2) within group (order by 3),
+  rank(1, 2) within group (order by 1, 2),
+  mode() within group (order by 1);
+"), @"
+    error: ordered-set aggregate `a2` takes 2 direct arguments but 1 was supplied
+       ╭▸ 
+    13 │ select a2(1) within group (order by 1, 2);
+       ╰╴       ━━
+    error: hypothetical-set aggregate `rank` has 2 hypothetical arguments but 1 ordering column
+       ╭▸ 
+    14 │ select rank(1, 2) within group (order by 1);
+       │        ━━━━
+       │
+       ╰ hint: each hypothetical argument must have a matching ordering column
+    error: hypothetical-set aggregate `rank` has 1 hypothetical argument but 2 ordering columns
+       ╭▸ 
+    15 │ select rank(1) within group (order by 1, 2);
+       │        ━━━━
+       │
+       ╰ hint: each hypothetical argument must have a matching ordering column
+    error: function `percentile_disc(numeric, int4, int4)` does not exist
+       ╭▸ 
+    16 │ select percentile_disc(0.5) within group (order by 1, 2);
+       │        ━━━━━━━━━━━━━━━
+       │
+       ├ note: `percentile_disc(float8, anyelement)` takes 2 arguments but 3 were supplied
+       ├ note: `percentile_disc(float8[], anyelement)` takes 2 arguments but 3 were supplied
+       ╰ hint: consider adding explicit type casts
+    ");
+}
+
+#[test]
+fn quoted_hypothetical_attribute_is_case_sensitive() {
+    assert_snapshot!(check(r#"
+create function sfn(internal, variadic "any") returns internal
+  language c
+  as 'x';
+create function ffn(internal, variadic "any") returns int
+  language c
+  as 'x';
+create aggregate h1(variadic "any" order by variadic "any") (
+  sfunc = sfn,
+  stype = internal,
+  finalfunc = ffn,
+  finalfunc_extra,
+  HYPOTHETICAL
+);
+create aggregate h2(variadic "any" order by variadic "any") (
+  sfunc = sfn,
+  stype = internal,
+  finalfunc = ffn,
+  finalfunc_extra,
+  "HYPOTHETICAL"
+);
+select h1(1) within group (order by 1, 2);
+select h2(1) within group (order by 1, 2);
+"#), @"
+    error: hypothetical-set aggregate `h1` has 1 hypothetical argument but 2 ordering columns
+       ╭▸ 
+    22 │ select h1(1) within group (order by 1, 2);
+       │        ━━
+       │
+       ╰ hint: each hypothetical argument must have a matching ordering column
+    ");
+}

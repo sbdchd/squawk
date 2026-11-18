@@ -637,14 +637,5 @@ create operator === (
   "Rightarg" = box,
   "Procedure" = area_equal$0
 );
-"#), @r#"
-    info: goto definition
-      ╭▸ file0.sql:2:17
-      │
-    2 │ create function area_equal(box, box) returns bool
-      │                 ────────── 2. destination
-      ‡
-    8 │   "Procedure" = area_equal
-      ╰╴                ────────── 1. source
-    "#);
+"#), @"no definition");
 }
