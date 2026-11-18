@@ -483,3 +483,41 @@ select 1 == 2, s == 'a', i == s from t;
       ╰ hint: consider adding explicit type casts
     ");
 }
+
+#[test]
+fn setof_operator_arg() {
+    assert_snapshot!(check("
+create table t (c int8);
+create function f(int8, int8) returns bool
+  language sql
+  return true;
+create operator #*# (
+  leftarg = setof int8,
+  rightarg = int8,
+  function = f
+);
+create operator #**# (
+  leftarg = int8,
+  rightarg = setof int8,
+  function = f
+);
+create operator ### (
+  leftarg = setof t.c%type,
+  rightarg = int8,
+  function = f
+);
+"), @"
+    error: `setof` is not allowed for operator arguments
+      ╭▸ 
+    7 │   leftarg = setof int8,
+      ╰╴            ━━━━━━━━━━
+    error: `setof` is not allowed for operator arguments
+       ╭▸ 
+    13 │   rightarg = setof int8,
+       ╰╴             ━━━━━━━━━━
+    error: `setof` is not allowed for operator arguments
+       ╭▸ 
+    17 │   leftarg = setof t.c%type,
+       ╰╴            ━━━━━━━━━━━━━━
+    ");
+}

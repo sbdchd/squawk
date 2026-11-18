@@ -143,6 +143,11 @@ fn name_from_type(ty: ast::Type, unknown_column: bool) -> Option<(ColumnName, Sy
                 return name_from_type(inner_ty, unknown_column);
             }
         }
+        ast::Type::SetofType(setof_type) => {
+            if let Some(inner_ty) = setof_type.ty() {
+                return name_from_type(inner_ty, unknown_column);
+            }
+        }
     }
     None
 }

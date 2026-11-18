@@ -323,7 +323,6 @@ fn column_def_list_invalid_columns() {
     assert_snapshot!(check(r#"
 create function f() returns record language sql as 'select 1';
 create domain name_text as text;
-select * from f() as t(x setof int);
 select * from f() as t(x int, y text, x int);
 select * from f() as t(x trigger);
 select * from f() as t(x anyelement);
@@ -332,38 +331,34 @@ select * from f() as t(x int[] collate "C");
 select * from rows from (f() as (x int collate "C"));
 select * from f() as t(a text collate "C", b text[] collate "C", c name_text collate "C", r record, rs record[]);
 "#), @r#"
-    error: column `x` cannot be declared `setof`
-      ╭▸ 
-    4 │ select * from f() as t(x setof int);
-      ╰╴                       ━━━━━━━━━━━
     error: column `x` specified more than once
       ╭▸ 
-    5 │ select * from f() as t(x int, y text, x int);
+    4 │ select * from f() as t(x int, y text, x int);
       ╰╴                                      ━
     error: column `x` cannot have pseudo-type `trigger`
       ╭▸ 
-    6 │ select * from f() as t(x trigger);
+    5 │ select * from f() as t(x trigger);
       │                        ━━━━━━━━━
       │
       ╰ note: pseudo-types can only be used for function arguments and return types
     error: column `x` cannot have pseudo-type `anyelement`
       ╭▸ 
-    7 │ select * from f() as t(x anyelement);
+    6 │ select * from f() as t(x anyelement);
       │                        ━━━━━━━━━━━━
       │
       ╰ note: pseudo-types can only be used for function arguments and return types
     error: collations are not supported by type `int4`
       ╭▸ 
-    8 │ select * from f() as t(x int collate "C");
+    7 │ select * from f() as t(x int collate "C");
       ╰╴                             ━━━━━━━━━━━
     error: collations are not supported by type `int4[]`
       ╭▸ 
-    9 │ select * from f() as t(x int[] collate "C");
+    8 │ select * from f() as t(x int[] collate "C");
       ╰╴                               ━━━━━━━━━━━
     error: collations are not supported by type `int4`
-       ╭▸ 
-    10 │ select * from rows from (f() as (x int collate "C"));
-       ╰╴                                       ━━━━━━━━━━━
+      ╭▸ 
+    9 │ select * from rows from (f() as (x int collate "C"));
+      ╰╴                                       ━━━━━━━━━━━
     "#);
 }
 

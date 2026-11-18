@@ -232,4 +232,57 @@ SOURCE_FILE
             NONE_KW "none"
         R_PAREN ")"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- percent_type"
+  WHITESPACE "\n"
+  ALTER_OPERATOR
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP_SIG
+      OP
+        CUSTOM_OP
+          EQ "="
+          EQ "="
+          EQ "="
+      WHITESPACE " "
+      L_PAREN "("
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE "\n  "
+    SET_OPTIONS
+      SET_KW "set"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            RESTRICT_KW "restrict"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PERCENT_TYPE
+              PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "t"
+                DOT "."
+                PATH_SEGMENT_REF
+                  IDENT "c"
+              PERCENT_TYPE_CLAUSE
+                PERCENT "%"
+                TYPE_KW "type"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

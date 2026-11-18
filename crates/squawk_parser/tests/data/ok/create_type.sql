@@ -70,3 +70,10 @@ create type t (
 );
 
 
+
+-- percent_type
+create type t (
+  input = i,
+  output = o,
+  element = t.c%type
+);

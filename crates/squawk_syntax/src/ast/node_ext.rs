@@ -286,6 +286,7 @@ impl ast::Type {
             ast::Type::CharacterType(ty) => ty.arg_list(),
             ast::Type::PathType(ty) => ty.arg_list(),
             ast::Type::VarcharType(ty) => ty.arg_list(),
+            ast::Type::SetofType(ty) => ty.ty()?.arg_list(),
             ast::Type::ArrayType(_)
             | ast::Type::DoubleType(_)
             | ast::Type::IntervalType(_)
@@ -296,16 +297,17 @@ impl ast::Type {
 
     pub fn setof_token(&self) -> Option<SyntaxToken> {
         match self {
-            ast::Type::ArrayType(ty) => ty.ty()?.setof_token(),
-            ast::Type::BitType(ty) => ty.setof_token(),
-            ast::Type::BitVaryingType(ty) => ty.setof_token(),
-            ast::Type::CharacterType(ty) => ty.setof_token(),
-            ast::Type::DoubleType(ty) => ty.setof_token(),
-            ast::Type::IntervalType(ty) => ty.setof_token(),
-            ast::Type::PathType(ty) => ty.setof_token(),
-            ast::Type::TimeType(ty) => ty.setof_token(),
-            ast::Type::TimestampType(ty) => ty.setof_token(),
-            ast::Type::VarcharType(ty) => ty.setof_token(),
+            ast::Type::SetofType(ty) => ty.setof_token(),
+            ast::Type::ArrayType(_)
+            | ast::Type::BitType(_)
+            | ast::Type::BitVaryingType(_)
+            | ast::Type::CharacterType(_)
+            | ast::Type::DoubleType(_)
+            | ast::Type::IntervalType(_)
+            | ast::Type::PathType(_)
+            | ast::Type::TimeType(_)
+            | ast::Type::TimestampType(_)
+            | ast::Type::VarcharType(_) => None,
         }
     }
 }
@@ -2000,7 +2002,7 @@ impl ast::Type {
 
     pub fn builtin_type_name(&self) -> Option<&'static str> {
         match self {
-            ast::Type::ArrayType(_) => None,
+            ast::Type::ArrayType(_) | ast::Type::SetofType(_) => None,
             ast::Type::PathType(path_type) => path_type.keyword_type_name(),
             ast::Type::BitType(_) => Some("bit"),
             ast::Type::BitVaryingType(_) => Some("varbit"),

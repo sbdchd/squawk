@@ -717,6 +717,29 @@ create function f(x t.a$0%type) returns int
 }
 
 #[test]
+fn percent_type_aggregate_stype() {
+    assert_snapshot!(goto("
+create table t (a int);
+create function f(int, int) returns int
+  language sql
+  as 'select 1';
+create aggregate agg(int) (
+  sfunc = f,
+  stype = t.a$0%type
+);
+"), @"
+    info: goto definition
+      ╭▸ file0.sql:2:17
+      │
+    2 │ create table t (a int);
+      │                 ─ 2. destination
+      ‡
+    8 │   stype = t.a%type
+      ╰╴            ─ 1. source
+    ");
+}
+
+#[test]
 fn type_reference_before_rename() {
     assert_snapshot!(goto("
 create type ty as (

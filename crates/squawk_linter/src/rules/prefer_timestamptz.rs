@@ -16,6 +16,7 @@ pub(crate) fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
         ),
         Some(
             ast::Type::ArrayType(_)
+            | ast::Type::SetofType(_)
             | ast::Type::VarcharType(_)
             | ast::Type::CharacterType(_)
             | ast::Type::BitType(_)

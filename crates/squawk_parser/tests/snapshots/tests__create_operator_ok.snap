@@ -441,4 +441,68 @@ SOURCE_FILE
       WHITESPACE "\n"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- percent_type"
+  WHITESPACE "\n"
+  CREATE_OPERATOR
+    CREATE_KW "create"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP
+      CUSTOM_OP
+        EQ "="
+        EQ "="
+        EQ "="
+    WHITESPACE " "
+    ATTRIBUTE_LIST
+      L_PAREN "("
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "leftarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PERCENT_TYPE
+            PATH_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "t"
+              DOT "."
+              PATH_SEGMENT_REF
+                IDENT "c"
+            PERCENT_TYPE_CLAUSE
+              PERCENT "%"
+              TYPE_KW "type"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          IDENT "rightarg"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+      COMMA ","
+      WHITESPACE "\n  "
+      ATTRIBUTE_OPTION
+        ATTRIBUTE_NAME
+          FUNCTION_KW "function"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        ATTRIBUTE_VALUE
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "f"
+      WHITESPACE "\n"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

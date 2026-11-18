@@ -1820,6 +1820,7 @@ pub enum SyntaxKind {
     SESSION_CHARACTERISTICS,
     SESSION_SCOPE,
     SET,
+    SETOF_TYPE,
     SET_ACCESS_METHOD,
     SET_ALL_PUBLICATION_OBJECT_LIST,
     SET_CATALOG,
@@ -3895,6 +3896,7 @@ impl SyntaxKind {
             | SyntaxKind::SESSION_CHARACTERISTICS
             | SyntaxKind::SESSION_SCOPE
             | SyntaxKind::SET
+            | SyntaxKind::SETOF_TYPE
             | SyntaxKind::SET_ACCESS_METHOD
             | SyntaxKind::SET_ALL_PUBLICATION_OBJECT_LIST
             | SyntaxKind::SET_CATALOG
@@ -7271,6 +7273,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::SESSION_CHARACTERISTICS => "session characteristics",
             SyntaxKind::SESSION_SCOPE => "session scope",
             SyntaxKind::SET => "set",
+            SyntaxKind::SETOF_TYPE => "setof type",
             SyntaxKind::SET_ACCESS_METHOD => "set access method",
             SyntaxKind::SET_ALL_PUBLICATION_OBJECT_LIST => "set all publication object list",
             SyntaxKind::SET_CATALOG => "set catalog",
