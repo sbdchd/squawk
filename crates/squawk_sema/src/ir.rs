@@ -797,10 +797,24 @@ pub struct Function {
     pub ptr: InIrFile<SyntaxNodePtr>,
     pub name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
     pub params: IdxRange<Param>,
-    pub direct_args: Option<usize>,
+    pub aggregate_kind: Option<AggregateKind>,
     pub ret: Option<Ty>,
     pub(crate) returns: ReturnKind,
     pub columns: Option<Columns>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AggregateKind {
+    OrderedSet { direct: usize },
+    Hypothetical { direct: usize },
+}
+
+impl AggregateKind {
+    pub fn direct(self) -> usize {
+        match self {
+            AggregateKind::OrderedSet { direct } | AggregateKind::Hypothetical { direct } => direct,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

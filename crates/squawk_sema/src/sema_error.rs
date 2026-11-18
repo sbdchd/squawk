@@ -89,6 +89,12 @@ pub(crate) enum LookupKind {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum DirectArgs {
+    Fixed,
+    Variadic,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ErrorArgs {
     List(IdxRange<ErrorArg>),
     Star,
@@ -658,6 +664,21 @@ pub(crate) enum SemaError {
     ParameterlessAggregate {
         name: Name,
         star_at: TextSize,
+    },
+    MissingWithinGroup {
+        name: Name,
+        within_at: Option<TextRange>,
+    },
+    OrderedSetDirectArgCount {
+        name: Name,
+        expected: usize,
+        direct_args: DirectArgs,
+        supplied: usize,
+    },
+    HypotheticalArgCount {
+        name: Name,
+        hypothetical: usize,
+        ordering: usize,
     },
     CannotCreateIndex {
         name: Name,
@@ -1529,9 +1550,10 @@ impl SemaError {
             } => DiagnosticKind::UnresolvedOperator,
             SemaError::UnresolvedRoutine { .. } => DiagnosticKind::UnresolvedFunction,
             SemaError::ArgumentTypeMismatch { .. } => DiagnosticKind::TypeMismatch,
-            SemaError::ArgumentCountMismatch { .. } | SemaError::MissingArguments { .. } => {
-                DiagnosticKind::ArgumentCountMismatch
-            }
+            SemaError::ArgumentCountMismatch { .. }
+            | SemaError::MissingArguments { .. }
+            | SemaError::OrderedSetDirectArgCount { .. }
+            | SemaError::HypotheticalArgCount { .. } => DiagnosticKind::ArgumentCountMismatch,
             SemaError::UnknownArgumentName { .. } => DiagnosticKind::UnresolvedParam,
             SemaError::PositionalAfterNamed
             | SemaError::DuplicateArgumentName { .. }
@@ -1541,7 +1563,8 @@ impl SemaError {
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
-            | SemaError::ParameterlessAggregate { .. } => DiagnosticKind::WrongRoutineKind,
+            | SemaError::ParameterlessAggregate { .. }
+            | SemaError::MissingWithinGroup { .. } => DiagnosticKind::WrongRoutineKind,
             SemaError::UnresolvedQualifiedColumn { .. }
             | SemaError::QualifiedSetTarget { .. }
             | SemaError::UnresolvedRecordColumn { .. } => DiagnosticKind::UnresolvedColumn,
@@ -1936,6 +1959,16 @@ impl SemaError {
                     edits: vec![Edit::insert(" over ()", over_at)],
                 },
             },
+            SemaError::MissingWithinGroup {
+                within_at: Some(within_at),
+                ..
+            } => Suggestion {
+                message: "move the aggregated arguments into `within group`".into(),
+                fix: Fix {
+                    title: "Move into `within group (order by ...)`".into(),
+                    edits: vec![Edit::replace(within_at, ") within group (order by ")],
+                },
+            },
             SemaError::ParameterlessAggregate { star_at, .. } => Suggestion {
                 message: "use `*` to call an aggregate with no arguments".into(),
                 fix: Fix {
@@ -2178,6 +2211,12 @@ impl SemaError {
             } => Some("use `drop expression` instead"),
             SemaError::WindowFrameCopy { hint, .. } => {
                 hint.then_some("omit the parentheses in this `over` clause")
+            }
+            SemaError::MissingWithinGroup {
+                within_at: None, ..
+            } => Some("pass the aggregated arguments in `within group (order by ...)`"),
+            SemaError::HypotheticalArgCount { .. } => {
+                Some("each hypothetical argument must have a matching ordering column")
             }
             SemaError::RefreshConcurrentlyWithoutUniqueIndex { .. } => Some(
                 "create a unique index with no `where` clause on one or more columns of the materialized view",
@@ -2759,6 +2798,38 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::WindowWithoutOver { name, .. } => {
                 write!(f, "window function `{}` requires an `over` clause", n(name))
             }
+            SemaError::MissingWithinGroup { name, .. } => write!(
+                f,
+                "ordered-set aggregate `{}` requires a `within group` clause",
+                n(name)
+            ),
+            SemaError::OrderedSetDirectArgCount {
+                name,
+                expected,
+                direct_args,
+                supplied,
+            } => write!(
+                f,
+                "ordered-set aggregate `{}` takes {}{expected} direct argument{} but {supplied} {} supplied",
+                n(name),
+                match direct_args {
+                    DirectArgs::Fixed => "",
+                    DirectArgs::Variadic => "at least ",
+                },
+                if expected == 1 { "" } else { "s" },
+                if supplied == 1 { "was" } else { "were" },
+            ),
+            SemaError::HypotheticalArgCount {
+                name,
+                hypothetical,
+                ordering,
+            } => write!(
+                f,
+                "hypothetical-set aggregate `{}` has {hypothetical} hypothetical argument{} but {ordering} ordering column{}",
+                n(name),
+                if hypothetical == 1 { "" } else { "s" },
+                if ordering == 1 { "" } else { "s" },
+            ),
             SemaError::Duplicate { object, name } => {
                 write!(f, "{object} `{}` already exists", n(name))
             }
