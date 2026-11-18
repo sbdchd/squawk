@@ -136,6 +136,15 @@ create type t (input = int4in, output = int4out);
 }
 
 #[test]
+fn implicit_shell_type_from_return_type() {
+    assert_snapshot!(check("
+create function t_in(cstring) returns t language internal as 'int4in';
+create function t_out(t) returns cstring language internal as 'int4out';
+create type t (input = t_in, output = t_out);
+"), @"no diagnostics");
+}
+
+#[test]
 fn base_type_unresolved_functions() {
     assert_snapshot!(check("
 create type t (

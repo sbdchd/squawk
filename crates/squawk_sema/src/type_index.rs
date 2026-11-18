@@ -1,6 +1,6 @@
 use std::ops::Index;
 
-use squawk_syntax::{AstPtr, ast};
+use squawk_syntax::SyntaxNodePtr;
 
 use crate::arena::{IdxRange, LayeredArena, LayeredMultimap};
 use crate::file::InIrFile;
@@ -9,7 +9,7 @@ use crate::ir::{
     Column, ColumnTypeRef, Columns, Subscript, Ty, Type, TypeCategory, TypeId, Typmod,
 };
 
-type NamePtr = InIrFile<AstPtr<ast::PathSegment>>;
+type NamePtr = InIrFile<SyntaxNodePtr>;
 
 #[derive(Debug, Default)]
 pub struct TypeIndex {

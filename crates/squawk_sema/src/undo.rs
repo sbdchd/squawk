@@ -1,5 +1,5 @@
 use smallvec::SmallVec;
-use squawk_syntax::{AstPtr, SyntaxNodePtr, ast};
+use squawk_syntax::SyntaxNodePtr;
 
 use crate::arena::IdxRange;
 use crate::column_exprs::{ColumnExpr, ColumnKey};
@@ -126,6 +126,6 @@ pub(crate) enum Undo {
     TableOfType(TableId, Option<TypeId>),
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),
     FinishShellType(TypeId, Box<Type>),
-    MoveType(TypeId, Name, Name, InIrFile<AstPtr<ast::PathSegment>>),
+    MoveType(TypeId, Name, Name, InIrFile<SyntaxNodePtr>),
     ArrayName(ArrayOwner, Option<Name>),
 }

@@ -92,6 +92,7 @@ impl Lowerer {
             file_id: FileId::Builtins.into(),
             ctes: vec![],
             pending_ctes: vec![],
+            pending_operator_refs: vec![],
             future_ctes: vec![],
             scopes: vec![],
             windows: vec![],
@@ -403,6 +404,7 @@ pub(crate) struct Lowerer {
     file_id: IrFileId,
     ctes: Vec<CteId>,
     pending_ctes: Vec<PendingCte>,
+    pending_operator_refs: Vec<PendingOperatorRef>,
     future_ctes: Vec<FutureCtes>,
     scopes: Vec<QueryScope>,
     windows: Vec<WindowId>,
@@ -594,6 +596,14 @@ struct PendingCte {
     with_table: ast::WithTable,
     scopes: usize,
     ctes: usize,
+}
+
+struct PendingOperatorRef {
+    reference: RefId,
+    schema: Name,
+    name: Name,
+    left: Operand,
+    right: Operand,
 }
 
 struct RelationSource {
@@ -9227,6 +9237,7 @@ impl Lowerer {
         });
         self.record_comment(create_operator.syntax(), Item::Operator(id));
         self.add_item_range(InIrFile::new(self.file_id, range), Item::Operator(id));
+        self.resolve_pending_operator_refs(id);
         if let Some(attributes) = create_operator.attribute_list() {
             let function = self.lower_operator_attributes(&attributes, left, right);
             self.index.operators.set_function(id, function);
@@ -9419,15 +9430,60 @@ impl Lowerer {
     ) {
         match value.operator_call().and_then(|call| call.op()) {
             Some(op) => {
-                self.lower_operator_ref(&op, left, right, IfMissing::Ignore);
+                let path = op.path_ref();
+                let schema =
+                    self.lower_schema_qualifier(path.as_ref().and_then(|path| path.qualifier()));
+                let text = op.operator_text();
+                self.add_operator_attribute_ref(op.operator_range(), schema, &text, left, right);
             }
             None => {
-                let range = value.syntax().text_range();
-                let text = value.operator_text();
                 let schema = self.default_creation_schema();
-                self.add_operator_ref(range, Some(schema), &text, left, right, IfMissing::Ignore);
+                let text = value.operator_text();
+                let range = value.syntax().text_range();
+                self.add_operator_attribute_ref(range, Some(schema), &text, left, right);
             }
         }
+    }
+
+    fn add_operator_attribute_ref(
+        &mut self,
+        range: TextRange,
+        schema: Option<Name>,
+        text: &str,
+        left: Operand,
+        right: Operand,
+    ) {
+        let reference = self.index.references.next_idx();
+        if self
+            .add_operator_ref(range, schema, text, left, right, IfMissing::Ignore)
+            .is_some()
+        {
+            return;
+        }
+        let schema = schema.unwrap_or_else(|| self.default_creation_schema());
+        let name = self.intern(text);
+        self.pending_operator_refs.push(PendingOperatorRef {
+            reference,
+            schema,
+            name,
+            left,
+            right,
+        });
+    }
+
+    fn resolve_pending_operator_refs(&mut self, id: OperatorId) {
+        let operator = &self.index.operators[id];
+        let references = &mut self.index.references;
+        self.pending_operator_refs.retain(|pending| {
+            let matches = pending.schema == operator.schema
+                && pending.name == operator.name
+                && operator.left.matches(pending.left)
+                && operator.right.matches(pending.right);
+            if matches {
+                references[pending.reference].resolution = Resolution::Operator(id);
+            }
+            !matches
+        });
     }
 
     fn lower_operator_ref(
@@ -11548,7 +11604,7 @@ impl Lowerer {
                 schema: ty.schema,
                 name: ty.name,
                 ptr: InIrFile::new(self.file_id, SyntaxNodePtr::new(node)),
-                name_ptr: InIrFile::new(self.file_id, AstPtr::new(&segment)),
+                name_ptr: self.ptr(segment.syntax()),
                 shell_name_ptr: Some(ty.name_ptr),
                 columns,
                 base: None,
@@ -12868,7 +12924,7 @@ impl Lowerer {
                 let ty = &self.index.types[domain];
                 let column = Column {
                     name: Some(name),
-                    ptr: ty.name_ptr.map(|ptr| ptr.syntax_node_ptr()),
+                    ptr: ty.name_ptr,
                     ty: ty.base,
                     typmod: None,
                     merge: None,
@@ -13023,7 +13079,7 @@ impl Lowerer {
             self.report_duplicate(ObjectKind::Type, segment.syntax(), name);
             return;
         }
-        let name_ptr = self.ast_ptr(&segment);
+        let name_ptr = self.ptr(segment.syntax());
         self.move_type(ty, schema, name, name_ptr);
         self.add_item(segment.syntax(), Item::Type(ty));
     }
@@ -13068,7 +13124,7 @@ impl Lowerer {
         ty: TypeId,
         schema: Name,
         name: Name,
-        name_ptr: InIrFile<AstPtr<ast::PathSegment>>,
+        name_ptr: InIrFile<SyntaxNodePtr>,
     ) {
         let in_transaction = self.in_transaction();
         if !self.index.types.is_local(ty) {
@@ -13430,6 +13486,16 @@ impl Lowerer {
             return;
         };
         let params = self.alloc_params(create_function.param_list());
+        if let Some(ret_type) = create_function.ret_type()
+            && let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = ret_type.func_type()
+            && path_type.keyword_type_name().is_none()
+            && let Some(type_path) = path_type.path_ref()
+            && create_function
+                .option_list()
+                .is_some_and(|options| creates_shell_return_type(&options))
+        {
+            self.alloc_implicit_shell_type(create_function.syntax(), &type_path);
+        }
         let Some(id) = self.alloc_function(
             FunctionKind::Function,
             IfExists::from_or_replace(create_function.or_replace().as_ref()),
@@ -13454,6 +13520,22 @@ impl Lowerer {
             create_function.body(),
             create_function.sql_body(),
         );
+    }
+
+    fn alloc_implicit_shell_type(&mut self, node: &SyntaxNode, path: &ast::PathRef) {
+        let Some(segment) = path.segment() else {
+            return;
+        };
+        let name = self.intern(&segment.text());
+        let schema = path
+            .qualifier()
+            .and_then(|qualifier| qualifier.segment())
+            .map(|segment| self.intern_schema(&segment.text()));
+        if self.find_type(schema, name) != Resolution::Unresolved {
+            return;
+        }
+        let schema = schema.unwrap_or_else(|| self.default_creation_schema());
+        self.alloc_named_type(TypeKind::Shell, node, segment.syntax(), schema, name, None);
     }
 
     fn lower_create_procedure(&mut self, create_procedure: &ast::CreateProcedure) {
@@ -26613,6 +26695,21 @@ impl Lowerer {
         {
             self.report_duplicate(ObjectKind::Type, segment.syntax(), name);
         }
+        let id = self.alloc_named_type(kind, node, segment.syntax(), schema, name, columns);
+        self.record_comment(node, Item::Type(id));
+        self.add_item(segment.syntax(), Item::Type(id));
+        Some(id)
+    }
+
+    fn alloc_named_type(
+        &mut self,
+        kind: TypeKind,
+        node: &SyntaxNode,
+        name_node: &SyntaxNode,
+        schema: Name,
+        name: Name,
+        columns: Option<Columns>,
+    ) -> TypeId {
         let array_name = self.new_array_name(schema, name, kind != TypeKind::Shell);
         let id = self.index.types.alloc(
             Type {
@@ -26620,7 +26717,7 @@ impl Lowerer {
                 schema,
                 name,
                 ptr: self.ptr(node),
-                name_ptr: self.ast_ptr(&segment),
+                name_ptr: self.ptr(name_node),
                 shell_name_ptr: None,
                 columns,
                 base: None,
@@ -26642,9 +26739,7 @@ impl Lowerer {
             self.index
                 .set_column_owner(columns.range, ColumnOwner::Type(id));
         }
-        self.record_comment(node, Item::Type(id));
-        self.add_item(segment.syntax(), Item::Type(id));
-        Some(id)
+        id
     }
 
     fn alloc_function(
@@ -27637,6 +27732,19 @@ fn same_access_method(a: Option<AccessMethodId>, b: Option<AccessMethodId>) -> b
         (Some(a), Some(b)) => a == b,
         (None, _) | (_, None) => true,
     }
+}
+
+fn creates_shell_return_type(options: &ast::FuncOptionList) -> bool {
+    options.options().any(|option| {
+        matches!(
+            option,
+            ast::FuncOption::LanguageFuncOption(language)
+                if language.language_name().is_some_and(|language| {
+                    language.name.eq_ignore_ascii_case("c")
+                        || language.name.eq_ignore_ascii_case("internal")
+                })
+        )
+    })
 }
 
 fn is_search_path(param: Option<ast::ConfigParameterRef>) -> bool {
