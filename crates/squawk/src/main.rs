@@ -117,7 +117,7 @@ pub enum Command {
     Format(FormatArgs),
     /// Run the language server
     Server,
-    /// Comment on a PR with Squawk's results.
+    /// Comment on a PR with lint results.
     UploadToGithub(Box<UploadToGithubArgs>),
 }
 
