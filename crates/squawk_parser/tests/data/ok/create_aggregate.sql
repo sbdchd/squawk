@@ -125,3 +125,10 @@ CREATE AGGREGATE unsafe_sum (float8)
     minvfunc = float8mi
 );
 
+
+-- percent_type
+create aggregate a(int) (
+  sfunc = f,
+  stype = t.c%type,
+  mstype = setof s.t.c%type
+);

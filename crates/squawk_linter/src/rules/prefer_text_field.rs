@@ -17,6 +17,7 @@ fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
         Some(ast::Type::VarcharType(varchar_type)) => varchar_type.arg_list().is_some(),
         Some(
             ast::Type::ArrayType(_)
+            | ast::Type::SetofType(_)
             | ast::Type::CharacterType(_)
             | ast::Type::BitType(_)
             | ast::Type::BitVaryingType(_)

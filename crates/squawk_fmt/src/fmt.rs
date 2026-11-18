@@ -8420,8 +8420,8 @@ fn build_attribute_value<'a>(ctx: &Ctx, value: &ast::AttributeValue) -> Doc<'a> 
         build_literal(&literal)
     } else if let Some(prefix_expr) = value.prefix_expr() {
         build_prefix_expr(ctx, &prefix_expr)
-    } else if let Some(ty) = value.ty() {
-        build_type(ctx, ty)
+    } else if let Some(func_type) = value.func_type() {
+        build_func_type(ctx, func_type)
     } else if let Some(custom_op) = value.custom_op() {
         build_custom_operator(&custom_op)
     } else if let Some(operator_call) = value.operator_call() {
@@ -20045,7 +20045,10 @@ fn build_func_type<'a>(ctx: &Ctx, func_type: ast::FuncType) -> Doc<'a> {
 }
 
 fn build_percent_type<'a>(percent_type: &ast::PercentType) -> Doc<'a> {
-    let mut doc = build_setof(percent_type.setof_token().as_ref());
+    let mut doc = match percent_type.setof_token() {
+        Some(_) => Doc::text("setof").append(Doc::space()),
+        None => Doc::nil(),
+    };
     if let Some(path) = percent_type.path_ref() {
         doc = doc
             .append(leading_comments(path.syntax()))
@@ -20097,8 +20100,18 @@ fn build_type<'a>(ctx: &Ctx, ty: ast::Type) -> Doc<'a> {
             build_keyword_type(ctx, varchar_type.syntax(), varchar_type.arg_list())
         }
         ast::Type::DoubleType(double_type) => build_keyword_node(double_type.syntax()),
+        ast::Type::SetofType(setof_type) => {
+            let mut doc = Doc::text("setof");
+            if let Some(inner) = setof_type.ty() {
+                doc = doc
+                    .append(Doc::space())
+                    .append(leading_comments(inner.syntax()))
+                    .append(build_type(ctx, inner));
+            }
+            doc
+        }
         ast::Type::IntervalType(interval_type) => {
-            let mut doc = build_setof(interval_type.setof_token().as_ref());
+            let mut doc = Doc::nil();
             if let Some(interval_token) = interval_type.interval_token() {
                 doc = doc
                     .append(leading_comments(&interval_token))
@@ -20117,7 +20130,7 @@ fn build_type<'a>(ctx: &Ctx, ty: ast::Type) -> Doc<'a> {
             doc
         }
         ast::Type::PathType(path_type) => {
-            let mut doc = build_setof(path_type.setof_token().as_ref());
+            let mut doc = Doc::nil();
             if let Some(path) = path_type.path_ref() {
                 doc = doc
                     .append(leading_comments(path.syntax()))
@@ -20130,7 +20143,7 @@ fn build_type<'a>(ctx: &Ctx, ty: ast::Type) -> Doc<'a> {
             doc.append(build_type_args(ctx, arg_list))
         }
         ast::Type::TimeType(time_type) => {
-            let mut doc = build_setof(time_type.setof_token().as_ref());
+            let mut doc = Doc::nil();
             if let Some(time_token) = time_type.time_token() {
                 doc = doc
                     .append(leading_comments(&time_token))
@@ -20144,7 +20157,7 @@ fn build_type<'a>(ctx: &Ctx, ty: ast::Type) -> Doc<'a> {
             .append(build_timezone(time_type.timezone()))
         }
         ast::Type::TimestampType(timestamp_type) => {
-            let mut doc = build_setof(timestamp_type.setof_token().as_ref());
+            let mut doc = Doc::nil();
             if let Some(timestamp_token) = timestamp_type.timestamp_token() {
                 doc = doc
                     .append(leading_comments(&timestamp_token))
@@ -20157,13 +20170,6 @@ fn build_type<'a>(ctx: &Ctx, ty: ast::Type) -> Doc<'a> {
             ))
             .append(build_timezone(timestamp_type.timezone()))
         }
-    }
-}
-
-fn build_setof<'a>(setof: Option<&SyntaxToken>) -> Doc<'a> {
-    match setof {
-        Some(_) => Doc::text("setof").append(Doc::space()),
-        None => Doc::nil(),
     }
 }
 

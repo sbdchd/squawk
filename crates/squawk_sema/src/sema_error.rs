@@ -810,9 +810,7 @@ pub(crate) enum SemaError {
         reason: ColumnDefListReason,
     },
     RowsFromColumnDefList,
-    SetofColumn {
-        name: Name,
-    },
+    SetofOperatorArg,
     PseudoTypeColumn {
         name: Name,
         ty: TyName,
@@ -1559,7 +1557,8 @@ impl SemaError {
             | SemaError::DuplicateArgumentName { .. }
             | SemaError::ArgumentPositionalAndNamed { .. }
             | SemaError::NotVariadic { .. }
-            | SemaError::UnlabeledVariadic { .. } => DiagnosticKind::InvalidArgument,
+            | SemaError::UnlabeledVariadic { .. }
+            | SemaError::SetofOperatorArg => DiagnosticKind::InvalidArgument,
             SemaError::ProcedureCalledAsFunction { .. }
             | SemaError::FunctionCalledAsProcedure { .. }
             | SemaError::AggregateDroppedAsFunction { .. }
@@ -1639,9 +1638,7 @@ impl SemaError {
             | SemaError::RowsFromColumnDefList
             | SemaError::OrdinalityColumnDefList { .. }
             | SemaError::DuplicateColumnDefList => DiagnosticKind::UnexpectedColumnDefList,
-            SemaError::SetofColumn { .. } | SemaError::PseudoTypeColumn { .. } => {
-                DiagnosticKind::InvalidTableDefinition
-            }
+            SemaError::PseudoTypeColumn { .. } => DiagnosticKind::InvalidTableDefinition,
             SemaError::CollationNotSupported { .. } | SemaError::UnsupportedReturnType { .. } => {
                 DiagnosticKind::TypeMismatch
             }
@@ -2394,6 +2391,7 @@ impl SemaError {
                 Some("row variable naming in the `referencing` clause is not supported")
             }
             SemaError::ViewDropColumns => Some("cannot drop columns from view"),
+            SemaError::SetofOperatorArg => Some("`setof` is not allowed for operator arguments"),
             _ => None,
         }
     }
@@ -2726,6 +2724,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::DuplicateColumnDefList
             | SemaError::TransitionRowVariable { .. }
             | SemaError::ViewDropColumns
+            | SemaError::SetofOperatorArg
             | SemaError::NoConflictArbiter { .. }
             | SemaError::DeferrableConflictArbiter
             | SemaError::ConflictConstraintWithoutIndex
@@ -3264,9 +3263,6 @@ impl fmt::Display for ErrorMessage<'_> {
                 n(from),
                 n(to)
             ),
-            SemaError::SetofColumn { name } => {
-                write!(f, "column `{}` cannot be declared `setof`", n(name))
-            }
             SemaError::PseudoTypeColumn { name, ty } => {
                 write!(
                     f,

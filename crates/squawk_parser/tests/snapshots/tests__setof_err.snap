@@ -1,0 +1,280 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/setof.sql
+---
+SOURCE_FILE
+  COMMENT "-- setof is only allowed in function return types"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        ERROR
+          SETOF_KW "setof"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_COLUMN
+      ADD_KW "add"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      COLUMN_NAME
+        IDENT "b"
+      WHITESPACE " "
+      ERROR
+        SETOF_KW "setof"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TYPE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TYPE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "c"
+    WHITESPACE " "
+    COMPOSITE_TYPE
+      AS_KW "as"
+      WHITESPACE " "
+      COMPOSITE_FIELD_LIST
+        L_PAREN "("
+        COMPOSITE_FIELD_DEF
+          COMPOSITE_FIELD
+            IDENT "a"
+          WHITESPACE " "
+          ERROR
+            SETOF_KW "setof"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TYPE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    TYPE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "c"
+    WHITESPACE " "
+    ALTER_TYPE_ATTRIBUTE_ACTION_LIST
+      ADD_ATTRIBUTE
+        ADD_KW "add"
+        WHITESPACE " "
+        ATTRIBUTE_KW "attribute"
+        WHITESPACE " "
+        COMPOSITE_FIELD
+          IDENT "b"
+        WHITESPACE " "
+        ERROR
+          SETOF_KW "setof"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          NAME_REF
+            IDENT "f"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+        WHITESPACE " "
+        FROM_ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          TABLE_ALIAS
+            IDENT "t"
+          COLUMN_DEF_LIST
+            L_PAREN "("
+            COLUMN_DEF
+              COLUMN_NAME
+                IDENT "x"
+              WHITESPACE " "
+              ERROR
+                SETOF_KW "setof"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    INT_KW "int"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      PARAM
+        PARAM_NAME
+          IDENT "a"
+        WHITESPACE " "
+        ERROR
+          SETOF_KW "setof"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+    WHITESPACE " "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      RETURN_TABLE_ARG_LIST
+        L_PAREN "("
+        RETURN_TABLE_COLUMN
+          COLUMN_NAME
+            IDENT "a"
+          WHITESPACE " "
+          ERROR
+            SETOF_KW "setof"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+        R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+    WHITESPACE " "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: `setof` is only allowed in function return types
+  ╭▸ 
+2 │ create table t (a setof int);
+  ╰╴                  ━
+error[syntax-error]: `setof` is only allowed in function return types
+  ╭▸ 
+4 │ alter table t add column b setof int;
+  ╰╴                           ━
+error[syntax-error]: `setof` is only allowed in function return types
+  ╭▸ 
+6 │ create type c as (a setof int);
+  ╰╴                    ━
+error[syntax-error]: `setof` is only allowed in function return types
+  ╭▸ 
+8 │ alter type c add attribute b setof int;
+  ╰╴                             ━
+error[syntax-error]: `setof` is only allowed in function return types
+   ╭▸ 
+10 │ select * from f() as t(x setof int);
+   ╰╴                         ━
+error[syntax-error]: `setof` is only allowed in function return types
+   ╭▸ 
+12 │ create function f(a setof int) returns int language sql return 1;
+   ╰╴                    ━
+error[syntax-error]: `setof` is only allowed in function return types
+   ╭▸ 
+14 │ create function f() returns table (a setof int) language sql return 1;
+   ╰╴                                     ━

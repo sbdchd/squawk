@@ -21,3 +21,7 @@ alter operator & (bool, bool)
 alter operator % (int, int) 
   set (restrict = none, join = none);
 
+
+-- percent_type
+alter operator === (int, int)
+  set (restrict = t.c%type);

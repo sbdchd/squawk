@@ -1105,7 +1105,7 @@ fn type_literal_string(p: &mut Parser<'_>) {
 fn type_literal(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     let interval_has_precision = p.at(INTERVAL_KW) && p.nth_at(1, L_PAREN);
-    let ty_kind = match opt_type_name_with(p, true, false) {
+    let ty_kind = match opt_type(p) {
         Some(ty) => Some(ty.kind()),
         None => {
             p.error("expected type name");
@@ -2433,70 +2433,6 @@ pub(crate) fn opt_array_bound(p: &mut Parser<'_>) -> bool {
     true
 }
 
-fn allows_type_mods(kind: SyntaxKind) -> bool {
-    matches!(
-        kind,
-        PATH_TYPE | BIT_TYPE | BIT_VARYING_TYPE | CHARACTER_TYPE | VARCHAR_TYPE
-    )
-}
-
-fn type_mods(
-    p: &mut Parser<'_>,
-    m: Marker,
-    type_args_enabled: bool,
-    percent_type_enabled: bool,
-    kind: SyntaxKind,
-) -> CompletedMarker {
-    if percent_type_enabled && opt_percent_type(p).is_some() {
-        return m.complete(p, PERCENT_TYPE);
-    }
-    if p.at(L_PAREN) && type_args_enabled && allows_type_mods(kind) {
-        let m = p.start();
-        delimited(
-            p,
-            L_PAREN,
-            R_PAREN,
-            COMMA,
-            ListItems::Required(ListItem::TypeModifier),
-            EXPR_FIRST.union(TokenSet::new(&[VARIADIC_KW])),
-            |p| arg_expr(p).is_some(),
-        );
-        m.complete(p, ARG_LIST);
-    }
-    let cm = m.complete(p, kind);
-    if !p.at(L_BRACK) && !p.at(ARRAY_KW) {
-        return cm;
-    }
-    let m = cm.precede(p);
-    if p.eat(ARRAY_KW) {
-        opt_array_bound(p);
-    } else {
-        let mut found_one_array_bracks = false;
-        while !p.at(EOF) && p.at(L_BRACK) {
-            if opt_array_bound(p) {
-                found_one_array_bracks = true;
-            }
-        }
-        if !found_one_array_bracks {
-            p.error("expected `[`");
-        }
-    }
-    m.complete(p, ARRAY_TYPE)
-}
-
-fn char_type(p: &mut Parser<'_>) -> SyntaxKind {
-    assert!(p.at(CHARACTER_KW) || p.at(CHAR_KW) || p.at(NCHAR_KW) || p.at(VARCHAR_KW));
-    if p.eat(VARCHAR_KW) {
-        return VARCHAR_TYPE;
-    }
-    p.bump_any();
-    if p.eat(VARYING_KW) {
-        VARCHAR_TYPE
-    } else {
-        CHARACTER_TYPE
-    }
-}
-
 const TYPE_NAME_FIRST: TokenSet = TokenSet::new(&[
     BIT_KW,
     NATIONAL_KW,
@@ -2534,78 +2470,205 @@ SimpleTypename is:
 
 */
 #[must_use]
-fn opt_type_name_with(
-    p: &mut Parser<'_>,
-    type_args_enabled: bool,
-    percent_type_enabled: bool,
-) -> Option<CompletedMarker> {
-    if !p.at_ts(TYPE_NAME_FIRST) {
-        return None;
+fn opt_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if p.at(SETOF_KW) {
+        let m = p.start();
+        p.bump(SETOF_KW);
+        if opt_non_setof_type(p).is_none() {
+            p.error("expected type name");
+        }
+        return Some(m.complete(p, SETOF_TYPE));
     }
+    opt_non_setof_type(p)
+}
+
+#[must_use]
+fn opt_non_setof_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let ty = opt_simple_type(p)?;
+    Some(opt_array_type(p, ty))
+}
+
+#[must_use]
+fn opt_func_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if at_percent_type(p) {
+        return Some(percent_type(p));
+    }
+    opt_type(p)
+}
+
+pub(crate) fn setof_not_allowed(p: &mut Parser<'_>) {
+    if p.at(SETOF_KW) {
+        p.err_and_bump("`setof` is only allowed in function return types");
+    }
+}
+
+fn at_percent_type(p: &Parser<'_>) -> bool {
+    let mut n = usize::from(p.at(SETOF_KW));
+    if !p.nth_at_ts(n, PATH_FIRST) {
+        return false;
+    }
+    n += 1;
+    while !p.nth_at(n, EOF) {
+        if p.nth_at(n, UESCAPE_KW) && p.nth_at(n + 1, STRING) {
+            n += 2;
+        }
+        if !p.nth_at(n, DOT) || !p.nth_at_ts(n + 1, COL_LABEL_FIRST) {
+            break;
+        }
+        n += 2;
+    }
+    p.nth_at(n, PERCENT) && p.nth_at(n + 1, TYPE_KW)
+}
+
+fn percent_type(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.eat(SETOF_KW);
-    let wrapper_type = match p.current() {
-        BIT_KW => {
-            p.bump(BIT_KW);
-            if p.eat(VARYING_KW) {
-                BIT_VARYING_TYPE
-            } else {
-                BIT_TYPE
-            }
-        }
-        NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
-            p.bump(NATIONAL_KW);
-            char_type(p)
-        }
+    path_name_ref(p);
+    if opt_percent_type(p).is_none() {
+        p.error("expected `%type`");
+    }
+    m.complete(p, PERCENT_TYPE)
+}
+
+#[must_use]
+fn opt_simple_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if let Some(ty) = opt_keyword_type(p) {
+        return Some(ty);
+    }
+    at_path_type(p).then(|| path_type(p))
+}
+
+#[must_use]
+fn opt_keyword_type(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    let ty = match p.current() {
+        BIT_KW => bit_type(p),
+        NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => char_type(p),
         CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => char_type(p),
-        TIMESTAMP_KW | TIME_KW => {
-            let kind = if p.eat(TIMESTAMP_KW) {
-                TIMESTAMP_TYPE
-            } else {
-                p.bump(TIME_KW);
-                TIME_TYPE
-            };
-            if p.eat(L_PAREN) {
-                uint_literal(p);
-                p.expect(R_PAREN);
-            }
-            let _ = opt_with_timezone(p);
-            kind
-        }
-        INTERVAL_KW => {
-            p.bump(INTERVAL_KW);
-            let has_precision = opt_interval_precision(p);
-            opt_interval_trailing(p, has_precision);
-            INTERVAL_TYPE
-        }
-        DOUBLE_KW if p.nth_at(1, PRECISION_KW) => {
-            p.bump(DOUBLE_KW);
-            p.bump(PRECISION_KW);
-            DOUBLE_TYPE
-        }
-        // Column constraint start sequence that can also overlap with a type
-        // since `generated` is a valid type name. Special case this so we can
-        // be more generous in our parsing.
-        GENERATED_KW if p.nth_at(1, ALWAYS_KW) => {
-            m.abandon(p);
-            return None;
-        }
-        _ if p.at_ts(TYPE_KEYWORDS) || p.at(IDENT) => {
-            path_name_ref(p);
-            PATH_TYPE
-        }
-        _ => {
-            m.abandon(p);
-            return None;
-        }
+        TIMESTAMP_KW | TIME_KW => time_type(p),
+        INTERVAL_KW => interval_type(p),
+        DOUBLE_KW if p.nth_at(1, PRECISION_KW) => double_type(p),
+        _ => return None,
     };
-    Some(type_mods(
+    Some(ty)
+}
+
+fn at_path_type(p: &Parser<'_>) -> bool {
+    // Column constraint start sequence that can also overlap with a type
+    // since `generated` is a valid type name. Special case this so we can
+    // be more generous in our parsing.
+    if p.at(GENERATED_KW) && p.nth_at(1, ALWAYS_KW) {
+        return false;
+    }
+    p.at_ts(TYPE_KEYWORDS) || p.at(IDENT)
+}
+
+fn path_type(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    path_name_ref(p);
+    opt_type_args(p);
+    m.complete(p, PATH_TYPE)
+}
+
+fn bit_type(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.bump(BIT_KW);
+    let kind = if p.eat(VARYING_KW) {
+        BIT_VARYING_TYPE
+    } else {
+        BIT_TYPE
+    };
+    opt_type_args(p);
+    m.complete(p, kind)
+}
+
+fn char_type(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.eat(NATIONAL_KW);
+    let kind = char_type_keywords(p);
+    opt_type_args(p);
+    m.complete(p, kind)
+}
+
+fn char_type_keywords(p: &mut Parser<'_>) -> SyntaxKind {
+    assert!(p.at(CHARACTER_KW) || p.at(CHAR_KW) || p.at(NCHAR_KW) || p.at(VARCHAR_KW));
+    if p.eat(VARCHAR_KW) {
+        return VARCHAR_TYPE;
+    }
+    p.bump_any();
+    if p.eat(VARYING_KW) {
+        VARCHAR_TYPE
+    } else {
+        CHARACTER_TYPE
+    }
+}
+
+fn time_type(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    let kind = if p.eat(TIMESTAMP_KW) {
+        TIMESTAMP_TYPE
+    } else {
+        p.bump(TIME_KW);
+        TIME_TYPE
+    };
+    if p.eat(L_PAREN) {
+        uint_literal(p);
+        p.expect(R_PAREN);
+    }
+    let _ = opt_with_timezone(p);
+    m.complete(p, kind)
+}
+
+fn interval_type(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.bump(INTERVAL_KW);
+    let has_precision = opt_interval_precision(p);
+    opt_interval_trailing(p, has_precision);
+    m.complete(p, INTERVAL_TYPE)
+}
+
+fn double_type(p: &mut Parser<'_>) -> CompletedMarker {
+    let m = p.start();
+    p.bump(DOUBLE_KW);
+    p.bump(PRECISION_KW);
+    m.complete(p, DOUBLE_TYPE)
+}
+
+fn opt_type_args(p: &mut Parser<'_>) {
+    if !p.at(L_PAREN) {
+        return;
+    }
+    let m = p.start();
+    delimited(
         p,
-        m,
-        type_args_enabled,
-        percent_type_enabled,
-        wrapper_type,
-    ))
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        ListItems::Required(ListItem::TypeModifier),
+        EXPR_FIRST.union(TokenSet::new(&[VARIADIC_KW])),
+        |p| arg_expr(p).is_some(),
+    );
+    m.complete(p, ARG_LIST);
+}
+
+fn opt_array_type(p: &mut Parser<'_>, ty: CompletedMarker) -> CompletedMarker {
+    if !p.at(L_BRACK) && !p.at(ARRAY_KW) {
+        return ty;
+    }
+    let m = ty.precede(p);
+    if p.eat(ARRAY_KW) {
+        opt_array_bound(p);
+    } else {
+        let mut found_one_array_bracks = false;
+        while !p.at(EOF) && p.at(L_BRACK) {
+            if opt_array_bound(p) {
+                found_one_array_bracks = true;
+            }
+        }
+        if !found_one_array_bracks {
+            p.error("expected `[`");
+        }
+    }
+    m.complete(p, ARRAY_TYPE)
 }
 
 fn opt_with_timezone(p: &mut Parser<'_>) -> bool {
@@ -2628,7 +2691,7 @@ fn opt_with_timezone(p: &mut Parser<'_>) -> bool {
 }
 
 fn opt_type_name(p: &mut Parser<'_>) -> bool {
-    opt_type_name_with(p, true, false).is_some()
+    opt_type(p).is_some()
 }
 
 fn type_name(p: &mut Parser<'_>) {
@@ -2638,15 +2701,19 @@ fn type_name(p: &mut Parser<'_>) {
 }
 
 pub(crate) fn func_type(p: &mut Parser<'_>) {
-    if opt_type_name_with(p, true, true).is_none() {
+    if opt_func_type(p).is_none() {
         p.error("expected type name");
     }
 }
 
 fn simple_type_name(p: &mut Parser<'_>) {
-    if opt_type_name_with(p, false, false).is_none() {
+    if !at_path_type(p) {
         p.error("expected simple type name");
+        return;
     }
+    let m = p.start();
+    path_name_ref(p);
+    m.complete(p, PATH_TYPE);
 }
 
 // param_name ( ':=' | '=>' ) a_expr
@@ -2882,7 +2949,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
         NATIONAL_KW if matches!(p.nth(1), CHAR_KW | CHARACTER_KW) => {
             p.bump(NATIONAL_KW);
-            char_type(p);
+            char_type_keywords(p);
             true
         }
         DOUBLE_KW if p.nth_at(1, PRECISION_KW) => {
@@ -2892,7 +2959,7 @@ fn name_ref_(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         }
         CHARACTER_KW | CHAR_KW | NCHAR_KW | VARCHAR_KW => {
             let has_varying = p.nth_at(1, VARYING_KW);
-            char_type(p);
+            char_type_keywords(p);
             has_varying
         }
         INTERVAL_KW => {
@@ -4858,6 +4925,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> ColumnDefKind {
         ColumnDefKind::FromAliasColumn => {
             let m = p.start();
             column_name(p);
+            setof_not_allowed(p);
             if !p.at(COMMA) && !p.at(R_PAREN) && opt_type_name(p) {
                 opt_collate(p);
                 m.complete(p, COLUMN_DEF);
@@ -4869,6 +4937,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> ColumnDefKind {
         ColumnDefKind::ColumnDef => {
             let m = p.start();
             column_name(p);
+            setof_not_allowed(p);
             if p.at(COMMA) || p.at(R_PAREN) || !opt_type_name(p) {
                 p.error("expected a type");
             } else {
@@ -4879,6 +4948,7 @@ fn column(p: &mut Parser<'_>, kind: ColumnDefKind) -> ColumnDefKind {
         ColumnDefKind::CompositeFieldDef => {
             let m = p.start();
             composite_field(p);
+            setof_not_allowed(p);
             if !p.at(COMMA) && !p.at(R_PAREN) && opt_type_name(p) {
                 opt_collate(p);
             }
@@ -5906,6 +5976,7 @@ fn opt_col_def(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     }
     let m = p.start();
     column_name(p);
+    setof_not_allowed(p);
     if opt_type_name(p) {
         opt_storage(p);
         opt_compression_method(p);
@@ -10809,6 +10880,7 @@ fn alter_type_attribute_action(p: &mut Parser<'_>) {
     let kind = if p.eat(ADD_KW) {
         p.expect(ATTRIBUTE_KW);
         composite_field(p);
+        setof_not_allowed(p);
         type_name(p);
         opt_collate(p);
         opt_cascade_or_restrict(p);
@@ -18023,6 +18095,7 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
                     _ => false,
                 };
                 if at_type {
+                    setof_not_allowed(p);
                     func_type(p);
                 } else {
                     param_name(p);
@@ -18030,15 +18103,18 @@ fn param(p: &mut Parser<'_>, kind: ParamKind) {
                         opt_param_mode(p);
                     }
                     // argtype
+                    setof_not_allowed(p);
                     func_type(p);
                 }
             } else {
                 // argtype
+                setof_not_allowed(p);
                 func_type(p);
             }
             opt_param_default(p);
         }
         ParamKind::TypeOnly => {
+            setof_not_allowed(p);
             if !opt_type_name(p) {
                 p.err_and_bump("expected type name");
             }
@@ -18291,6 +18367,7 @@ fn return_table_column(p: &mut Parser<'_>) -> bool {
     }
     let m = p.start();
     column_name(p);
+    setof_not_allowed(p);
     func_type(p);
     m.complete(p, RETURN_TABLE_COLUMN);
     true
@@ -19261,6 +19338,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
                 opt_if_not_exists(p);
                 // column_name
                 column_name(p);
+                setof_not_allowed(p);
                 type_name(p);
                 opt_alter_option_list(p);
                 opt_collate(p);
@@ -19464,7 +19542,7 @@ fn def_arg(p: &mut Parser<'_>) {
         p.expect(L_PAREN);
         qual_op(p);
         p.expect(R_PAREN);
-    } else if !opt_type_name(p) {
+    } else if opt_func_type(p).is_none() {
         let message = format!("expected attribute value, found {}", p.current());
         err_recover_run(p, message, ATTRIBUTE_VALUE_RECOVERY);
     }

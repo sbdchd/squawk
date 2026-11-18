@@ -207,6 +207,7 @@ fn opt_cursor_arg(p: &mut Parser) -> bool {
 
 fn decl_datatype(p: &mut Parser) {
     if !at_percent_datatype(p) {
+        grammar::setof_not_allowed(p);
         grammar::func_type(p);
         return;
     }

@@ -1,5 +1,5 @@
 use squawk_diagnostics::Edit;
-use squawk_rowan::TextSize;
+use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::{file::InFile, ir::Item};
 use squawk_syntax::ast::{self, AstNode};
 
@@ -14,6 +14,21 @@ pub(super) fn add_schema(
 ) -> Option<()> {
     let offset = position.value;
     let token = token_from_offset(db, position)?;
+
+    if let Some(ty) = token.parent_ancestors().find_map(ast::Type::cast)
+        && let Some(edit) = builtin_type_edit(&ty)
+    {
+        if !edit.range.contains(offset) {
+            return None;
+        }
+        actions.push(CodeAction {
+            title: "Add schema".to_owned(),
+            edits: vec![Edit::replace(edit.range, edit.text)],
+            kind: ActionKind::RefactorRewrite,
+        });
+        return Some(());
+    }
+
     let range = token.parent_ancestors().find_map(|node| {
         if let Some(path) = ast::Path::cast(node.clone())
             && path.qualifier().is_none()
@@ -59,6 +74,59 @@ pub(super) fn add_schema(
     });
 
     Some(())
+}
+
+struct BuiltinTypeEdit {
+    range: TextRange,
+    text: String,
+}
+
+fn builtin_type_edit(ty: &ast::Type) -> Option<BuiltinTypeEdit> {
+    let name = ty.builtin_type_name()?;
+    let modifier = match ty {
+        ast::Type::ArrayType(_) | ast::Type::SetofType(_) => return None,
+        ast::Type::PathType(path_type) => {
+            let segment = path_type.path_ref()?.unqualified_segment()?;
+            let segment_range = segment.syntax().text_range();
+            let range = match (segment.text().as_ref(), path_type.arg_list()) {
+                ("float", Some(arg_list)) => segment_range.cover(arg_list.syntax().text_range()),
+                _ => segment_range,
+            };
+            return Some(BuiltinTypeEdit {
+                range,
+                text: format!("pg_catalog.{name}"),
+            });
+        }
+        ast::Type::BitType(bit) => bit
+            .arg_list()
+            .map_or_else(|| "(1)".to_owned(), |args| args.syntax().to_string()),
+        ast::Type::CharacterType(character) => character
+            .arg_list()
+            .map_or_else(|| "(1)".to_owned(), |args| args.syntax().to_string()),
+        ast::Type::BitVaryingType(bit) => bit
+            .arg_list()
+            .map_or_else(String::new, |args| args.syntax().to_string()),
+        ast::Type::VarcharType(varchar) => varchar
+            .arg_list()
+            .map_or_else(String::new, |args| args.syntax().to_string()),
+        ast::Type::DoubleType(_) => String::new(),
+        ast::Type::IntervalType(interval) => {
+            if interval.interval_qualifier().is_some() || interval.literal().is_some() {
+                return None;
+            }
+            String::new()
+        }
+        ast::Type::TimeType(time) => time
+            .literal()
+            .map_or_else(String::new, |literal| format!("({})", literal.syntax())),
+        ast::Type::TimestampType(timestamp) => timestamp
+            .literal()
+            .map_or_else(String::new, |literal| format!("({})", literal.syntax())),
+    };
+    Some(BuiltinTypeEdit {
+        range: ty.syntax().text_range(),
+        text: format!("pg_catalog.{name}{modifier}"),
+    })
 }
 
 #[cfg(test)]
@@ -361,6 +429,137 @@ select f$0();"),
             "
 create function f() returns int8 as 'select 1' language sql;
 select myschema.f$0();"
+        ));
+    }
+
+    #[test]
+    fn add_schema_bigint() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select 1::bigint$0;"),
+            @"select 1::pg_catalog.int8;"
+        );
+    }
+
+    #[test]
+    fn add_schema_bigint_array() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select 1::bigint$0[];"),
+            @"select 1::pg_catalog.int8[];"
+        );
+    }
+
+    #[test]
+    fn add_schema_bigint_literal() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select bigint$0 '1';"),
+            @"select pg_catalog.int8 '1';"
+        );
+    }
+
+    #[test]
+    fn add_schema_int_column() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "create table t (a int$0);"),
+            @"create table t (a pg_catalog.int4);"
+        );
+    }
+
+    #[test]
+    fn add_schema_numeric_with_args() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select 1::numeric$0(10, 2);"),
+            @"select 1::pg_catalog.numeric(10, 2);"
+        );
+    }
+
+    #[test]
+    fn add_schema_float_with_precision() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select 1::float$0(10);"),
+            @"select 1::pg_catalog.float4;"
+        );
+    }
+
+    #[test]
+    fn add_schema_double_precision() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select 1::double$0 precision;"),
+            @"select 1::pg_catalog.float8;"
+        );
+    }
+
+    #[test]
+    fn add_schema_varchar_with_args() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select 'a'::character$0 varying(10);"),
+            @"select 'a'::pg_catalog.varchar(10);"
+        );
+    }
+
+    #[test]
+    fn add_schema_char() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select 'a'::char$0;"),
+            @"select 'a'::pg_catalog.bpchar(1);"
+        );
+    }
+
+    #[test]
+    fn add_schema_bit() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select '1'::bit$0;"),
+            @"select '1'::pg_catalog.bit(1);"
+        );
+    }
+
+    #[test]
+    fn add_schema_timestamptz() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select now()::timestamp$0(3) with time zone;"),
+            @"select now()::pg_catalog.timestamptz(3);"
+        );
+    }
+
+    #[test]
+    fn add_schema_interval() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "select '1 day'::interval$0;"),
+            @"select '1 day'::pg_catalog.interval;"
+        );
+    }
+
+    #[test]
+    fn add_schema_setof_double_precision() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            "create function f() returns setof double$0 precision
+  language sql
+  return 1;"),
+            @"
+        create function f() returns setof pg_catalog.float8
+          language sql
+          return 1;
+        "
+        );
+    }
+
+    #[test]
+    fn add_schema_interval_with_fields_not_applicable() {
+        assert!(code_action_not_applicable(
+            add_schema,
+            "select '1'::interval$0 year to month;"
         ));
     }
 }

@@ -2500,13 +2500,13 @@ impl Lowerer {
                 continue;
             };
             let name = name.text();
-            let ty = option.attribute_value().and_then(|value| value.ty());
+            let ty = option.attribute_value().and_then(|value| value.func_type());
             match name.as_ref() {
-                "stype" => stype = ty.and_then(|ty| self.lower_type(&ty)),
-                "mstype" => mstype = ty.and_then(|ty| self.lower_type(&ty)),
+                "stype" => stype = ty.and_then(|ty| self.lower_func_type(&ty)),
+                "mstype" => mstype = ty.and_then(|ty| self.lower_func_type(&ty)),
                 "basetype" if lower_basetype => {
                     if let Some(ty) = ty {
-                        self.lower_type(&ty);
+                        self.lower_func_type(&ty);
                     }
                 }
                 "finalfunc_extra" => finalfunc_extra = true,
@@ -5571,8 +5571,9 @@ impl Lowerer {
             .flat_map(|list| list.params())
             .enumerate()
         {
-            let operand = self
-                .lower_func_type(param.func_type())
+            let operand = param
+                .func_type()
+                .and_then(|ty| self.lower_func_type(&ty))
                 .map_or(Operand::Unknown, Operand::Ty);
             match i {
                 0 => {
@@ -9212,8 +9213,14 @@ impl Lowerer {
                 "rightarg" => &mut right,
                 _ => continue,
             };
-            *operand = match option.attribute_value().and_then(|value| value.ty()) {
-                Some(ty) => self.lower_type(&ty).map_or(Operand::Unknown, Operand::Ty),
+            *operand = match option.attribute_value().and_then(|value| value.func_type()) {
+                Some(ty) => {
+                    if ty.setof_token().is_some() {
+                        self.push_error(ty.syntax(), SemaError::SetofOperatorArg);
+                    }
+                    self.lower_func_type(&ty)
+                        .map_or(Operand::Unknown, Operand::Ty)
+                }
                 None => Operand::Unknown,
             };
         }
@@ -9393,7 +9400,8 @@ impl Lowerer {
             let name = name.text();
             match name.as_ref() {
                 "function" | "procedure" => {
-                    if let Some(ast::Type::PathType(path_type)) = value.ty()
+                    if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) =
+                        value.func_type()
                         && let Some(path) = path_type.path_ref()
                     {
                         let arg_types: SmallVec<[Option<Ty>; 2]> = [left, right]
@@ -9408,7 +9416,8 @@ impl Lowerer {
                     }
                 }
                 "restrict" | "join" => {
-                    if let Some(ast::Type::PathType(path_type)) = value.ty()
+                    if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) =
+                        value.func_type()
                         && let Some(path) = path_type.path_ref()
                     {
                         self.lower_function_path_ref(&path, None);
@@ -9790,7 +9799,9 @@ impl Lowerer {
                 let mut arg_types: SmallVec<[Option<Ty>; 4]> = SmallVec::new();
                 let mut missing = false;
                 for param in param_list.params() {
-                    let ty = self.lower_func_type_lookup(param.func_type());
+                    let ty = param
+                        .func_type()
+                        .map_or(TypeLookup::Unknown, |ty| self.lower_func_type_lookup(&ty));
                     missing |= matches!(ty, TypeLookup::Missing);
                     if !matches!(param.mode(), Some(ast::ParamMode::ParamOut(_))) {
                         arg_types.push(ty.ty());
@@ -9801,7 +9812,9 @@ impl Lowerer {
                     .iter()
                     .flat_map(|order_by| order_by.params())
                 {
-                    let ty = self.lower_func_type_lookup(param.func_type());
+                    let ty = param
+                        .func_type()
+                        .map_or(TypeLookup::Unknown, |ty| self.lower_func_type_lookup(&ty));
                     missing |= matches!(ty, TypeLookup::Missing);
                     arg_types.push(ty.ty());
                 }
@@ -11397,10 +11410,10 @@ impl Lowerer {
                         continue;
                     };
                     let name = name.text();
-                    let ty = option.attribute_value().and_then(|value| value.ty());
+                    let ty = option.attribute_value().and_then(|value| value.func_type());
                     match name.as_ref() {
                         "subtype" => {
-                            subtype = ty.and_then(|ty| self.lower_type(&ty));
+                            subtype = ty.and_then(|ty| self.lower_func_type(&ty));
                         }
                         "multirange_type_name" => {
                             let value = option.attribute_value();
@@ -11410,21 +11423,23 @@ impl Lowerer {
                                 .and_then(|literal| literal.string_value())
                             {
                                 multirange_name = Some(MultirangeName::String(name));
-                            } else if let Some(ast::Type::PathType(path_type)) = ty
+                            } else if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) =
+                                ty
                                 && let Some(path) = path_type.path_ref()
                             {
                                 multirange_name = Some(MultirangeName::Path(path));
                             }
                         }
                         "collation" => {
-                            if let Some(ast::Type::PathType(path_type)) = ty
+                            if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = ty
                                 && let Some(path) = path_type.path_ref()
                             {
                                 self.lower_collation_ref(&path, IfMissing::Error);
                             }
                         }
                         option @ ("canonical" | "subtype_diff") => {
-                            let Some(ast::Type::PathType(path_type)) = ty else {
+                            let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = ty
+                            else {
                                 continue;
                             };
                             if option == "canonical" {
@@ -11434,7 +11449,7 @@ impl Lowerer {
                             }
                         }
                         "subtype_opclass" => {
-                            if let Some(ast::Type::PathType(path_type)) = ty
+                            if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = ty
                                 && let Some(path) = path_type.path_ref()
                             {
                                 let btree = self.intern("btree");
@@ -12677,12 +12692,12 @@ impl Lowerer {
             match name.as_ref() {
                 "element" => {
                     element = value
-                        .and_then(|value| value.ty())
-                        .and_then(|ty| self.lower_type(&ty));
+                        .and_then(|value| value.func_type())
+                        .and_then(|ty| self.lower_func_type(&ty));
                 }
                 "like" => {
-                    if let Some(ty) = value.and_then(|value| value.ty()) {
-                        self.lower_type(&ty);
+                    if let Some(ty) = value.and_then(|value| value.func_type()) {
+                        self.lower_func_type(&ty);
                     }
                 }
                 option @ ("input" | "output" | "receive" | "send" | "typmod_in" | "typmod_out"
@@ -12693,7 +12708,8 @@ impl Lowerer {
                         }
                         continue;
                     }
-                    let Some(ast::Type::PathType(path_type)) = value.and_then(|value| value.ty())
+                    let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) =
+                        value.and_then(|value| value.func_type())
                     else {
                         continue;
                     };
@@ -13168,6 +13184,12 @@ impl Lowerer {
                     lookup @ (TypeLookup::Missing | TypeLookup::Unknown) => lookup,
                 };
             }
+            ast::Type::SetofType(setof) => {
+                let Some(inner) = setof.ty() else {
+                    return TypeLookup::Unknown;
+                };
+                return self.lower_type_lookup(&inner, if_missing);
+            }
             ast::Type::PathType(path_type) => {
                 let Some(path) = path_type.path_ref() else {
                     return TypeLookup::Unknown;
@@ -13307,20 +13329,17 @@ impl Lowerer {
         self.builtin_type(literal.type_name()?)
     }
 
-    fn lower_func_type(&mut self, func_type: Option<ast::FuncType>) -> Option<Ty> {
+    fn lower_func_type(&mut self, func_type: &ast::FuncType) -> Option<Ty> {
         self.lower_func_type_lookup(func_type).ty()
     }
 
-    fn lower_func_type_lookup(&mut self, func_type: Option<ast::FuncType>) -> TypeLookup {
+    fn lower_func_type_lookup(&mut self, func_type: &ast::FuncType) -> TypeLookup {
         match func_type {
-            Some(ast::FuncType::Type(ty)) => self.lower_type_lookup(&ty, IfMissing::Error),
-            Some(ast::FuncType::PercentType(percent_type)) => {
-                match self.percent_type(&percent_type) {
-                    Some(ty) => TypeLookup::Found(ty),
-                    None => TypeLookup::Unknown,
-                }
-            }
-            None => TypeLookup::Unknown,
+            ast::FuncType::Type(ty) => self.lower_type_lookup(ty, IfMissing::Error),
+            ast::FuncType::PercentType(percent_type) => match self.percent_type(percent_type) {
+                Some(ty) => TypeLookup::Found(ty),
+                None => TypeLookup::Unknown,
+            },
         }
     }
 
@@ -13486,8 +13505,15 @@ impl Lowerer {
             return;
         };
         let params = self.alloc_params(create_function.param_list());
-        if let Some(ret_type) = create_function.ret_type()
-            && let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = ret_type.func_type()
+        let ret_ty = match create_function
+            .ret_type()
+            .and_then(|ret_type| ret_type.func_type())
+        {
+            Some(ast::FuncType::Type(ast::Type::SetofType(setof))) => setof.ty(),
+            Some(ast::FuncType::Type(ty)) => Some(ty),
+            Some(ast::FuncType::PercentType(_)) | None => None,
+        };
+        if let Some(ast::Type::PathType(path_type)) = ret_ty
             && path_type.keyword_type_name().is_none()
             && let Some(type_path) = path_type.path_ref()
             && create_function
@@ -13899,7 +13925,7 @@ impl Lowerer {
             Some(ast::ParamMode::ParamInOut(_)) => ParamMode::InOut,
             Some(ast::ParamMode::ParamVariadic(_)) => ParamMode::Variadic,
         };
-        let ty = self.lower_func_type(param.func_type());
+        let ty = param.func_type().and_then(|ty| self.lower_func_type(&ty));
         let default = param.param_default();
         if let Some(expr) = default.as_ref().and_then(|default| default.expr()) {
             self.lower_expr_in(ExprContext::Default, &expr);
@@ -16551,9 +16577,7 @@ impl Lowerer {
                 ..self.column_def(&column_name)
             };
             if let Some(name) = column.name {
-                if column_def.ty().is_some_and(|ty| ty.setof_token().is_some()) {
-                    self.push_error(column_def.syntax(), SemaError::SetofColumn { name });
-                } else if let Some(ty) = ty
+                if let Some(ty) = ty
                     && self.is_pseudo_column_type(ty)
                 {
                     let ty = self.index.ty_name(ty);
@@ -25081,6 +25105,7 @@ impl Lowerer {
     fn type_function_name(&mut self, ty: &ast::Type) -> Option<TypeFunctionName> {
         match ty {
             ast::Type::ArrayType(array) => self.type_function_name(&array.ty()?),
+            ast::Type::SetofType(setof) => self.type_function_name(&setof.ty()?),
             ast::Type::PathType(path_type) => {
                 let segment = path_type.path_ref()?.segment()?;
                 let name = match path_type.keyword_type_name() {
@@ -26761,11 +26786,13 @@ impl Lowerer {
         let mut ret = None;
         let mut table_columns = None;
         if let Some(ret_clause) = ret_clause {
-            ret = self.lower_func_type(ret_clause.func_type());
+            ret = ret_clause
+                .func_type()
+                .and_then(|ty| self.lower_func_type(&ty));
             if let Some(list) = ret_clause.return_table_arg_list() {
                 let start = self.index.columns.next_idx();
                 for arg in list.args() {
-                    let ty = self.lower_func_type(arg.func_type());
+                    let ty = arg.func_type().and_then(|ty| self.lower_func_type(&ty));
                     if let Some(name) = arg.name() {
                         let column = Column {
                             ty,
@@ -27016,9 +27043,9 @@ impl Lowerer {
             .find(|option| option.name().is_some_and(|name| name.text() == "basetype"));
         if let Some(ty) = basetype
             .and_then(|option| option.attribute_value())
-            .and_then(|value| value.ty())
+            .and_then(|value| value.func_type())
         {
-            let lowered = self.lower_type(&ty);
+            let lowered = self.lower_func_type(&ty);
             if lowered.is_some() && lowered == self.builtin_type("any") {
                 return self.index.params.range_from(start);
             }
@@ -27724,7 +27751,10 @@ fn graph_element_kind(vertex_or_edge: Option<&ast::VertexOrEdge>) -> GraphElemen
 }
 
 fn attribute_path(option: &ast::AttributeOption) -> Option<ast::PathRef> {
-    option.attribute_value()?.ty()?.path_ref()
+    match option.attribute_value()?.func_type()? {
+        ast::FuncType::Type(ty) => ty.path_ref(),
+        ast::FuncType::PercentType(_) => None,
+    }
 }
 
 fn same_access_method(a: Option<AccessMethodId>, b: Option<AccessMethodId>) -> bool {

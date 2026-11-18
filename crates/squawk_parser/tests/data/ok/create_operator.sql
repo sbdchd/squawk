@@ -53,3 +53,10 @@ create operator + (
   commutator = operator(pg_catalog.+),
   negator = operator(-)
 );
+
+-- percent_type
+create operator === (
+  leftarg = t.c%type,
+  rightarg = int,
+  function = f
+);

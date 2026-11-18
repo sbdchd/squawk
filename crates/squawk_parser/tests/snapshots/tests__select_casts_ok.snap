@@ -368,12 +368,13 @@ SOURCE_FILE
             WHITESPACE " "
             AS_KW "as"
             WHITESPACE " "
-            PATH_TYPE
+            SETOF_TYPE
               SETOF_KW "setof"
               WHITESPACE " "
-              PATH_REF
-                PATH_SEGMENT_REF
-                  INT_KW "int"
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    INT_KW "int"
             R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -389,12 +390,13 @@ SOURCE_FILE
             COLON_COLON
               COLON ":"
               COLON ":"
-            PATH_TYPE
+            SETOF_TYPE
               SETOF_KW "setof"
               WHITESPACE " "
-              PATH_REF
-                PATH_SEGMENT_REF
-                  INT_KW "int"
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    INT_KW "int"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- based on postgres' gram.y"

@@ -303,8 +303,8 @@ impl Highlighter<'_> {
                 ast::AttributeOption(option) => {
                     if let Some(name) = option.name()
                         && let Some(words) = attribute_option_values(&name.text())
-                        && let Some(ast::Type::PathType(path_type)) =
-                            option.attribute_value().and_then(|value| value.ty())
+                        && let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) =
+                            option.attribute_value().and_then(|value| value.func_type())
                         && path_type.arg_list().is_none()
                         && let Some(path) = path_type.path_ref()
                         && path.qualifier().is_none()
@@ -394,17 +394,17 @@ impl Highlighter<'_> {
     fn ty(&mut self, file_id: IrFileId, ty: ast::Type) {
         match ty {
             ast::Type::ArrayType(_) => {}
+            ast::Type::SetofType(setof_type) => {
+                self.type_keyword(file_id, setof_type.setof_token());
+            }
             ast::Type::BitType(bit_type) => {
-                self.type_keyword(file_id, bit_type.setof_token());
                 self.type_keyword(file_id, bit_type.bit_token());
             }
             ast::Type::BitVaryingType(bit_varying_type) => {
-                self.type_keyword(file_id, bit_varying_type.setof_token());
                 self.type_keyword(file_id, bit_varying_type.bit_token());
                 self.type_keyword(file_id, bit_varying_type.varying_token());
             }
             ast::Type::VarcharType(varchar_type) => {
-                self.type_keyword(file_id, varchar_type.setof_token());
                 self.type_keyword(file_id, varchar_type.national_token());
                 self.type_keyword(
                     file_id,
@@ -417,7 +417,6 @@ impl Highlighter<'_> {
                 self.type_keyword(file_id, varchar_type.varying_token());
             }
             ast::Type::CharacterType(character_type) => {
-                self.type_keyword(file_id, character_type.setof_token());
                 self.type_keyword(file_id, character_type.national_token());
                 self.type_keyword(
                     file_id,
@@ -428,26 +427,20 @@ impl Highlighter<'_> {
                 );
             }
             ast::Type::DoubleType(double_type) => {
-                self.type_keyword(file_id, double_type.setof_token());
                 self.type_keyword(file_id, double_type.double_token());
                 self.type_keyword(file_id, double_type.precision_token());
             }
             ast::Type::IntervalType(interval_type) => {
-                self.type_keyword(file_id, interval_type.setof_token());
                 self.type_keyword(file_id, interval_type.interval_token());
             }
-            ast::Type::PathType(path_type) => {
-                self.type_keyword(file_id, path_type.setof_token());
-            }
+            ast::Type::PathType(_) => {}
             ast::Type::TimeType(time_type) => {
-                self.type_keyword(file_id, time_type.setof_token());
                 self.type_keyword(file_id, time_type.time_token());
                 if let Some(timezone) = time_type.timezone() {
                     self.timezone(file_id, timezone);
                 }
             }
             ast::Type::TimestampType(timestamp_type) => {
-                self.type_keyword(file_id, timestamp_type.setof_token());
                 self.type_keyword(file_id, timestamp_type.timestamp_token());
                 if let Some(timezone) = timestamp_type.timezone() {
                     self.timezone(file_id, timezone);

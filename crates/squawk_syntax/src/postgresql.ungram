@@ -765,6 +765,9 @@ ArrayType =
   // t[10][10]
   Type 'array'? ArrayBound*
 
+SetofType =
+  'setof' Type
+
 ArrayBound =
   '[' Expr? ']'
 
@@ -773,10 +776,9 @@ PercentType =
   'setof'? PathRef PercentTypeClause 'array'? ArrayBound*
 
 PathType =
-  'setof'? PathRef ArgList?
+  PathRef ArgList?
 
 VarcharType =
-  'setof'?
   (
     'varchar'
   | 'national'? ( 'character' | 'char' ) 'varying'
@@ -785,37 +787,33 @@ VarcharType =
   ArgList?
 
 CharacterType =
-  'setof'?
   ('national'? ( 'character' | 'char' ) | 'nchar')
   ArgList?
 
 BitType =
-  'setof'? 'bit' ArgList?
+  'bit' ArgList?
 
 BitVaryingType =
-  'setof'? 'bit' 'varying' ArgList?
+  'bit' 'varying' ArgList?
 
 DoubleType =
-  'setof'? 'double' 'precision'
+  'double' 'precision'
 
 Timezone =
   WithTimezone
 | WithoutTimezone
 
 TimeType =
-  'setof'?
   'time'
   ('(' Literal ')')?
   Timezone?
 
 TimestampType =
-  'setof'?
   'timestamp'
   ('(' Literal ')')?
   Timezone?
 
 IntervalType =
-  'setof'?
   'interval'
   ('(' Literal ')' | IntervalQualifier)?
 
@@ -851,6 +849,7 @@ IntervalSecond =
 Type =
   ArrayType
 | PathType
+| SetofType
 | VarcharType
 | CharacterType
 | BitType
@@ -3297,7 +3296,7 @@ AttributeValue =
 | 'constraint'
 | OperatorCall
 | CustomOp
-| Type
+| FuncType
 | '+'
 | '-'
 | '*'

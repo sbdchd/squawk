@@ -2977,6 +2977,10 @@ impl AttributeValue {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn func_type(&self) -> Option<FuncType> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn literal(&self) -> Option<Literal> {
         support::child(&self.syntax)
     }
@@ -2986,10 +2990,6 @@ impl AttributeValue {
     }
     #[inline]
     pub fn prefix_expr(&self) -> Option<PrefixExpr> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -3214,10 +3214,6 @@ impl BitType {
     pub fn bit_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BIT_KW)
     }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
-    }
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -3232,10 +3228,6 @@ impl BitVaryingType {
     #[inline]
     pub fn bit_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::BIT_KW)
-    }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
     #[inline]
     pub fn varying_token(&self) -> Option<SyntaxToken> {
@@ -3623,10 +3615,6 @@ impl CharacterType {
     #[inline]
     pub fn nchar_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NCHAR_KW)
-    }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
 }
 
@@ -7935,10 +7923,6 @@ impl DoubleType {
     #[inline]
     pub fn precision_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::PRECISION_KW)
-    }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
 }
 
@@ -13220,10 +13204,6 @@ impl IntervalType {
     #[inline]
     pub fn interval_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::INTERVAL_KW)
-    }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
 }
 
@@ -19297,10 +19277,6 @@ impl PathType {
     #[inline]
     pub fn path_ref(&self) -> Option<PathRef> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
 }
 
@@ -26378,6 +26354,21 @@ impl SetXmlOption {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetofType {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetofType {
+    #[inline]
+    pub fn ty(&self) -> Option<Type> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn setof_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SETOF_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Share {
     pub(crate) syntax: SyntaxNode,
 }
@@ -27614,10 +27605,6 @@ impl TimeType {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
     }
     #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
-    }
-    #[inline]
     pub fn time_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::TIME_KW)
     }
@@ -27658,10 +27645,6 @@ impl TimestampType {
     #[inline]
     pub fn r_paren_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::R_PAREN)
-    }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
     #[inline]
     pub fn timestamp_token(&self) -> Option<SyntaxToken> {
@@ -28757,10 +28740,6 @@ impl VarcharType {
     #[inline]
     pub fn nchar_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::NCHAR_KW)
-    }
-    #[inline]
-    pub fn setof_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::SETOF_KW)
     }
     #[inline]
     pub fn varchar_token(&self) -> Option<SyntaxToken> {
@@ -32279,6 +32258,7 @@ pub enum Type {
     DoubleType(DoubleType),
     IntervalType(IntervalType),
     PathType(PathType),
+    SetofType(SetofType),
     TimeType(TimeType),
     TimestampType(TimestampType),
     VarcharType(VarcharType),
@@ -54681,6 +54661,24 @@ impl AstNode for SetXmlOption {
         &self.syntax
     }
 }
+impl AstNode for SetofType {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SETOF_TYPE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for Share {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -75929,6 +75927,7 @@ impl AstNode for Type {
                 | SyntaxKind::DOUBLE_TYPE
                 | SyntaxKind::INTERVAL_TYPE
                 | SyntaxKind::PATH_TYPE
+                | SyntaxKind::SETOF_TYPE
                 | SyntaxKind::TIME_TYPE
                 | SyntaxKind::TIMESTAMP_TYPE
                 | SyntaxKind::VARCHAR_TYPE
@@ -75944,6 +75943,7 @@ impl AstNode for Type {
             SyntaxKind::DOUBLE_TYPE => Type::DoubleType(DoubleType { syntax }),
             SyntaxKind::INTERVAL_TYPE => Type::IntervalType(IntervalType { syntax }),
             SyntaxKind::PATH_TYPE => Type::PathType(PathType { syntax }),
+            SyntaxKind::SETOF_TYPE => Type::SetofType(SetofType { syntax }),
             SyntaxKind::TIME_TYPE => Type::TimeType(TimeType { syntax }),
             SyntaxKind::TIMESTAMP_TYPE => Type::TimestampType(TimestampType { syntax }),
             SyntaxKind::VARCHAR_TYPE => Type::VarcharType(VarcharType { syntax }),
@@ -75963,6 +75963,7 @@ impl AstNode for Type {
             Type::DoubleType(it) => &it.syntax,
             Type::IntervalType(it) => &it.syntax,
             Type::PathType(it) => &it.syntax,
+            Type::SetofType(it) => &it.syntax,
             Type::TimeType(it) => &it.syntax,
             Type::TimestampType(it) => &it.syntax,
             Type::VarcharType(it) => &it.syntax,
@@ -76009,6 +76010,12 @@ impl From<PathType> for Type {
     #[inline]
     fn from(node: PathType) -> Type {
         Type::PathType(node)
+    }
+}
+impl From<SetofType> for Type {
+    #[inline]
+    fn from(node: SetofType) -> Type {
+        Type::SetofType(node)
     }
 }
 impl From<TimeType> for Type {
