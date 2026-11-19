@@ -179,23 +179,19 @@ impl<'a> Converter<'a> {
         self.res
     }
 
-    fn push(
-        &mut self,
-        kind: SyntaxKind,
-        len: usize,
-        err: Option<(Cow<'static, str>, ops::Range<u32>)>,
-    ) {
-        let token_start = u32::try_from(self.offset).unwrap();
+    fn push(&mut self, kind: SyntaxKind, len: usize) {
         self.res.push(kind, self.offset);
         self.offset += len;
+    }
 
-        if let Some((msg, err_range)) = err {
-            self.res.error.push(LexError {
-                msg,
-                range: token_start + err_range.start..token_start + err_range.end,
-                hint: None,
-            });
-        }
+    #[cold]
+    fn push_error(&mut self, msg: Cow<'static, str>, err_range: ops::Range<u32>) {
+        let token_start = u32::try_from(self.offset).unwrap();
+        self.res.error.push(LexError {
+            msg,
+            range: token_start + err_range.start..token_start + err_range.end,
+            hint: None,
+        });
     }
 
     fn extend_token(&mut self, kind: &squawk_lexer::TokenKind, token_text: &str) {
@@ -311,7 +307,10 @@ impl<'a> Converter<'a> {
                 err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
             )
         });
-        self.push(syntax_kind, token_text.len(), err);
+        if let Some((msg, err_range)) = err {
+            self.push_error(msg, err_range);
+        }
+        self.push(syntax_kind, token_text.len());
     }
 
     fn extend_literal(&mut self, token_text: &str, kind: &squawk_lexer::LiteralKind) {
@@ -448,7 +447,10 @@ impl<'a> Converter<'a> {
                 err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
             )
         });
-        self.push(syntax_kind, token_text.len(), err);
+        if let Some((msg, err_range)) = err {
+            self.push_error(msg, err_range);
+        }
+        self.push(syntax_kind, token_text.len());
     }
 
     fn validate_prefixed_string_content(
