@@ -46,6 +46,7 @@ const fn is_whitespace(c: char) -> bool {
 
 impl Cursor<'_> {
     // see: https://github.com/rust-lang/rust/blob/ba1d7f4a083e6402679105115ded645512a7aea8/compiler/rustc_lexer/src/lib.rs#L339
+    #[inline]
     pub(crate) fn advance_token(&mut self) -> Token {
         let Some(first_char) = self.bump() else {
             return Token::new(TokenKind::Eof, 0);
