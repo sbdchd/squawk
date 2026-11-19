@@ -178,6 +178,7 @@ impl EntryPoint {
 pub(crate) struct Parser<'t> {
     inp: InputView<'t>,
     pos: usize,
+    current_kind: SyntaxKind,
     events: Vec<Event>,
     errors: Vec<String>,
     steps: Cell<u32>,
@@ -219,6 +220,7 @@ impl<'t> Parser<'t> {
         Parser {
             inp: inp.view(),
             pos: 0,
+            current_kind: inp.view().kind(0),
             events: Vec::with_capacity(inp.len() * 4),
             errors: vec![],
             steps: Cell::new(0),
@@ -229,13 +231,19 @@ impl<'t> Parser<'t> {
     pub(crate) fn with_limit<T>(&mut self, n: usize, f: impl FnOnce(&mut Parser<'t>) -> T) -> T {
         let inp = self.inp;
         self.inp = inp.limited(self.pos + n);
+        self.current_kind = self.inp.kind(self.pos);
         let res = f(self);
         self.inp = inp;
+        self.current_kind = self.inp.kind(self.pos);
         res
     }
 
     fn kind_at(&self, idx: usize) -> SyntaxKind {
-        self.inp.kind(idx)
+        if idx == self.pos {
+            self.current_kind
+        } else {
+            self.inp.kind(idx)
+        }
     }
 
     fn contextual_kind_at(&self, idx: usize) -> SyntaxKind {
@@ -674,6 +682,7 @@ impl<'t> Parser<'t> {
 
     fn do_bump(&mut self, kind: SyntaxKind, n_raw_tokens: u8) {
         self.pos += n_raw_tokens as usize;
+        self.current_kind = self.inp.kind(self.pos);
         self.steps.set(0);
         self.push_event(Event::Token { kind, n_raw_tokens });
     }
@@ -1016,6 +1025,31 @@ mod tests {
     use super::*;
 
     #[test]
+    fn cached_kind_tracks_composite_token_consumption() {
+        let lexed = LexedStr::new("select a::b + 1;");
+        let input = lexed.to_input();
+        let mut parser = Parser::new(&input);
+        parser.bump(SyntaxKind::SELECT_KW);
+        assert_eq!(parser.current(), SyntaxKind::IDENT);
+        parser.bump(SyntaxKind::IDENT);
+        assert_eq!(parser.current(), SyntaxKind::COLON);
+        assert!(!parser.eat(SyntaxKind::MINUS));
+        assert_eq!(parser.current(), SyntaxKind::COLON);
+        parser.bump(SyntaxKind::COLON_COLON);
+        assert_eq!(parser.current(), SyntaxKind::IDENT);
+        parser.bump(SyntaxKind::IDENT);
+        assert_eq!(parser.current(), SyntaxKind::PLUS);
+        parser.bump(SyntaxKind::PLUS);
+        assert_eq!(parser.current(), SyntaxKind::INT_NUMBER);
+        parser.bump_any();
+        assert_eq!(parser.current(), SyntaxKind::SEMICOLON);
+        parser.bump(SyntaxKind::SEMICOLON);
+        assert_eq!(parser.current(), SyntaxKind::EOF);
+        parser.bump_any();
+        assert_eq!(parser.current(), SyntaxKind::EOF);
+    }
+
+    #[test]
     fn nested_input_limits_restore_token_metadata() {
         let lexed = LexedStr::new("loop+1");
         let input = lexed.to_input();
@@ -1043,7 +1077,7 @@ mod tests {
         });
         assert_eq!(parser.kind_at(2), SyntaxKind::INT_NUMBER);
         assert!(parser.is_joint_at(1));
-        parser.pos = 1;
+        parser.bump_any();
         parser.with_limit(1, |parser| {
             assert_eq!(parser.kind_at(1), SyntaxKind::PLUS);
             assert_eq!(parser.kind_at(2), SyntaxKind::EOF);
@@ -1052,6 +1086,7 @@ mod tests {
         parser.with_limit(0, |parser| {
             assert_eq!(parser.current(), SyntaxKind::EOF);
         });
+        assert_eq!(parser.current(), SyntaxKind::PLUS);
         assert_eq!(parser.kind_at(2), SyntaxKind::INT_NUMBER);
     }
 }
