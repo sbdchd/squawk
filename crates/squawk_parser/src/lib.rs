@@ -70,6 +70,8 @@ impl Marker {
     /// Finishes the syntax tree node and assigns `kind` to it,
     /// and creates a `CompletedMarker` for possible future
     /// operation like `.precede()` to deal with `forward_parent`.
+    #[expect(clippy::inline_always)]
+    #[inline(always)]
     pub(crate) fn complete(mut self, p: &mut Parser<'_>, kind: SyntaxKind) -> CompletedMarker {
         self.bomb.defuse();
         let idx = self.pos as usize;
