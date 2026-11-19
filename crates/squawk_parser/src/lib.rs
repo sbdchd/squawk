@@ -126,8 +126,12 @@ impl CompletedMarker {
     /// Extends this completed marker *to the left* up to `m`.
     pub(crate) fn extend_to(self, p: &mut Parser<'_>, mut m: Marker) -> CompletedMarker {
         m.bomb.defuse();
+        let distance = self.pos - m.pos;
+        if distance == 1 {
+            return self;
+        }
         let idx = m.pos as usize;
-        let forward_parent = NonZeroU32::new(self.pos - m.pos).unwrap();
+        let forward_parent = NonZeroU32::new(distance).unwrap();
         p.events[idx].set_forward_parent(forward_parent);
         self
     }
