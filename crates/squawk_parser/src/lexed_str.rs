@@ -5,12 +5,19 @@ use std::{borrow::Cow, num::IntErrorKind, ops};
 use squawk_lexer::tokenize;
 
 use crate::SyntaxKind;
+use crate::generated::token_sets::CONTEXTUAL_KEYWORDS;
 
 pub struct LexedStr<'a> {
     text: &'a str,
     kind: Vec<SyntaxKind>,
     start: Vec<u32>,
     error: Vec<LexError>,
+    contextual_keywords: Vec<ContextualKeyword>,
+}
+
+pub(crate) struct ContextualKeyword {
+    pub(crate) token: u32,
+    pub(crate) kind: SyntaxKind,
 }
 
 pub struct LexError {
@@ -84,10 +91,6 @@ impl<'a> LexedStr<'a> {
         self.kind[i]
     }
 
-    pub(crate) fn text(&self, i: usize) -> &str {
-        self.range_text(i..i + 1)
-    }
-
     #[inline]
     pub(crate) fn range_text(&self, r: ops::Range<usize>) -> &str {
         assert!(r.start < r.end && r.end <= self.len());
@@ -125,6 +128,10 @@ impl<'a> LexedStr<'a> {
 
     pub fn errors(&self) -> impl Iterator<Item = &LexError> + '_ {
         self.error.iter()
+    }
+
+    pub(crate) fn contextual_keywords(&self) -> &[ContextualKeyword] {
+        &self.contextual_keywords
     }
 
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
@@ -214,6 +221,7 @@ impl<'a> Converter<'a> {
                 kind: Vec::with_capacity(tokens),
                 start: Vec::with_capacity(tokens),
                 error: Vec::new(),
+                contextual_keywords: vec![],
             },
             offset: 0,
             prefixed_string_continuation: None,
@@ -276,9 +284,17 @@ impl<'a> Converter<'a> {
                     SyntaxKind::COMMENT
                 }
 
-                squawk_lexer::TokenKind::Ident => {
-                    SyntaxKind::from_keyword(token_text()).unwrap_or(SyntaxKind::IDENT)
-                }
+                squawk_lexer::TokenKind::Ident => match SyntaxKind::from_keyword(token_text()) {
+                    Some(kind) if CONTEXTUAL_KEYWORDS.contains(kind) => {
+                        self.res.contextual_keywords.push(ContextualKeyword {
+                            token: u32::try_from(self.res.kind.len()).unwrap(),
+                            kind,
+                        });
+                        SyntaxKind::IDENT
+                    }
+                    Some(kind) => kind,
+                    None => SyntaxKind::IDENT,
+                },
                 squawk_lexer::TokenKind::Literal { kind, .. } => {
                     self.extend_literal(token_text(), kind);
                     return;

@@ -334,8 +334,13 @@ fn keyword_lookup_body(keywords: &[&str]) -> proc_macro2::TokenStream {
 
 fn generate_syntax_kinds(grammar: KindsSrc) -> String {
     // TODO: we should have a check to make sure each keyword is used in the grammar once the grammar is ready
-    let keyword_lookup = keyword_lookup_body(grammar.keywords);
-    let contextual_keyword_lookup = keyword_lookup_body(grammar.contextual_keywords);
+    let all_keywords_values = grammar
+        .keywords
+        .iter()
+        .chain(grammar.contextual_keywords)
+        .copied()
+        .collect::<Vec<_>>();
+    let keyword_lookup = keyword_lookup_body(&all_keywords_values);
 
     let punctuation = grammar
         .punct
@@ -343,12 +348,6 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
         .map(|(_token, name)| format_ident!("{}", name))
         .collect::<Vec<_>>();
 
-    let all_keywords_values = grammar
-        .keywords
-        .iter()
-        .chain(grammar.contextual_keywords)
-        .copied()
-        .collect::<Vec<_>>();
     let all_keywords = all_keywords_values
         .iter()
         .map(|&name| match name {
@@ -434,11 +433,6 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
 
                 pub(crate) fn from_keyword(ident: &str) -> Option<SyntaxKind> {
                     #keyword_lookup
-                }
-
-                #[doc = r"PL/pgSQL keywords that aren't SQL keywords. These stay `IDENT` in the token stream so SQL is unaffected; the PL/pgSQL grammar matches on the contextual kind instead."]
-                pub(crate) fn from_contextual_keyword(ident: &str) -> Option<SyntaxKind> {
-                    #contextual_keyword_lookup
                 }
             }
 
