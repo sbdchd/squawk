@@ -113,17 +113,17 @@ impl Event {
     }
 
     fn start_kind(self) -> SyntaxKind {
-        assert!(self.is_start());
+        debug_assert!(self.is_start());
         Output::event_kind(self.output()).into()
     }
 
     pub(crate) fn complete_start(&mut self, kind: SyntaxKind) {
-        assert!(self.is_start());
+        debug_assert!(self.is_start());
         *self = Event(u64::from(Output::enter_event(kind)) | self.0 & !u64::from(u32::MAX));
     }
 
     pub(crate) fn set_forward_parent(&mut self, forward_parent: NonZeroU32) {
-        assert!(self.is_start());
+        debug_assert!(self.is_start());
         *self = Event(u64::from(self.output()) | u64::from(forward_parent.get()) << 32);
     }
 }
