@@ -168,10 +168,10 @@ pub(crate) struct Parser<'t> {
     events: Vec<Event>,
     errors: Vec<String>,
     node_count: usize,
-    steps: Cell<u32>,
+    steps_left: Cell<u32>,
 }
 
-const PARSER_STEP_LIMIT: usize = 15_000_000;
+const PARSER_STEP_LIMIT: u32 = 15_000_000;
 
 #[derive(Clone, Copy)]
 enum TriviaBetween {
@@ -211,7 +211,7 @@ impl<'t> Parser<'t> {
             events: Vec::with_capacity(inp.len() * 4),
             errors: vec![],
             node_count: 0,
-            steps: Cell::new(0),
+            steps_left: Cell::new(PARSER_STEP_LIMIT),
         }
     }
 
@@ -671,7 +671,7 @@ impl<'t> Parser<'t> {
     fn do_bump(&mut self, kind: SyntaxKind, n_raw_tokens: u8) {
         self.pos += n_raw_tokens as usize;
         self.current_kind = self.inp.kind(self.pos);
-        self.steps.set(0);
+        self.steps_left.set(PARSER_STEP_LIMIT);
         self.push_event(Event::token(kind, n_raw_tokens));
     }
 
@@ -1000,12 +1000,9 @@ impl<'t> Parser<'t> {
     /// token.
     #[must_use]
     fn nth(&self, n: usize) -> SyntaxKind {
-        let steps = self.steps.get();
-        assert!(
-            (steps as usize) < PARSER_STEP_LIMIT,
-            "the parser seems stuck"
-        );
-        self.steps.set(steps + 1);
+        let steps_left = self.steps_left.get();
+        assert!(steps_left != 0, "the parser seems stuck");
+        self.steps_left.set(steps_left - 1);
 
         self.kind_at(self.pos + n)
     }
