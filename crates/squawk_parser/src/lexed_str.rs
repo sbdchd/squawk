@@ -40,9 +40,7 @@ impl<'a> LexedStr<'a> {
         let mut conv = Converter::new(text);
 
         for token in tokenize(&text[conv.offset..]) {
-            let token_text = &text[conv.offset..][..token.len as usize];
-
-            conv.extend_token(&token.kind, token_text);
+            conv.extend_token(&token.kind, token.len as usize);
         }
 
         conv.finalize_with_eof()
@@ -194,7 +192,9 @@ impl<'a> Converter<'a> {
         });
     }
 
-    fn extend_token(&mut self, kind: &squawk_lexer::TokenKind, token_text: &str) {
+    fn extend_token(&mut self, kind: &squawk_lexer::TokenKind, len: usize) {
+        let (text, offset) = (self.res.text, self.offset);
+        let token_text = || &text[offset..][..len];
         if !matches!(
             kind,
             squawk_lexer::TokenKind::Whitespace
@@ -224,10 +224,10 @@ impl<'a> Converter<'a> {
 
                 squawk_lexer::TokenKind::Whitespace => SyntaxKind::WHITESPACE,
                 squawk_lexer::TokenKind::Ident => {
-                    SyntaxKind::from_keyword(token_text).unwrap_or(SyntaxKind::IDENT)
+                    SyntaxKind::from_keyword(token_text()).unwrap_or(SyntaxKind::IDENT)
                 }
                 squawk_lexer::TokenKind::Literal { kind, .. } => {
-                    self.extend_literal(token_text, kind);
+                    self.extend_literal(token_text(), kind);
                     return;
                 }
                 squawk_lexer::TokenKind::PsqlCommand { ends_query: false } => {
@@ -269,6 +269,7 @@ impl<'a> Converter<'a> {
                 squawk_lexer::TokenKind::PositionalParam {
                     trailing_junk_start,
                 } => {
+                    let token_text = token_text();
                     let digits = &token_text[1..*trailing_junk_start as usize];
                     if digits.is_empty() {
                         err = "missing parameter number";
@@ -292,7 +293,7 @@ impl<'a> Converter<'a> {
                 } => {
                     if !terminated {
                         err = "missing trailing \" to terminate the quoted identifier";
-                    } else if is_empty_quoted_ident(token_text, *uescape) {
+                    } else if is_empty_quoted_ident(token_text(), *uescape) {
                         err = "empty delimited identifier";
                     }
                     SyntaxKind::IDENT
@@ -304,13 +305,13 @@ impl<'a> Converter<'a> {
         let err = err.map(|msg| {
             (
                 msg.into(),
-                err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
+                err_range.unwrap_or(0..u32::try_from(len).unwrap()),
             )
         });
         if let Some((msg, err_range)) = err {
             self.push_error(msg, err_range);
         }
-        self.push(syntax_kind, token_text.len());
+        self.push(syntax_kind, len);
     }
 
     fn extend_literal(&mut self, token_text: &str, kind: &squawk_lexer::LiteralKind) {
