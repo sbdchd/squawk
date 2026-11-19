@@ -76,6 +76,7 @@ impl Marker {
         self.bomb.defuse();
         let idx = self.pos as usize;
         p.events[idx].complete_start(kind);
+        p.node_count += 1;
         p.push_event(Event::finish());
         CompletedMarker::new(self.pos, kind)
     }
@@ -152,7 +153,7 @@ impl EntryPoint {
             Self::Plpgsql => plpgsql_grammar::plpgsql_entry_point(&mut p),
         }
         // 3. forward parents
-        event::process(p.events, p.errors)
+        event::process(p.events, p.errors, p.node_count)
     }
 }
 
@@ -162,6 +163,7 @@ pub(crate) struct Parser<'t> {
     current_kind: SyntaxKind,
     events: Vec<Event>,
     errors: Vec<String>,
+    node_count: usize,
     steps: Cell<u32>,
 }
 
@@ -204,6 +206,7 @@ impl<'t> Parser<'t> {
             current_kind: inp.view().kind(0),
             events: Vec::with_capacity(inp.len() * 4),
             errors: vec![],
+            node_count: 0,
             steps: Cell::new(0),
         }
     }

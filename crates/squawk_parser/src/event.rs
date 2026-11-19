@@ -129,18 +129,16 @@ impl Event {
 }
 
 /// Generate the syntax tree with the control of events.
-pub(super) fn process(mut events: Vec<Event>, errors: Vec<String>) -> Output {
-    let mut res = Vec::with_capacity(events.len());
-    let mut node_count = 0;
+pub(super) fn process(mut events: Vec<Event>, errors: Vec<String>, node_count: usize) -> Output {
+    let mut res = vec![0; events.len()];
+    let mut len = 0;
     let mut forward_parents = vec![];
 
     for i in 0..events.len() {
         let event = events[i];
         let Some(forward_parent) = event.forward_parent() else {
-            if event != Event::TOMBSTONE {
-                node_count += usize::from(event.is_start());
-                res.push(event.output());
-            }
+            res[len] = event.output();
+            len += usize::from(event != Event::TOMBSTONE);
             continue;
         };
         // For events[A, B, C], B is A's forward_parent, C is B's forward_parent,
@@ -162,11 +160,18 @@ pub(super) fn process(mut events: Vec<Event>, errors: Vec<String>) -> Output {
 
         for kind in forward_parents.drain(..).rev() {
             if kind != SyntaxKind::TOMBSTONE {
-                res.push(Output::enter_event(kind));
-                node_count += 1;
+                res[len] = Output::enter_event(kind);
+                len += 1;
             }
         }
     }
 
+    res.truncate(len);
+    debug_assert_eq!(
+        res.iter()
+            .filter(|&&event| Output::is_enter_event(event))
+            .count(),
+        node_count
+    );
     Output::new(res, errors, node_count)
 }
