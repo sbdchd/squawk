@@ -75,13 +75,8 @@ impl Marker {
     pub(crate) fn complete(mut self, p: &mut Parser<'_>, kind: SyntaxKind) -> CompletedMarker {
         self.bomb.defuse();
         let idx = self.pos as usize;
-        match &mut p.events[idx] {
-            Event::Start { kind: slot, .. } => {
-                *slot = kind;
-            }
-            _ => unreachable!(),
-        }
-        p.push_event(Event::Finish);
+        p.events[idx].complete_start(kind);
+        p.push_event(Event::finish());
         CompletedMarker::new(self.pos, kind)
     }
 
@@ -91,13 +86,7 @@ impl Marker {
         self.bomb.defuse();
         let idx = self.pos as usize;
         if idx == p.events.len() - 1 {
-            match p.events.pop() {
-                Some(Event::Start {
-                    kind: SyntaxKind::TOMBSTONE,
-                    forward_parent: None,
-                }) => (),
-                _ => unreachable!(),
-            }
+            assert_eq!(p.events.pop(), Some(Event::TOMBSTONE));
         }
     }
 }
@@ -118,7 +107,7 @@ impl CompletedMarker {
     /// whole `A`, decide that it should have started some node
     /// `B` before starting `A`. `precede` allows doing exactly
     /// that. See also docs about
-    /// [`Event::Start::forward_parent`](crate::event::Event::Start::forward_parent).
+    /// [`Event`](crate::event::Event).
     ///
     /// Given completed events `[START, FINISH]` and its corresponding
     /// `CompletedMarker(pos: 0, _)`.
@@ -128,13 +117,8 @@ impl CompletedMarker {
     pub(crate) fn precede(self, p: &mut Parser<'_>) -> Marker {
         let new_pos = p.start();
         let idx = self.pos as usize;
-        match &mut p.events[idx] {
-            Event::Start { forward_parent, .. } => {
-                *forward_parent = NonZeroU32::new(new_pos.pos - self.pos);
-                debug_assert!(forward_parent.is_some());
-            }
-            _ => unreachable!(),
-        }
+        let forward_parent = NonZeroU32::new(new_pos.pos - self.pos).unwrap();
+        p.events[idx].set_forward_parent(forward_parent);
         new_pos
     }
 
@@ -142,13 +126,8 @@ impl CompletedMarker {
     pub(crate) fn extend_to(self, p: &mut Parser<'_>, mut m: Marker) -> CompletedMarker {
         m.bomb.defuse();
         let idx = m.pos as usize;
-        match &mut p.events[idx] {
-            Event::Start { forward_parent, .. } => {
-                *forward_parent = NonZeroU32::new(self.pos - m.pos);
-                debug_assert!(forward_parent.is_some());
-            }
-            _ => unreachable!(),
-        }
+        let forward_parent = NonZeroU32::new(self.pos - m.pos).unwrap();
+        p.events[idx].set_forward_parent(forward_parent);
         self
     }
 
@@ -609,7 +588,7 @@ impl<'t> Parser<'t> {
     /// belong to the same node.
     pub(crate) fn start(&mut self) -> Marker {
         let pos = u32::try_from(self.events.len()).unwrap();
-        self.push_event(Event::tombstone());
+        self.push_event(Event::TOMBSTONE);
         Marker::new(pos)
     }
 
@@ -686,7 +665,7 @@ impl<'t> Parser<'t> {
         self.pos += n_raw_tokens as usize;
         self.current_kind = self.inp.kind(self.pos);
         self.steps.set(0);
-        self.push_event(Event::Token { kind, n_raw_tokens });
+        self.push_event(Event::token(kind, n_raw_tokens));
     }
 
     fn push_event(&mut self, event: Event) {
@@ -700,7 +679,7 @@ impl<'t> Parser<'t> {
     pub(crate) fn error<T: Into<String>>(&mut self, message: T) {
         let index = u32::try_from(self.errors.len()).expect("too many parse errors");
         self.errors.push(message.into());
-        self.push_event(Event::Error { index });
+        self.push_event(Event::error(index));
     }
 
     /// Checks if the current token is `kind`.
