@@ -255,7 +255,8 @@ impl<'t> Parser<'t> {
     }
 
     /// Consume the next token if `kind` matches.
-    #[inline]
+    #[expect(clippy::inline_always)]
+    #[inline(always)]
     pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
         if !self.at(kind) {
             return false;
