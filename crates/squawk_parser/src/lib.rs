@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use drop_bomb::DropBomb;
+use drop_bomb::DebugDropBomb;
 use event::Event;
 use grammar::OPERATOR_FIRST;
 use std::cell::Cell;
@@ -56,14 +56,14 @@ pub use crate::output::Output;
 /// See [`Parser::start`].
 pub(crate) struct Marker {
     pos: u32,
-    bomb: DropBomb,
+    bomb: DebugDropBomb,
 }
 
 impl Marker {
     fn new(pos: u32) -> Marker {
         Marker {
             pos,
-            bomb: DropBomb::new("Marker must be either completed or abandoned"),
+            bomb: DebugDropBomb::new("Marker must be either completed or abandoned"),
         }
     }
 
