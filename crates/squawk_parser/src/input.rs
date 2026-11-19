@@ -28,30 +28,31 @@
 
 use crate::SyntaxKind;
 
-#[allow(non_camel_case_types)]
-type bits = u64;
+const JOINT_MASK: u16 = 1 << 15;
+const _: () = assert!((SyntaxKind::__LAST as u16) < JOINT_MASK);
+
+struct InputToken {
+    kind: SyntaxKind,
+    contextual_kind_and_joint: u16,
+}
+
+const _: () = assert!(std::mem::size_of::<InputToken>() == 4);
 
 /// Input for the parser -- a sequence of tokens.
 ///
 /// As of now, parser doesn't have access to the *text* of the tokens, and makes
 /// decisions based solely on their classification. Unlike `LexerToken`, the
 /// `Tokens` doesn't include whitespace and comments. Main input to the parser.
-///
-/// Struct of arrays internally, but this shouldn't really matter.
 #[derive(Default)]
 pub struct Input {
-    kind: Vec<SyntaxKind>,
-    joint: Vec<bits>,
-    contextual_kind: Vec<SyntaxKind>,
+    tokens: Vec<InputToken>,
 }
 
 /// `pub` impl used by callers to create `Tokens`.
 impl Input {
     pub(crate) fn with_capacity(capacity: usize) -> Self {
         Input {
-            kind: Vec::with_capacity(capacity),
-            joint: Vec::with_capacity(capacity.div_ceil(bits::BITS as usize)),
-            contextual_kind: Vec::with_capacity(capacity),
+            tokens: Vec::with_capacity(capacity),
         }
     }
 
@@ -81,47 +82,96 @@ impl Input {
     /// ```
     #[inline]
     pub(crate) fn was_joint(&mut self) {
-        let n = self.len() - 1;
-        let (idx, b_idx) = Self::bit_index(n);
-        self.joint[idx] |= 1 << b_idx;
+        self.tokens.last_mut().unwrap().contextual_kind_and_joint |= JOINT_MASK;
     }
     #[inline]
     fn push_impl(&mut self, kind: SyntaxKind, contextual_kind: SyntaxKind) {
-        let idx = self.len();
-        if idx.is_multiple_of(bits::BITS as usize) {
-            self.joint.push(0);
-        }
-        self.kind.push(kind);
-        self.contextual_kind.push(contextual_kind);
+        self.tokens.push(InputToken {
+            kind,
+            contextual_kind_and_joint: contextual_kind as u16,
+        });
     }
 }
 
-/// pub(crate) impl used by the parser to consume `Tokens`.
-impl Input {
+#[derive(Clone, Copy)]
+pub(crate) struct InputView<'a> {
+    tokens: &'a [InputToken],
+}
+
+impl InputView<'_> {
+    pub(crate) fn limited(self, end: usize) -> Self {
+        Self {
+            tokens: &self.tokens[..end.min(self.tokens.len())],
+        }
+    }
+
+    pub(crate) fn len(&self) -> usize {
+        self.tokens.len()
+    }
+
     pub(crate) fn kind(&self, idx: usize) -> SyntaxKind {
-        self.kind.get(idx).copied().unwrap_or(SyntaxKind::EOF)
+        self.tokens
+            .get(idx)
+            .map_or(SyntaxKind::EOF, |token| token.kind)
     }
     /// For an `IDENT`, the PL/pgSQL keyword it spells, or `IDENT` if it spells
     /// none. `EOF` for every other token.
     pub(crate) fn contextual_kind(&self, idx: usize) -> SyntaxKind {
-        self.contextual_kind
-            .get(idx)
-            .copied()
-            .unwrap_or(SyntaxKind::EOF)
+        self.tokens.get(idx).map_or(SyntaxKind::EOF, |token| {
+            (token.contextual_kind_and_joint & !JOINT_MASK).into()
+        })
     }
     pub(crate) fn is_joint(&self, n: usize) -> bool {
-        let (idx, b_idx) = Self::bit_index(n);
-        self.joint[idx] & 1 << b_idx != 0
+        self.tokens[n].contextual_kind_and_joint & JOINT_MASK != 0
     }
 }
 
 impl Input {
-    fn bit_index(n: usize) -> (usize, usize) {
-        let idx = n / (bits::BITS as usize);
-        let b_idx = n % (bits::BITS as usize);
-        (idx, b_idx)
+    pub(crate) fn view(&self) -> InputView<'_> {
+        InputView {
+            tokens: &self.tokens,
+        }
     }
+
     pub(crate) fn len(&self) -> usize {
-        self.kind.len()
+        self.tokens.len()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn token_metadata_stays_independent() {
+        let mut input = Input::with_capacity(0);
+        assert_eq!(input.view().kind(0), SyntaxKind::EOF);
+        assert_eq!(input.view().contextual_kind(0), SyntaxKind::EOF);
+        for i in 0..130 {
+            if i % 2 == 0 {
+                input.push_ident(SyntaxKind::LOOP_KW);
+            } else {
+                input.push(SyntaxKind::PLUS);
+            }
+            if i % 3 == 0 {
+                input.was_joint();
+            }
+        }
+        let input = input.view();
+        assert_eq!(input.len(), 130);
+        for i in 0..input.len() {
+            let (kind, contextual_kind) = if i % 2 == 0 {
+                (SyntaxKind::IDENT, SyntaxKind::LOOP_KW)
+            } else {
+                (SyntaxKind::PLUS, SyntaxKind::EOF)
+            };
+            assert_eq!(input.kind(i), kind);
+            assert_eq!(input.contextual_kind(i), contextual_kind);
+            assert_eq!(input.is_joint(i), i % 3 == 0);
+        }
+        assert_eq!(input.kind(input.len()), SyntaxKind::EOF);
+        assert_eq!(input.contextual_kind(input.len()), SyntaxKind::EOF);
+        assert_eq!(input.kind(usize::MAX), SyntaxKind::EOF);
+        assert_eq!(input.contextual_kind(usize::MAX), SyntaxKind::EOF);
     }
 }

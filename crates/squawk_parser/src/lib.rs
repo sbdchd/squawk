@@ -50,7 +50,7 @@ pub use crate::{
     },
 };
 
-use crate::input::Input;
+use crate::input::{Input, InputView};
 pub use crate::output::Output;
 
 /// See [`Parser::start`].
@@ -176,9 +176,8 @@ impl EntryPoint {
 }
 
 pub(crate) struct Parser<'t> {
-    inp: &'t Input,
+    inp: InputView<'t>,
     pos: usize,
-    limit: usize,
     events: Vec<Event>,
     errors: Vec<String>,
     steps: Cell<u32>,
@@ -218,9 +217,8 @@ const SPECIAL_OP_CHARS: TokenSet = TokenSet::new(&[
 impl<'t> Parser<'t> {
     fn new(inp: &'t Input) -> Parser<'t> {
         Parser {
-            inp,
+            inp: inp.view(),
             pos: 0,
-            limit: usize::MAX,
             events: Vec::with_capacity(inp.len() * 4),
             errors: vec![],
             steps: Cell::new(0),
@@ -229,29 +227,23 @@ impl<'t> Parser<'t> {
 
     // Part of a hack to support pl/pgsql loops where we have to stop at `loop`
     pub(crate) fn with_limit<T>(&mut self, n: usize, f: impl FnOnce(&mut Parser<'t>) -> T) -> T {
-        let limit = self.limit;
-        self.limit = limit.min(self.pos + n);
+        let inp = self.inp;
+        self.inp = inp.limited(self.pos + n);
         let res = f(self);
-        self.limit = limit;
+        self.inp = inp;
         res
     }
 
     fn kind_at(&self, idx: usize) -> SyntaxKind {
-        if idx >= self.limit {
-            return SyntaxKind::EOF;
-        }
         self.inp.kind(idx)
     }
 
     fn contextual_kind_at(&self, idx: usize) -> SyntaxKind {
-        if idx >= self.limit {
-            return SyntaxKind::EOF;
-        }
         self.inp.contextual_kind(idx)
     }
 
     fn is_joint_at(&self, idx: usize) -> bool {
-        idx + 1 < self.limit && self.inp.is_joint(idx)
+        idx + 1 < self.inp.len() && self.inp.is_joint(idx)
     }
 
     /// Consume the next token if `kind` matches.
@@ -1016,5 +1008,50 @@ impl<'t> Parser<'t> {
         self.steps.set(steps + 1);
 
         self.kind_at(self.pos + n)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn nested_input_limits_restore_token_metadata() {
+        let lexed = LexedStr::new("loop+1");
+        let input = lexed.to_input();
+        let mut parser = Parser::new(&input);
+        assert_eq!(parser.contextual_kind_at(0), SyntaxKind::LOOP_KW);
+        assert!(parser.is_joint_at(0));
+        assert!(parser.is_joint_at(1));
+        parser.with_limit(2, |parser| {
+            assert_eq!(parser.kind_at(2), SyntaxKind::EOF);
+            assert_eq!(parser.contextual_kind_at(2), SyntaxKind::EOF);
+            assert!(parser.is_joint_at(0));
+            assert!(!parser.is_joint_at(1));
+            parser.with_limit(1, |parser| {
+                assert_eq!(parser.kind_at(0), SyntaxKind::IDENT);
+                assert_eq!(parser.contextual_kind_at(0), SyntaxKind::LOOP_KW);
+                assert_eq!(parser.kind_at(1), SyntaxKind::EOF);
+                assert!(!parser.is_joint_at(0));
+                parser.with_limit(3, |parser| {
+                    assert_eq!(parser.kind_at(1), SyntaxKind::EOF);
+                });
+            });
+            assert_eq!(parser.kind_at(1), SyntaxKind::PLUS);
+            assert!(parser.is_joint_at(0));
+            assert!(!parser.is_joint_at(1));
+        });
+        assert_eq!(parser.kind_at(2), SyntaxKind::INT_NUMBER);
+        assert!(parser.is_joint_at(1));
+        parser.pos = 1;
+        parser.with_limit(1, |parser| {
+            assert_eq!(parser.kind_at(1), SyntaxKind::PLUS);
+            assert_eq!(parser.kind_at(2), SyntaxKind::EOF);
+            assert!(!parser.is_joint_at(1));
+        });
+        parser.with_limit(0, |parser| {
+            assert_eq!(parser.current(), SyntaxKind::EOF);
+        });
+        assert_eq!(parser.kind_at(2), SyntaxKind::INT_NUMBER);
     }
 }

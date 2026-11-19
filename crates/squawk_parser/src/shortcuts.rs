@@ -177,6 +177,7 @@ mod tests {
     fn kinds(text: &str) -> Vec<(SyntaxKind, SyntaxKind)> {
         let lexed = LexedStr::new(text);
         let input = lexed.to_input();
+        let input = input.view();
         (0..text.split_whitespace().count())
             .map(|i| (input.kind(i), input.contextual_kind(i)))
             .collect()
