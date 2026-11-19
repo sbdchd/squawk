@@ -731,6 +731,9 @@ impl<'t> Parser<'t> {
     #[must_use]
     #[inline]
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
+        if kind >= SyntaxKind::ABORT_KW && kind <= SyntaxKind::WHITESPACE {
+            return self.kind_at(self.pos + n) == kind;
+        }
         match kind {
             // =>
             SyntaxKind::FAT_ARROW => self.at_composite2(
@@ -1025,6 +1028,29 @@ impl<'t> Parser<'t> {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn raw_token_kinds_support_current_and_lookahead_checks() {
+        let kinds = (SyntaxKind::ABORT_KW as u16)..=(SyntaxKind::WHITESPACE as u16);
+        let mut input = Input::with_capacity(kinds.len());
+        for kind in kinds.clone() {
+            input.push(kind.into());
+        }
+        let mut parser = Parser::new(&input);
+        for kind in kinds {
+            let expected = SyntaxKind::from(kind);
+            assert!(parser.nth_at(0, expected));
+            assert!(!parser.nth_at(1, expected));
+            let next = if kind < SyntaxKind::WHITESPACE as u16 {
+                SyntaxKind::from(kind + 1)
+            } else {
+                SyntaxKind::EOF
+            };
+            assert!(parser.nth_at(1, next));
+            parser.bump_any();
+        }
+        assert!(parser.nth_at(0, SyntaxKind::EOF));
+    }
 
     #[test]
     fn cached_kind_tracks_composite_token_consumption() {
