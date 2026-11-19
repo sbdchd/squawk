@@ -11799,6 +11799,7 @@ impl Lowerer {
         typmod: Option<Typmod>,
         literal: &ast::Literal,
     ) {
+        self.record_literal_type(literal, target);
         let typmod = typmod.or_else(|| self.index.domain_typmod(target));
         if let Some(target) = self.literal_target(target, typmod) {
             self.lower_literal_value(target, literal);
@@ -13326,7 +13327,14 @@ impl Lowerer {
     }
 
     fn literal_type(&mut self, literal: &ast::Literal) -> Option<Ty> {
-        self.builtin_type(literal.type_name()?)
+        let ty = self.builtin_type(literal.type_name()?)?;
+        self.record_literal_type(literal, ty);
+        Some(ty)
+    }
+
+    fn record_literal_type(&mut self, literal: &ast::Literal, ty: Ty) {
+        let range = self.index.range(self.ptr(literal.syntax()).file_range());
+        self.index.literal_types.insert(range, ty);
     }
 
     fn lower_func_type(&mut self, func_type: &ast::FuncType) -> Option<Ty> {
@@ -20627,7 +20635,12 @@ impl Lowerer {
         self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
     }
 
-    fn lower_bin_operator(&mut self, op: &ast::BinOp, left: ArgType, right: ArgType) -> Option<Ty> {
+    fn lower_bin_operator(
+        &mut self,
+        op: &ast::BinOp,
+        left: ArgType,
+        right: ArgType,
+    ) -> LoweredOperator {
         let left = Some(left);
         let right = Some(right);
         match op {
@@ -20692,14 +20705,17 @@ impl Lowerer {
                 self.add_expr_operator_ref(range, None, "=", left, right)
             }
             ast::BinOp::And(_) | ast::BinOp::Is(_) | ast::BinOp::IsNot(_) | ast::BinOp::Or(_) => {
-                self.builtin_type("bool")
+                LoweredOperator {
+                    ty: self.builtin_type("bool"),
+                    operator: None,
+                }
             }
             ast::BinOp::AtTimeZone(_)
             | ast::BinOp::ColonColon(_)
             | ast::BinOp::ColonEq(_)
             | ast::BinOp::Escape(_)
             | ast::BinOp::FatArrow(_)
-            | ast::BinOp::Overlaps(_) => None,
+            | ast::BinOp::Overlaps(_) => LoweredOperator::default(),
         }
     }
 
@@ -20854,7 +20870,7 @@ impl Lowerer {
             let found =
                 self.add_expr_operator_ref(op_range, None, operator, Some(left), Some(common));
             if let (ArgType::Known(left), ArgType::Known(right)) = (left, common) {
-                self.check_comparison(comparison, rhs.syntax(), left, right, found);
+                self.check_comparison(comparison, rhs.syntax(), left, right, found.ty);
             }
             return self.builtin_type("bool");
         }
@@ -21013,10 +21029,11 @@ impl Lowerer {
         match op {
             ast::PrefixOp::Minus(token) | ast::PrefixOp::Plus(token) => {
                 self.add_expr_operator_ref(token.text_range(), None, token.text(), None, right)
+                    .ty
             }
-            ast::PrefixOp::CustomOp(custom_op) => self.lower_custom_op(custom_op, None, right),
+            ast::PrefixOp::CustomOp(custom_op) => self.lower_custom_op(custom_op, None, right).ty,
             ast::PrefixOp::OperatorCall(operator_call) => {
-                self.lower_operator_call(operator_call, None, right)
+                self.lower_operator_call(operator_call, None, right).ty
             }
             ast::PrefixOp::Not(_) => self.builtin_type("bool"),
         }
@@ -21027,7 +21044,7 @@ impl Lowerer {
         custom_op: &ast::CustomOp,
         left: Option<ArgType>,
         right: Option<ArgType>,
-    ) -> Option<Ty> {
+    ) -> LoweredOperator {
         let range = custom_op.syntax().text_range();
         let text = custom_op.operator_text();
         self.add_expr_operator_ref(range, None, &text, left, right)
@@ -21038,8 +21055,10 @@ impl Lowerer {
         operator_call: &ast::OperatorCall,
         left: Option<ArgType>,
         right: Option<ArgType>,
-    ) -> Option<Ty> {
-        let op = operator_call.op()?;
+    ) -> LoweredOperator {
+        let Some(op) = operator_call.op() else {
+            return LoweredOperator::default();
+        };
         let path = op.path_ref();
         let schema = self.lower_schema_qualifier(path.as_ref().and_then(|path| path.qualifier()));
         let range = op.operator_range();
@@ -21054,9 +21073,15 @@ impl Lowerer {
         text: &str,
         left: Option<ArgType>,
         right: Option<ArgType>,
-    ) -> Option<Ty> {
-        let operator = self.add_expr_operator_ref_at(range, range, schema, text, left, right)?;
-        self.operator_result_type(operator, left, right)
+    ) -> LoweredOperator {
+        let Some(operator) = self.add_expr_operator_ref_at(range, range, schema, text, left, right)
+        else {
+            return LoweredOperator::default();
+        };
+        LoweredOperator {
+            ty: self.operator_result_type(operator, left, right),
+            operator: Some(operator),
+        }
     }
 
     fn add_expr_operator_ref_at(
@@ -23321,9 +23346,28 @@ impl Lowerer {
                 {
                     self.check_condition(condition, lhs, lhs_ty);
                 }
-                let ty = op
+                let LoweredOperator { ty, operator } = op
                     .as_ref()
-                    .and_then(|op| self.lower_bin_operator(op, left, right));
+                    .map(|op| self.lower_bin_operator(op, left, right))
+                    .unwrap_or_default();
+                if let Some(operator) = operator {
+                    let operator = &self.index.operators[operator];
+                    let operands = Operands {
+                        left: operator.left,
+                        right: operator.right,
+                    };
+                    for (expr, operand) in [
+                        (lhs.as_ref(), operands.left),
+                        (rhs.as_ref(), operands.right),
+                    ] {
+                        if let Some(expr) = expr
+                            && let Some(literal) = expr.as_literal()
+                            && let Operand::Ty(ty) = operand
+                        {
+                            self.record_literal_type(&literal, ty);
+                        }
+                    }
+                }
                 if op.is_some_and(|op| op.is_comparison()) {
                     if let Some(rhs) = &rhs
                         && let Some(lhs_ty) = lhs_ty
@@ -27522,6 +27566,12 @@ impl Lowerer {
     fn ast_ptr<N: AstNode>(&self, node: &N) -> InIrFile<AstPtr<N>> {
         InIrFile::new(self.file_id, AstPtr::new(node))
     }
+}
+
+#[derive(Default)]
+struct LoweredOperator {
+    ty: Option<Ty>,
+    operator: Option<OperatorId>,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq)]

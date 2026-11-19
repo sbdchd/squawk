@@ -3,6 +3,45 @@ use insta::assert_snapshot;
 use super::hover;
 
 #[test]
+fn abs_string_argument() {
+    assert_snapshot!(hover("select abs('1'$0);"), @"
+    hover: float8
+      ╭▸ file0.sql:1:12
+      │
+    1 │ select abs('1');
+      │            ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn addition_string_operand() {
+    assert_snapshot!(hover("select 1 + '1'$0;"), @"
+    hover: int4
+      ╭▸ file0.sql:1:12
+      │
+    1 │ select 1 + '1';
+      │            ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn cast_string() {
+    assert_snapshot!(hover("select '1'$0::integer;"), @"
+    hover: int4
+      ╭▸ file0.sql:1:8
+      │
+    1 │ select '1'::integer;
+      │        ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
 fn string() {
     assert_snapshot!(hover(r"
 select 'foo$0';

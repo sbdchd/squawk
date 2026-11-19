@@ -74,10 +74,15 @@ pub(crate) fn hover_with_index(
     }
     let literal = token.token.parent().and_then(ast::Literal::cast)?;
     let LiteralHover { snippet, comment } = hover_literal(&literal)?;
+    let range = position.with_value(token.original_range(literal.syntax().text_range()));
+    let snippet = match index.literal_types.get(&range) {
+        Some(&ty) => index.type_name(ty).to_string(),
+        None => snippet.to_string(),
+    };
     Some(HoverInfo {
-        snippet: snippet.to_string(),
+        snippet,
         comment,
-        range: position.with_value(token.original_range(literal.syntax().text_range())),
+        range,
     })
 }
 
