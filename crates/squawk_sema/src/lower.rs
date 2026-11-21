@@ -1320,7 +1320,8 @@ impl Lowerer {
             | ast::Stmt::ResetRole(_)
             | ast::Stmt::ResetSessionAuth(_)
             | ast::Stmt::SetTransaction(_)
-            | ast::Stmt::Show(_) => {}
+            | ast::Stmt::Show(_)
+            | ast::Stmt::Wait(_) => {}
         }
         self.check_generated_refs();
     }

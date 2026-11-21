@@ -1,0 +1,148 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/wait.sql
+---
+SOURCE_FILE
+  COMMENT "-- wait for lsn"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- options"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    WAIT_OPTION_LIST
+      L_PAREN "("
+      WAIT_OPTION
+        WAIT_OPTION_NAME
+          IDENT "timeout"
+        WHITESPACE " "
+        LITERAL
+          STRING "'1d'"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    WAIT_OPTION_LIST
+      L_PAREN "("
+      WAIT_OPTION
+        WAIT_OPTION_NAME
+          MODE_KW "mode"
+        WHITESPACE " "
+        LITERAL
+          STRING "'standby_write'"
+      COMMA ","
+      WHITESPACE " "
+      WAIT_OPTION
+        WAIT_OPTION_NAME
+          IDENT "timeout"
+        WHITESPACE " "
+        LITERAL
+          STRING "'1d'"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    WAIT_OPTION_LIST
+      L_PAREN "("
+      WAIT_OPTION
+        WAIT_OPTION_NAME
+          MODE_KW "mode"
+        WHITESPACE " "
+        LITERAL
+          STRING "'primary_flush'"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    WAIT_OPTION_LIST
+      L_PAREN "("
+      WAIT_OPTION
+        WAIT_OPTION_NAME
+          IDENT "timeout"
+        WHITESPACE " "
+        LITERAL
+          STRING "'0.1s'"
+      COMMA ","
+      WHITESPACE " "
+      WAIT_OPTION
+        WAIT_OPTION_NAME
+          IDENT "no_throw"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    WHITESPACE " "
+    WITH_KW "with"
+    WHITESPACE " "
+    WAIT_OPTION_LIST
+      L_PAREN "("
+      WAIT_OPTION
+        WAIT_OPTION_NAME
+          IDENT "timeout"
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "100"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

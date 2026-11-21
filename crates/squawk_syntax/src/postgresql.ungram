@@ -5961,6 +5961,18 @@ Deallocate =
 Load =
   'load' Literal ';'?
 
+Wait =
+  'wait' 'for' 'lsn' Literal ('with' WaitOptionList)? ';'?
+
+WaitOptionList =
+  '(' (WaitOption (',' WaitOption)*) ')'
+
+WaitOption =
+  WaitOptionName Expr?
+
+WaitOptionName =
+  '#ident'?
+
 Listen =
   'listen' Channel ';'?
 
@@ -6981,6 +6993,7 @@ Stmt =
 | Update
 | Vacuum
 | Values
+| Wait
 | CompoundSelect
 | ParenSelect
 | EmptyStmt

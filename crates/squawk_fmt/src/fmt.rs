@@ -2367,6 +2367,61 @@ fn build_load<'a>(ctx: &Ctx, load: &ast::Load) -> Doc<'a> {
     doc.group().append(build_semicolon(load.semicolon_token()))
 }
 
+fn build_wait<'a>(ctx: &Ctx, wait: &ast::Wait) -> Doc<'a> {
+    let mut doc = build_keyword_tokens([
+        (wait.wait_token(), "wait"),
+        (wait.for_token(), "for"),
+        (wait.lsn_token(), "lsn"),
+    ]);
+    if let Some(literal) = wait.literal() {
+        doc = doc
+            .append(space_before(literal.syntax()))
+            .append(build_literal(&literal));
+    }
+    if let Some(with_token) = wait.with_token() {
+        doc = doc
+            .append(space_before(&with_token))
+            .append(Doc::text("with"));
+    }
+    if let Some(options) = wait.wait_option_list() {
+        doc = doc
+            .append(space_before(options.syntax()))
+            .append(build_wait_option_list(ctx, &options));
+    }
+    doc.group().append(build_semicolon(wait.semicolon_token()))
+}
+
+fn build_wait_option_list<'a>(ctx: &Ctx, list: &ast::WaitOptionList) -> Doc<'a> {
+    let body = build_comma_separated_docs(list.wait_options().map(|option| {
+        (
+            leading_comments(option.syntax()).append(build_wait_option(ctx, &option)),
+            option.syntax().clone(),
+        )
+    }))
+    .unwrap_or_else(Doc::nil);
+
+    list.l_paren_token()
+        .map(|el| comments_before(&el))
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("))
+        .append(wrap_body(ctx, body, list.r_paren_token().as_ref()))
+        .append(Doc::text(")"))
+        .group()
+}
+
+fn build_wait_option<'a>(ctx: &Ctx, option: &ast::WaitOption) -> Doc<'a> {
+    let mut doc = option
+        .wait_option_name()
+        .map(|name| build_keyword_node(name.syntax()))
+        .unwrap_or_else(Doc::nil);
+    if let Some(expr) = option.expr() {
+        doc = doc
+            .append(space_before(expr.syntax()))
+            .append(build_expr(ctx, expr));
+    }
+    doc.group()
+}
+
 fn build_discard<'a>(ctx: &Ctx, discard: &ast::Discard) -> Doc<'a> {
     let mut doc = Doc::text("discard");
     if let Some(target) = discard.discard_target() {
@@ -3197,6 +3252,7 @@ fn build_stmt<'a>(ctx: &Ctx, stmt: ast::Stmt) -> Doc<'a> {
         ast::Stmt::ImportForeignSchema(stmt) => build_import_foreign_schema(ctx, &stmt),
         ast::Stmt::Listen(stmt) => build_listen(ctx, &stmt),
         ast::Stmt::Load(stmt) => build_load(ctx, &stmt),
+        ast::Stmt::Wait(stmt) => build_wait(ctx, &stmt),
         ast::Stmt::Lock(stmt) => build_lock(ctx, &stmt),
         ast::Stmt::Move(stmt) => build_move(ctx, &stmt),
         ast::Stmt::Notify(stmt) => build_notify(ctx, &stmt),
