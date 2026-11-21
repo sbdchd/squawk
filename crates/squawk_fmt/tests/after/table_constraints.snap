@@ -33,7 +33,7 @@ create table named_constraints (
     no inherit,
   constraint long_check check (
     a_very_long_check_left_hand_expression_name
-      > a_very_long_check_right_hand_expression_name
+    > a_very_long_check_right_hand_expression_name
   ),
   constraint parent_fk
     foreign key (
@@ -66,7 +66,7 @@ create table named_constraints (
     using index tablespace fast
     where (
       a_very_long_exclusion_predicate_expression
-        > an_extremely_long_exclusion_predicate_value_that_forces_wrapping
+      > an_extremely_long_exclusion_predicate_value_that_forces_wrapping
     )
     deferrable
 );

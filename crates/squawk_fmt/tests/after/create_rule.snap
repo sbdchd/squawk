@@ -11,7 +11,7 @@ create or replace rule extraordinarily_long_rule_name_for_recording_all_account_
   to extraordinarily_long_schema_name.extraordinarily_long_accounts_table_name
     where (
       old.account_owner_identifier is distinct from new.account_owner_identifier
-        and new.account_is_active
+      and new.account_is_active
     )
   do also (
     notify extraordinarily_long_account_changes_channel,
@@ -27,7 +27,7 @@ create /* or */ or /* replace */ replace /* rule */ rule /* name */ audit_change
   /* to */ to /* schema */ public /* dot */ . /* relation */ accounts
     /* where */ where /* left paren */ (
       /* condition */ old.owner_id
-        is distinct from new.owner_id /* right paren */
+      is distinct from new.owner_id /* right paren */
     )
   /* do */ do /* instead */ instead /* action left */ (
     /* notify */ notify /* channel */ account_changes /* comma */,

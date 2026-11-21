@@ -4,6 +4,188 @@ select (date '2026-01-01', date '2026-01-02') overlaps (
 
 select (1, 2) overlaps (3, 4);
 
+select items[1:2], items[:2], items[1:], items[:];
+
+select
+  items[start_offset:end_offset],
+  items[1:10],
+  items[-2:-1],
+  items[+1:+2],
+  items[-start_offset:+end_offset];
+
+select
+  items[start_offset + 1 : end_offset - 1],
+  items[start_offset + 1 : end_offset],
+  items[start_offset : end_offset - 1];
+
+select items[: end_offset - 1], items[start_offset + 1 :];
+
+select
+  items[lower_bound() : upper_bound()],
+  items[bounds.start_offset : bounds.end_offset],
+  items[offsets[1] : offsets[2]];
+
+select
+  items[-(start_offset + 1) : end_offset],
+  items[(start_offset) : end_offset];
+
+select items[
+  /* before start */ start_offset
+  + 1 /* before colon */ : /* before end */ end_offset - 1 /* before close */
+];
+
+select items[
+  -- before start
+  start_offset + 1 -- before colon
+  : -- before end
+  end_offset - 1 -- before close
+];
+
+select
+  items[/* before colon */ : /* before end */ end_offset - 1],
+  items[start_offset + 1 /* before colon */ : /* before close */];
+
+select items[
+  first_extraordinarily_long_column_name:second_extraordinarily_long_column_name
+];
+
+select items[
+  first_extraordinarily_long_column_name
+  + second_extraordinarily_long_column_name:third_extraordinarily_long_column_name
+];
+
+select items[
+  /* before start */ 1 /* before colon */ : /* before end */ 2 /* before close */
+];
+
+select items[
+  -- before start
+  1 -- before colon
+  : -- before end
+  2 -- before close
+];
+
+select items[/* before colon */ : /* before close */];
+
+select items[1:2][
+  first_extraordinarily_long_column_name:second_extraordinarily_long_column_name
+];
+
+select (
+  first_extraordinarily_long_column_name
+  + second_extraordinarily_long_column_name
+  + third_extraordinarily_long_column_name
+);
+
+select (
+  first_extraordinarily_long_column_name
+  = second_extraordinarily_long_column_name
+  and third_extraordinarily_long_column_name
+  = fourth_extraordinarily_long_column_name
+);
+
+select (
+  first_extraordinarily_long_column_name /* before operator */
+  + /* after operator */ second_extraordinarily_long_column_name
+);
+
+select (
+  abs(1) > 0
+  and 1000 + 20 > 10
+  and 50 < 1000
+  and length('foooooooooooooooooooooooooooooooo') > 10
+);
+
+select (
+  abs(1) > 0
+  or 1000 + 20 > 10
+  or 50 < 1000
+  or length('foooooooooooooooooooooooooooooooo') > 10
+);
+
+select check_condition(
+  (
+    state in ('cancelled', 'completed', 'discarded')
+      and finalized_at is not null
+  )
+    or finalized_at is null
+);
+
+select *
+from foo
+  join bar on
+    foo.first_long_column = bar.first_long_column
+    and foo.second_long_column = bar.second_long_column;
+
+select foo(
+  condition => first_long_column = second_long_column
+    and third_long_column = fourth_long_column
+);
+
+select array[
+  first_long_column = second_long_column
+    and third_long_column = fourth_long_column,
+  first_long_column = second_long_column
+    or third_long_column = fourth_long_column
+];
+
+select items[
+  first_long_column = second_long_column
+  and third_long_column = fourth_long_column
+];
+
+select bool_and(true and false), array[true and false], items[true or false];
+
+select *
+from foo
+  join bar on
+    /* first */ foo.first_long_column = bar.first_long_column /* before and */
+    and /* after and */ foo.second_long_column
+      = bar.second_long_column /* last */;
+
+select bool_and(
+  /* first */ first_long_column = second_long_column /* before and */
+    and /* after and */ third_long_column = fourth_long_column /* last */
+);
+
+select array[
+  /* first */ first_long_column = second_long_column /* before or */
+    or /* after or */ third_long_column = fourth_long_column /* last */
+];
+
+select items[
+  -- first
+  first_long_column = second_long_column -- after first
+  -- before and
+  and -- after and
+  third_long_column = fourth_long_column -- last
+];
+
+select (
+  /* first */ abs(1) > 0 /* before and */
+  and /* after and */ 1000 + 20 > 10
+  and 50 < 1000 /* last */
+);
+
+select (
+  -- first
+  abs(1) > 0 -- after first
+  -- before and
+  and -- after and
+  1000 + 20 > 10
+  -- before next and
+  and 50 < 1000 -- last
+);
+
+select (
+  abs(1) > 0
+  and (
+    1000 + 20 > 10
+    or 50 < 1000
+    or length('foooooooooooooooooooooooooooooooo') > 10
+  )
+);
+
 select fooo(
   loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong + loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong + 3 + 4 + 5 + 6
 );

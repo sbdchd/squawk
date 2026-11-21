@@ -25,7 +25,8 @@ select * from merged;
 
 merge into a_very_long_schema_name.a_very_long_target_table_name as an_extremely_long_target_alias
 using a_very_long_schema_name.a_very_long_source_table_name as an_extremely_long_source_alias
-on an_extremely_long_target_alias.organization_identifier
+on
+  an_extremely_long_target_alias.organization_identifier
   = an_extremely_long_source_alias.organization_identifier
 when matched and
   an_extremely_long_source_alias.should_update_the_existing_record then
@@ -46,6 +47,19 @@ merge into target t
 using source1 s1 inner join source2 s2 on s1.id = s2.id on t.id = s1.id
 when not matched then
   insert values (s1.id, s2.value);
+
+merge into target t
+using source s
+on
+  t.first_extraordinarily_long_column_name
+  = s.first_extraordinarily_long_column_name
+  and t.second_extraordinarily_long_column_name
+  = s.second_extraordinarily_long_column_name
+when matched and
+  /* before condition */ s.first_extraordinarily_long_column_name
+  > 0 /* before and */
+  and /* after and */ s.second_extraordinarily_long_column_name > 0 then
+  delete;
 
 merge into target t
 using /* before left source */ source1 /* before left alias */ s1
