@@ -6,6 +6,19 @@ MERGE INTO a_very_long_schema_name.a_very_long_target_table_name AS an_extremely
 
 MERGE INTO target t USING source1 s1 INNER JOIN source2 s2 ON s1.id = s2.id ON t.id = s1.id WHEN NOT MATCHED THEN INSERT VALUES (s1.id, s2.value);
 
+merge into target t
+using source s
+on
+  t.first_extraordinarily_long_column_name
+  = s.first_extraordinarily_long_column_name
+  and t.second_extraordinarily_long_column_name
+  = s.second_extraordinarily_long_column_name
+when matched and
+  /* before condition */ s.first_extraordinarily_long_column_name
+  > 0 /* before and */
+  and /* after and */ s.second_extraordinarily_long_column_name > 0 then
+  delete;
+
 MERGE INTO target t USING /* before left source */ source1 /* before left alias */ s1 /* before inner */ INNER /* before join */ JOIN /* before right source */ source2 /* before right alias */ s2 /* before join on */ ON /* before join condition */ s1.id = s2.id /* before merge on */ ON /* before merge condition */ t.id = s1.id WHEN MATCHED THEN DELETE;
 
 /* before merge */ MERGE /* before into */ INTO /* before target */ ONLY /* before target open */ (/* before schema */ public /* before dot */ . /* before table */ target /* before target close */) /* before as */ AS /* before target alias */ t /* before using */ USING /* before source */ source /* before source as */ AS /* before source alias */ s /* before on */ ON /* before condition */ t.id = s.id /* before first when */ WHEN /* before matched */ MATCHED /* before and */ AND /* before predicate */ s.deleted /* before then */ THEN /* before delete */ DELETE /* before second when */ WHEN /* before second matched */ MATCHED /* before second then */ THEN /* before update */ UPDATE /* before set */ SET /* before column */ value /* before equals */ = /* before value */ s.value /* before third when */ WHEN /* before not */ NOT /* before third matched */ MATCHED /* before by */ BY /* before source keyword */ SOURCE /* before source and */ AND /* before source predicate */ t.active /* before source then */ THEN /* before do */ DO /* before nothing */ NOTHING /* before fourth when */ WHEN /* before fourth not */ NOT /* before fourth matched */ MATCHED /* before target by */ BY /* before target keyword */ TARGET /* before target then */ THEN /* before insert */ INSERT /* before columns */ (/* before id */ id /* before comma */, /* before value column */ value /* before columns close */) /* before overriding */ OVERRIDING /* before user */ USER /* before overriding value */ VALUE /* before values */ VALUES /* before row */ (/* before source id */ s.id /* before values comma */, /* before source value */ s.value /* before row close */) /* before fifth when */ WHEN NOT MATCHED THEN INSERT /* before default */ DEFAULT /* before default values */ VALUES /* before returning */ RETURNING /* before return target */ t.id /* before semicolon */;

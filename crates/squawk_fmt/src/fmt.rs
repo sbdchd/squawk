@@ -920,11 +920,9 @@ fn build_using_on_clause<'a>(ctx: &Ctx, using: &ast::UsingOnClause) -> Doc<'a> {
 fn build_on_clause<'a>(ctx: &Ctx, on_clause: &ast::OnClause) -> Doc<'a> {
     let mut doc = Doc::text("on");
     if let Some(expr) = on_clause.expr() {
-        doc = doc
-            .append(space_before(expr.syntax()))
-            .append(build_expr(ctx, expr));
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_merge_when_clause<'a>(ctx: &Ctx, clause: ast::MergeWhenClause) -> Doc<'a> {
@@ -1020,9 +1018,9 @@ fn build_merge_when_not_matched_prefix<'a>(
 fn build_merge_condition<'a>(ctx: &Ctx, condition: &ast::MergeCondition) -> Doc<'a> {
     let mut doc = Doc::text("and");
     if let Some(expr) = condition.expr() {
-        doc = append_nested_node(ctx, doc, expr, |value| build_expr(ctx, value));
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_merge_action<'a>(ctx: &Ctx, action: ast::MergeAction) -> Doc<'a> {
@@ -7767,6 +7765,18 @@ fn append_clause_body<'a>(
     }
 }
 
+fn append_condition_body<'a>(ctx: &Ctx, doc: Doc<'a>, expr: ast::Expr) -> Doc<'a> {
+    let syntax = expr.syntax().clone();
+    let is_logical = matches!(&expr, ast::Expr::BinExpr(binary)
+        if binary.op().as_ref().and_then(logical_op).is_some());
+    if is_logical {
+        append_nested_clause(ctx, doc, &syntax, build_nested_expr(ctx, expr).group())
+    } else {
+        let hug = ends_with_inline_bracketed_expr(&expr);
+        append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug)
+    }
+}
+
 fn build_alter_option_list<'a>(ctx: &Ctx, list: &ast::AlterOptionList) -> Doc<'a> {
     let mut doc = Doc::text("options");
     if let Some(l_paren) = list.l_paren_token() {
@@ -9280,11 +9290,9 @@ fn build_distinct_on<'a>(ctx: &Ctx, distinct_on: &ast::DistinctOn) -> Doc<'a> {
 fn build_having_clause<'a>(ctx: &Ctx, having: &ast::HavingClause) -> Doc<'a> {
     let mut doc = Doc::text("having");
     if let Some(expr) = having.expr() {
-        doc = doc
-            .append(space_before(expr.syntax()))
-            .append(build_expr(ctx, expr));
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_window_clause<'a>(ctx: &Ctx, window: &ast::WindowClause) -> Doc<'a> {
@@ -15396,11 +15404,9 @@ fn build_join<'a>(ctx: &Ctx, join: &ast::Join) -> Doc<'a> {
 fn build_join_on_clause<'a>(ctx: &Ctx, on_clause: &ast::OnClause) -> Doc<'a> {
     let mut doc = Doc::text("on");
     if let Some(expr) = on_clause.expr() {
-        let syntax = expr.syntax().clone();
-        let hug = ends_with_inline_bracketed_expr(&expr);
-        doc = append_clause_body(ctx, doc, &syntax, build_nested_expr(ctx, expr).group(), hug);
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_join_using_clause<'a>(ctx: &Ctx, using: &ast::JoinUsingClause) -> Doc<'a> {
@@ -17195,15 +17201,7 @@ fn build_where_clause<'a>(ctx: &Ctx, where_clause: &ast::WhereClause) -> Doc<'a>
         .map(|token| leading_comments(&token).append(Doc::text("where")))
         .unwrap_or_else(Doc::nil);
     if let Some(expr) = where_clause.expr() {
-        let syntax = expr.syntax().clone();
-        let is_logical = matches!(&expr, ast::Expr::BinExpr(binary)
-            if binary.op().as_ref().and_then(logical_op).is_some());
-        doc = if is_logical {
-            append_nested_clause(ctx, doc, &syntax, build_nested_expr(ctx, expr))
-        } else {
-            let hug = ends_with_inline_bracketed_expr(&expr);
-            append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug)
-        };
+        doc = append_condition_body(ctx, doc, expr);
     }
     doc.group()
 }
@@ -19113,9 +19111,7 @@ fn build_case_expr<'a>(ctx: &Ctx, case_expr: &ast::CaseExpr) -> Doc<'a> {
 fn build_when_clause<'a>(ctx: &Ctx, when_clause: &ast::WhenClause) -> Doc<'a> {
     let mut doc = Doc::text("when");
     if let Some(condition) = when_clause.condition() {
-        doc = doc
-            .append(space_before(condition.syntax()))
-            .append(build_expr(ctx, condition));
+        doc = append_condition_body(ctx, doc, condition);
     }
     if let Some(then) = when_clause.then_token() {
         doc = doc
