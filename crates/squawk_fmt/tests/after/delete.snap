@@ -24,9 +24,7 @@ delete from foo for portion of valid_at from 1 to 2;
 delete from foo
 for portion of valid_at from 1 to 2
 where
-  organization_id = 12345
-  and status = 'inactive'
-  and archived_at is not null
+  organization_id = 12345 and status = 'inactive' and archived_at is not null
 returning id, valid_at;
 
 delete from foo for portion of valid_at (1 + 2);

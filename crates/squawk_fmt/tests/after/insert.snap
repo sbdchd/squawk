@@ -39,7 +39,7 @@ with inserted as (
           = excluded.extremely_long_descriptive_column_name
       where
         a_very_long_table_name.organization_identifier
-          = excluded.organization_identifier
+        = excluded.organization_identifier
   returning organization_identifier, extremely_long_descriptive_column_name
 )
 select organization_identifier, extremely_long_descriptive_column_name
