@@ -4,6 +4,34 @@ select (date '2026-01-01', date '2026-01-02') overlaps (
 
 select (1, 2) overlaps (3, 4);
 
+select items[1:2], items[:2], items[1:], items[:];
+
+select items[
+  first_extraordinarily_long_column_name:second_extraordinarily_long_column_name
+];
+
+select items[
+  first_extraordinarily_long_column_name
+  + second_extraordinarily_long_column_name:third_extraordinarily_long_column_name
+];
+
+select items[
+  /* before start */ 1 /* before colon */ : /* before end */ 2 /* before close */
+];
+
+select items[
+  -- before start
+  1 -- before colon
+  : -- before end
+  2 -- before close
+];
+
+select items[/* before colon */ : /* before close */];
+
+select items[1:2][
+  first_extraordinarily_long_column_name:second_extraordinarily_long_column_name
+];
+
 select (
   first_extraordinarily_long_column_name
   + second_extraordinarily_long_column_name

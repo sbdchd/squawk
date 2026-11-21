@@ -15173,7 +15173,7 @@ fn is_inline_bracketed_expr(expr: &ast::Expr) -> bool {
             Some(arg_list) => arg_list_has_body(&arg_list),
             None => true,
         },
-        ast::Expr::ParenExpr(_) | ast::Expr::IndexExpr(_) => true,
+        ast::Expr::ParenExpr(_) | ast::Expr::IndexExpr(_) | ast::Expr::SliceExpr(_) => true,
         ast::Expr::TupleExpr(tuple_expr) => tuple_expr.exprs().next().is_some(),
         ast::Expr::CastExpr(cast_expr) => {
             cast_expr.cast_token().is_some() || cast_expr.treat_token().is_some()
@@ -15186,8 +15186,7 @@ fn is_inline_bracketed_expr(expr: &ast::Expr) -> bool {
         | ast::Expr::Literal(_)
         | ast::Expr::NameRef(_)
         | ast::Expr::PostfixExpr(_)
-        | ast::Expr::PrefixExpr(_)
-        | ast::Expr::SliceExpr(_) => false,
+        | ast::Expr::PrefixExpr(_) => false,
     }
 }
 
@@ -16723,25 +16722,25 @@ fn build_slice_expr<'a>(ctx: &Ctx, slice_expr: &ast::SliceExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("["));
 
+    let mut body = Doc::nil();
     if let Some(start) = slice_expr.start() {
-        doc = doc
+        body = body
             .append(leading_comments(start.syntax()))
             .append(build_expr(ctx, start));
     }
     if let Some(colon) = slice_expr.colon_token() {
-        doc = doc.append(comments_before(&colon));
+        body = body.append(comments_before(&colon));
     }
-    doc = doc.append(Doc::text(":"));
+    body = body.append(Doc::text(":"));
 
     if let Some(end) = slice_expr.end() {
-        doc = doc
+        body = body
             .append(leading_comments(end.syntax()))
             .append(build_expr(ctx, end));
     }
-    if let Some(r_brack) = slice_expr.r_brack_token() {
-        doc = doc.append(comments_before(&r_brack));
-    }
-    doc.append(Doc::text("]"))
+    doc.append(wrap_body(ctx, body, slice_expr.r_brack_token().as_ref()))
+        .append(Doc::text("]"))
+        .group()
 }
 
 fn build_tuple_expr<'a>(ctx: &Ctx, tuple_expr: &ast::TupleExpr) -> Doc<'a> {
