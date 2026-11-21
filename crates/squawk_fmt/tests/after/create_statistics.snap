@@ -16,7 +16,7 @@ create statistics if not exists
     extraordinarily_long_first_column_name,
     (lower(extraordinarily_long_second_column_name)),
     extraordinarily_long_third_column_name
-      + extraordinarily_long_fourth_column_name
+    + extraordinarily_long_fourth_column_name
   from extraordinarily_long_schema_name.extraordinarily_long_table_name;
 
 -- comments in every position

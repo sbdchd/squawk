@@ -91,7 +91,7 @@ select foo(
 
 select
   a -- lhs
-    + b;
+  + b;
 
 select
   a -- lhs

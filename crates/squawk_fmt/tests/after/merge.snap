@@ -26,7 +26,7 @@ select * from merged;
 merge into a_very_long_schema_name.a_very_long_target_table_name as an_extremely_long_target_alias
 using a_very_long_schema_name.a_very_long_source_table_name as an_extremely_long_source_alias
 on an_extremely_long_target_alias.organization_identifier
-  = an_extremely_long_source_alias.organization_identifier
+= an_extremely_long_source_alias.organization_identifier
 when matched and
   an_extremely_long_source_alias.should_update_the_existing_record then
   update

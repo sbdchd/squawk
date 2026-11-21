@@ -5,6 +5,24 @@ select (date '2026-01-01', date '2026-01-02') overlaps (
 select (1, 2) overlaps (3, 4);
 
 select (
+  first_extraordinarily_long_column_name
+  + second_extraordinarily_long_column_name
+  + third_extraordinarily_long_column_name
+);
+
+select (
+  first_extraordinarily_long_column_name
+  = second_extraordinarily_long_column_name
+  and third_extraordinarily_long_column_name
+  = fourth_extraordinarily_long_column_name
+);
+
+select (
+  first_extraordinarily_long_column_name /* before operator */
+  + /* after operator */ second_extraordinarily_long_column_name
+);
+
+select (
   abs(1) > 0
   and 1000 + 20 > 10
   and 50 < 1000

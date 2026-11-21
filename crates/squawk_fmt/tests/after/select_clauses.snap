@@ -229,4 +229,4 @@ select *
 from t
 where
   aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-    = calculate_something();
+  = calculate_something();

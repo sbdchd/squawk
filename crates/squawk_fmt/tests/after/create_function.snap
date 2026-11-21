@@ -141,7 +141,7 @@ create function record_and_calculate(
       a_very_long_input_parameter_name, another_very_long_input_parameter_name
     );
     return a_very_long_input_parameter_name
-      + another_very_long_input_parameter_name;
+    + another_very_long_input_parameter_name;
   end;
 
 create function commented_body(value integer) returns integer

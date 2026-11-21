@@ -19459,7 +19459,6 @@ fn build_bin_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr) -> Doc<'a> {
 fn build_bin_expr_chain<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, flattened: bool) -> Doc<'a> {
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
-    let lhs_is_inline_bracketed = is_inline_bracketed_expr(&lhs);
     let lhs_requires_inline_separator = matches!(&lhs, ast::Expr::CaseExpr(_));
     let comments = comment_run_before(rhs.syntax());
     let after_op = comments.before_node(Doc::space());
@@ -19483,13 +19482,7 @@ fn build_bin_expr_chain<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, flattened: bool)
 
     let lhs_doc = build_bin_expr_operand(ctx, lhs, precedence);
     let doc = lhs_doc.append(tail);
-    if flattened {
-        doc
-    } else if lhs_is_inline_bracketed || rhs_requires_inline_separator {
-        doc.group()
-    } else {
-        doc.nest(ctx.indent).group()
-    }
+    if flattened { doc } else { doc.group() }
 }
 
 fn build_within_clause<'a>(ctx: &Ctx, within_clause: &ast::WithinClause) -> Doc<'a> {
