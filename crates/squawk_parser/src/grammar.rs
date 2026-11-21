@@ -8479,6 +8479,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
         (UNLISTEN_KW, _) => Some(unlisten(p)),
         (UPDATE_KW, _) => Some(update(p, None, r.semi_allowed)),
         (VACUUM_KW, _) => Some(vacuum(p)),
+        (WAIT_KW, _) => Some(wait(p)),
         (WITH_KW, _) => with(
             p,
             None,
@@ -16100,6 +16101,52 @@ fn deallocate(p: &mut Parser<'_>) -> CompletedMarker {
     }
     p.eat(SEMICOLON);
     m.complete(p, DEALLOCATE)
+}
+
+// WAIT FOR LSN 'lsn' [ WITH ( option [, ...] ) ]
+fn wait(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(WAIT_KW));
+    let m = p.start();
+    p.bump(WAIT_KW);
+    p.expect(FOR_KW);
+    p.expect(LSN_KW);
+    string_literal(p);
+    if p.eat(WITH_KW) {
+        if p.at(L_PAREN) {
+            wait_option_list(p);
+        } else {
+            p.error("expected `(`");
+        }
+    }
+    p.eat(SEMICOLON);
+    m.complete(p, WAIT)
+}
+
+fn wait_option_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    delimited(
+        p,
+        L_PAREN,
+        R_PAREN,
+        COMMA,
+        ListItems::Required(ListItem::Option),
+        NAME_FIRST,
+        opt_wait_option,
+    );
+    m.complete(p, WAIT_OPTION_LIST);
+}
+
+fn opt_wait_option(p: &mut Parser<'_>) -> bool {
+    if !p.at_ts(NAME_FIRST) {
+        return false;
+    }
+    let m = p.start();
+    let name = p.start();
+    pg_name(p);
+    name.complete(p, WAIT_OPTION_NAME);
+    opt_expr(p);
+    m.complete(p, WAIT_OPTION);
+    true
 }
 
 // LOAD string

@@ -1,0 +1,69 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/wait.sql
+---
+SOURCE_FILE
+  COMMENT "-- missing lsn"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing lsn keyword"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing for"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- missing option list"
+  WHITESPACE "\n"
+  WAIT
+    WAIT_KW "wait"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    LSN_KW "lsn"
+    WHITESPACE " "
+    LITERAL
+      STRING "'0/306EE20'"
+    WHITESPACE " "
+    WITH_KW "with"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected string literal
+  ╭▸ 
+2 │ wait for lsn;
+  ╰╴            ━
+error[syntax-error]: expected `lsn`
+  ╭▸ 
+5 │ wait for '0/306EE20';
+  ╰╴        ━
+error[syntax-error]: expected `for`
+  ╭▸ 
+8 │ wait lsn '0/306EE20';
+  ╰╴    ━
+error[syntax-error]: expected `(`
+   ╭▸ 
+11 │ wait for lsn '0/306EE20' with;
+   ╰╴                             ━

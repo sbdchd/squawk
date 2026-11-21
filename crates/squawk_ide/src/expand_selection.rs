@@ -41,6 +41,7 @@ const DELIMITED_LIST_KINDS: &[SyntaxKind] = &[
     SyntaxKind::ATTRIBUTE_LIST,
     SyntaxKind::ATOMIC_BODY,
     SyntaxKind::CHECKPOINT_OPTION_LIST,
+    SyntaxKind::WAIT_OPTION_LIST,
     SyntaxKind::COLUMN_DEF_LIST,
     SyntaxKind::COLUMN_LIST,
     SyntaxKind::COLUMN_REF_LIST,

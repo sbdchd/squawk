@@ -1,0 +1,23 @@
+---
+source: crates/squawk_fmt/tests/tests.rs
+input_file: crates/squawk_fmt/tests/before/wait.sql
+---
+wait for lsn '0/306EE20';
+
+wait for lsn '0/306EE20' with (timeout '1d');
+
+wait for lsn '0/306EE20' with (mode 'standby_write', timeout '1d');
+
+wait for lsn '0/306EE20' with (timeout '0.1s', no_throw);
+
+wait for lsn '0/306EE20' with (timeout 100);
+
+wait for lsn 'FFFFFFFF/FFFFFFFF' with (
+  mode 'standby_write',
+  timeout '10min',
+  no_throw
+);
+
+/* before wait */ wait /* before for */ for /* before lsn */ lsn /* before literal */ '0/306EE20' /* before with */ with /* before list */ (
+  /* before option */ timeout /* before value */ '1d' /* after value */
+) /* before semicolon */;

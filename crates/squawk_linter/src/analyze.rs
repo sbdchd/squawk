@@ -223,7 +223,8 @@ pub fn possibly_slow_stmt(stmt: &ast::Stmt) -> bool {
         | ast::Stmt::Table(_)
         | ast::Stmt::Unlisten(_)
         | ast::Stmt::Update(_)
-        | ast::Stmt::Values(_) => false,
+        | ast::Stmt::Values(_)
+        | ast::Stmt::Wait(_) => false,
     }
 }
 
