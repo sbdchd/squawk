@@ -6,6 +6,45 @@ select (1, 2) overlaps (3, 4);
 
 select items[1:2], items[:2], items[1:], items[:];
 
+select
+  items[start_offset:end_offset],
+  items[1:10],
+  items[-2:-1],
+  items[+1:+2],
+  items[-start_offset:+end_offset];
+
+select
+  items[start_offset + 1 : end_offset - 1],
+  items[start_offset + 1 : end_offset],
+  items[start_offset : end_offset - 1];
+
+select items[: end_offset - 1], items[start_offset + 1 :];
+
+select
+  items[lower_bound() : upper_bound()],
+  items[bounds.start_offset : bounds.end_offset],
+  items[offsets[1] : offsets[2]];
+
+select
+  items[-(start_offset + 1) : end_offset],
+  items[(start_offset) : end_offset];
+
+select items[
+  /* before start */ start_offset
+  + 1 /* before colon */ : /* before end */ end_offset - 1 /* before close */
+];
+
+select items[
+  -- before start
+  start_offset + 1 -- before colon
+  : -- before end
+  end_offset - 1 -- before close
+];
+
+select
+  items[/* before colon */ : /* before end */ end_offset - 1],
+  items[start_offset + 1 /* before colon */ : /* before close */];
+
 select items[
   first_extraordinarily_long_column_name:second_extraordinarily_long_column_name
 ];
