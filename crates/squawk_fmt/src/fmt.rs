@@ -16717,6 +16717,34 @@ fn build_index_expr<'a>(ctx: &Ctx, index_expr: &ast::IndexExpr) -> Doc<'a> {
         .group()
 }
 
+fn is_simple_slice_bound(expr: &ast::Expr) -> bool {
+    match expr {
+        ast::Expr::Literal(_) | ast::Expr::NameRef(_) => true,
+        ast::Expr::PrefixExpr(prefix) => match prefix.op() {
+            Some(ast::PrefixOp::Plus(_) | ast::PrefixOp::Minus(_)) => {
+                prefix.expr().as_ref().is_some_and(is_simple_slice_bound)
+            }
+            Some(
+                ast::PrefixOp::CustomOp(_) | ast::PrefixOp::Not(_) | ast::PrefixOp::OperatorCall(_),
+            )
+            | None => false,
+        },
+        ast::Expr::ArrayExpr(_)
+        | ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::CallExpr(_)
+        | ast::Expr::CaseExpr(_)
+        | ast::Expr::CastExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::FieldExpr(_)
+        | ast::Expr::IndexExpr(_)
+        | ast::Expr::ParenExpr(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::SliceExpr(_)
+        | ast::Expr::TupleExpr(_) => false,
+    }
+}
+
 fn build_slice_expr<'a>(ctx: &Ctx, slice_expr: &ast::SliceExpr) -> Doc<'a> {
     let mut doc = match slice_expr.base() {
         Some(base) => build_expr(ctx, base),
@@ -16728,20 +16756,37 @@ fn build_slice_expr<'a>(ctx: &Ctx, slice_expr: &ast::SliceExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("["));
 
+    let start = slice_expr.start();
+    let end = slice_expr.end();
+    let spaced = start
+        .as_ref()
+        .is_some_and(|expr| !is_simple_slice_bound(expr))
+        || end
+            .as_ref()
+            .is_some_and(|expr| !is_simple_slice_bound(expr));
+    let has_start = start.is_some();
     let mut body = Doc::nil();
-    if let Some(start) = slice_expr.start() {
+    if let Some(start) = start {
         body = body
             .append(leading_comments(start.syntax()))
             .append(build_expr(ctx, start));
     }
     if let Some(colon) = slice_expr.colon_token() {
-        body = body.append(comments_before(&colon));
+        body = body.append(if spaced && has_start {
+            space_before(&colon)
+        } else {
+            comments_before(&colon)
+        });
     }
     body = body.append(Doc::text(":"));
 
-    if let Some(end) = slice_expr.end() {
+    if let Some(end) = end {
         body = body
-            .append(leading_comments(end.syntax()))
+            .append(if spaced {
+                space_before(end.syntax())
+            } else {
+                leading_comments(end.syntax())
+            })
             .append(build_expr(ctx, end));
     }
     doc.append(wrap_body(ctx, body, slice_expr.r_brack_token().as_ref()))

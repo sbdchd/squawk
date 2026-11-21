@@ -18,18 +18,20 @@ select
   items[-start_offset:+end_offset];
 
 select
-  items[start_offset + 1:end_offset - 1],
-  items[start_offset + 1:end_offset],
-  items[start_offset:end_offset - 1];
+  items[start_offset + 1 : end_offset - 1],
+  items[start_offset + 1 : end_offset],
+  items[start_offset : end_offset - 1];
 
-select items[:end_offset - 1], items[start_offset + 1:];
+select items[: end_offset - 1], items[start_offset + 1 :];
 
 select
-  items[lower_bound():upper_bound()],
-  items[bounds.start_offset:bounds.end_offset],
-  items[offsets[1]:offsets[2]];
+  items[lower_bound() : upper_bound()],
+  items[bounds.start_offset : bounds.end_offset],
+  items[offsets[1] : offsets[2]];
 
-select items[-(start_offset + 1):end_offset], items[(start_offset):end_offset];
+select
+  items[-(start_offset + 1) : end_offset],
+  items[(start_offset) : end_offset];
 
 select items[
   /* before start */ start_offset
@@ -53,7 +55,7 @@ select items[
 
 select items[
   first_extraordinarily_long_column_name
-  + second_extraordinarily_long_column_name:third_extraordinarily_long_column_name
+  + second_extraordinarily_long_column_name : third_extraordinarily_long_column_name
 ];
 
 select items[
