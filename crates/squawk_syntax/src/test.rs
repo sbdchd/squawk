@@ -356,3 +356,54 @@ fn parse_errors_are_sorted_by_position() {
     17..17: expected an expression, found `;`
     ");
 }
+
+#[test]
+fn every_stmt_has_a_fixture() {
+    assert_every_kind_has_a_fixture("ok", ast::Stmt::can_cast, |parse| {
+        std::iter::once(parse.tree().syntax().clone())
+    });
+}
+
+#[test]
+fn every_plpgsql_stmt_has_a_fixture() {
+    assert_every_kind_has_a_fixture("plpgsql/ok", ast::PlpgsqlStmt::can_cast, |parse| {
+        plpgsql_bodies(parse).into_iter().map(|body| body.syntax())
+    });
+}
+
+fn assert_every_kind_has_a_fixture<I: IntoIterator<Item = SyntaxNode>>(
+    dir: &str,
+    is_kind: fn(SyntaxKind) -> bool,
+    roots: impl Fn(&Parse<SourceFile>) -> I,
+) {
+    let mut covered = vec![false; SyntaxKind::__LAST as usize + 1];
+    let fixtures_dir = Utf8Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../squawk_parser/tests/data")
+        .join(dir);
+    for entry in fixtures_dir.read_dir_utf8().unwrap() {
+        let path = entry.unwrap().into_path();
+        if path.extension() != Some("sql") {
+            continue;
+        }
+        let text = std::fs::read_to_string(&path).unwrap();
+        let parse = SourceFile::parse(&text);
+        for root in roots(&parse) {
+            for node in root.descendants() {
+                if is_kind(node.kind()) {
+                    covered[node.kind() as usize] = true;
+                }
+            }
+        }
+    }
+
+    let missing = (0..=SyntaxKind::__LAST as u16)
+        .map(SyntaxKind::from)
+        .filter(|kind| is_kind(*kind) && !covered[*kind as usize])
+        .map(|kind| format!("{kind:?}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(
+        missing.is_empty(),
+        "kinds without a fixture in squawk_parser/tests/data/{dir}:\n{missing}"
+    );
+}
