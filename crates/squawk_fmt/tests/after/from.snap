@@ -238,9 +238,9 @@ from pg_proc p
   left join pg_namespace son on son.oid = so.oprnamespace
   left join pg_depend dep on
     dep.classid = 'pg_proc'::regclass
-      and dep.objid = p.oid
-      and dep.objsubid = 0
-      and dep.deptype = 'e'
+    and dep.objid = p.oid
+    and dep.objsubid = 0
+    and dep.deptype = 'e'
   left join pg_extension ext on ext.oid = dep.refobjid;
 
 select * from users left outer join profiles using (user_id) as matched_users;

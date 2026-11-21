@@ -1620,7 +1620,7 @@ fn build_trigger_when_condition<'a>(ctx: &Ctx, condition: &ast::WhenCondition) -
     );
     let body = condition
         .expr()
-        .map(|expr| leading_comments(expr.syntax()).append(build_expr(ctx, expr)))
+        .map(|expr| leading_comments(expr.syntax()).append(build_nested_expr(ctx, expr).group()))
         .unwrap_or_else(Doc::nil);
     doc.append(Doc::text("("))
         .append(wrap_body(ctx, body, condition.r_paren_token().as_ref()))
@@ -8160,7 +8160,7 @@ fn build_check_constraint<'a>(ctx: &Ctx, constraint: &ast::CheckConstraint) -> D
     if let Some(expr) = constraint.expr() {
         body = body
             .append(leading_comments(expr.syntax()))
-            .append(build_expr(ctx, expr));
+            .append(build_nested_expr(ctx, expr).group());
     }
     doc = doc
         .append(wrap_body(ctx, body, constraint.r_paren_token().as_ref()))
@@ -8776,7 +8776,7 @@ fn build_where_condition_clause<'a>(
     if let Some(expr) = where_clause.expr() {
         body = body
             .append(leading_comments(expr.syntax()))
-            .append(build_expr(ctx, expr));
+            .append(build_nested_expr(ctx, expr).group());
     }
     doc.append(wrap_body(ctx, body, where_clause.r_paren_token().as_ref()))
         .append(Doc::text(")"))
@@ -15173,12 +15173,21 @@ fn is_inline_bracketed_expr(expr: &ast::Expr) -> bool {
             Some(arg_list) => arg_list_has_body(&arg_list),
             None => true,
         },
-        ast::Expr::ParenExpr(_) => true,
+        ast::Expr::ParenExpr(_) | ast::Expr::IndexExpr(_) => true,
         ast::Expr::TupleExpr(tuple_expr) => tuple_expr.exprs().next().is_some(),
         ast::Expr::CastExpr(cast_expr) => {
             cast_expr.cast_token().is_some() || cast_expr.treat_token().is_some()
         }
-        _ => false,
+        ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::CaseExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::FieldExpr(_)
+        | ast::Expr::Literal(_)
+        | ast::Expr::NameRef(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::PrefixExpr(_)
+        | ast::Expr::SliceExpr(_) => false,
     }
 }
 
@@ -15390,7 +15399,7 @@ fn build_join_on_clause<'a>(ctx: &Ctx, on_clause: &ast::OnClause) -> Doc<'a> {
     if let Some(expr) = on_clause.expr() {
         let syntax = expr.syntax().clone();
         let hug = ends_with_inline_bracketed_expr(&expr);
-        doc = append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug);
+        doc = append_clause_body(ctx, doc, &syntax, build_nested_expr(ctx, expr).group(), hug);
     }
     doc
 }
@@ -16696,10 +16705,7 @@ fn build_index_expr<'a>(ctx: &Ctx, index_expr: &ast::IndexExpr) -> Doc<'a> {
     if let Some(index) = index_expr.index() {
         body = body
             .append(leading_comments(index.syntax()))
-            .append(match index {
-                ast::Expr::BinExpr(binary) => build_bin_expr(ctx, &binary),
-                expression => build_expr(ctx, expression),
-            });
+            .append(build_nested_expr(ctx, index).group());
     }
     doc.append(wrap_body(ctx, body, index_expr.r_brack_token().as_ref()))
         .append(Doc::text("]"))
@@ -17191,25 +17197,13 @@ fn build_where_clause<'a>(ctx: &Ctx, where_clause: &ast::WhereClause) -> Doc<'a>
         .unwrap_or_else(Doc::nil);
     if let Some(expr) = where_clause.expr() {
         let syntax = expr.syntax().clone();
-        let logical = match &expr {
-            ast::Expr::BinExpr(bin_expr) => bin_expr
-                .op()
-                .as_ref()
-                .and_then(logical_op)
-                .map(|logical| (bin_expr.clone(), logical)),
-            _ => None,
-        };
-        doc = match logical {
-            Some((bin_expr, logical)) => append_nested_clause(
-                ctx,
-                doc,
-                &syntax,
-                build_logical_expr(ctx, &bin_expr, logical),
-            ),
-            None => {
-                let hug = ends_with_inline_bracketed_expr(&expr);
-                append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug)
-            }
+        let is_logical = matches!(&expr, ast::Expr::BinExpr(binary)
+            if binary.op().as_ref().and_then(logical_op).is_some());
+        doc = if is_logical {
+            append_nested_clause(ctx, doc, &syntax, build_nested_expr(ctx, expr))
+        } else {
+            let hug = ends_with_inline_bracketed_expr(&expr);
+            append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug)
         };
     }
     doc.group()
@@ -19224,10 +19218,7 @@ fn build_paren_expr<'a>(ctx: &Ctx, paren_expr: &ast::ParenExpr) -> Doc<'a> {
     if let Some(expr) = paren_expr.expr() {
         body = body
             .append(leading_comments(expr.syntax()))
-            .append(match expr {
-                ast::Expr::BinExpr(binary) => build_bin_expr(ctx, &binary),
-                expression => build_expr(ctx, expression),
-            });
+            .append(build_nested_expr(ctx, expr).group());
     } else if let Some(select) = paren_expr.select_variant() {
         body = body
             .append(leading_comments(select.syntax()))
@@ -19412,6 +19403,15 @@ fn logical_op(op: &ast::BinOp) -> Option<LogicalOp> {
     }
 }
 
+fn build_nested_expr<'a>(ctx: &Ctx, expr: ast::Expr) -> Doc<'a> {
+    if let ast::Expr::BinExpr(binary) = &expr
+        && let Some(logical) = binary.op().as_ref().and_then(logical_op)
+    {
+        return build_logical_expr(ctx, binary, logical);
+    }
+    build_expr(ctx, expr)
+}
+
 fn build_logical_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, logical: LogicalOp) -> Doc<'a> {
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
@@ -19428,11 +19428,12 @@ fn build_logical_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, logical: LogicalOp
         rhs => build_expr(ctx, rhs),
     };
 
-    lhs_doc
-        .append(comment_run_after(lhs.syntax()).between_nodes(Doc::line_or_space()))
+    let tail = comment_run_after(lhs.syntax())
+        .between_nodes(Doc::line_or_space())
         .append(build_op(bin_expr.op().unwrap()))
         .append(space_before(rhs.syntax()))
-        .append(rhs_doc)
+        .append(rhs_doc);
+    lhs_doc.append(tail)
 }
 
 fn build_bin_expr_operand<'a>(ctx: &Ctx, expr: ast::Expr, precedence: Option<u8>) -> Doc<'a> {
@@ -19449,16 +19450,7 @@ fn build_bin_expr_operand<'a>(ctx: &Ctx, expr: ast::Expr, precedence: Option<u8>
 
 fn build_bin_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr) -> Doc<'a> {
     if let Some(logical) = bin_expr.op().as_ref().and_then(logical_op) {
-        let lhs_is_inline_bracketed = bin_expr
-            .lhs()
-            .as_ref()
-            .is_some_and(is_inline_bracketed_expr);
-        let doc = build_logical_expr(ctx, bin_expr, logical);
-        return if lhs_is_inline_bracketed {
-            doc.group()
-        } else {
-            doc.nest(ctx.indent).group()
-        };
+        return build_logical_expr(ctx, bin_expr, logical).group();
     }
 
     build_bin_expr_chain(ctx, bin_expr, false)

@@ -95,7 +95,7 @@ select
 
 select
   a -- lhs
-    and b;
+  and b;
 
 select
   1

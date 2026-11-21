@@ -11,7 +11,7 @@ create or replace rule extraordinarily_long_rule_name_for_recording_all_account_
   to extraordinarily_long_schema_name.extraordinarily_long_accounts_table_name
     where (
       old.account_owner_identifier is distinct from new.account_owner_identifier
-        and new.account_is_active
+      and new.account_is_active
     )
   do also (
     notify extraordinarily_long_account_changes_channel,

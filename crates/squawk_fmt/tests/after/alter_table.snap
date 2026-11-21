@@ -175,7 +175,7 @@ alter table /* TEMPLATE: schema */ river_job
   add constraint finalized_or_finalized_at_null check (
     (
       state in ('cancelled', 'completed', 'discarded')
-        and finalized_at is not null
+      and finalized_at is not null
     )
     or finalized_at is null
   );
