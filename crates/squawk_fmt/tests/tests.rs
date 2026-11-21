@@ -3,6 +3,8 @@ use dir_test::{Fixture, dir_test};
 use insta::{assert_snapshot, with_settings};
 use squawk_fmt::FormatOptions;
 use squawk_fmt::validation::assert_valid_format;
+use squawk_syntax::SyntaxKind;
+use squawk_syntax::ast::{self, AstNode};
 
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/before",
@@ -27,6 +29,36 @@ fn fmt(fixture: Fixture<&str>) {
     }, {
         assert_snapshot!(test_name, formatted);
     });
+}
+
+#[test]
+fn every_stmt_has_a_fixture() {
+    let mut covered = vec![false; SyntaxKind::__LAST as usize + 1];
+    let fixtures_dir = Utf8Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/before");
+    for entry in fixtures_dir.read_dir_utf8().unwrap() {
+        let path = entry.unwrap().into_path();
+        if path.extension() != Some("sql") {
+            continue;
+        }
+        let text = std::fs::read_to_string(&path).unwrap();
+        let parse = ast::SourceFile::parse(&text);
+        for node in parse.tree().syntax().descendants() {
+            if ast::Stmt::can_cast(node.kind()) {
+                covered[node.kind() as usize] = true;
+            }
+        }
+    }
+
+    let missing = (0..=SyntaxKind::__LAST as u16)
+        .map(SyntaxKind::from)
+        .filter(|kind| ast::Stmt::can_cast(*kind) && !covered[*kind as usize])
+        .map(|kind| format!("{kind:?}"))
+        .collect::<Vec<_>>()
+        .join("\n");
+    assert!(
+        missing.is_empty(),
+        "statements without a fixture in tests/before:\n{missing}"
+    );
 }
 
 fn fmt_with_line_ending(line_ending: &str) -> String {

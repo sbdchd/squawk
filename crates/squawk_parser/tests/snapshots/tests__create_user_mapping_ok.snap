@@ -1,0 +1,78 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/create_user_mapping.sql
+---
+SOURCE_FILE
+  COMMENT "-- simple"
+  WHITESPACE "\n"
+  CREATE_USER_MAPPING
+    CREATE_KW "create"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    USER_MAPPING_ROLE
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    WHITESPACE " "
+    SERVER_CLAUSE
+      SERVER_KW "server"
+      WHITESPACE " "
+      SERVER_REF
+        IDENT "s"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full"
+  WHITESPACE "\n"
+  CREATE_USER_MAPPING
+    CREATE_KW "create"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    IF_NOT_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      NOT_KW "not"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    USER_MAPPING_ROLE
+      ROLE_REF
+        ROLE_REF_CURRENT_USER
+          CURRENT_USER_KW "current_user"
+    WHITESPACE " "
+    SERVER_CLAUSE
+      SERVER_KW "server"
+      WHITESPACE " "
+      SERVER_REF
+        IDENT "some_server_name"
+    WHITESPACE " "
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ADD_FOREIGN_OPTION
+        FOREIGN_OPTION_NAME
+          USER_KW "user"
+        WHITESPACE " "
+        LITERAL
+          STRING "'bob'"
+      COMMA ","
+      WHITESPACE " "
+      ADD_FOREIGN_OPTION
+        FOREIGN_OPTION_NAME
+          PASSWORD_KW "password"
+        WHITESPACE " "
+        LITERAL
+          STRING "'secret'"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
