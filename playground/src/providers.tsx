@@ -168,6 +168,10 @@ export async function provideHover(
       },
     ]
 
+    if (result.substitutions) {
+      contents.push({ value: `---\n\n${result.substitutions}` })
+    }
+
     if (result.comment) {
       contents.push({ value: `---\n\n${result.comment}` })
     }

@@ -61,3 +61,18 @@ select * from graph_table(g match (x) columns (x.id$0));
       ╰╴                                                 ── hover
     ");
 }
+
+#[test]
+fn renamed_property() {
+    assert_snapshot!(hover("
+create table v (id int primary key, name text);
+create property graph g vertex tables (v properties (name as n));
+select * from graph_table(g match (x) columns (x.n$0));
+"), @"
+    hover: column n text
+      ╭▸ file0.sql:4:50
+      │
+    4 │ select * from graph_table(g match (x) columns (x.n));
+      ╰╴                                                 ─ hover
+    ");
+}

@@ -637,6 +637,12 @@ pub enum Ty {
     Array(ElementTy),
 }
 
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct Substitution {
+    pub param: Ty,
+    pub ty: Ty,
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum ElementTy {
     Type(TypeId),

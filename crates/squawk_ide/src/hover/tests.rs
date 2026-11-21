@@ -32,21 +32,48 @@ fn hover_files(files: &[&str]) -> String {
 fn markdown() {
     let hover = Hover {
         snippet: "column public.t.a int4".to_string(),
+        substitutions: None,
         comment: None,
     };
-    assert_eq!(hover.markdown(), "\n```sql\ncolumn public.t.a int4\n```\n");
+    assert_snapshot!(hover.markdown(), @"
+    ```sql
+    column public.t.a int4
+    ```
+    ");
 }
 
 #[test]
 fn markdown_with_comment() {
     let hover = Hover {
         snippet: "column public.t.a int4".to_string(),
+        substitutions: None,
         comment: Some("Column docs".to_string()),
     };
-    assert_eq!(
-        hover.markdown(),
-        "\n```sql\ncolumn public.t.a int4\n```\n---\nColumn docs\n",
-    );
+    assert_snapshot!(hover.markdown(), @"
+    ```sql
+    column public.t.a int4
+    ```
+    ---
+    Column docs
+    ");
+}
+
+#[test]
+fn markdown_with_substitutions() {
+    let hover = Hover {
+        snippet: "function public.f(anyelement) returns anyelement".to_string(),
+        substitutions: Some("`anyelement` = `int4`".to_string()),
+        comment: Some("Function docs".to_string()),
+    };
+    assert_snapshot!(hover.markdown(), @"
+    ```sql
+    function public.f(anyelement) returns anyelement
+    ```
+    ---
+    `anyelement` = `int4`
+    ---
+    Function docs
+    ");
 }
 
 #[test]

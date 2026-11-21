@@ -15,8 +15,8 @@ use crate::ir::{
     Body, Case, Channel, Column, ColumnId, ColumnOwner, Cte, Cursor, ElementTy, EnumLabel,
     EnumLabelId, FunctionId, Item, ItemRange, JsonPath, Merge, Param, ParamId, PreparedStatement,
     PreparedTransaction, Query, RefId, Reference, Savepoint, Scope, SearchPathChange, Source,
-    SourceId, SourceKind, Star, Subscript, Transaction, Transform, Ty, TypeId, TypeKind, Typmod,
-    Window,
+    SourceId, SourceKind, Star, Subscript, Substitution, Transaction, Transform, Ty, TypeId,
+    TypeKind, Typmod, Window,
 };
 use crate::keyed_index::{
     AccessMethodIndex, CastIndex, DatabaseIndex, EventTriggerIndex, ForeignDataWrapperIndex,
@@ -271,6 +271,8 @@ pub struct IndexData {
     pub columns: LayeredArena<Column>,
     pub(crate) column_owners: FxHashMap<ColumnId, ColumnOwner>,
     pub literal_types: FxHashMap<FileRange, Ty>,
+    pub substitutions: LayeredArena<Substitution>,
+    pub call_substitutions: FxHashMap<RefId, IdxRange<Substitution>>,
     pub(crate) merges: LayeredArena<Merge>,
     pub references: LayeredArena<Reference>,
     pub bodies: LayeredArena<Body>,

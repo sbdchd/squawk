@@ -137,6 +137,9 @@ pub(crate) fn render_hover(files: &[&str]) -> Option<String> {
         );
     let title = format!("hover: {}", hover.snippet);
     let mut group = Level::INFO.primary_title(&title).element(snippet);
+    if let Some(substitutions) = &hover.substitutions {
+        group = group.element(Level::NOTE.message(substitutions));
+    }
     if let Some(comment) = &hover.comment {
         group = group.element(Level::NOTE.message(comment));
     }

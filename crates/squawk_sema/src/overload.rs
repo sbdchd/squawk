@@ -5,8 +5,8 @@ use crate::{
     interner::Name,
     ir::{
         CastContext, CastId, CastMethod, CastTypes, Function, FunctionId, FunctionKind, Operand,
-        Operator, OperatorId, Param, ParamMode, Resolution, Ty, TypeCategory as Category, TypeId,
-        TypeKind,
+        Operator, OperatorId, Param, ParamMode, Resolution, Substitution, Ty,
+        TypeCategory as Category, TypeId, TypeKind,
     },
     semantic_index::IndexData,
 };
@@ -533,13 +533,71 @@ impl<'a> Overloads<'a> {
         if solution.uncertain {
             return None;
         }
+        match pseudo {
+            Pseudo::Any | Pseudo::Record => Some(ret),
+            Pseudo::AnyElement
+            | Pseudo::AnyNonArray
+            | Pseudo::AnyEnum
+            | Pseudo::AnyArray
+            | Pseudo::AnyRange
+            | Pseudo::AnyMultirange
+            | Pseudo::AnyCompatible
+            | Pseudo::AnyCompatibleNonArray
+            | Pseudo::AnyCompatibleArray
+            | Pseudo::AnyCompatibleRange
+            | Pseudo::AnyCompatibleMultirange => self.resolve_pseudo(pseudo, &solution),
+        }
+    }
+
+    pub(crate) fn substitutions(
+        &self,
+        function: &Function,
+        args: &[CallArg],
+    ) -> SmallVec<[Substitution; 2]> {
+        let mut pseudos: SmallVec<[(Ty, Pseudo); 2]> = smallvec![];
+        for ty in self
+            .inputs(function)
+            .filter_map(|param| param.ty)
+            .chain(function.ret)
+        {
+            if let Some(pseudo) = self.pseudo(ty)
+                && !matches!(pseudo, Pseudo::Any | Pseudo::Record)
+                && !pseudos.iter().any(|&(seen, _)| seen == ty)
+            {
+                pseudos.push((ty, pseudo));
+            }
+        }
+        if pseudos.is_empty() {
+            return smallvec![];
+        }
+        let Some(params) = self.bind(function, args) else {
+            return smallvec![];
+        };
+        let Some(solution) = self
+            .solve(&params, args)
+            .filter(|solution| !solution.uncertain)
+        else {
+            return smallvec![];
+        };
+        pseudos
+            .into_iter()
+            .filter_map(|(param, pseudo)| {
+                Some(Substitution {
+                    param,
+                    ty: self.resolve_pseudo(pseudo, &solution)?,
+                })
+            })
+            .collect()
+    }
+
+    fn resolve_pseudo(&self, pseudo: Pseudo, solution: &Polymorphic) -> Option<Ty> {
         let compatible = || {
             solution
                 .compatible
                 .or_else(|| self.builtin_types.text.map(Ty::Type))
         };
         match pseudo {
-            Pseudo::Any | Pseudo::Record => Some(ret),
+            Pseudo::Any | Pseudo::Record => None,
             Pseudo::AnyElement | Pseudo::AnyNonArray | Pseudo::AnyEnum => solution.element,
             Pseudo::AnyArray => solution.array.or_else(|| self.array_of(solution.element?)),
             Pseudo::AnyRange => solution.range,
