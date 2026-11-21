@@ -2,6 +2,72 @@ with cte as (select 1) select x from cte where x > 0 group by x having count(*) 
 
 select x from foo fetch first 5 rows with ties;
 
+select *
+from pg_proc p
+  left join pg_description d on
+    d.objoid = p.oid and d.classoid = 'pg_proc'::regclass;
+
+select *
+from foo
+where
+  first_extraordinarily_long_column_name = 1
+  and second_extraordinarily_long_column_name = 2;
+
+select *
+from foo
+  join bar on
+    first_extraordinarily_long_column_name = 1
+    and second_extraordinarily_long_column_name = 2;
+
+select count(*)
+from foo
+group by
+  first_extraordinarily_long_column_name,
+  second_extraordinarily_long_column_name
+having
+  first_extraordinarily_long_column_name = 1
+  and second_extraordinarily_long_column_name = 2;
+
+select case
+  when
+    first_extraordinarily_long_column_name = 1
+    and second_extraordinarily_long_column_name = 2 then
+    true
+  else false
+end;
+
+select case when a = 1 then true end
+from foo join bar on a = 1
+where a = 1
+group by a
+having a = 1;
+
+select count(*)
+from foo
+having
+  /* before condition */ count(*) > 1 /* before and */
+  and /* after and */ count(distinct extraordinarily_long_column_name)
+  > 2 /* after condition */;
+
+select case
+  when -- before condition
+    first_extraordinarily_long_column_name = 1 -- after first
+    -- before and
+    and -- after and
+    second_extraordinarily_long_column_name = 2 -- before then
+  then
+    true
+  else false
+end;
+
+select case
+  when (
+    first_extraordinarily_long_column_name = 1
+    and second_extraordinarily_long_column_name = 2
+  ) then
+    true
+end;
+
 with a_very_long_common_table_expression_name as (select a_very_long_source_column_name from a_very_long_source_relation_name) select a_very_long_result_column_name from a_very_long_common_table_expression_name where a_very_long_filter_column_name > a_very_long_filter_threshold_value group by a_very_long_result_column_name having count(*) > a_very_long_having_threshold_value window a_very_long_window_name as (partition by a_very_long_partition_column_name order by a_very_long_order_column_name) order by a_very_long_result_column_name desc for no key update of a_very_long_common_table_expression_name skip locked limit a_very_long_limit_expression offset a_very_long_offset_expression rows;
 
 with /* before recursive */ recursive /* before cte */ cte /* before columns */ (/* before column */ x /* before columns close */) /* before as */ as /* before materialized */ materialized /* before query open */ (/* before query */ select 1 /* before query close */) /* before outer select */ select /* before target */ x /* before from */ from /* before relation */ cte /* before where */ where /* before where expression */ x > 0 /* before group */ group /* before by */ by /* before group expression */ x /* before having */ having /* before having expression */ count(*) > 0 /* before window */ window /* before window name */ win /* before window as */ as /* before window open */ (/* before partition */ partition /* before partition by */ by /* before partition expression */ x /* before window close */) /* before order */ order /* before order by */ by /* before order expression */ x /* before desc */ desc /* before locking */ for /* before lock strength */ update /* before locking of */ of /* before locked relation */ cte /* before lock wait */ nowait /* before limit */ limit /* before limit value */ 10 /* before offset */ offset /* before offset value */ 2 /* before rows */ rows /* before semicolon */;

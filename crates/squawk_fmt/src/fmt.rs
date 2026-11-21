@@ -920,11 +920,9 @@ fn build_using_on_clause<'a>(ctx: &Ctx, using: &ast::UsingOnClause) -> Doc<'a> {
 fn build_on_clause<'a>(ctx: &Ctx, on_clause: &ast::OnClause) -> Doc<'a> {
     let mut doc = Doc::text("on");
     if let Some(expr) = on_clause.expr() {
-        doc = doc
-            .append(space_before(expr.syntax()))
-            .append(build_expr(ctx, expr));
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_merge_when_clause<'a>(ctx: &Ctx, clause: ast::MergeWhenClause) -> Doc<'a> {
@@ -1020,9 +1018,9 @@ fn build_merge_when_not_matched_prefix<'a>(
 fn build_merge_condition<'a>(ctx: &Ctx, condition: &ast::MergeCondition) -> Doc<'a> {
     let mut doc = Doc::text("and");
     if let Some(expr) = condition.expr() {
-        doc = append_nested_node(ctx, doc, expr, |value| build_expr(ctx, value));
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_merge_action<'a>(ctx: &Ctx, action: ast::MergeAction) -> Doc<'a> {
@@ -1620,7 +1618,7 @@ fn build_trigger_when_condition<'a>(ctx: &Ctx, condition: &ast::WhenCondition) -
     );
     let body = condition
         .expr()
-        .map(|expr| leading_comments(expr.syntax()).append(build_expr(ctx, expr)))
+        .map(|expr| leading_comments(expr.syntax()).append(build_nested_expr(ctx, expr).group()))
         .unwrap_or_else(Doc::nil);
     doc.append(Doc::text("("))
         .append(wrap_body(ctx, body, condition.r_paren_token().as_ref()))
@@ -2365,6 +2363,61 @@ fn build_load<'a>(ctx: &Ctx, load: &ast::Load) -> Doc<'a> {
         doc = append_nested_node(ctx, doc, literal, |lit| build_literal(&lit));
     }
     doc.group().append(build_semicolon(load.semicolon_token()))
+}
+
+fn build_wait<'a>(ctx: &Ctx, wait: &ast::Wait) -> Doc<'a> {
+    let mut doc = build_keyword_tokens([
+        (wait.wait_token(), "wait"),
+        (wait.for_token(), "for"),
+        (wait.lsn_token(), "lsn"),
+    ]);
+    if let Some(literal) = wait.literal() {
+        doc = doc
+            .append(space_before(literal.syntax()))
+            .append(build_literal(&literal));
+    }
+    if let Some(with_token) = wait.with_token() {
+        doc = doc
+            .append(space_before(&with_token))
+            .append(Doc::text("with"));
+    }
+    if let Some(options) = wait.wait_option_list() {
+        doc = doc
+            .append(space_before(options.syntax()))
+            .append(build_wait_option_list(ctx, &options));
+    }
+    doc.group().append(build_semicolon(wait.semicolon_token()))
+}
+
+fn build_wait_option_list<'a>(ctx: &Ctx, list: &ast::WaitOptionList) -> Doc<'a> {
+    let body = build_comma_separated_docs(list.wait_options().map(|option| {
+        (
+            leading_comments(option.syntax()).append(build_wait_option(ctx, &option)),
+            option.syntax().clone(),
+        )
+    }))
+    .unwrap_or_else(Doc::nil);
+
+    list.l_paren_token()
+        .map(|el| comments_before(&el))
+        .unwrap_or_else(Doc::nil)
+        .append(Doc::text("("))
+        .append(wrap_body(ctx, body, list.r_paren_token().as_ref()))
+        .append(Doc::text(")"))
+        .group()
+}
+
+fn build_wait_option<'a>(ctx: &Ctx, option: &ast::WaitOption) -> Doc<'a> {
+    let mut doc = option
+        .wait_option_name()
+        .map(|name| build_keyword_node(name.syntax()))
+        .unwrap_or_else(Doc::nil);
+    if let Some(expr) = option.expr() {
+        doc = doc
+            .append(space_before(expr.syntax()))
+            .append(build_expr(ctx, expr));
+    }
+    doc.group()
 }
 
 fn build_discard<'a>(ctx: &Ctx, discard: &ast::Discard) -> Doc<'a> {
@@ -3197,6 +3250,7 @@ fn build_stmt<'a>(ctx: &Ctx, stmt: ast::Stmt) -> Doc<'a> {
         ast::Stmt::ImportForeignSchema(stmt) => build_import_foreign_schema(ctx, &stmt),
         ast::Stmt::Listen(stmt) => build_listen(ctx, &stmt),
         ast::Stmt::Load(stmt) => build_load(ctx, &stmt),
+        ast::Stmt::Wait(stmt) => build_wait(ctx, &stmt),
         ast::Stmt::Lock(stmt) => build_lock(ctx, &stmt),
         ast::Stmt::Move(stmt) => build_move(ctx, &stmt),
         ast::Stmt::Notify(stmt) => build_notify(ctx, &stmt),
@@ -7767,6 +7821,18 @@ fn append_clause_body<'a>(
     }
 }
 
+fn append_condition_body<'a>(ctx: &Ctx, doc: Doc<'a>, expr: ast::Expr) -> Doc<'a> {
+    let syntax = expr.syntax().clone();
+    let is_logical = matches!(&expr, ast::Expr::BinExpr(binary)
+        if binary.op().as_ref().and_then(logical_op).is_some());
+    if is_logical {
+        append_nested_clause(ctx, doc, &syntax, build_nested_expr(ctx, expr).group())
+    } else {
+        let hug = ends_with_inline_bracketed_expr(&expr);
+        append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug)
+    }
+}
+
 fn build_alter_option_list<'a>(ctx: &Ctx, list: &ast::AlterOptionList) -> Doc<'a> {
     let mut doc = Doc::text("options");
     if let Some(l_paren) = list.l_paren_token() {
@@ -8160,7 +8226,7 @@ fn build_check_constraint<'a>(ctx: &Ctx, constraint: &ast::CheckConstraint) -> D
     if let Some(expr) = constraint.expr() {
         body = body
             .append(leading_comments(expr.syntax()))
-            .append(build_expr(ctx, expr));
+            .append(build_nested_expr(ctx, expr).group());
     }
     doc = doc
         .append(wrap_body(ctx, body, constraint.r_paren_token().as_ref()))
@@ -8776,7 +8842,7 @@ fn build_where_condition_clause<'a>(
     if let Some(expr) = where_clause.expr() {
         body = body
             .append(leading_comments(expr.syntax()))
-            .append(build_expr(ctx, expr));
+            .append(build_nested_expr(ctx, expr).group());
     }
     doc.append(wrap_body(ctx, body, where_clause.r_paren_token().as_ref()))
         .append(Doc::text(")"))
@@ -9280,11 +9346,9 @@ fn build_distinct_on<'a>(ctx: &Ctx, distinct_on: &ast::DistinctOn) -> Doc<'a> {
 fn build_having_clause<'a>(ctx: &Ctx, having: &ast::HavingClause) -> Doc<'a> {
     let mut doc = Doc::text("having");
     if let Some(expr) = having.expr() {
-        doc = doc
-            .append(space_before(expr.syntax()))
-            .append(build_expr(ctx, expr));
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_window_clause<'a>(ctx: &Ctx, window: &ast::WindowClause) -> Doc<'a> {
@@ -15173,12 +15237,20 @@ fn is_inline_bracketed_expr(expr: &ast::Expr) -> bool {
             Some(arg_list) => arg_list_has_body(&arg_list),
             None => true,
         },
-        ast::Expr::ParenExpr(_) => true,
+        ast::Expr::ParenExpr(_) | ast::Expr::IndexExpr(_) | ast::Expr::SliceExpr(_) => true,
         ast::Expr::TupleExpr(tuple_expr) => tuple_expr.exprs().next().is_some(),
         ast::Expr::CastExpr(cast_expr) => {
             cast_expr.cast_token().is_some() || cast_expr.treat_token().is_some()
         }
-        _ => false,
+        ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::CaseExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::FieldExpr(_)
+        | ast::Expr::Literal(_)
+        | ast::Expr::NameRef(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::PrefixExpr(_) => false,
     }
 }
 
@@ -15388,11 +15460,9 @@ fn build_join<'a>(ctx: &Ctx, join: &ast::Join) -> Doc<'a> {
 fn build_join_on_clause<'a>(ctx: &Ctx, on_clause: &ast::OnClause) -> Doc<'a> {
     let mut doc = Doc::text("on");
     if let Some(expr) = on_clause.expr() {
-        let syntax = expr.syntax().clone();
-        let hug = ends_with_inline_bracketed_expr(&expr);
-        doc = append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug);
+        doc = append_condition_body(ctx, doc, expr);
     }
-    doc
+    doc.group()
 }
 
 fn build_join_using_clause<'a>(ctx: &Ctx, using: &ast::JoinUsingClause) -> Doc<'a> {
@@ -16696,14 +16766,39 @@ fn build_index_expr<'a>(ctx: &Ctx, index_expr: &ast::IndexExpr) -> Doc<'a> {
     if let Some(index) = index_expr.index() {
         body = body
             .append(leading_comments(index.syntax()))
-            .append(match index {
-                ast::Expr::BinExpr(binary) => build_bin_expr(ctx, &binary),
-                expression => build_expr(ctx, expression),
-            });
+            .append(build_nested_expr(ctx, index).group());
     }
     doc.append(wrap_body(ctx, body, index_expr.r_brack_token().as_ref()))
         .append(Doc::text("]"))
         .group()
+}
+
+fn is_simple_slice_bound(expr: &ast::Expr) -> bool {
+    match expr {
+        ast::Expr::Literal(_) | ast::Expr::NameRef(_) => true,
+        ast::Expr::PrefixExpr(prefix) => match prefix.op() {
+            Some(ast::PrefixOp::Plus(_) | ast::PrefixOp::Minus(_)) => {
+                prefix.expr().as_ref().is_some_and(is_simple_slice_bound)
+            }
+            Some(
+                ast::PrefixOp::CustomOp(_) | ast::PrefixOp::Not(_) | ast::PrefixOp::OperatorCall(_),
+            )
+            | None => false,
+        },
+        ast::Expr::ArrayExpr(_)
+        | ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::CallExpr(_)
+        | ast::Expr::CaseExpr(_)
+        | ast::Expr::CastExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::FieldExpr(_)
+        | ast::Expr::IndexExpr(_)
+        | ast::Expr::ParenExpr(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::SliceExpr(_)
+        | ast::Expr::TupleExpr(_) => false,
+    }
 }
 
 fn build_slice_expr<'a>(ctx: &Ctx, slice_expr: &ast::SliceExpr) -> Doc<'a> {
@@ -16717,25 +16812,42 @@ fn build_slice_expr<'a>(ctx: &Ctx, slice_expr: &ast::SliceExpr) -> Doc<'a> {
     }
     doc = doc.append(Doc::text("["));
 
-    if let Some(start) = slice_expr.start() {
-        doc = doc
+    let start = slice_expr.start();
+    let end = slice_expr.end();
+    let spaced = start
+        .as_ref()
+        .is_some_and(|expr| !is_simple_slice_bound(expr))
+        || end
+            .as_ref()
+            .is_some_and(|expr| !is_simple_slice_bound(expr));
+    let has_start = start.is_some();
+    let mut body = Doc::nil();
+    if let Some(start) = start {
+        body = body
             .append(leading_comments(start.syntax()))
             .append(build_expr(ctx, start));
     }
     if let Some(colon) = slice_expr.colon_token() {
-        doc = doc.append(comments_before(&colon));
+        body = body.append(if spaced && has_start {
+            space_before(&colon)
+        } else {
+            comments_before(&colon)
+        });
     }
-    doc = doc.append(Doc::text(":"));
+    body = body.append(Doc::text(":"));
 
-    if let Some(end) = slice_expr.end() {
-        doc = doc
-            .append(leading_comments(end.syntax()))
+    if let Some(end) = end {
+        body = body
+            .append(if spaced {
+                space_before(end.syntax())
+            } else {
+                leading_comments(end.syntax())
+            })
             .append(build_expr(ctx, end));
     }
-    if let Some(r_brack) = slice_expr.r_brack_token() {
-        doc = doc.append(comments_before(&r_brack));
-    }
-    doc.append(Doc::text("]"))
+    doc.append(wrap_body(ctx, body, slice_expr.r_brack_token().as_ref()))
+        .append(Doc::text("]"))
+        .group()
 }
 
 fn build_tuple_expr<'a>(ctx: &Ctx, tuple_expr: &ast::TupleExpr) -> Doc<'a> {
@@ -17190,27 +17302,7 @@ fn build_where_clause<'a>(ctx: &Ctx, where_clause: &ast::WhereClause) -> Doc<'a>
         .map(|token| leading_comments(&token).append(Doc::text("where")))
         .unwrap_or_else(Doc::nil);
     if let Some(expr) = where_clause.expr() {
-        let syntax = expr.syntax().clone();
-        let logical = match &expr {
-            ast::Expr::BinExpr(bin_expr) => bin_expr
-                .op()
-                .as_ref()
-                .and_then(logical_op)
-                .map(|logical| (bin_expr.clone(), logical)),
-            _ => None,
-        };
-        doc = match logical {
-            Some((bin_expr, logical)) => append_nested_clause(
-                ctx,
-                doc,
-                &syntax,
-                build_logical_expr(ctx, &bin_expr, logical),
-            ),
-            None => {
-                let hug = ends_with_inline_bracketed_expr(&expr);
-                append_clause_body(ctx, doc, &syntax, build_expr(ctx, expr), hug)
-            }
-        };
+        doc = append_condition_body(ctx, doc, expr);
     }
     doc.group()
 }
@@ -19120,9 +19212,7 @@ fn build_case_expr<'a>(ctx: &Ctx, case_expr: &ast::CaseExpr) -> Doc<'a> {
 fn build_when_clause<'a>(ctx: &Ctx, when_clause: &ast::WhenClause) -> Doc<'a> {
     let mut doc = Doc::text("when");
     if let Some(condition) = when_clause.condition() {
-        doc = doc
-            .append(space_before(condition.syntax()))
-            .append(build_expr(ctx, condition));
+        doc = append_condition_body(ctx, doc, condition);
     }
     if let Some(then) = when_clause.then_token() {
         doc = doc
@@ -19224,10 +19314,7 @@ fn build_paren_expr<'a>(ctx: &Ctx, paren_expr: &ast::ParenExpr) -> Doc<'a> {
     if let Some(expr) = paren_expr.expr() {
         body = body
             .append(leading_comments(expr.syntax()))
-            .append(match expr {
-                ast::Expr::BinExpr(binary) => build_bin_expr(ctx, &binary),
-                expression => build_expr(ctx, expression),
-            });
+            .append(build_nested_expr(ctx, expr).group());
     } else if let Some(select) = paren_expr.select_variant() {
         body = body
             .append(leading_comments(select.syntax()))
@@ -19412,6 +19499,15 @@ fn logical_op(op: &ast::BinOp) -> Option<LogicalOp> {
     }
 }
 
+fn build_nested_expr<'a>(ctx: &Ctx, expr: ast::Expr) -> Doc<'a> {
+    if let ast::Expr::BinExpr(binary) = &expr
+        && let Some(logical) = binary.op().as_ref().and_then(logical_op)
+    {
+        return build_logical_expr(ctx, binary, logical);
+    }
+    build_expr(ctx, expr)
+}
+
 fn build_logical_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, logical: LogicalOp) -> Doc<'a> {
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
@@ -19428,11 +19524,12 @@ fn build_logical_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, logical: LogicalOp
         rhs => build_expr(ctx, rhs),
     };
 
-    lhs_doc
-        .append(comment_run_after(lhs.syntax()).between_nodes(Doc::line_or_space()))
+    let tail = comment_run_after(lhs.syntax())
+        .between_nodes(Doc::line_or_space())
         .append(build_op(bin_expr.op().unwrap()))
         .append(space_before(rhs.syntax()))
-        .append(rhs_doc)
+        .append(rhs_doc);
+    lhs_doc.append(tail)
 }
 
 fn build_bin_expr_operand<'a>(ctx: &Ctx, expr: ast::Expr, precedence: Option<u8>) -> Doc<'a> {
@@ -19449,16 +19546,7 @@ fn build_bin_expr_operand<'a>(ctx: &Ctx, expr: ast::Expr, precedence: Option<u8>
 
 fn build_bin_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr) -> Doc<'a> {
     if let Some(logical) = bin_expr.op().as_ref().and_then(logical_op) {
-        let lhs_is_inline_bracketed = bin_expr
-            .lhs()
-            .as_ref()
-            .is_some_and(is_inline_bracketed_expr);
-        let doc = build_logical_expr(ctx, bin_expr, logical);
-        return if lhs_is_inline_bracketed {
-            doc.group()
-        } else {
-            doc.nest(ctx.indent).group()
-        };
+        return build_logical_expr(ctx, bin_expr, logical).group();
     }
 
     build_bin_expr_chain(ctx, bin_expr, false)
@@ -19467,7 +19555,6 @@ fn build_bin_expr<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr) -> Doc<'a> {
 fn build_bin_expr_chain<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, flattened: bool) -> Doc<'a> {
     let lhs = bin_expr.lhs().unwrap();
     let rhs = bin_expr.rhs().unwrap();
-    let lhs_is_inline_bracketed = is_inline_bracketed_expr(&lhs);
     let lhs_requires_inline_separator = matches!(&lhs, ast::Expr::CaseExpr(_));
     let comments = comment_run_before(rhs.syntax());
     let after_op = comments.before_node(Doc::space());
@@ -19491,13 +19578,7 @@ fn build_bin_expr_chain<'a>(ctx: &Ctx, bin_expr: &ast::BinExpr, flattened: bool)
 
     let lhs_doc = build_bin_expr_operand(ctx, lhs, precedence);
     let doc = lhs_doc.append(tail);
-    if flattened {
-        doc
-    } else if lhs_is_inline_bracketed || rhs_requires_inline_separator {
-        doc.group()
-    } else {
-        doc.nest(ctx.indent).group()
-    }
+    if flattened { doc } else { doc.group() }
 }
 
 fn build_within_clause<'a>(ctx: &Ctx, within_clause: &ast::WithinClause) -> Doc<'a> {

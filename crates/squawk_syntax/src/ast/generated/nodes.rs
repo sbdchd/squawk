@@ -28960,6 +28960,86 @@ impl Volatile {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct Wait {
+    pub(crate) syntax: SyntaxNode,
+}
+impl Wait {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn wait_option_list(&self) -> Option<WaitOptionList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn semicolon_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEMICOLON)
+    }
+    #[inline]
+    pub fn for_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::FOR_KW)
+    }
+    #[inline]
+    pub fn lsn_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::LSN_KW)
+    }
+    #[inline]
+    pub fn wait_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WAIT_KW)
+    }
+    #[inline]
+    pub fn with_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::WITH_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WaitOption {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WaitOption {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn wait_option_name(&self) -> Option<WaitOptionName> {
+        support::child(&self.syntax)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WaitOptionList {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WaitOptionList {
+    #[inline]
+    pub fn wait_options(&self) -> AstChildren<WaitOption> {
+        support::children(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct WaitOptionName {
+    pub(crate) syntax: SyntaxNode,
+}
+impl WaitOptionName {
+    #[inline]
+    pub fn ident_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IDENT)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct WhenClause {
     pub(crate) syntax: SyntaxNode,
 }
@@ -32128,6 +32208,7 @@ pub enum Stmt {
     Update(Update),
     Vacuum(Vacuum),
     Values(Values),
+    Wait(Wait),
     Commit(Commit),
     Rollback(Rollback),
 }
@@ -57433,6 +57514,78 @@ impl AstNode for Volatile {
         &self.syntax
     }
 }
+impl AstNode for Wait {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WAIT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for WaitOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WAIT_OPTION
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for WaitOptionList {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WAIT_OPTION_LIST
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for WaitOptionName {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::WAIT_OPTION_NAME
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for WhenClause {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -73460,6 +73613,7 @@ impl AstNode for Stmt {
                 | SyntaxKind::UPDATE
                 | SyntaxKind::VACUUM
                 | SyntaxKind::VALUES
+                | SyntaxKind::WAIT
         ) || Commit::can_cast(kind)
             || Rollback::can_cast(kind)
     }
@@ -73725,6 +73879,7 @@ impl AstNode for Stmt {
             SyntaxKind::UPDATE => Stmt::Update(Update { syntax }),
             SyntaxKind::VACUUM => Stmt::Vacuum(Vacuum { syntax }),
             SyntaxKind::VALUES => Stmt::Values(Values { syntax }),
+            SyntaxKind::WAIT => Stmt::Wait(Wait { syntax }),
             _ => {
                 if let Some(result) = Commit::cast(syntax.clone()) {
                     return Some(Stmt::Commit(result));
@@ -73925,6 +74080,7 @@ impl AstNode for Stmt {
             Stmt::Update(it) => &it.syntax,
             Stmt::Vacuum(it) => &it.syntax,
             Stmt::Values(it) => &it.syntax,
+            Stmt::Wait(it) => &it.syntax,
             Stmt::Commit(it) => it.syntax(),
             Stmt::Rollback(it) => it.syntax(),
         }
@@ -75038,6 +75194,12 @@ impl From<Values> for Stmt {
     #[inline]
     fn from(node: Values) -> Stmt {
         Stmt::Values(node)
+    }
+}
+impl From<Wait> for Stmt {
+    #[inline]
+    fn from(node: Wait) -> Stmt {
+        Stmt::Wait(node)
     }
 }
 impl AstNode for SubscriptionSource {

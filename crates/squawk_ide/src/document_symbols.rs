@@ -379,6 +379,7 @@ impl Symbols<'_> {
             | ast::Stmt::Truncate(_)
             | ast::Stmt::Vacuum(_)
             | ast::Stmt::Values(_)
+            | ast::Stmt::Wait(_)
             | ast::Stmt::Commit(_)
             | ast::Stmt::Rollback(_) => None,
         };

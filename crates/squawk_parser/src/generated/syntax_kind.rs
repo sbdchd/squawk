@@ -2019,6 +2019,10 @@ pub enum SyntaxKind {
     VIEW_RENAME_TO,
     VIRTUAL,
     VOLATILE,
+    WAIT,
+    WAIT_OPTION,
+    WAIT_OPTION_LIST,
+    WAIT_OPTION_NAME,
     WHEN_CLAUSE,
     WHEN_CLAUSE_LIST,
     WHEN_CONDITION,
@@ -4095,6 +4099,10 @@ impl SyntaxKind {
             | SyntaxKind::VIEW_RENAME_TO
             | SyntaxKind::VIRTUAL
             | SyntaxKind::VOLATILE
+            | SyntaxKind::WAIT
+            | SyntaxKind::WAIT_OPTION
+            | SyntaxKind::WAIT_OPTION_LIST
+            | SyntaxKind::WAIT_OPTION_NAME
             | SyntaxKind::WHEN_CLAUSE
             | SyntaxKind::WHEN_CLAUSE_LIST
             | SyntaxKind::WHEN_CONDITION
@@ -7474,6 +7482,10 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::VIEW_RENAME_TO => "view rename to",
             SyntaxKind::VIRTUAL => "virtual",
             SyntaxKind::VOLATILE => "volatile",
+            SyntaxKind::WAIT => "wait",
+            SyntaxKind::WAIT_OPTION => "wait option",
+            SyntaxKind::WAIT_OPTION_LIST => "wait option list",
+            SyntaxKind::WAIT_OPTION_NAME => "wait option name",
             SyntaxKind::WHEN_CLAUSE => "when clause",
             SyntaxKind::WHEN_CLAUSE_LIST => "when clause list",
             SyntaxKind::WHEN_CONDITION => "when condition",

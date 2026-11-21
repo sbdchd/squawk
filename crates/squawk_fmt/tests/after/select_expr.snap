@@ -8,13 +8,195 @@ select (date '2026-01-01', date '2026-01-02') overlaps (
 
 select (1, 2) overlaps (3, 4);
 
+select items[1:2], items[:2], items[1:], items[:];
+
+select
+  items[start_offset:end_offset],
+  items[1:10],
+  items[-2:-1],
+  items[+1:+2],
+  items[-start_offset:+end_offset];
+
+select
+  items[start_offset + 1 : end_offset - 1],
+  items[start_offset + 1 : end_offset],
+  items[start_offset : end_offset - 1];
+
+select items[: end_offset - 1], items[start_offset + 1 :];
+
+select
+  items[lower_bound() : upper_bound()],
+  items[bounds.start_offset : bounds.end_offset],
+  items[offsets[1] : offsets[2]];
+
+select
+  items[-(start_offset + 1) : end_offset],
+  items[(start_offset) : end_offset];
+
+select items[
+  /* before start */ start_offset
+  + 1 /* before colon */ : /* before end */ end_offset - 1 /* before close */
+];
+
+select items[
+  -- before start
+  start_offset + 1 -- before colon
+  : -- before end
+  end_offset - 1 -- before close
+];
+
+select
+  items[/* before colon */ : /* before end */ end_offset - 1],
+  items[start_offset + 1 /* before colon */ : /* before close */];
+
+select items[
+  first_extraordinarily_long_column_name:second_extraordinarily_long_column_name
+];
+
+select items[
+  first_extraordinarily_long_column_name
+  + second_extraordinarily_long_column_name : third_extraordinarily_long_column_name
+];
+
+select items[
+  /* before start */ 1 /* before colon */ : /* before end */ 2 /* before close */
+];
+
+select items[
+  -- before start
+  1 -- before colon
+  : -- before end
+  2 -- before close
+];
+
+select items[/* before colon */ : /* before close */];
+
+select items[1:2][
+  first_extraordinarily_long_column_name:second_extraordinarily_long_column_name
+];
+
+select (
+  first_extraordinarily_long_column_name
+  + second_extraordinarily_long_column_name
+  + third_extraordinarily_long_column_name
+);
+
+select (
+  first_extraordinarily_long_column_name
+  = second_extraordinarily_long_column_name
+  and third_extraordinarily_long_column_name
+  = fourth_extraordinarily_long_column_name
+);
+
+select (
+  first_extraordinarily_long_column_name /* before operator */
+  + /* after operator */ second_extraordinarily_long_column_name
+);
+
+select (
+  abs(1) > 0
+  and 1000 + 20 > 10
+  and 50 < 1000
+  and length('foooooooooooooooooooooooooooooooo') > 10
+);
+
+select (
+  abs(1) > 0
+  or 1000 + 20 > 10
+  or 50 < 1000
+  or length('foooooooooooooooooooooooooooooooo') > 10
+);
+
+select check_condition(
+  (
+    state in ('cancelled', 'completed', 'discarded')
+    and finalized_at is not null
+  )
+  or finalized_at is null
+);
+
+select *
+from foo
+  join bar on
+    foo.first_long_column = bar.first_long_column
+    and foo.second_long_column = bar.second_long_column;
+
+select foo(
+  condition => first_long_column = second_long_column
+  and third_long_column = fourth_long_column
+);
+
+select array[
+  first_long_column = second_long_column
+  and third_long_column = fourth_long_column,
+  first_long_column = second_long_column
+  or third_long_column = fourth_long_column
+];
+
+select items[
+  first_long_column = second_long_column
+  and third_long_column = fourth_long_column
+];
+
+select bool_and(true and false), array[true and false], items[true or false];
+
+select *
+from foo
+  join bar on
+    /* first */ foo.first_long_column = bar.first_long_column /* before and */
+    and /* after and */ foo.second_long_column
+    = bar.second_long_column /* last */;
+
+select bool_and(
+  /* first */ first_long_column = second_long_column /* before and */
+  and /* after and */ third_long_column = fourth_long_column /* last */
+);
+
+select array[
+  /* first */ first_long_column = second_long_column /* before or */
+  or /* after or */ third_long_column = fourth_long_column /* last */
+];
+
+select items[
+  -- first
+  first_long_column = second_long_column -- after first
+  -- before and
+  and -- after and
+  third_long_column = fourth_long_column -- last
+];
+
+select (
+  /* first */ abs(1) > 0 /* before and */
+  and /* after and */ 1000 + 20 > 10
+  and 50 < 1000 /* last */
+);
+
+select (
+  -- first
+  abs(1) > 0 -- after first
+  -- before and
+  and -- after and
+  1000 + 20 > 10
+  -- before next and
+  and 50 < 1000 -- last
+);
+
+select (
+  abs(1) > 0
+  and (
+    1000 + 20 > 10
+    or 50 < 1000
+    or length('foooooooooooooooooooooooooooooooo') > 10
+  )
+);
+
 select fooo(
   loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong
-    + loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong
-    + 3
-    + 4
-    + 5
-    + 6
+  + loooooooooooooooooooooooooooooooooooooooooooooooooooooooooooong
+  + 3
+  + 4
+  + 5
+  + 6
 );
 
 select fooo(a + b - c + d), fooo(a * b / c % d), fooo(a ^ b ^ c);
@@ -111,127 +293,127 @@ select json_build_object(
 
 select fooo(
   a_very_long_first_operand
-    || a_very_long_second_operand
-    || a_very_long_third_operand
-    || a_very_long_fourth_operand
+  || a_very_long_second_operand
+  || a_very_long_third_operand
+  || a_very_long_fourth_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    -> a_very_long_second_operand
-    ->> a_very_long_third_operand
+  -> a_very_long_second_operand
+  ->> a_very_long_third_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    operator(public.||) a_very_long_second_operand
-    || a_very_long_third_operand
+  operator(public.||) a_very_long_second_operand
+  || a_very_long_third_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    at time zone 'America/Los_Angeles'
-    at time zone 'America/New_York'
+  at time zone 'America/Los_Angeles'
+  at time zone 'America/New_York'
 );
 
 select fooo(
   a_very_long_first_operand
-    = a_very_long_second_operand
-    = a_very_long_third_operand
+  = a_very_long_second_operand
+  = a_very_long_third_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    is distinct from a_very_long_second_operand
-    is distinct from a_very_long_third_operand
+  is distinct from a_very_long_second_operand
+  is distinct from a_very_long_third_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    || a_very_long_second_operand
-      + a_very_long_third_operand
-      + a_very_long_fourth_operand
-    || 5
+  || a_very_long_second_operand
+  + a_very_long_third_operand
+  + a_very_long_fourth_operand
+  || 5
 );
 
 select fooo(
   a_very_long_first_operand || (
-      a_very_long_second_operand || a_very_long_third_operand
-    )
-    || 4
+    a_very_long_second_operand || a_very_long_third_operand
+  )
+  || 4
 );
 
 select fooo(
   a_very_long_first_operand /* before op */
-    || /* after op */ a_very_long_second_operand /* before next op */
-    || /* after next op */ a_very_long_third_operand
+  || /* after op */ a_very_long_second_operand /* before next op */
+  || /* after next op */ a_very_long_third_operand
 );
 
 select fooo(
   a_very_long_first_operand -- after first
-    || -- after op
-    a_very_long_second_operand
-    -- before next op
-    || a_very_long_third_operand
+  || -- after op
+  a_very_long_second_operand
+  -- before next op
+  || a_very_long_third_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    - a_very_long_second_operand
-    + a_very_long_third_operand
-    - a_very_long_fourth_operand
+  - a_very_long_second_operand
+  + a_very_long_third_operand
+  - a_very_long_fourth_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    * a_very_long_second_operand
-    / a_very_long_third_operand
-    % a_very_long_fourth_operand
+  * a_very_long_second_operand
+  / a_very_long_third_operand
+  % a_very_long_fourth_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    ^ a_very_long_second_operand
-    ^ a_very_long_third_operand
+  ^ a_very_long_second_operand
+  ^ a_very_long_third_operand
 );
 
 select fooo(
   a_very_long_first_operand
-    + a_very_long_second_operand
-      * a_very_long_third_operand
-      * a_very_long_fourth_operand
-    + 5
+  + a_very_long_second_operand
+  * a_very_long_third_operand
+  * a_very_long_fourth_operand
+  + 5
 );
 
 select fooo(
   (a_very_long_first_operand + a_very_long_second_operand)
-    + a_very_long_third_operand
-    + 4
+  + a_very_long_third_operand
+  + 4
 );
 
 select fooo(
   a_very_long_first_operand - (
-      a_very_long_second_operand - a_very_long_third_operand
-    )
-    - 4
+    a_very_long_second_operand - a_very_long_third_operand
+  )
+  - 4
 );
 
 select fooo(
   /* before first */ a_very_long_first_operand /* before first op */
-    + /* after first op */ a_very_long_second_operand /* before second op */
-    - /* after second op */ a_very_long_third_operand /* after last */
+  + /* after first op */ a_very_long_second_operand /* before second op */
+  - /* after second op */ a_very_long_third_operand /* after last */
 );
 
 select fooo(
   a_very_long_first_operand -- after first
-    -- before first op
-    + -- after first op
-    -- before second
-    a_very_long_second_operand -- after second
-    -- before second op
-    + -- after second op
-    -- before third
-    a_very_long_third_operand -- after third
+  -- before first op
+  + -- after first op
+  -- before second
+  a_very_long_second_operand -- after second
+  -- before second op
+  + -- after second op
+  -- before third
+  a_very_long_third_operand -- after third
 );
 
 select /* before left */ (
@@ -337,8 +519,7 @@ select
   1 + 1,
   1 /* before op */ + /* after op */ 1,
   a_very_long_binary_left_expression
-    + a_very_long_binary_middle_expression
-      * a_very_long_binary_right_expression,
+  + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
   2 @@@ 2,
   true and false,
   ts at time zone 'UTC',
@@ -367,7 +548,7 @@ select
   1 operator(+) 1,
   1 operator(public.+) 1,
   1
-    operator /* before paren */ (/* before path */ public /* before dot */ . /* before op */ + /* after op */) /* after paren */ 1,
+  operator /* before paren */ (/* before path */ public /* before dot */ . /* before op */ + /* after op */) /* after paren */ 1,
   true or false,
   (1, 2) overlaps (3, 4),
   10 % 3,
@@ -376,16 +557,15 @@ select
   6 / 2,
   2 * 3,
   a_very_long_binary_left_expression
-    + a_very_long_binary_middle_expression
-      * a_very_long_binary_right_expression,
+  + a_very_long_binary_middle_expression * a_very_long_binary_right_expression,
   -- call expr
   1 = any(array[1, 2]),
   2 = all(select x from things),
   3 = some(array[3]),
   4 /* before op */
-    = /* before any */ any /* before opening paren */ (
-      /* before expr */ array[4] /* before closing paren */
-    ) /* after any */,
+  = /* before any */ any /* before opening paren */ (
+    /* before expr */ array[4] /* before closing paren */
+  ) /* after any */,
   exists(select 1 from things),
   exists(
     select 10000000000000000000000000000000000000000000000000000000000000000
@@ -618,7 +798,7 @@ select
   ),
   json_arrayagg(v) /* before filter */ filter /* before filter opening */ (
     /* before where */ where /* before condition */ v
-      > 0 /* before filter closing */
+    > 0 /* before filter closing */
   ) /* before over */ over /* before over opening */ (
     /* before partition */ partition /* before by */ by /* before partition expr */ category
     /* before order */ order /* before order by */ by
@@ -843,7 +1023,7 @@ select
     a_very_long_filter_argument_expression
   ) filter (
     where a_very_long_filter_condition_expression
-      > a_very_long_filter_threshold_expression
+    > a_very_long_filter_threshold_expression
   ),
   a_very_long_window_function_name(
     a_very_long_null_treatment_argument_expression
@@ -993,7 +1173,7 @@ select
   ),
   (
     a_very_long_parenthesized_expression
-      + a_second_very_long_parenthesized_expression
+    + a_second_very_long_parenthesized_expression
   ),
   -- postfix expr
   'x' at /* between at and local */ local,
@@ -1042,8 +1222,14 @@ select
   c[2:],
   c[:3],
   c[:],
-  c /* before bracket */ [/* before start */ 1 /* before colon */ : /* before end */ 2 /* before closing bracket */],
-  a_very_long_sliced_expression[a_very_long_slice_start_expression:a_very_long_slice_end_expression][a_second_very_long_slice_start_expression:a_second_very_long_slice_end_expression],
+  c /* before bracket */ [
+    /* before start */ 1 /* before colon */ : /* before end */ 2 /* before closing bracket */
+  ],
+  a_very_long_sliced_expression[
+    a_very_long_slice_start_expression:a_very_long_slice_end_expression
+  ][
+    a_second_very_long_slice_start_expression:a_second_very_long_slice_end_expression
+  ],
   -- tuple expr
   (1, 2, 3),
   (
@@ -1149,9 +1335,9 @@ select cast(
 select
   (
     first_extraordinarily_long_column_name
-        = second_extraordinarily_long_column_name
-      and third_extraordinarily_long_column_name
-        = fourth_extraordinarily_long_column_name
+    = second_extraordinarily_long_column_name
+    and third_extraordinarily_long_column_name
+    = fourth_extraordinarily_long_column_name
   )
   = expected_boolean_result;
 
@@ -1159,9 +1345,9 @@ select
 select
   (
     first_extraordinarily_long_column_name
-        = second_extraordinarily_long_column_name
-      and third_extraordinarily_long_column_name
-        = fourth_extraordinarily_long_column_name
+    = second_extraordinarily_long_column_name
+    and third_extraordinarily_long_column_name
+    = fourth_extraordinarily_long_column_name
   )
   between false
   and true;
@@ -1176,25 +1362,25 @@ where
   and unique_key = @unique_key
   and unique_states is not null
   and case state
-      when 'available' then unique_states & (1 << 0)
-      when 'cancelled' then unique_states & (1 << 1)
-      when 'completed' then unique_states & (1 << 2)
-      when 'discarded' then unique_states & (1 << 3)
-      when 'pending' then unique_states & (1 << 4)
-      when 'retryable' then unique_states & (1 << 5)
-      when 'running' then unique_states & (1 << 6)
-      when 'scheduled' then unique_states & (1 << 7)
-      else 0
-    end >= 1;
+    when 'available' then unique_states & (1 << 0)
+    when 'cancelled' then unique_states & (1 << 1)
+    when 'completed' then unique_states & (1 << 2)
+    when 'discarded' then unique_states & (1 << 3)
+    when 'pending' then unique_states & (1 << 4)
+    when 'retryable' then unique_states & (1 << 5)
+    when 'running' then unique_states & (1 << 6)
+    when 'scheduled' then unique_states & (1 << 7)
+    else 0
+  end >= 1;
 
 -- multiline case followed by a long binary right operand
 select
   case state
-      when 'available' then unique_states & (1 << 0)
-      when 'cancelled' then unique_states & (1 << 1)
-      else 0
-    end
-    >= an_extraordinarily_long_expression_that_will_not_fit_after_the_end_keyword;
+    when 'available' then unique_states & (1 << 0)
+    when 'cancelled' then unique_states & (1 << 1)
+    else 0
+  end
+  >= an_extraordinarily_long_expression_that_will_not_fit_after_the_end_keyword;
 
 -- before comment placement expression
 select

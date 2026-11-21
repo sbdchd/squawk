@@ -18,6 +18,72 @@ offset 2 rows;
 
 select x from foo fetch first 5 rows with ties;
 
+select *
+from pg_proc p
+  left join pg_description d on
+    d.objoid = p.oid and d.classoid = 'pg_proc'::regclass;
+
+select *
+from foo
+where
+  first_extraordinarily_long_column_name = 1
+  and second_extraordinarily_long_column_name = 2;
+
+select *
+from foo
+  join bar on
+    first_extraordinarily_long_column_name = 1
+    and second_extraordinarily_long_column_name = 2;
+
+select count(*)
+from foo
+group by
+  first_extraordinarily_long_column_name,
+  second_extraordinarily_long_column_name
+having
+  first_extraordinarily_long_column_name = 1
+  and second_extraordinarily_long_column_name = 2;
+
+select case
+  when
+    first_extraordinarily_long_column_name = 1
+    and second_extraordinarily_long_column_name = 2 then
+    true
+  else false
+end;
+
+select case when a = 1 then true end
+from foo join bar on a = 1
+where a = 1
+group by a
+having a = 1;
+
+select count(*)
+from foo
+having
+  /* before condition */ count(*) > 1 /* before and */
+  and /* after and */ count(distinct extraordinarily_long_column_name)
+  > 2 /* after condition */;
+
+select case
+  when -- before condition
+    first_extraordinarily_long_column_name = 1 -- after first
+    -- before and
+    and -- after and
+    second_extraordinarily_long_column_name = 2 -- before then
+  then
+    true
+  else false
+end;
+
+select case
+  when (
+    first_extraordinarily_long_column_name = 1
+    and second_extraordinarily_long_column_name = 2
+  ) then
+    true
+end;
+
 with a_very_long_common_table_expression_name as (
   select a_very_long_source_column_name from a_very_long_source_relation_name
 )
@@ -229,4 +295,4 @@ select *
 from t
 where
   aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-    = calculate_something();
+  = calculate_something();
