@@ -30,6 +30,7 @@ export type LintError = {
 
 export interface HoverResult {
   snippet: string
+  substitutions: string | null
   comment: string | null
 }
 

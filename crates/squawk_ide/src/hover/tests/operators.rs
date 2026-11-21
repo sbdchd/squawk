@@ -57,3 +57,19 @@ select 1 +$0 2;
       ╰ note: add
     ");
 }
+
+#[test]
+fn polymorphic_operator() {
+    assert_snapshot!(hover("
+select array[1] ||$0 2;
+"), @"
+    hover: operator pg_catalog.||(anycompatiblearray, anycompatible) returns anycompatiblearray
+      ╭▸ file0.sql:2:17
+      │
+    2 │ select array[1] || 2;
+      │                 ── hover
+      │
+      ├ note: `anycompatiblearray` = `int4[]`, `anycompatible` = `int4`
+      ╰ note: append element onto end of array
+    ");
+}

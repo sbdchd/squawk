@@ -19,6 +19,7 @@ use squawk_ide_db::{Db, parse, semantic_index};
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Hover {
     pub snippet: String,
+    pub substitutions: Option<String>,
     pub comment: Option<String>,
 }
 
@@ -33,6 +34,10 @@ impl Hover {
 "
         );
 
+        if let Some(substitutions) = &self.substitutions {
+            writeln!(out, "---\n{substitutions}").unwrap();
+        }
+
         if let Some(comment) = &self.comment {
             writeln!(out, "---\n{comment}").unwrap();
         }
@@ -46,6 +51,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
     let hover = hover_with_index(semantic_index(db, file), &parse(db, file).tree(), position)?;
     Some(Hover {
         snippet: hover.snippet,
+        substitutions: hover.substitutions,
         comment: hover.comment,
     })
 }
@@ -53,6 +59,7 @@ pub fn hover(db: &dyn Db, position: InFile<TextSize>) -> Option<Hover> {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct HoverInfo {
     pub snippet: String,
+    pub substitutions: Option<String>,
     pub comment: Option<String>,
     pub range: FileRange,
 }
@@ -68,6 +75,7 @@ pub(crate) fn hover_with_index(
     {
         return Some(HoverInfo {
             snippet,
+            substitutions: item_substitutions(index, item.value.item),
             comment: item_comment(index, item.value.item).map(str::to_string),
             range: item.map(|item| item.range),
         });
@@ -81,9 +89,32 @@ pub(crate) fn hover_with_index(
     };
     Some(HoverInfo {
         snippet,
+        substitutions: None,
         comment,
         range,
     })
+}
+
+fn item_substitutions(index: &SemanticIndex, item: Item) -> Option<String> {
+    let Item::Reference(reference) = item else {
+        return None;
+    };
+    let substitutions = index.call_substitutions.get(&reference)?;
+    let mut out = String::new();
+    for (i, id) in substitutions.iter().enumerate() {
+        let substitution = &index.substitutions[id];
+        if i > 0 {
+            out.push_str(", ");
+        }
+        write!(
+            out,
+            "`{}` = `{}`",
+            index.type_name(substitution.param),
+            index.type_name(substitution.ty)
+        )
+        .unwrap();
+    }
+    Some(out)
 }
 
 pub(crate) fn function_signature(index: &SemanticIndex, function: FunctionId) -> String {

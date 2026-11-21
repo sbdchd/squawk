@@ -419,6 +419,7 @@ impl SquawkDatabase {
 
         let converted = result.map(|hover| WasmHover {
             snippet: hover.snippet,
+            substitutions: hover.substitutions,
             comment: hover.comment,
         });
 
@@ -899,6 +900,7 @@ struct WasmCodeAction {
 #[derive(Serialize)]
 struct WasmHover {
     snippet: String,
+    substitutions: Option<String>,
     comment: Option<String>,
 }
 

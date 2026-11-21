@@ -90,6 +90,8 @@ impl IndexData {
             columns: LayeredArena::default(),
             column_owners: FxHashMap::default(),
             literal_types: FxHashMap::default(),
+            substitutions: LayeredArena::default(),
+            call_substitutions: FxHashMap::default(),
             merges: LayeredArena::default(),
             references: LayeredArena::default(),
             bodies: LayeredArena::default(),
@@ -160,6 +162,8 @@ impl IndexData {
             columns: LayeredArena::on_top_of(&base.columns),
             column_owners: FxHashMap::default(),
             literal_types: FxHashMap::default(),
+            substitutions: LayeredArena::on_top_of(&base.substitutions),
+            call_substitutions: FxHashMap::default(),
             merges: LayeredArena::on_top_of(&base.merges),
             references: LayeredArena::on_top_of(&base.references),
             bodies: LayeredArena::on_top_of(&base.bodies),
@@ -233,6 +237,8 @@ fn shrink_to_fit(index: &mut IndexData) {
         columns,
         column_owners,
         literal_types,
+        substitutions,
+        call_substitutions,
         merges,
         references,
         bodies,
@@ -305,6 +311,8 @@ fn shrink_to_fit(index: &mut IndexData) {
     columns.shrink_to_fit();
     column_owners.shrink_to_fit();
     literal_types.shrink_to_fit();
+    substitutions.shrink_to_fit();
+    call_substitutions.shrink_to_fit();
     merges.shrink_to_fit();
     references.shrink_to_fit();
     bodies.shrink_to_fit();

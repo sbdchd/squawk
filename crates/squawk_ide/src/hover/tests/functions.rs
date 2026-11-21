@@ -450,3 +450,38 @@ select x$0 from (select f() as x) s;
       ╰╴       ─ hover
     ");
 }
+
+#[test]
+fn polymorphic_function_call() {
+    assert_snapshot!(hover("
+select array_append$0(array[1], 2);
+"), @"
+    hover: function pg_catalog.array_append(anycompatiblearray, anycompatible) returns anycompatiblearray
+      ╭▸ file0.sql:2:8
+      │
+    2 │ select array_append(array[1], 2);
+      │        ──────────── hover
+      │
+      ├ note: `anycompatiblearray` = `int4[]`, `anycompatible` = `int4`
+      ╰ note: append element onto end of array
+    ");
+}
+
+#[test]
+fn polymorphic_function_call_field() {
+    assert_snapshot!(hover("
+create type pair as (a int, b int);
+create function f(anyelement) returns anyelement
+  language sql
+  return $1;
+select (f$0(row(1, 2)::pair)).a;
+"), @"
+    hover: function public.f(anyelement) returns anyelement
+      ╭▸ file0.sql:6:9
+      │
+    6 │ select (f(row(1, 2)::pair)).a;
+      │         ─ hover
+      │
+      ╰ note: `anyelement` = `pair`
+    ");
+}

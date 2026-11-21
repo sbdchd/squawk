@@ -813,6 +813,7 @@ impl LoweredCall {
 #[derive(Clone, Copy)]
 struct Callee {
     name: Name,
+    reference: RefId,
     resolution: Resolution,
     ty: Option<Ty>,
 }
@@ -16829,7 +16830,12 @@ impl Lowerer {
         let LoweredCall { args, callee, .. } =
             self.with_from_function(|this| this.lower_call_with_args(call));
         self.check_from_set_returning(srf_calls, Some(call));
-        let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
+        let Some(Callee {
+            reference,
+            resolution: Resolution::Function(function),
+            ..
+        }) = callee
+        else {
             return FunctionSource {
                 callee,
                 function: None,
@@ -16837,6 +16843,7 @@ impl Lowerer {
                 scalar: None,
             };
         };
+        self.record_call(reference, function, &args);
         if let Some(ty) = self.unsupported_return_type(function, &args) {
             let error = SemaError::UnsupportedReturnType {
                 function: self.index.functions[function].name,
@@ -16917,7 +16924,7 @@ impl Lowerer {
             .find(|resolution| !matches!(resolution, Resolution::Function(_)))
             .or_else(|| resolutions.first().copied())
             .unwrap_or(Resolution::Unknown);
-        self.add_ref(
+        let reference = self.add_ref(
             name,
             ReferenceKind::Function(RoutineKind::Function),
             name_ref.syntax(),
@@ -16927,6 +16934,7 @@ impl Lowerer {
         FunctionSource {
             callee: Some(Callee {
                 name,
+                reference,
                 resolution,
                 ty: None,
             }),
@@ -20875,17 +20883,21 @@ impl Lowerer {
             return self.builtin_type("bool");
         }
         for (expr, right) in list.exprs().zip(elements) {
-            let Some(operator) = self.add_expr_operator_ref_at(
+            let Some(OperatorRef {
+                operator,
+                reference,
+            }) = self.add_expr_operator_ref_at(
                 op_range,
                 expr.syntax().text_range(),
                 None,
                 operator,
                 Some(left),
                 Some(right),
-            ) else {
+            )
+            else {
                 continue;
             };
-            let found = self.operator_result_type(operator, Some(left), Some(right));
+            let found = self.record_operator_call(reference, operator, Some(left), Some(right));
             let Operator {
                 left: declared_left,
                 right: declared_right,
@@ -21074,12 +21086,15 @@ impl Lowerer {
         left: Option<ArgType>,
         right: Option<ArgType>,
     ) -> LoweredOperator {
-        let Some(operator) = self.add_expr_operator_ref_at(range, range, schema, text, left, right)
+        let Some(OperatorRef {
+            operator,
+            reference,
+        }) = self.add_expr_operator_ref_at(range, range, schema, text, left, right)
         else {
             return LoweredOperator::default();
         };
         LoweredOperator {
-            ty: self.operator_result_type(operator, left, right),
+            ty: self.record_operator_call(reference, operator, left, right),
             operator: Some(operator),
         }
     }
@@ -21092,7 +21107,7 @@ impl Lowerer {
         text: &str,
         left: Option<ArgType>,
         right: Option<ArgType>,
-    ) -> Option<OperatorId> {
+    ) -> Option<OperatorRef> {
         let name = self.intern(text);
         let mut resolution = self.select_operator(schema, name, left, right);
         if matches!(resolution, Resolution::Unresolved | Resolution::Ambiguous)
@@ -21112,11 +21127,14 @@ impl Lowerer {
             self.push_error_at(InIrFile::new(self.file_id, error_range), error);
             resolution = Resolution::Unknown;
         }
-        self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
+        let reference = self.add_ref_at(name, ReferenceKind::Operator, range, resolution);
         let Resolution::Operator(operator) = resolution else {
             return None;
         };
-        Some(operator)
+        Some(OperatorRef {
+            operator,
+            reference,
+        })
     }
 
     fn operator_result_type(
@@ -21126,15 +21144,18 @@ impl Lowerer {
         right: Option<ArgType>,
     ) -> Option<Ty> {
         let function = self.index.operators[operator].function?;
-        let args: SmallVec<[CallArg; 2]> = [left, right]
-            .into_iter()
-            .flatten()
-            .map(|ty| CallArg {
-                ty,
-                ..CallArg::default()
-            })
-            .collect();
-        self.call_type(function, &args)
+        self.call_type(function, &operator_args(left, right))
+    }
+
+    fn record_operator_call(
+        &mut self,
+        reference: RefId,
+        operator: OperatorId,
+        left: Option<ArgType>,
+        right: Option<ArgType>,
+    ) -> Option<Ty> {
+        let function = self.index.operators[operator].function?;
+        self.record_call(reference, function, &operator_args(left, right))
     }
 
     fn report_unresolved_routine(
@@ -23224,8 +23245,11 @@ impl Lowerer {
                 if ty.is_some() {
                     return ty;
                 }
-                return match callee?.resolution {
-                    Resolution::Function(function) => self.call_type(function, &args),
+                let callee = callee?;
+                return match callee.resolution {
+                    Resolution::Function(function) => {
+                        self.record_call(callee.reference, function, &args)
+                    }
                     resolution => self.resolution_type(resolution),
                 };
             }
@@ -25042,9 +25066,10 @@ impl Lowerer {
                 ));
             }
         };
-        self.add_ref(name, kind, name_ref.syntax(), resolution);
+        let reference = self.add_ref(name, kind, name_ref.syntax(), resolution);
         Some(Callee {
             name,
+            reference,
             resolution,
             ty: None,
         })
@@ -25064,7 +25089,7 @@ impl Lowerer {
             && let Some(FunctionStyleCast { resolution, ty }) =
                 self.function_style_cast(schema, name, args)
         {
-            self.add_ref_from(
+            let reference = self.add_ref_from(
                 name,
                 node,
                 resolution,
@@ -25075,6 +25100,7 @@ impl Lowerer {
             );
             return Callee {
                 name,
+                reference,
                 resolution,
                 ty: Some(ty),
             };
@@ -25091,7 +25117,7 @@ impl Lowerer {
                 node,
             ),
         };
-        self.add_ref(
+        let reference = self.add_ref(
             name,
             ReferenceKind::Function(RoutineKind::Function),
             node,
@@ -25099,6 +25125,7 @@ impl Lowerer {
         );
         Callee {
             name,
+            reference,
             resolution,
             ty: None,
         }
@@ -25210,7 +25237,7 @@ impl Lowerer {
             return callee.ty;
         }
         match callee.resolution {
-            Resolution::Function(function) => self.call_type(function, &args),
+            Resolution::Function(function) => self.record_call(callee.reference, function, &args),
             resolution => self.resolution_type(resolution),
         }
     }
@@ -25357,7 +25384,26 @@ impl Lowerer {
         let Resolution::Function(function) = callee.resolution else {
             return None;
         };
-        self.call_type(function, args)
+        self.record_call(callee.reference, function, args)
+    }
+
+    fn record_call(
+        &mut self,
+        reference: RefId,
+        function: FunctionId,
+        args: &[CallArg],
+    ) -> Option<Ty> {
+        let ty = self.call_type(function, args);
+        let substitutions = self
+            .overloads()
+            .substitutions(&self.index.functions[function], args);
+        if !substitutions.is_empty() {
+            let substitutions = self.index.substitutions.alloc_many(substitutions);
+            self.index
+                .call_substitutions
+                .insert(reference, substitutions);
+        }
+        ty
     }
 
     fn lower_system_function_ref(
@@ -25369,7 +25415,7 @@ impl Lowerer {
         let name = self.intern(function);
         let resolution =
             self.find_routine(Some(self.pg_catalog), name, args, FunctionKind::Function);
-        self.add_ref_at(
+        let reference = self.add_ref_at(
             name,
             ReferenceKind::Function(RoutineKind::Function),
             range,
@@ -25377,6 +25423,7 @@ impl Lowerer {
         );
         Callee {
             name,
+            reference,
             resolution,
             ty: None,
         }
@@ -26156,12 +26203,17 @@ impl Lowerer {
         if ty.is_some() {
             return self.expr_field_base(ty);
         }
-        let Some(Resolution::Function(function)) = callee.map(|callee| callee.resolution) else {
+        let Some(Callee {
+            reference,
+            resolution: Resolution::Function(function),
+            ..
+        }) = callee
+        else {
             return self.expr_field_base(
                 callee.and_then(|callee| self.resolution_type(callee.resolution)),
             );
         };
-        let ty = self.call_type(function, &args);
+        let ty = self.record_call(reference, function, &args);
         match self.index.functions[function].columns {
             Some(columns) => FieldBase::Columns { columns, ty },
             None => self.expr_field_base(ty),
@@ -27566,6 +27618,22 @@ impl Lowerer {
     fn ast_ptr<N: AstNode>(&self, node: &N) -> InIrFile<AstPtr<N>> {
         InIrFile::new(self.file_id, AstPtr::new(node))
     }
+}
+
+fn operator_args(left: Option<ArgType>, right: Option<ArgType>) -> SmallVec<[CallArg; 2]> {
+    [left, right]
+        .into_iter()
+        .flatten()
+        .map(|ty| CallArg {
+            ty,
+            ..CallArg::default()
+        })
+        .collect()
+}
+
+struct OperatorRef {
+    operator: OperatorId,
+    reference: RefId,
 }
 
 #[derive(Default)]
