@@ -271,6 +271,7 @@ pub struct IndexData {
     pub columns: LayeredArena<Column>,
     pub(crate) column_owners: FxHashMap<ColumnId, ColumnOwner>,
     pub literal_types: FxHashMap<FileRange, Ty>,
+    pub call_types: FxHashMap<RefId, Option<Ty>>,
     pub substitutions: LayeredArena<Substitution>,
     pub call_substitutions: FxHashMap<RefId, IdxRange<Substitution>>,
     pub(crate) merges: LayeredArena<Merge>,

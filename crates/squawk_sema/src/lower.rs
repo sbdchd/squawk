@@ -13338,6 +13338,14 @@ impl Lowerer {
         self.index.literal_types.insert(range, ty);
     }
 
+    fn record_unknown_literal(&mut self, expr: &ast::Expr, ty: Ty) {
+        if expr.is_unknown_literal()
+            && let Some(literal) = expr.unparen().as_literal()
+        {
+            self.record_literal_type(&literal, ty);
+        }
+    }
+
     fn lower_func_type(&mut self, func_type: &ast::FuncType) -> Option<Ty> {
         self.lower_func_type_lookup(func_type).ty()
     }
@@ -14292,8 +14300,18 @@ impl Lowerer {
         let right_unknown = output_is_unknown_literal(operands.rhs_node, position);
         match (left_ty, right_ty) {
             _ if left_unknown && right_unknown => left_ty,
-            (_, Some(right_ty)) if left_unknown => Some(right_ty),
-            (Some(left_ty), _) if right_unknown => Some(left_ty),
+            (_, Some(right_ty)) if left_unknown => {
+                if let Some(expr) = operands.lhs_node.nth_output_expr(position) {
+                    self.record_unknown_literal(&expr, right_ty);
+                }
+                Some(right_ty)
+            }
+            (Some(left_ty), _) if right_unknown => {
+                if let Some(expr) = operands.rhs_node.nth_output_expr(position) {
+                    self.record_unknown_literal(&expr, left_ty);
+                }
+                Some(left_ty)
+            }
             (Some(left_ty), Some(right_ty)) => {
                 Some(self.compound_common_type(op, left_ty, right_ty, operands.rhs_node, position))
             }
@@ -14350,6 +14368,13 @@ impl Lowerer {
             ExprContext::Values
         };
         let mut columns: SmallVec<[Column; 8]> = SmallVec::with_capacity(first_len);
+        let mut common: SmallVec<[CommonType; 8]> = if insert_source {
+            smallvec![]
+        } else {
+            (0..first_len)
+                .map(|_| CommonType::new(ArgType::UnknownLiteral))
+                .collect()
+        };
         for (row_index, row) in values
             .row_list()
             .into_iter()
@@ -14361,6 +14386,9 @@ impl Lowerer {
             }
             for (column_index, expr) in row.exprs().enumerate() {
                 let ty = self.lower_expr_in(context, &expr);
+                if let Some(common) = common.get_mut(column_index) {
+                    common.push(&self.overloads(), expr_arg_type(Some(&expr), ty));
+                }
                 if insert_source && !expr.is_default() {
                     self.insert_values.push(InsertValue {
                         position: column_index,
@@ -14377,6 +14405,20 @@ impl Lowerer {
                         typmod: None,
                         merge: None,
                     });
+                }
+            }
+        }
+        for (column, common) in columns.iter_mut().zip(common) {
+            if let ArgType::Known(ty) = common.finish() {
+                column.ty = Some(ty);
+            }
+        }
+        if !insert_source {
+            for row in values.row_list().into_iter().flat_map(|list| list.rows()) {
+                for (expr, column) in row.exprs().zip(&columns) {
+                    if let Some(ty) = column.ty {
+                        self.record_unknown_literal(&expr, ty);
+                    }
                 }
             }
         }
@@ -16930,6 +16972,7 @@ impl Lowerer {
             name_ref.syntax(),
             resolution,
         );
+        self.index.call_types.insert(reference, None);
         let FunctionColumns { columns, scalar } = self.combine_function_columns(&items);
         FunctionSource {
             callee: Some(Callee {
@@ -20770,8 +20813,11 @@ impl Lowerer {
             return self.lower_in_list(tuple, left);
         }
         if let ast::Expr::CallExpr(call) = rhs
-            && let Some(operand) = self
-                .lower_quantified_operand(call, lhs.and_then(|lhs| lhs.row_width()).unwrap_or(1))
+            && let Some(operand) = self.lower_quantified_operand(
+                call,
+                lhs.and_then(|lhs| lhs.row_width()).unwrap_or(1),
+                left,
+            )
         {
             return operand;
         }
@@ -20873,6 +20919,10 @@ impl Lowerer {
         }
         if let ArgType::Known(ty) = common {
             self.lower_literal_comparison(ty, lhs);
+            self.record_unknown_literal(lhs, ty);
+            for expr in list.exprs() {
+                self.record_unknown_literal(&expr, ty);
+            }
         }
         if elements.len() > 1 && common != ArgType::Untyped {
             let found =
@@ -20929,11 +20979,34 @@ impl Lowerer {
         match keyword {
             ast::FunctionLikeKeyword::Coalesce
             | ast::FunctionLikeKeyword::Greatest
-            | ast::FunctionLikeKeyword::Least => self.common_args_type(args),
-            ast::FunctionLikeKeyword::Nullif => self.nullif_type(args),
+            | ast::FunctionLikeKeyword::Least => {
+                let ty = self.common_args_type(args);
+                if let Some(ty) = ty {
+                    self.record_unknown_literal_args(call, ty);
+                }
+                ty
+            }
+            ast::FunctionLikeKeyword::Nullif => {
+                let ty = self.nullif_type(args);
+                if let Some(ty) = ty {
+                    self.record_unknown_literal_args(call, ty);
+                }
+                ty
+            }
             ast::FunctionLikeKeyword::Grouping => self.builtin_type("int4"),
             ast::FunctionLikeKeyword::MergeAction => self.builtin_type("text"),
             ast::FunctionLikeKeyword::XmlConcat => self.xmlconcat_type(call, args),
+        }
+    }
+
+    fn record_unknown_literal_args(&mut self, call: &ast::CallExpr, ty: Ty) {
+        for expr in call
+            .arg_list()
+            .into_iter()
+            .flat_map(|list| list.args())
+            .filter_map(|arg| arg.expr())
+        {
+            self.record_unknown_literal(&expr, ty);
         }
     }
 
@@ -20989,7 +21062,12 @@ impl Lowerer {
         common.push(&self.overloads(), expr_arg_type(Some(expr), ty));
     }
 
-    fn lower_quantified_operand(&mut self, call: &ast::CallExpr, width: usize) -> Option<ArgType> {
+    fn lower_quantified_operand(
+        &mut self,
+        call: &ast::CallExpr,
+        width: usize,
+        left: ArgType,
+    ) -> Option<ArgType> {
         let (quantifier, expr, query) = if let Some(any_fn) = call.any_fn() {
             (Quantifier::Any, any_fn.expr(), any_fn.select_variant())
         } else if let Some(some_fn) = call.some_fn() {
@@ -21010,6 +21088,12 @@ impl Lowerer {
         };
         let ty = self.lower_expr(&expr);
         if expr.is_unknown_literal() {
+            if width == 1
+                && let ArgType::Known(left) = left
+                && let Some(base) = self.index.base_type(left)
+            {
+                self.record_unknown_literal(&expr, base.array());
+            }
             return Some(ArgType::UnknownLiteral);
         }
         let Some(base) = ty.and_then(|ty| self.index.base_type(ty)) else {
@@ -23089,6 +23173,9 @@ impl Lowerer {
 
     fn lower_limit_expr(&mut self, context: ExprContext, expr: &ast::Expr) {
         self.lower_expr_in(context, expr);
+        if let Some(ty) = self.builtin_type("int8") {
+            self.record_unknown_literal(expr, ty);
+        }
         self.check_unknown_literal_expr(LiteralTarget::Int(IntType::Int8), expr);
     }
 
@@ -23266,12 +23353,20 @@ impl Lowerer {
                     self.push_error(array.syntax(), SemaError::EmptyArrayType { cast: None });
                 }
                 let mut element = None;
+                let mut common = CommonType::new(ArgType::UnknownLiteral);
                 for expr in array.exprs() {
                     self.array_cast =
                         array_cast && matches!(expr.unparen(), ast::Expr::ArrayExpr(_));
                     let ty = self.lower_expr(&expr);
                     self.array_cast = false;
+                    common.push(&self.overloads(), expr_arg_type(Some(&expr), ty));
                     element = element.or(ty);
+                }
+                if let ArgType::Known(ty) = common.finish() {
+                    element = Some(ty);
+                    for expr in array.exprs() {
+                        self.record_unknown_literal(&expr, ty);
+                    }
                 }
                 if let Some(query) = array.select_variant() {
                     let query = self.lower_scalar_sublink(query);
@@ -23287,11 +23382,21 @@ impl Lowerer {
                 return element.map(Ty::array);
             }
             ast::Expr::BetweenExpr(between) => {
-                self.lower_exprs(
-                    [between.target(), between.start(), between.end()]
+                let mut common = CommonType::new(ArgType::UnknownLiteral);
+                for expr in [between.target(), between.start(), between.end()]
+                    .into_iter()
+                    .flatten()
+                {
+                    self.lower_common_expr(&mut common, &expr);
+                }
+                if let ArgType::Known(ty) = common.finish() {
+                    for expr in [between.target(), between.start(), between.end()]
                         .into_iter()
-                        .flatten(),
-                );
+                        .flatten()
+                    {
+                        self.record_unknown_literal(&expr, ty);
+                    }
+                }
                 if let Some(ast::Expr::TupleExpr(target)) = between.target() {
                     for bound in [between.start(), between.end()].into_iter().flatten() {
                         if let ast::Expr::TupleExpr(bound) = bound {
@@ -23440,7 +23545,19 @@ impl Lowerer {
                     self.lower_common_expr(&mut common, &expr);
                 }
                 self.check_contained_set_returning(srf_calls, SetReturningConstruct::Case);
-                return common.resolve(&self.overloads());
+                let ty = common.resolve(&self.overloads());
+                if let Some(ty) = ty {
+                    for expr in case
+                        .when_clause_list()
+                        .into_iter()
+                        .flat_map(|list| list.when_clauses())
+                        .filter_map(|when| when.then())
+                        .chain(case.else_clause().and_then(|clause| clause.expr()))
+                    {
+                        self.record_unknown_literal(&expr, ty);
+                    }
+                }
+                return ty;
             }
             ast::Expr::CastExpr(cast) => {
                 if cast.kind() == Some(ast::CastKind::Treat) {
@@ -25394,6 +25511,7 @@ impl Lowerer {
         args: &[CallArg],
     ) -> Option<Ty> {
         let ty = self.call_type(function, args);
+        self.index.call_types.insert(reference, ty);
         let substitutions = self
             .overloads()
             .substitutions(&self.index.functions[function], args);

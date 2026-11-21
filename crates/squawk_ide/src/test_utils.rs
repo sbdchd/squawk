@@ -8,10 +8,11 @@ use squawk_sema::file::{FileId, FileIndex, FilePosition, FileRange, InFile};
 use squawk_sema::semantic_index::SemanticIndex;
 use squawk_sema::semantic_index_builder::SemanticIndexBuilder;
 use squawk_syntax::SourceFile;
+use squawk_syntax::ast::{self, AstNode};
 
 use crate::hover::hover_with_index as hover;
 use squawk_ide_db::Database;
-use squawk_ide_db::offsets::item_at_position;
+use squawk_ide_db::offsets::{TokenAt, item_at_token};
 
 // TODO: we should probably use something else since `$0` is valid syntax, maybe `%0`?
 const MARKER: &str = "$0";
@@ -216,9 +217,14 @@ pub(crate) fn render_targets<T: IntoIterator<Item = FileRange>>(
     if targets.is_empty() {
         return None;
     }
-    let source = item_at_position(&index, file, position)
-        .unwrap()
-        .map(|item| item.range);
+    let token = TokenAt::new(file, position.value).unwrap();
+    let source = match item_at_token(&index, position, &token) {
+        Some(item) => item.map(|item| item.range),
+        None => {
+            let literal = token.token.parent().and_then(ast::Literal::cast).unwrap();
+            position.with_value(token.original_range(literal.syntax().text_range()))
+        }
+    };
 
     let paths: Vec<String> = (0..files.len())
         .map(|index| format!("file{index}.sql"))

@@ -758,3 +758,146 @@ fn whitespace_after_string() {
 select 'foo' $0;
 "), @"no hover");
 }
+
+#[test]
+fn case_string_result() {
+    assert_snapshot!(hover("select case when true then '1'$0 else 1 end;"), @"
+    hover: int4
+      ╭▸ file0.sql:1:28
+      │
+    1 │ select case when true then '1' else 1 end;
+      │                            ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn coalesce_string_argument() {
+    assert_snapshot!(hover("select coalesce('1'$0, 1);"), @"
+    hover: int4
+      ╭▸ file0.sql:1:17
+      │
+    1 │ select coalesce('1', 1);
+      │                 ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn greatest_string_argument() {
+    assert_snapshot!(hover("select greatest(1, '2'$0);"), @"
+    hover: int4
+      ╭▸ file0.sql:1:20
+      │
+    1 │ select greatest(1, '2');
+      │                    ─── hover
+      │
+      ╰ note: value of literal: ` 2 `
+    ");
+}
+
+#[test]
+fn nullif_string_argument() {
+    assert_snapshot!(hover("select nullif(1, '1'$0);"), @"
+    hover: int4
+      ╭▸ file0.sql:1:18
+      │
+    1 │ select nullif(1, '1');
+      │                  ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn in_list_string_element() {
+    assert_snapshot!(hover("select 1 in ('1'$0, 2);"), @"
+    hover: int4
+      ╭▸ file0.sql:1:14
+      │
+    1 │ select 1 in ('1', 2);
+      │              ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn between_string_bound() {
+    assert_snapshot!(hover("select 1 between '0'$0 and 2;"), @"
+    hover: int4
+      ╭▸ file0.sql:1:18
+      │
+    1 │ select 1 between '0' and 2;
+      │                  ─── hover
+      │
+      ╰ note: value of literal: ` 0 `
+    ");
+}
+
+#[test]
+fn any_string_array() {
+    assert_snapshot!(hover("select 1 = any('{1}'$0);"), @"
+    hover: int4[]
+      ╭▸ file0.sql:1:16
+      │
+    1 │ select 1 = any('{1}');
+      │                ───── hover
+      │
+      ╰ note: value of literal: ` {1} `
+    ");
+}
+
+#[test]
+fn array_string_element() {
+    assert_snapshot!(hover("select array['1'$0, 2];"), @"
+    hover: int4
+      ╭▸ file0.sql:1:14
+      │
+    1 │ select array['1', 2];
+      │              ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn union_string_output() {
+    assert_snapshot!(hover("select '1'$0 union select 1;"), @"
+    hover: int4
+      ╭▸ file0.sql:1:8
+      │
+    1 │ select '1' union select 1;
+      │        ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
+
+#[test]
+fn values_string_row() {
+    assert_snapshot!(hover("select * from (values (1), ('2'$0)) v (a);"), @"
+    hover: int4
+      ╭▸ file0.sql:1:29
+      │
+    1 │ select * from (values (1), ('2')) v (a);
+      │                             ─── hover
+      │
+      ╰ note: value of literal: ` 2 `
+    ");
+}
+
+#[test]
+fn limit_string_value() {
+    assert_snapshot!(hover("create table t (a int); select * from t limit '1'$0;"), @"
+    hover: int8
+      ╭▸ file0.sql:1:47
+      │
+    1 │ create table t (a int); select * from t limit '1';
+      │                                               ─── hover
+      │
+      ╰ note: value of literal: ` 1 `
+    ");
+}
