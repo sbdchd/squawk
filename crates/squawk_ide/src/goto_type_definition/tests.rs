@@ -15,6 +15,375 @@ fn goto(sql: &str) -> String {
 }
 
 #[test]
+fn integer_literal() {
+    assert_snapshot!(goto("select 1000$0;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:8
+          │
+        1 │ select 1000;
+          │        ──── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn string_literal() {
+    assert_snapshot!(goto("select 'hello'$0;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:8
+          │
+        1 │ select 'hello';
+          │        ─────── 1. source
+          │
+          ⸬  builtins.sql:32396:24
+          │
+    32396 │ create type pg_catalog.text (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn coerced_string_literal() {
+    assert_snapshot!(goto("select 1 + '1'$0;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:12
+          │
+        1 │ select 1 + '1';
+          │            ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn coerced_left_string_literal() {
+    assert_snapshot!(goto("select '1'$0 + 1;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:8
+          │
+        1 │ select '1' + 1;
+          │        ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn comparison_literal() {
+    assert_snapshot!(goto("select 1 = '1'$0;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:12
+          │
+        1 │ select 1 = '1';
+          │            ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn cast_string_literal() {
+    assert_snapshot!(goto("create domain d as text; select 'hello'$0::d;"), @"
+    info: goto type definition
+      ╭▸ file0.sql:1:15
+      │
+    1 │ create domain d as text; select 'hello'::d;
+      ╰╴              ─ 2. destination  ─────── 1. source
+    ");
+}
+
+#[test]
+fn abs_string_literal() {
+    assert_snapshot!(goto("select abs('1'$0);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:12
+          │
+        1 │ select abs('1');
+          │            ─── 1. source
+          │
+          ⸬  builtins.sql:32131:24
+          │
+    32131 │ create type pg_catalog.float8 (
+          ╰╴                       ────── 2. destination
+    ");
+}
+
+#[test]
+fn function_argument_literal() {
+    assert_snapshot!(goto("create function f(integer) returns integer
+  language sql
+  return 1; select f('-1'$0);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:3:22
+          │
+        3 │   return 1; select f('-1');
+          │                      ──── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn sql_body_literal() {
+    assert_snapshot!(goto("create function f() returns integer
+  language sql
+  as $$ select 1000$0; $$;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:3:16
+          │
+        3 │   as $$ select 1000; $$;
+          │                ──── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn null_literal() {
+    assert_snapshot!(goto("select null$0;"), @"no type definition");
+}
+
+#[test]
+fn coerced_enum_literal() {
+    assert_snapshot!(goto("create type mood as enum (
+  'happy',
+  'sad'
+); select 'happy'$0::mood;"), @"
+    info: goto type definition
+      ╭▸ file0.sql:1:13
+      │
+    1 │ create type mood as enum (
+      │             ──── 2. destination
+      ‡
+    4 │ ); select 'happy'::mood;
+      ╰╴          ─────── 1. source
+    ");
+}
+
+#[test]
+fn case_literal() {
+    assert_snapshot!(goto("select case when true then '1'$0 else 1 end;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:28
+          │
+        1 │ select case when true then '1' else 1 end;
+          │                            ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn coalesce_literal() {
+    assert_snapshot!(goto("select coalesce('1'$0, 1);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:17
+          │
+        1 │ select coalesce('1', 1);
+          │                 ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn greatest_literal() {
+    assert_snapshot!(goto("select greatest(1, '2'$0);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:20
+          │
+        1 │ select greatest(1, '2');
+          │                    ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn nullif_literal() {
+    assert_snapshot!(goto("select nullif(1, '1'$0);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:18
+          │
+        1 │ select nullif(1, '1');
+          │                  ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn in_list_literal() {
+    assert_snapshot!(goto("select 1 in ('1'$0, 2);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:14
+          │
+        1 │ select 1 in ('1', 2);
+          │              ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn between_literal() {
+    assert_snapshot!(goto("select 1 between '0'$0 and 2;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:18
+          │
+        1 │ select 1 between '0' and 2;
+          │                  ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn any_literal() {
+    assert_snapshot!(goto("select 1 = any('{1}'$0);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:16
+          │
+        1 │ select 1 = any('{1}');
+          │                ───── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn array_literal() {
+    assert_snapshot!(goto("select array['1'$0, 2];"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:14
+          │
+        1 │ select array['1', 2];
+          │              ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn union_left_literal() {
+    assert_snapshot!(goto("select '1'$0 union select 1;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:8
+          │
+        1 │ select '1' union select 1;
+          │        ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn union_right_literal() {
+    assert_snapshot!(goto("select 1 union select '2'$0;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:23
+          │
+        1 │ select 1 union select '2';
+          │                       ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn values_literal() {
+    assert_snapshot!(goto("select * from (values (1), ('2'$0)) v (a);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:29
+          │
+        1 │ select * from (values (1), ('2')) v (a);
+          │                             ─── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn limit_literal() {
+    assert_snapshot!(goto("create table t (a int); select * from t limit '1'$0;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:47
+          │
+        1 │ create table t (a int); select * from t limit '1';
+          │                                               ─── 1. source
+          │
+          ⸬  builtins.sql:32168:24
+          │
+    32168 │ create type pg_catalog.int8 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn polymorphic_unresolved_call() {
+    assert_snapshot!(goto("create function f(anyelement) returns anyelement
+  language sql
+  return $1; select f$0(null);"), @"no type definition");
+}
+
+#[test]
+fn multi_arg_unnest() {
+    assert_snapshot!(goto("select * from unnest$0(array[1], array['a']);"), @"no type definition");
+}
+
+#[test]
 fn cte_column_int_literal() {
     assert_snapshot!(goto("
 create type pg_catalog.int4;
@@ -1044,5 +1413,168 @@ select a$0 from f();
       ‡
     6 │ select a from f();
       ╰╴       ─ 1. source
+    ");
+}
+
+#[test]
+fn graph_property() {
+    assert_snapshot!(goto("
+create table person (id int, name text);
+create property graph g vertex tables (person properties (name as n));
+select * from graph_table(g match (a) columns (a.n$0));
+"), @"
+    info: goto type definition
+          ╭▸ file0.sql:4:50
+          │
+        4 │ select * from graph_table(g match (a) columns (a.n));
+          │                                                  ─ 1. source
+          │
+          ⸬  builtins.sql:32396:24
+          │
+    32396 │ create type pg_catalog.text (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn function_call() {
+    assert_snapshot!(goto("
+create function f() returns integer
+  language sql
+  return 1;
+select f$0();
+"), @"
+    info: goto type definition
+          ╭▸ file0.sql:5:8
+          │
+        5 │ select f();
+          │        ─ 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn builtin_function_call() {
+    assert_snapshot!(goto("select now$0();"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:8
+          │
+        1 │ select now();
+          │        ─── 1. source
+          │
+          ⸬  builtins.sql:32425:24
+          │
+    32425 │ create type pg_catalog.timestamptz (
+          ╰╴                       ─────────── 2. destination
+    ");
+}
+
+#[test]
+fn polymorphic_function_call() {
+    assert_snapshot!(goto("select array_append$0(array[1], 2);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:8
+          │
+        1 │ select array_append(array[1], 2);
+          │        ──────────── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn operator() {
+    assert_snapshot!(goto("select 1 +$0 2;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:10
+          │
+        1 │ select 1 + 2;
+          │          ─ 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn custom_operator() {
+    assert_snapshot!(goto("
+create function f(integer, integer) returns text
+  language sql
+  return '';
+create operator === (leftarg = integer, rightarg = integer, function = f);
+select 1 ===$0 2;
+"), @"
+    info: goto type definition
+          ╭▸ file0.sql:6:10
+          │
+        6 │ select 1 === 2;
+          │          ─── 1. source
+          │
+          ⸬  builtins.sql:32396:24
+          │
+    32396 │ create type pg_catalog.text (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn polymorphic_operator() {
+    assert_snapshot!(goto("select array[1] ||$0 2;"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:17
+          │
+        1 │ select array[1] || 2;
+          │                 ── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
+    ");
+}
+
+#[test]
+fn polymorphic_function_call_field() {
+    assert_snapshot!(goto("
+create type pair as (a int, b int);
+create function f(anyelement) returns anyelement
+  language sql
+  return $1;
+select (f$0(row(1, 2)::pair)).a;
+"), @"
+    info: goto type definition
+      ╭▸ file0.sql:2:13
+      │
+    2 │ create type pair as (a int, b int);
+      │             ──── 2. destination
+      ‡
+    6 │ select (f(row(1, 2)::pair)).a;
+      ╰╴        ─ 1. source
+    ");
+}
+
+#[test]
+fn polymorphic_from_function() {
+    assert_snapshot!(goto("select * from unnest$0(array[1, 2]);"), @"
+    info: goto type definition
+          ╭▸ file0.sql:1:15
+          │
+        1 │ select * from unnest(array[1, 2]);
+          │               ────── 1. source
+          │
+          ⸬  builtins.sql:32162:24
+          │
+    32162 │ create type pg_catalog.int4 (
+          ╰╴                       ──── 2. destination
     ");
 }

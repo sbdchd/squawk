@@ -4,9 +4,9 @@ use squawk_sema::{
     ir::{Item, Ty},
     semantic_index::SemanticIndex,
 };
-use squawk_syntax::ast;
+use squawk_syntax::ast::{self, AstNode};
 
-use squawk_ide_db::offsets::item_at_position;
+use squawk_ide_db::offsets::{TokenAt, item_at_token};
 use squawk_ide_db::{Db, parse, semantic_index};
 
 pub fn goto_type_definition(db: &dyn Db, position: InFile<TextSize>) -> Option<InFile<TextRange>> {
@@ -19,24 +19,35 @@ pub(crate) fn goto_type_definition_with_index(
     file: &ast::SourceFile,
     position: FilePosition,
 ) -> Option<FileRange> {
-    let item = item_at_position(index, file, position)?.value.item;
-    let ty = item_type(index, item)?;
+    let token = TokenAt::new(file, position.value)?;
+    let ty = match item_at_token(index, position, &token) {
+        Some(item) => item_type(index, item.value.item)?,
+        None => {
+            let literal = token.token.parent().and_then(ast::Literal::cast)?;
+            let range = position.with_value(token.original_range(literal.syntax().text_range()));
+            *index.literal_types.get(&range)?
+        }
+    };
     Some(index.range(ty_range(index, ty)))
 }
 
 fn item_type(index: &SemanticIndex, item: Item) -> Option<Ty> {
     match item {
-        Item::Reference(reference) => {
-            item_type(index, index.references[reference].resolution.item()?)
-        }
+        Item::Reference(reference) => match index.call_types.get(&reference) {
+            Some(&ty) => ty,
+            None => item_type(index, index.references[reference].resolution.item()?),
+        },
         Item::Column(column) => index.columns[column].ty,
         Item::Source(source) => index.source_type(source),
         Item::Table(table) => Some(Ty::Table(table)),
         Item::Cte(cte) => Some(Ty::Cte(cte)),
         Item::Type(ty) => Some(Ty::Type(ty)),
         Item::Param(param) => index.params[param].ty,
-        Item::Function(_)
-        | Item::Window(_)
+        Item::EnumLabel(label) => Some(Ty::Type(index.enum_labels[label].ty)),
+        Item::GraphProperty(property) => index.columns[index.graph_properties[property].column].ty,
+        Item::Function(function) => index.functions[function].ret,
+        Item::Operator(operator) => index.functions[index.operators[operator].function?].ret,
+        Item::Window(_)
         | Item::JsonPath(_)
         | Item::Index(_)
         | Item::Constraint(_)
@@ -58,14 +69,11 @@ fn item_type(index: &SemanticIndex, item: Item) -> Option<Ty> {
         | Item::Subscription(_)
         | Item::GraphElement(_)
         | Item::GraphLabel(_)
-        | Item::EnumLabel(_)
-        | Item::GraphProperty(_)
         | Item::Collation(_)
         | Item::Schema(_)
         | Item::Tablespace(_)
         | Item::Database(_)
         | Item::Extension(_)
-        | Item::Operator(_)
         | Item::Savepoint(_)
         | Item::Cursor(_)
         | Item::PreparedTransaction(_)
