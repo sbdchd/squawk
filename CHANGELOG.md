@@ -7,6 +7,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## v2.74.0 - 2026-11-22
+
+### Added
+
+- parser: support pg19's wait for lsn (#1496)
+- ide: goto type def for literals (#1494)
+- ide: show the substituted value with generics on hover (#1493)
+- ide: add qualify column code action (#1491)
+- sema: check aggregates for missing args (#1487)
+- sema: check string literal type constructors (#1484)
+- docs: add squawk format info (#1486)
+
+### Changed
+
+- parser: improve perf (#1500, #1499)
+- fmt: avoid indent w/ logical exprs + slice changes + consistent conds (#1495)
+- docs: update --help docs in readme and site (#1490)
+
+### Fixed
+
+- parser: fix panics found via hegel (#1498)
+- ide: fix hover for type of string literals (#1492)
+- ide: fix add schema for builtins + fix parser edge cases for %type (#1489)
+- ide: fix goto def on ops & implicit shell types + syntax highlighting (#1488)
+
+### Internal
+
+- parser: add tests to ensure we have fixtures for all statements (#1497)
+- internal: cleanup typos (#1483)
+
 ## v2.73.0 - 2026-11-15
 
 ### Added
