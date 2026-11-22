@@ -19,6 +19,10 @@ alter foreign table t
 alter foreign table t
   alter c set (a, , b = 1);
 
+-- keyword in merge partitions list
+ALTER TABLE t MERGE PARTITIONS (USER);
+ALTER TABLE t MERGE PARTITIONS (a, CURRENT_USER) INTO b;
+
 -- trailing comma in action list
 ALTER TABLE t
   ADD c t[] DEFAULT (())::t[],

@@ -10819,10 +10819,16 @@ fn table_name_ref_list(p: &mut Parser<'_>) {
         R_PAREN,
         COMMA,
         ListItems::Required(ListItem::Table),
-        NAME_REF_FIRST,
+        PATH_FIRST,
         |p| {
-            table_name_ref(p);
-            true
+            if opt_table_name_ref(p).is_some() {
+                return true;
+            }
+            if p.at_ts(NAME_REF_FIRST) {
+                p.err_and_bump("expected table name");
+                return true;
+            }
+            false
         },
     );
     m.complete(p, TABLE_NAME_REF_LIST);
