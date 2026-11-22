@@ -5,12 +5,19 @@ use std::{borrow::Cow, num::IntErrorKind, ops};
 use squawk_lexer::tokenize;
 
 use crate::SyntaxKind;
+use crate::generated::token_sets::CONTEXTUAL_KEYWORDS;
 
 pub struct LexedStr<'a> {
     text: &'a str,
     kind: Vec<SyntaxKind>,
     start: Vec<u32>,
     error: Vec<LexError>,
+    contextual_keywords: Vec<ContextualKeyword>,
+}
+
+pub(crate) struct ContextualKeyword {
+    pub(crate) token: u32,
+    pub(crate) kind: SyntaxKind,
 }
 
 pub struct LexError {
@@ -40,9 +47,7 @@ impl<'a> LexedStr<'a> {
         let mut conv = Converter::new(text);
 
         for token in tokenize(&text[conv.offset..]) {
-            let token_text = &text[conv.offset..][..token.len as usize];
-
-            conv.extend_token(&token.kind, token_text);
+            conv.extend_token(&token.kind, token.len as usize);
         }
 
         conv.finalize_with_eof()
@@ -86,10 +91,6 @@ impl<'a> LexedStr<'a> {
         self.kind[i]
     }
 
-    pub(crate) fn text(&self, i: usize) -> &str {
-        self.range_text(i..i + 1)
-    }
-
     #[inline]
     pub(crate) fn range_text(&self, r: ops::Range<usize>) -> &str {
         assert!(r.start < r.end && r.end <= self.len());
@@ -129,6 +130,10 @@ impl<'a> LexedStr<'a> {
         self.error.iter()
     }
 
+    pub(crate) fn contextual_keywords(&self) -> &[ContextualKeyword] {
+        &self.contextual_keywords
+    }
+
     fn push(&mut self, kind: SyntaxKind, offset: usize) {
         self.kind.push(kind);
         self.start.push(u32::try_from(offset).unwrap());
@@ -159,6 +164,54 @@ fn is_empty_quoted_ident(token_text: &str, uescape: bool) -> bool {
     inner == Some("\"\"")
 }
 
+fn simple_syntax_kind(kind: &squawk_lexer::TokenKind) -> Option<SyntaxKind> {
+    match kind {
+        squawk_lexer::TokenKind::Semi => Some(SyntaxKind::SEMICOLON),
+        squawk_lexer::TokenKind::Comma => Some(SyntaxKind::COMMA),
+        squawk_lexer::TokenKind::Dot => Some(SyntaxKind::DOT),
+        squawk_lexer::TokenKind::DotDot => Some(SyntaxKind::DOT_DOT),
+        squawk_lexer::TokenKind::OpenParen => Some(SyntaxKind::L_PAREN),
+        squawk_lexer::TokenKind::CloseParen => Some(SyntaxKind::R_PAREN),
+        squawk_lexer::TokenKind::OpenBracket => Some(SyntaxKind::L_BRACK),
+        squawk_lexer::TokenKind::CloseBracket => Some(SyntaxKind::R_BRACK),
+        squawk_lexer::TokenKind::OpenCurly => Some(SyntaxKind::L_CURLY),
+        squawk_lexer::TokenKind::CloseCurly => Some(SyntaxKind::R_CURLY),
+        squawk_lexer::TokenKind::At => Some(SyntaxKind::AT),
+        squawk_lexer::TokenKind::Pound => Some(SyntaxKind::POUND),
+        squawk_lexer::TokenKind::Tilde => Some(SyntaxKind::TILDE),
+        squawk_lexer::TokenKind::Question => Some(SyntaxKind::QUESTION),
+        squawk_lexer::TokenKind::Colon => Some(SyntaxKind::COLON),
+        squawk_lexer::TokenKind::Eq => Some(SyntaxKind::EQ),
+        squawk_lexer::TokenKind::Bang => Some(SyntaxKind::BANG),
+        squawk_lexer::TokenKind::Lt => Some(SyntaxKind::L_ANGLE),
+        squawk_lexer::TokenKind::Gt => Some(SyntaxKind::R_ANGLE),
+        squawk_lexer::TokenKind::Minus => Some(SyntaxKind::MINUS),
+        squawk_lexer::TokenKind::And => Some(SyntaxKind::AMP),
+        squawk_lexer::TokenKind::Or => Some(SyntaxKind::PIPE),
+        squawk_lexer::TokenKind::Plus => Some(SyntaxKind::PLUS),
+        squawk_lexer::TokenKind::Star => Some(SyntaxKind::STAR),
+        squawk_lexer::TokenKind::Slash => Some(SyntaxKind::SLASH),
+        squawk_lexer::TokenKind::Caret => Some(SyntaxKind::CARET),
+        squawk_lexer::TokenKind::Percent => Some(SyntaxKind::PERCENT),
+        squawk_lexer::TokenKind::Unknown => Some(SyntaxKind::ERROR),
+        squawk_lexer::TokenKind::Eof => Some(SyntaxKind::EOF),
+        squawk_lexer::TokenKind::Backtick => Some(SyntaxKind::BACKTICK),
+        squawk_lexer::TokenKind::Whitespace => Some(SyntaxKind::WHITESPACE),
+        squawk_lexer::TokenKind::LineComment => Some(SyntaxKind::COMMENT),
+        squawk_lexer::TokenKind::PsqlCommand { ends_query: false } => {
+            Some(SyntaxKind::PSQL_COMMAND_TEXT)
+        }
+        squawk_lexer::TokenKind::PsqlCommand { ends_query: true } => {
+            Some(SyntaxKind::PSQL_TERMINATOR_TEXT)
+        }
+        squawk_lexer::TokenKind::Ident
+        | squawk_lexer::TokenKind::Literal { .. }
+        | squawk_lexer::TokenKind::BlockComment { .. }
+        | squawk_lexer::TokenKind::PositionalParam { .. }
+        | squawk_lexer::TokenKind::QuotedIdent { .. } => None,
+    }
+}
+
 impl<'a> Converter<'a> {
     fn new(text: &'a str) -> Self {
         let tokens = text.len() / 4 + 1;
@@ -168,6 +221,7 @@ impl<'a> Converter<'a> {
                 kind: Vec::with_capacity(tokens),
                 start: Vec::with_capacity(tokens),
                 error: Vec::new(),
+                contextual_keywords: vec![],
             },
             offset: 0,
             prefixed_string_continuation: None,
@@ -194,13 +248,22 @@ impl<'a> Converter<'a> {
         });
     }
 
-    fn extend_token(&mut self, kind: &squawk_lexer::TokenKind, token_text: &str) {
+    fn extend_token(&mut self, kind: &squawk_lexer::TokenKind, len: usize) {
+        if let Some(syntax_kind) = simple_syntax_kind(kind) {
+            if !matches!(
+                kind,
+                squawk_lexer::TokenKind::Whitespace | squawk_lexer::TokenKind::LineComment
+            ) {
+                self.prefixed_string_continuation = None;
+            }
+            self.push(syntax_kind, len);
+            return;
+        }
+        let (text, offset) = (self.res.text, self.offset);
+        let token_text = || &text[offset..][..len];
         if !matches!(
             kind,
-            squawk_lexer::TokenKind::Whitespace
-                | squawk_lexer::TokenKind::LineComment
-                | squawk_lexer::TokenKind::BlockComment { .. }
-                | squawk_lexer::TokenKind::Literal { .. }
+            squawk_lexer::TokenKind::BlockComment { .. } | squawk_lexer::TokenKind::Literal { .. }
         ) {
             self.prefixed_string_continuation = None;
         }
@@ -214,7 +277,6 @@ impl<'a> Converter<'a> {
 
         let syntax_kind = {
             match kind {
-                squawk_lexer::TokenKind::LineComment => SyntaxKind::COMMENT,
                 squawk_lexer::TokenKind::BlockComment { terminated } => {
                     if !terminated {
                         err = "missing trailing `*/` symbols to terminate the block comment";
@@ -222,53 +284,25 @@ impl<'a> Converter<'a> {
                     SyntaxKind::COMMENT
                 }
 
-                squawk_lexer::TokenKind::Whitespace => SyntaxKind::WHITESPACE,
-                squawk_lexer::TokenKind::Ident => {
-                    SyntaxKind::from_keyword(token_text).unwrap_or(SyntaxKind::IDENT)
-                }
+                squawk_lexer::TokenKind::Ident => match SyntaxKind::from_keyword(token_text()) {
+                    Some(kind) if CONTEXTUAL_KEYWORDS.contains(kind) => {
+                        self.res.contextual_keywords.push(ContextualKeyword {
+                            token: u32::try_from(self.res.kind.len()).unwrap(),
+                            kind,
+                        });
+                        SyntaxKind::IDENT
+                    }
+                    Some(kind) => kind,
+                    None => SyntaxKind::IDENT,
+                },
                 squawk_lexer::TokenKind::Literal { kind, .. } => {
-                    self.extend_literal(token_text, kind);
+                    self.extend_literal(token_text(), kind);
                     return;
                 }
-                squawk_lexer::TokenKind::PsqlCommand { ends_query: false } => {
-                    SyntaxKind::PSQL_COMMAND_TEXT
-                }
-                squawk_lexer::TokenKind::PsqlCommand { ends_query: true } => {
-                    SyntaxKind::PSQL_TERMINATOR_TEXT
-                }
-                squawk_lexer::TokenKind::Semi => SyntaxKind::SEMICOLON,
-                squawk_lexer::TokenKind::Comma => SyntaxKind::COMMA,
-                squawk_lexer::TokenKind::Dot => SyntaxKind::DOT,
-                squawk_lexer::TokenKind::DotDot => SyntaxKind::DOT_DOT,
-                squawk_lexer::TokenKind::OpenParen => SyntaxKind::L_PAREN,
-                squawk_lexer::TokenKind::CloseParen => SyntaxKind::R_PAREN,
-                squawk_lexer::TokenKind::OpenBracket => SyntaxKind::L_BRACK,
-                squawk_lexer::TokenKind::CloseBracket => SyntaxKind::R_BRACK,
-                squawk_lexer::TokenKind::OpenCurly => SyntaxKind::L_CURLY,
-                squawk_lexer::TokenKind::CloseCurly => SyntaxKind::R_CURLY,
-                squawk_lexer::TokenKind::At => SyntaxKind::AT,
-                squawk_lexer::TokenKind::Pound => SyntaxKind::POUND,
-                squawk_lexer::TokenKind::Tilde => SyntaxKind::TILDE,
-                squawk_lexer::TokenKind::Question => SyntaxKind::QUESTION,
-                squawk_lexer::TokenKind::Colon => SyntaxKind::COLON,
-                squawk_lexer::TokenKind::Eq => SyntaxKind::EQ,
-                squawk_lexer::TokenKind::Bang => SyntaxKind::BANG,
-                squawk_lexer::TokenKind::Lt => SyntaxKind::L_ANGLE,
-                squawk_lexer::TokenKind::Gt => SyntaxKind::R_ANGLE,
-                squawk_lexer::TokenKind::Minus => SyntaxKind::MINUS,
-                squawk_lexer::TokenKind::And => SyntaxKind::AMP,
-                squawk_lexer::TokenKind::Or => SyntaxKind::PIPE,
-                squawk_lexer::TokenKind::Plus => SyntaxKind::PLUS,
-                squawk_lexer::TokenKind::Star => SyntaxKind::STAR,
-                squawk_lexer::TokenKind::Slash => SyntaxKind::SLASH,
-                squawk_lexer::TokenKind::Caret => SyntaxKind::CARET,
-                squawk_lexer::TokenKind::Percent => SyntaxKind::PERCENT,
-                squawk_lexer::TokenKind::Unknown => SyntaxKind::ERROR,
-                squawk_lexer::TokenKind::Eof => SyntaxKind::EOF,
-                squawk_lexer::TokenKind::Backtick => SyntaxKind::BACKTICK,
                 squawk_lexer::TokenKind::PositionalParam {
                     trailing_junk_start,
                 } => {
+                    let token_text = token_text();
                     let digits = &token_text[1..*trailing_junk_start as usize];
                     if digits.is_empty() {
                         err = "missing parameter number";
@@ -286,13 +320,48 @@ impl<'a> Converter<'a> {
                     }
                     SyntaxKind::POSITIONAL_PARAM
                 }
+                squawk_lexer::TokenKind::Whitespace
+                | squawk_lexer::TokenKind::LineComment
+                | squawk_lexer::TokenKind::Semi
+                | squawk_lexer::TokenKind::Comma
+                | squawk_lexer::TokenKind::Dot
+                | squawk_lexer::TokenKind::DotDot
+                | squawk_lexer::TokenKind::OpenParen
+                | squawk_lexer::TokenKind::CloseParen
+                | squawk_lexer::TokenKind::OpenBracket
+                | squawk_lexer::TokenKind::CloseBracket
+                | squawk_lexer::TokenKind::OpenCurly
+                | squawk_lexer::TokenKind::CloseCurly
+                | squawk_lexer::TokenKind::At
+                | squawk_lexer::TokenKind::Pound
+                | squawk_lexer::TokenKind::Tilde
+                | squawk_lexer::TokenKind::Question
+                | squawk_lexer::TokenKind::Colon
+                | squawk_lexer::TokenKind::Eq
+                | squawk_lexer::TokenKind::Bang
+                | squawk_lexer::TokenKind::Lt
+                | squawk_lexer::TokenKind::Gt
+                | squawk_lexer::TokenKind::Minus
+                | squawk_lexer::TokenKind::And
+                | squawk_lexer::TokenKind::Or
+                | squawk_lexer::TokenKind::Plus
+                | squawk_lexer::TokenKind::Star
+                | squawk_lexer::TokenKind::Slash
+                | squawk_lexer::TokenKind::Caret
+                | squawk_lexer::TokenKind::Percent
+                | squawk_lexer::TokenKind::Unknown
+                | squawk_lexer::TokenKind::Eof
+                | squawk_lexer::TokenKind::Backtick
+                | squawk_lexer::TokenKind::PsqlCommand { .. } => {
+                    unreachable!("handled by `simple_syntax_kind`")
+                }
                 squawk_lexer::TokenKind::QuotedIdent {
                     terminated,
                     uescape,
                 } => {
                     if !terminated {
                         err = "missing trailing \" to terminate the quoted identifier";
-                    } else if is_empty_quoted_ident(token_text, *uescape) {
+                    } else if is_empty_quoted_ident(token_text(), *uescape) {
                         err = "empty delimited identifier";
                     }
                     SyntaxKind::IDENT
@@ -304,13 +373,13 @@ impl<'a> Converter<'a> {
         let err = err.map(|msg| {
             (
                 msg.into(),
-                err_range.unwrap_or(0..u32::try_from(token_text.len()).unwrap()),
+                err_range.unwrap_or(0..u32::try_from(len).unwrap()),
             )
         });
         if let Some((msg, err_range)) = err {
             self.push_error(msg, err_range);
         }
-        self.push(syntax_kind, token_text.len());
+        self.push(syntax_kind, len);
     }
 
     fn extend_literal(&mut self, token_text: &str, kind: &squawk_lexer::LiteralKind) {

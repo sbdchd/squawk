@@ -12,6 +12,7 @@ pub(crate) struct Cursor<'a> {
     /// Iterator over chars. Slightly faster than a &str.
     chars: Chars<'a>,
     len_remaining: usize,
+    input_len: usize,
 }
 
 pub(crate) const EOF_CHAR: char = '\0';
@@ -21,6 +22,7 @@ impl<'a> Cursor<'a> {
         Cursor {
             len_remaining: input.len(),
             chars: input.chars(),
+            input_len: input.len(),
         }
     }
 
@@ -51,6 +53,10 @@ impl<'a> Cursor<'a> {
     /// Returns amount of already consumed symbols.
     pub(crate) fn pos_within_token(&self) -> u32 {
         u32::try_from(self.len_remaining - self.chars.as_str().len()).unwrap()
+    }
+
+    pub(crate) fn consumed_len(&self) -> usize {
+        self.input_len - self.chars.as_str().len()
     }
 
     /// Resets the number of bytes consumed to 0.

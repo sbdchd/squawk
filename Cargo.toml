@@ -70,7 +70,7 @@ proc-macro2 = "1.0.95"
 snapbox = { version = "0.6.0", features = ["diff", "term-svg", "cmd"] }
 smallvec = "1.13.2"
 hashbrown = { version = "0.15.5", default-features = false }
-tabled = "0.17.0"
+tabled = { version = "0.17.0", default-features = false, features = ["std"] }
 etcetera = "0.11.0"
 url = "2.5.4"
 crossbeam-channel = "0.5.15"
@@ -104,6 +104,9 @@ squawk-thread = { path = "./crates/squawk_thread", version = "2.73.0" }
 unsafe_code = "warn"
 unreachable_pub = "warn"
 unexpected_cfgs = "warn"
+
+[workspace.lints.cargo]
+unused_dependencies = "deny"
 
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -2 }

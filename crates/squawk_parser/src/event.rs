@@ -37,135 +37,141 @@ use crate::{output::Output, syntax_kind::SyntaxKind};
 /// `Parser` produces a flat list of `Event`s.
 /// They are converted to a tree-structure in
 /// a separate pass, via `SyntaxTreeBuilder`.
-#[derive(Debug, Clone, Copy)]
-pub(crate) enum Event {
-    /// This event signifies the start of the node.
-    /// It should be either abandoned (in which case the
-    /// `kind` is `TOMBSTONE`, and the event is ignored),
-    /// or completed via a `Finish` event.
-    ///
-    /// All tokens between a `Start` and a `Finish` would
-    /// become the children of the respective node.
-    ///
-    /// For left-recursive syntactic constructs, the parser produces
-    /// a child node before it sees a parent. `forward_parent`
-    /// saves the position of current event's parent.
-    ///
-    /// Consider this path
-    ///
-    /// `foo::bar`
-    ///
-    /// The events for it would look like this:
-    ///
-    /// ```text
-    /// START(PATH) IDENT('foo') FINISH START(PATH) T![::] IDENT('bar') FINISH
-    ///       |                          /\
-    ///       |                          |
-    ///       +------forward-parent------+
-    /// ```
-    ///
-    /// And the tree would look like this
-    ///
-    /// ```text
-    ///    +--PATH---------+
-    ///    |   |           |
-    ///    |   |           |
-    ///    |  '::'       'bar'
-    ///    |
-    ///   PATH
-    ///    |
-    ///   'foo'
-    /// ```
-    ///
-    /// See also `CompletedMarker::precede`.
-    Start {
-        kind: SyntaxKind,
-        forward_parent: Option<NonZeroU32>,
-    },
-
-    /// Complete the previous `Start` event
-    Finish,
-
-    /// Produce a single leaf-element.
-    /// `n_raw_tokens` is used to glue complex contextual tokens.
-    /// For example, lexer tokenizes `>>` as `>`, `>`, and
-    /// `n_raw_tokens = 2` is used to produce a single `>>`.
-    Token {
-        kind: SyntaxKind,
-        n_raw_tokens: u8,
-    },
-    Error {
-        index: u32,
-    },
-}
-
-const _: () = assert!(mem::size_of::<Event>() == 8);
+///
+/// A start event signifies the start of a node.
+/// It should be either abandoned (in which case the
+/// `kind` is `TOMBSTONE`, and the event is ignored),
+/// or completed via a `Finish` event.
+///
+/// All tokens between a `Start` and a `Finish` would
+/// become the children of the respective node.
+///
+/// For left-recursive syntactic constructs, the parser produces
+/// a child node before it sees a parent. `forward_parent`
+/// saves the position of current event's parent.
+///
+/// Consider this path
+///
+/// `foo::bar`
+///
+/// The events for it would look like this:
+///
+/// ```text
+/// START(PATH) IDENT('foo') FINISH START(PATH) T![::] IDENT('bar') FINISH
+///       |                          /\
+///       |                          |
+///       +------forward-parent------+
+/// ```
+///
+/// And the tree would look like this
+///
+/// ```text
+///    +--PATH---------+
+///    |   |           |
+///    |   |           |
+///    |  '::'       'bar'
+///    |
+///   PATH
+///    |
+///   'foo'
+/// ```
+///
+/// See also `CompletedMarker::precede`.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct Event(u64);
 
 impl Event {
-    pub(crate) fn tombstone() -> Self {
-        Event::Start {
-            kind: SyntaxKind::TOMBSTONE,
-            forward_parent: None,
-        }
+    pub(crate) const TOMBSTONE: Event = Event::new(Output::enter_event(SyntaxKind::TOMBSTONE));
+
+    const fn new(output: u32) -> Self {
+        Event(output as u64)
+    }
+
+    pub(crate) const fn finish() -> Self {
+        Self::new(Output::EXIT)
+    }
+
+    pub(crate) const fn token(kind: SyntaxKind, n_raw_tokens: u8) -> Self {
+        Self::new(Output::token_event(kind, n_raw_tokens))
+    }
+
+    pub(crate) fn error(index: u32) -> Self {
+        Self::new(Output::error_event(index))
+    }
+
+    #[allow(clippy::cast_possible_truncation)]
+    fn output(self) -> u32 {
+        self.0 as u32
+    }
+
+    fn forward_parent(self) -> Option<NonZeroU32> {
+        NonZeroU32::new((self.0 >> 32) as u32)
+    }
+
+    fn is_start(self) -> bool {
+        Output::is_enter_event(self.output())
+    }
+
+    fn start_kind(self) -> SyntaxKind {
+        debug_assert!(self.is_start());
+        Output::event_kind(self.output()).into()
+    }
+
+    pub(crate) fn complete_start(&mut self, kind: SyntaxKind) {
+        debug_assert!(self.is_start());
+        *self = Event(u64::from(Output::enter_event(kind)) | self.0 & !u64::from(u32::MAX));
+    }
+
+    pub(crate) fn set_forward_parent(&mut self, forward_parent: NonZeroU32) {
+        debug_assert!(self.is_start());
+        *self = Event(u64::from(self.output()) | u64::from(forward_parent.get()) << 32);
     }
 }
 
 /// Generate the syntax tree with the control of events.
-pub(super) fn process(mut events: Vec<Event>, mut errors: Vec<String>) -> Output {
-    let mut res = Output::with_capacity(events.len());
-    let mut forward_parents = Vec::new();
+pub(super) fn process(mut events: Vec<Event>, errors: Vec<String>, node_count: usize) -> Output {
+    let mut res = vec![0; events.len()];
+    let mut len = 0;
+    let mut forward_parents = vec![];
 
     for i in 0..events.len() {
-        match events[i] {
-            Event::Start {
-                kind,
-                forward_parent: None,
-            } => {
-                if kind != SyntaxKind::TOMBSTONE {
-                    res.enter_node(kind);
-                }
-            }
-            Event::Start {
-                kind,
-                forward_parent,
-            } => {
-                // For events[A, B, C], B is A's forward_parent, C is B's forward_parent,
-                // in the normal control flow, the parent-child relation: `A -> B -> C`,
-                // while with the magic forward_parent, it writes: `C <- B <- A`.
+        let event = events[i];
+        let Some(forward_parent) = event.forward_parent() else {
+            res[len] = event.output();
+            len += usize::from(event != Event::TOMBSTONE);
+            continue;
+        };
+        // For events[A, B, C], B is A's forward_parent, C is B's forward_parent,
+        // in the normal control flow, the parent-child relation: `A -> B -> C`,
+        // while with the magic forward_parent, it writes: `C <- B <- A`.
 
-                // append `A` into parents.
-                forward_parents.push(kind);
-                let mut idx = i;
-                let mut fp = forward_parent;
-                while let Some(fwd) = fp {
-                    idx += fwd.get() as usize;
-                    // append `A`'s forward_parent `B`
-                    fp = match mem::replace(&mut events[idx], Event::tombstone()) {
-                        Event::Start {
-                            kind,
-                            forward_parent,
-                        } => {
-                            forward_parents.push(kind);
-                            forward_parent
-                        }
-                        _ => unreachable!(),
-                    };
-                    // append `B`'s forward_parent `C` in the next stage.
-                }
+        // append `A` into parents.
+        forward_parents.push(event.start_kind());
+        let mut idx = i;
+        let mut fp = Some(forward_parent);
+        while let Some(fwd) = fp {
+            idx += fwd.get() as usize;
+            // append `A`'s forward_parent `B`
+            let parent = mem::replace(&mut events[idx], Event::TOMBSTONE);
+            forward_parents.push(parent.start_kind());
+            fp = parent.forward_parent();
+            // append `B`'s forward_parent `C` in the next stage.
+        }
 
-                for kind in forward_parents.drain(..).rev() {
-                    if kind != SyntaxKind::TOMBSTONE {
-                        res.enter_node(kind);
-                    }
-                }
+        for kind in forward_parents.drain(..).rev() {
+            if kind != SyntaxKind::TOMBSTONE {
+                res[len] = Output::enter_event(kind);
+                len += 1;
             }
-            Event::Finish => res.leave_node(),
-            Event::Token { kind, n_raw_tokens } => {
-                res.token(kind, n_raw_tokens);
-            }
-            Event::Error { index } => res.error(mem::take(&mut errors[index as usize])),
         }
     }
 
-    res
+    res.truncate(len);
+    debug_assert_eq!(
+        res.iter()
+            .filter(|&&event| Output::is_enter_event(event))
+            .count(),
+        node_count
+    );
+    Output::new(res, errors, node_count)
 }

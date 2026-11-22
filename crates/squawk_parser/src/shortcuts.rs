@@ -109,6 +109,7 @@ impl LexedStr<'_> {
     pub fn to_input(&self) -> crate::Input {
         let mut res = crate::Input::with_capacity(self.len());
         let mut was_joint = false;
+        let mut contextual_keywords = self.contextual_keywords().iter().peekable();
         for i in 0..self.len() {
             let kind = self.kind(i);
             if kind.is_trivia() {
@@ -120,8 +121,9 @@ impl LexedStr<'_> {
                     res.was_joint();
                 }
                 if kind == SyntaxKind::IDENT {
-                    let contextual_kind = SyntaxKind::from_contextual_keyword(self.text(i))
-                        .unwrap_or(SyntaxKind::IDENT);
+                    let contextual_kind = contextual_keywords
+                        .next_if(|keyword| keyword.token as usize == i)
+                        .map_or(SyntaxKind::IDENT, |keyword| keyword.kind);
                     res.push_ident(contextual_kind);
                 } else {
                     res.push(kind);

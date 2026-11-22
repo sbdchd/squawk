@@ -18,7 +18,6 @@ categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 serde_json.workspace = true
-tempfile.workspace = true
 serde = { workspace = true, features = ["rc"] }
 clap.workspace = true
 console.workspace = true
@@ -45,6 +44,7 @@ lsp-server.workspace = true
 similar.workspace = true
 
 [dev-dependencies]
+tempfile.workspace = true
 insta.workspace = true
 snapbox.workspace = true
 

@@ -109,6 +109,8 @@ impl Cursor<'_> {
                 _ => self.ident(),
             },
 
+            '\u{feff}' if self.consumed_len() == BOM.len() => TokenKind::Whitespace,
+
             // Identifier (this should be checked after other variant that can
             // start as identifier).
             c if is_ident_start(c) => self.ident(),
@@ -691,25 +693,15 @@ impl Cursor<'_> {
 
 /// Creates an iterator that produces tokens from the input string.
 pub fn tokenize(input: &str) -> impl Iterator<Item = Token> + '_ {
-    let (bom, input) = match input.strip_prefix(BOM) {
-        Some(input) => (
-            Some(Token::new(
-                TokenKind::Whitespace,
-                u32::try_from(BOM.len()).unwrap(),
-            )),
-            input,
-        ),
-        None => (None, input),
-    };
     let mut cursor = Cursor::new(input);
-    bom.into_iter().chain(std::iter::from_fn(move || {
+    std::iter::from_fn(move || {
         let token = cursor.advance_token();
         if token.kind != TokenKind::Eof {
             Some(token)
         } else {
             None
         }
-    }))
+    })
 }
 
 #[cfg(test)]
@@ -1702,6 +1694,18 @@ U&"d!0061t!+000061" UESCAPE '!'
             " " @ Whitespace,
             "1" @ Literal { kind: Int { base: Decimal, empty_int: false, trailing_junk_start: 1 } },
             ";" @ Semi,
+        ]
+        "#);
+    }
+
+    #[test]
+    fn repeated_bom_at_start() {
+        assert_debug_snapshot!(lex("\u{feff}\u{feff} select"), @r#"
+        [
+            "\u{feff}" @ Whitespace,
+            "\u{feff}" @ Ident,
+            " " @ Whitespace,
+            "select" @ Ident,
         ]
         "#);
     }

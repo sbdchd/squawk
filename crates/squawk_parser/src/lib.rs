@@ -75,13 +75,9 @@ impl Marker {
     pub(crate) fn complete(mut self, p: &mut Parser<'_>, kind: SyntaxKind) -> CompletedMarker {
         self.bomb.defuse();
         let idx = self.pos as usize;
-        match &mut p.events[idx] {
-            Event::Start { kind: slot, .. } => {
-                *slot = kind;
-            }
-            _ => unreachable!(),
-        }
-        p.push_event(Event::Finish);
+        p.events[idx].complete_start(kind);
+        p.node_count += 1;
+        p.push_event(Event::finish());
         CompletedMarker::new(self.pos, kind)
     }
 
@@ -91,13 +87,7 @@ impl Marker {
         self.bomb.defuse();
         let idx = self.pos as usize;
         if idx == p.events.len() - 1 {
-            match p.events.pop() {
-                Some(Event::Start {
-                    kind: SyntaxKind::TOMBSTONE,
-                    forward_parent: None,
-                }) => (),
-                _ => unreachable!(),
-            }
+            assert_eq!(p.events.pop(), Some(Event::TOMBSTONE));
         }
     }
 }
@@ -118,7 +108,7 @@ impl CompletedMarker {
     /// whole `A`, decide that it should have started some node
     /// `B` before starting `A`. `precede` allows doing exactly
     /// that. See also docs about
-    /// [`Event::Start::forward_parent`](crate::event::Event::Start::forward_parent).
+    /// [`Event`](crate::event::Event).
     ///
     /// Given completed events `[START, FINISH]` and its corresponding
     /// `CompletedMarker(pos: 0, _)`.
@@ -128,27 +118,21 @@ impl CompletedMarker {
     pub(crate) fn precede(self, p: &mut Parser<'_>) -> Marker {
         let new_pos = p.start();
         let idx = self.pos as usize;
-        match &mut p.events[idx] {
-            Event::Start { forward_parent, .. } => {
-                *forward_parent = NonZeroU32::new(new_pos.pos - self.pos);
-                debug_assert!(forward_parent.is_some());
-            }
-            _ => unreachable!(),
-        }
+        let forward_parent = NonZeroU32::new(new_pos.pos - self.pos).unwrap();
+        p.events[idx].set_forward_parent(forward_parent);
         new_pos
     }
 
     /// Extends this completed marker *to the left* up to `m`.
     pub(crate) fn extend_to(self, p: &mut Parser<'_>, mut m: Marker) -> CompletedMarker {
         m.bomb.defuse();
-        let idx = m.pos as usize;
-        match &mut p.events[idx] {
-            Event::Start { forward_parent, .. } => {
-                *forward_parent = NonZeroU32::new(self.pos - m.pos);
-                debug_assert!(forward_parent.is_some());
-            }
-            _ => unreachable!(),
+        let distance = self.pos - m.pos;
+        if distance == 1 {
+            return self;
         }
+        let idx = m.pos as usize;
+        let forward_parent = NonZeroU32::new(distance).unwrap();
+        p.events[idx].set_forward_parent(forward_parent);
         self
     }
 
@@ -173,7 +157,7 @@ impl EntryPoint {
             Self::Plpgsql => plpgsql_grammar::plpgsql_entry_point(&mut p),
         }
         // 3. forward parents
-        event::process(p.events, p.errors)
+        event::process(p.events, p.errors, p.node_count)
     }
 }
 
@@ -183,10 +167,11 @@ pub(crate) struct Parser<'t> {
     current_kind: SyntaxKind,
     events: Vec<Event>,
     errors: Vec<String>,
-    steps: Cell<u32>,
+    node_count: usize,
+    steps_left: Cell<u32>,
 }
 
-const PARSER_STEP_LIMIT: usize = 15_000_000;
+const PARSER_STEP_LIMIT: u32 = 15_000_000;
 
 #[derive(Clone, Copy)]
 enum TriviaBetween {
@@ -225,7 +210,8 @@ impl<'t> Parser<'t> {
             current_kind: inp.view().kind(0),
             events: Vec::with_capacity(inp.len() * 4),
             errors: vec![],
-            steps: Cell::new(0),
+            node_count: 0,
+            steps_left: Cell::new(PARSER_STEP_LIMIT),
         }
     }
 
@@ -609,7 +595,7 @@ impl<'t> Parser<'t> {
     /// belong to the same node.
     pub(crate) fn start(&mut self) -> Marker {
         let pos = u32::try_from(self.events.len()).unwrap();
-        self.push_event(Event::tombstone());
+        self.push_event(Event::TOMBSTONE);
         Marker::new(pos)
     }
 
@@ -685,8 +671,8 @@ impl<'t> Parser<'t> {
     fn do_bump(&mut self, kind: SyntaxKind, n_raw_tokens: u8) {
         self.pos += n_raw_tokens as usize;
         self.current_kind = self.inp.kind(self.pos);
-        self.steps.set(0);
-        self.push_event(Event::Token { kind, n_raw_tokens });
+        self.steps_left.set(PARSER_STEP_LIMIT);
+        self.push_event(Event::token(kind, n_raw_tokens));
     }
 
     fn push_event(&mut self, event: Event) {
@@ -700,7 +686,7 @@ impl<'t> Parser<'t> {
     pub(crate) fn error<T: Into<String>>(&mut self, message: T) {
         let index = u32::try_from(self.errors.len()).expect("too many parse errors");
         self.errors.push(message.into());
-        self.push_event(Event::Error { index });
+        self.push_event(Event::error(index));
     }
 
     /// Checks if the current token is `kind`.
@@ -1014,12 +1000,9 @@ impl<'t> Parser<'t> {
     /// token.
     #[must_use]
     fn nth(&self, n: usize) -> SyntaxKind {
-        let steps = self.steps.get();
-        assert!(
-            (steps as usize) < PARSER_STEP_LIMIT,
-            "the parser seems stuck"
-        );
-        self.steps.set(steps + 1);
+        let steps_left = self.steps_left.get();
+        assert!(steps_left != 0, "the parser seems stuck");
+        self.steps_left.set(steps_left - 1);
 
         self.kind_at(self.pos + n)
     }

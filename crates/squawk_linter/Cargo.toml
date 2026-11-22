@@ -21,11 +21,11 @@ squawk-rowan.workspace = true
 serde.workspace = true
 enum-iterator.workspace = true
 squawk-line-index.workspace = true
-annotate-snippets.workspace = true
 rustc-hash.workspace = true
 smallvec.workspace = true
 
 [dev-dependencies]
+annotate-snippets.workspace = true
 insta.workspace = true
 tabled.workspace = true
 

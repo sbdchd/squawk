@@ -4250,6 +4250,10 @@ impl SyntaxKind {
                     SyntaxKind::XML_KW
                 } else if ident.eq_ignore_ascii_case("yes") {
                     SyntaxKind::YES_KW
+                } else if ident.eq_ignore_ascii_case("get") {
+                    SyntaxKind::GET_KW
+                } else if ident.eq_ignore_ascii_case("log") {
+                    SyntaxKind::LOG_KW
                 } else {
                     return None;
                 }
@@ -4395,6 +4399,18 @@ impl SyntaxKind {
                     SyntaxKind::YEAR_KW
                 } else if ident.eq_ignore_ascii_case("zone") {
                     SyntaxKind::ZONE_KW
+                } else if ident.eq_ignore_ascii_case("dump") {
+                    SyntaxKind::DUMP_KW
+                } else if ident.eq_ignore_ascii_case("exit") {
+                    SyntaxKind::EXIT_KW
+                } else if ident.eq_ignore_ascii_case("hint") {
+                    SyntaxKind::HINT_KW
+                } else if ident.eq_ignore_ascii_case("info") {
+                    SyntaxKind::INFO_KW
+                } else if ident.eq_ignore_ascii_case("loop") {
+                    SyntaxKind::LOOP_KW
+                } else if ident.eq_ignore_ascii_case("open") {
+                    SyntaxKind::OPEN_KW
                 } else {
                     return None;
                 }
@@ -4542,6 +4558,20 @@ impl SyntaxKind {
                     SyntaxKind::WRITE_KW
                 } else if ident.eq_ignore_ascii_case("xmlpi") {
                     SyntaxKind::XMLPI_KW
+                } else if ident.eq_ignore_ascii_case("alias") {
+                    SyntaxKind::ALIAS_KW
+                } else if ident.eq_ignore_ascii_case("debug") {
+                    SyntaxKind::DEBUG_KW
+                } else if ident.eq_ignore_ascii_case("elsif") {
+                    SyntaxKind::ELSIF_KW
+                } else if ident.eq_ignore_ascii_case("query") {
+                    SyntaxKind::QUERY_KW
+                } else if ident.eq_ignore_ascii_case("raise") {
+                    SyntaxKind::RAISE_KW
+                } else if ident.eq_ignore_ascii_case("slice") {
+                    SyntaxKind::SLICE_KW
+                } else if ident.eq_ignore_ascii_case("while") {
+                    SyntaxKind::WHILE_KW
                 } else {
                     return None;
                 }
@@ -4711,6 +4741,14 @@ impl SyntaxKind {
                     SyntaxKind::WINDOW_KW
                 } else if ident.eq_ignore_ascii_case("within") {
                     SyntaxKind::WITHIN_KW
+                } else if ident.eq_ignore_ascii_case("assert") {
+                    SyntaxKind::ASSERT_KW
+                } else if ident.eq_ignore_ascii_case("detail") {
+                    SyntaxKind::DETAIL_KW
+                } else if ident.eq_ignore_ascii_case("elseif") {
+                    SyntaxKind::ELSEIF_KW
+                } else if ident.eq_ignore_ascii_case("notice") {
+                    SyntaxKind::NOTICE_KW
                 } else {
                     return None;
                 }
@@ -4872,6 +4910,22 @@ impl SyntaxKind {
                     SyntaxKind::WRAPPER_KW
                 } else if ident.eq_ignore_ascii_case("xmlroot") {
                     SyntaxKind::XMLROOT_KW
+                } else if ident.eq_ignore_ascii_case("errcode") {
+                    SyntaxKind::ERRCODE_KW
+                } else if ident.eq_ignore_ascii_case("foreach") {
+                    SyntaxKind::FOREACH_KW
+                } else if ident.eq_ignore_ascii_case("message") {
+                    SyntaxKind::MESSAGE_KW
+                } else if ident.eq_ignore_ascii_case("perform") {
+                    SyntaxKind::PERFORM_KW
+                } else if ident.eq_ignore_ascii_case("reverse") {
+                    SyntaxKind::REVERSE_KW
+                } else if ident.eq_ignore_ascii_case("rowtype") {
+                    SyntaxKind::ROWTYPE_KW
+                } else if ident.eq_ignore_ascii_case("stacked") {
+                    SyntaxKind::STACKED_KW
+                } else if ident.eq_ignore_ascii_case("warning") {
+                    SyntaxKind::WARNING_KW
                 } else {
                     return None;
                 }
@@ -4987,6 +5041,12 @@ impl SyntaxKind {
                     SyntaxKind::XMLPARSE_KW
                 } else if ident.eq_ignore_ascii_case("xmltable") {
                     SyntaxKind::XMLTABLE_KW
+                } else if ident.eq_ignore_ascii_case("constant") {
+                    SyntaxKind::CONSTANT_KW
+                } else if ident.eq_ignore_ascii_case("datatype") {
+                    SyntaxKind::DATATYPE_KW
+                } else if ident.eq_ignore_ascii_case("sqlstate") {
+                    SyntaxKind::SQLSTATE_KW
                 } else {
                     return None;
                 }
@@ -5080,6 +5140,10 @@ impl SyntaxKind {
                     SyntaxKind::XMLEXISTS_KW
                 } else if ident.eq_ignore_ascii_case("xmlforest") {
                     SyntaxKind::XMLFOREST_KW
+                } else if ident.eq_ignore_ascii_case("exception") {
+                    SyntaxKind::EXCEPTION_KW
+                } else if ident.eq_ignore_ascii_case("row_count") {
+                    SyntaxKind::ROW_COUNT_KW
                 } else {
                     return None;
                 }
@@ -5147,6 +5211,12 @@ impl SyntaxKind {
                     SyntaxKind::WHITESPACE_KW
                 } else if ident.eq_ignore_ascii_case("xmlelement") {
                     SyntaxKind::XMLELEMENT_KW
+                } else if ident.eq_ignore_ascii_case("pg_context") {
+                    SyntaxKind::PG_CONTEXT_KW
+                } else if ident.eq_ignore_ascii_case("table_name") {
+                    SyntaxKind::TABLE_NAME_KW
+                } else if ident.eq_ignore_ascii_case("use_column") {
+                    SyntaxKind::USE_COLUMN_KW
                 } else {
                     return None;
                 }
@@ -5184,6 +5254,12 @@ impl SyntaxKind {
                     SyntaxKind::UNCOMMITTED_KW
                 } else if ident.eq_ignore_ascii_case("unencrypted") {
                     SyntaxKind::UNENCRYPTED_KW
+                } else if ident.eq_ignore_ascii_case("column_name") {
+                    SyntaxKind::COLUMN_NAME_KW
+                } else if ident.eq_ignore_ascii_case("diagnostics") {
+                    SyntaxKind::DIAGNOSTICS_KW
+                } else if ident.eq_ignore_ascii_case("schema_name") {
+                    SyntaxKind::SCHEMA_NAME_KW
                 } else {
                     return None;
                 }
@@ -5213,6 +5289,10 @@ impl SyntaxKind {
                     SyntaxKind::SUBSCRIPTION_KW
                 } else if ident.eq_ignore_ascii_case("xmlserialize") {
                     SyntaxKind::XMLSERIALIZE_KW
+                } else if ident.eq_ignore_ascii_case("message_text") {
+                    SyntaxKind::MESSAGE_TEXT_KW
+                } else if ident.eq_ignore_ascii_case("use_variable") {
+                    SyntaxKind::USE_VARIABLE_KW
                 } else {
                     return None;
                 }
@@ -5243,6 +5323,8 @@ impl SyntaxKind {
                     SyntaxKind::JSON_SERIALIZE_KW
                 } else if ident.eq_ignore_ascii_case("localtimestamp") {
                     SyntaxKind::LOCALTIMESTAMP_KW
+                } else if ident.eq_ignore_ascii_case("pg_routine_oid") {
+                    SyntaxKind::PG_ROUTINE_OID_KW
                 } else {
                     return None;
                 }
@@ -5252,163 +5334,7 @@ impl SyntaxKind {
                     SyntaxKind::CHARACTERISTICS_KW
                 } else if ident.eq_ignore_ascii_case("current_catalog") {
                     SyntaxKind::CURRENT_CATALOG_KW
-                } else {
-                    return None;
-                }
-            }
-            17 => {
-                if ident.eq_ignore_ascii_case("current_timestamp") {
-                    SyntaxKind::CURRENT_TIMESTAMP_KW
-                } else {
-                    return None;
-                }
-            }
-            _ => return None,
-        };
-        Some(kw)
-    }
-    #[doc = r"PL/pgSQL keywords that aren't SQL keywords. These stay `IDENT` in the token stream so SQL is unaffected; the PL/pgSQL grammar matches on the contextual kind instead."]
-    pub(crate) fn from_contextual_keyword(ident: &str) -> Option<SyntaxKind> {
-        let kw = match ident.len() {
-            3 => {
-                if ident.eq_ignore_ascii_case("get") {
-                    SyntaxKind::GET_KW
-                } else if ident.eq_ignore_ascii_case("log") {
-                    SyntaxKind::LOG_KW
-                } else {
-                    return None;
-                }
-            }
-            4 => {
-                if ident.eq_ignore_ascii_case("dump") {
-                    SyntaxKind::DUMP_KW
-                } else if ident.eq_ignore_ascii_case("exit") {
-                    SyntaxKind::EXIT_KW
-                } else if ident.eq_ignore_ascii_case("hint") {
-                    SyntaxKind::HINT_KW
-                } else if ident.eq_ignore_ascii_case("info") {
-                    SyntaxKind::INFO_KW
-                } else if ident.eq_ignore_ascii_case("loop") {
-                    SyntaxKind::LOOP_KW
-                } else if ident.eq_ignore_ascii_case("open") {
-                    SyntaxKind::OPEN_KW
-                } else {
-                    return None;
-                }
-            }
-            5 => {
-                if ident.eq_ignore_ascii_case("alias") {
-                    SyntaxKind::ALIAS_KW
-                } else if ident.eq_ignore_ascii_case("debug") {
-                    SyntaxKind::DEBUG_KW
-                } else if ident.eq_ignore_ascii_case("elsif") {
-                    SyntaxKind::ELSIF_KW
-                } else if ident.eq_ignore_ascii_case("query") {
-                    SyntaxKind::QUERY_KW
-                } else if ident.eq_ignore_ascii_case("raise") {
-                    SyntaxKind::RAISE_KW
-                } else if ident.eq_ignore_ascii_case("slice") {
-                    SyntaxKind::SLICE_KW
-                } else if ident.eq_ignore_ascii_case("while") {
-                    SyntaxKind::WHILE_KW
-                } else {
-                    return None;
-                }
-            }
-            6 => {
-                if ident.eq_ignore_ascii_case("assert") {
-                    SyntaxKind::ASSERT_KW
-                } else if ident.eq_ignore_ascii_case("detail") {
-                    SyntaxKind::DETAIL_KW
-                } else if ident.eq_ignore_ascii_case("elseif") {
-                    SyntaxKind::ELSEIF_KW
-                } else if ident.eq_ignore_ascii_case("notice") {
-                    SyntaxKind::NOTICE_KW
-                } else {
-                    return None;
-                }
-            }
-            7 => {
-                if ident.eq_ignore_ascii_case("errcode") {
-                    SyntaxKind::ERRCODE_KW
-                } else if ident.eq_ignore_ascii_case("foreach") {
-                    SyntaxKind::FOREACH_KW
-                } else if ident.eq_ignore_ascii_case("message") {
-                    SyntaxKind::MESSAGE_KW
-                } else if ident.eq_ignore_ascii_case("perform") {
-                    SyntaxKind::PERFORM_KW
-                } else if ident.eq_ignore_ascii_case("reverse") {
-                    SyntaxKind::REVERSE_KW
-                } else if ident.eq_ignore_ascii_case("rowtype") {
-                    SyntaxKind::ROWTYPE_KW
-                } else if ident.eq_ignore_ascii_case("stacked") {
-                    SyntaxKind::STACKED_KW
-                } else if ident.eq_ignore_ascii_case("warning") {
-                    SyntaxKind::WARNING_KW
-                } else {
-                    return None;
-                }
-            }
-            8 => {
-                if ident.eq_ignore_ascii_case("constant") {
-                    SyntaxKind::CONSTANT_KW
-                } else if ident.eq_ignore_ascii_case("datatype") {
-                    SyntaxKind::DATATYPE_KW
-                } else if ident.eq_ignore_ascii_case("sqlstate") {
-                    SyntaxKind::SQLSTATE_KW
-                } else {
-                    return None;
-                }
-            }
-            9 => {
-                if ident.eq_ignore_ascii_case("exception") {
-                    SyntaxKind::EXCEPTION_KW
-                } else if ident.eq_ignore_ascii_case("row_count") {
-                    SyntaxKind::ROW_COUNT_KW
-                } else {
-                    return None;
-                }
-            }
-            10 => {
-                if ident.eq_ignore_ascii_case("pg_context") {
-                    SyntaxKind::PG_CONTEXT_KW
-                } else if ident.eq_ignore_ascii_case("table_name") {
-                    SyntaxKind::TABLE_NAME_KW
-                } else if ident.eq_ignore_ascii_case("use_column") {
-                    SyntaxKind::USE_COLUMN_KW
-                } else {
-                    return None;
-                }
-            }
-            11 => {
-                if ident.eq_ignore_ascii_case("column_name") {
-                    SyntaxKind::COLUMN_NAME_KW
-                } else if ident.eq_ignore_ascii_case("diagnostics") {
-                    SyntaxKind::DIAGNOSTICS_KW
-                } else if ident.eq_ignore_ascii_case("schema_name") {
-                    SyntaxKind::SCHEMA_NAME_KW
-                } else {
-                    return None;
-                }
-            }
-            12 => {
-                if ident.eq_ignore_ascii_case("message_text") {
-                    SyntaxKind::MESSAGE_TEXT_KW
-                } else if ident.eq_ignore_ascii_case("use_variable") {
-                    SyntaxKind::USE_VARIABLE_KW
-                } else {
-                    return None;
-                }
-            }
-            14 => {
-                if ident.eq_ignore_ascii_case("pg_routine_oid") {
-                    SyntaxKind::PG_ROUTINE_OID_KW
-                } else {
-                    return None;
-                }
-            }
-            15 => {
-                if ident.eq_ignore_ascii_case("constraint_name") {
+                } else if ident.eq_ignore_ascii_case("constraint_name") {
                     SyntaxKind::CONSTRAINT_NAME_KW
                 } else {
                     return None;
@@ -5422,7 +5348,9 @@ impl SyntaxKind {
                 }
             }
             17 => {
-                if ident.eq_ignore_ascii_case("pg_exception_hint") {
+                if ident.eq_ignore_ascii_case("current_timestamp") {
+                    SyntaxKind::CURRENT_TIMESTAMP_KW
+                } else if ident.eq_ignore_ascii_case("pg_exception_hint") {
                     SyntaxKind::PG_EXCEPTION_HINT_KW
                 } else if ident.eq_ignore_ascii_case("returned_sqlstate") {
                     SyntaxKind::RETURNED_SQLSTATE_KW
