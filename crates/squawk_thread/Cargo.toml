@@ -17,9 +17,11 @@ doctest = false
 crossbeam-channel.workspace = true
 crossbeam-utils.workspace = true
 jod-thread.workspace = true
-libc.workspace = true
 salsa.workspace = true
 tracing.workspace = true
+
+[target.'cfg(target_vendor = "apple")'.dependencies]
+libc.workspace = true
 
 [lints]
 workspace = true
