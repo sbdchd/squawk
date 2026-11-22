@@ -216,6 +216,68 @@ SOURCE_FILE
           R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- keyword in merge partitions list"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    MERGE_PARTITIONS
+      MERGE_KW "MERGE"
+      WHITESPACE " "
+      PARTITIONS_KW "PARTITIONS"
+      WHITESPACE " "
+      TABLE_NAME_REF_LIST
+        L_PAREN "("
+        ERROR
+          USER_KW "USER"
+        R_PAREN ")"
+      TABLE_NAME
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "ALTER"
+    WHITESPACE " "
+    TABLE_KW "TABLE"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    MERGE_PARTITIONS
+      MERGE_KW "MERGE"
+      WHITESPACE " "
+      PARTITIONS_KW "PARTITIONS"
+      WHITESPACE " "
+      TABLE_NAME_REF_LIST
+        L_PAREN "("
+        TABLE_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "a"
+        COMMA ","
+        WHITESPACE " "
+        ERROR
+          CURRENT_USER_KW "CURRENT_USER"
+        R_PAREN ")"
+      WHITESPACE " "
+      INTO_KW "INTO"
+      WHITESPACE " "
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            IDENT "b"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- trailing comma in action list"
   WHITESPACE "\n"
   ALTER_TABLE
@@ -330,15 +392,27 @@ error[syntax-error]: expected an attribute, found `,`
    ╭▸ 
 20 │   alter c set (a, , b = 1);
    ╰╴                  ━
+error[syntax-error]: expected table name
+   ╭▸ 
+23 │ ALTER TABLE t MERGE PARTITIONS (USER);
+   ╰╴                                ━
+error[syntax-error]: expected path name
+   ╭▸ 
+23 │ ALTER TABLE t MERGE PARTITIONS (USER);
+   ╰╴                                     ━
+error[syntax-error]: expected table name
+   ╭▸ 
+24 │ ALTER TABLE t MERGE PARTITIONS (a, CURRENT_USER) INTO b;
+   ╰╴                                   ━
 error[syntax-error]: expected at least one expression
    ╭▸ 
-24 │   ADD c t[] DEFAULT (())::t[],
+28 │   ADD c t[] DEFAULT (())::t[],
    ╰╴                      ━
 error[syntax-error]: expected at least one expression
    ╭▸ 
-25 │   ALTER c SET DEFAULT ''::d + (()),
+29 │   ALTER c SET DEFAULT ''::d + (()),
    ╰╴                                ━
 error[syntax-error]: unexpected trailing `,`
    ╭▸ 
-25 │   ALTER c SET DEFAULT ''::d + (()),
+29 │   ALTER c SET DEFAULT ''::d + (()),
    ╰╴                                  ━

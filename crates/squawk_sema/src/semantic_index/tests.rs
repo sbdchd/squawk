@@ -39,6 +39,7 @@ mod numerics;
 mod operator_classes;
 mod operators;
 mod ordinals;
+mod parser_fixtures;
 mod partitions;
 mod policies;
 mod polymorphic_types;

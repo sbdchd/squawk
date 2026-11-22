@@ -48,7 +48,7 @@ pub fn quote_quoted_ident(text: &str) -> Cow<'_, str> {
 pub fn unquote_ident(node: &SyntaxNode) -> Option<String> {
     let text = node.text().to_string();
 
-    if !text.starts_with('"') || !text.ends_with('"') {
+    if text.len() < 2 || !text.starts_with('"') || !text.ends_with('"') {
         return None;
     }
 
@@ -204,6 +204,19 @@ mod tests {
     use insta::assert_snapshot;
 
     use super::*;
+    use crate::ast::AstNode;
+
+    #[test]
+    fn unquote_lone_double_quote() {
+        let parse = crate::SourceFile::parse(r#"select ""#);
+        let node = parse
+            .tree()
+            .syntax()
+            .descendants()
+            .find(|node| node.text() == r#"""#)
+            .unwrap();
+        assert_eq!(unquote_ident(&node), None);
+    }
 
     #[test]
     fn dollar_quoted_strings_round_trip() {

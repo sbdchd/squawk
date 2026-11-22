@@ -381,7 +381,9 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     | ast::Expr::PrefixExpr(_)
                     | ast::Expr::TupleExpr(_)
                     | ast::Expr::IndexExpr(_)
-                    | ast::Expr::SliceExpr(_) => unreachable!("not possible in the grammar"),
+                    | ast::Expr::SliceExpr(_) => {
+                        return Some((ColumnName::UnknownColumn(None), node));
+                    }
                     ast::Expr::FieldExpr(field_expr) => {
                         if let Some(name_ref) = field_expr.field() {
                             return Some(name_from_name_ref(&name_ref, in_type, None));
