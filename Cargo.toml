@@ -105,6 +105,9 @@ unsafe_code = "warn"
 unreachable_pub = "warn"
 unexpected_cfgs = "warn"
 
+[workspace.lints.cargo]
+unused_dependencies = "deny"
+
 [workspace.lints.clippy]
 pedantic = { level = "warn", priority = -2 }
 assert_is_empty = "allow"
