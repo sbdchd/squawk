@@ -24,7 +24,7 @@
 // IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-use drop_bomb::DropBomb;
+use drop_bomb::DebugDropBomb;
 use event::Event;
 use grammar::OPERATOR_FIRST;
 use std::cell::Cell;
@@ -50,26 +50,28 @@ pub use crate::{
     },
 };
 
-use crate::input::Input;
+use crate::input::{Input, InputView};
 pub use crate::output::Output;
 
 /// See [`Parser::start`].
 pub(crate) struct Marker {
     pos: u32,
-    bomb: DropBomb,
+    bomb: DebugDropBomb,
 }
 
 impl Marker {
     fn new(pos: u32) -> Marker {
         Marker {
             pos,
-            bomb: DropBomb::new("Marker must be either completed or abandoned"),
+            bomb: DebugDropBomb::new("Marker must be either completed or abandoned"),
         }
     }
 
     /// Finishes the syntax tree node and assigns `kind` to it,
     /// and creates a `CompletedMarker` for possible future
     /// operation like `.precede()` to deal with `forward_parent`.
+    #[expect(clippy::inline_always)]
+    #[inline(always)]
     pub(crate) fn complete(mut self, p: &mut Parser<'_>, kind: SyntaxKind) -> CompletedMarker {
         self.bomb.defuse();
         let idx = self.pos as usize;
@@ -176,9 +178,9 @@ impl EntryPoint {
 }
 
 pub(crate) struct Parser<'t> {
-    inp: &'t Input,
+    inp: InputView<'t>,
     pos: usize,
-    limit: usize,
+    current_kind: SyntaxKind,
     events: Vec<Event>,
     errors: Vec<String>,
     steps: Cell<u32>,
@@ -218,9 +220,9 @@ const SPECIAL_OP_CHARS: TokenSet = TokenSet::new(&[
 impl<'t> Parser<'t> {
     fn new(inp: &'t Input) -> Parser<'t> {
         Parser {
-            inp,
+            inp: inp.view(),
             pos: 0,
-            limit: usize::MAX,
+            current_kind: inp.view().kind(0),
             events: Vec::with_capacity(inp.len() * 4),
             errors: vec![],
             steps: Cell::new(0),
@@ -229,33 +231,34 @@ impl<'t> Parser<'t> {
 
     // Part of a hack to support pl/pgsql loops where we have to stop at `loop`
     pub(crate) fn with_limit<T>(&mut self, n: usize, f: impl FnOnce(&mut Parser<'t>) -> T) -> T {
-        let limit = self.limit;
-        self.limit = limit.min(self.pos + n);
+        let inp = self.inp;
+        self.inp = inp.limited(self.pos + n);
+        self.current_kind = self.inp.kind(self.pos);
         let res = f(self);
-        self.limit = limit;
+        self.inp = inp;
+        self.current_kind = self.inp.kind(self.pos);
         res
     }
 
     fn kind_at(&self, idx: usize) -> SyntaxKind {
-        if idx >= self.limit {
-            return SyntaxKind::EOF;
+        if idx == self.pos {
+            self.current_kind
+        } else {
+            self.inp.kind(idx)
         }
-        self.inp.kind(idx)
     }
 
     fn contextual_kind_at(&self, idx: usize) -> SyntaxKind {
-        if idx >= self.limit {
-            return SyntaxKind::EOF;
-        }
         self.inp.contextual_kind(idx)
     }
 
     fn is_joint_at(&self, idx: usize) -> bool {
-        idx + 1 < self.limit && self.inp.is_joint(idx)
+        idx + 1 < self.inp.len() && self.inp.is_joint(idx)
     }
 
     /// Consume the next token if `kind` matches.
-    #[inline]
+    #[expect(clippy::inline_always)]
+    #[inline(always)]
     pub(crate) fn eat(&mut self, kind: SyntaxKind) -> bool {
         if !self.at(kind) {
             return false;
@@ -681,6 +684,7 @@ impl<'t> Parser<'t> {
 
     fn do_bump(&mut self, kind: SyntaxKind, n_raw_tokens: u8) {
         self.pos += n_raw_tokens as usize;
+        self.current_kind = self.inp.kind(self.pos);
         self.steps.set(0);
         self.push_event(Event::Token { kind, n_raw_tokens });
     }
@@ -727,6 +731,9 @@ impl<'t> Parser<'t> {
     #[must_use]
     #[inline]
     pub(crate) fn nth_at(&self, n: usize, kind: SyntaxKind) -> bool {
+        if kind >= SyntaxKind::ABORT_KW && kind <= SyntaxKind::WHITESPACE {
+            return self.kind_at(self.pos + n) == kind;
+        }
         match kind {
             // =>
             SyntaxKind::FAT_ARROW => self.at_composite2(
@@ -1015,5 +1022,99 @@ impl<'t> Parser<'t> {
         self.steps.set(steps + 1);
 
         self.kind_at(self.pos + n)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn raw_token_kinds_support_current_and_lookahead_checks() {
+        let kinds = (SyntaxKind::ABORT_KW as u16)..=(SyntaxKind::WHITESPACE as u16);
+        let mut input = Input::with_capacity(kinds.len());
+        for kind in kinds.clone() {
+            input.push(kind.into());
+        }
+        let mut parser = Parser::new(&input);
+        for kind in kinds {
+            let expected = SyntaxKind::from(kind);
+            assert!(parser.nth_at(0, expected));
+            assert!(!parser.nth_at(1, expected));
+            let next = if kind < SyntaxKind::WHITESPACE as u16 {
+                SyntaxKind::from(kind + 1)
+            } else {
+                SyntaxKind::EOF
+            };
+            assert!(parser.nth_at(1, next));
+            parser.bump_any();
+        }
+        assert!(parser.nth_at(0, SyntaxKind::EOF));
+    }
+
+    #[test]
+    fn cached_kind_tracks_composite_token_consumption() {
+        let lexed = LexedStr::new("select a::b + 1;");
+        let input = lexed.to_input();
+        let mut parser = Parser::new(&input);
+        parser.bump(SyntaxKind::SELECT_KW);
+        assert_eq!(parser.current(), SyntaxKind::IDENT);
+        parser.bump(SyntaxKind::IDENT);
+        assert_eq!(parser.current(), SyntaxKind::COLON);
+        assert!(!parser.eat(SyntaxKind::MINUS));
+        assert_eq!(parser.current(), SyntaxKind::COLON);
+        parser.bump(SyntaxKind::COLON_COLON);
+        assert_eq!(parser.current(), SyntaxKind::IDENT);
+        parser.bump(SyntaxKind::IDENT);
+        assert_eq!(parser.current(), SyntaxKind::PLUS);
+        parser.bump(SyntaxKind::PLUS);
+        assert_eq!(parser.current(), SyntaxKind::INT_NUMBER);
+        parser.bump_any();
+        assert_eq!(parser.current(), SyntaxKind::SEMICOLON);
+        parser.bump(SyntaxKind::SEMICOLON);
+        assert_eq!(parser.current(), SyntaxKind::EOF);
+        parser.bump_any();
+        assert_eq!(parser.current(), SyntaxKind::EOF);
+    }
+
+    #[test]
+    fn nested_input_limits_restore_token_metadata() {
+        let lexed = LexedStr::new("loop+1");
+        let input = lexed.to_input();
+        let mut parser = Parser::new(&input);
+        assert_eq!(parser.contextual_kind_at(0), SyntaxKind::LOOP_KW);
+        assert!(parser.is_joint_at(0));
+        assert!(parser.is_joint_at(1));
+        parser.with_limit(2, |parser| {
+            assert_eq!(parser.kind_at(2), SyntaxKind::EOF);
+            assert_eq!(parser.contextual_kind_at(2), SyntaxKind::EOF);
+            assert!(parser.is_joint_at(0));
+            assert!(!parser.is_joint_at(1));
+            parser.with_limit(1, |parser| {
+                assert_eq!(parser.kind_at(0), SyntaxKind::IDENT);
+                assert_eq!(parser.contextual_kind_at(0), SyntaxKind::LOOP_KW);
+                assert_eq!(parser.kind_at(1), SyntaxKind::EOF);
+                assert!(!parser.is_joint_at(0));
+                parser.with_limit(3, |parser| {
+                    assert_eq!(parser.kind_at(1), SyntaxKind::EOF);
+                });
+            });
+            assert_eq!(parser.kind_at(1), SyntaxKind::PLUS);
+            assert!(parser.is_joint_at(0));
+            assert!(!parser.is_joint_at(1));
+        });
+        assert_eq!(parser.kind_at(2), SyntaxKind::INT_NUMBER);
+        assert!(parser.is_joint_at(1));
+        parser.bump_any();
+        parser.with_limit(1, |parser| {
+            assert_eq!(parser.kind_at(1), SyntaxKind::PLUS);
+            assert_eq!(parser.kind_at(2), SyntaxKind::EOF);
+            assert!(!parser.is_joint_at(1));
+        });
+        parser.with_limit(0, |parser| {
+            assert_eq!(parser.current(), SyntaxKind::EOF);
+        });
+        assert_eq!(parser.current(), SyntaxKind::PLUS);
+        assert_eq!(parser.kind_at(2), SyntaxKind::INT_NUMBER);
     }
 }
