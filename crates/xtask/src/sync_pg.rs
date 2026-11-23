@@ -164,6 +164,8 @@ const IGNORED_LINES: &[&str] = &[
     "CREATE TABLE fail_part PARTITION OF list_parted FOR VALUES IN ();",
     "update dposintatable set (f1[2])[1] = array[98];",
     "CREATE FOREIGN TABLE ft1 ();                                    -- ERROR",
+    "SELECT JSON();",
+    "SELECT JSON_SCALAR();",
     r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
     r#"select 'a\\bcd' as f1, 'a\\b\'cd' as f2, 'a\\b\'''cd' as f3, 'abcd\\'   as f4, 'ab\\\'cd' as f5, '\\\\' as f6;"#,
     "copy (select * from test1) (t,id) to stdout;",
