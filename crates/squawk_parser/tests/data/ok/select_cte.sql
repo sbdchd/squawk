@@ -147,3 +147,7 @@ with x as (
   select * from t group by all
 )
 select * from x;
+
+-- recursive as a cte name
+with recursive as (select 1) select * from recursive;
+with recursive (t) as (select 1) select * from recursive;

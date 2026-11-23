@@ -7358,4 +7358,17 @@ SOURCE_FILE
                 STRING "'b'"
             R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            SUBSTRING_FN
+              SUBSTRING_KW "substring"
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

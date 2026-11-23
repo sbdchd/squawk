@@ -5,3 +5,5 @@ deallocate all;
 deallocate prepare foo;
 deallocate foo;
 
+-- keyword as statement name
+deallocate prepare;

@@ -137,3 +137,6 @@ explain create table t as
 -- create materialized view
 explain create materialized view t
   as select 1;
+
+-- keyword option names
+explain (yes) select 1;

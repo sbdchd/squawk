@@ -23,3 +23,7 @@ FETCH BACKWARD ALL FROM cursor_name;
 
 FETCH FORWARD cursor_name;
 FETCH BACKWARD cursor_name;
+
+-- keywords as cursor names
+FETCH prior;
+FETCH last;
