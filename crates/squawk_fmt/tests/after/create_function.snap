@@ -201,3 +201,11 @@ create function f(
 )
   as $$ select 1 $$
   language sql;
+
+create function f() returns boolean
+  begin atomic
+    ;
+    /* before empty */;
+    return false;
+    /* before trailing empty */;
+  end;

@@ -4,3 +4,6 @@ create policy extraordinarily_long_account_access_policy_name on extraordinarily
 
 -- comments in every position
 create /* policy */ policy /* name */ account_access /* on */ on /* schema */ public /* dot */ . /* table */ accounts /* as */ as /* policy type */ restrictive /* for */ for /* command */ select /* to */ to /* first role */ account_admin /* comma */, /* second role */ account_auditor /* using */ using /* left paren */ (/* expression */ owner_name = current_user /* right paren */) /* with */ with /* check */ check /* check left paren */ (/* check expression */ active /* check right paren */) /* end */;
+
+-- quoted policy types keep their case
+create policy p on t as "PERMISSIVE";

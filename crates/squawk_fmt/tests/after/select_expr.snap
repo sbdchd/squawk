@@ -548,7 +548,9 @@ select
   1 operator(+) 1,
   1 operator(public.+) 1,
   1
-  operator /* before paren */ (/* before path */ public /* before dot */ . /* before op */ + /* after op */) /* after paren */ 1,
+  operator /* before paren */ (
+    /* before path */ public /* before dot */ . /* before op */ + /* after op */
+  ) /* after paren */ 1,
   true or false,
   (1, 2) overlaps (3, 4),
   10 % 3,
@@ -865,7 +867,6 @@ select
   json_scalar(
     a_very_long_json_scalar_input_expression_that_forces_the_builtin_to_wrap
   ),
-  json_scalar(),
   json_scalar /* before opening paren */ (
     /* before expression */ 1 /* before closing paren */
   ),
@@ -1153,7 +1154,9 @@ select
   (table foo order by a desc, b asc),
   (
     /* before table */ table
-      /* before only */ only /* before relation opening paren */ (/* before relation */ public /* before dot */ . /* before name */ foo /* before relation closing paren */) /* before outer closing paren */
+      /* before only */ only /* before relation opening paren */ (
+        /* before relation */ public /* before dot */ . /* before name */ foo /* before relation closing paren */
+      ) /* before outer closing paren */
   ),
   (
     table
@@ -1214,7 +1217,7 @@ select
   -2,
   - -a_very_long_double_minus_prefix_input_expression_that_is_long_enough_to_extend_past_eighty_characters,
   not true,
-  not -+a_very_long_prefix_input_expression_that_is_long_enough_to_force_wrapping_past_eighty_characters,
+  not - +a_very_long_prefix_input_expression_that_is_long_enough_to_force_wrapping_past_eighty_characters,
   operator(a_very_long_operator_schema_name.###) a_very_long_custom_prefix_input_expression,
   -- slice expr
   c[:2][2:],
@@ -1424,3 +1427,13 @@ select treat(
 
 select
   an_extraordinarily_long_expression_name::an_extraordinarily_long_type_name;
+
+-- prefix operators that would merge into one operator
+select @ -5.0, @ @1, - @1, - -1, + -1, @a, -a;
+
+select
+  a
+  operator(
+    -- before operator
+    pg_catalog.+
+  ) b;

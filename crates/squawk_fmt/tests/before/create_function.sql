@@ -75,3 +75,5 @@ create function empty_params_with_comment( -- no params
 create function f(a int, -- function params
 b int) returns table (c int, -- returns table
 d int) as $$ select 1 $$ language sql;
+
+create function f() returns boolean begin atomic ; /* before empty */ ; return false; /* before trailing empty */ ; end;

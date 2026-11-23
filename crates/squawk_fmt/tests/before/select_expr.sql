@@ -486,7 +486,6 @@ select
   JSON_EXISTS(doc, '$' EMPTY OBJECT ON ERROR),
   JSON_SCALAR(1),
   JSON_SCALAR(a_very_long_json_scalar_input_expression_that_forces_the_builtin_to_wrap),
-  JSON_SCALAR(),
   JSON_SCALAR /* before opening paren */ (/* before expression */ 1 /* before closing paren */),
   JSON_SERIALIZE(doc),
   JSON_SERIALIZE(doc FORMAT JSON RETURNING text FORMAT JSON),
@@ -742,3 +741,9 @@ select an_extraordinarily_long_left_operand_name not in (select an_extraordinari
 select treat(an_extraordinarily_long_expression_name as an_extraordinarily_long_type_name);
 
 select an_extraordinarily_long_expression_name::an_extraordinarily_long_type_name;
+
+-- prefix operators that would merge into one operator
+select @ -5.0, @ @ 1, - @ 1, - -1, + -1, @a, -a;
+
+select a operator(-- before operator
+pg_catalog.+) b;

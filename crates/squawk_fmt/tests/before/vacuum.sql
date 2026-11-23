@@ -13,3 +13,6 @@ vacuum (analyze, verbose, index_cleanup auto, parallel 4) a_very_long_schema_nam
 /* before */ VACUUM /* after vacuum */ (/* after left paren */ FULL /* before comma */, /* after comma */ ANALYZE /* before value */ TRUE /* before second comma */, /* after second comma */ INDEX_CLEANUP /* before name value */ AUTO /* before right paren */) /* before tables */ public /* before table dot */ . /* after table dot */ records /* before columns */ (/* after columns left paren */ id /* before column comma */, /* after column comma */ name /* before columns right paren */) /* before table comma */, /* after table comma */ archived_records /* before semicolon */;
 
 VACUUM /* before full */ FULL /* before freeze */ FREEZE /* before verbose */ VERBOSE /* before analyse */ ANALYSE /* before legacy table */ records /* before legacy semicolon */;
+
+-- quoted option names keep their case
+vacuum ("VERBOSE") t;

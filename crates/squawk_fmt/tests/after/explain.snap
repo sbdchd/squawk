@@ -21,3 +21,9 @@ explain (
   /* before format */ format /* before json */ json /* before close */
 )
   /* before select */ select /* before target */ 1 /* before semicolon */;
+
+-- quoted option names keep their case
+explain (
+  "VERBOSE"
+)
+  select 1;

@@ -154,6 +154,31 @@ fn configurable_width() {
 }
 
 #[test]
+fn empty_delimiters_at_narrow_width() {
+    let sql = "select count(*) over (), json_object(), json_array(), json_serialize(), overlay(), substring() from t window w as ();\n";
+    let options = squawk_fmt::FormatOptions {
+        width: 5,
+        ..Default::default()
+    };
+
+    let formatted = squawk_fmt::fmt_str(sql, options).unwrap();
+    assert_valid_format(sql, &formatted, options);
+    assert_snapshot!(formatted, @"
+    select
+      count(
+        *
+      ) over (),
+      json_object(),
+      json_array(),
+      json_serialize(),
+      overlay(),
+      substring()
+    from t
+    window w as ();
+    ");
+}
+
+#[test]
 fn normalizes_line_endings_inside_block_comments() {
     let sql = "select 1;\r\n/* a\n * comment\n */\nselect 2;\n";
     let expected = "select 1;\r\n/* a\r\n * comment\r\n */\r\nselect 2;\r\n";
@@ -326,6 +351,22 @@ select * from graph_table(g match (a)-> /* c */ {1, 3}(b) columns (a.id));
     1 | select * from graph_table(g match (a)-> /* c */{1, 3}(b) columns (a.id));
       |                                         ^^^^^^^
     ");
+    }
+
+    #[test]
+    fn trailing_whitespace() {
+        assert_snapshot!(validation_diagnostic("select f(\n  \n);"), @"
+        error: trailing whitespace
+          |
+        2 |   
+          | ^^
+        ");
+        assert_snapshot!(validation_diagnostic("select 1;  \nselect 2;"), @"
+        error: trailing whitespace
+          |
+        1 | select 1;  
+          |          ^^
+        ");
     }
 
     /// Block comments must have whitespace between them.

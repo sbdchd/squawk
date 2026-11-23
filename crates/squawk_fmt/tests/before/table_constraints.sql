@@ -69,3 +69,9 @@ create table source_ordered_referential_actions (
   parent_id bigint REFERENCES parents /* before update on */ ON /* before update */ UPDATE /* before update action */ CASCADE /* before delete on */ ON /* before delete */ DELETE /* before delete action */ RESTRICT,
   FOREIGN KEY (parent_id) REFERENCES parents (id) /* before update on */ ON /* before update */ UPDATE /* before update action */ SET /* before update null */ NULL /* before delete on */ ON /* before delete */ DELETE /* before delete action */ NO /* before action */ ACTION
 );
+
+create table t (i int primary key using index tablespace ts);
+
+create table t (i int unique with (fillfactor = 10));
+
+create table t (i int unique /* before with */ with (fillfactor = 10));

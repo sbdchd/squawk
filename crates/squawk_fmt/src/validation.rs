@@ -52,22 +52,43 @@ fn validate_no_extra_spaces(formatted: &str) -> Result<()> {
             continue;
         }
         let text = &formatted[start..offset];
-        let at_line_start = start == 0 || formatted[..start].ends_with(['\n', '\r']);
-        let at_eof = offset == formatted.len();
-        if at_line_start || at_eof || text.contains(['\n', '\r']) || text == " " {
+        if text.contains(['\n', '\r']) {
+            let mut line_start = 0;
+            for (i, c) in text.char_indices() {
+                if !matches!(c, '\n' | '\r') {
+                    continue;
+                }
+                if i > line_start {
+                    bail!(spacing_error(
+                        formatted,
+                        start + line_start..start + i,
+                        "trailing whitespace",
+                    ));
+                }
+                line_start = i + 1;
+            }
             continue;
         }
-        let snippet = Snippet::source(formatted)
-            .fold(true)
-            .annotation(AnnotationKind::Primary.span(start..offset));
-        let group = Level::ERROR
-            .primary_title(format!(
-                "expected a single space between tokens, found {text:?}"
-            ))
-            .element(snippet);
-        bail!(Renderer::plain().render(&[group]));
+        let at_line_start = start == 0 || formatted[..start].ends_with(['\n', '\r']);
+        let at_eof = offset == formatted.len();
+        if at_line_start || at_eof || text == " " {
+            continue;
+        }
+        bail!(spacing_error(
+            formatted,
+            start..offset,
+            &format!("expected a single space between tokens, found {text:?}"),
+        ));
     }
     Ok(())
+}
+
+fn spacing_error(formatted: &str, span: Range<usize>, title: &str) -> String {
+    let snippet = Snippet::source(formatted)
+        .fold(true)
+        .annotation(AnnotationKind::Primary.span(span));
+    let group = Level::ERROR.primary_title(title).element(snippet);
+    Renderer::plain().render(&[group])
 }
 
 fn validate_indentation(formatted: &str, indent: usize) -> Result<()> {

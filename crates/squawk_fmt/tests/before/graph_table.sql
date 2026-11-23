@@ -46,3 +46,9 @@ select * from GRAPH_TABLE (g MATCH (a)<-[e]- -(b) COLUMNS (x));
 select * from GRAPH_TABLE (g MATCH ((a)- -(b)) COLUMNS (x));
 
 select * from GRAPH_TABLE (g MATCH (a)-{1,3} -(b) COLUMNS (x));
+
+select * from graph_table (g match (/* before label */ is person) columns (1 as one));
+
+select * from graph_table (g match () /* between vertices */ () columns (1 as one));
+
+select * from graph_table (g match () /* before edge */ -[]- () columns (1 as one));

@@ -152,7 +152,9 @@ create table commented_constraints (
     /* before exclusion expression */ id
       /* before exclusion with */ with /* before exclusion op */ = /* before exclusion comma */,
     /* before second exclusion */ valid_at
-      with /* before operator */ operator /* before operator opening paren */ (/* before operator name */ public /* before operator dot */ . /* before operator op */ && /* before operator closing paren */) /* before exclusion closing paren */
+      with /* before operator */ operator /* before operator opening paren */ (
+        /* before operator name */ public /* before operator dot */ . /* before operator op */ && /* before operator closing paren */
+      ) /* before exclusion closing paren */
   )
     /* before include */ include /* before include opening paren */ (
       id /* before include closing paren */
@@ -178,3 +180,9 @@ create table source_ordered_referential_actions (
     /* before update on */ on /* before update */ update /* before update action */ set /* before update null */ null
     /* before delete on */ on /* before delete */ delete /* before delete action */ no /* before action */ action
 );
+
+create table t (i int primary key using index tablespace ts);
+
+create table t (i int unique with (fillfactor = 10));
+
+create table t (i int unique /* before with */ with (fillfactor = 10));

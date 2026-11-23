@@ -57,3 +57,9 @@ create type /* base name */ commented_base /* attributes */ (
   /* input */ input /* equals */ = /* value */ commented_in /* comma */,
   /* output */ output = commented_out /* close */
 ) /* end */;
+
+create type empty_composite as ();
+
+create type empty_enum as enum ();
+
+create type commented_empty_composite as (/* empty */);
