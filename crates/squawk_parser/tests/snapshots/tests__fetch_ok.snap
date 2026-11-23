@@ -285,4 +285,20 @@ SOURCE_FILE
     CURSOR_REF
       IDENT "cursor_name"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- keywords as cursor names"
+  WHITESPACE "\n"
+  FETCH
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    CURSOR_REF
+      PRIOR_KW "prior"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    CURSOR_REF
+      LAST_KW "last"
+    SEMICOLON ";"
   WHITESPACE "\n"

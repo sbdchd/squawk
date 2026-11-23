@@ -339,7 +339,7 @@ JsonValueFn =
   ')'
 
 SubstringFn =
-  'substring' '(' SubstringArgs ')'
+  'substring' '(' SubstringArgs? ')'
 
 SubstringArgs =
   SubstringForFrom

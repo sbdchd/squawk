@@ -35,3 +35,12 @@ SOURCE_FILE
       IDENT "foo"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- keyword as statement name"
+  WHITESPACE "\n"
+  DEALLOCATE
+    DEALLOCATE_KW "deallocate"
+    WHITESPACE " "
+    PREPARED_STATEMENT_REF
+      PREPARE_KW "prepare"
+    SEMICOLON ";"
+  WHITESPACE "\n"

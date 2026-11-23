@@ -100,3 +100,5 @@ b);
 
 select * from foo() as t (a int, -- from alias column defs
 b int);
+
+select * from f() as (a int, b text);

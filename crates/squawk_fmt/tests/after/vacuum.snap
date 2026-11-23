@@ -45,3 +45,6 @@ vacuum (analyze, verbose, index_cleanup auto, parallel 4)
 
 vacuum /* before full */ full /* before freeze */ freeze /* before verbose */ verbose /* before analyse */ analyse
   /* before legacy table */ records /* before legacy semicolon */;
+
+-- quoted option names keep their case
+vacuum ("VERBOSE") t;

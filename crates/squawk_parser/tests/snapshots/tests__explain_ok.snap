@@ -1485,4 +1485,26 @@ SOURCE_FILE
               LITERAL
                 INT_NUMBER "1"
       SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- keyword option names"
+  WHITESPACE "\n"
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    EXPLAIN_OPTION_LIST
+      L_PAREN "("
+      EXPLAIN_OPTION
+        EXPLAIN_OPTION_NAME
+          YES_KW "yes"
+      R_PAREN ")"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n"

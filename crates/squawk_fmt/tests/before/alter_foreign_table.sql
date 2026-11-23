@@ -7,3 +7,7 @@ ALTER FOREIGN TABLE public.items ADD CONSTRAINT positive_quantity CHECK (quantit
 ALTER FOREIGN TABLE IF EXISTS public.items OWNER TO role_with_a_very_long_descriptive_name;
 
 ALTER FOREIGN TABLE ft1 /* options */ OPTIONS /* open */ (/* drop */ DROP /* name */ delimiter /* comma */, /* set */ SET /* name */ quote /* value */ '~' /* comma */, /* add */ ADD /* name */ escape /* value */ '@' /* close */);
+
+alter foreign table ft1 alter c options (add p1 'v1');
+
+alter foreign table ft1 alter column c8 options (set p2 'V2', drop p1, add a_long_option_name 'a long option value');

@@ -1265,6 +1265,49 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "5"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "c"
+      WHITESPACE " "
+      SET_GENERATED_OPTIONS
+        SET_GENERATED
+          SET_KW "set"
+          WHITESPACE " "
+          GENERATED_KW "generated"
+          WHITESPACE " "
+          GENERATED_BY_DEFAULT
+            BY_KW "by"
+            WHITESPACE " "
+            DEFAULT_KW "default"
+        WHITESPACE " "
+        RESTART
+          RESTART_KW "restart"
+        WHITESPACE " "
+        SET_SEQUENCE_OPTION
+          SET_KW "set"
+          WHITESPACE " "
+          OPTION_INCREMENT
+            INCREMENT_KW "increment"
+            WHITESPACE " "
+            BY_KW "by"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "3"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- inherit"
   WHITESPACE "\n"

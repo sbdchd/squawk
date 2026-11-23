@@ -22,3 +22,9 @@ create type /* enum name */ commented_enum /* as */ as /* enum */ enum /* open *
 create type /* range name */ commented_range /* as */ as /* range */ range /* attributes */ (/* option */ subtype /* equals */ = /* value */ numeric /* comma */, /* option two */ multirange_type_name = commented_multirange /* close */) /* end */;
 
 create type /* base name */ commented_base /* attributes */ (/* input */ input /* equals */ = /* value */ commented_in /* comma */, /* output */ output = commented_out /* close */) /* end */;
+
+create type empty_composite as ();
+
+create type empty_enum as enum ();
+
+create type commented_empty_composite as (/* empty */);

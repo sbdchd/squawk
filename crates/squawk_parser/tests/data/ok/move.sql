@@ -23,3 +23,7 @@ move BACKWARD ALL FROM cursor_name;
 
 move forward c;
 move backward c;
+
+-- keywords as cursor names
+move last;
+move next;

@@ -74,3 +74,29 @@ SOURCE_FILE
     ROLE_KW "ROLE"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  SET_ROLE
+    SET_KW "set"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "4"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        DEFAULT_KW "default"
+    SEMICOLON ";"
+  WHITESPACE "\n"

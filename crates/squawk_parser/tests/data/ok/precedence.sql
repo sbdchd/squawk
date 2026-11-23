@@ -39,3 +39,9 @@ select x in (1, 2) || 'z';
 -- prefix operators are left associative with binary operators
 select ~ a ~ b;
 select ~ a + b;
+
+-- operators after any/all apply to the comparison
+select 1 = any(array[1])::text;
+select a = any(c) collate "C" from t;
+select a = any(c) || 'x' from t;
+select a < all(select 1)::int;

@@ -698,6 +698,76 @@ SOURCE_FILE
           R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- an operator after a schema name needs a `.`"
+  WHITESPACE "\n"
+  DROP_OPERATOR
+    DROP_KW "drop"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP_SIG_LIST
+      OP_SIG
+        OP
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "a"
+          WHITESPACE " "
+          L_ANGLE "<"
+        WHITESPACE " "
+        L_PAREN "("
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+        COMMA ","
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_OPERATOR
+    ALTER_KW "alter"
+    WHITESPACE " "
+    OPERATOR_KW "operator"
+    WHITESPACE " "
+    OP_SIG
+      OP
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "\"d\""
+          DOT "."
+          PATH_SEGMENT_REF
+            IDENT "\"d\""
+        WHITESPACE " "
+        EQ "="
+      WHITESPACE " "
+      L_PAREN "("
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+      COMMA ","
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "r"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected operator, found `and`
@@ -780,3 +850,11 @@ error[syntax-error]: expected name
    ╭▸ 
 29 │ create table t (c int, exclude using gist (c with binary.=));
    ╰╴                                                  ━
+error[syntax-error]: expected `.` before operator
+   ╭▸ 
+32 │ drop operator a < (int, int);
+   ╰╴               ━
+error[syntax-error]: expected `.` before operator
+   ╭▸ 
+33 │ alter operator "d"."d" = (int, int) owner to r;
+   ╰╴                      ━

@@ -285,4 +285,20 @@ SOURCE_FILE
     CURSOR_REF
       IDENT "c"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- keywords as cursor names"
+  WHITESPACE "\n"
+  MOVE
+    MOVE_KW "move"
+    WHITESPACE " "
+    CURSOR_REF
+      LAST_KW "last"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  MOVE
+    MOVE_KW "move"
+    WHITESPACE " "
+    CURSOR_REF
+      NEXT_KW "next"
+    SEMICOLON ";"
   WHITESPACE "\n"

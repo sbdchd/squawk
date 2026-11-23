@@ -68,5 +68,7 @@ create operator + (
 );
 
 create operator + (
-  commutator /* before qualified operator */ = /* before operator keyword */ operator /* before open paren */ (/* before operator */ pg_catalog.+ /* before close paren */) /* before semicolon */
+  commutator /* before qualified operator */ = /* before operator keyword */ operator /* before open paren */ (
+    /* before operator */ pg_catalog.+ /* before close paren */
+  ) /* before semicolon */
 );

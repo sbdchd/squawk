@@ -51,6 +51,7 @@ savepoint foo;
 
 release savepoint foo;
 release foo;
+release savepoint;
 
 rollback to savepoint foo;
 rollback work to savepoint foo;
@@ -58,6 +59,7 @@ rollback transaction to savepoint foo;
 rollback to foo;
 rollback work to foo;
 rollback transaction to foo;
+rollback to savepoint;
 
 end;
 end work;

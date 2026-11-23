@@ -26,3 +26,17 @@ alter foreign table ft1
     /* set */ set /* name */ quote /* value */ '~' /* comma */,
     /* add */ add /* name */ escape /* value */ '@' /* close */
   );
+
+alter foreign table ft1
+  alter c
+    options (
+      add p1 'v1'
+    );
+
+alter foreign table ft1
+  alter column c8
+    options (
+      set p2 'V2',
+      drop p1,
+      add a_long_option_name 'a long option value'
+    );

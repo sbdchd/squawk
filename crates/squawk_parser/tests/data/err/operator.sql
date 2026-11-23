@@ -27,3 +27,7 @@ select 1 from t order by a using pg_catalog.<;
 -- same for the operator of an exclusion constraint
 create table t (c int, exclude using gist (c with and));
 create table t (c int, exclude using gist (c with binary.=));
+
+-- an operator after a schema name needs a `.`
+drop operator a < (int, int);
+alter operator "d"."d" = (int, int) owner to r;

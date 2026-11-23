@@ -1,0 +1,40 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/json_constructors.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_FN
+              JSON_KW "json"
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_SCALAR_FN
+              JSON_SCALAR_KW "json_scalar"
+              L_PAREN "("
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected an expression, found `)`
+  ╭▸ 
+1 │ select json();
+  ╰╴            ━
+error[syntax-error]: expected an expression, found `)`
+  ╭▸ 
+2 │ select json_scalar();
+  ╰╴                   ━

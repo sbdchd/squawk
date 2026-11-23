@@ -13,3 +13,5 @@ set role to 'api';
 
 RESET ROLE;
 
+set role to 4;
+set role to default;

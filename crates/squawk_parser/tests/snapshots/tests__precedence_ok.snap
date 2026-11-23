@@ -700,4 +700,150 @@ SOURCE_FILE
               NAME_REF
                 IDENT "b"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operators after any/all apply to the comparison"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            BIN_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                ANY_FN
+                  ANY_KW "any"
+                  L_PAREN "("
+                  ARRAY_EXPR
+                    ARRAY_KW "array"
+                    L_BRACK "["
+                    LITERAL
+                      INT_NUMBER "1"
+                    R_BRACK "]"
+                  R_PAREN ")"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  TEXT_KW "text"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          COLLATE
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                ANY_FN
+                  ANY_KW "any"
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "c"
+                  R_PAREN ")"
+            WHITESPACE " "
+            COLLATE_KW "collate"
+            WHITESPACE " "
+            COLLATION_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "\"C\""
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              EQ "="
+              WHITESPACE " "
+              CALL_EXPR
+                ANY_FN
+                  ANY_KW "any"
+                  L_PAREN "("
+                  NAME_REF
+                    IDENT "c"
+                  R_PAREN ")"
+            WHITESPACE " "
+            CUSTOM_OP
+              PIPE "|"
+              PIPE "|"
+            WHITESPACE " "
+            LITERAL
+              STRING "'x'"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CAST_EXPR
+            BIN_EXPR
+              NAME_REF
+                IDENT "a"
+              WHITESPACE " "
+              L_ANGLE "<"
+              WHITESPACE " "
+              CALL_EXPR
+                ALL_FN
+                  ALL_KW "all"
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "select"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            INT_NUMBER "1"
+                  R_PAREN ")"
+            COLON_COLON
+              COLON ":"
+              COLON ":"
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  INT_KW "int"
+    SEMICOLON ";"
   WHITESPACE "\n"

@@ -430,6 +430,9 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             return name_from_expr(collate.expr()?, in_type);
         }
         ast::Expr::FieldExpr(field_expr) => {
+            if field_expr.star_token().is_some() {
+                return Some((ColumnName::Star, node));
+            }
             if let Some(name_ref) = field_expr.field() {
                 return Some(name_from_name_ref(&name_ref, in_type, None));
             }
@@ -475,6 +478,8 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
         ast::Expr::ParenExpr(paren_expr) => {
             if let Some(expr) = paren_expr.expr() {
                 return name_from_expr(expr, in_type);
+            } else if paren_expr.values().is_some() {
+                return Some((ColumnName::column("column1"), node));
             } else if let Some(select) = paren_expr.select()
                 && let Some(mut targets) = select
                     .select_clause()
@@ -537,6 +542,8 @@ fn examples() {
     assert_snapshot!(name("(select 1 as a)::text"), @"a");
     assert_snapshot!(name("(select 1::text)::int"), @"text");
     assert_snapshot!(name("(select case when true then 1 end)::text"), @"case");
+    assert_snapshot!(name("(values (1))"), @"column1");
+    assert_snapshot!(name("(values (1))::text"), @"column1");
 
     // func
     assert_snapshot!(name("count(*)"), @"count");

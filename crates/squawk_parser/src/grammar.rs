@@ -503,7 +503,9 @@ fn substring_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(SUBSTRING_KW);
     p.expect(L_PAREN);
-    substring_args(p);
+    if !p.at(R_PAREN) {
+        substring_args(p);
+    }
     p.expect(R_PAREN);
     let m = m.complete(p, SUBSTRING_FN).precede(p);
     opt_agg_clauses(p);
@@ -1635,7 +1637,7 @@ fn json_fn(p: &mut Parser<'_>) -> CompletedMarker {
     p.expect(JSON_KW);
     p.expect(L_PAREN);
     // json_value_expr
-    opt_expr(p);
+    expr(p);
     opt_json_format_clause(p);
     opt_json_keys_unique_clause(p);
     p.expect(R_PAREN);
@@ -1650,7 +1652,7 @@ fn json_scalar_fn(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(JSON_SCALAR_KW);
     p.expect(L_PAREN);
-    opt_expr(p);
+    expr(p);
     p.expect(R_PAREN);
     let m = m.complete(p, JSON_SCALAR_FN).precede(p);
     opt_agg_clauses(p);
@@ -3224,6 +3226,8 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
 
 const BETWEEN_BP: u8 = 6;
 
+const SUB_TYPE_FIRST: TokenSet = TokenSet::new(&[ANY_KW, SOME_KW, ALL_KW]);
+
 const BETWEEN_SYMMETRY_FIRST: TokenSet = TokenSet::new(&[SYMMETRIC_KW, ASYMMETRIC_KW]);
 
 fn is_postfix_op(kind: SyntaxKind) -> bool {
@@ -3355,7 +3359,11 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: Restrictions) -> Option<(CompletedMark
             Associativity::Left => op_bp + 1,
             Associativity::Right => op_bp,
         };
-        let _rhs = expr_bp(p, op_bp, r);
+        if p.at_ts(SUB_TYPE_FIRST) && p.nth_at(1, L_PAREN) {
+            atom_expr(p);
+        } else {
+            expr_bp(p, op_bp, r);
+        }
         lhs = m.complete(p, BIN_EXPR);
         expr_kind = ExprKind::Other;
     }
@@ -3526,7 +3534,9 @@ const WITH_FOLLOW: TokenSet = TokenSet::new(&[
 fn with_query_clause(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.expect(WITH_KW);
-    p.eat(RECURSIVE_KW);
+    if p.at(RECURSIVE_KW) && !p.nth_at(1, AS_KW) && !p.nth_at(1, L_PAREN) {
+        p.bump(RECURSIVE_KW);
+    }
     if p.at_ts(WITH_FOLLOW) {
         p.error("expected common table expression");
         return m.complete(p, WITH_CLAUSE);
@@ -4703,6 +4713,7 @@ fn opt_restart_value(p: &mut Parser<'_>) {
     if opt_signed_numeric_literal(p).is_none()
         && p.at_ts(EXPR_FIRST)
         && !p.at_ts(SEQUENCE_OPTION_FIRST)
+        && !p.at(SET_KW)
     {
         numeric_literal(p);
     }
@@ -5597,7 +5608,13 @@ fn opt_op_path(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     op_path_segment(p);
     let mut qual = m.complete(p, PATH_REF);
-    while p.at(DOT) {
+    while !p.at(EOF) {
+        if !p.at(DOT) {
+            if p.at_ts(OPERATOR_FIRST) {
+                p.error("expected `.` before operator");
+            }
+            break;
+        }
         let path = qual.precede(p);
         p.bump(DOT);
         let named = at_op_path_segment(p);
@@ -8152,6 +8169,10 @@ fn savepoint_create(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, SAVEPOINT_CREATE)
 }
 
+const DIRECTION_FOLLOW: TokenSet = NAME_FIRST
+    .union(NUMERIC_FIRST)
+    .union(TokenSet::new(&[FROM_KW, IN_KW, ALL_KW, MINUS, PLUS]));
+
 // RELEASE [ SAVEPOINT ] savepoint_name
 //
 // https://www.postgresql.org/docs/17/sql-release-savepoint.html
@@ -8159,7 +8180,9 @@ fn release(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(RELEASE_KW));
     let m = p.start();
     p.bump(RELEASE_KW);
-    p.eat(SAVEPOINT_KW);
+    if p.nth_at_ts(1, NAME_FIRST) {
+        p.eat(SAVEPOINT_KW);
+    }
     savepoint_ref(p);
     p.eat(SEMICOLON);
     m.complete(p, RELEASE_SAVEPOINT)
@@ -8186,7 +8209,9 @@ fn rollback(p: &mut Parser<'_>) -> CompletedMarker {
     }
     let _ = p.eat(WORK_KW) || p.eat(TRANSACTION_KW);
     let kind = if is_rollback && p.eat(TO_KW) {
-        p.eat(SAVEPOINT_KW);
+        if p.nth_at_ts(1, NAME_FIRST) {
+            p.eat(SAVEPOINT_KW);
+        }
         savepoint_ref(p);
         ROLLBACK_TO_SAVEPOINT
     } else {
@@ -8481,15 +8506,15 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
         ),
         (SET_KW, CONSTRAINTS_KW) => Some(set_constraints(p)),
         (SET_KW, LOCAL_KW) => match p.nth(2) {
-            ROLE_KW if !p.nth_at(3, EQ) => Some(set_role(p)),
+            ROLE_KW if !at_generic_set_role(p, 3) => Some(set_role(p)),
             SESSION_KW => Some(set_session_auth(p)),
             _ => Some(set(p)),
         },
-        (SET_KW, ROLE_KW) if !p.nth_at(2, EQ) => Some(set_role(p)),
+        (SET_KW, ROLE_KW) if !at_generic_set_role(p, 2) => Some(set_role(p)),
         (SET_KW, SESSION_KW) => match p.nth(2) {
             AUTHORIZATION_KW | SESSION_KW => Some(set_session_auth(p)),
             CHARACTERISTICS_KW => Some(set_transaction(p)),
-            ROLE_KW if !p.nth_at(3, EQ) => Some(set_role(p)),
+            ROLE_KW if !at_generic_set_role(p, 3) => Some(set_role(p)),
             _ => Some(set(p)),
         },
         (SET_KW, TRANSACTION_KW) => Some(set_transaction(p)),
@@ -14490,7 +14515,7 @@ fn opt_explain_option_list(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 const EXPLAIN_OPTION_FIRST: TokenSet =
-    TokenSet::new(&[ANALYZE_KW, ANALYSE_KW, VERBOSE_KW, IDENT, FORMAT_KW]);
+    NON_RESERVED_WORD.union(TokenSet::new(&[ANALYZE_KW, ANALYSE_KW, FORMAT_KW]));
 
 // where option can be one of:
 //     ANALYZE [ boolean ]
@@ -15689,16 +15714,22 @@ fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(SET_KW);
     opt_set_scope(p);
     p.expect(ROLE_KW);
-    p.eat(TO_KW);
+    let to = p.eat(TO_KW);
     if p.at(NONE_KW) {
         let target = p.start();
         p.bump(NONE_KW);
         target.complete(p, SET_ROLE_NONE);
+    } else if to && p.at_ts(NUMERIC_FIRST) {
+        literal(p);
     } else if opt_string_literal(p).is_none() {
         role_ref(p);
     }
     p.eat(SEMICOLON);
     m.complete(p, SET_ROLE)
+}
+
+fn at_generic_set_role(p: &Parser<'_>, n: usize) -> bool {
+    p.nth_at(n, EQ) || (p.nth_at(n, TO_KW) && p.nth_at(n + 1, DEFAULT_KW))
 }
 
 // RESET ROLE
@@ -16126,7 +16157,9 @@ fn deallocate(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(DEALLOCATE_KW));
     let m = p.start();
     p.bump(DEALLOCATE_KW);
-    p.eat(PREPARE_KW);
+    if p.nth_at_ts(1, NAME_FIRST) || p.nth_at(1, ALL_KW) {
+        p.eat(PREPARE_KW);
+    }
     if !p.eat(ALL_KW) {
         prepared_statement_ref(p);
     }
@@ -16486,7 +16519,9 @@ fn move_(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(MOVE_KW));
     let m = p.start();
     p.bump(MOVE_KW);
-    opt_direction(p);
+    if p.nth_at_ts(1, DIRECTION_FOLLOW) {
+        opt_direction(p);
+    }
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
     cursor_ref(p);
@@ -16514,7 +16549,9 @@ fn fetch(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(FETCH_KW));
     let m = p.start();
     p.bump(FETCH_KW);
-    opt_direction(p);
+    if p.nth_at_ts(1, DIRECTION_FOLLOW) {
+        opt_direction(p);
+    }
     let _ = p.eat(FROM_KW) || p.eat(IN_KW);
     // cursor_name
     cursor_ref(p);
