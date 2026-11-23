@@ -9,7 +9,7 @@ use std::str::Chars;
 /// - <https://github.com/astral-sh/ruff/blob/d1079680bb29f6b797b5df15327195300f635f3c/crates/ruff_python_parser/src/lexer/cursor.rs>
 ///
 #[derive(Clone, Copy, PartialEq, Eq)]
-pub(crate) enum EscStringContinuation {
+pub(crate) enum EscStrCont {
     Inactive,
     AfterString,
     AfterNewline,
@@ -20,7 +20,7 @@ pub(crate) struct Cursor<'a> {
     chars: Chars<'a>,
     len_remaining: usize,
     input_len: usize,
-    pub(crate) esc_string_continuation: EscStringContinuation,
+    pub(crate) esc_str_cont: EscStrCont,
 }
 
 pub(crate) const EOF_CHAR: char = '\0';
@@ -31,7 +31,7 @@ impl<'a> Cursor<'a> {
             len_remaining: input.len(),
             chars: input.chars(),
             input_len: input.len(),
-            esc_string_continuation: EscStringContinuation::Inactive,
+            esc_str_cont: EscStrCont::Inactive,
         }
     }
 

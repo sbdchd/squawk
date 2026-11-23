@@ -1,6 +1,6 @@
 mod cursor;
 mod token;
-use cursor::{Cursor, EscStringContinuation};
+use cursor::{Cursor, EscStrCont};
 pub use token::{Base, LiteralKind, Token, TokenKind};
 
 // via: https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L346
@@ -57,10 +57,7 @@ impl Cursor<'_> {
         };
         // A string continued on a later line keeps the escape mode of an
         // `E''` string, e.g. `E'a'\n'\'b'`
-        let continuation = std::mem::replace(
-            &mut self.esc_string_continuation,
-            EscStringContinuation::Inactive,
-        );
+        let cont = std::mem::replace(&mut self.esc_str_cont, EscStrCont::Inactive);
         let token_kind = match first_char {
             // Slash, comment or block comment.
             '/' => match self.first() {
@@ -69,7 +66,7 @@ impl Cursor<'_> {
             },
             '-' => match self.first() {
                 '-' => {
-                    self.esc_string_continuation = continuation;
+                    self.esc_str_cont = cont;
                     self.line_comment()
                 }
                 _ => TokenKind::Minus,
@@ -77,17 +74,17 @@ impl Cursor<'_> {
 
             // // Whitespace sequence.
             c if is_whitespace(c) => {
-                if continuation == EscStringContinuation::Inactive {
+                if cont == EscStrCont::Inactive {
                     self.whitespace()
                 } else {
                     let mut newline = is_newline(c);
                     while is_whitespace(self.first()) {
                         newline |= self.bump().is_some_and(is_newline);
                     }
-                    self.esc_string_continuation = if newline {
-                        EscStringContinuation::AfterNewline
+                    self.esc_str_cont = if newline {
+                        EscStrCont::AfterNewline
                     } else {
-                        continuation
+                        cont
                     };
                     TokenKind::Whitespace
                 }
@@ -119,7 +116,7 @@ impl Cursor<'_> {
                         kind: LiteralKind::EscStr { terminated: true }
                     }
                 ) {
-                    self.esc_string_continuation = EscStringContinuation::AfterString;
+                    self.esc_str_cont = EscStrCont::AfterString;
                 }
                 kind
             }
@@ -218,10 +215,10 @@ impl Cursor<'_> {
 
             // String literal
             '\'' => {
-                let backslash_escapes = continuation == EscStringContinuation::AfterNewline;
+                let backslash_escapes = cont == EscStrCont::AfterNewline;
                 let terminated = self.single_quoted_string(backslash_escapes);
                 if backslash_escapes && terminated {
-                    self.esc_string_continuation = EscStringContinuation::AfterString;
+                    self.esc_str_cont = EscStrCont::AfterString;
                 }
                 let kind = LiteralKind::Str { terminated };
                 TokenKind::Literal { kind }
