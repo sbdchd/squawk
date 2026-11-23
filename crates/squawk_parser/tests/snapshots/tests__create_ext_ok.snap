@@ -91,3 +91,18 @@ SOURCE_FILE
         STRING "'buzz'"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  CREATE_EXTENSION
+    CREATE_KW "create"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    EXTENSION
+      IDENT "e"
+    WHITESPACE " "
+    EXTENSION_VERSION_CLAUSE
+      VERSION_KW "version"
+      WHITESPACE " "
+      EXTENSION_VERSION
+        CASCADE_KW "cascade"
+    SEMICOLON ";"
+  WHITESPACE "\n"

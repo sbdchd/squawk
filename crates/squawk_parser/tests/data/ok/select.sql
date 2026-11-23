@@ -326,6 +326,8 @@ select 1 offset 1 rows;
 -- select_with_fetch_clause
 -- first
 select 1 fetch first 3 rows only;
+select 1 fetch first row row only;
+select 1 fetch first row(1) rows only;
 
 -- next
 select 1 order by 1 fetch next 1 row with ties;
