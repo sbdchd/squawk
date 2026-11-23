@@ -129,4 +129,28 @@ SOURCE_FILE
           STRING "'5432'"
       R_PAREN ")"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  CREATE_SERVER
+    CREATE_KW "create"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    SERVER
+      IDENT "s"
+    WHITESPACE " "
+    SERVER_VERSION
+      VERSION_KW "version"
+      WHITESPACE " "
+      LITERAL
+        NULL_KW "null"
+    WHITESPACE " "
+    FOREIGN_KW "foreign"
+    WHITESPACE " "
+    DATA_KW "data"
+    WHITESPACE " "
+    WRAPPER_KW "wrapper"
+    WHITESPACE " "
+    FOREIGN_DATA_WRAPPER_REF
+      IDENT "w"
+    SEMICOLON ";"
+  WHITESPACE "\n"

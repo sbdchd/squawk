@@ -7,3 +7,7 @@ create or replace trusted procedural language l
   inline f.b
   validator x.y;
 
+
+create trusted language l;
+create trusted procedural language l;
+create procedural language l;

@@ -325,40 +325,40 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 return Some((ColumnName::column(name), trim_fn.syntax().clone()));
             }
             if let Some(xml_root_fn) = call_expr.xml_root_fn() {
-                return Some((ColumnName::column("xml_root"), xml_root_fn.syntax().clone()));
+                return Some((ColumnName::column("xmlroot"), xml_root_fn.syntax().clone()));
             }
             if let Some(xml_serialize_fn) = call_expr.xml_serialize_fn() {
                 return Some((
-                    ColumnName::column("xml_serialize"),
+                    ColumnName::column("xmlserialize"),
                     xml_serialize_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_element_fn) = call_expr.xml_element_fn() {
                 return Some((
-                    ColumnName::column("xml_element"),
+                    ColumnName::column("xmlelement"),
                     xml_element_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_forest_fn) = call_expr.xml_forest_fn() {
                 return Some((
-                    ColumnName::column("xml_forest"),
+                    ColumnName::column("xmlforest"),
                     xml_forest_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_exists_fn) = call_expr.xml_exists_fn() {
                 return Some((
-                    ColumnName::column("xml_exists"),
+                    ColumnName::column("xmlexists"),
                     xml_exists_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_parse_fn) = call_expr.xml_parse_fn() {
                 return Some((
-                    ColumnName::column("xml_parse"),
+                    ColumnName::column("xmlparse"),
                     xml_parse_fn.syntax().clone(),
                 ));
             }
             if let Some(xml_pi_fn) = call_expr.xml_pi_fn() {
-                return Some((ColumnName::column("xml_pi"), xml_pi_fn.syntax().clone()));
+                return Some((ColumnName::column("xmlpi"), xml_pi_fn.syntax().clone()));
             }
             if let Some(collation_for_fn) = call_expr.collation_for_fn() {
                 return Some((
@@ -403,9 +403,15 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             {
                 return Some((column, node));
             }
-            return Some((ColumnName::column("case"), node));
+            return Some((
+                ColumnName::UnknownColumn(Some(ColumnNameValue::Static("case"))),
+                node,
+            ));
         }
         ast::Expr::CastExpr(cast_expr) => {
+            if cast_expr.treat_token().is_some() {
+                return name_from_type(cast_expr.ty()?, false);
+            }
             let mut unknown_column = false;
             if let Some(expr) = cast_expr.expr()
                 && let Some((column, node)) = name_from_expr(expr, in_type)
@@ -476,7 +482,13 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                     .map(|x| x.targets())
                 && let Some(target) = targets.next()
             {
-                return ColumnName::from_target(&target);
+                let (column, node) = ColumnName::from_target(&target)?;
+                let column = match column {
+                    ColumnName::UnknownColumn(Some(name)) => ColumnName::Column(name),
+                    ColumnName::UnknownColumn(None) => ColumnName::column("?column?"),
+                    ColumnName::Column(_) | ColumnName::Star => column,
+                };
+                return Some((column, node));
             }
         }
         ast::Expr::TupleExpr(_) => {
@@ -520,6 +532,11 @@ fn examples() {
     // paren expr
     assert_snapshot!(name("(1 * 2)"), @"?column?");
     assert_snapshot!(name("(select 1 as a)"), @"a");
+    assert_snapshot!(name("(select 1)::text"), @"?column?");
+    assert_snapshot!(name("(select 1)::int::text"), @"?column?");
+    assert_snapshot!(name("(select 1 as a)::text"), @"a");
+    assert_snapshot!(name("(select 1::text)::int"), @"text");
+    assert_snapshot!(name("(select case when true then 1 end)::text"), @"case");
 
     // func
     assert_snapshot!(name("count(*)"), @"count");
@@ -546,13 +563,16 @@ fn examples() {
     assert_snapshot!(name("trim(leading ' ' from '  hi  ')"), @"ltrim");
     assert_snapshot!(name("trim(trailing ' ' from '  hi  ')"), @"rtrim");
     assert_snapshot!(name("trim(both ' ' from '  hi  ')"), @"btrim");
-    assert_snapshot!(name("xmlroot('<a/>', version '1.0')"), @"xml_root");
-    assert_snapshot!(name("xmlserialize(document '<a/>' as text)"), @"xml_serialize");
-    assert_snapshot!(name("xmlelement(name foo, 'bar')"), @"xml_element");
-    assert_snapshot!(name("xmlforest('bar' as foo)"), @"xml_forest");
-    assert_snapshot!(name("xmlexists('//a' passing '<a/>')"), @"xml_exists");
-    assert_snapshot!(name("xmlparse(document '<a/>')"), @"xml_parse");
-    assert_snapshot!(name("xmlpi(name foo, 'bar')"), @"xml_pi");
+    assert_snapshot!(name("xmlroot('<a/>', version '1.0')"), @"xmlroot");
+    assert_snapshot!(name("xmlserialize(document '<a/>' as text)"), @"xmlserialize");
+    assert_snapshot!(name("xmlelement(name foo, 'bar')"), @"xmlelement");
+    assert_snapshot!(name("xmlforest('bar' as foo)"), @"xmlforest");
+    assert_snapshot!(name("xmlexists('//a' passing '<a/>')"), @"xmlexists");
+    assert_snapshot!(name("xmlparse(document '<a/>')"), @"xmlparse");
+    assert_snapshot!(name("xmlpi(name foo, 'bar')"), @"xmlpi");
+    assert_snapshot!(name("treat(1 as text)"), @"text");
+    assert_snapshot!(name("treat(1 as int)"), @"int4");
+    assert_snapshot!(name("treat('a' as varchar)"), @"varchar");
 
     // index
     assert_snapshot!(name("foo[bar]"), @"foo");
@@ -566,6 +586,12 @@ fn examples() {
 
     // case
     assert_snapshot!(name("case when true then 'foo' end"), @"case");
+    assert_snapshot!(name("case when true then 1 end::text"), @"text");
+    assert_snapshot!(name("(case when true then 1 end)::int"), @"int4");
+    assert_snapshot!(
+        name("case when false then 'a' else now()::text end::text"),
+        @"now"
+    );
     assert_snapshot!(name("case when true then 'foo' else now()::text end"), @"now");
     assert_snapshot!(name("case when true then 'foo' else 'bar' end"), @"case");
     assert_snapshot!(name("case when true then 'foo' else '1'::bigint::text end"), @"case");

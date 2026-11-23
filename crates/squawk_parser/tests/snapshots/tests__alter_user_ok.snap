@@ -323,3 +323,14 @@ SOURCE_FILE
             IDENT "p"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  ALTER_USER
+    ALTER_KW "alter"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    ROLE_REF
+      ROLE_NAME_REF
+        IDENT "u"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"

@@ -39,3 +39,4 @@ alter user u reset p;
 alter user u reset all;
 alter user u in database d reset p;
 
+alter user u;

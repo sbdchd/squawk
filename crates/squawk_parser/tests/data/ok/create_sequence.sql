@@ -17,3 +17,6 @@ create temporary sequence if not exists s
 -- unlogged
 create unlogged sequence s;
 
+
+create local temp sequence s;
+create global temporary sequence s;

@@ -426,7 +426,7 @@ SOURCE_FILE@0..600
           ARRAY_EXPR@553..570
             ARRAY_KW@553..558 "array"
             L_PAREN@558..559 "("
-            PAREN_EXPR@559..569
+            PAREN_SELECT@559..569
               L_PAREN@559..560 "("
               SELECT@560..568
                 SELECT_CLAUSE@560..568
@@ -449,9 +449,9 @@ SOURCE_FILE@0..600
           ARRAY_EXPR@579..598
             ARRAY_KW@579..584 "array"
             L_PAREN@584..585 "("
-            PAREN_EXPR@585..597
+            PAREN_SELECT@585..597
               L_PAREN@585..586 "("
-              PAREN_EXPR@586..596
+              PAREN_SELECT@586..596
                 L_PAREN@586..587 "("
                 SELECT@587..595
                   SELECT_CLAUSE@587..595

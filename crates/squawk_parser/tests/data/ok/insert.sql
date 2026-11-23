@@ -141,3 +141,4 @@ insert into t values (1) union values (2);
 insert into t (select 1);
 insert into t (select 1 union select 2);
 insert into t select 1 union select 2;
+insert into t select on conflict do nothing;

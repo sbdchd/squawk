@@ -266,3 +266,23 @@ SOURCE_FILE
       IDENT "cursor_name"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  FETCH
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    FORWARD
+      FORWARD_KW "FORWARD"
+    WHITESPACE " "
+    CURSOR_REF
+      IDENT "cursor_name"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH
+    FETCH_KW "FETCH"
+    WHITESPACE " "
+    BACKWARD
+      BACKWARD_KW "BACKWARD"
+    WHITESPACE " "
+    CURSOR_REF
+      IDENT "cursor_name"
+    SEMICOLON ";"
+  WHITESPACE "\n"

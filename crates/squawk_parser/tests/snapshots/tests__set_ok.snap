@@ -232,3 +232,57 @@ SOURCE_FILE
           INT_NUMBER "1"
     SEMICOLON ";"
   WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    LOCAL_SCOPE
+      LOCAL_KW "local"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SESSION_SCOPE
+      SESSION_KW "session"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        CONFIG_VALUE_NAME
+          IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n"

@@ -21,3 +21,5 @@ FETCH BACKWARD FROM cursor_name;
 FETCH BACKWARD 10 FROM cursor_name;
 FETCH BACKWARD ALL FROM cursor_name;
 
+FETCH FORWARD cursor_name;
+FETCH BACKWARD cursor_name;

@@ -89,3 +89,5 @@ select 1 operator(u&"schema" uescape '!'.+) 2;
 
 
 set catalog 'foo';
+
+create schema s create local temp view v as select 1 create global temp sequence q;

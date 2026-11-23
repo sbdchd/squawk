@@ -451,3 +451,5 @@ CREATE TABLE foo (
 create table sequence (a int);
 
 create table if (a int);
+
+create table exclude (exclude int);

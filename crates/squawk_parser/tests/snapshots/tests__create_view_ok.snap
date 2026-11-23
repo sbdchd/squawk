@@ -866,4 +866,98 @@ SOURCE_FILE
                   IDENT "x"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP
+      LOCAL_KW "local"
+      WHITESPACE " "
+      TEMP_KW "temp"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    TEMP
+      GLOBAL_KW "global"
+      WHITESPACE " "
+      TEMPORARY_KW "temporary"
+    WHITESPACE " "
+    RECURSIVE_KW "recursive"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    COLUMN_LIST
+      L_PAREN "("
+      COLUMN_NAME
+        IDENT "a"
+      R_PAREN ")"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    OR_REPLACE
+      OR_KW "or"
+      WHITESPACE " "
+      REPLACE_KW "replace"
+    WHITESPACE " "
+    TEMP
+      LOCAL_KW "local"
+      WHITESPACE " "
+      TEMP_KW "temp"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n"

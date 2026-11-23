@@ -561,3 +561,9 @@ select * from xmltable;
 select * from json_table;
 select * from graph_table;
 select * from json_table, xmltable x;
+
+select array((select 1) union select 2);
+
+-- operator keywords as bare labels
+select a between, b escape, c in, d like, e ilike, f uescape from t;
+select 1 between;

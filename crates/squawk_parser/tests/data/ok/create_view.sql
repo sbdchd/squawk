@@ -56,3 +56,7 @@ create view v as (table t);
 create view v as (select 1 order by 1);
 create view v as ((select 1));
 create view v as (with x as (select 1) select * from x);
+
+create local temp view v as select 1;
+create global temporary recursive view v (a) as select 1;
+create or replace local temp view v as select 1;

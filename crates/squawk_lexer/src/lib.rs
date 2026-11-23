@@ -1,6 +1,6 @@
 mod cursor;
 mod token;
-use cursor::Cursor;
+use cursor::{Cursor, EscStringContinuation};
 pub use token::{Base, LiteralKind, Token, TokenKind};
 
 // via: https://github.com/postgres/postgres/blob/db0c96cc18aec417101e37e59fcc53d4bf647915/src/backend/parser/scan.l#L346
@@ -44,6 +44,10 @@ const fn is_whitespace(c: char) -> bool {
     )
 }
 
+const fn is_newline(c: char) -> bool {
+    matches!(c, '\n' | '\r')
+}
+
 impl Cursor<'_> {
     // see: https://github.com/rust-lang/rust/blob/ba1d7f4a083e6402679105115ded645512a7aea8/compiler/rustc_lexer/src/lib.rs#L339
     #[inline]
@@ -51,6 +55,12 @@ impl Cursor<'_> {
         let Some(first_char) = self.bump() else {
             return Token::new(TokenKind::Eof, 0);
         };
+        // A string continued on a later line keeps the escape mode of an
+        // `E''` string, e.g. `E'a'\n'\'b'`
+        let continuation = std::mem::replace(
+            &mut self.esc_string_continuation,
+            EscStringContinuation::Inactive,
+        );
         let token_kind = match first_char {
             // Slash, comment or block comment.
             '/' => match self.first() {
@@ -58,12 +68,30 @@ impl Cursor<'_> {
                 _ => TokenKind::Slash,
             },
             '-' => match self.first() {
-                '-' => self.line_comment(),
+                '-' => {
+                    self.esc_string_continuation = continuation;
+                    self.line_comment()
+                }
                 _ => TokenKind::Minus,
             },
 
             // // Whitespace sequence.
-            c if is_whitespace(c) => self.whitespace(),
+            c if is_whitespace(c) => {
+                if continuation == EscStringContinuation::Inactive {
+                    self.whitespace()
+                } else {
+                    let mut newline = is_newline(c);
+                    while is_whitespace(self.first()) {
+                        newline |= self.bump().is_some_and(is_newline);
+                    }
+                    self.esc_string_continuation = if newline {
+                        EscStringContinuation::AfterNewline
+                    } else {
+                        continuation
+                    };
+                    TokenKind::Whitespace
+                }
+            }
 
             // https://www.postgresql.org/docs/current/sql-syntax-lexical.html#SQL-SYNTAX-STRINGS-UESCAPE
             'u' | 'U' => {
@@ -80,7 +108,20 @@ impl Cursor<'_> {
             }
             // escaped strings
             'e' | 'E' => {
-                self.prefixed_string(|terminated| LiteralKind::EscStr { terminated }, false, true)
+                let kind = self.prefixed_string(
+                    |terminated| LiteralKind::EscStr { terminated },
+                    false,
+                    true,
+                );
+                if matches!(
+                    kind,
+                    TokenKind::Literal {
+                        kind: LiteralKind::EscStr { terminated: true }
+                    }
+                ) {
+                    self.esc_string_continuation = EscStringContinuation::AfterString;
+                }
+                kind
             }
 
             // bit string
@@ -177,7 +218,11 @@ impl Cursor<'_> {
 
             // String literal
             '\'' => {
-                let terminated = self.single_quoted_string(false);
+                let backslash_escapes = continuation == EscStringContinuation::AfterNewline;
+                let terminated = self.single_quoted_string(backslash_escapes);
+                if backslash_escapes && terminated {
+                    self.esc_string_continuation = EscStringContinuation::AfterString;
+                }
                 let kind = LiteralKind::Str { terminated };
                 TokenKind::Literal { kind }
             }
@@ -1421,6 +1466,47 @@ e'\uAAAA \UFFFFFFFF'
         assert_debug_snapshot!(lex(r"E'foo\'bar'"), @r#"
         [
             "E'foo\\'bar'" @ Literal { kind: EscStr { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_continuation_keeps_backslash_escapes() {
+        assert_debug_snapshot!(lex("E'a'\n'\\'b' -- c\n'\\''"), @r#"
+        [
+            "E'a'" @ Literal { kind: EscStr { terminated: true } },
+            "\n" @ Whitespace,
+            "'\\'b'" @ Literal { kind: Str { terminated: true } },
+            " " @ Whitespace,
+            "-- c" @ LineComment,
+            "\n" @ Whitespace,
+            "'\\''" @ Literal { kind: Str { terminated: true } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_continuation_requires_newline() {
+        assert_debug_snapshot!(lex("E'a' '\\'b'"), @r#"
+        [
+            "E'a'" @ Literal { kind: EscStr { terminated: true } },
+            " " @ Whitespace,
+            "'\\'" @ Literal { kind: Str { terminated: true } },
+            "b'" @ Literal { kind: BitStr { terminated: false } },
+        ]
+        "#);
+    }
+
+    #[test]
+    fn escape_string_continuation_broken_by_block_comment() {
+        assert_debug_snapshot!(lex("E'a'\n/* c */ '\\'b'"), @r#"
+        [
+            "E'a'" @ Literal { kind: EscStr { terminated: true } },
+            "\n" @ Whitespace,
+            "/* c */" @ BlockComment { terminated: true },
+            " " @ Whitespace,
+            "'\\'" @ Literal { kind: Str { terminated: true } },
+            "b'" @ Literal { kind: BitStr { terminated: false } },
         ]
         "#);
     }

@@ -2258,3 +2258,28 @@ SOURCE_FILE
                 INT_NUMBER "2"
     SEMICOLON ";"
   WHITESPACE "\n"
+  INSERT
+    INSERT_KW "insert"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    RELATION_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "t"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+    WHITESPACE " "
+    ON_CONFLICT_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      CONFLICT_KW "conflict"
+      WHITESPACE " "
+      CONFLICT_DO_NOTHING
+        DO_KW "do"
+        WHITESPACE " "
+        NOTHING_KW "nothing"
+    SEMICOLON ";"
+  WHITESPACE "\n"

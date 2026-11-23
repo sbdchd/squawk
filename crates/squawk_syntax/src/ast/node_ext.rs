@@ -522,12 +522,14 @@ impl ast::Literal {
         };
         let base = radix.base();
         let mut value: u64 = 0;
+        let mut has_digits = false;
         for c in digits.chars().filter(|&c| c != '_') {
+            has_digits = true;
             value = value
                 .checked_mul(base.into())?
                 .checked_add(c.to_digit(base)?.into())?;
         }
-        Some(value)
+        has_digits.then_some(value)
     }
 }
 
@@ -3333,6 +3335,20 @@ fn integer_value() {
     assert_eq!(extract_literal("select 1.0").integer_value(), None);
 }
 
+#[test]
+fn integer_value_without_digits() {
+    for sql in ["select 0x", "select 0b", "select 0o", "select 0x_"] {
+        let literal = SourceFile::parse(sql)
+            .tree()
+            .syntax()
+            .descendants()
+            .find_map(ast::Literal::cast)
+            .unwrap();
+        assert_eq!(literal.integer_value(), None, "{sql}");
+        assert_eq!(literal.integer_value_u64(), None, "{sql}");
+    }
+}
+
 #[cfg(test)]
 fn decode_literal(sql: &str) -> String {
     let parse = SourceFile::parse(sql);
@@ -3371,6 +3387,16 @@ fn decoded_value_maps_doubled_quotes() {
       2 -> 11 Some('b')
       3 -> 12 Some('\'')
     "#);
+}
+
+#[test]
+fn decoded_value_escape_string_continuation() {
+    assert_snapshot!(
+        extract_literal("select E'a'\n'\\'b';")
+            .string_value()
+            .unwrap(),
+        @"a'b"
+    );
 }
 
 #[test]
