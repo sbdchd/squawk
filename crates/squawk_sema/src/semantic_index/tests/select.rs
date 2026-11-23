@@ -745,3 +745,52 @@ select 1 union select ('2');
       ╰╴                                ━
     ");
 }
+
+#[test]
+fn locking_clause_after_table_values_and_compound() {
+    assert_snapshot!(check("
+create table t (a int);
+table t for update of t;
+values (1) for update of t;
+select union select for no key update of f;
+"), @"
+    error: missing `from` clause entry for table `t`
+      ╭▸ 
+    4 │ values (1) for update of t;
+      ╰╴                         ━
+    error: missing `from` clause entry for table `f`
+      ╭▸ 
+    5 │ select union select for no key update of f;
+      ╰╴                                         ━
+    ");
+}
+
+#[test]
+fn locking_clause_unsupported_source() {
+    assert_snapshot!(check("
+create table c (y int, k int);
+create table d (z int, k int);
+select * from (c join d on true) as i for update of i;
+select * from (c join d using (k) as u) for no key update of u;
+select * from generate_series(1, 2) g for share of g;
+with w as (select 1) select * from w for key share of w;
+select * from (c join d on true) as i, (select 1) s for update of c, s;
+"), @"
+    error: `for update` cannot be applied to a join
+      ╭▸ 
+    4 │ select * from (c join d on true) as i for update of i;
+      ╰╴                                                    ━
+    error: `for no key update` cannot be applied to a join
+      ╭▸ 
+    5 │ select * from (c join d using (k) as u) for no key update of u;
+      ╰╴                                                             ━
+    error: `for share` cannot be applied to a function
+      ╭▸ 
+    6 │ select * from generate_series(1, 2) g for share of g;
+      ╰╴                                                   ━
+    error: `for key share` cannot be applied to a `with` query
+      ╭▸ 
+    7 │ with w as (select 1) select * from w for key share of w;
+      ╰╴                                                      ━
+    ");
+}

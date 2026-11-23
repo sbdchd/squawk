@@ -266,8 +266,10 @@ fn visible_sources(
 ) -> impl Iterator<Item = SourceId> + '_ {
     iter::successors(scope, |&scope| index.scopes[scope].parent).flat_map(|scope| {
         let scope = &index.scopes[scope];
-        let sources = &index.queries[scope.query].sources;
-        scope.visible_indices().map(|index| sources[index])
+        let query = &index.queries[scope.query];
+        scope
+            .visible_indices(query)
+            .map(|index| query.sources[index])
     })
 }
 
@@ -602,6 +604,33 @@ mod tests {
          select      | Snippet |        
          table       | Snippet |        
          truncate    | Snippet |
+        ");
+    }
+
+    #[test]
+    fn completion_nested_join() {
+        assert_snapshot!(completions("from a join(c join d on $0e i"), @"
+         label | kind  | detail 
+        -------+-------+--------
+         c     | Table |        
+         d     | Table |
+        ");
+    }
+
+    #[test]
+    fn completion_nested_join_valid() {
+        assert_snapshot!(completions("
+create table a (x int);
+create table c (y int);
+create table d (z int);
+select * from a join (c join d on $0) as i on true;
+"), @"
+         label | kind   | detail 
+        -------+--------+--------
+         y     | Column | int    
+         z     | Column | int    
+         c     | Table  |        
+         d     | Table  |
         ");
     }
 

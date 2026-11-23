@@ -304,6 +304,7 @@ fn shrink_to_fit(index: &mut IndexData) {
     ctes.shrink_to_fit();
     for query in queries.iter_local_mut() {
         query.sources.shrink_to_fit();
+        query.aliased.shrink_to_fit();
     }
     queries.shrink_to_fit();
     for scope in scopes.iter_local_mut() {

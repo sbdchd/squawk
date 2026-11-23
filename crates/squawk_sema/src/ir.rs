@@ -1003,7 +1003,14 @@ pub struct Query {
     #[expect(dead_code)]
     pub(crate) parent: Option<QueryId>,
     pub sources: SmallVec<[SourceId; 2]>,
+    pub(crate) aliased: Vec<Range<usize>>,
     pub(crate) columns: Columns,
+}
+
+impl Query {
+    pub(crate) fn is_aliased(&self, index: usize) -> bool {
+        self.aliased.iter().any(|range| range.contains(&index))
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -1040,19 +1047,34 @@ pub struct Scope {
     pub parent: Option<ScopeId>,
     pub(crate) visible: Range<usize>,
     pub(crate) hidden: Vec<Range<usize>>,
+    pub(crate) aliased: usize,
 }
 
 impl Scope {
-    pub fn visible_indices(&self) -> impl Iterator<Item = usize> + Clone + '_ {
-        self.visible
-            .into_iter()
-            .filter(|index| !self.hidden.iter().any(|range| range.contains(index)))
+    pub fn visible_indices<'a>(
+        &'a self,
+        query: &'a Query,
+    ) -> impl Iterator<Item = usize> + Clone + 'a {
+        self.visible.into_iter().filter(move |&index| {
+            !self.is_aliased(query, index)
+                && !self.hidden.iter().any(|range| range.contains(&index))
+        })
     }
 
-    pub(crate) fn hidden_indices(&self) -> impl Iterator<Item = usize> + '_ {
+    pub(crate) fn hidden_indices<'a>(
+        &'a self,
+        query: &'a Query,
+    ) -> impl Iterator<Item = usize> + 'a {
         self.hidden
             .iter()
             .flat_map(|range| range.start.max(self.visible.start)..range.end.min(self.visible.end))
+            .filter(move |&index| !self.is_aliased(query, index))
+    }
+
+    pub(crate) fn is_aliased(&self, query: &Query, index: usize) -> bool {
+        query.aliased[..self.aliased]
+            .iter()
+            .any(|range| range.contains(&index))
     }
 }
 
