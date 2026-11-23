@@ -4141,4 +4141,27 @@ SOURCE_FILE
           WHITESPACE " "
           PARTIAL_KW "partial"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_COLUMN
+      ADD_KW "add"
+      WHITESPACE " "
+      COLUMN_NAME
+        EXCLUDE_KW "exclude"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    SEMICOLON ";"
   WHITESPACE "\n"

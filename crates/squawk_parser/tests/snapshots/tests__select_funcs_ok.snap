@@ -7191,4 +7191,171 @@ SOURCE_FILE
               WHITESPACE "\n"
               R_PAREN ")"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  COMMENT "-- special syntax funcs in from"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          JSON_OBJECT_FN
+            JSON_OBJECT_KW "json_object"
+            L_PAREN "("
+            JSON_KEY_VALUE
+              LITERAL
+                STRING "'a'"
+              COLON ":"
+              WHITESPACE " "
+              JSON_VALUE_EXPR
+                LITERAL
+                  INT_NUMBER "1"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          JSON_ARRAY_FN
+            JSON_ARRAY_KW "json_array"
+            L_PAREN "("
+            JSON_EXPR_FORMAT
+              LITERAL
+                INT_NUMBER "1"
+            COMMA ","
+            WHITESPACE " "
+            JSON_EXPR_FORMAT
+              LITERAL
+                INT_NUMBER "2"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          JSON_SCALAR_FN
+            JSON_SCALAR_KW "json_scalar"
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          XML_ELEMENT_FN
+            XMLELEMENT_KW "xmlelement"
+            L_PAREN "("
+            NAME_KW "name"
+            WHITESPACE " "
+            ELEMENT_TAG
+              IDENT "a"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          POSITION_FN
+            POSITION_KW "position"
+            L_PAREN "("
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            IN_KW "in"
+            WHITESPACE " "
+            LITERAL
+              STRING "'b'"
+            R_PAREN ")"
+        WHITESPACE " "
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
+        WHITESPACE " "
+        FROM_ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          TABLE_ALIAS
+            IDENT "p"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          TRIM_FN
+            TRIM_KW "trim"
+            L_PAREN "("
+            TRIM_BOTH
+              BOTH_KW "both"
+            WHITESPACE " "
+            TRIM_EXPR_FROM
+              LITERAL
+                STRING "'a'"
+              WHITESPACE " "
+              FROM_KW "from"
+              WHITESPACE " "
+              LITERAL
+                STRING "'b'"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

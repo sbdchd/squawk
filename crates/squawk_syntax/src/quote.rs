@@ -159,33 +159,28 @@ pub fn strip_unicode_esc_prefix(text: &str) -> Option<&str> {
 }
 
 pub fn quote_dollar_string_literal(content: &str) -> Option<String> {
-    let tag = if !content.contains("$$") && !content.ends_with('$') {
-        String::new()
-    } else {
-        let mut tag = String::with_capacity(11);
-        tag.push('q');
-        let mut found = false;
-        for idx in 0..10 {
-            if !content.contains(&format!("${tag}$")) {
-                found = true;
-                break;
-            }
-            tag.push(char::from(b'0' + idx));
+    let mut tag = String::with_capacity(11);
+    for idx in 0..=10 {
+        match idx {
+            0 => (),
+            1 => tag.push('q'),
+            _ => tag.push(char::from(b'0' + idx - 2)),
         }
-        if !found {
-            return None;
+        let delimiter_len = tag.len() + 2;
+        let mut quoted = String::with_capacity(content.len() + 2 * delimiter_len);
+        quoted.push('$');
+        quoted.push_str(&tag);
+        quoted.push('$');
+        quoted.push_str(content);
+        quoted.push('$');
+        quoted.push_str(&tag);
+        quoted.push('$');
+        let delimiter = &quoted[..delimiter_len];
+        if quoted[delimiter_len..].find(delimiter) == Some(content.len()) {
+            return Some(quoted);
         }
-        tag
-    };
-    let mut quoted = String::with_capacity(content.len() + 2 * (tag.len() + 2));
-    quoted.push('$');
-    quoted.push_str(&tag);
-    quoted.push('$');
-    quoted.push_str(content);
-    quoted.push('$');
-    quoted.push_str(&tag);
-    quoted.push('$');
-    Some(quoted)
+    }
+    None
 }
 
 pub fn dollar_quote_tag(text: &str) -> Option<&str> {
@@ -228,9 +223,21 @@ mod tests {
             "$q$",
             "trailing $",
             "$$ $q$ $q0$",
+            "$$q",
+            "$$q0",
+            "$ $q",
         ] {
             let quoted = quote_dollar_string_literal(content).unwrap();
-            assert_eq!(strip_dollar_quotes(&quoted), Some(content));
+            let parse = crate::SourceFile::parse(&format!("select {quoted};"));
+            assert!(parse.errors().is_empty(), "{quoted}");
+            let literal = parse
+                .tree()
+                .syntax()
+                .descendants()
+                .find_map(crate::ast::Literal::cast)
+                .unwrap();
+            assert_eq!(literal.syntax().text(), quoted.as_str());
+            assert_eq!(literal.string_value().as_deref(), Some(content));
         }
         assert_eq!(
             quote_dollar_string_literal("hello").as_deref(),

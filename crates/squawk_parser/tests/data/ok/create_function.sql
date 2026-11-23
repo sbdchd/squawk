@@ -433,3 +433,4 @@ create function like() returns int8 as 'select 1' language sql;
 -- the option list may be empty when a routine body follows
 create function f() returns int return 1;
 create function f() returns int begin atomic return 1; end;
+create function f() returns null on null input as 'select 1' language sql;

@@ -21,3 +21,5 @@ move BACKWARD FROM cursor_name;
 move BACKWARD 10 FROM cursor_name;
 move BACKWARD ALL FROM cursor_name;
 
+move forward c;
+move backward c;

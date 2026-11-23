@@ -575,9 +575,9 @@ SOURCE_FILE
           ARRAY_EXPR
             ARRAY_KW "array"
             L_PAREN "("
-            PAREN_EXPR
+            PAREN_SELECT
               L_PAREN "("
-              PAREN_EXPR
+              PAREN_SELECT
                 L_PAREN "("
                 SELECT
                   SELECT_CLAUSE
@@ -7335,5 +7335,125 @@ SOURCE_FILE
         FROM_ALIAS
           TABLE_ALIAS
             IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          ARRAY_EXPR
+            ARRAY_KW "array"
+            L_PAREN "("
+            COMPOUND_SELECT
+              PAREN_SELECT
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
+              WHITESPACE " "
+              UNION
+                UNION_KW "union"
+              WHITESPACE " "
+              SELECT
+                SELECT_CLAUSE
+                  SELECT_KW "select"
+                  WHITESPACE " "
+                  TARGET_LIST
+                    TARGET
+                      LITERAL
+                        INT_NUMBER "2"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- operator keywords as bare labels"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          NAME_REF
+            IDENT "a"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              BETWEEN_KW "between"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "b"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              ESCAPE_KW "escape"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "c"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              IN_KW "in"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "d"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              LIKE_KW "like"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "e"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              ILIKE_KW "ilike"
+        COMMA ","
+        WHITESPACE " "
+        TARGET
+          NAME_REF
+            IDENT "f"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              UESCAPE_KW "uescape"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_NAME
+            COLUMN_NAME
+              BETWEEN_KW "between"
     SEMICOLON ";"
   WHITESPACE "\n"

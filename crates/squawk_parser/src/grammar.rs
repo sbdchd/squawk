@@ -61,9 +61,9 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 fn array_expr(p: &mut Parser<'_>, m: Option<Marker>) -> CompletedMarker {
     assert!(p.at(L_PAREN) || p.at(L_BRACK));
     let m = m.unwrap_or_else(|| p.start());
-    if p.at(L_PAREN) && p.nth_at_ts(1, SELECT_FIRST) {
+    if p.at(L_PAREN) && (p.nth_at_ts(1, SELECT_FIRST) || p.nth_at(1, L_PAREN)) {
         p.expect(L_PAREN);
-        select(p, None, &SelectRestrictions::default());
+        query(p);
         p.expect(R_PAREN);
     } else {
         // `[` or `(`
@@ -1952,7 +1952,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, ExprKind
         _ if p.at_ts(OPERATOR_FIRST) && p.at(CUSTOM_OP) => {
             m = p.start();
             p.bump(CUSTOM_OP);
-            (PREFIX_EXPR, 7)
+            (PREFIX_EXPR, 8)
         }
         NOT_KW if !r.not_disabled => {
             m = p.start();
@@ -1962,7 +1962,7 @@ fn lhs(p: &mut Parser<'_>, r: Restrictions) -> Option<(CompletedMarker, ExprKind
         OPERATOR_KW if p.at(OPERATOR_CALL) => {
             m = p.start();
             p.expect(OPERATOR_CALL);
-            (PREFIX_EXPR, 7)
+            (PREFIX_EXPR, 8)
         }
         _ => {
             let (lhs, expr_kind) = atom_expr(p)?;
@@ -1998,14 +1998,6 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
     let mut is_func_name = lhs.kind() == NAME_REF;
     loop {
         lhs = match p.current() {
-            NOT_KW if p.nth_at(1, BETWEEN_KW) => {
-                is_func_name = false;
-                between_expr(p)
-            }
-            BETWEEN_KW => {
-                is_func_name = false;
-                between_expr(p)
-            }
             L_PAREN => {
                 lhs = call_expr_args(p, lhs, is_func_name);
                 is_func_name = false;
@@ -2020,96 +2012,6 @@ fn postfix_expr(p: &mut Parser<'_>, mut lhs: CompletedMarker) -> CompletedMarker
                     || p.nth_at_ts(1, TYPE_KEYWORDS)
                     || p.nth_at_ts(1, ALL_KEYWORDS);
                 field_expr(p, lhs)
-            }
-            AT_KW if p.at(AT_LOCAL) => {
-                let m = lhs.precede(p);
-                p.bump(AT_LOCAL);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            ISNULL_KW => {
-                let m = lhs.precede(p);
-                p.bump(ISNULL_KW);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_NOT_NORMALIZED) => {
-                let m = lhs.precede(p);
-                p.bump(IS_NOT_NORMALIZED);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_NORMALIZED) => {
-                let m = lhs.precede(p);
-                p.bump(IS_NORMALIZED);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_NOT_JSON_OBJECT) => {
-                let m = lhs.precede(p);
-                p.bump(IS_NOT_JSON_OBJECT);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_NOT_JSON_ARRAY) => {
-                let m = lhs.precede(p);
-                p.bump(IS_NOT_JSON_ARRAY);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_NOT_JSON_VALUE) => {
-                let m = lhs.precede(p);
-                p.bump(IS_NOT_JSON_VALUE);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_NOT_JSON_SCALAR) => {
-                let m = lhs.precede(p);
-                p.bump(IS_NOT_JSON_SCALAR);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_NOT_JSON) => {
-                let m = lhs.precede(p);
-                p.bump(IS_NOT_JSON);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_JSON_OBJECT) => {
-                let m = lhs.precede(p);
-                p.bump(IS_JSON_OBJECT);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_JSON_ARRAY) => {
-                let m = lhs.precede(p);
-                p.bump(IS_JSON_ARRAY);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_JSON_VALUE) => {
-                let m = lhs.precede(p);
-                p.bump(IS_JSON_VALUE);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_JSON_SCALAR) => {
-                let m = lhs.precede(p);
-                p.bump(IS_JSON_SCALAR);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            IS_KW if p.at(IS_JSON) => {
-                let m = lhs.precede(p);
-                p.bump(IS_JSON);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
-            }
-            NOTNULL_KW => {
-                let m = lhs.precede(p);
-                p.bump(NOTNULL_KW);
-                lhs = m.complete(p, POSTFIX_EXPR);
-                break;
             }
             _ => break,
         };
@@ -2992,15 +2894,18 @@ fn opt_between_symmetry(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
-fn between_expr(p: &mut Parser<'_>) -> CompletedMarker {
+fn between_expr(p: &mut Parser<'_>, m: Marker, r: Restrictions) -> CompletedMarker {
     assert!(p.at(NOT_KW) || p.at(BETWEEN_KW));
-    let m = p.start();
     p.eat(NOT_KW);
     p.expect(BETWEEN_KW);
     opt_between_symmetry(p);
-    b_expr(p);
+    if b_expr(p).is_none() {
+        p.error("expected lower bound");
+    }
     p.expect(AND_KW);
-    b_expr(p);
+    if expr_bp(p, BETWEEN_BP + 1, r).is_none() {
+        p.error("expected upper bound");
+    }
     m.complete(p, BETWEEN_EXPR)
 }
 
@@ -3164,8 +3069,8 @@ fn opt_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     expr(p)
 }
 
-// Based on the Postgres grammar b_expr, it's expr without `AND`, `NOT`, `IS`,
-// and `IN`
+// Based on the Postgres grammar b_expr, it's expr without `AND`, `NOT`,
+// `BETWEEN`, `IN`, and `IS` (except `IS DISTINCT FROM`)
 fn b_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
     expr_bp(
         p,
@@ -3175,6 +3080,7 @@ fn b_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
             is_disabled: true,
             not_disabled: true,
             and_disabled: true,
+            between_disabled: true,
             ..Restrictions::default()
         },
     )
@@ -3220,7 +3126,7 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
         // =
         EQ if p.next_not_joined_op() => (5, EQ, Right), // symbol
         // in
-        IN_KW if !r.in_disabled => (6, IN_KW, Right),
+        IN_KW if !r.in_disabled => (6, IN_KW, Left),
         // <>
         L_ANGLE if p.at(NEQB) => (5, NEQB, Left), // symbol
         // <=
@@ -3246,39 +3152,49 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
         // not in
         NOT_KW if !r.not_disabled && p.at(NOT_IN) => (6, NOT_IN, Left),
         // is normalized
-        IS_KW if !r.is_disabled && p.at(IS_NORMALIZED) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_NORMALIZED) => (4, IS_NORMALIZED, Left),
         // is not normalized
-        IS_KW if !r.is_disabled && p.at(IS_NOT_NORMALIZED) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_NOT_NORMALIZED) => (4, IS_NOT_NORMALIZED, Left),
         // is distinct from
-        IS_KW if !r.is_disabled && p.at(IS_DISTINCT_FROM) => (4, IS_DISTINCT_FROM, Left),
+        IS_KW if p.at(IS_DISTINCT_FROM) => (4, IS_DISTINCT_FROM, Left),
         // is not distinct from
-        IS_KW if !r.is_disabled && p.at(IS_NOT_DISTINCT_FROM) => (4, IS_NOT_DISTINCT_FROM, Left),
+        IS_KW if p.at(IS_NOT_DISTINCT_FROM) => (4, IS_NOT_DISTINCT_FROM, Left),
         // is not json object
-        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_OBJECT) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_OBJECT) => (4, IS_NOT_JSON_OBJECT, Left),
         // is not json array
-        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_ARRAY) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_ARRAY) => (4, IS_NOT_JSON_ARRAY, Left),
         // is not json value
-        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_VALUE) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_VALUE) => (4, IS_NOT_JSON_VALUE, Left),
         // is not json scalar
-        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_SCALAR) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_SCALAR) => (4, IS_NOT_JSON_SCALAR, Left),
         // is not json
-        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_NOT_JSON) => (4, IS_NOT_JSON, Left),
         // is json object
-        IS_KW if !r.is_disabled && p.at(IS_JSON_OBJECT) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_JSON_OBJECT) => (4, IS_JSON_OBJECT, Left),
         // is json array
-        IS_KW if !r.is_disabled && p.at(IS_JSON_ARRAY) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_JSON_ARRAY) => (4, IS_JSON_ARRAY, Left),
         // is json value
-        IS_KW if !r.is_disabled && p.at(IS_JSON_VALUE) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_JSON_VALUE) => (4, IS_JSON_VALUE, Left),
         // is json scalar
-        IS_KW if !r.is_disabled && p.at(IS_JSON_SCALAR) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_JSON_SCALAR) => (4, IS_JSON_SCALAR, Left),
         // is json
-        IS_KW if !r.is_disabled && p.at(IS_JSON) => NOT_AN_OP,
+        IS_KW if !r.is_disabled && p.at(IS_JSON) => (4, IS_JSON, Left),
+        // isnull
+        ISNULL_KW if !r.is_disabled => (4, ISNULL_KW, Left),
+        // notnull
+        NOTNULL_KW if !r.is_disabled => (4, NOTNULL_KW, Left),
+        // not between
+        NOT_KW if !r.between_disabled && p.nth_at(1, BETWEEN_KW) => (BETWEEN_BP, BETWEEN_KW, Left),
+        // between
+        BETWEEN_KW if !r.between_disabled => (BETWEEN_BP, BETWEEN_KW, Left),
         // at time zone
         AT_KW if p.at(AT_TIME_ZONE) => (11, AT_TIME_ZONE, Left),
+        // at local
+        AT_KW if p.at(AT_LOCAL) => (11, AT_LOCAL, Left),
         // similar to
         SIMILAR_KW if p.at(SIMILAR_TO) => (6, SIMILAR_TO, Left),
         // is not
-        IS_KW if p.at(IS_NOT) => (4, IS_NOT, Left),
+        IS_KW if !r.is_disabled && p.at(IS_NOT) => (4, IS_NOT, Left),
         // operator(pg_catalog.+)
         OPERATOR_KW if p.at(OPERATOR_CALL) => (7, OPERATOR_CALL, Left),
         // is
@@ -3306,8 +3222,35 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
     }
 }
 
+const BETWEEN_BP: u8 = 6;
+
+const BETWEEN_SYMMETRY_FIRST: TokenSet = TokenSet::new(&[SYMMETRIC_KW, ASYMMETRIC_KW]);
+
+fn is_postfix_op(kind: SyntaxKind) -> bool {
+    matches!(
+        kind,
+        ISNULL_KW
+            | NOTNULL_KW
+            | AT_LOCAL
+            | IS_NORMALIZED
+            | IS_NOT_NORMALIZED
+            | IS_JSON
+            | IS_JSON_OBJECT
+            | IS_JSON_ARRAY
+            | IS_JSON_VALUE
+            | IS_JSON_SCALAR
+            | IS_NOT_JSON
+            | IS_NOT_JSON_OBJECT
+            | IS_NOT_JSON_ARRAY
+            | IS_NOT_JSON_VALUE
+            | IS_NOT_JSON_SCALAR
+    )
+}
+
 // tokens that are in bin expr and also in bare_labels
-const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[OR_KW, AND_KW, IS_KW, COLLATE_KW]);
+const OVERLAPPING_TOKENS: TokenSet = TokenSet::new(&[
+    OR_KW, AND_KW, IS_KW, COLLATE_KW, BETWEEN_KW, ESCAPE_KW, IN_KW, LIKE_KW, ILIKE_KW,
+]);
 
 #[derive(Default, Clone, Copy)]
 enum BareLabelBehavior {
@@ -3324,6 +3267,7 @@ struct Restrictions {
     is_disabled: bool,
     not_disabled: bool,
     and_disabled: bool,
+    between_disabled: bool,
     bare_label: BareLabelBehavior,
 }
 
@@ -3355,7 +3299,9 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: Restrictions) -> Option<(CompletedMark
     loop {
         if p.at_ts(OVERLAPPING_TOKENS)
             && !p.nth_at_ts(1, EXPR_FIRST)
-            && !(p.nth_at(1, AS_KW) || (p.at(IS_KW) && p.nth_at(1, DISTINCT_KW)))
+            && !(p.nth_at(1, AS_KW)
+                || (p.at(IS_KW) && p.nth_at(1, DISTINCT_KW))
+                || (p.at(BETWEEN_KW) && p.nth_at_ts(1, BETWEEN_SYMMETRY_FIRST)))
         {
             match r.bare_label {
                 BareLabelBehavior::Allowed => break,
@@ -3367,7 +3313,30 @@ fn expr_bp(p: &mut Parser<'_>, bp: u8, r: Restrictions) -> Option<(CompletedMark
             break;
         }
         let m = lhs.precede(p);
+        if op == BETWEEN_KW {
+            lhs = between_expr(p, m, r);
+            expr_kind = ExprKind::Other;
+            continue;
+        }
         p.bump(op);
+        if is_postfix_op(op) {
+            lhs = m.complete(p, POSTFIX_EXPR);
+            expr_kind = ExprKind::Other;
+            continue;
+        }
+        if matches!(op, IS_KW | IS_NOT | IN_KW | NOT_IN) {
+            let rhs = if matches!(op, IN_KW | NOT_IN) && !p.at(L_PAREN) {
+                self::lhs(p, r)
+            } else {
+                atom_expr(p)
+            };
+            if rhs.is_none() {
+                p.error("expected an expression");
+            }
+            lhs = m.complete(p, BIN_EXPR);
+            expr_kind = ExprKind::Other;
+            continue;
+        }
         if matches!(op, COLON_COLON) {
             type_name(p);
             let cast_expr = m.complete(p, CAST_EXPR);
@@ -4111,6 +4080,33 @@ const FUNC_EXPR_COMMON_SUBEXPR_FIRST: TokenSet = TokenSet::new(&[
     XMLTABLE_KW,
 ]);
 
+// functions from FUNC_EXPR_COMMON_SUBEXPR_FIRST whose arguments need their own
+// parser instead of a regular argument list
+const SPECIAL_SYNTAX_FUNC_FIRST: TokenSet = TokenSet::new(&[
+    EXTRACT_KW,
+    JSON_KW,
+    JSON_ARRAY_KW,
+    JSON_ARRAYAGG_KW,
+    JSON_EXISTS_KW,
+    JSON_OBJECT_KW,
+    JSON_OBJECTAGG_KW,
+    JSON_QUERY_KW,
+    JSON_SCALAR_KW,
+    JSON_SERIALIZE_KW,
+    JSON_VALUE_KW,
+    OVERLAY_KW,
+    POSITION_KW,
+    SUBSTRING_KW,
+    TRIM_KW,
+    XMLELEMENT_KW,
+    XMLEXISTS_KW,
+    XMLFOREST_KW,
+    XMLPARSE_KW,
+    XMLPI_KW,
+    XMLROOT_KW,
+    XMLSERIALIZE_KW,
+]);
+
 const FROM_ITEM_KEYWORDS_FIRST: TokenSet = TokenSet::new(&[])
     .union(UNRESERVED_KEYWORDS)
     .union(COL_NAME_KEYWORD_FIRST)
@@ -4254,6 +4250,14 @@ fn data_source(p: &mut Parser<'_>, in_parens: bool) -> DataSource {
             collation_for_fn(p);
             opt_from_alias(p);
             EXPR_FROM_ITEM
+        }
+        _ if p.at_ts(SPECIAL_SYNTAX_FUNC_FIRST) && p.nth_at(1, L_PAREN) => {
+            if atom_expr(p).is_none() {
+                p.error("expected a function call");
+            }
+            opt_with_ordinality(p);
+            opt_from_alias(p);
+            FUNCTION_FROM_ITEM
         }
         _ if p.at_ts(FROM_ITEM_KEYWORDS_FIRST) => from_item_name(p),
         _ => {
@@ -5718,6 +5722,12 @@ const TABLE_CONSTRAINT_FIRST: TokenSet = TokenSet::new(&[
     NOT_KW,
 ]);
 
+// `exclude` is an unreserved keyword, so it can also be a column name
+fn at_table_constraint(p: &Parser<'_>) -> bool {
+    p.at_ts(TABLE_CONSTRAINT_FIRST)
+        && !(p.at(EXCLUDE_KW) && !p.nth_at(1, L_PAREN) && !p.nth_at(1, USING_KW))
+}
+
 // and table_constraint is:
 // [ CONSTRAINT constraint_name ]
 // { CHECK ( expression ) [ NO INHERIT ] |
@@ -5971,7 +5981,7 @@ fn opt_col_def(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if p.at(LIKE_KW) {
         return Some(like_clause(p));
     }
-    if p.at_ts(TABLE_CONSTRAINT_FIRST) {
+    if at_table_constraint(p) {
         return Some(table_constraint(p));
     }
     let m = p.start();
@@ -6590,6 +6600,7 @@ const TARGET_FOLLOW: TokenSet = TokenSet::new(&[
     WINDOW_KW,
     FETCH_KW,
     FOR_KW,
+    ON_KW,
     R_PAREN,
     R_BRACK,
     RETURNING_KW,
@@ -8271,7 +8282,7 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
         (CREATE_KW, FUNCTION_KW) => Some(create_function(p)),
         (CREATE_KW, GROUP_KW) => Some(create_group(p)),
         (CREATE_KW, INDEX_KW | UNIQUE_KW) => Some(create_index(p)),
-        (CREATE_KW, LANGUAGE_KW) => Some(create_language(p)),
+        (CREATE_KW, LANGUAGE_KW | PROCEDURAL_KW | TRUSTED_KW) => Some(create_language(p)),
         (CREATE_KW, MATERIALIZED_KW) => Some(create_materialized_view(p)),
         (CREATE_KW, OPERATOR_KW) => match p.nth(2) {
             CLASS_KW => Some(create_operator_class(p)),
@@ -8290,7 +8301,9 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
                 CONSTRAINT_KW | TRIGGER_KW => Some(create_trigger(p)),
                 PROCEDURAL_KW | TRUSTED_KW | LANGUAGE_KW => Some(create_language(p)),
                 PROCEDURE_KW => Some(create_procedure(p)),
-                RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => Some(create_view(p)),
+                GLOBAL_KW | LOCAL_KW | RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => {
+                    Some(create_view(p))
+                }
                 RULE_KW => Some(create_rule(p)),
                 TRANSFORM_KW => Some(create_transform(p)),
                 _ => Some(create_function(p)),
@@ -8309,13 +8322,21 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
         (CREATE_KW, STATISTICS_KW) => Some(create_statistics(p)),
         (CREATE_KW, SUBSCRIPTION_KW) => Some(create_subscription(p)),
         (CREATE_KW, UNLOGGED_KW) if p.nth_at(2, PROPERTY_KW) => Some(create_property_graph(p)),
-        (CREATE_KW, LOCAL_KW | GLOBAL_KW) if p.nth_at(3, PROPERTY_KW) => {
-            Some(create_property_graph(p))
+        (CREATE_KW, LOCAL_KW | GLOBAL_KW) => {
+            // CREATE LOCAL TEMP [ RECURSIVE ] VIEW
+            // CREATE LOCAL TEMP SEQUENCE
+            // CREATE LOCAL TEMP PROPERTY GRAPH
+            // CREATE LOCAL TEMP TABLE
+            // ^0     ^1    ^2   ^3
+            match p.nth(3) {
+                RECURSIVE_KW | VIEW_KW => Some(create_view(p)),
+                SEQUENCE_KW => Some(create_sequence(p)),
+                PROPERTY_KW => Some(create_property_graph(p)),
+                _ => Some(create_table(p)),
+            }
         }
         (CREATE_KW, TABLE_KW) => Some(create_table(p)),
-        (CREATE_KW, GLOBAL_KW | LOCAL_KW | UNLOGGED_KW) if !p.nth_at(2, SEQUENCE_KW) => {
-            Some(create_table(p))
-        }
+        (CREATE_KW, UNLOGGED_KW) if !p.nth_at(2, SEQUENCE_KW) => Some(create_table(p)),
         (CREATE_KW, TABLESPACE_KW) => Some(create_tablespace(p)),
         (CREATE_KW, TEMP_KW | TEMPORARY_KW) => {
             // CREATE TEMP [ RECURSIVE ] VIEW
@@ -8460,15 +8481,15 @@ pub(crate) fn stmt(p: &mut Parser, r: &StmtRestrictions) -> Option<CompletedMark
         ),
         (SET_KW, CONSTRAINTS_KW) => Some(set_constraints(p)),
         (SET_KW, LOCAL_KW) => match p.nth(2) {
-            ROLE_KW => Some(set_role(p)),
+            ROLE_KW if !p.nth_at(3, EQ) => Some(set_role(p)),
             SESSION_KW => Some(set_session_auth(p)),
             _ => Some(set(p)),
         },
-        (SET_KW, ROLE_KW) => Some(set_role(p)),
+        (SET_KW, ROLE_KW) if !p.nth_at(2, EQ) => Some(set_role(p)),
         (SET_KW, SESSION_KW) => match p.nth(2) {
             AUTHORIZATION_KW | SESSION_KW => Some(set_session_auth(p)),
             CHARACTERISTICS_KW => Some(set_transaction(p)),
-            ROLE_KW => Some(set_role(p)),
+            ROLE_KW if !p.nth_at(3, EQ) => Some(set_role(p)),
             _ => Some(set(p)),
         },
         (SET_KW, TRANSACTION_KW) => Some(set_transaction(p)),
@@ -8567,10 +8588,7 @@ fn alter_server(p: &mut Parser<'_>) -> CompletedMarker {
         _ => {
             let mut found_option = false;
             if p.at(VERSION_KW) {
-                let m = p.start();
-                p.bump(VERSION_KW);
-                string_literal(p);
-                m.complete(p, SERVER_VERSION);
+                server_version(p);
                 found_option = true;
             }
             found_option |= opt_alter_option_list(p);
@@ -9310,7 +9328,9 @@ fn alter_index(p: &mut Parser<'_>) -> CompletedMarker {
                     let m = p.start();
                     p.expect(SET_KW);
                     p.expect(STATISTICS_KW);
-                    int_literal(p);
+                    if !p.eat(DEFAULT_KW) {
+                        int_literal(p);
+                    }
                     m.complete(p, SET_STATISTICS);
                 }
                 m.complete(p, ALTER_SET_STATISTICS);
@@ -11031,11 +11051,15 @@ fn alter_user(p: &mut Parser<'_>) -> CompletedMarker {
     let m = p.start();
     p.bump(ALTER_KW);
     p.bump(USER_KW);
-    if !p.eat(ALL_KW) {
+    let all = p.eat(ALL_KW);
+    if !all {
         role_ref(p);
     }
     // be careful of the case where we're at the IN of IN DATABASE
-    if p.at(WITH_KW) || (p.at_ts(ROLE_OPTION_FIRST) && !p.nth_at(1, DATABASE_KW)) {
+    if p.at(WITH_KW)
+        || (!all && (p.at(SEMICOLON) || p.at(EOF)))
+        || (p.at_ts(ROLE_OPTION_FIRST) && !p.nth_at(1, DATABASE_KW))
+    {
         opt_role_option_list(p);
         return m.complete(p, ALTER_USER);
     }
@@ -13317,7 +13341,11 @@ fn rule_stmt_list(p: &mut Parser<'_>) {
 //     [ OWNED BY { table_name.column_name | NONE } ]
 fn create_sequence(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(
-        p.at(CREATE_KW) && matches!(p.nth(1), TEMPORARY_KW | TEMP_KW | UNLOGGED_KW | SEQUENCE_KW)
+        p.at(CREATE_KW)
+            && matches!(
+                p.nth(1),
+                GLOBAL_KW | LOCAL_KW | TEMPORARY_KW | TEMP_KW | UNLOGGED_KW | SEQUENCE_KW
+            )
     );
     let m = p.start();
     p.bump(CREATE_KW);
@@ -13351,10 +13379,7 @@ fn create_server(p: &mut Parser<'_>) -> CompletedMarker {
         m.complete(p, SERVER_TYPE);
     }
     if p.at(VERSION_KW) {
-        let m = p.start();
-        p.bump(VERSION_KW);
-        string_literal(p);
-        m.complete(p, SERVER_VERSION);
+        server_version(p);
     }
     p.expect(FOREIGN_KW);
     p.expect(DATA_KW);
@@ -16249,6 +16274,19 @@ fn opt_discard_target(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
+// VERSION { 'server_version' | NULL }
+fn server_version(p: &mut Parser<'_>) {
+    assert!(p.at(VERSION_KW));
+    let m = p.start();
+    p.bump(VERSION_KW);
+    if p.at(NULL_KW) {
+        literal(p);
+    } else {
+        string_literal(p);
+    }
+    m.complete(p, SERVER_VERSION);
+}
+
 fn opt_temp(p: &mut Parser<'_>) -> bool {
     p.eat(TEMP_KW) || p.eat(TEMPORARY_KW)
 }
@@ -16404,7 +16442,7 @@ pub(crate) fn opt_direction(p: &mut Parser<'_>) -> bool {
         FORWARD_KW => {
             let m = p.start();
             p.bump(FORWARD_KW);
-            if !p.eat(ALL_KW) && p.at_ts(EXPR_FIRST) {
+            if !p.eat(ALL_KW) && (p.at_ts(NUMERIC_FIRST) || p.at(MINUS) || p.at(PLUS)) {
                 let _ = b_expr(p);
             }
             m.complete(p, FORWARD);
@@ -16412,7 +16450,7 @@ pub(crate) fn opt_direction(p: &mut Parser<'_>) -> bool {
         BACKWARD_KW => {
             let m = p.start();
             p.bump(BACKWARD_KW);
-            if !p.eat(ALL_KW) && p.at_ts(EXPR_FIRST) {
+            if !p.eat(ALL_KW) && (p.at_ts(NUMERIC_FIRST) || p.at(MINUS) || p.at(PLUS)) {
                 let _ = b_expr(p);
             }
             m.complete(p, BACKWARD);
@@ -17240,10 +17278,18 @@ fn drop_schema(p: &mut Parser<'_>) -> CompletedMarker {
 fn opt_schema_elements(p: &mut Parser<'_>) {
     while !p.at(EOF) {
         match (p.current(), p.nth(1)) {
-            (CREATE_KW, TABLE_KW | GLOBAL_KW | LOCAL_KW | UNLOGGED_KW)
-                if !p.nth_at(2, SEQUENCE_KW) =>
-            {
+            (CREATE_KW, TABLE_KW) => {
                 create_table(p);
+            }
+            (CREATE_KW, UNLOGGED_KW) if !p.nth_at(2, SEQUENCE_KW) => {
+                create_table(p);
+            }
+            (CREATE_KW, GLOBAL_KW | LOCAL_KW) => {
+                match p.nth(3) {
+                    RECURSIVE_KW | VIEW_KW => create_view(p),
+                    SEQUENCE_KW => create_sequence(p),
+                    _ => create_table(p),
+                };
             }
             (CREATE_KW, TEMP_KW | TEMPORARY_KW) => {
                 // CREATE TEMP [ RECURSIVE ] VIEW
@@ -17260,7 +17306,9 @@ fn opt_schema_elements(p: &mut Parser<'_>) {
                     AGGREGATE_KW => create_aggregate(p),
                     CONSTRAINT_KW | TRIGGER_KW => create_trigger(p),
                     PROCEDURE_KW => create_procedure(p),
-                    RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => create_view(p),
+                    GLOBAL_KW | LOCAL_KW | RECURSIVE_KW | TEMP_KW | TEMPORARY_KW | VIEW_KW => {
+                        create_view(p)
+                    }
                     _ => create_function(p),
                 };
             }
@@ -18443,6 +18491,9 @@ fn return_table_arg_list(p: &mut Parser<'_>) {
 fn opt_ret_type(p: &mut Parser<'_>) {
     // [ RETURNS rettype
     //       | RETURNS TABLE ( column_name column_type [, ...] ) ]
+    if p.at(RETURNS_KW) && p.nth_at(1, NULL_KW) && p.nth_at(2, ON_KW) {
+        return;
+    }
     let m = p.start();
     if p.eat(RETURNS_KW) {
         if p.eat(TABLE_KW) {
@@ -18743,8 +18794,9 @@ fn opt_ident(p: &mut Parser<'_>) -> bool {
     // handle cases like:
     // U&"!0069!006E!0074!0038" UESCAPE '!'
     if p.eat(IDENT) {
-        if p.eat(UESCAPE_KW) {
-            p.expect(STRING);
+        if p.at(UESCAPE_KW) && p.nth_at(1, STRING) {
+            p.bump(UESCAPE_KW);
+            p.bump(STRING);
         }
         true
     } else {
@@ -19380,7 +19432,7 @@ fn opt_alter_table_action(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         ADD_KW => {
             let m = p.start();
             p.bump(ADD_KW);
-            let kind = if p.at_ts(TABLE_CONSTRAINT_FIRST) {
+            let kind = if at_table_constraint(p) {
                 // at table_constraint or table_constraint_using_index
                 table_constraint(p);
                 ADD_CONSTRAINT

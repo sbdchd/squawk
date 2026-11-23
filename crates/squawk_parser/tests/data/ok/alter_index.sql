@@ -35,3 +35,4 @@ alter index all in tablespace t
   set tablespace n
   nowait;
 
+alter index i alter column 1 set statistics default;

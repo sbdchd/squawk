@@ -17,3 +17,5 @@ alter server s
 alter server s
   rename to t;
 
+
+alter server s version null;

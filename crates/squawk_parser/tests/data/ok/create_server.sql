@@ -11,3 +11,5 @@ create server if not exists s
 -- docs_1
 CREATE SERVER myserver FOREIGN DATA WRAPPER postgres_fdw OPTIONS (host 'foo', dbname 'foodb', port '5432');
 
+
+create server s version null foreign data wrapper w;

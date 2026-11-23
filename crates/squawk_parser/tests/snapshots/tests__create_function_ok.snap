@@ -3474,3 +3474,42 @@ SOURCE_FILE
       END_KW "end"
     SEMICOLON ";"
   WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      RETURNS_NULL_ON_NULL_INPUT_FUNC_OPTION
+        RETURNS_KW "returns"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        ON_KW "on"
+        WHITESPACE " "
+        NULL_KW "null"
+        WHITESPACE " "
+        INPUT_KW "input"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "'select 1'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+    SEMICOLON ";"
+  WHITESPACE "\n"

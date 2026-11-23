@@ -69,4 +69,39 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             IDENT "y"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  CREATE_LANGUAGE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRUSTED_KW "trusted"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    LANGUAGE
+      IDENT "l"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_LANGUAGE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRUSTED_KW "trusted"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    LANGUAGE
+      IDENT "l"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_LANGUAGE
+    CREATE_KW "create"
+    WHITESPACE " "
+    PROCEDURAL_KW "procedural"
+    WHITESPACE " "
+    LANGUAGE_KW "language"
+    WHITESPACE " "
+    LANGUAGE
+      IDENT "l"
+    SEMICOLON ";"
+  WHITESPACE "\n"

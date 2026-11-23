@@ -947,4 +947,55 @@ SOURCE_FILE
       LITERAL
         STRING "'foo'"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SCHEMA
+    CREATE_KW "create"
+    WHITESPACE " "
+    SCHEMA_KW "schema"
+    WHITESPACE " "
+    NAMED_SCHEMA
+      SCHEMA
+        IDENT "s"
+    WHITESPACE " "
+    CREATE_VIEW
+      CREATE_KW "create"
+      WHITESPACE " "
+      TEMP
+        LOCAL_KW "local"
+        WHITESPACE " "
+        TEMP_KW "temp"
+      WHITESPACE " "
+      VIEW_KW "view"
+      WHITESPACE " "
+      VIEW
+        PATH
+          PATH_SEGMENT
+            IDENT "v"
+      WHITESPACE " "
+      AS_KW "as"
+      WHITESPACE " "
+      SELECT
+        SELECT_CLAUSE
+          SELECT_KW "select"
+          WHITESPACE " "
+          TARGET_LIST
+            TARGET
+              LITERAL
+                INT_NUMBER "1"
+    WHITESPACE " "
+    CREATE_SEQUENCE
+      CREATE_KW "create"
+      WHITESPACE " "
+      TEMP
+        GLOBAL_KW "global"
+        WHITESPACE " "
+        TEMP_KW "temp"
+      WHITESPACE " "
+      SEQUENCE_KW "sequence"
+      WHITESPACE " "
+      SEQUENCE
+        PATH
+          PATH_SEGMENT
+            IDENT "q"
+      SEMICOLON ";"
   WHITESPACE "\n"

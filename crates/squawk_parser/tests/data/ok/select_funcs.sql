@@ -487,3 +487,11 @@ select json_value(
   default z on error
 );
 
+
+-- special syntax funcs in from
+select * from json_object('a': 1);
+select * from json_array(1, 2);
+select * from json_scalar(1);
+select * from xmlelement(name a);
+select * from position('a' in 'b') with ordinality as p;
+select * from trim(both 'a' from 'b');
