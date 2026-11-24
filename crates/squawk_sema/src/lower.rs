@@ -27083,6 +27083,9 @@ impl Lowerer {
             None if persistence == Persistence::Temp => self.pg_temp,
             _ => self.creation_schema(path),
         };
+        if if_exists == IfExists::Ignore && self.relation_exists(schema, name) {
+            return None;
+        }
         Some(self.alloc_table_in(
             kind,
             if_exists,
