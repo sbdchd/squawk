@@ -5105,9 +5105,21 @@ impl Lowerer {
 
     fn lower_drop_foreign_data_wrapper(&mut self, drop_wrapper: &ast::DropForeignDataWrapper) {
         let if_missing = IfMissing::from_if_exists(drop_wrapper.if_exists().as_ref());
+        let cascade = matches!(
+            drop_wrapper.drop_behavior(),
+            Some(ast::DropBehavior::Cascade(_))
+        );
         for wrapper_ref in drop_wrapper.foreign_data_wrapper_refs() {
             if let Some(wrapper) = self.lower_foreign_data_wrapper_ref(&wrapper_ref, if_missing) {
+                let dependents = if cascade {
+                    self.dependents(Object::ForeignDataWrapper(wrapper))
+                } else {
+                    smallvec![]
+                };
                 self.drop_foreign_data_wrapper(wrapper);
+                for dependent in dependents {
+                    self.drop_object(dependent);
+                }
             }
         }
     }
@@ -5183,9 +5195,11 @@ impl Lowerer {
     }
 
     fn lower_create_server(&mut self, create_server: &ast::CreateServer) {
-        if let Some(wrapper_ref) = create_server.foreign_data_wrapper_ref() {
-            self.lower_foreign_data_wrapper_ref(&wrapper_ref, IfMissing::Error);
-        }
+        let wrapper = create_server
+            .foreign_data_wrapper_ref()
+            .and_then(|wrapper_ref| {
+                self.lower_foreign_data_wrapper_ref(&wrapper_ref, IfMissing::Error)
+            });
         let Some(server) = create_server.server() else {
             return;
         };
@@ -5197,7 +5211,11 @@ impl Lowerer {
             }
             self.report_duplicate(ObjectKind::Server, name_node, name);
         }
-        self.alloc_server(create_server.syntax(), name_node, name);
+        let server = self.alloc_server(create_server.syntax(), name_node, name);
+        if let Some(wrapper) = wrapper {
+            self.dependencies
+                .add_dependency(Object::Server(server), Object::ForeignDataWrapper(wrapper));
+        }
     }
 
     fn lower_alter_server(&mut self, alter_server: &ast::AlterServer) {
@@ -5216,9 +5234,14 @@ impl Lowerer {
                             self.report_duplicate(ObjectKind::Server, name_node, new_name);
                             continue;
                         }
+                        let moved = self.index.servers.next_idx();
                         self.drop_server(server);
-                        let id = self.alloc_server(alter_server.syntax(), name_node, new_name);
-                        self.copy_comment(Item::Server(server), Item::Server(id));
+                        self.alloc_server(alter_server.syntax(), name_node, new_name);
+                        self.record_moves(
+                            Object::Server(server),
+                            self.index.servers.range_from(moved),
+                            Object::Server,
+                        );
                     }
                 }
                 ast::AlterServerAction::OwnerTo(owner_to) => self.lower_owner_to(&owner_to),
