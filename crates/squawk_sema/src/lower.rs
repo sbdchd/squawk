@@ -535,6 +535,7 @@ struct TableConflictRule {
 struct TriggerFlags {
     constraint: bool,
     instead_of_insert: bool,
+    for_each_row: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -19238,6 +19239,10 @@ impl Lowerer {
             .into_iter()
             .flat_map(|list| list.trigger_events())
             .any(|event| matches!(event, ast::TriggerEvent::TriggerEventInsert(_)));
+        let for_each_row = matches!(
+            create_trigger.trigger_level(),
+            Some(ast::TriggerLevel::ForEachRow(_))
+        );
         if let (Some(table), Some(name)) = (table, create_trigger.trigger()) {
             self.alloc_trigger(
                 IfExists::from_or_replace(create_trigger.or_replace().as_ref()),
@@ -19247,6 +19252,7 @@ impl Lowerer {
                 TriggerFlags {
                     constraint,
                     instead_of_insert,
+                    for_each_row,
                 },
             );
         }
@@ -19264,6 +19270,7 @@ impl Lowerer {
         let TriggerFlags {
             constraint,
             instead_of_insert,
+            for_each_row,
         } = flags;
         let name = self.intern(&name_node.text());
         if let Some(existing) = self.find_trigger(table, name) {
@@ -19278,7 +19285,10 @@ impl Lowerer {
                     };
                     self.push_error(name_node.syntax(), error);
                 }
-                IfExists::Replace => self.drop_trigger(existing),
+                IfExists::Replace if self.index.triggers[existing].table == table => {
+                    self.drop_trigger(existing);
+                }
+                IfExists::Replace => {}
             }
         }
         let id = self.index.triggers.alloc(Trigger {
@@ -19286,6 +19296,7 @@ impl Lowerer {
             table,
             constraint,
             instead_of_insert,
+            for_each_row,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
@@ -19362,6 +19373,7 @@ impl Lowerer {
             .and_then(|on_relation| self.lower_on_relation(&on_relation, if_missing));
         if let Some(trigger_ref) = drop_trigger.trigger_ref()
             && let Some(trigger) = self.lower_trigger_ref(table, &trigger_ref, if_missing)
+            && Some(self.index.triggers[trigger].table) == table
         {
             self.drop_trigger(trigger);
         }
@@ -19373,7 +19385,8 @@ impl Lowerer {
             .and_then(|on_relation| self.lower_on_relation(&on_relation, IfMissing::Error));
         let trigger = alter_trigger
             .trigger_ref()
-            .and_then(|trigger_ref| self.lower_trigger_ref(table, &trigger_ref, IfMissing::Error));
+            .and_then(|trigger_ref| self.lower_trigger_ref(table, &trigger_ref, IfMissing::Error))
+            .filter(|&trigger| Some(self.index.triggers[trigger].table) == table);
         match alter_trigger.action() {
             Some(ast::AlterTriggerAction::TriggerRenameTo(rename)) => {
                 if let Some(trigger) = trigger
@@ -19383,6 +19396,7 @@ impl Lowerer {
                         table,
                         constraint,
                         instead_of_insert,
+                        for_each_row,
                         ..
                     } = self.index.triggers[trigger];
                     let new_name = self.intern(&name.text());
@@ -19400,6 +19414,7 @@ impl Lowerer {
                         TriggerFlags {
                             constraint,
                             instead_of_insert,
+                            for_each_row,
                         },
                     );
                     self.record_moves(
@@ -19428,6 +19443,16 @@ impl Lowerer {
             .triggers
             .get(table)
             .find(|id| self.index.triggers[*id].name == name && !self.dropped_triggers.contains(id))
+            .or_else(|| self.find_partitioned_trigger(table, name))
+    }
+
+    fn find_partitioned_trigger(&self, table: TableId, name: Name) -> Option<TriggerId> {
+        self.inheritances
+            .parents(table)
+            .iter()
+            .filter(|inheritance| inheritance.kind == InheritanceKind::Partition)
+            .find_map(|inheritance| self.find_trigger(inheritance.parent, name))
+            .filter(|&trigger| self.index.triggers[trigger].for_each_row)
     }
 
     fn lower_create_rule(&mut self, create_rule: &ast::CreateRule) {

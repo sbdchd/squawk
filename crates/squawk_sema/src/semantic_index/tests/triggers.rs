@@ -314,3 +314,55 @@ create trigger tr after update on t
       ╰╴
     ");
 }
+
+#[test]
+fn partition_row_triggers() {
+    assert_snapshot!(check("
+create function f() returns trigger
+  language plpgsql
+  as 'begin return null; end';
+create table p (a int) partition by range (a);
+create table p2
+  partition of p
+  for values from (0) to (10);
+create trigger row_trg
+  after insert
+  on p
+  for each row
+  execute function f();
+create trigger stmt_trg
+  after insert
+  on p
+  for each statement
+  execute function f();
+alter table only p2 disable trigger row_trg;
+alter table p2 disable trigger stmt_trg;
+create trigger row_trg
+  after insert
+  on p2
+  for each row
+  execute function f();
+create trigger stmt_trg
+  after insert
+  on p2
+  for each row
+  execute function f();
+alter trigger row_trg on p rename to renamed;
+alter table p2 enable trigger renamed;
+alter table p detach partition p2;
+alter table p2 enable trigger renamed;
+"), @"
+    error: trigger `stmt_trg` does not exist
+       ╭▸ 
+    20 │ alter table p2 disable trigger stmt_trg;
+       ╰╴                               ━━━━━━━━
+    error: trigger `row_trg` for relation `p2` already exists
+       ╭▸ 
+    21 │ create trigger row_trg
+       ╰╴               ━━━━━━━
+    error: trigger `renamed` does not exist
+       ╭▸ 
+    34 │ alter table p2 enable trigger renamed;
+       ╰╴                              ━━━━━━━
+    ");
+}
