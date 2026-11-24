@@ -871,6 +871,33 @@ impl RuleRelations {
     }
 }
 
+#[derive(Clone, Copy)]
+enum ValuesItem {
+    Expr(Option<Ty>),
+    Star(IdxRange<Column>),
+}
+
+impl ValuesItem {
+    fn width(self) -> usize {
+        match self {
+            ValuesItem::Expr(_) => 1,
+            ValuesItem::Star(columns) => columns.len(),
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+struct ValuesColumn {
+    ty: Option<Ty>,
+    arg: ArgType,
+}
+
+struct ValuesColumns {
+    columns: SmallVec<[Column; 8]>,
+    common: SmallVec<[CommonType; 8]>,
+    insert_source: bool,
+}
+
 struct IdentPart<'a> {
     ident: Cow<'a, str>,
     rest: &'a str,
@@ -14395,66 +14422,157 @@ impl Lowerer {
         } else {
             ExprContext::Values
         };
-        let mut columns: SmallVec<[Column; 8]> = SmallVec::with_capacity(first_len);
-        let mut common: SmallVec<[CommonType; 8]> = if insert_source {
-            smallvec![]
-        } else {
-            (0..first_len)
-                .map(|_| CommonType::new(ArgType::UnknownLiteral))
-                .collect()
+        let mut out = ValuesColumns {
+            columns: SmallVec::with_capacity(first_len),
+            common: SmallVec::new(),
+            insert_source,
         };
+        let mut star_widths: SmallVec<[Option<usize>; 2]> = SmallVec::new();
+        let mut row_width = None;
+        let mut complete = true;
         for (row_index, row) in values
             .row_list()
             .into_iter()
             .flat_map(|list| list.rows())
             .enumerate()
         {
-            if row_index > 0 && row.exprs().count() != first_len {
-                self.push_error(row.syntax(), SemaError::ValuesLengthMismatch);
+            let first_row = row_index == 0;
+            let mut position = Some(0);
+            for expr in row.exprs() {
+                let item = self.lower_values_item(context, &expr);
+                if expr.is_field_star() {
+                    star_widths.push(item.map(ValuesItem::width));
+                }
+                let (Some(start), Some(item)) = (position, item) else {
+                    position = None;
+                    continue;
+                };
+                match item {
+                    ValuesItem::Expr(ty) => {
+                        let column = ValuesColumn {
+                            ty,
+                            arg: expr_arg_type(Some(&expr), ty),
+                        };
+                        self.push_values_column(&mut out, first_row, start, &expr, column);
+                    }
+                    ValuesItem::Star(columns) => {
+                        for (offset, id) in columns.iter().enumerate() {
+                            let ty = self.index.columns[id].ty;
+                            let column = ValuesColumn {
+                                ty,
+                                arg: ty.map_or(ArgType::default(), ArgType::Known),
+                            };
+                            self.push_values_column(
+                                &mut out,
+                                first_row,
+                                start + offset,
+                                &expr,
+                                column,
+                            );
+                        }
+                    }
+                }
+                position = Some(start + item.width());
             }
-            for (column_index, expr) in row.exprs().enumerate() {
-                let ty = self.lower_expr_in(context, &expr);
-                if let Some(common) = common.get_mut(column_index) {
-                    common.push(&self.overloads(), expr_arg_type(Some(&expr), ty));
-                }
-                if insert_source && !expr.is_default() {
-                    self.insert_values.push(InsertValue {
-                        position: column_index,
-                        ty: expr_arg_type(Some(&expr), ty),
-                        expr: expr.clone(),
-                    });
-                }
-                if row_index == 0 {
-                    let name = self.intern(&format_smolstr!("column{}", column_index + 1));
-                    columns.push(Column {
-                        name: Some(name),
-                        ptr: self.ptr(expr.syntax()),
-                        ty,
-                        typmod: None,
-                        merge: None,
-                    });
+            match (position, row_width) {
+                (None, _) => complete = false,
+                (Some(width), None) => row_width = Some(width),
+                (Some(width), Some(expected)) => {
+                    if complete && width != expected {
+                        self.push_error(row.syntax(), SemaError::ValuesLengthMismatch);
+                    }
                 }
             }
         }
+        let ValuesColumns {
+            mut columns,
+            common,
+            ..
+        } = out;
         for (column, common) in columns.iter_mut().zip(common) {
             if let ArgType::Known(ty) = common.finish() {
                 column.ty = Some(ty);
             }
         }
         if !insert_source {
-            for row in values.row_list().into_iter().flat_map(|list| list.rows()) {
-                for (expr, column) in row.exprs().zip(&columns) {
-                    if let Some(ty) = column.ty {
-                        self.record_unknown_literal(&expr, ty);
-                    }
-                }
-            }
+            self.record_values_unknown_literals(values, &columns, star_widths);
         }
         let id = self.alloc_query(QueryKind::Values, values.syntax());
-        self.index.queries[id].columns.range = self.index.columns.alloc_many(columns);
+        self.index.queries[id].columns = Columns {
+            range: self.index.columns.alloc_many(columns),
+            complete,
+        };
         self.lower_tail_clauses_for_outputs(id, values.tail_clauses());
         self.ctes.truncate(mark);
         id
+    }
+
+    fn lower_values_item(&mut self, context: ExprContext, expr: &ast::Expr) -> Option<ValuesItem> {
+        if let ast::Expr::FieldExpr(field_expr) = expr
+            && let Some(star) = field_expr.star_token()
+        {
+            let columns = self.lower_field_star(field_expr, &star).columns?;
+            return Some(ValuesItem::Star(columns.range));
+        }
+        Some(ValuesItem::Expr(self.lower_expr_in(context, expr)))
+    }
+
+    fn push_values_column(
+        &mut self,
+        out: &mut ValuesColumns,
+        first_row: bool,
+        position: usize,
+        expr: &ast::Expr,
+        ValuesColumn { ty, arg }: ValuesColumn,
+    ) {
+        if first_row {
+            if !out.insert_source {
+                out.common.push(CommonType::new(ArgType::UnknownLiteral));
+            }
+            let name = self.intern(&format_smolstr!("column{}", position + 1));
+            out.columns.push(Column {
+                name: Some(name),
+                ptr: self.ptr(expr.syntax()),
+                ty,
+                typmod: None,
+                merge: None,
+            });
+        }
+        if let Some(common) = out.common.get_mut(position) {
+            common.push(&self.overloads(), arg);
+        }
+        if out.insert_source && !expr.is_default() {
+            self.insert_values.push(InsertValue {
+                position,
+                ty: arg,
+                expr: expr.clone(),
+            });
+        }
+    }
+
+    fn record_values_unknown_literals(
+        &mut self,
+        values: &ast::Values,
+        columns: &[Column],
+        star_widths: SmallVec<[Option<usize>; 2]>,
+    ) {
+        let mut star_widths = star_widths.into_iter();
+        for row in values.row_list().into_iter().flat_map(|list| list.rows()) {
+            let mut position = Some(0);
+            for expr in row.exprs() {
+                if expr.is_field_star() {
+                    let width = star_widths.next().flatten();
+                    position = position.zip(width).map(|(start, width)| start + width);
+                    continue;
+                }
+                if let Some(index) = position
+                    && let Some(ty) = columns.get(index).and_then(|column| column.ty)
+                {
+                    self.record_unknown_literal(&expr, ty);
+                }
+                position = position.map(|index| index + 1);
+            }
+        }
     }
 
     fn lower_table_query(&mut self, table: &ast::Table) -> QueryId {
@@ -14960,7 +15078,7 @@ impl Lowerer {
                     .row_list()
                     .into_iter()
                     .flat_map(|list| list.rows())
-                    .filter_map(|row| row.exprs().nth(position))
+                    .filter_map(|row| values_row_expr(&row, position))
                 {
                     self.check_assignment(assignment, &expr);
                 }
@@ -15083,10 +15201,9 @@ impl Lowerer {
         }
         let value = match &values.rows {
             Some(rows) => {
-                let Some(value) = rows
-                    .rows()
-                    .find_map(|row| row.exprs().nth(position).filter(|expr| !expr.is_default()))
-                else {
+                let Some(value) = rows.rows().find_map(|row| {
+                    values_row_expr(&row, position).filter(|expr| !expr.is_default())
+                }) else {
                     return;
                 };
                 value.syntax().clone()
@@ -28341,4 +28458,11 @@ fn locked_source(kind: SourceKind) -> Option<LockedSource> {
         | SourceKind::ElementVariable
         | SourceKind::Other => None,
     }
+}
+
+fn values_row_expr(row: &ast::Row, position: usize) -> Option<ast::Expr> {
+    if row.exprs().any(|expr| expr.is_field_star()) {
+        return None;
+    }
+    row.exprs().nth(position)
 }

@@ -367,6 +367,13 @@ impl ast::Expr {
         }
     }
 
+    pub fn is_field_star(&self) -> bool {
+        match self {
+            ast::Expr::FieldExpr(field_expr) => field_expr.star_token().is_some(),
+            _ => false,
+        }
+    }
+
     pub fn is_default(&self) -> bool {
         match self {
             ast::Expr::Literal(literal) => matches!(literal.kind(), Some(LitKind::Default(_))),
