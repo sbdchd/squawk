@@ -121,6 +121,7 @@ pub(crate) enum Undo {
     IndexKey(IndexId, Option<IdxRange<Name>>),
     PartitionKey(TableId, PartitionKey),
     ViewColumnDep(usize, Name),
+    GeneratedColumnDep(usize, Name),
     IndexColumns(IndexId, IdxRange<Name>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),

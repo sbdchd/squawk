@@ -127,6 +127,7 @@ impl Lowerer {
             column_exprs: ColumnExprs::default(),
             partition_keys: FxHashMap::default(),
             view_column_deps: vec![],
+            generated_column_deps: vec![],
             view_bases: FxHashMap::default(),
             insert_values: vec![],
             partition_bounds: FxHashMap::default(),
@@ -439,6 +440,7 @@ pub(crate) struct Lowerer {
     column_exprs: ColumnExprs,
     partition_keys: FxHashMap<TableId, PartitionKey>,
     view_column_deps: Vec<ViewColumnDep>,
+    generated_column_deps: Vec<GeneratedColumnDep>,
     view_bases: FxHashMap<TableId, TableId>,
     insert_values: Vec<InsertValue>,
     partition_bounds: FxHashMap<TableId, PartitionBound>,
@@ -483,6 +485,12 @@ pub(crate) struct Lowerer {
 #[derive(Clone, Copy)]
 struct ViewColumnDep {
     view: TableId,
+    table: TableId,
+    column: Name,
+}
+
+struct GeneratedColumnDep {
+    expr: ColumnExprId,
     table: TableId,
     column: Name,
 }
@@ -1922,6 +1930,14 @@ impl Lowerer {
                 }
             }
         }
+        for (i, dep) in self.generated_column_deps.iter_mut().enumerate() {
+            if dep.table == table && dep.column == from {
+                dep.column = to;
+                if in_transaction {
+                    self.undo.push(Undo::GeneratedColumnDep(i, from));
+                }
+            }
+        }
         if let Some(&previous @ PartitionKey::Columns(key)) = self.partition_keys.get(&table)
             && self
                 .index
@@ -3065,6 +3081,9 @@ impl Lowerer {
                 Undo::ViewColumnDep(dep, column) => {
                     self.view_column_deps[dep].column = column;
                 }
+                Undo::GeneratedColumnDep(dep, column) => {
+                    self.generated_column_deps[dep].column = column;
+                }
                 Undo::IndexColumns(id, columns) => {
                     self.index.indexes.set_columns(id, columns);
                 }
@@ -3390,6 +3409,32 @@ impl Lowerer {
         self.set_table_columns(table, range);
     }
 
+    fn drop_generated_dependents(
+        &mut self,
+        table: TableId,
+        column: Name,
+        dropped: &mut Vec<ColumnId>,
+    ) {
+        let mut i = 0;
+        while let Some(dep) = self.generated_column_deps.get(i) {
+            i += 1;
+            if dep.table != table || dep.column != column {
+                continue;
+            }
+            let Some(key) = self.column_exprs.column_of(dep.expr) else {
+                continue;
+            };
+            let generated = self.index.tables[table].columns.range.iter().find(|id| {
+                self.index.columns[*id].name == Some(key.column) && !dropped.contains(id)
+            });
+            if let Some(generated) = generated {
+                self.set_column_expr(table, key.column, None);
+                self.drop_column_indexes(table, key.column);
+                dropped.push(generated);
+            }
+        }
+    }
+
     fn drop_column_indexes(&mut self, table: TableId, column: Name) {
         for index in self.index.indexes.on_table(table) {
             if self.dropped_indexes.contains(&index) || !self.index_columns_contain(index, column) {
@@ -3457,6 +3502,18 @@ impl Lowerer {
                 table,
                 refs: self.index.references.range_from(refs),
             });
+            for reference in self.index.references.range_from(refs) {
+                if let Resolution::Column { column, .. } =
+                    self.index.references[reference].resolution
+                    && let Some(column) = self.index.columns[column].name
+                {
+                    self.generated_column_deps.push(GeneratedColumnDep {
+                        expr: id,
+                        table,
+                        column,
+                    });
+                }
+            }
         }
         for reference in self.index.references.range_from(refs) {
             if let Resolution::Function(function) = self.index.references[reference].resolution {
@@ -17992,6 +18049,12 @@ impl Lowerer {
                 self.set_column_expr(table, name, None);
                 self.drop_column_sequences(table, name);
                 self.drop_column_indexes(table, name);
+                if matches!(
+                    drop_column.drop_behavior(),
+                    Some(ast::DropBehavior::Cascade(_))
+                ) {
+                    self.drop_generated_dependents(table, name, &mut dropped);
+                }
             }
             dropped.extend(column);
         }

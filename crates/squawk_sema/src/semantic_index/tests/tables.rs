@@ -1071,3 +1071,35 @@ alter table t alter column j type int;
        ╰ hint: add a `using` clause that converts the existing values
     ");
 }
+
+#[test]
+fn drop_column_cascade_generated() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  g int generated always as (a * 2) stored
+);
+alter table t drop column a cascade;
+alter table t add column g int;
+create table u (
+  a int,
+  g int generated always as (a * 2) stored,
+  h int
+);
+alter table u rename column a to b;
+alter table u drop column b cascade;
+select h from u;
+select g from u;
+"), @"
+    error: column `g` does not exist
+       ╭▸ 
+    16 │ select g from u;
+       │        ━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    16 - select g from u;
+    16 + select h from u;
+       ╰╴
+    ");
+}
