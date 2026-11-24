@@ -688,3 +688,10 @@ select ('{}'::jsonb).nope;
       ╰╴                     ━━━━
     ");
 }
+
+#[test]
+fn record_field_through_cte() {
+    assert_snapshot!(check("
+with cte as (select pg_get_keywords() k) select (k).word from cte;
+"), @"no diagnostics");
+}

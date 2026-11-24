@@ -26559,9 +26559,16 @@ impl Lowerer {
         field: &ast::NameRef,
     ) -> Option<Ty> {
         let column = self.name_ref_name(field)?;
-        if let Some(columns) = columns
-            && self.find_column_in(columns.range, column).is_some()
-        {
+        let Some(columns) = columns else {
+            self.add_ref(
+                column,
+                ReferenceKind::Column,
+                field.syntax(),
+                Resolution::Unknown,
+            );
+            return None;
+        };
+        if self.find_column_in(columns.range, column).is_some() {
             return self.add_columns_field_ref(Some(columns), field);
         }
         self.push_error(field.syntax(), SemaError::UnresolvedRecordColumn { column });
@@ -26609,8 +26616,16 @@ impl Lowerer {
             );
         };
         let ty = self.record_call(reference, function, &args);
-        match self.index.functions[function].columns {
+        let columns = self.index.functions[function].columns;
+        match columns {
             Some(columns) => FieldBase::Columns { columns, ty },
+            None if self.is_record(ty) => FieldBase::Columns {
+                columns: Columns {
+                    range: self.index.columns.alloc_many([]),
+                    complete: true,
+                },
+                ty,
+            },
             None => self.expr_field_base(ty),
         }
     }
