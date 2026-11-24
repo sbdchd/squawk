@@ -1478,6 +1478,11 @@ impl Lowerer {
                         self.index.types[*target].name_ptr == self.index.types[ty].name_ptr
                     })
                 };
+                let is_constructor = |function: FunctionId| {
+                    targets.iter().any(|(_, target)| {
+                        self.index.types[*target].ptr == self.index.functions[function].ptr
+                    })
+                };
                 let blocked =
                     self.type_dependents(*ty)
                         .into_iter()
@@ -1487,8 +1492,11 @@ impl Lowerer {
                                 self.index.constraints[constraint].owner,
                                 ConstraintOwner::Domain(domain) if is_target(domain)
                             ),
-                            Object::Function(_)
-                            | Object::ColumnExpr(_)
+                            Object::Function(function) => {
+                                !is_constructor(function)
+                                    || !self.dependents(Object::Function(function)).is_empty()
+                            }
+                            Object::ColumnExpr(_)
                             | Object::OperatorFamilyMember(_)
                             | Object::Table(_)
                             | Object::Trigger(_)
@@ -12003,8 +12011,77 @@ impl Lowerer {
         );
         types.set_category(range, category, preferred, collatable);
         if let Some(multirange_name) = multirange_name {
-            self.alloc_multirange_type(range, multirange_name);
+            let multirange = self.alloc_multirange_type(range, multirange_name);
+            if self.file_id != FileId::Builtins.into()
+                && let Some(segment) = path.segment()
+            {
+                self.alloc_range_constructors(
+                    range,
+                    multirange,
+                    subtype,
+                    create_type.syntax(),
+                    &segment,
+                );
+            }
         }
+    }
+
+    fn alloc_range_constructors(
+        &mut self,
+        range: TypeId,
+        multirange: TypeId,
+        subtype: Option<Ty>,
+        node: &SyntaxNode,
+        segment: &ast::PathSegment,
+    ) {
+        let range_ty = Some(Ty::Type(range));
+        let array = Some(Ty::Type(range).array());
+        let text = self.builtin_type("text");
+        let ptr = self.ptr(node);
+        let param = |mode, ty| Param {
+            name: None,
+            mode,
+            ty,
+            has_default: false,
+            ptr,
+            name_ptr: None,
+        };
+        let bound = || param(ParamMode::In, subtype);
+        let flags = param(ParamMode::In, text);
+        let element = param(ParamMode::In, range_ty);
+        let elements = param(ParamMode::Variadic, array);
+        self.alloc_type_constructor(range, [bound(), bound()], node, segment);
+        self.alloc_type_constructor(range, [bound(), bound(), flags], node, segment);
+        self.alloc_type_constructor(multirange, [], node, segment);
+        self.alloc_type_constructor(multirange, [element], node, segment);
+        self.alloc_type_constructor(multirange, [elements], node, segment);
+    }
+
+    fn alloc_type_constructor(
+        &mut self,
+        ty: TypeId,
+        params: impl IntoIterator<Item = Param>,
+        node: &SyntaxNode,
+        segment: &ast::PathSegment,
+    ) {
+        let params = self.index.params.alloc_many(params);
+        let Type { schema, name, .. } = self.index.types[ty];
+        let function = self.index.functions.alloc(Function {
+            kind: FunctionKind::Function,
+            window: false,
+            schema,
+            name,
+            ptr: self.ptr(node),
+            name_ptr: self.ast_ptr(segment),
+            params,
+            aggregate_kind: None,
+            ret: Some(Ty::Type(ty)),
+            returns: ReturnKind::Single,
+            columns: None,
+        });
+        self.index.set_param_function(params, function);
+        self.dependencies
+            .add_dependency(Object::Function(function), Object::Type(ty));
     }
 
     fn generated_subscript_results(&mut self, node: &SyntaxNode) -> Option<SubscriptResults> {
@@ -27712,7 +27789,11 @@ impl Lowerer {
         id
     }
 
-    fn alloc_multirange_type(&mut self, range_id: TypeId, multirange_name: MultirangeName) {
+    fn alloc_multirange_type(
+        &mut self,
+        range_id: TypeId,
+        multirange_name: MultirangeName,
+    ) -> TypeId {
         let range = &self.index.types[range_id];
         let (ptr, name_ptr, range_schema) = (range.ptr, range.name_ptr, range.schema);
         let range_name = range.name;
@@ -27753,7 +27834,7 @@ impl Lowerer {
                 array_name,
             },
             &self.index.columns,
-        );
+        )
     }
 
     fn subscripted(&self, ty: Ty, slice: bool) -> Option<Ty> {

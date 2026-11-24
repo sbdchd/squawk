@@ -96,3 +96,52 @@ select null::m;
       ╰╴             ━
     ");
 }
+
+#[test]
+fn range_type_constructors() {
+    assert_snapshot!(check(r#"
+create type textrange_c as range (subtype = text, collation = "C");
+select
+  textrange_c('A', 'Z'),
+  textrange_c('A', 'Z', '[]'),
+  textmultirange_c(),
+  textmultirange_c(textrange_c('a', 'b')),
+  textmultirange_c(textrange_c('a', 'b'), textrange_c('c', 'd'));
+select lower(textrange_c('A', 'Z')) || 'a';
+select textrange_c(1, 2);
+create type fr as range (subtype = float8, multirange_type_name = mfr);
+select mfr(fr(1, 2)), fr(null, 2.5);
+alter type fr rename to fr2;
+select fr(1.0, 2);
+create view fv as
+  select upper(fr(1.0, 2));
+drop type fr2;
+drop view fv;
+drop type fr2;
+select fr(1.0, 2);
+select mfr();
+"#), @"
+    error: function `textrange_c(int4, int4)` does not exist
+       ╭▸ 
+    10 │ select textrange_c(1, 2);
+       │        ━━━━━━━━━━━
+       │
+       ├ note: `textrange_c(text, text)` expects `text` for argument 1, found `int4`
+       ├ note: `textrange_c(text, text, text)` takes 3 arguments but 2 were supplied
+       ╰ hint: consider adding explicit type casts
+    error: cannot drop type `fr2` because other objects depend on it
+       ╭▸ 
+    17 │ drop type fr2;
+       ╰╴          ━━━
+    error: function `fr(numeric, int4)` does not exist
+       ╭▸ 
+    20 │ select fr(1.0, 2);
+       │        ━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: function `mfr()` does not exist
+       ╭▸ 
+    21 │ select mfr();
+       ╰╴       ━━━
+    ");
+}
