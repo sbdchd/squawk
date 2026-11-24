@@ -903,6 +903,12 @@ struct IdentPart<'a> {
     rest: &'a str,
 }
 
+#[derive(Clone, Copy)]
+struct FieldFunction {
+    function: FunctionId,
+    ty: Option<Ty>,
+}
+
 enum FieldBase {
     Source(Option<SourceId>),
     Scalar(Ty),
@@ -26071,6 +26077,51 @@ impl Lowerer {
             .return_type(&self.index.functions[function], args)
     }
 
+    fn find_field_function(&self, arg: Ty, name: Name) -> Option<FieldFunction> {
+        let args = [CallArg::positional(ArgType::Known(arg))];
+        let Resolution::Function(function) =
+            self.find_routine(None, name, &args, FunctionKind::Function)
+        else {
+            return None;
+        };
+        Some(FieldFunction {
+            function,
+            ty: self.call_type(function, &args),
+        })
+    }
+
+    fn add_field_function_ref(
+        &mut self,
+        name: Name,
+        field: &ast::NameRef,
+        FieldFunction { function, ty }: FieldFunction,
+    ) -> Option<Ty> {
+        self.add_ref(
+            name,
+            ReferenceKind::Function(RoutineKind::Function),
+            field.syntax(),
+            Resolution::Function(function),
+        );
+        ty
+    }
+
+    fn source_row_type(&mut self, source: SourceId) -> Option<Ty> {
+        match self.index.sources[source].kind {
+            SourceKind::Table(table) => Some(Ty::Table(table)),
+            SourceKind::Cte(cte) => Some(Ty::Cte(cte)),
+            SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::Returning(_)
+            | SourceKind::Excluded(_)
+            | SourceKind::RuleRelation(_)
+            | SourceKind::ElementVariable
+            | SourceKind::Other => self.builtin_type("record"),
+        }
+    }
+
     fn find_row_function(&self, source: SourceId, name: Name) -> Option<FunctionId> {
         let SourceKind::Table(table) = self.index.sources[source].kind else {
             return None;
@@ -26273,6 +26324,9 @@ impl Lowerer {
             FieldBase::Scalar(ty) => {
                 let field = field_expr.field()?;
                 let column = self.name_ref_name(&field)?;
+                if let Some(function) = self.find_field_function(ty, column) {
+                    return self.add_field_function_ref(column, &field, function);
+                }
                 let error = SemaError::ColumnNotationNotComposite {
                     column,
                     ty: self.index.ty_name(ty),
@@ -26290,6 +26344,15 @@ impl Lowerer {
                 let field = field_expr.field()?;
                 if self.is_record(ty) {
                     return self.add_record_field_ref(None, &field);
+                }
+                if let Some(ty) = ty
+                    && let Some(name) = self.name_ref_name(&field)
+                    && self
+                        .ty_columns(ty)
+                        .is_some_and(|columns| self.find_column_in(columns.range, name).is_none())
+                    && let Some(function) = self.find_field_function(ty, name)
+                {
+                    return self.add_field_function_ref(name, &field, function);
                 }
                 return self.add_field_ref(ty, &field);
             }
@@ -26321,6 +26384,11 @@ impl Lowerer {
                     ReferenceKind::Function(RoutineKind::Function),
                     Resolution::Function(function),
                 ),
+                None if let Some(row) = self.source_row_type(source)
+                    && let Some(function) = self.find_field_function(row, name) =>
+                {
+                    return self.add_field_function_ref(name, &field, function);
+                }
                 None if self.index.sources[source].columns.complete => {
                     let resolution = match self.index.sources[source].name {
                         Some(qualifier) => {

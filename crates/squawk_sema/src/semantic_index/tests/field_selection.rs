@@ -668,3 +668,23 @@ returning (merge_action()).x;
       ╰╴                           ━
     ");
 }
+
+#[test]
+fn functional_notation() {
+    assert_snapshot!(check("
+create table t (a int);
+select x.count, x.a from t x;
+select ('{}'::jsonb).jsonb_typeof;
+select x.nope from t x;
+select ('{}'::jsonb).nope;
+"), @"
+    error: column `x.nope` does not exist
+      ╭▸ 
+    5 │ select x.nope from t x;
+      ╰╴         ━━━━
+    error: column notation `.nope` applied to type `jsonb`, which is not a composite type
+      ╭▸ 
+    6 │ select ('{}'::jsonb).nope;
+      ╰╴                     ━━━━
+    ");
+}
