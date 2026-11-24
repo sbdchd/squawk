@@ -17440,6 +17440,9 @@ impl Lowerer {
         else {
             return;
         };
+        if self.lower_alter_table_rename_index(alter_table, &path) {
+            return;
+        }
         let composite = relation_name.as_ref().and_then(|relation_name| {
             self.lower_composite_type_alter(alter_table, relation_name, &path)
         });
@@ -17458,6 +17461,37 @@ impl Lowerer {
         };
         let recurse = relation_name.is_some_and(|name| name.only_token().is_none());
         self.lower_alter_table_actions(table, recurse, alter_table.actions(), alter_table.syntax());
+    }
+
+    fn lower_alter_table_rename_index(
+        &mut self,
+        alter_table: &ast::AlterTable,
+        path: &ast::PathRef,
+    ) -> bool {
+        let mut actions = alter_table.actions();
+        let (Some(ast::AlterTableAction::TableRenameTo(rename)), None) =
+            (actions.next(), actions.next())
+        else {
+            return false;
+        };
+        let Some(segment) = path.segment() else {
+            return false;
+        };
+        let name = self.intern(&segment.text());
+        let schema = path
+            .qualifier()
+            .and_then(|qualifier| qualifier.segment())
+            .map(|segment| self.intern_schema(&segment.text()));
+        if self.find_table(schema, name).is_some() || self.find_index(schema, name).is_none() {
+            return false;
+        }
+        let Some(index) = self.lower_index_ref(path, IfMissing::Error) else {
+            return false;
+        };
+        if let Some(new_name) = rename.table_name().and_then(|name| name.path()) {
+            self.rename_index(index, &new_name, alter_table.syntax());
+        }
+        true
     }
 
     fn lower_composite_type_alter(

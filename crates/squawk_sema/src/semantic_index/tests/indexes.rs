@@ -520,3 +520,20 @@ alter table t add exclude using gist (j with =);
        ╰╴                                             ━
     ");
 }
+
+#[test]
+fn alter_table_rename_index() {
+    assert_snapshot!(check("
+create table t (a int);
+create index i on t (a);
+alter table i rename to j;
+alter index j rename to k;
+drop index k;
+drop index i;
+"), @"
+    error: index `i` does not exist
+      ╭▸ 
+    7 │ drop index i;
+      ╰╴           ━
+    ");
+}
