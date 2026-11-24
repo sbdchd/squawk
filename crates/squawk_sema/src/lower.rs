@@ -26465,6 +26465,15 @@ impl Lowerer {
         {
             return self.lower_field_star_base(&inner, &star);
         }
+        if let ast::Expr::NameRef(name_ref) = &base
+            && let Some(name) = self.name_ref_name(name_ref)
+            && self.resolve_source(name).is_none()
+            && let Some(param) = self.find_param(name)
+        {
+            let resolution = Resolution::Param(param);
+            self.add_ref(name, ReferenceKind::Param, name_ref.syntax(), resolution);
+            return Some(self.expr_field_base(self.resolution_type(resolution)));
+        }
         let qualifier = match &base {
             ast::Expr::NameRef(name_ref) => Some(name_ref.clone()),
             ast::Expr::FieldExpr(inner) => match inner.base() {
