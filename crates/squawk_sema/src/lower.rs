@@ -17407,6 +17407,7 @@ impl Lowerer {
             TableLookup::Table
             | TableLookup::ForeignTable
             | TableLookup::TableOrForeignTable
+            | TableLookup::TableViewOrForeignTable
             | TableLookup::TableOrView
             | TableLookup::TableOrMaterializedView
             | TableLookup::Any
@@ -17452,7 +17453,7 @@ impl Lowerer {
             None => self.lower_table_ref(
                 &path,
                 IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
-                TableLookup::TableOrForeignTable,
+                alter_table_lookup(alter_table.actions()),
             ),
         };
         let recurse = relation_name.is_some_and(|name| name.only_token().is_none());
@@ -28593,4 +28594,98 @@ fn values_row_expr(row: &ast::Row, position: usize) -> Option<ast::Expr> {
         return None;
     }
     row.exprs().nth(position)
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum AlterTableTarget {
+    AnyRelation,
+    TableViewOrForeignTable,
+    TableOrForeignTable,
+}
+
+fn alter_table_lookup(actions: impl Iterator<Item = ast::AlterTableAction>) -> TableLookup {
+    match actions
+        .map(|action| alter_table_target(&action))
+        .max()
+        .unwrap_or(AlterTableTarget::TableOrForeignTable)
+    {
+        AlterTableTarget::AnyRelation => TableLookup::Any,
+        AlterTableTarget::TableViewOrForeignTable => TableLookup::TableViewOrForeignTable,
+        AlterTableTarget::TableOrForeignTable => TableLookup::TableOrForeignTable,
+    }
+}
+
+fn alter_table_target(action: &ast::AlterTableAction) -> AlterTableTarget {
+    match action {
+        ast::AlterTableAction::TableRenameTo(_)
+        | ast::AlterTableAction::OwnerTo(_)
+        | ast::AlterTableAction::SetSchema(_) => AlterTableTarget::AnyRelation,
+        ast::AlterTableAction::RenameColumn(_)
+        | ast::AlterTableAction::SetOptions(_)
+        | ast::AlterTableAction::ResetOptions(_) => AlterTableTarget::TableViewOrForeignTable,
+        ast::AlterTableAction::AlterColumn(alter_column) => match alter_column.option() {
+            Some(
+                ast::AlterColumnOption::SetDefault(_) | ast::AlterColumnOption::DropDefault(_),
+            ) => AlterTableTarget::TableViewOrForeignTable,
+            Some(
+                ast::AlterColumnOption::AddGenerated(_)
+                | ast::AlterColumnOption::DropExpression(_)
+                | ast::AlterColumnOption::DropIdentity(_)
+                | ast::AlterColumnOption::DropNotNull(_)
+                | ast::AlterColumnOption::Inherit(_)
+                | ast::AlterColumnOption::NoInherit(_)
+                | ast::AlterColumnOption::ResetOptions(_)
+                | ast::AlterColumnOption::Restart(_)
+                | ast::AlterColumnOption::SetCompression(_)
+                | ast::AlterColumnOption::SetExpression(_)
+                | ast::AlterColumnOption::SetGenerated(_)
+                | ast::AlterColumnOption::SetGeneratedOptions(_)
+                | ast::AlterColumnOption::SetNotNull(_)
+                | ast::AlterColumnOption::SetOptions(_)
+                | ast::AlterColumnOption::SetOptionsList(_)
+                | ast::AlterColumnOption::SetSequenceOption(_)
+                | ast::AlterColumnOption::SetStatistics(_)
+                | ast::AlterColumnOption::SetStorage(_)
+                | ast::AlterColumnOption::SetType(_),
+            )
+            | None => AlterTableTarget::TableOrForeignTable,
+        },
+        ast::AlterTableAction::AddColumn(_)
+        | ast::AlterTableAction::AddConstraint(_)
+        | ast::AlterTableAction::AlterConstraint(_)
+        | ast::AlterTableAction::AlterOptionList(_)
+        | ast::AlterTableAction::AttachPartition(_)
+        | ast::AlterTableAction::ClusterOn(_)
+        | ast::AlterTableAction::DetachPartition(_)
+        | ast::AlterTableAction::DisableRls(_)
+        | ast::AlterTableAction::DisableRule(_)
+        | ast::AlterTableAction::DisableTrigger(_)
+        | ast::AlterTableAction::DropColumn(_)
+        | ast::AlterTableAction::DropConstraint(_)
+        | ast::AlterTableAction::EnableAlwaysRule(_)
+        | ast::AlterTableAction::EnableAlwaysTrigger(_)
+        | ast::AlterTableAction::EnableReplicaRule(_)
+        | ast::AlterTableAction::EnableReplicaTrigger(_)
+        | ast::AlterTableAction::EnableRls(_)
+        | ast::AlterTableAction::EnableRule(_)
+        | ast::AlterTableAction::EnableTrigger(_)
+        | ast::AlterTableAction::ForceRls(_)
+        | ast::AlterTableAction::InheritTable(_)
+        | ast::AlterTableAction::MergePartitions(_)
+        | ast::AlterTableAction::NoForceRls(_)
+        | ast::AlterTableAction::NoInheritTable(_)
+        | ast::AlterTableAction::NotOf(_)
+        | ast::AlterTableAction::OfType(_)
+        | ast::AlterTableAction::OptionItemList(_)
+        | ast::AlterTableAction::RenameConstraint(_)
+        | ast::AlterTableAction::ReplicaIdentity(_)
+        | ast::AlterTableAction::SetAccessMethod(_)
+        | ast::AlterTableAction::SetLogged(_)
+        | ast::AlterTableAction::SetTablespace(_)
+        | ast::AlterTableAction::SetUnlogged(_)
+        | ast::AlterTableAction::SetWithoutCluster(_)
+        | ast::AlterTableAction::SetWithoutOids(_)
+        | ast::AlterTableAction::SplitPartition(_)
+        | ast::AlterTableAction::ValidateConstraint(_) => AlterTableTarget::TableOrForeignTable,
+    }
 }

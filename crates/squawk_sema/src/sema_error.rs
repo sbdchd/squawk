@@ -1383,6 +1383,7 @@ impl fmt::Display for TableLookup {
             TableLookup::Table => "table",
             TableLookup::ForeignTable => "foreign table",
             TableLookup::TableOrForeignTable => "table or foreign table",
+            TableLookup::TableViewOrForeignTable => "table, view, or foreign table",
             TableLookup::TableOrView => "table or view",
             TableLookup::TableOrMaterializedView => "table or materialized view",
             TableLookup::Any | TableLookup::FromItem => "relation",
