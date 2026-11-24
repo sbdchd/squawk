@@ -4834,10 +4834,11 @@ impl Lowerer {
         if_missing: IfMissing,
         role_refs: ast::AstChildren<ast::RoleRef>,
     ) {
-        for role_ref in role_refs {
-            if let Some(role) = self.lower_role_ref(&role_ref, if_missing) {
-                self.drop_role(role);
-            }
+        let roles: SmallVec<[RoleId; 4]> = role_refs
+            .filter_map(|role_ref| self.lower_role_ref(&role_ref, if_missing))
+            .collect();
+        for role in roles {
+            self.drop_role(role);
         }
     }
 

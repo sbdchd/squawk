@@ -398,3 +398,24 @@ create table t (a int);
 grant select on t to "public";
 "#), @"no diagnostics");
 }
+
+#[test]
+fn drop_role_repeated() {
+    assert_snapshot!(check("
+create role zr1;
+drop role zr1, zr1;
+drop role zr1;
+create role zr2;
+drop user if exists zr2, zr2;
+drop role zr2;
+"), @"
+    error: role `zr1` does not exist
+      ╭▸ 
+    4 │ drop role zr1;
+      ╰╴          ━━━
+    error: role `zr2` does not exist
+      ╭▸ 
+    7 │ drop role zr2;
+      ╰╴          ━━━
+    ");
+}
