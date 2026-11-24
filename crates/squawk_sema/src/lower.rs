@@ -11096,7 +11096,9 @@ impl Lowerer {
         };
         let name = self.intern(&segment.text());
         let schema = match path.qualifier() {
-            None if persistence == Persistence::Temp => self.pg_temp,
+            None if persistence == Persistence::Temp || self.refs_use_temp_relation(refs) => {
+                self.pg_temp
+            }
             _ => self.creation_schema(&path),
         };
         let if_exists = IfExists::from_or_replace(create_view.or_replace().as_ref());
@@ -11125,6 +11127,20 @@ impl Lowerer {
             self.view_bases.insert(table, base);
         }
         self.depend_on_refs(refs, self.index.tables.range_from(start), Object::Table);
+    }
+
+    fn refs_use_temp_relation(&self, refs: RefId) -> bool {
+        self.index
+            .references
+            .range_from(refs)
+            .iter()
+            .any(|reference| {
+                if let Resolution::Table(table) = self.index.references[reference].resolution {
+                    self.index.tables[table].schema == self.pg_temp
+                } else {
+                    false
+                }
+            })
     }
 
     fn auto_updatable_view_base(

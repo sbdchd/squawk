@@ -628,3 +628,24 @@ alter table w alter b set not null;
        ╰╴            ━
     ");
 }
+
+#[test]
+fn view_over_temp_table_is_temp() {
+    assert_snapshot!(check("
+create temp table w (a int);
+create view v as
+  select a from w;
+create table v (b int);
+select a from v;
+select b from public.v;
+create table w2 (a int);
+create view v2 as
+  select a from w2;
+create table v2 (b int);
+"), @"
+    error: relation `v2` already exists
+       ╭▸ 
+    11 │ create table v2 (b int);
+       ╰╴             ━━
+    ");
+}
