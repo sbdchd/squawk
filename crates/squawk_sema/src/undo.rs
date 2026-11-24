@@ -123,6 +123,7 @@ pub(crate) enum Undo {
     ViewColumnDep(usize, Name),
     GeneratedColumnDep(usize, Name),
     IndexColumns(IndexId, IdxRange<Name>),
+    IndexParent(IndexId, Option<IndexId>),
     TypeColumns(TypeId, Columns),
     TableOfType(TableId, Option<TypeId>),
     TypeSubscript(TypeId, Option<Subscript>, SubscriptResults),

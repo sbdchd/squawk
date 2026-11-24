@@ -3087,6 +3087,9 @@ impl Lowerer {
                 Undo::IndexColumns(id, columns) => {
                     self.index.indexes.set_columns(id, columns);
                 }
+                Undo::IndexParent(id, parent) => {
+                    self.index.indexes.set_parent(id, parent);
+                }
                 Undo::TypeColumns(ty, columns) => {
                     self.index
                         .types
@@ -3440,12 +3443,7 @@ impl Lowerer {
             if self.dropped_indexes.contains(&index) || !self.index_columns_contain(index, column) {
                 continue;
             }
-            self.drop_index(index);
-            let constraints: SmallVec<[ConstraintId; 1]> =
-                self.index.constraints.backed_by(index).collect();
-            for constraint in constraints {
-                self.drop_constraint(constraint);
-            }
+            self.drop_index_and_constraints(index);
         }
     }
 
@@ -4020,9 +4018,187 @@ impl Lowerer {
     }
 
     fn drop_index(&mut self, index: IndexId) {
-        if self.dropped_indexes.insert(index) && self.in_transaction() {
+        if !self.dropped_indexes.insert(index) {
+            return;
+        }
+        if self.in_transaction() {
             self.undo.push(Undo::DropIndex(index));
         }
+        let Some(table) = self.index.indexes[index].table else {
+            return;
+        };
+        let mut i = 0;
+        while let Some(&inheritance) = self.inheritances.children(table).get(i) {
+            i += 1;
+            for child in self.index.indexes.on_table(inheritance.child) {
+                if self.index.indexes[child].parent == Some(index) {
+                    self.drop_index_and_constraints(child);
+                }
+            }
+        }
+    }
+
+    fn drop_index_and_constraints(&mut self, index: IndexId) {
+        self.drop_index(index);
+        let constraints: SmallVec<[ConstraintId; 1]> =
+            self.index.constraints.backed_by(index).collect();
+        for constraint in constraints {
+            self.drop_constraint(constraint);
+        }
+    }
+
+    fn set_index_parent(&mut self, index: IndexId, parent: Option<IndexId>) {
+        let previous = self.index.indexes.set_parent(index, parent);
+        if self.in_transaction() {
+            self.undo.push(Undo::IndexParent(index, previous));
+        }
+    }
+
+    fn add_partition_indexes(&mut self, parent: TableId, partition: TableId) {
+        for index in self.index.indexes.on_table(parent) {
+            if !self.dropped_indexes.contains(&index) {
+                self.add_partition_index(index, partition);
+            }
+        }
+    }
+
+    fn add_index_to_partitions(&mut self, index: IndexId) {
+        let Some(table) = self.index.indexes[index].table else {
+            return;
+        };
+        let mut i = 0;
+        while let Some(&inheritance) = self.inheritances.children(table).get(i) {
+            i += 1;
+            if inheritance.kind == InheritanceKind::Partition {
+                self.add_partition_index(index, inheritance.child);
+            }
+        }
+    }
+
+    fn add_partition_index(&mut self, parent: IndexId, partition: TableId) {
+        if !self.is_live_child(partition) {
+            return;
+        }
+        match self.index.tables[partition].kind {
+            TableKind::Table => {}
+            TableKind::ForeignTable
+            | TableKind::View
+            | TableKind::MaterializedView
+            | TableKind::Sequence
+            | TableKind::PropertyGraph => return,
+        }
+        let existing = self
+            .index
+            .indexes
+            .on_table(partition)
+            .into_iter()
+            .find(|&index| {
+                !self.dropped_indexes.contains(&index)
+                    && self.index.indexes[index]
+                        .parent
+                        .is_none_or(|existing| existing == parent)
+                    && self.partition_index_matches(parent, index)
+            });
+        if let Some(index) = existing {
+            self.set_index_parent(index, Some(parent));
+            return;
+        }
+        let index = self.clone_partition_index(parent, partition);
+        self.add_index_to_partitions(index);
+    }
+
+    fn partition_index_matches(&self, parent: IndexId, index: IndexId) -> bool {
+        let indexes = &self.index.indexes;
+        let key_matches = match (indexes.key(parent), indexes.key(index)) {
+            (Some(parent), Some(key)) => parent.eq(key),
+            (None, None) => true,
+            (Some(_), None) | (None, Some(_)) => false,
+        };
+        let constraint_matches = self
+            .index_constraint(parent)
+            .map(|constraint| self.index.constraints[constraint].kind)
+            .is_none_or(|kind| {
+                self.index_constraint(index)
+                    .is_some_and(|constraint| self.index.constraints[constraint].kind == kind)
+            });
+        key_matches
+            && constraint_matches
+            && indexes.columns(parent).eq(indexes.columns(index))
+            && indexes[parent].unique == indexes[index].unique
+            && indexes[parent].partial == indexes[index].partial
+    }
+
+    fn index_constraint(&self, index: IndexId) -> Option<ConstraintId> {
+        self.index
+            .constraints
+            .backed_by(index)
+            .find(|constraint| !self.dropped_constraints.contains(constraint))
+    }
+
+    fn clone_partition_index(&mut self, parent: IndexId, partition: TableId) -> IndexId {
+        let Index {
+            schema: _,
+            name: _,
+            table: _,
+            key,
+            columns,
+            parent: _,
+            name_addition,
+            unique,
+            partial,
+            deferrable,
+            ptr,
+            name_ptr,
+        } = self.index.indexes[parent];
+        let constraint = self.index_constraint(parent);
+        let kind = constraint.map(|constraint| self.index.constraints[constraint].kind);
+        let label = match kind {
+            Some(ConstraintKind::PrimaryKey) => "pkey",
+            Some(ConstraintKind::Unique) => "key",
+            Some(ConstraintKind::Exclude) => "excl",
+            Some(
+                ConstraintKind::Check
+                | ConstraintKind::NotNull { .. }
+                | ConstraintKind::ForeignKey
+                | ConstraintKind::DomainNotNull,
+            )
+            | None => "idx",
+        };
+        let Table { schema, name, .. } = self.index.tables[partition];
+        let name = pg_names::choose_relation_name(
+            self.index.names.resolve(name),
+            name_addition.map(|addition| self.index.names.resolve(addition)),
+            label,
+            |name| self.relation_name_exists(schema, name),
+            |name| kind.is_some() && self.constraint_name_exists(schema, name),
+        );
+        let name = self.intern(&name);
+        let index = self.index.indexes.alloc(Index {
+            schema,
+            name,
+            table: Some(partition),
+            key,
+            columns,
+            parent: Some(parent),
+            name_addition,
+            unique,
+            partial,
+            deferrable,
+            ptr,
+            name_ptr,
+        });
+        if let Some(kind) = kind {
+            self.index.constraints.alloc(Constraint {
+                kind,
+                name,
+                owner: ConstraintOwner::Table(partition),
+                index: Some(index),
+                no_inherit: false,
+                ptr,
+                name_ptr,
+            });
+        }
+        index
     }
 
     fn move_extension(&mut self, extension: ExtensionId, schema: Name) {
@@ -10736,6 +10912,9 @@ impl Lowerer {
         };
         for &parent in &parents {
             self.add_inheritance(parent, table, inheritance_kind);
+            if inheritance_kind == InheritanceKind::Partition {
+                self.add_partition_indexes(parent, table);
+            }
         }
         if let Some(partition_type) = partition_type
             && let [parent] = parents[..]
@@ -17897,6 +18076,7 @@ impl Lowerer {
                         && !self.report_circular_inheritance(path.syntax(), table, partition)
                     {
                         self.add_inheritance(table, partition, InheritanceKind::Partition);
+                        self.add_partition_indexes(table, partition);
                         attached = Some(partition);
                     }
                     if let Some(partition_type) = attach.partition_type() {
@@ -17917,6 +18097,13 @@ impl Lowerer {
                         && let Some(table) = table
                     {
                         self.remove_inheritance(table, partition, InheritanceKind::Partition);
+                        for index in self.index.indexes.on_table(partition) {
+                            if self.index.indexes[index].parent.is_some_and(|parent| {
+                                self.index.indexes[parent].table == Some(table)
+                            }) {
+                                self.set_index_parent(index, None);
+                            }
+                        }
                     }
                     continue;
                 }
@@ -18113,6 +18300,7 @@ impl Lowerer {
             }
         }
 
+        let indexes = self.index.indexes.next_idx();
         for action in actions.clone() {
             if let ast::AlterTableAction::AddColumn(add_column) = action {
                 self.lower_add_column(table, &add_column, node);
@@ -18131,6 +18319,11 @@ impl Lowerer {
                 && !alter_column.is_set_type()
             {
                 self.lower_alter_column(table, original, alter_column, node);
+            }
+        }
+        if recurse {
+            for index in self.index.indexes.range_from(indexes) {
+                self.add_index_to_partitions(index);
             }
         }
     }
@@ -18159,6 +18352,7 @@ impl Lowerer {
             self.index.tables.set_constraints_complete(partition, false);
             if let Some(parent) = parent {
                 self.add_inheritance(parent, partition, InheritanceKind::Partition);
+                self.add_partition_indexes(parent, partition);
             }
         }
     }
@@ -18198,6 +18392,7 @@ impl Lowerer {
             self.index.tables.set_constraints_complete(id, false);
             if let Some(parent) = parent {
                 self.add_inheritance(parent, id, InheritanceKind::Partition);
+                self.add_partition_indexes(parent, id);
             }
         }
     }
@@ -18717,6 +18912,9 @@ impl Lowerer {
         let query = self.alloc_query(QueryKind::Index, create_index.syntax());
         self.push_scope(query);
         let relation_name = create_index.table_relation_name();
+        let recurse = relation_name
+            .as_ref()
+            .is_some_and(|name| name.only_token().is_none());
         let path = relation_name
             .as_ref()
             .and_then(|name| name.table_name_ref())
@@ -18829,6 +19027,9 @@ impl Lowerer {
                 let Some(segment) = index.path().and_then(|path| path.segment()) else {
                     return;
                 };
+                let name_addition = table
+                    .is_some_and(|table| self.index.tables[table].partitioned)
+                    .then(|| self.intern(&index_column_names(create_index)));
                 let schema = match table {
                     Some(table) => self.index.tables[table].schema,
                     None => self
@@ -18843,6 +19044,7 @@ impl Lowerer {
                     table,
                     key,
                     columns,
+                    name_addition,
                     unique,
                     partial,
                 );
@@ -18853,6 +19055,9 @@ impl Lowerer {
                 };
                 let Table { schema, name, .. } = self.index.tables[table];
                 let addition = index_column_names(create_index);
+                let name_addition = self.index.tables[table]
+                    .partitioned
+                    .then(|| self.intern(&addition));
                 let name = pg_names::choose_relation_name(
                     self.index.names.resolve(name),
                     Some(&addition),
@@ -18868,6 +19073,8 @@ impl Lowerer {
                     table: Some(table),
                     key,
                     columns,
+                    parent: None,
+                    name_addition,
                     unique,
                     partial,
                     deferrable: false,
@@ -18877,7 +19084,13 @@ impl Lowerer {
                 self.record_comment(create_index.syntax(), Item::Index(id));
             }
         }
-        self.depend_on_refs(refs, self.index.indexes.range_from(start), Object::Index);
+        let created = self.index.indexes.range_from(start);
+        self.depend_on_refs(refs, created, Object::Index);
+        if recurse {
+            for index in created {
+                self.add_index_to_partitions(index);
+            }
+        }
     }
 
     fn check_partitioned_unique(
@@ -19519,8 +19732,12 @@ impl Lowerer {
             });
         match alter_index.action() {
             Some(ast::AlterIndexAction::AttachIndexPartition(attach)) => {
-                if let Some(path) = attach.index_ref().and_then(|index| index.path_ref()) {
-                    self.lower_index_ref(&path, IfMissing::Error);
+                if let Some(path) = attach.index_ref().and_then(|index| index.path_ref())
+                    && let Some(partition_index) = self.lower_index_ref(&path, IfMissing::Error)
+                    && let Some(index) = index
+                    && self.index.indexes.is_local(partition_index)
+                {
+                    self.set_index_parent(partition_index, Some(index));
                 }
             }
             Some(ast::AlterIndexAction::SetTablespace(set_tablespace)) => {
@@ -27207,6 +27424,7 @@ impl Lowerer {
         table: Option<TableId>,
         key: Option<IdxRange<Name>>,
         columns: IdxRange<Name>,
+        name_addition: Option<Name>,
         unique: bool,
         partial: bool,
     ) -> Option<IndexId> {
@@ -27223,6 +27441,8 @@ impl Lowerer {
             table,
             key,
             columns,
+            parent: None,
+            name_addition,
             unique,
             partial,
             deferrable: false,
@@ -27838,6 +28058,9 @@ impl Lowerer {
             | ConstraintKind::Exclude
             | ConstraintKind::DomainNotNull => false,
         };
+        let name_addition = addition
+            .filter(|_| self.index.tables[table].partitioned)
+            .map(|addition| self.intern(addition));
         let constraint = &self.index.constraints[constraint_id];
         let index = self.index.indexes.alloc(Index {
             schema,
@@ -27845,6 +28068,8 @@ impl Lowerer {
             table: Some(table),
             key,
             columns,
+            parent: None,
+            name_addition,
             unique,
             partial: false,
             deferrable,

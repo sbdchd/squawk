@@ -531,3 +531,60 @@ create table tl6
        ╰╴  ━━━━━━━━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn partition_indexes() {
+    assert_snapshot!(check("
+create table p (
+  a int,
+  b int,
+  primary key (a),
+  unique (a, b)
+)
+  partition by range (a);
+create table p1
+  partition of p
+  for values from (0) to (10)
+  partition by range (a);
+create table p2 (
+  a int not null,
+  b int
+);
+create unique index mine on p2 (a, b);
+alter table p attach partition p2 for values from (10) to (20);
+create index named on p (b, (a + 1));
+create index on only p (b);
+create table p11
+  partition of p1
+  for values from (0) to (5);
+alter index p1_pkey rename to x1;
+alter index p11_pkey rename to x2;
+alter index p2_pkey rename to x3;
+alter index p11_a_b_key rename to x4;
+alter index p2_a_b_key rename to x5;
+alter index p11_b_expr_idx rename to x6;
+alter index p2_b_idx rename to x7;
+begin;
+drop index named;
+alter index x6 rename to x8;
+rollback;
+alter index x6 rename to x8;
+alter table p detach partition p2;
+alter table p drop constraint p_pkey;
+alter index x1 rename to y1;
+alter index x3 rename to y3;
+"), @"
+    error: index `p2_b_idx` does not exist
+       ╭▸ 
+    30 │ alter index p2_b_idx rename to x7;
+       ╰╴            ━━━━━━━━
+    error: index `x6` does not exist
+       ╭▸ 
+    33 │ alter index x6 rename to x8;
+       ╰╴            ━━
+    error: index `x1` does not exist
+       ╭▸ 
+    38 │ alter index x1 rename to y1;
+       ╰╴            ━━
+    ");
+}

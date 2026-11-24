@@ -137,6 +137,8 @@ pub struct Index {
     pub table: Option<TableId>,
     pub(crate) key: Option<IdxRange<Name>>,
     pub(crate) columns: IdxRange<Name>,
+    pub(crate) parent: Option<IndexId>,
+    pub(crate) name_addition: Option<Name>,
     pub(crate) unique: bool,
     pub(crate) partial: bool,
     pub(crate) deferrable: bool,
