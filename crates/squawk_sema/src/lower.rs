@@ -2432,7 +2432,11 @@ impl Lowerer {
                     let path = column.path_ref()?;
                     let segment = path.segment()?;
                     let table = self
-                        .lower_qualified_column_ref(&path, TableLookup::TableOrForeignTable)
+                        .lower_qualified_column_ref(
+                            &path,
+                            TableLookup::TableOrForeignTable,
+                            IfMissing::Error,
+                        )
                         .table?;
                     Some(SequenceOwner {
                         table,
@@ -2462,6 +2466,7 @@ impl Lowerer {
         &mut self,
         path: &ast::PathRef,
         lookup: TableLookup,
+        if_missing: IfMissing,
     ) -> QualifiedColumn {
         let Some(segment) = path.segment() else {
             return QualifiedColumn {
@@ -2474,7 +2479,7 @@ impl Lowerer {
             && self.find_composite_type(&qualifier).is_some()
         {
             let ty = self.lower_type_path_ref(&qualifier, IfMissing::Error, None);
-            let column = self.lower_type_attribute_ref(ty, &segment, IfMissing::Error);
+            let column = self.lower_type_attribute_ref(ty, &segment, if_missing);
             return QualifiedColumn {
                 table: None,
                 column,
@@ -2482,7 +2487,7 @@ impl Lowerer {
         }
         let table = path
             .qualifier()
-            .and_then(|table| self.lower_table_ref(&table, IfMissing::Error, lookup));
+            .and_then(|table| self.lower_table_ref(&table, if_missing, lookup));
         let name = self.intern(&segment.text());
         let column = table.and_then(|table| self.find_table_column(table, name));
         let resolution = match (table, column) {
@@ -2490,7 +2495,10 @@ impl Lowerer {
                 source: None,
                 column,
             },
-            (Some(table), None) if self.index.tables[table].columns.complete => {
+            (Some(table), None)
+                if self.index.tables[table].columns.complete
+                    && matches!(if_missing, IfMissing::Error) =>
+            {
                 let Table {
                     name: relation,
                     columns,
@@ -6189,7 +6197,7 @@ impl Lowerer {
     ) -> Option<OperatorFamilyId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let family = self
             .search_path(schema, Lookup::OperatorClass)
             .find_map(|schema| self.find_operator_family_in(schema, name, access_method));
@@ -6215,7 +6223,7 @@ impl Lowerer {
     ) -> Option<OperatorClassId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let class = self
             .search_path(schema, Lookup::OperatorClass)
             .find_map(|schema| self.find_operator_class_in(schema, name, access_method));
@@ -6500,7 +6508,7 @@ impl Lowerer {
     ) -> Option<StatisticsId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let statistics = self
             .search_path(schema, Lookup::Statistics)
             .find_map(|schema| self.find_statistics_in(schema, name));
@@ -6966,7 +6974,7 @@ impl Lowerer {
     ) -> Option<TextSearchId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let text_search = self
             .search_path(schema, Lookup::TextSearch)
             .find_map(|schema| self.find_text_search_in(kind, schema, name));
@@ -8357,7 +8365,7 @@ impl Lowerer {
     ) -> Option<ConversionId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let conversion = self
             .search_path(schema, Lookup::Conversion)
             .find_map(|schema| self.find_conversion_in(schema, name));
@@ -9744,6 +9752,9 @@ impl Lowerer {
             let Some(id) = self.lower_operator_ref(&op, left, right, if_missing) else {
                 continue;
             };
+            if left == Operand::Unknown || right == Operand::Unknown {
+                continue;
+            }
             if cascade {
                 self.drop_operator_with_dependents(id);
             } else if self.dependents(Object::Operator(id)).is_empty() {
@@ -9902,7 +9913,8 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> Option<OperatorId> {
         let path = op.path_ref();
-        let schema = self.lower_schema_qualifier(path.as_ref().and_then(|path| path.qualifier()));
+        let schema = self
+            .lower_schema_qualifier_or(path.as_ref().and_then(|path| path.qualifier()), if_missing);
         let range = op.operator_range();
         let text = op.operator_text();
         self.add_operator_ref(range, schema, &text, left, right, if_missing)
@@ -10191,7 +10203,7 @@ impl Lowerer {
         drop: Option<DropRoutine>,
     ) -> Option<FunctionId> {
         let segment = path.segment()?;
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let name = self.intern(&segment.text());
         let resolution = match param_list {
             Some(param_list) => {
@@ -13809,7 +13821,7 @@ impl Lowerer {
                         if_missing,
                     ),
                     None => {
-                        let schema = self.lower_schema_qualifier(qualifier);
+                        let schema = self.lower_schema_qualifier_or(qualifier, if_missing);
                         self.lookup_type_name(segment.syntax(), schema, &segment.text(), if_missing)
                     }
                 };
@@ -13963,17 +13975,24 @@ impl Lowerer {
     ) -> TypeLookup {
         match func_type {
             ast::FuncType::Type(ty) => self.lower_type_lookup(ty, if_missing),
-            ast::FuncType::PercentType(percent_type) => match self.percent_type(percent_type) {
-                Some(ty) => TypeLookup::Found(ty),
-                None => TypeLookup::Unknown,
-            },
+            ast::FuncType::PercentType(percent_type) => {
+                match self.percent_type(percent_type, if_missing) {
+                    Some(ty) => TypeLookup::Found(ty),
+                    None if matches!(if_missing, IfMissing::Ignore) => TypeLookup::Missing,
+                    None => TypeLookup::Unknown,
+                }
+            }
         }
     }
 
-    fn percent_type(&mut self, percent_type: &ast::PercentType) -> Option<Ty> {
+    fn percent_type(
+        &mut self,
+        percent_type: &ast::PercentType,
+        if_missing: IfMissing,
+    ) -> Option<Ty> {
         let path = percent_type.path_ref()?;
         let column = self
-            .lower_qualified_column_ref(&path, TableLookup::Any)
+            .lower_qualified_column_ref(&path, TableLookup::Any, if_missing)
             .column?;
         let ty = self.index.columns[column].ty?;
         if percent_type.array_token().is_some() || percent_type.array_bounds().next().is_some() {
@@ -13991,7 +14010,7 @@ impl Lowerer {
     ) -> Option<TypeId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let found = self
             .search_path(schema, Lookup::Type)
             .find_map(|schema| self.find_type_in(schema, name));
@@ -14480,8 +14499,16 @@ impl Lowerer {
     }
 
     fn lower_schema_qualifier(&mut self, qualifier: Option<ast::PathRef>) -> Option<Name> {
+        self.lower_schema_qualifier_or(qualifier, IfMissing::Error)
+    }
+
+    fn lower_schema_qualifier_or(
+        &mut self,
+        qualifier: Option<ast::PathRef>,
+        if_missing: IfMissing,
+    ) -> Option<Name> {
         let segment = qualifier?.segment()?;
-        Some(self.lower_schema_ref(segment.syntax(), &segment.text()))
+        Some(self.lower_schema_ref_or(segment.syntax(), &segment.text(), if_missing))
     }
 
     fn lower_set_schema_ref(&mut self, schema_ref: &ast::SchemaRef) -> Option<Name> {
@@ -14490,10 +14517,21 @@ impl Lowerer {
     }
 
     fn lower_schema_ref(&mut self, node: &SyntaxNode, text: &str) -> Name {
+        self.lower_schema_ref_or(node, text, IfMissing::Error)
+    }
+
+    fn lower_schema_ref_or(
+        &mut self,
+        node: &SyntaxNode,
+        text: &str,
+        if_missing: IfMissing,
+    ) -> Name {
         let name = self.intern_schema(text);
-        let resolution = self
-            .find_schema(name)
-            .map_or(Resolution::Unresolved, Resolution::Schema);
+        let resolution = match (self.find_schema(name), if_missing) {
+            (Some(schema), _) => Resolution::Schema(schema),
+            (None, IfMissing::Ignore) => Resolution::Unknown,
+            (None, IfMissing::Error) => Resolution::Unresolved,
+        };
         self.add_ref(name, ReferenceKind::Schema, node, resolution);
         name
     }
@@ -17868,7 +17906,7 @@ impl Lowerer {
     ) -> Option<TableId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let found = self.find_table(schema, name);
         if found.is_none()
             && matches!(lookup, TableLookup::CopyTo | TableLookup::CopyFrom)
@@ -19568,7 +19606,7 @@ impl Lowerer {
         let path = relation_name_ref.path_ref()?;
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let table = self.find_table(schema, name);
         let resolution = match (table, if_missing) {
             (Some(table), _) => Resolution::Table(table),
@@ -20400,7 +20438,7 @@ impl Lowerer {
             }
             ast::CommentObject::ObjectColumn(object) => {
                 if let Some(path) = object.name().and_then(|name| name.path_ref()) {
-                    self.lower_qualified_column_ref(&path, TableLookup::Any);
+                    self.lower_qualified_column_ref(&path, TableLookup::Any, IfMissing::Error);
                 }
                 None
             }
@@ -20927,7 +20965,7 @@ impl Lowerer {
     fn lower_index_ref(&mut self, path: &ast::PathRef, if_missing: IfMissing) -> Option<IndexId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let index = self.find_index(schema, name);
         let resolution = match index {
             Some(index) => Resolution::Index(index),
@@ -21070,7 +21108,7 @@ impl Lowerer {
     ) -> Option<CollationId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let collation = self
             .search_path(schema, Lookup::Collation)
             .find_map(|schema| self.find_collation_in(schema, name));

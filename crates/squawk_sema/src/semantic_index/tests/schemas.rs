@@ -263,3 +263,59 @@ create conversion s.conv for 'LATIN1' to 'UTF8' from iso8859_1_to_utf8;
 alter conversion s.conv set schema s;
 "), @"no diagnostics");
 }
+
+#[test]
+fn if_exists_missing_schema() {
+    assert_snapshot!(check("
+drop table if exists nos.t;
+drop view if exists nos.t;
+drop materialized view if exists nos.t;
+drop sequence if exists nos.t;
+drop index if exists nos.t;
+drop type if exists nos.t;
+drop domain if exists nos.t;
+drop function if exists nos.t;
+drop aggregate if exists nos.t(int);
+drop routine if exists nos.t(nos.x);
+drop cast if exists (nos.x as int);
+drop collation if exists nos.t;
+drop conversion if exists nos.t;
+drop statistics if exists nos.t;
+drop text search parser if exists nos.t;
+drop operator class if exists nos.t using btree;
+drop operator family if exists nos.t using btree;
+drop trigger if exists x on nos.t;
+drop rule if exists x on nos.t;
+drop policy if exists x on nos.t;
+alter table if exists nos.t add column b int;
+alter index if exists nos.t rename to u;
+create function int_add(int, int) returns int
+  language sql
+  as 'select 1';
+create operator @#@ (
+  leftarg = int,
+  rightarg = int,
+  function = int_add
+);
+drop operator if exists @#@ (nos.x, int);
+drop operator if exists nos.@#@ (int, int);
+select 1 @#@ 1;
+create function foo(int) returns int
+  language sql
+  as 'select 1';
+drop function if exists foo(nos.x);
+drop function if exists nos.foo(int);
+drop function if exists foo(nos.t.a%type);
+select foo(1);
+drop table nos.t;
+"), @"
+    error: schema `nos` does not exist
+       ╭▸ 
+    42 │ drop table nos.t;
+       ╰╴           ━━━
+    error: relation `t` does not exist
+       ╭▸ 
+    42 │ drop table nos.t;
+       ╰╴               ━
+    ");
+}
