@@ -846,6 +846,31 @@ struct NameResolution {
     resolution: Resolution,
 }
 
+#[derive(Clone, Copy)]
+enum RuleRelations {
+    Old,
+    New,
+    OldAndNew,
+}
+
+impl RuleRelations {
+    fn for_event(event: Option<RuleEvent>) -> RuleRelations {
+        match event {
+            Some(RuleEvent::Select | RuleEvent::Delete) => RuleRelations::Old,
+            Some(RuleEvent::Insert) => RuleRelations::New,
+            Some(RuleEvent::Update) | None => RuleRelations::OldAndNew,
+        }
+    }
+
+    fn range(self) -> Range<usize> {
+        match self {
+            RuleRelations::Old => (0..1).into(),
+            RuleRelations::New => (1..2).into(),
+            RuleRelations::OldAndNew => (0..2).into(),
+        }
+    }
+}
+
 struct IdentPart<'a> {
     ident: Cow<'a, str>,
     rest: &'a str,
@@ -18896,6 +18921,16 @@ impl Lowerer {
         let start = self.index.rules.next_idx();
         let query = self.alloc_query(QueryKind::Rule, create_rule.syntax());
         self.push_scope(query);
+        let event = create_rule
+            .rule_on()
+            .and_then(|rule_on| rule_on.rule_event())
+            .and_then(|event| event.kind())
+            .map(|kind| match kind {
+                ast::RuleEventKind::Select => RuleEvent::Select,
+                ast::RuleEventKind::Insert => RuleEvent::Insert,
+                ast::RuleEventKind::Update => RuleEvent::Update,
+                ast::RuleEventKind::Delete => RuleEvent::Delete,
+            });
         let mut table = None;
         if let Some(rule_on) = create_rule.rule_on() {
             let RelationSource { kind, columns, .. } =
@@ -18916,7 +18951,7 @@ impl Lowerer {
                     columns,
                 });
             }
-            self.set_visible((0..2).into());
+            self.set_visible(RuleRelations::for_event(event).range());
             if let Some(expr) = rule_on.where_clause().and_then(|clause| clause.expr()) {
                 self.lower_condition(ConditionKind::Where, &expr);
             }
@@ -18946,16 +18981,6 @@ impl Lowerer {
         }
         self.scopes.pop();
 
-        let event = create_rule
-            .rule_on()
-            .and_then(|rule_on| rule_on.rule_event())
-            .and_then(|event| event.kind())
-            .map(|kind| match kind {
-                ast::RuleEventKind::Select => RuleEvent::Select,
-                ast::RuleEventKind::Insert => RuleEvent::Insert,
-                ast::RuleEventKind::Update => RuleEvent::Update,
-                ast::RuleEventKind::Delete => RuleEvent::Delete,
-            });
         if let (Some(table), Some(name), Some(event)) = (table, create_rule.rule(), event) {
             let rule_do = create_rule.rule_do();
             let instead = rule_do

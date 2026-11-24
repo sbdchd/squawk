@@ -286,3 +286,24 @@ create rule rr as on update
   do instead update v set a = new.a;
 update v set a = 2;"), @"no diagnostics");
 }
+
+#[test]
+fn rule_where_sees_event_relations() {
+    assert_snapshot!(check("
+create table t (a int);
+create table t2 (a int);
+create rule r1 as on insert to t where a < 100 do instead insert into t2 values (new.a);
+create rule r2 as on delete to t where a < 100 do instead nothing;
+create rule r3 as on update to t where a < 100 do instead nothing;
+create rule r4 as on insert to t where old.a < 100 do instead nothing;
+"), @"
+    error: column reference `a` is ambiguous
+      ╭▸ 
+    6 │ create rule r3 as on update to t where a < 100 do instead nothing;
+      ╰╴                                       ━
+    error: missing `from` clause entry for table `old`
+      ╭▸ 
+    7 │ create rule r4 as on insert to t where old.a < 100 do instead nothing;
+      ╰╴                                       ━━━
+    ");
+}
