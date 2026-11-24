@@ -726,6 +726,17 @@ impl TypeLookup {
 
 const MAX_CANDIDATES: usize = 5;
 
+fn param_types_match<'a>(
+    mut params: impl Iterator<Item = &'a Param>,
+    arg_types: &[Option<Ty>],
+) -> bool {
+    arg_types.iter().all(|arg_type| {
+        params
+            .next()
+            .is_some_and(|param| arg_type.is_none() || *arg_type == param.ty)
+    }) && params.next().is_none()
+}
+
 fn call_kind(kind: RoutineKind) -> FunctionKind {
     match kind {
         RoutineKind::Procedure => FunctionKind::Procedure,
@@ -10223,10 +10234,23 @@ impl Lowerer {
                             &segment, schema, name, aggregate, drop,
                         );
                     }
-                    match function {
-                        Some(function) => Some(Resolution::Function(function)),
-                        None if matches!(if_missing, IfMissing::Error)
-                            && arg_types.iter().all(Option::is_some) =>
+                    let procedure = self.find_procedure_with_all_arg_types(
+                        schema,
+                        name,
+                        kind,
+                        &param_list,
+                        &arg_types,
+                    );
+                    match (function, procedure) {
+                        (Some(function), Some(procedure)) if function != procedure => {
+                            Some(Resolution::Ambiguous)
+                        }
+                        (Some(function), _) | (None, Some(function)) => {
+                            Some(Resolution::Function(function))
+                        }
+                        (None, None)
+                            if matches!(if_missing, IfMissing::Error)
+                                && arg_types.iter().all(Option::is_some) =>
                         {
                             let start = self.index.errors.args.next_idx();
                             for ty in arg_types.iter().flatten() {
@@ -10260,7 +10284,7 @@ impl Lowerer {
                             );
                             Some(Resolution::Unknown)
                         }
-                        None => None,
+                        (None, None) => None,
                     }
                 }
             }
@@ -10302,6 +10326,26 @@ impl Lowerer {
     ) -> Option<FunctionId> {
         self.find_function_by(schema, name, |function| {
             kind.matches(function.kind) && self.has_arg_types(function, arg_types)
+        })
+    }
+
+    fn find_procedure_with_all_arg_types(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: RoutineKind,
+        param_list: &ast::ParamList,
+        arg_types: &[Option<Ty>],
+    ) -> Option<FunctionId> {
+        match kind {
+            RoutineKind::Procedure | RoutineKind::Routine => {}
+            RoutineKind::Function | RoutineKind::Aggregate => return None,
+        }
+        if param_list.params().any(|param| param.mode().is_some()) {
+            return None;
+        }
+        self.find_function_by(schema, name, |function| {
+            function.kind == FunctionKind::Procedure && self.has_all_arg_types(function, arg_types)
         })
     }
 
@@ -10626,7 +10670,7 @@ impl Lowerer {
         } = self.index.functions[function];
         if self
             .find_function_by(Some(schema), name, |function| {
-                self.same_signature((function.kind, function.params), (kind, params))
+                self.same_signature(function.params, params)
             })
             .is_some()
         {
@@ -10722,16 +10766,17 @@ impl Lowerer {
     }
 
     fn has_arg_types(&self, function: &Function, arg_types: &[Option<Ty>]) -> bool {
-        let mut inputs = function
+        let inputs = function
             .params
             .iter()
             .map(|id| &self.index.params[id])
             .filter(|param| param.mode != ParamMode::Out);
-        arg_types.iter().all(|arg_type| {
-            inputs
-                .next()
-                .is_some_and(|param| arg_type.is_none() || *arg_type == param.ty)
-        }) && inputs.next().is_none()
+        param_types_match(inputs, arg_types)
+    }
+
+    fn has_all_arg_types(&self, function: &Function, arg_types: &[Option<Ty>]) -> bool {
+        let params = function.params.iter().map(|id| &self.index.params[id]);
+        param_types_match(params, arg_types)
     }
 
     fn lower_database_options(&mut self, options: &ast::DatabaseOptionList) {
@@ -14458,22 +14503,16 @@ impl Lowerer {
             .unwrap_or(self.public)
     }
 
-    fn same_signature(
-        &self,
-        a: (FunctionKind, IdxRange<Param>),
-        b: (FunctionKind, IdxRange<Param>),
-    ) -> bool {
-        let signature_types = |(kind, params): (FunctionKind, IdxRange<Param>)| {
+    fn same_signature(&self, a: IdxRange<Param>, b: IdxRange<Param>) -> bool {
+        let input_types = |params: IdxRange<Param>| {
             params
                 .iter()
                 .map(|id| &self.index.params[id])
-                .filter(move |param| {
-                    kind == FunctionKind::Procedure || param.mode != ParamMode::Out
-                })
+                .filter(|param| param.mode != ParamMode::Out)
                 .map(|param| param.ty)
         };
-        let mut a = signature_types(a);
-        let mut b = signature_types(b);
+        let mut a = input_types(a);
+        let mut b = input_types(b);
         loop {
             match (a.next(), b.next()) {
                 (None, None) => return true,
@@ -27961,7 +28000,7 @@ impl Lowerer {
         }
         let mut replaced = None;
         if let Some(existing) = self.find_function_by(Some(schema), name, |function| {
-            self.same_signature((function.kind, function.params), (kind, params))
+            self.same_signature(function.params, params)
         }) {
             match if_exists {
                 IfExists::Error => {
