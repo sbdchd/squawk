@@ -1844,3 +1844,30 @@ create function u(b int) returns int
        ╰╴                ━
     ");
 }
+
+#[test]
+fn drop_if_exists_missing_arg_type() {
+    assert_snapshot!(check("
+create function foo(int) returns int
+  language sql
+  as 'select 1';
+drop function if exists foo(no_such_type);
+drop function if exists foo(no_such_type[]);
+select foo(1);
+drop aggregate if exists foo(no_such_type);
+drop aggregate if exists foo(int order by no_such_type);
+drop procedure if exists foo(no_such_type);
+drop routine if exists foo(no_such_type);
+drop function foo(no_such_type);
+alter function foo(no_such_type) immutable;
+"), @"
+    error: type `no_such_type` does not exist
+       ╭▸ 
+    12 │ drop function foo(no_such_type);
+       ╰╴                  ━━━━━━━━━━━━
+    error: type `no_such_type` does not exist
+       ╭▸ 
+    13 │ alter function foo(no_such_type) immutable;
+       ╰╴                   ━━━━━━━━━━━━
+    ");
+}

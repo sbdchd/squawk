@@ -10197,9 +10197,9 @@ impl Lowerer {
                 let mut arg_types: SmallVec<[Option<Ty>; 4]> = SmallVec::new();
                 let mut missing = false;
                 for param in param_list.params() {
-                    let ty = param
-                        .func_type()
-                        .map_or(TypeLookup::Unknown, |ty| self.lower_func_type_lookup(&ty));
+                    let ty = param.func_type().map_or(TypeLookup::Unknown, |ty| {
+                        self.lower_func_type_lookup(&ty, if_missing)
+                    });
                     missing |= matches!(ty, TypeLookup::Missing);
                     if !matches!(param.mode(), Some(ast::ParamMode::ParamOut(_))) {
                         arg_types.push(ty.ty());
@@ -10210,9 +10210,9 @@ impl Lowerer {
                     .iter()
                     .flat_map(|order_by| order_by.params())
                 {
-                    let ty = param
-                        .func_type()
-                        .map_or(TypeLookup::Unknown, |ty| self.lower_func_type_lookup(&ty));
+                    let ty = param.func_type().map_or(TypeLookup::Unknown, |ty| {
+                        self.lower_func_type_lookup(&ty, if_missing)
+                    });
                     missing |= matches!(ty, TypeLookup::Missing);
                     arg_types.push(ty.ty());
                 }
@@ -13859,6 +13859,7 @@ impl Lowerer {
             Some(TypeMatch::Array(owner)) => (owner.resolution(), true),
             None => (Resolution::Unresolved, false),
         };
+        let missing = resolution == Resolution::Unresolved;
         let resolution = match (resolution, if_missing) {
             (Resolution::Unresolved, IfMissing::Ignore) => Resolution::Unknown,
             (resolution, IfMissing::Error | IfMissing::Ignore) => resolution,
@@ -13873,10 +13874,12 @@ impl Lowerer {
                 candidates: TypeCandidates::TypeName,
             },
         );
+        if missing {
+            return TypeLookup::Missing;
+        }
         match resolution {
             Resolution::Type(ty) => found(Ty::Type(ty)),
             Resolution::Table(table) => found(Ty::Table(table)),
-            Resolution::Unresolved => TypeLookup::Missing,
             Resolution::Column { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
@@ -13918,6 +13921,7 @@ impl Lowerer {
             | Resolution::Extension(_)
             | Resolution::Operator(_)
             | Resolution::Unknown
+            | Resolution::Unresolved
             | Resolution::Ambiguous => TypeLookup::Unknown,
         }
     }
@@ -13947,12 +13951,17 @@ impl Lowerer {
     }
 
     fn lower_func_type(&mut self, func_type: &ast::FuncType) -> Option<Ty> {
-        self.lower_func_type_lookup(func_type).ty()
+        self.lower_func_type_lookup(func_type, IfMissing::Error)
+            .ty()
     }
 
-    fn lower_func_type_lookup(&mut self, func_type: &ast::FuncType) -> TypeLookup {
+    fn lower_func_type_lookup(
+        &mut self,
+        func_type: &ast::FuncType,
+        if_missing: IfMissing,
+    ) -> TypeLookup {
         match func_type {
-            ast::FuncType::Type(ty) => self.lower_type_lookup(ty, IfMissing::Error),
+            ast::FuncType::Type(ty) => self.lower_type_lookup(ty, if_missing),
             ast::FuncType::PercentType(percent_type) => match self.percent_type(percent_type) {
                 Some(ty) => TypeLookup::Found(ty),
                 None => TypeLookup::Unknown,
