@@ -128,6 +128,7 @@ impl Lowerer {
             partition_keys: FxHashMap::default(),
             view_column_deps: vec![],
             generated_column_deps: vec![],
+            reserved_constraint_names: SmallVec::new(),
             view_bases: FxHashMap::default(),
             insert_values: vec![],
             partition_bounds: FxHashMap::default(),
@@ -441,6 +442,7 @@ pub(crate) struct Lowerer {
     partition_keys: FxHashMap<TableId, PartitionKey>,
     view_column_deps: Vec<ViewColumnDep>,
     generated_column_deps: Vec<GeneratedColumnDep>,
+    reserved_constraint_names: SmallVec<[ReservedConstraintName; 2]>,
     view_bases: FxHashMap<TableId, TableId>,
     insert_values: Vec<InsertValue>,
     partition_bounds: FxHashMap<TableId, PartitionBound>,
@@ -493,6 +495,19 @@ struct GeneratedColumnDep {
     expr: ColumnExprId,
     table: TableId,
     column: Name,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+enum ConstraintPass {
+    Check,
+    NotNull,
+    Index,
+    ForeignKey,
+}
+
+struct ReservedConstraintName {
+    name: Name,
+    pass: ConstraintPass,
 }
 
 struct InsertValue {
@@ -10961,6 +10976,7 @@ impl Lowerer {
         let Some(args) = create_table.table_arg_list() else {
             return;
         };
+        self.reserve_constraint_names(&args);
         self.with_table_scope(
             QueryKind::Constraint,
             Some(table),
@@ -11016,6 +11032,65 @@ impl Lowerer {
                 }
             },
         );
+        self.reserved_constraint_names.clear();
+    }
+
+    fn reserve_constraint_names(&mut self, args: &ast::TableArgList) {
+        for arg in args.args() {
+            match arg {
+                ast::TableArg::Column(column) => {
+                    for clause in column.clauses() {
+                        match clause {
+                            ast::ColumnClause::ColumnConstraint(constraint) => {
+                                if let Some(name) = constraint.constraint_name() {
+                                    self.reserve_constraint_name(&name, &constraint.into());
+                                }
+                            }
+                            ast::ColumnClause::AlterOptionList(_)
+                            | ast::ColumnClause::Collate(_)
+                            | ast::ColumnClause::CompressionMethod(_)
+                            | ast::ColumnClause::Storage(_)
+                            | ast::ColumnClause::WithOptions(_) => {}
+                        }
+                    }
+                }
+                ast::TableArg::TableConstraint(constraint) => {
+                    if let Some(name) = constraint.constraint_name() {
+                        self.reserve_constraint_name(&name, &constraint.into());
+                    }
+                }
+                ast::TableArg::LikeClause(_) => {}
+            }
+        }
+    }
+
+    fn reserve_constraint_name(
+        &mut self,
+        name: &ast::ConstraintName,
+        constraint: &ast::Constraint,
+    ) {
+        let pass = match constraint {
+            ast::Constraint::CheckConstraint(_) => ConstraintPass::Check,
+            ast::Constraint::NotNullConstraint(_) => ConstraintPass::NotNull,
+            ast::Constraint::ExcludeConstraint(_)
+            | ast::Constraint::PrimaryKeyConstraint(_)
+            | ast::Constraint::UniqueConstraint(_) => ConstraintPass::Index,
+            ast::Constraint::ForeignKeyConstraint(_) | ast::Constraint::ReferencesConstraint(_) => {
+                ConstraintPass::ForeignKey
+            }
+            ast::Constraint::DefaultConstraint(_)
+            | ast::Constraint::GeneratedConstraint(_)
+            | ast::Constraint::NullConstraint(_) => return,
+        };
+        let name = self.intern(&name.text());
+        self.reserved_constraint_names
+            .push(ReservedConstraintName { name, pass });
+    }
+
+    fn constraint_name_reserved(&self, name: &str, pass: ConstraintPass) -> bool {
+        self.reserved_constraint_names
+            .iter()
+            .any(|reserved| reserved.pass < pass && self.index.names.resolve(reserved.name) == name)
     }
 
     fn lower_partition_by(
@@ -13281,7 +13356,12 @@ impl Lowerer {
             .and_then(|clause| clause.constraint_name())
         {
             Some(name) => ConstraintName::Explicit(name),
-            None => ConstraintName::Generated(self.choose_constraint_name(owner, None, "check")),
+            None => ConstraintName::Generated(self.choose_constraint_name(
+                owner,
+                None,
+                "check",
+                ConstraintPass::Check,
+            )),
         };
         let constraint =
             self.alloc_constraint(ConstraintKind::Check, owner, check.syntax(), name, None);
@@ -13338,7 +13418,12 @@ impl Lowerer {
         }
         let name = match name {
             Some(name) => ConstraintName::Explicit(name),
-            None => ConstraintName::Generated(self.choose_constraint_name(owner, None, "not_null")),
+            None => ConstraintName::Generated(self.choose_constraint_name(
+                owner,
+                None,
+                "not_null",
+                ConstraintPass::NotNull,
+            )),
         };
         self.alloc_constraint(ConstraintKind::DomainNotNull, owner, node, name, None);
     }
@@ -21028,6 +21113,7 @@ impl Lowerer {
                 ConstraintOwner::Table(table),
                 addition.as_deref(),
                 "check",
+                ConstraintPass::Check,
             )),
         };
         let constraint = self.alloc_constraint(
@@ -21132,6 +21218,7 @@ impl Lowerer {
                     ConstraintOwner::Table(table),
                     Some(&addition),
                     "not_null",
+                    ConstraintPass::NotNull,
                 ))
             }
         };
@@ -22172,6 +22259,7 @@ impl Lowerer {
                     ConstraintOwner::Table(table),
                     Some(&addition),
                     "fkey",
+                    ConstraintPass::ForeignKey,
                 ))
             }
         };
@@ -22240,6 +22328,7 @@ impl Lowerer {
                     ConstraintOwner::Table(table),
                     addition.as_deref(),
                     "fkey",
+                    ConstraintPass::ForeignKey,
                 ))
             }
         };
@@ -23118,13 +23207,17 @@ impl Lowerer {
         owner: ConstraintOwner,
         addition: Option<&str>,
         label: &str,
+        pass: ConstraintPass,
     ) -> Name {
         let schema = self.constraint_owner_schema(owner);
         let name = pg_names::choose_constraint_name(
             self.index.names.resolve(self.constraint_owner_name(owner)),
             addition,
             label,
-            |name| self.constraint_name_exists(schema, name),
+            |name| {
+                self.constraint_name_reserved(name, pass)
+                    || self.constraint_name_exists(schema, name)
+            },
         );
         self.intern(&name)
     }
@@ -28068,7 +28161,10 @@ impl Lowerer {
                     addition,
                     label,
                     |name| self.relation_name_exists(schema, name),
-                    |name| self.constraint_name_exists(schema, name),
+                    |name| {
+                        self.constraint_name_reserved(name, ConstraintPass::Index)
+                            || self.constraint_name_exists(schema, name)
+                    },
                 );
                 ConstraintName::Generated(self.intern(&name))
             }
