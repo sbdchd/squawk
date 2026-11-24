@@ -19221,8 +19221,11 @@ impl Lowerer {
         let key: Option<SmallVec<[Name; 4]>> = items
             .partition_items()
             .map(|item| {
-                let Some(ast::Expr::NameRef(name_ref)) = item.expr().map(|expr| expr.unparen())
-                else {
+                let mut expr = item.expr()?.unparen();
+                while let ast::Expr::Collate(collate) = &expr {
+                    expr = collate.expr()?.unparen();
+                }
+                let ast::Expr::NameRef(name_ref) = expr else {
                     return None;
                 };
                 self.name_ref_name(&name_ref)
