@@ -182,3 +182,25 @@ drop collation s.c2;
        ╰╴                 ━━
     ");
 }
+
+#[test]
+fn icu_collations() {
+    assert_snapshot!(check(r#"
+create table t (
+  a text collate "en-x-icu",
+  b text collate pg_catalog."de-DE-x-icu"
+);
+create collation c from "sv-x-icu";
+select a collate "en-x-icu" < b collate "en-x-icu" from t;
+select a collate "en-icu", a collate public."en-x-icu" from t;
+"#), @r#"
+    error: collation `en-icu` does not exist
+      ╭▸ 
+    8 │ select a collate "en-icu", a collate public."en-x-icu" from t;
+      ╰╴                 ━━━━━━━━
+    error: collation `en-x-icu` does not exist
+      ╭▸ 
+    8 │ select a collate "en-icu", a collate public."en-x-icu" from t;
+      ╰╴                                            ━━━━━━━━━━
+    "#);
+}

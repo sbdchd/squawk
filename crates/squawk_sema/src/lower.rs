@@ -20947,6 +20947,11 @@ impl Lowerer {
             .find_map(|schema| self.find_collation_in(schema, name));
         let resolution = match collation {
             Some(collation) => Resolution::Collation(collation),
+            None if schema.is_none_or(|schema| schema == self.pg_catalog)
+                && self.index.names.resolve(name).ends_with("-x-icu") =>
+            {
+                Resolution::Unknown
+            }
             None => match if_missing {
                 IfMissing::Ignore => Resolution::Unknown,
                 IfMissing::Error => Resolution::Unresolved,
