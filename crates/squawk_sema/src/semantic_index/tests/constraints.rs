@@ -1118,3 +1118,29 @@ alter table p6 alter column a type text;
        ╰ note: key columns `a` and `a` are of incompatible types: `text` and `int4`
     ");
 }
+
+#[test]
+fn check_constraint_name_with_field_selection() {
+    assert_snapshot!(check("
+create type attbl as (
+  a int,
+  b int
+);
+create table atref (b attbl check ((b).a is not null));
+alter table atref drop constraint atref_b_check;
+create table two (
+  b attbl,
+  c attbl,
+  check ((b).a = (c).a),
+  check ((b).a = (b).b)
+);
+alter table two drop constraint two_check;
+alter table two drop constraint two_b_check;
+alter table two drop constraint two_c_check;
+"), @"
+    error: constraint `two_c_check` does not exist
+       ╭▸ 
+    16 │ alter table two drop constraint two_c_check;
+       ╰╴                                ━━━━━━━━━━━
+    ");
+}

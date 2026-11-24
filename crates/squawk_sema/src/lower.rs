@@ -21006,7 +21006,10 @@ impl Lowerer {
         let mut single = true;
         for id in self.index.references.range_from(start) {
             let reference = &self.index.references[id];
-            if let Resolution::Column { .. } = reference.resolution {
+            if let Resolution::Column {
+                source: Some(_), ..
+            } = reference.resolution
+            {
                 match column {
                     None => column = Some(reference.name),
                     Some(name) if name == reference.name => {}
