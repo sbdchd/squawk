@@ -3556,27 +3556,27 @@ SOURCE_FILE
       FROM_KW "from"
       WHITESPACE " "
       JOIN_EXPR
-        RELATION_FROM_ITEM
-          RELATION_NAME_REF
-            PATH_REF
+        JOIN_EXPR
+          RELATION_FROM_ITEM
+            RELATION_NAME_REF
               PATH_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "cal"
+                DOT "."
                 PATH_SEGMENT_REF
-                  IDENT "cal"
-              DOT "."
-              PATH_SEGMENT_REF
-                IDENT "event_types"
-          WHITESPACE " "
-          FROM_ALIAS
-            TABLE_ALIAS
-              IDENT "t"
-        WHITESPACE "\n  "
-        JOIN
-          JOIN_CROSS
-            CROSS_KW "cross"
+                  IDENT "event_types"
             WHITESPACE " "
-            JOIN_KW "join"
-          WHITESPACE " "
-          JOIN_EXPR
+            FROM_ALIAS
+              TABLE_ALIAS
+                IDENT "t"
+          WHITESPACE "\n  "
+          JOIN
+            JOIN_CROSS
+              CROSS_KW "cross"
+              WHITESPACE " "
+              JOIN_KW "join"
+            WHITESPACE " "
             FUNCTION_FROM_ITEM
               CALL_EXPR
                 NAME_REF
@@ -3608,44 +3608,44 @@ SOURCE_FILE
               FROM_ALIAS
                 TABLE_ALIAS
                   IDENT "etg"
-            WHITESPACE "\n  "
-            JOIN
-              JOIN_CROSS
-                CROSS_KW "cross"
-                WHITESPACE " "
-                JOIN_KW "join"
-              WHITESPACE " "
-              FUNCTION_FROM_ITEM
-                CALL_EXPR
-                  NAME_REF
-                    IDENT "json_array_elements"
-                  ARG_LIST
-                    L_PAREN "("
-                    ARG
-                      CAST_EXPR
-                        PAREN_EXPR
-                          L_PAREN "("
-                          BIN_EXPR
-                            NAME_REF
-                              IDENT "etg"
-                            CUSTOM_OP
-                              MINUS "-"
-                              R_ANGLE ">"
-                            LITERAL
-                              STRING "'eventTypes'"
-                          R_PAREN ")"
-                        COLON_COLON
-                          COLON ":"
-                          COLON ":"
-                        PATH_TYPE
-                          PATH_REF
-                            PATH_SEGMENT_REF
-                              JSON_KW "json"
-                    R_PAREN ")"
-                WHITESPACE " "
-                FROM_ALIAS
-                  TABLE_ALIAS
-                    IDENT "et"
+        WHITESPACE "\n  "
+        JOIN
+          JOIN_CROSS
+            CROSS_KW "cross"
+            WHITESPACE " "
+            JOIN_KW "join"
+          WHITESPACE " "
+          FUNCTION_FROM_ITEM
+            CALL_EXPR
+              NAME_REF
+                IDENT "json_array_elements"
+              ARG_LIST
+                L_PAREN "("
+                ARG
+                  CAST_EXPR
+                    PAREN_EXPR
+                      L_PAREN "("
+                      BIN_EXPR
+                        NAME_REF
+                          IDENT "etg"
+                        CUSTOM_OP
+                          MINUS "-"
+                          R_ANGLE ">"
+                        LITERAL
+                          STRING "'eventTypes'"
+                      R_PAREN ")"
+                    COLON_COLON
+                      COLON ":"
+                      COLON ":"
+                    PATH_TYPE
+                      PATH_REF
+                        PATH_SEGMENT_REF
+                          JSON_KW "json"
+                R_PAREN ")"
+            WHITESPACE " "
+            FROM_ALIAS
+              TABLE_ALIAS
+                IDENT "et"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- extract bookings"

@@ -4581,16 +4581,34 @@ fn join(p: &mut Parser<'_>) {
     let is_natural = p.eat(NATURAL_KW);
     let result = join_type(p);
     let join_kind = result.map(|x| x.kind()).unwrap_or(JOIN_INNER);
-    if opt_from_item(p).is_none() {
-        p.error("expected a table, subquery, or function call");
-    }
     let can_have_on_clause = !is_natural && join_kind != JOIN_CROSS;
+    match opt_join_rhs(p) {
+        Some(mut rhs) => {
+            if can_have_on_clause {
+                while p.at_ts(JOIN_FIRST) {
+                    let m = rhs.precede(p);
+                    join(p);
+                    rhs = m.complete(p, JOIN_EXPR);
+                }
+            }
+        }
+        None => p.error("expected a table, subquery, or function call"),
+    }
     if p.at(ON_KW) && can_have_on_clause {
         on_clause(p);
     } else if p.at(USING_KW) {
         join_using_clause(p);
     }
     m.complete(p, JOIN);
+}
+
+fn opt_join_rhs(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(FROM_ITEM_FIRST) {
+        return None;
+    }
+    let m = p.start();
+    let DataSource { kind, .. } = data_source(p, false);
+    Some(m.complete(p, kind))
 }
 
 // Improve error recovery for wrong joins

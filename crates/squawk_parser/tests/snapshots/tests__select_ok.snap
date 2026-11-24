@@ -5592,6 +5592,156 @@ SOURCE_FILE
                   IDENT "departments"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  COMMENT "-- joins are left associative"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        JOIN_EXPR
+          RELATION_FROM_ITEM
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "a"
+          WHITESPACE " "
+          JOIN
+            JOIN_CROSS
+              CROSS_KW "cross"
+              WHITESPACE " "
+              JOIN_KW "join"
+            WHITESPACE " "
+            RELATION_FROM_ITEM
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "b"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          RELATION_FROM_ITEM
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "c"
+          WHITESPACE " "
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        JOIN_EXPR
+          RELATION_FROM_ITEM
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "a"
+          WHITESPACE " "
+          JOIN
+            NATURAL_KW "natural"
+            WHITESPACE " "
+            JOIN_INNER
+              JOIN_KW "join"
+            WHITESPACE " "
+            RELATION_FROM_ITEM
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "b"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          RELATION_FROM_ITEM
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "c"
+          WHITESPACE " "
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        RELATION_FROM_ITEM
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "a"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          JOIN_EXPR
+            RELATION_FROM_ITEM
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "b"
+            WHITESPACE " "
+            JOIN
+              JOIN_INNER
+                JOIN_KW "join"
+              WHITESPACE " "
+              RELATION_FROM_ITEM
+                RELATION_NAME_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "c"
+              WHITESPACE " "
+              ON_CLAUSE
+                ON_KW "on"
+                WHITESPACE " "
+                LITERAL
+                  TRUE_KW "true"
+          WHITESPACE " "
+          ON_CLAUSE
+            ON_KW "on"
+            WHITESPACE " "
+            LITERAL
+              TRUE_KW "true"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
   COMMENT "-- pg docs"
   WHITESPACE "\n\n"
   COMMENT "-- using"

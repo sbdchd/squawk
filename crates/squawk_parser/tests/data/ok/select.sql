@@ -392,6 +392,11 @@ left join k using (event);
 -- natural
 SELECT * FROM employees NATURAL JOIN departments;
 
+-- joins are left associative
+select * from a cross join b join c on true;
+select * from a natural join b join c on true;
+select * from a join b join c on true on true;
+
 -- pg docs
 
 -- using

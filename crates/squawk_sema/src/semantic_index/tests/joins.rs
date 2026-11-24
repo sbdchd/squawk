@@ -443,3 +443,12 @@ select * from (c join d on true) as i join e on c.y = e.w;
        ╰╴                                                ━
     ");
 }
+
+#[test]
+fn cross_join_then_join_on_sees_left() {
+    assert_snapshot!(check("
+create table t (a int);
+select * from t x cross join t y join t on x.a = t.a;
+select * from t x natural join t y join t on x.a = t.a;
+"), @"no diagnostics");
+}
