@@ -329,3 +329,27 @@ create aggregate agg(int) (sfunc = array_append, stype = int[], initcond = '{}')
 create aggregate agg2(anycompatible) (sfunc = array_append, stype = anycompatiblearray);
 "), @"no diagnostics");
 }
+
+#[test]
+fn array_of_array_like_types() {
+    assert_snapshot!(check("
+select array_sort(array['1 4'::int2vector]);
+select array_fill('1 4'::oidvector, array[1]);
+select array_append(array['1 4'::int2vector], '1 2');
+create domain d as int[];
+select array_fill(null::d, array[1]);
+select array_fill(null::int[], array[1]);
+select array_append(array['1 4'::int2vector], '1 2'::int2vector);
+select array_append('1 4'::int2vector, 1::int2);
+select array_fill('{}'::d[], array[1]);
+"), @"
+    error: could not find array type for type `int4[]`
+      ╭▸ 
+    7 │ select array_fill(null::int[], array[1]);
+      ╰╴       ━━━━━━━━━━
+    error: could not find array type for type `d[]`
+       ╭▸ 
+    10 │ select array_fill('{}'::d[], array[1]);
+       ╰╴       ━━━━━━━━━━
+    ");
+}

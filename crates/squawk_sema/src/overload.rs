@@ -540,7 +540,7 @@ impl<'a> Overloads<'a> {
         ]
         .into_iter()
         .filter(|(pseudo, _)| variadic == Some(*pseudo) || ret == Some(*pseudo))
-        .find_map(|(_, element)| element.filter(|element| self.is_array(*element)))
+        .find_map(|(_, element)| element.filter(|element| array_of(*element).is_none()))
     }
 
     pub(crate) fn return_type(&self, function: &Function, args: &[CallArg]) -> Option<Ty> {
@@ -619,13 +619,13 @@ impl<'a> Overloads<'a> {
         match pseudo {
             Pseudo::Any | Pseudo::Record => None,
             Pseudo::AnyElement | Pseudo::AnyNonArray | Pseudo::AnyEnum => solution.element,
-            Pseudo::AnyArray => solution.array.or_else(|| self.array_of(solution.element?)),
+            Pseudo::AnyArray => solution.array.or_else(|| array_of(solution.element?)),
             Pseudo::AnyRange => solution.range,
             Pseudo::AnyMultirange => solution
                 .multirange
                 .or_else(|| self.multirange_of(solution.range?)),
             Pseudo::AnyCompatible | Pseudo::AnyCompatibleNonArray => compatible(),
-            Pseudo::AnyCompatibleArray => self.array_of(compatible()?),
+            Pseudo::AnyCompatibleArray => array_of(compatible()?),
             Pseudo::AnyCompatibleRange => solution.compatible_range,
             Pseudo::AnyCompatibleMultirange => solution
                 .compatible_multirange
@@ -1149,10 +1149,6 @@ impl<'a> Overloads<'a> {
             .is_some_and(|base| self.type_kind(base) == Some(TypeKind::Enum))
     }
 
-    fn array_of(&self, element: Ty) -> Option<Ty> {
-        (!self.is_array(element)).then(|| element.array())
-    }
-
     fn multirange_of(&self, range: Ty) -> Option<Ty> {
         let Ty::Type(range) = range else {
             return None;
@@ -1371,6 +1367,13 @@ fn retain_max<Id>(viable: &mut Viable<Id>, score: impl Fn(&Candidate<Id>) -> usi
         return;
     };
     viable.retain(|candidate| score(candidate) == max);
+}
+
+fn array_of(element: Ty) -> Option<Ty> {
+    match element {
+        Ty::Type(_) | Ty::Table(_) | Ty::Cte(_) => Some(element.array()),
+        Ty::Array(_) => None,
+    }
 }
 
 fn unify(slot: &mut Option<Ty>, ty: Ty) -> Option<()> {
