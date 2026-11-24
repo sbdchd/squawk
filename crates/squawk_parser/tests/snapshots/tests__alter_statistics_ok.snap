@@ -131,4 +131,55 @@ SOURCE_FILE
       WHITESPACE " "
       DEFAULT_KW "default"
     SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_STATISTICS
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    SET_STATISTICS
+      SET_KW "set"
+      WHITESPACE " "
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "100"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_STATISTICS
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    STATISTICS_REF
+      PATH_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "foo"
+        DOT "."
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    SET_STATISTICS
+      SET_KW "set"
+      WHITESPACE " "
+      STATISTICS_KW "statistics"
+      WHITESPACE " "
+      DEFAULT_KW "default"
+    SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -8577,13 +8577,17 @@ fn empty_stmt(p: &mut Parser<'_>) -> CompletedMarker {
 // ALTER STATISTICS name OWNER TO { new_owner | CURRENT_ROLE | CURRENT_USER | SESSION_USER }
 // ALTER STATISTICS name RENAME TO new_name
 // ALTER STATISTICS name SET SCHEMA new_schema
-// ALTER STATISTICS name SET STATISTICS { new_target | DEFAULT }
+// ALTER STATISTICS [ IF EXISTS ] name SET STATISTICS { new_target | DEFAULT }
 fn alter_statistics(p: &mut Parser<'_>) -> CompletedMarker {
     assert!(p.at(ALTER_KW) && p.nth_at(1, STATISTICS_KW));
     let m = p.start();
     p.bump(ALTER_KW);
     p.bump(STATISTICS_KW);
+    let if_exists = opt_if_exists(p).is_some();
     statistics_ref(p);
+    if if_exists && !(p.at(SET_KW) && p.nth_at(1, STATISTICS_KW)) {
+        p.error("expected `set statistics`");
+    }
     match p.current() {
         OWNER_KW => {
             owner_to(p);

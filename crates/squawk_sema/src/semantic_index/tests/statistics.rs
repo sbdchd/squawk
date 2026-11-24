@@ -130,3 +130,17 @@ drop statistics s2;
       ╰╴                ━━
     ");
 }
+
+#[test]
+fn alter_statistics_if_exists() {
+    assert_snapshot!(check("
+alter statistics if exists missing set statistics 100;
+alter statistics if exists nos.missing set statistics default;
+alter statistics missing set statistics 100;
+"), @"
+    error: statistics object `missing` does not exist
+      ╭▸ 
+    4 │ alter statistics missing set statistics 100;
+      ╰╴                 ━━━━━━━
+    ");
+}

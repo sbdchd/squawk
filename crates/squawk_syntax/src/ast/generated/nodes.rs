@@ -1881,6 +1881,10 @@ impl AlterStatistics {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn if_exists(&self) -> Option<IfExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn statistics_ref(&self) -> Option<StatisticsRef> {
         support::child(&self.syntax)
     }

@@ -6406,10 +6406,11 @@ impl Lowerer {
     }
 
     fn lower_alter_statistics(&mut self, alter_statistics: &ast::AlterStatistics) {
+        let if_missing = IfMissing::from_if_exists(alter_statistics.if_exists().as_ref());
         let statistics = alter_statistics
             .statistics_ref()
             .and_then(|statistics| statistics.path_ref())
-            .and_then(|path| self.lower_statistics_ref(&path, IfMissing::Error));
+            .and_then(|path| self.lower_statistics_ref(&path, if_missing));
         match alter_statistics.action() {
             Some(ast::AlterStatisticsAction::StatisticsRenameTo(rename)) => {
                 if let Some(statistics) = statistics

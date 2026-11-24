@@ -20,3 +20,8 @@ alter /* statistics */ statistics /* name */ reporting.commented_statistics
 
 alter statistics reporting.statistics_with_a_very_long_and_descriptive_name
   set statistics /* expression */ 10000;
+
+alter /* a */ statistics /* b */ if /* c */ exists /* d */ foo.s
+  /* e */ set /* f */ statistics /* g */ 100;
+
+alter statistics if exists foo.s set statistics default;

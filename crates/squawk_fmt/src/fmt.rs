@@ -10737,6 +10737,7 @@ fn build_alter_statistics<'a>(ctx: &Ctx, stmt: &ast::AlterStatistics) -> Doc<'a>
             .append(space_before(&token))
             .append(Doc::text("statistics"));
     }
+    doc = append_if_exists(doc, stmt.if_exists());
     doc = append_commented_path_ref(doc, stmt.statistics_ref());
     if let Some(action) = stmt.action() {
         let action_doc = match &action {
