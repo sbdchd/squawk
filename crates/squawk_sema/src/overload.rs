@@ -2,6 +2,7 @@ use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 
 use crate::{
+    inheritance_graph::InheritanceGraph,
     interner::Name,
     ir::{
         CastContext, CastId, CastMethod, CastTypes, Function, FunctionId, FunctionKind, Operand,
@@ -227,6 +228,7 @@ pub(crate) struct Overloads<'a> {
     pg_catalog: Name,
     builtin_types: BuiltinTypes,
     dropped_casts: &'a FxHashSet<CastId>,
+    inheritances: &'a InheritanceGraph,
 }
 
 impl<'a> Overloads<'a> {
@@ -235,12 +237,14 @@ impl<'a> Overloads<'a> {
         pg_catalog: Name,
         builtin_types: BuiltinTypes,
         dropped_casts: &'a FxHashSet<CastId>,
+        inheritances: &'a InheritanceGraph,
     ) -> Overloads<'a> {
         Overloads {
             index,
             pg_catalog,
             builtin_types,
             dropped_casts,
+            inheritances,
         }
     }
 
@@ -785,6 +789,9 @@ impl<'a> Overloads<'a> {
     }
 
     pub(crate) fn coercion(&self, source: Ty, target: Ty, context: CastContext) -> Coercion {
+        if self.inherits(source, target) {
+            return Coercion::Yes;
+        }
         match self.coercion_path(source, target, context) {
             CoercionPath::Relabel
             | CoercionPath::Function
@@ -895,7 +902,24 @@ impl<'a> Overloads<'a> {
         }
     }
 
+    fn inherits(&self, child: Ty, parent: Ty) -> bool {
+        let (Some(Ty::Table(child)), Ty::Table(parent)) = (self.index.base_type(child), parent)
+        else {
+            return false;
+        };
+        self.inheritances
+            .ancestors(child, |_| true)
+            .contains(&parent)
+    }
+
     fn coerce(&self, arg: Ty, param: Ty) -> Option<Match> {
+        if self.inherits(arg, param) {
+            return Some(Match::Implicit);
+        }
+        self.coerce_type(arg, param)
+    }
+
+    fn coerce_type(&self, arg: Ty, param: Ty) -> Option<Match> {
         if arg == param {
             return Some(Match::Exact);
         }
@@ -955,7 +979,7 @@ impl<'a> Overloads<'a> {
         }
         let arg_element = self.index.element_type(arg_base)?;
         let param_element = self.index.element_type(param_base)?;
-        match self.coerce(arg_element, param_element)? {
+        match self.coerce_type(arg_element, param_element)? {
             Match::Exact | Match::DomainBase | Match::Implicit => Some(Match::Implicit),
             Match::Uncertain => Some(Match::Uncertain),
             Match::Polymorphic | Match::UnknownLiteral => None,

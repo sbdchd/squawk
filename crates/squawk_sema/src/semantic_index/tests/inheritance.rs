@@ -367,3 +367,73 @@ alter table t inherit t;
       ╰ note: `t` is already a child of `t`
     ");
 }
+
+#[test]
+fn child_row_converts_to_parent() {
+    assert_snapshot!(check("
+create table base (i int);
+create table derived () inherits (base);
+create table more (j int) inherits (derived);
+create table other (i int);
+create table pt (i int) partition by range (i);
+create table pt1
+  partition of pt
+  for values from (0) to (10);
+create function f(base) returns int
+  language sql
+  as 'select 1';
+create function g(pt) returns int
+  language sql
+  as 'select 1';
+select derived::base from derived;
+select f(derived.*) from derived;
+select f(more) from more;
+select (more::base).i from more;
+select (more::base).j from more;
+select f(other) from other;
+select f(null::other);
+select x::base[] from (select array[derived] as x from derived) s;
+select base::derived from base;
+select g(pt1) from pt1;
+alter table derived no inherit base;
+select f(derived) from derived;
+select f(more) from more;
+"), @"
+    error: column `j` does not exist
+       ╭▸ 
+    20 │ select (more::base).j from more;
+       ╰╴                    ━
+    error: argument 1 of `f` has type `other`, expected `base`
+       ╭▸ 
+    21 │ select f(other) from other;
+       │          ━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: argument 1 of `f` has type `other`, expected `base`
+       ╭▸ 
+    22 │ select f(null::other);
+       │          ━━━━━━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: cannot cast type `derived[]` to `base[]`
+       ╭▸ 
+    23 │ select x::base[] from (select array[derived] as x from derived) s;
+       ╰╴       ━━━━━━━━━
+    error: cannot cast type `base` to `derived`
+       ╭▸ 
+    24 │ select base::derived from base;
+       ╰╴       ━━━━━━━━━━━━━
+    error: argument 1 of `f` has type `derived`, expected `base`
+       ╭▸ 
+    27 │ select f(derived) from derived;
+       │          ━━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    error: argument 1 of `f` has type `more`, expected `base`
+       ╭▸ 
+    28 │ select f(more) from more;
+       │          ━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
+}

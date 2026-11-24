@@ -26706,6 +26706,7 @@ impl Lowerer {
             self.pg_catalog,
             self.builtin_types,
             &self.dropped_casts,
+            &self.inheritances,
         )
     }
 
