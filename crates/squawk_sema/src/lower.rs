@@ -103,7 +103,7 @@ impl Lowerer {
             aggregate_calls: vec![],
             outer_aggregates: vec![],
             srf_calls: vec![],
-            array_cast: false,
+            array_cast: ArrayCast::None,
             foreign_keys: vec![],
             pending_foreign_keys: vec![],
             generated_refs: vec![],
@@ -417,7 +417,7 @@ pub(crate) struct Lowerer {
     aggregate_calls: Vec<AggregateCall>,
     outer_aggregates: Vec<usize>,
     srf_calls: Vec<SrfCall>,
-    array_cast: bool,
+    array_cast: ArrayCast,
     foreign_keys: Vec<ForeignKey>,
     pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
@@ -508,6 +508,17 @@ enum ConstraintPass {
 struct ReservedConstraintName {
     name: Name,
     pass: ConstraintPass,
+}
+
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
+enum ArrayCast {
+    #[default]
+    None,
+    Unknown,
+    Array {
+        array: Ty,
+        element: Ty,
+    },
 }
 
 struct InsertValue {
@@ -15686,6 +15697,69 @@ impl Lowerer {
         }
     }
 
+    fn array_cast_target(&self, ty: Option<Ty>) -> ArrayCast {
+        let Some(array) = ty.and_then(|ty| self.index.base_type(ty)) else {
+            return ArrayCast::Unknown;
+        };
+        match self.index.element_type(array) {
+            Some(element) => ArrayCast::Array { array, element },
+            None => ArrayCast::None,
+        }
+    }
+
+    fn lower_cast_array_elements(&mut self, array: &ast::ArrayExpr, target: Ty, element: Ty) {
+        let mut multidimensional = false;
+        let mut types: SmallVec<[Option<Ty>; 8]> = SmallVec::new();
+        for expr in array.exprs() {
+            if is_array_literal(&expr) {
+                self.array_cast = ArrayCast::Array {
+                    array: target,
+                    element,
+                };
+            }
+            let ty = self.lower_expr(&expr);
+            self.array_cast = ArrayCast::None;
+            multidimensional |= ty.is_some_and(|ty| self.is_subarray(ty));
+            types.push(ty);
+        }
+        let element = if multidimensional { target } else { element };
+        for (expr, source) in array.exprs().zip(types) {
+            if expr.is_unknown_literal() {
+                self.record_unknown_literal(&expr, element);
+            } else if let Some(source) = source {
+                self.check_explicit_cast(source, element, expr.syntax());
+            }
+        }
+    }
+
+    fn is_subarray(&self, ty: Ty) -> bool {
+        match ty {
+            Ty::Array(_) => true,
+            Ty::Type(id) => {
+                self.index.element_type(ty).is_some()
+                    && !(self.index.types[id].schema == self.pg_catalog
+                        && matches!(
+                            self.index.names.resolve(self.index.types[id].name),
+                            "int2vector" | "oidvector"
+                        ))
+            }
+            Ty::Table(_) | Ty::Cte(_) => false,
+        }
+    }
+
+    fn check_explicit_cast(&mut self, source: Ty, target: Ty, node: &SyntaxNode) {
+        let coercion = self
+            .overloads()
+            .coercion(source, target, CastContext::Explicit);
+        if coercion == Coercion::No {
+            let error = SemaError::CannotCast {
+                source: self.index.ty_name(source),
+                target: self.index.ty_name(target),
+            };
+            self.push_error(node, error);
+        }
+    }
+
     fn attach_empty_array_cast(&mut self, target: Ty, expr: &ast::Expr) -> bool {
         let ast::Expr::ArrayExpr(array) = expr.unparen() else {
             return false;
@@ -24282,17 +24356,29 @@ impl Lowerer {
             }
             ast::Expr::ArrayExpr(array) => {
                 let array_cast = std::mem::take(&mut self.array_cast);
-                if !array_cast && array.select_variant().is_none() && array.exprs().next().is_none()
+                if array_cast == ArrayCast::None
+                    && array.select_variant().is_none()
+                    && array.exprs().next().is_none()
                 {
                     self.push_error(array.syntax(), SemaError::EmptyArrayType { cast: None });
                 }
                 let mut element = None;
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
+                if let ArrayCast::Array {
+                    array: target,
+                    element,
+                } = array_cast
+                    && array.select_variant().is_none()
+                {
+                    self.lower_cast_array_elements(array, target, element);
+                    return Some(target);
+                }
                 for expr in array.exprs() {
-                    self.array_cast =
-                        array_cast && matches!(expr.unparen(), ast::Expr::ArrayExpr(_));
+                    if is_array_literal(&expr) {
+                        self.array_cast = array_cast;
+                    }
                     let ty = self.lower_expr(&expr);
-                    self.array_cast = false;
+                    self.array_cast = ArrayCast::None;
                     common.push(&self.overloads(), expr_arg_type(Some(&expr), ty));
                     element = element.or(ty);
                 }
@@ -24499,28 +24585,16 @@ impl Lowerer {
                 }
                 let ty = cast.ty().and_then(|ty| self.lower_type(&ty));
                 if let Some(expr) = cast.expr() {
-                    self.array_cast = matches!(expr.unparen(), ast::Expr::ArrayExpr(_))
-                        && ty.is_none_or(|ty| {
-                            self.index
-                                .base_type(ty)
-                                .is_none_or(|ty| matches!(ty, Ty::Array(_)))
-                        });
+                    if is_array_literal(&expr) {
+                        self.array_cast = self.array_cast_target(ty);
+                    }
                     let source = self.lower_expr(&expr);
-                    self.array_cast = false;
+                    self.array_cast = ArrayCast::None;
                     if let Some(source) = source
                         && let Some(target) = ty
                         && !expr.is_unknown_literal()
                     {
-                        let coercion =
-                            self.overloads()
-                                .coercion(source, target, CastContext::Explicit);
-                        if coercion == Coercion::No {
-                            let error = SemaError::CannotCast {
-                                source: self.index.ty_name(source),
-                                target: self.index.ty_name(target),
-                            };
-                            self.push_error(cast.syntax(), error);
-                        }
+                        self.check_explicit_cast(source, target, cast.syntax());
                     }
                 }
                 self.lower_exprs(cast.literal().map(ast::Expr::Literal));
@@ -29202,6 +29276,10 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => false,
     }
+}
+
+fn is_array_literal(expr: &ast::Expr) -> bool {
+    matches!(expr.unparen(), ast::Expr::ArrayExpr(array) if array.select_variant().is_none())
 }
 
 fn index_column_names(create_index: &ast::CreateIndex) -> String {
