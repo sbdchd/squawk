@@ -2012,6 +2012,9 @@ impl Lowerer {
             array_name,
             ..
         } = self.index.tables[table];
+        if self.index.tables[table].schema == schema {
+            return;
+        }
         if self.report_relation_name_taken(schema, name, schema_ref.syntax()) {
             return;
         }
@@ -5385,6 +5388,9 @@ impl Lowerer {
                         name_ptr,
                         ..
                     } = self.index.operator_families[family];
+                    if self.index.operator_families[family].schema == schema {
+                        return;
+                    }
                     if self.has_operator_family(schema, name, access_method) {
                         self.report_duplicate_for_access_method(
                             ObjectKind::OperatorFamily,
@@ -5745,6 +5751,9 @@ impl Lowerer {
                         family,
                         ..
                     } = self.index.operator_classes[class];
+                    if self.index.operator_classes[class].schema == schema {
+                        return;
+                    }
                     if self.has_operator_class(schema, name, access_method) {
                         self.report_duplicate_for_access_method(
                             ObjectKind::OperatorClass,
@@ -6106,6 +6115,9 @@ impl Lowerer {
                         name_ptr,
                         ..
                     } = self.index.statistics[statistics];
+                    if self.index.statistics[statistics].schema == schema {
+                        return;
+                    }
                     if self.find_statistics_in(schema, name).is_some() {
                         let error = SemaError::DuplicateInSchema {
                             object: ObjectKind::Statistics,
@@ -6562,6 +6574,9 @@ impl Lowerer {
             name_ptr,
             ..
         } = self.index.text_search[text_search];
+        if self.index.text_search[text_search].schema == schema {
+            return;
+        }
         if self.find_text_search_in(kind, schema, name).is_some() {
             let error = SemaError::DuplicateInSchema {
                 object: ObjectKind::TextSearch(kind),
@@ -7934,6 +7949,9 @@ impl Lowerer {
                 };
                 if let Some(conversion) = conversion {
                     let Conversion { name, name_ptr, .. } = self.index.conversions[conversion];
+                    if self.index.conversions[conversion].schema == schema {
+                        return;
+                    }
                     if self.find_conversion_in(schema, name).is_some() {
                         let error = SemaError::DuplicateInSchema {
                             object: ObjectKind::Conversion,
@@ -9359,6 +9377,9 @@ impl Lowerer {
             name_range,
             ..
         } = self.index.operators[operator];
+        if self.index.operators[operator].schema == schema {
+            return;
+        }
         if self
             .find_operator(Some(schema), name, left, right)
             .is_some()
@@ -10272,7 +10293,9 @@ impl Lowerer {
         let Some(schema) = self.lower_set_schema_ref(&schema_ref) else {
             return;
         };
-        if let Some(function) = function {
+        if let Some(function) = function
+            && self.index.functions[function].schema != schema
+        {
             let Function { name, name_ptr, .. } = self.index.functions[function];
             self.move_function(function, node, schema_ref.syntax(), schema, name, name_ptr);
         }
@@ -13174,8 +13197,14 @@ impl Lowerer {
             return;
         };
         let Type {
-            name, array_name, ..
+            schema: current,
+            name,
+            array_name,
+            ..
         } = self.index.types[ty];
+        if current == schema {
+            return;
+        }
         let taken = if self.type_name_taken(schema, name) {
             Some(name)
         } else {
@@ -20361,6 +20390,9 @@ impl Lowerer {
                 };
                 if let Some(collation) = collation {
                     let Collation { name, name_ptr, .. } = self.index.collations[collation];
+                    if self.index.collations[collation].schema == schema {
+                        return;
+                    }
                     if self.find_collation_in(schema, name).is_some() {
                         let error = SemaError::DuplicateInSchema {
                             object: ObjectKind::Collation,

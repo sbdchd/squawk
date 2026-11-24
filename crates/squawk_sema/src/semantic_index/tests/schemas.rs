@@ -202,3 +202,64 @@ select a from r.t;
       ╰╴                ━
     ");
 }
+
+#[test]
+fn set_schema_to_same_schema() {
+    assert_snapshot!(check("
+create schema s;
+create table s.w (
+  a int,
+  b int
+);
+alter table s.w set schema s;
+create view s.v as
+  select a from s.w;
+alter view s.v set schema s;
+create sequence s.q;
+alter sequence s.q set schema s;
+create function s.f() returns int
+  as $$ select 1 $$
+  language sql;
+alter function s.f() set schema s;
+create aggregate s.agg(int) (
+  sfunc = int4pl,
+  stype = int
+);
+alter aggregate s.agg(int) set schema s;
+create type s.e as enum (
+  'a'
+);
+alter type s.e set schema s;
+create domain s.d as int;
+alter domain s.d set schema s;
+create function s.eq(int, s.e) returns bool
+  as $$ select true $$
+  language sql;
+create operator s.=== (
+  leftarg = int,
+  rightarg = s.e,
+  function = s.eq
+);
+alter operator s.=== (int, s.e) set schema s;
+create collation s.c (
+  locale = 'C'
+);
+alter collation s.c set schema s;
+create statistics s.st on a, b from s.w;
+alter statistics s.st set schema s;
+create text search configuration s.ts (
+  copy = english
+);
+alter text search configuration s.ts set schema s;
+create operator family s.fam
+  using btree;
+alter operator family s.fam using btree set schema s;
+create operator class s.cls
+  for type int
+  using hash as
+    operator 1 =;
+alter operator class s.cls using hash set schema s;
+create conversion s.conv for 'LATIN1' to 'UTF8' from iso8859_1_to_utf8;
+alter conversion s.conv set schema s;
+"), @"no diagnostics");
+}
