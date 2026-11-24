@@ -10847,8 +10847,11 @@ impl Lowerer {
             let Some(path) = parent.path_ref() else {
                 continue;
             };
-            let Some(parent) = self.lower_table_ref(&path, IfMissing::Error, TableLookup::Table)
-            else {
+            let lookup = match inheritance_kind {
+                InheritanceKind::Inherits => TableLookup::TableOrForeignTable,
+                InheritanceKind::Partition => TableLookup::Table,
+            };
+            let Some(parent) = self.lower_table_ref(&path, IfMissing::Error, lookup) else {
                 complete = false;
                 continue;
             };

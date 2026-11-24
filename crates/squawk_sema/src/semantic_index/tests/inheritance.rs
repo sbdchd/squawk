@@ -437,3 +437,38 @@ select f(more) from more;
        ╰ hint: consider adding explicit type casts
     ");
 }
+
+#[test]
+fn inherit_from_foreign_table() {
+    assert_snapshot!(check("
+create foreign data wrapper zw; create server zs foreign data wrapper zw;
+create foreign table ft (a int) server zs;
+create table c () inherits (ft);
+select a, b from c;
+create foreign table fc () inherits (ft) server zs;
+create view v as
+  select 1 as a;
+create table cv () inherits (v);
+create table pc
+  partition of ft default;
+"), @"
+    error: column `b` does not exist
+      ╭▸ 
+    5 │ select a, b from c;
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    5 - select a, b from c;
+    5 + select a, a from c;
+      ╰╴
+    error: `v` is not a table or foreign table
+      ╭▸ 
+    9 │ create table cv () inherits (v);
+      ╰╴                             ━
+    error: `ft` is not a table
+       ╭▸ 
+    11 │   partition of ft default;
+       ╰╴               ━━
+    ");
+}
