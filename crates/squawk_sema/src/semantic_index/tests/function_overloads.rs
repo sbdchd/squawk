@@ -173,3 +173,49 @@ call p(b => 1);
       ╰ hint: no procedure with that name accepts the given argument names
     ");
 }
+
+#[test]
+fn prefer_non_variadic() {
+    assert_snapshot!(check("
+select datemultirange(daterange('2018-03-03', '2018-04-04'));
+create function v(int) returns int
+  language sql
+  as 'select 1';
+create function v(variadic int[]) returns text
+  language sql
+  as 'select ''a''';
+select v(1) + 1;
+select v('1') + 1;
+select v('1', 2) + 1;
+select v(variadic array[1]) + 1;
+create function w(int, variadic int[]) returns text
+  language sql
+  as 'select ''a''';
+create function w(int, int) returns int
+  language sql
+  as 'select 1';
+select w(1, 2) + 1;
+select w(1, '2') + 1;
+"), @"
+    error: operator does not exist: `text + int4`
+       ╭▸ 
+    11 │ select v('1', 2) + 1;
+       │                  ━
+       ╰╴
+    help: use `||` to concatenate strings
+       ╭╴
+    11 - select v('1', 2) + 1;
+    11 + select v('1', 2) || 1;
+       ╰╴
+    error: operator does not exist: `text + int4`
+       ╭▸ 
+    12 │ select v(variadic array[1]) + 1;
+       │                             ━
+       ╰╴
+    help: use `||` to concatenate strings
+       ╭╴
+    12 - select v(variadic array[1]) + 1;
+    12 + select v(variadic array[1]) || 1;
+       ╰╴
+    ");
+}

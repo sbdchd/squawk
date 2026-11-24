@@ -264,9 +264,29 @@ impl<'a> Overloads<'a> {
             {
                 continue;
             }
+            if let Some(other) = viable.iter_mut().find(|other| {
+                other.params == candidate.params && other.params.iter().all(Option::is_some)
+            }) {
+                let existing = &self.index.functions[other.id];
+                let existing_expanded = self.expands_variadic(existing, args);
+                if existing_expanded != self.expands_variadic(function, args) {
+                    if existing_expanded && existing.schema == function.schema {
+                        *other = candidate;
+                    }
+                    continue;
+                }
+            }
             viable.push(candidate);
         }
         self.choose(viable, args, Resolution::Function)
+    }
+
+    fn expands_variadic(&self, function: &Function, args: &[CallArg]) -> bool {
+        !args.iter().any(|arg| arg.variadic)
+            && self
+                .inputs(function)
+                .last()
+                .is_some_and(|param| param.mode == ParamMode::Variadic)
     }
 
     pub(crate) fn select_operator(
