@@ -264,7 +264,7 @@ impl<'a> Overloads<'a> {
             };
             if viable
                 .iter()
-                .any(|other| self.same_signature(&self.index.functions[other.id], function))
+                .any(|other| self.is_shadowed(&self.index.functions[other.id], function))
             {
                 continue;
             }
@@ -699,6 +699,20 @@ impl<'a> Overloads<'a> {
             .iter()
             .map(move |id| &params[id])
             .filter(move |param| param.mode != ParamMode::Out || procedure)
+    }
+
+    fn is_shadowed(&self, existing: &Function, function: &Function) -> bool {
+        self.same_signature(existing, function)
+            && (existing.schema != function.schema || self.same_input_types(existing, function))
+    }
+
+    fn same_input_types(&self, a: &Function, b: &Function) -> bool {
+        let input_types = |function: &Function| {
+            self.inputs(function)
+                .filter(|param| param.mode != ParamMode::Out)
+                .map(|param| param.ty)
+        };
+        input_types(a).eq(input_types(b))
     }
 
     fn same_signature(&self, a: &Function, b: &Function) -> bool {
