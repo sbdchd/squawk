@@ -779,6 +779,17 @@ select h from t;
 }
 
 #[test]
+fn add_column_if_not_exists_skips_constraints() {
+    assert_snapshot!(check("
+create table t (c int);
+alter table t
+  add column if not exists c integer primary key,
+  add primary key (c);
+alter table t add column if not exists c int not null references nope;
+"), @"no diagnostics");
+}
+
+#[test]
 fn alter_table_alter_column() {
     assert_snapshot!(check("
 create table t (a int, b text);

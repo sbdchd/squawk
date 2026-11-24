@@ -18364,13 +18364,14 @@ impl Lowerer {
         {
             let columns = self.index.tables[table].columns;
             if self.columns_contain(columns.range, name) {
-                if add_column.if_not_exists().is_none() {
-                    self.report_duplicate_column(
-                        self.index.tables[table].name,
-                        column_name.syntax(),
-                        name,
-                    );
+                if add_column.if_not_exists().is_some() {
+                    return;
                 }
+                self.report_duplicate_column(
+                    self.index.tables[table].name,
+                    column_name.syntax(),
+                    name,
+                );
             } else {
                 let start = self.index.columns.next_idx();
                 self.index.columns.alloc_copies(columns.range);
