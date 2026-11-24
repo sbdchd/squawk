@@ -17727,6 +17727,10 @@ impl Lowerer {
         actions: impl Iterator<Item = ast::AlterTableAction> + Clone,
         node: &SyntaxNode,
     ) {
+        let original = match table {
+            Some(table) => self.index.tables[table].columns,
+            None => self.unknown_columns(),
+        };
         let mut dropped = vec![];
         for action in actions.clone() {
             let drop_column = match action {
@@ -18105,7 +18109,7 @@ impl Lowerer {
             if let ast::AlterTableAction::AlterColumn(alter_column) = action
                 && alter_column.is_set_type()
             {
-                self.lower_alter_column(table, &alter_column, node);
+                self.lower_alter_column(table, original, &alter_column, node);
             }
         }
 
@@ -18126,7 +18130,7 @@ impl Lowerer {
             if let ast::AlterTableAction::AlterColumn(alter_column) = &action
                 && !alter_column.is_set_type()
             {
-                self.lower_alter_column(table, alter_column, node);
+                self.lower_alter_column(table, original, alter_column, node);
             }
         }
     }
@@ -18214,6 +18218,7 @@ impl Lowerer {
     fn lower_alter_column(
         &mut self,
         table: Option<TableId>,
+        original: Columns,
         alter_column: &ast::AlterColumn,
         node: &SyntaxNode,
     ) {
@@ -18228,9 +18233,15 @@ impl Lowerer {
                     self.lower_collate(&collate);
                 }
                 if let Some(expr) = set_type.using_expr().and_then(|using| using.expr()) {
-                    self.with_table_scope(QueryKind::Constraint, table, node, |this| {
-                        this.lower_expr_in(ExprContext::Transform, &expr);
-                    });
+                    self.with_table_columns_scope(
+                        QueryKind::Constraint,
+                        table,
+                        original,
+                        node,
+                        |this| {
+                            this.lower_expr_in(ExprContext::Transform, &expr);
+                        },
+                    );
                 }
                 if let Some(table) = table
                     && self.index.tables.is_local(table)
@@ -20604,18 +20615,29 @@ impl Lowerer {
         node: &SyntaxNode,
         f: impl FnOnce(&mut Self),
     ) {
+        let columns = match table {
+            Some(table) => self.index.tables[table].columns,
+            None => self.unknown_columns(),
+        };
+        self.with_table_columns_scope(kind, table, columns, node, f);
+    }
+
+    fn with_table_columns_scope(
+        &mut self,
+        kind: QueryKind,
+        table: Option<TableId>,
+        columns: Columns,
+        node: &SyntaxNode,
+        f: impl FnOnce(&mut Self),
+    ) {
         let query = self.alloc_query(kind, node);
         self.push_scope(query);
-        let (name, kind, columns) = match table {
-            Some(table) => {
-                let table_def = &self.index.tables[table];
-                (
-                    Some(table_def.name),
-                    SourceKind::Table(table),
-                    table_def.columns,
-                )
-            }
-            None => (None, SourceKind::External, self.unknown_columns()),
+        let (name, kind) = match table {
+            Some(table) => (
+                Some(self.index.tables[table].name),
+                SourceKind::Table(table),
+            ),
+            None => (None, SourceKind::External),
         };
         self.push_source(Source {
             name,

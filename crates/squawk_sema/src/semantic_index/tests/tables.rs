@@ -1103,3 +1103,40 @@ select g from u;
        ╰╴
     ");
 }
+
+#[test]
+fn alter_table_using_sees_original_table() {
+    assert_snapshot!(check("
+create table t (
+  f1 int,
+  f2 int,
+  f3 text
+);
+alter table t alter f1 type text, alter f2 type bigint using f1 * 10;
+create table u (
+  f1 int,
+  f2 int,
+  f3 text
+);
+alter table u alter f1 type text using f2 || f3, drop column f3;
+select f3 from u;
+alter table u alter f2 type text using f1 * 10;
+"), @"
+    error: column `f3` does not exist
+       ╭▸ 
+    14 │ select f3 from u;
+       │        ━━
+       ╰╴
+    help: a column with a similar name exists
+       ╭╴
+    14 - select f3 from u;
+    14 + select f1 from u;
+       ╰╴
+    error: operator does not exist: `text * int4`
+       ╭▸ 
+    15 │ alter table u alter f2 type text using f1 * 10;
+       │                                           ━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
+}
