@@ -5161,6 +5161,30 @@ impl Lowerer {
         self.lower_access_method_ref(&access_method_ref, Some(kind), IfMissing::Error)
     }
 
+    fn lower_index_method_ref(
+        &mut self,
+        access_method_ref: &ast::AccessMethodRef,
+    ) -> Option<AccessMethodId> {
+        let name = self.intern(&access_method_ref.text());
+        if self.index.names.resolve(name) == "rtree" && self.find_access_method(name).is_none() {
+            let gist = self.intern("gist");
+            let access_method = self.find_access_method(gist);
+            let resolution = access_method.map_or(Resolution::Unresolved, Resolution::AccessMethod);
+            self.add_ref(
+                name,
+                ReferenceKind::AccessMethod,
+                access_method_ref.syntax(),
+                resolution,
+            );
+            return access_method;
+        }
+        self.lower_access_method_ref(
+            access_method_ref,
+            Some(AccessMethodKind::Index),
+            IfMissing::Error,
+        )
+    }
+
     fn lower_access_method_ref(
         &mut self,
         access_method_ref: &ast::AccessMethodRef,
@@ -18986,7 +19010,9 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         let start = self.index.indexes.next_idx();
         let access_method = match create_index.using_method() {
-            Some(using_method) => self.lower_using_method(&using_method, AccessMethodKind::Index),
+            Some(using_method) => using_method
+                .access_method_ref()
+                .and_then(|method| self.lower_index_method_ref(&method)),
             None => {
                 let btree = self.intern("btree");
                 self.find_access_method(btree)
@@ -22131,11 +22157,7 @@ impl Lowerer {
             .constraint_index_method()
             .and_then(|method| method.access_method_ref())
         {
-            Some(access_method_ref) => self.lower_access_method_ref(
-                &access_method_ref,
-                Some(AccessMethodKind::Index),
-                IfMissing::Error,
-            ),
+            Some(access_method_ref) => self.lower_index_method_ref(&access_method_ref),
             None => {
                 let btree = self.intern("btree");
                 self.find_access_method(btree)

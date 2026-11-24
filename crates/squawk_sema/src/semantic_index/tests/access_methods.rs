@@ -175,3 +175,47 @@ select a from t tablesample nope ('x');
       ╰╴                            ━━━━
     ");
 }
+
+#[test]
+fn rtree_is_gist() {
+    assert_snapshot!(check("
+create table t (
+  a box,
+  b int
+);
+create index on t using rtree (a);
+create unique index on t using rtree (a);
+create index on t using rtree (b);
+create index on t using nope (a);
+create table ex (
+  a box,
+  exclude using rtree (a with &&)
+);
+create operator family fam
+  using rtree;
+drop access method rtree;
+"), @"
+    error: access method `gist` does not support unique indexes
+      ╭▸ 
+    7 │ create unique index on t using rtree (a);
+      ╰╴                               ━━━━━
+    error: data type `int4` has no default operator class for access method `gist`
+      ╭▸ 
+    8 │ create index on t using rtree (b);
+      │                                ━
+      │
+      ╰ hint: specify an operator class for the index or define a default operator class for the data type
+    error: access method `nope` does not exist
+      ╭▸ 
+    9 │ create index on t using nope (a);
+      ╰╴                        ━━━━
+    error: access method `rtree` does not exist
+       ╭▸ 
+    15 │   using rtree;
+       ╰╴        ━━━━━
+    error: access method `rtree` does not exist
+       ╭▸ 
+    16 │ drop access method rtree;
+       ╰╴                   ━━━━━
+    ");
+}
