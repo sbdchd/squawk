@@ -452,3 +452,23 @@ select * from t x cross join t y join t on x.a = t.a;
 select * from t x natural join t y join t on x.a = t.a;
 "), @"no diagnostics");
 }
+
+#[test]
+fn join_alias_hides_inner_aliases() {
+    assert_snapshot!(check("
+create table t (a int);
+create table u (b int);
+select * from t x join (u x cross join u y) j on a = 1;
+select * from t x join (u x cross join u x) j on true;
+select * from t x join (u x cross join u y) on true;
+"), @"
+    error: table name `x` specified more than once
+      ╭▸ 
+    5 │ select * from t x join (u x cross join u x) j on true;
+      ╰╴                                         ━
+    error: table name `x` specified more than once
+      ╭▸ 
+    6 │ select * from t x join (u x cross join u y) on true;
+      ╰╴                          ━
+    ");
+}

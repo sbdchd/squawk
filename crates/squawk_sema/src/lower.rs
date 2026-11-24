@@ -236,6 +236,7 @@ struct QueryScope {
     scope: ScopeId,
     merges: Vec<ScopeMerge>,
     windows: Range<usize>,
+    alias_boundary: usize,
 }
 
 #[derive(Clone, Copy)]
@@ -16115,9 +16116,15 @@ impl Lowerer {
                 } else if let Some(paren_expr) = paren.paren_expr() {
                     if let Some(item) = paren_expr.from_list_item() {
                         let start = self.scope_sources_len();
-                        self.lower_from_list_item(item);
-                        if let Some(alias) = paren.alias() {
-                            self.lower_join_alias(from_item, &alias, start);
+                        match paren.alias() {
+                            Some(alias) => {
+                                let alias_boundary =
+                                    std::mem::replace(&mut self.scope_mut().alias_boundary, start);
+                                self.lower_from_list_item(item);
+                                self.scope_mut().alias_boundary = alias_boundary;
+                                self.lower_join_alias(from_item, &alias, start);
+                            }
+                            None => self.lower_from_list_item(item),
                         }
                         return;
                     }
@@ -16323,9 +16330,10 @@ impl Lowerer {
         let Some(name) = name else {
             return;
         };
-        let query = &self.index.queries[self.scope().query];
+        let scope = self.scope();
+        let query = &self.index.queries[scope.query];
         let duplicate = query.sources.iter().enumerate().any(|(index, id)| {
-            if query.is_aliased(index) {
+            if index < scope.alias_boundary || query.is_aliased(index) {
                 return false;
             }
             let prev = &self.index.sources[*id];
@@ -16450,6 +16458,7 @@ impl Lowerer {
             scope,
             merges: vec![],
             windows: Range::default(),
+            alias_boundary: 0,
         });
     }
 
