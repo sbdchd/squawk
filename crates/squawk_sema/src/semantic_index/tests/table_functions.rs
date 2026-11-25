@@ -416,3 +416,39 @@ select * from json_populate_record(null::record, '{}');
        ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn keyword_function_column_def_list() {
+    assert_snapshot!(check("
+select * from coalesce(row(1)) as t (a int);
+select * from greatest(row(1)) as t (a int);
+select * from coalesce(1) as t (a);
+select relname from coalesce(null::pg_class);
+select * from coalesce(row(1));
+select * from nullif(row(1), row(2));
+select * from rows from (greatest(row(1), row(2)));
+select * from coalesce(1) as t (a int);
+select * from coalesce(null::pg_class) as t (a int);
+"), @"
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    6 │ select * from coalesce(row(1));
+      ╰╴              ━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    7 │ select * from nullif(row(1), row(2));
+      ╰╴              ━━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    8 │ select * from rows from (greatest(row(1), row(2)));
+      ╰╴                         ━━━━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    9 │ select * from coalesce(1) as t (a int);
+      ╰╴                               ━━━━━━━
+    error: a column definition list is redundant for a function returning a named composite type
+       ╭▸ 
+    10 │ select * from coalesce(null::pg_class) as t (a int);
+       ╰╴                                            ━━━━━━━
+    ");
+}

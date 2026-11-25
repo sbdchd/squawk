@@ -17714,6 +17714,10 @@ impl Lowerer {
         let LoweredCall { args, callee, .. } =
             self.with_from_function(|this| this.lower_call_with_args(call));
         self.check_from_set_returning(srf_calls, Some(call));
+        if let Some(keyword) = call.function_like_keyword() {
+            let ty = self.keyword_call_type(call, keyword, &args);
+            self.check_keyword_column_defs(call, ty, column_defs);
+        }
         let Some(Callee {
             reference,
             resolution: Resolution::Function(function),
@@ -17880,6 +17884,27 @@ impl Lowerer {
         }
     }
 
+    fn check_keyword_column_defs(
+        &mut self,
+        call: &ast::CallExpr,
+        ty: Option<Ty>,
+        column_defs: ColumnDefs<'_>,
+    ) {
+        match column_defs {
+            ColumnDefs::List(list) => {
+                if let Some(reason) = self.column_def_list_type_reason(ty) {
+                    self.push_error(list.syntax(), SemaError::UnexpectedColumnDefList { reason });
+                }
+            }
+            ColumnDefs::None => {
+                if self.is_record(ty) {
+                    self.push_error(call.syntax(), SemaError::MissingColumnDefList);
+                }
+            }
+            ColumnDefs::Rejected => {}
+        }
+    }
+
     fn column_def_list_reason(
         &mut self,
         function: FunctionId,
@@ -17891,10 +17916,15 @@ impl Lowerer {
         {
             return Some(ColumnDefListReason::OutParams);
         }
-        let ty = self.call_type(function, args)?;
-        if Some(ty) == record {
+        let ty = self.call_type(function, args);
+        self.column_def_list_type_reason(ty)
+    }
+
+    fn column_def_list_type_reason(&mut self, ty: Option<Ty>) -> Option<ColumnDefListReason> {
+        if self.is_record(ty) {
             return None;
         }
+        let ty = ty?;
         Some(match self.ty_columns(ty) {
             Some(_) => ColumnDefListReason::NamedComposite,
             None => ColumnDefListReason::NotRecord,
