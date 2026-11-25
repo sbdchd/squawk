@@ -17668,7 +17668,7 @@ impl Lowerer {
                         self.push_error(outer.syntax(), SemaError::DuplicateColumnDefList);
                     }
                     let srf_calls = self.srf_calls.len();
-                    let LoweredCall { args, callee, .. } =
+                    let LoweredCall { args, callee, ty } =
                         self.with_from_function(|this| this.lower_call_with_args(&call));
                     self.check_from_set_returning(srf_calls, Some(&call));
                     if let Some(Callee {
@@ -17679,6 +17679,8 @@ impl Lowerer {
                         self.check_column_def_list(function, &args, &list);
                     } else if let Some(keyword) = call.function_like_keyword() {
                         let ty = self.keyword_call_type(&call, keyword, &args);
+                        self.check_value_column_defs(call.syntax(), ty, ColumnDefs::List(&list));
+                    } else if ty.is_some() {
                         self.check_value_column_defs(call.syntax(), ty, ColumnDefs::List(&list));
                     }
                     FunctionColumns {
@@ -17748,11 +17750,14 @@ impl Lowerer {
             return self.lower_expanded_unnest(call, &name_ref);
         }
         let srf_calls = self.srf_calls.len();
-        let LoweredCall { args, callee, .. } =
+        let LoweredCall { args, callee, ty } =
             self.with_from_function(|this| this.lower_call_with_args(call));
         self.check_from_set_returning(srf_calls, Some(call));
-        if let Some(keyword) = call.function_like_keyword() {
-            let ty = self.keyword_call_type(call, keyword, &args);
+        let value_ty = match call.function_like_keyword() {
+            Some(keyword) => Some(self.keyword_call_type(call, keyword, &args)),
+            None => ty.map(Some),
+        };
+        if let Some(ty) = value_ty {
             self.check_value_column_defs(call.syntax(), ty, column_defs);
             let name = self.inferred_name(ast::Expr::CallExpr(call.clone()));
             let FunctionColumns { columns, scalar } =

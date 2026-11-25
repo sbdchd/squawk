@@ -544,3 +544,37 @@ select * from rows from (current_date as (a int));
        ╰╴                                         ━━━━━━━
     ");
 }
+
+#[test]
+fn special_function_column_def_list() {
+    assert_snapshot!(check("
+select t from json_object('a': 1) as t;
+select t.a from json_object('a': 1) as t (a);
+select t.nope from json_object('a': 1) as t (a);
+select * from json_object('a': 1) as t (a int);
+select * from xmlelement(name a) as t (a int);
+select * from json_value('1', '$') as t (a int);
+select * from rows from (json_array(1) as (a int));
+"), @"
+    error: column `t.nope` does not exist
+      ╭▸ 
+    4 │ select t.nope from json_object('a': 1) as t (a);
+      ╰╴         ━━━━
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    5 │ select * from json_object('a': 1) as t (a int);
+      ╰╴                                       ━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    6 │ select * from xmlelement(name a) as t (a int);
+      ╰╴                                      ━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    7 │ select * from json_value('1', '$') as t (a int);
+      ╰╴                                        ━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    8 │ select * from rows from (json_array(1) as (a int));
+      ╰╴                                          ━━━━━━━
+    ");
+}
