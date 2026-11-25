@@ -485,3 +485,34 @@ select (f$0(row(1, 2)::pair)).a;
       ╰ note: `anyelement` = `pair`
     ");
 }
+
+#[test]
+fn polymorphic_functional_notation() {
+    assert_snapshot!(hover("
+select (array[1]).array_rev$0erse;
+"), @"
+    hover: function pg_catalog.array_reverse(anyarray) returns anyarray
+      ╭▸ file0.sql:2:19
+      │
+    2 │ select (array[1]).array_reverse;
+      │                   ───────────── hover
+      │
+      ├ note: `anyarray` = `int4[]`
+      ╰ note: reverse array
+    ");
+}
+
+#[test]
+fn functional_notation_on_record() {
+    assert_snapshot!(hover("
+select (row(1)).pg_type$0of;
+"), @"
+    hover: function pg_catalog.pg_typeof(any) returns regtype
+      ╭▸ file0.sql:2:17
+      │
+    2 │ select (row(1)).pg_typeof;
+      │                 ───────── hover
+      │
+      ╰ note: type of the argument
+    ");
+}

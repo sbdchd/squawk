@@ -952,7 +952,7 @@ struct IdentPart<'a> {
 #[derive(Clone, Copy)]
 struct FieldFunction {
     function: FunctionId,
-    ty: Option<Ty>,
+    arg: Ty,
 }
 
 enum FieldBase {
@@ -26890,25 +26890,23 @@ impl Lowerer {
         let Resolution::Function(function) = overloads.select(candidates, &args) else {
             return None;
         };
-        Some(FieldFunction {
-            function,
-            ty: self.call_type(function, &args),
-        })
+        Some(FieldFunction { function, arg })
     }
 
     fn add_field_function_ref(
         &mut self,
         name: Name,
         field: &ast::NameRef,
-        FieldFunction { function, ty }: FieldFunction,
+        FieldFunction { function, arg }: FieldFunction,
     ) -> Option<Ty> {
-        self.add_ref(
+        let reference = self.add_ref(
             name,
             ReferenceKind::Function(RoutineKind::Function),
             field.syntax(),
             Resolution::Function(function),
         );
-        ty
+        let args = [CallArg::positional(ArgType::Known(arg))];
+        self.record_call(reference, function, &args)
     }
 
     fn source_row_type(&mut self, source: SourceId) -> Option<Ty> {
