@@ -798,3 +798,119 @@ select (row(s.*)).f3 from (select 1 as a, 2 as b) s;
        ╰╴                  ━━
     ");
 }
+
+#[test]
+fn opaque_record_fields() {
+    assert_snapshot!(check("
+create function rr() returns record
+  language sql
+  as 'select 1, 2';
+select (x).f1 from (select row(1)) s (x);
+with c(x) as (
+  select row(1)
+)
+select (y).f1 from c as d (y);
+select (o.y).a from (select s as y from (select 1 as a) s) o;
+select (x).f1
+from (select row(1) as x) s right join (select row(1) as x) t using (x);
+select (s.x).* from (select row(1) as x) s;
+select (s.x).f1 from (values (row(1))) s (x);
+select (x).nope from (select row(1)) s (x);
+with c(x) as (
+  select row(1)
+)
+select (y).nope from c as d (y);
+select (o.y).nope from (select s as y from (select 1 as a) s) o;
+select (o.y).nope from (select j as y from json_to_record('{}') as j (a int)) o;
+select (s.x).column1 from (select rr() as x) s;
+select (x).f1
+from (select row(1) as x) s full join (select row(1) as x) t using (x);
+select (lag(x) over ()).f1 from (select row(1) as x) s;
+select (s.y).f1 from (select lag(x) over () as y from (select row(1) as x) t) s;
+select (null::record).*;
+select (rr()).*;
+select row((s.x).*) from (values (row(1))) s (x);
+"), @"
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    14 │ select (s.x).f1 from (values (row(1))) s (x);
+       ╰╴             ━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    15 │ select (x).nope from (select row(1)) s (x);
+       ╰╴           ━━━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    19 │ select (y).nope from c as d (y);
+       ╰╴           ━━━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    20 │ select (o.y).nope from (select s as y from (select 1 as a) s) o;
+       ╰╴             ━━━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    21 │ select (o.y).nope from (select j as y from json_to_record('{}') as j (a int)) o;
+       ╰╴             ━━━━
+    error: could not identify column `column1` in type `record`
+       ╭▸ 
+    22 │ select (s.x).column1 from (select rr() as x) s;
+       ╰╴             ━━━━━━━
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    23 │ select (x).f1
+       ╰╴           ━━
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    25 │ select (lag(x) over ()).f1 from (select row(1) as x) s;
+       ╰╴                        ━━
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    26 │ select (s.y).f1 from (select lag(x) over () as y from (select row(1) as x) t) s;
+       ╰╴             ━━
+    error: cannot expand `.*` on a `record` with unknown columns
+       ╭▸ 
+    27 │ select (null::record).*;
+       ╰╴                      ━
+    error: cannot expand `.*` on a `record` with unknown columns
+       ╭▸ 
+    28 │ select (rr()).*;
+       ╰╴              ━
+    error: cannot expand `.*` on a `record` with unknown columns
+       ╭▸ 
+    29 │ select row((s.x).*) from (values (row(1))) s (x);
+       ╰╴                 ━
+    ");
+}
+
+#[test]
+fn function_source_rows() {
+    assert_snapshot!(check("
+select (o.y) + 1, (o.y).pg_typeof
+from (select j as y from generate_series(1, 2) as j (b)) o;
+select (o.y).a, (o.y).b
+from (select u as y from unnest(array[1], array[2]) as u (a, b)) o;
+select * from unnest(array[(1, 2), (3, 4)]) as t (a int, b int);
+select * from pg_class c, unnest(array[c]) as u where u.relname = 'a';
+select (o.y).b from (select j as y from generate_series(1, 2) as j (b)) o;
+select (o.y).nope
+from (select j as y from generate_series(1, 2) with ordinality as j (b, c)) o;
+select (o.y).nope
+from (
+  select j as y
+  from rows from (generate_series(1, 2), generate_series(1, 3)) as j (b, c)
+) o;
+"), @"
+    error: column notation `.b` applied to type `int4`, which is not a composite type
+      ╭▸ 
+    8 │ select (o.y).b from (select j as y from generate_series(1, 2) as j (b)) o;
+      ╰╴             ━
+    error: could not identify column `nope` in type `record`
+      ╭▸ 
+    9 │ select (o.y).nope
+      ╰╴             ━━━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    11 │ select (o.y).nope
+       ╰╴             ━━━━
+    ");
+}

@@ -600,6 +600,7 @@ pub(crate) enum SemaError {
     NotComposite {
         name: Name,
     },
+    StarOnAnonymousRecord,
     StarNotComposite {
         ty: TyName,
     },
@@ -1630,6 +1631,7 @@ impl SemaError {
             | SemaError::NumericValueOutOfRange { .. } => DiagnosticKind::ValueOutOfRange,
             SemaError::NotEnum { .. }
             | SemaError::NotComposite { .. }
+            | SemaError::StarOnAnonymousRecord
             | SemaError::StarNotComposite { .. }
             | SemaError::ColumnNotationNotComposite { .. }
             | SemaError::WrongTypeKind { .. }
@@ -3519,6 +3521,9 @@ impl fmt::Display for ErrorMessage<'_> {
             } => write!(f, "value `{}` is out of range for type `numeric`", n(value)),
             SemaError::NotEnum { name } => write!(f, "`{}` is not an enum", n(name)),
             SemaError::NotComposite { name } => write!(f, "`{}` is not a composite type", n(name)),
+            SemaError::StarOnAnonymousRecord => {
+                f.write_str("cannot expand `.*` on a `record` with unknown columns")
+            }
             SemaError::StarNotComposite { ty } => {
                 write!(f, "type `{}` is not a composite type", self.ty(ty))
             }
