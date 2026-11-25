@@ -111,7 +111,15 @@ fn builtin_type_edit(ty: &ast::Type) -> Option<BuiltinTypeEdit> {
             .map_or_else(String::new, |args| args.syntax().to_string()),
         ast::Type::DoubleType(_) => String::new(),
         ast::Type::IntervalType(interval) => {
-            if interval.interval_qualifier().is_some() || interval.literal().is_some() {
+            let literal_qualifier = interval
+                .syntax()
+                .parent()
+                .and_then(ast::CastExpr::cast)
+                .and_then(|cast| cast.interval_qualifier());
+            if interval.interval_qualifier().is_some()
+                || interval.literal().is_some()
+                || literal_qualifier.is_some()
+            {
                 return None;
             }
             String::new()
@@ -560,6 +568,14 @@ select myschema.f$0();"
         assert!(code_action_not_applicable(
             add_schema,
             "select '1'::interval$0 year to month;"
+        ));
+    }
+
+    #[test]
+    fn add_schema_interval_literal_with_fields_not_applicable() {
+        assert!(code_action_not_applicable(
+            add_schema,
+            r#"select interval$0 '1' month;"#
         ));
     }
 }
