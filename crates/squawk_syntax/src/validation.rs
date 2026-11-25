@@ -50,7 +50,11 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::DistinctOn(it) => validate_distinct_on(&it, errors),
                 ast::ExceptTableClause(it) => validate_except_table_clause(&it, errors),
                 ast::FuncOptionList(it) => validate_func_option_list(&it, errors),
-                ast::FunctionFromItem(it) => validate_function_only(it.only_token(), errors),
+                ast::FunctionFromItem(it) => {
+                    validate_function_only(it.only_token(), errors);
+                    validate_from_function(it.call_expr(), errors);
+                },
+                ast::RowsFromArg(it) => validate_from_function(it.call_expr(), errors),
                 ast::ExprFromItem(it) => validate_function_only(it.only_token(), errors),
                 ast::FunctionSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(&it, errors),
@@ -137,6 +141,17 @@ fn validate_except_table_clause(clause: &ast::ExceptTableClause, acc: &mut Vec<S
                 name.syntax().text_range(),
             ));
         }
+    }
+}
+
+fn validate_from_function(call: Option<ast::CallExpr>, acc: &mut Vec<SyntaxError>) {
+    if let Some(call) = call
+        && call.function_like_keyword() == Some(ast::FunctionLikeKeyword::Grouping)
+    {
+        acc.push(SyntaxError::new(
+            "`grouping` cannot be used in a `from` clause",
+            call.syntax().text_range(),
+        ));
     }
 }
 
