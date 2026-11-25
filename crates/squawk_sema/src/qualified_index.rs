@@ -4,6 +4,7 @@ use la_arena::Idx;
 use smallvec::SmallVec;
 
 use crate::arena::{IdxRange, LayeredArena, LayeredMultimap};
+use crate::file::IrFileId;
 use crate::interner::{Name, QualifiedName};
 use crate::ir::{
     Collation, Conversion, Function, FunctionId, Operator, OperatorClass, OperatorFamily,
@@ -14,6 +15,8 @@ pub trait Qualified {
     fn name(&self) -> Name;
 
     fn schema(&self) -> Name;
+
+    fn file_id(&self) -> IrFileId;
 
     fn name_mut(&mut self) -> &mut Name;
 
@@ -169,6 +172,10 @@ macro_rules! qualified {
 
                 fn schema(&self) -> Name {
                     self.schema
+                }
+
+                fn file_id(&self) -> IrFileId {
+                    self.ptr.file_id
                 }
 
                 fn name_mut(&mut self) -> &mut Name {

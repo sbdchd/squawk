@@ -82,8 +82,8 @@ impl IndexIndex {
         std::mem::replace(&mut self.indexes.local_mut(id).parent, parent)
     }
 
-    pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = IndexId> + '_ {
-        self.indexes.named(schema, name)
+    pub(crate) fn qualified(&self) -> &QualifiedIndex<Index> {
+        &self.indexes
     }
 
     pub(crate) fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = IndexId> + '_ {

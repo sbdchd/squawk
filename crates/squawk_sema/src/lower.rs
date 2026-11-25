@@ -34,6 +34,7 @@ use crate::pg_float::{FloatInputError, FloatType};
 use crate::pg_int::{IntInputError, IntType};
 use crate::pg_json::{JsonInputError, JsonType};
 use crate::pg_numeric::{NumericInputError, NumericTypmod};
+use crate::qualified_index::{Qualified, QualifiedIndex};
 use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
 
@@ -6330,14 +6331,12 @@ impl Lowerer {
         schema: Name,
         name: Name,
     ) -> impl Iterator<Item = OperatorFamilyId> + '_ {
-        self.index
-            .operator_families
-            .named(schema, name)
-            .filter(|id| {
-                let family = &self.index.operator_families[*id];
-                self.visible(family.schema, family.ptr.file_id)
-                    && !self.dropped_operator_families.contains(id)
-            })
+        self.live_named(
+            &self.index.operator_families,
+            &self.dropped_operator_families,
+            schema,
+            name,
+        )
     }
 
     fn operator_classes_named(
@@ -6345,14 +6344,12 @@ impl Lowerer {
         schema: Name,
         name: Name,
     ) -> impl Iterator<Item = OperatorClassId> + '_ {
-        self.index
-            .operator_classes
-            .named(schema, name)
-            .filter(|id| {
-                let class = &self.index.operator_classes[*id];
-                self.visible(class.schema, class.ptr.file_id)
-                    && !self.dropped_operator_classes.contains(id)
-            })
+        self.live_named(
+            &self.index.operator_classes,
+            &self.dropped_operator_classes,
+            schema,
+            name,
+        )
     }
 
     fn has_operator_family(
@@ -6626,13 +6623,16 @@ impl Lowerer {
     }
 
     fn find_statistics_in(&self, schema: Name, name: Name) -> Option<StatisticsId> {
-        self.index.statistics.named(schema, name).find(|id| {
-            let statistics = &self.index.statistics[*id];
-            self.visible(statistics.schema, statistics.ptr.file_id)
-                && !self.dropped_statistics.contains(id)
-                && statistics
-                    .table
-                    .is_none_or(|table| !self.dropped_tables.contains(&table))
+        self.live_named(
+            self.index.statistics.qualified(),
+            &self.dropped_statistics,
+            schema,
+            name,
+        )
+        .find(|id| {
+            self.index.statistics[*id]
+                .table
+                .is_none_or(|table| !self.dropped_tables.contains(&table))
         })
     }
 
@@ -7083,12 +7083,13 @@ impl Lowerer {
         schema: Name,
         name: Name,
     ) -> Option<TextSearchId> {
-        self.index.text_search.named(schema, name).find(|id| {
-            let text_search = &self.index.text_search[*id];
-            text_search.kind == kind
-                && self.visible(text_search.schema, text_search.ptr.file_id)
-                && !self.dropped_text_search.contains(id)
-        })
+        self.live_named(
+            &self.index.text_search,
+            &self.dropped_text_search,
+            schema,
+            name,
+        )
+        .find(|id| self.index.text_search[*id].kind == kind)
     }
 
     fn lower_create_publication(&mut self, create_publication: &ast::CreatePublication) {
@@ -8423,11 +8424,13 @@ impl Lowerer {
     }
 
     fn find_conversion_in(&self, schema: Name, name: Name) -> Option<ConversionId> {
-        self.index.conversions.named(schema, name).find(|id| {
-            let conversion = &self.index.conversions[*id];
-            self.visible(conversion.schema, conversion.ptr.file_id)
-                && !self.dropped_conversions.contains(id)
-        })
+        self.live_named(
+            &self.index.conversions,
+            &self.dropped_conversions,
+            schema,
+            name,
+        )
+        .next()
     }
 
     fn lower_create_language(&mut self, create_language: &ast::CreateLanguage) {
@@ -21370,11 +21373,13 @@ impl Lowerer {
     }
 
     fn find_collation_in(&self, schema: Name, name: Name) -> Option<CollationId> {
-        self.index.collations.named(schema, name).find(|id| {
-            let collation = &self.index.collations[*id];
-            self.visible(collation.schema, collation.ptr.file_id)
-                && !self.dropped_collations.contains(id)
-        })
+        self.live_named(
+            &self.index.collations,
+            &self.dropped_collations,
+            schema,
+            name,
+        )
+        .next()
     }
 
     fn with_table_scope(
@@ -23789,13 +23794,16 @@ impl Lowerer {
     }
 
     fn find_index_in(&self, schema: Name, name: Name) -> Option<IndexId> {
-        self.index.indexes.named(schema, name).find(|id| {
-            let index = &self.index.indexes[*id];
-            self.visible(index.schema, index.ptr.file_id)
-                && !self.dropped_indexes.contains(id)
-                && index
-                    .table
-                    .is_none_or(|table| !self.dropped_tables.contains(&table))
+        self.live_named(
+            self.index.indexes.qualified(),
+            &self.dropped_indexes,
+            schema,
+            name,
+        )
+        .find(|id| {
+            self.index.indexes[*id]
+                .table
+                .is_none_or(|table| !self.dropped_tables.contains(&table))
         })
     }
 
@@ -23829,6 +23837,19 @@ impl Lowerer {
                     && *schema != self.dollar_user
                     && (lookup.searches_temp() || *schema != self.pg_temp)
             }))
+    }
+
+    fn live_named<T: Qualified>(
+        &self,
+        index: &QualifiedIndex<T>,
+        dropped: &FxHashSet<Idx<T>>,
+        schema: Name,
+        name: Name,
+    ) -> impl Iterator<Item = Idx<T>> {
+        index.named(schema, name).filter(move |id| {
+            let value = &index[*id];
+            self.visible(value.schema(), value.file_id()) && !dropped.contains(id)
+        })
     }
 
     fn visible(&self, schema: Name, file_id: IrFileId) -> bool {
