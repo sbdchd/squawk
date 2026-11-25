@@ -1,0 +1,22 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/create_extension_option_order.sql
+---
+SOURCE_FILE
+  CREATE_EXTENSION
+    CREATE_KW "create"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    EXTENSION
+      CUBE_KW "cube"
+    WHITESPACE " "
+    CASCADE_KW "cascade"
+    WHITESPACE " "
+    EXTENSION_SCHEMA
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n"

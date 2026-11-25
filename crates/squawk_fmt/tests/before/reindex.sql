@@ -21,3 +21,5 @@ reindex (concurrently, verbose) table public.my_table;
 reindex (concurrently true, tablespace an_intentionally_long_tablespace_name, verbose false) table concurrently an_intentionally_long_schema_name.an_intentionally_long_table_name;
 
 /* before reindex */ REINDEX /* before left paren */ (/* after left paren */ CONCURRENTLY /* before option value */ TRUE /* before comma */, /* after comma */ TABLESPACE /* before tablespace */ new_tablespace /* before second comma */, /* after second comma */ VERBOSE /* before verbose value */ NO /* before right paren */) /* before target */ TABLE /* before concurrently */ CONCURRENTLY /* before table name */ public /* before dot */ . /* after dot */ records /* before semicolon */;
+
+reindex (tablespace 1) table x;

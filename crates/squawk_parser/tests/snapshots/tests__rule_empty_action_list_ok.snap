@@ -1,0 +1,40 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/rule_empty_action_list.sql
+---
+SOURCE_FILE
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    RULE
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      RULE_EVENT
+        INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      RULE_STMT_LIST
+        L_PAREN "("
+        WHITESPACE " "
+        EMPTY_STMT
+          SEMICOLON ";"
+        WHITESPACE " "
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

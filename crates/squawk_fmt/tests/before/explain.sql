@@ -8,3 +8,5 @@ explain (analyze true, verbose, costs false, format json) select an_intentionall
 
 -- quoted option names keep their case
 explain ("VERBOSE") select 1;
+
+explain refresh materialized view m;

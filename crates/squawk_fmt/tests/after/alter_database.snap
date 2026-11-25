@@ -45,3 +45,11 @@ alter database /* name */ commented_config
 
 alter database /* name */ commented_refresh
   /* action */ refresh /* collation keyword */ collation /* version keyword */ version /* semicolon */;
+
+alter database x reset time zone;
+
+alter database x set names;
+
+alter database x set names 'utf8';
+
+alter database x set time zone 'utc';

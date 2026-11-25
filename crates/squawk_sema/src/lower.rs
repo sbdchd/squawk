@@ -4781,6 +4781,9 @@ impl Lowerer {
                     self.lower_query(query);
                 }
             }
+            ast::ExplainStmt::Refresh(refresh) => {
+                self.lower_refresh(&refresh);
+            }
         }
     }
 
@@ -5659,7 +5662,10 @@ impl Lowerer {
     }
 
     fn lower_alter_user_mapping(&mut self, alter_user_mapping: &ast::AlterUserMapping) {
-        if let Some(role_ref) = alter_user_mapping.role_ref() {
+        if let Some(role_ref) = alter_user_mapping
+            .user_mapping_role()
+            .and_then(|role| role.role_ref())
+        {
             self.lower_grantee_role_ref(&role_ref);
         }
         if let Some(server_ref) = alter_user_mapping
@@ -7100,9 +7106,7 @@ impl Lowerer {
                 }
             }
             Some(ast::PublicationForClause::ForAllPublicationObjects(all)) => {
-                if let Some(except) = all.except_table_clause() {
-                    self.lower_publication_except_tables(&except);
-                }
+                self.lower_all_publication_objects(all.all_publication_objects());
             }
             None => {}
         }
@@ -7132,9 +7136,7 @@ impl Lowerer {
                 }
             }
             Some(ast::AlterPublicationAction::SetAllPublicationObjectList(set_all)) => {
-                if let Some(except) = set_all.except_table_clause() {
-                    self.lower_publication_except_tables(&except);
-                }
+                self.lower_all_publication_objects(set_all.all_publication_objects());
             }
             Some(ast::AlterPublicationAction::PublicationRenameTo(rename)) => {
                 if let Some(publication) = publication
@@ -7219,6 +7221,22 @@ impl Lowerer {
                 }
             }
             ast::PublicationObject::PublicationObjectCurrentSchema(_) => {}
+        }
+    }
+
+    fn lower_all_publication_objects(
+        &mut self,
+        objects: impl Iterator<Item = ast::AllPublicationObject>,
+    ) {
+        for object in objects {
+            match object {
+                ast::AllPublicationObject::AllPublicationTables(tables) => {
+                    if let Some(except) = tables.except_table_clause() {
+                        self.lower_publication_except_tables(&except);
+                    }
+                }
+                ast::AllPublicationObject::AllPublicationSequences(_) => {}
+            }
         }
     }
 
@@ -7314,6 +7332,7 @@ impl Lowerer {
                 | ast::AlterSubscriptionAction::DropSubscriptionPublication(_)
                 | ast::AlterSubscriptionAction::EnableSubscription(_)
                 | ast::AlterSubscriptionAction::RefreshPublication(_)
+                | ast::AlterSubscriptionAction::RefreshSequences(_)
                 | ast::AlterSubscriptionAction::SetOptions(_)
                 | ast::AlterSubscriptionAction::SetPublication(_)
                 | ast::AlterSubscriptionAction::SkipSubscription(_),
@@ -14325,6 +14344,7 @@ impl Lowerer {
             }
             Some(
                 ast::SetTarget::SetConfig(_)
+                | ast::SetTarget::SetNames(_)
                 | ast::SetTarget::SetTimeZone(_)
                 | ast::SetTarget::SetXmlOption(_),
             )
@@ -14340,7 +14360,9 @@ impl Lowerer {
             Some(ast::ResetTarget::All(_)) => true,
             Some(ast::ResetTarget::ConfigParameterRef(param)) => is_search_path(Some(param)),
             Some(
-                ast::ResetTarget::ResetTimeZone(_) | ast::ResetTarget::ResetTransactionIsolation(_),
+                ast::ResetTarget::ResetTimeZone(_)
+                | ast::ResetTarget::ResetTransactionIsolation(_)
+                | ast::ResetTarget::SessionAuthorization(_),
             )
             | None => false,
         };
@@ -20105,6 +20127,7 @@ impl Lowerer {
                 self.lower_query(query);
             }
             ast::RuleStmt::Notify(notify) => self.lower_notify(&notify),
+            ast::RuleStmt::EmptyStmt(_) => {}
         }
     }
 
@@ -20936,8 +20959,11 @@ impl Lowerer {
             }
             ast::CommentObject::ObjectType(object) => {
                 let path = object.type_name_ref()?.path_ref()?;
-                self.lower_type_path_ref(&path, if_missing, None)
-                    .map(Object::Type)
+                let ty = self.lower_type_path_ref(&path, if_missing, None);
+                if object.array_token().is_some() || object.array_bounds().next().is_some() {
+                    return None;
+                }
+                ty.map(Object::Type)
             }
             ast::CommentObject::ObjectView(object) => {
                 let path = object.view_ref()?.path_ref()?;
@@ -24647,11 +24673,12 @@ impl Lowerer {
     }
 
     fn lower_locking_clause(&mut self, locking: &ast::LockingClause, query: QueryId, len: usize) {
-        let strength = locking.lock_strength().map(|strength| match strength {
-            ast::LockStrength::ForUpdate(_) => LockStrength::Update,
-            ast::LockStrength::ForNoKeyUpdate(_) => LockStrength::NoKeyUpdate,
-            ast::LockStrength::ForShare(_) => LockStrength::Share,
-            ast::LockStrength::ForKeyShare(_) => LockStrength::KeyShare,
+        let strength = locking.lock_strength().and_then(|strength| match strength {
+            ast::LockStrength::ForUpdate(_) => Some(LockStrength::Update),
+            ast::LockStrength::ForNoKeyUpdate(_) => Some(LockStrength::NoKeyUpdate),
+            ast::LockStrength::ForShare(_) => Some(LockStrength::Share),
+            ast::LockStrength::ForKeyShare(_) => Some(LockStrength::KeyShare),
+            ast::LockStrength::ReadOnly(_) => None,
         });
         for expr in locking
             .locking_of()

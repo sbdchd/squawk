@@ -1,0 +1,40 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/json_array_select_format_json.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            JSON_ARRAY_FN
+              JSON_ARRAY_KW "json_array"
+              L_PAREN "("
+              JSON_SELECT_FORMAT
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        STAR "*"
+                  WHITESPACE " "
+                  FROM_CLAUSE
+                    FROM_KW "from"
+                    WHITESPACE " "
+                    RELATION_FROM_ITEM
+                      RELATION_NAME_REF
+                        PATH_REF
+                          PATH_SEGMENT_REF
+                            IDENT "x"
+                WHITESPACE " "
+                JSON_FORMAT_CLAUSE
+                  FORMAT_KW "format"
+                  WHITESPACE " "
+                  JSON_KW "json"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

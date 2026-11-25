@@ -8,7 +8,7 @@ alter publication selected_tables set tables in schema first_schema, /* before o
 
 alter publication selected_tables set table public.accounts (id) where (id > 200);
 
-alter publication everything set all tables, all sequences except (table private.tokens, audit.logs);
+alter publication everything set all tables except (table private.tokens, audit.logs), all sequences;
 
 alter publication everything set (publish = 'insert, update');
 

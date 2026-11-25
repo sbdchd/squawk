@@ -1,0 +1,38 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/create_statistics_from_alias.sql
+---
+SOURCE_FILE
+  CREATE_STATISTICS
+    CREATE_KW "create"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    STATISTICS
+      PATH
+        PATH_SEGMENT
+          IDENT "s"
+    WHITESPACE " "
+    STATISTICS_ON_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      NAME_REF
+        IDENT "a"
+      COMMA ","
+      WHITESPACE " "
+      NAME_REF
+        IDENT "b"
+    WHITESPACE " "
+    FROM_TABLE
+      FROM_KW "from"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+      WHITESPACE " "
+      FROM_ALIAS
+        TABLE_ALIAS
+          GROUPS_KW "groups"
+    SEMICOLON ";"
+  WHITESPACE "\n"

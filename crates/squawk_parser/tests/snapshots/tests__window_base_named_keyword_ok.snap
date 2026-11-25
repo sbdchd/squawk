@@ -1,0 +1,34 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/window_base_named_keyword.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    WINDOW_CLAUSE
+      WINDOW_KW "window"
+      WHITESPACE " "
+      WINDOW_DEF
+        WINDOW
+          IDENT "w"
+        WHITESPACE " "
+        AS_KW "as"
+        WHITESPACE " "
+        L_PAREN "("
+        WINDOW_SPEC
+          WINDOW_REF
+            PERIOD_KW "period"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

@@ -21,3 +21,11 @@ alter /* database keyword */ database /* database name */ commented_app /* actio
 alter database /* name */ commented_config /* action */ set /* parameter */ statement_timeout /* assignment */ to /* value */ '30s';
 
 alter database /* name */ commented_refresh /* action */ refresh /* collation keyword */ collation /* version keyword */ version /* semicolon */;
+
+alter database x reset time zone;
+
+alter database x set names;
+
+alter database x set names 'utf8';
+
+alter database x set time zone 'utc';

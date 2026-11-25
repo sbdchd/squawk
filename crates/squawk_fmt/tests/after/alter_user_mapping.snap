@@ -15,3 +15,9 @@ alter user mapping for public
   options (
     set user_name 'reporter'
   );
+
+alter user mapping for user
+  server s
+  options (
+    x ''
+  );

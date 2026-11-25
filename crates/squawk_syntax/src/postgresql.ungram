@@ -3807,7 +3807,7 @@ DropPublicationObjects =
   'drop' (PublicationObject (',' PublicationObject)*)
 
 SetAllPublicationObjectList =
-  'set' (AllPublicationObject (',' AllPublicationObject)*) ExceptTableClause?
+  'set' (AllPublicationObject (',' AllPublicationObject)*)
 
 SetPublicationObjects =
   'set' (PublicationObject (',' PublicationObject)*)
@@ -4156,7 +4156,7 @@ ObjectTablespace =
   'tablespace' TablespaceRef
 
 ObjectType =
-  'type' TypeNameRef
+  'type' TypeNameRef 'array'? ArrayBound*
 
 ObjectView =
   'view' ViewRef
@@ -4334,10 +4334,10 @@ DatabaseOptionTemplate =
   'template' '='? (Literal | 'default' | DatabaseRef)
 
 SetConfigParam =
-  'set' ConfigParameterRef ConfigAssignment
+  'set' (SetTimeZone | SetNames | (ConfigParameterRef ConfigAssignment))
 
 ResetConfigParam =
-  'reset' ('all' | ConfigParameterRef)
+  'reset' ResetTarget
 
 RefreshCollationVersion =
   'refresh' 'collation' 'version'
@@ -4381,6 +4381,7 @@ AlterSubscriptionAction =
 | SetPublication
 | DropSubscriptionPublication
 | RefreshPublication
+| RefreshSequences
 | EnableSubscription
 | DisableSubscription
 | SkipSubscription
@@ -4401,6 +4402,9 @@ DropSubscriptionPublication =
 
 RefreshPublication =
   'refresh' 'publication' WithParams?
+
+RefreshSequences =
+  'refresh' 'sequences'
 
 EnableSubscription =
   'enable'
@@ -4551,7 +4555,7 @@ AlterUserAction =
 | SetConfigParam
 
 AlterUserMapping =
-  'alter' 'user' 'mapping' 'for' RoleRef ServerClause AlterOptionList ';'?
+  'alter' 'user' 'mapping' 'for' UserMappingRole ServerClause AlterOptionList ';'?
 
 AlterView =
   'alter' 'view' IfExists? ViewRef action:AlterViewAction ';'?
@@ -5171,14 +5175,14 @@ PublicationForClause =
 | ForPublicationObjects
 
 ForAllPublicationObjects =
-  'for' (AllPublicationObject (',' AllPublicationObject)*) ExceptTableClause?
+  'for' (AllPublicationObject (',' AllPublicationObject)*)
 
 AllPublicationObject =
   AllPublicationTables
 | AllPublicationSequences
 
 AllPublicationTables =
-  'all' 'tables'
+  'all' 'tables' ExceptTableClause?
 
 AllPublicationSequences =
   'all' 'sequences'
@@ -5248,6 +5252,7 @@ RuleStmt =
 | Update
 | Delete
 | Notify
+| EmptyStmt
 
 CreateSequence =
   'create' Persistence? 'sequence' IfNotExists? Sequence
@@ -5566,6 +5571,7 @@ ExplainStmt =
 | Declare
 | CreateTableAs
 | CreateMaterializedView
+| Refresh
 
 ImportForeignSchema =
   'import' 'foreign' 'schema' SchemaRef
@@ -5849,6 +5855,7 @@ ResetSessionAuth =
 
 SetTransaction =
   'set'
+  SetScope?
   (
     SessionCharacteristics
   | TransactionModes
@@ -5901,7 +5908,7 @@ ReindexOptionConcurrently =
   'concurrently' (Literal | '#ident' | 'no' | 'yes')?
 
 ReindexOptionTablespace =
-  'tablespace' TablespaceRef
+  'tablespace' (TablespaceRef | Literal)
 
 ReindexOptionVerbose =
   'verbose' (Literal | '#ident' | 'no' | 'yes')?
@@ -5984,6 +5991,7 @@ ResetTarget =
 | ConfigParameterRef
 | ResetTimeZone
 | ResetTransactionIsolation
+| SessionAuthorization
 
 ResetTimeZone =
   'time' 'zone'
@@ -6257,7 +6265,7 @@ WhenCondition =
   'when' '(' Expr ')'
 
 FromTable =
-  'from' TableNameRef
+  'from' TableNameRef FromAlias?
 
 TriggerEventList =
   (TriggerEvent ('or' TriggerEvent)*)
@@ -6387,9 +6395,13 @@ LocalScope =
 SetTarget =
   SetCatalog
 | SetConfig
+| SetNames
 | SetSchemaValue
 | SetTimeZone
 | SetXmlOption
+
+SetNames =
+  'names' ('default' | Literal)?
 
 SetXmlOption =
   'xml' 'option' XmlDocumentOrContent
@@ -6486,7 +6498,7 @@ NotLeakproofFuncOption =
   'not' 'leakproof'
 
 ResetFuncOption =
-  'reset' ('all' | ConfigParameterRef)
+  'reset' ResetTarget
 
 ConfigParameterRef =
   PathRef
@@ -7032,6 +7044,7 @@ LockStrength =
 | ForKeyShare
 | ForShare
 | ForUpdate
+| ReadOnly
 
 FrameExtent =
   FrameBetween

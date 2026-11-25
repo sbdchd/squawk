@@ -36,3 +36,5 @@ reindex (
   /* after second comma */ verbose /* before verbose value */ no /* before right paren */
 )
   /* before target */ table /* before concurrently */ concurrently /* before table name */ public /* before dot */ . /* after dot */ records /* before semicolon */;
+
+reindex (tablespace 1) table x;

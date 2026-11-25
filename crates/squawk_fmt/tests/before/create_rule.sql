@@ -4,3 +4,5 @@ create or replace rule extraordinarily_long_rule_name_for_recording_all_account_
 
 -- comments in every position
 create /* or */ or /* replace */ replace /* rule */ rule /* name */ audit_change /* as */ as /* on */ on /* event */ update /* to */ to /* schema */ public /* dot */ . /* relation */ accounts /* where */ where /* left paren */ (/* condition */ old.owner_id is distinct from new.owner_id /* right paren */) /* do */ do /* instead */ instead /* action left */ (/* notify */ notify /* channel */ account_changes /* comma */, /* payload */ 'changed' /* first semicolon */; /* update */ update /* table */ audit_log /* set */ set /* column */ changed /* equals */ = /* value */ true /* second semicolon */; /* action right */) /* end */;
+
+create rule r as on insert to t do ( ; );

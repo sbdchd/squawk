@@ -1,0 +1,105 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/from_function_named_type_func_keyword.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          NAME_REF
+            LEFT_KW "left"
+          ARG_LIST
+            L_PAREN "("
+            ARG
+              LITERAL
+                STRING "'abc'"
+            COMMA ","
+            WHITESPACE " "
+            ARG
+              LITERAL
+                INT_NUMBER "2"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        RELATION_FROM_ITEM
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "t"
+        WHITESPACE " "
+        JOIN
+          NATURAL_KW "natural"
+          WHITESPACE " "
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          FUNCTION_FROM_ITEM
+            CALL_EXPR
+              NAME_REF
+                FULL_KW "full"
+              ARG_LIST
+                L_PAREN "("
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  MERGE
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    USING_ON_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          NAME_REF
+            IS_KW "is"
+          ARG_LIST
+            L_PAREN "("
+            R_PAREN ")"
+      WHITESPACE " "
+      ON_CLAUSE
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+    WHITESPACE " "
+    MERGE_WHEN_MATCHED
+      WHEN_KW "when"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE " "
+      MERGE_DELETE
+        DELETE_KW "delete"
+    SEMICOLON ";"
+  WHITESPACE "\n"

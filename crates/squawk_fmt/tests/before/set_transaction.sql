@@ -13,3 +13,7 @@ set session characteristics as transaction isolation level serializable, read wr
 SET /* before session */ SESSION /* before characteristics */ CHARACTERISTICS /* before as */ AS /* before transaction */ TRANSACTION /* before mode */ READ /* before write */ WRITE /* before semicolon */;
 
 SET /* before transaction */ TRANSACTION /* before snapshot */ SNAPSHOT /* before literal */ '00000003-0000001B-1' /* before semicolon */;
+
+set local session characteristics as transaction read only;
+
+set local transaction read only;

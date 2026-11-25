@@ -1849,15 +1849,10 @@ fn build_function_option<'a>(ctx: &Ctx, option: ast::FuncOption) -> Doc<'a> {
             }
             doc
         }
-        ast::FuncOption::ResetFuncOption(option) => {
-            let mut doc = Doc::text("reset");
-            if let Some(all) = option.all_token() {
-                doc = doc.append(space_before(&all)).append(Doc::text("all"));
-            } else {
-                doc = append_commented_path_ref(doc, option.config_parameter_ref());
-            }
-            doc
-        }
+        ast::FuncOption::ResetFuncOption(option) => option
+            .reset_target()
+            .map(|target| build_reset_keyword(&target))
+            .unwrap_or_else(|| Doc::text("reset")),
         ast::FuncOption::RowsFuncOption(option) => {
             build_literal_function_option("rows", option.literal())
         }
@@ -2179,6 +2174,10 @@ fn build_reindex_option<'a>(option: &ast::ReindexOption) -> Doc<'a> {
                 doc = doc
                     .append(space_before(tablespace.syntax()))
                     .append(build_name(tablespace.syntax()));
+            } else if let Some(literal) = option.literal() {
+                doc = doc
+                    .append(space_before(literal.syntax()))
+                    .append(build_literal(&literal));
             }
             doc.group()
         }
@@ -2275,23 +2274,29 @@ fn build_reindex_target_parts<'a>(
 fn build_reset<'a>(ctx: &Ctx, reset: &ast::Reset) -> Doc<'a> {
     let mut doc = Doc::text("reset");
     if let Some(target) = reset.reset_target() {
-        let target_doc = leading_comments(target.syntax()).append(match target {
-            ast::ResetTarget::All(target) => build_keyword_node(target.syntax()),
-            ast::ResetTarget::ConfigParameterRef(target) => {
-                if let Some(path) = target.path_ref() {
-                    build_path_ref(&path)
-                } else {
-                    Doc::nil()
-                }
-            }
-            ast::ResetTarget::ResetTimeZone(target) => build_keyword_node(target.syntax()),
-            ast::ResetTarget::ResetTransactionIsolation(target) => {
-                build_keyword_node(target.syntax())
-            }
-        });
-        doc = doc.append(Doc::line_or_space().append(target_doc).nest(ctx.indent));
+        doc = doc.append(
+            Doc::line_or_space()
+                .append(build_reset_target(&target))
+                .nest(ctx.indent),
+        );
     }
     doc.group().append(build_semicolon(reset.semicolon_token()))
+}
+
+fn build_reset_target<'a>(target: &ast::ResetTarget) -> Doc<'a> {
+    leading_comments(target.syntax()).append(match target {
+        ast::ResetTarget::ConfigParameterRef(target) => {
+            if let Some(path) = target.path_ref() {
+                build_path_ref(&path)
+            } else {
+                Doc::nil()
+            }
+        }
+        ast::ResetTarget::All(_)
+        | ast::ResetTarget::ResetTimeZone(_)
+        | ast::ResetTarget::ResetTransactionIsolation(_)
+        | ast::ResetTarget::SessionAuthorization(_) => build_keyword_node(target.syntax()),
+    })
 }
 
 fn build_load<'a>(ctx: &Ctx, load: &ast::Load) -> Doc<'a> {
@@ -4502,6 +4507,7 @@ fn build_rule_stmt<'a>(ctx: &Ctx, stmt: ast::RuleStmt) -> Doc<'a> {
         ast::RuleStmt::Notify(stmt) => build_notify(ctx, &stmt),
         ast::RuleStmt::Update(stmt) => build_update(ctx, &stmt),
         ast::RuleStmt::SelectVariant(stmt) => build_select_variant(ctx, stmt),
+        ast::RuleStmt::EmptyStmt(stmt) => build_empty_stmt(&stmt),
     }
 }
 
@@ -4684,7 +4690,9 @@ fn build_create_statistics<'a>(ctx: &Ctx, stmt: &ast::CreateStatistics) -> Doc<'
         });
     }
     if let Some(from) = stmt.from_table() {
-        doc = append_nested_node(ctx, doc, from, |from| build_statistics_from_table(&from));
+        doc = append_nested_node(ctx, doc, from, |from| {
+            build_statistics_from_table(ctx, &from)
+        });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -4707,14 +4715,14 @@ fn build_statistics_on_clause<'a>(ctx: &Ctx, on: &ast::StatisticsOnClause) -> Do
     doc.group()
 }
 
-fn build_statistics_from_table<'a>(from: &ast::FromTable) -> Doc<'a> {
+fn build_statistics_from_table<'a>(ctx: &Ctx, from: &ast::FromTable) -> Doc<'a> {
     let mut doc = build_keyword_tokens([(from.from_token(), "from")]);
     if let Some(table) = from.table_name_ref() {
         doc = doc
             .append(Doc::space())
             .append(build_extension_path_value(&table));
     }
-    doc
+    doc.append(build_from_alias(ctx, from.from_alias()))
 }
 
 fn build_create_tablespace<'a>(ctx: &Ctx, stmt: &ast::CreateTablespace) -> Doc<'a> {
@@ -6223,9 +6231,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
         ast::SecurityLabelObject::ObjectType(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.type_token(), "type")]),
-            node.type_name_ref()
-                .map(|name| build_extension_path_value(&name))
-                .unwrap_or_else(Doc::nil),
+            build_object_type_value(ctx, &node),
         ),
         ast::SecurityLabelObject::ObjectView(node) => append_nested_group(
             ctx,
@@ -6460,6 +6466,9 @@ fn build_transaction_mode_list<'a>(list: &ast::TransactionModeList) -> Doc<'a> {
 
 fn build_set_transaction<'a>(ctx: &Ctx, set: &ast::SetTransaction) -> Doc<'a> {
     let mut doc = Doc::text("set");
+    if let Some(scope) = set.set_scope() {
+        doc = append_nested_clause(ctx, doc, scope.syntax(), build_keyword_node(scope.syntax()));
+    }
     let body = if let Some(characteristics) = set.session_characteristics() {
         let mut body = Doc::text("session");
         for (token, keyword) in [
@@ -6561,6 +6570,7 @@ fn build_set_target<'a>(ctx: &Ctx, target: ast::SetTarget) -> Doc<'a> {
             build_set_literal_target("schema", target.literal())
         }
         ast::SetTarget::SetConfig(target) => build_set_config(ctx, &target),
+        ast::SetTarget::SetNames(target) => build_set_names(&target),
         ast::SetTarget::SetTimeZone(target) => build_set_time_zone(ctx, &target),
         ast::SetTarget::SetXmlOption(target) => build_set_xml_option(&target),
     }
@@ -6587,6 +6597,20 @@ fn build_set_xml_option<'a>(target: &ast::SetXmlOption) -> Doc<'a> {
         doc = doc
             .append(space_before(value.syntax()))
             .append(build_keyword_node(value.syntax()));
+    }
+    doc.group()
+}
+
+fn build_set_names<'a>(target: &ast::SetNames) -> Doc<'a> {
+    let mut doc = Doc::text("names");
+    if let Some(literal) = target.literal() {
+        doc = doc
+            .append(space_before(literal.syntax()))
+            .append(build_literal(&literal));
+    } else if let Some(default) = target.default_token() {
+        doc = doc
+            .append(space_before(&default))
+            .append(Doc::text("default"));
     }
     doc.group()
 }
@@ -6636,6 +6660,18 @@ fn build_set_config<'a>(ctx: &Ctx, set: &ast::SetConfig) -> Doc<'a> {
 
 fn build_set_config_param<'a>(ctx: &Ctx, set: &ast::SetConfigParam) -> Doc<'a> {
     let mut doc = Doc::text("set");
+    if let Some(time_zone) = set.set_time_zone() {
+        return doc
+            .append(space_before(time_zone.syntax()))
+            .append(build_set_time_zone(ctx, &time_zone))
+            .group();
+    }
+    if let Some(names) = set.set_names() {
+        return doc
+            .append(space_before(names.syntax()))
+            .append(build_set_names(&names))
+            .group();
+    }
     doc = append_commented_path_ref(doc, set.config_parameter_ref());
     if let Some(assignment) = set.config_assignment() {
         doc = doc
@@ -9236,13 +9272,10 @@ fn build_publication_for_clause<'a>(ctx: &Ctx, clause: ast::PublicationForClause
     match clause {
         ast::PublicationForClause::ForAllPublicationObjects(clause) => {
             let mut doc = Doc::text("for");
-            if let Some(objects) = build_all_publication_objects(clause.all_publication_objects()) {
+            if let Some(objects) =
+                build_all_publication_objects(ctx, clause.all_publication_objects())
+            {
                 doc = doc.append(Doc::line_or_space().append(objects).nest(ctx.indent));
-            }
-            if let Some(except) = clause.except_table_clause() {
-                doc = doc
-                    .append(line_before(except.syntax()))
-                    .append(build_except_table_clause(ctx, &except));
             }
             doc.group()
         }
@@ -9257,6 +9290,7 @@ fn build_publication_for_clause<'a>(ctx: &Ctx, clause: ast::PublicationForClause
 }
 
 fn build_all_publication_objects<'a>(
+    ctx: &Ctx,
     objects: impl Iterator<Item = ast::AllPublicationObject>,
 ) -> Option<Doc<'a>> {
     build_comma_separated_docs(objects.map(|object| {
@@ -9267,7 +9301,12 @@ fn build_all_publication_objects<'a>(
                 if let Some(token) = object.tables_token() {
                     doc = doc.append(space_before(&token)).append(Doc::text("tables"));
                 }
-                doc
+                if let Some(except) = object.except_table_clause() {
+                    doc = doc
+                        .append(line_before(except.syntax()))
+                        .append(build_except_table_clause(ctx, &except));
+                }
+                doc.group()
             }
             ast::AllPublicationObject::AllPublicationSequences(object) => {
                 let mut doc = Doc::text("all");
@@ -10945,10 +10984,10 @@ fn build_alter_user_mapping<'a>(ctx: &Ctx, stmt: &ast::AlterUserMapping) -> Doc<
             doc = doc.append(space_before(&token)).append(Doc::text(keyword));
         }
     }
-    if let Some(role) = stmt.role_ref() {
+    if let Some(role) = stmt.user_mapping_role() {
         doc = doc
             .append(space_before(role.syntax()))
-            .append(build_role_ref(&role));
+            .append(build_user_mapping_role(&role));
     }
     if let Some(server) = stmt.server_clause() {
         doc = append_nested_node(ctx, doc, server, |server| build_server_clause(&server));
@@ -12774,13 +12813,16 @@ fn build_alter_database_action<'a>(ctx: &Ctx, action: &ast::AlterDatabaseAction)
 }
 
 fn build_reset_config_param<'a>(action: &ast::ResetConfigParam) -> Doc<'a> {
-    let mut doc = Doc::text("reset");
-    if let Some(token) = action.all_token() {
-        doc = doc.append(space_before(&token)).append(Doc::text("all"));
-    } else {
-        doc = append_commented_path_ref(doc, action.config_parameter_ref());
-    }
-    doc
+    action
+        .reset_target()
+        .map(|target| build_reset_keyword(&target))
+        .unwrap_or_else(|| Doc::text("reset"))
+}
+
+fn build_reset_keyword<'a>(target: &ast::ResetTarget) -> Doc<'a> {
+    Doc::text("reset")
+        .append(Doc::space())
+        .append(build_reset_target(target))
 }
 
 fn build_set_tablespace<'a>(action: &ast::SetTablespace) -> Doc<'a> {
@@ -13302,6 +13344,22 @@ fn build_extension_member_value<'a>(ctx: &Ctx, prefix: Doc<'a>, value: Option<Do
     }
 }
 
+fn build_object_type_value<'a>(ctx: &Ctx, node: &ast::ObjectType) -> Doc<'a> {
+    let mut doc = node
+        .type_name_ref()
+        .map(|name| build_extension_path_value(&name))
+        .unwrap_or_else(Doc::nil);
+    if let Some(array) = node.array_token() {
+        doc = doc.append(space_before(&array)).append(Doc::text("array"));
+    }
+    for bound in node.array_bounds() {
+        doc = doc
+            .append(comments_before(bound.syntax()))
+            .append(build_array_bound(ctx, &bound));
+    }
+    doc
+}
+
 fn build_extension_path_value<'a>(node: &impl ast::HasPathRef) -> Doc<'a> {
     leading_comments(node.syntax()).append(
         node.path_ref()
@@ -13651,8 +13709,7 @@ fn build_extension_member_object<'a>(ctx: &Ctx, object: ast::ExtensionMemberObje
         ast::ExtensionMemberObject::ObjectType(node) => build_extension_member_value(
             ctx,
             build_keyword_tokens([(node.type_token(), "type")]),
-            node.type_name_ref()
-                .map(|name| build_extension_path_value(&name)),
+            Some(build_object_type_value(ctx, &node)),
         ),
         ast::ExtensionMemberObject::ObjectView(node) => build_extension_member_value(
             ctx,
@@ -13696,13 +13753,10 @@ fn build_alter_publication_action<'a>(ctx: &Ctx, action: ast::AlterPublicationAc
         }
         ast::AlterPublicationAction::SetAllPublicationObjectList(action) => {
             let mut doc = Doc::text("set");
-            if let Some(objects) = build_all_publication_objects(action.all_publication_objects()) {
+            if let Some(objects) =
+                build_all_publication_objects(ctx, action.all_publication_objects())
+            {
                 doc = doc.append(Doc::line_or_space().append(objects).nest(ctx.indent));
-            }
-            if let Some(except) = action.except_table_clause() {
-                doc = doc
-                    .append(line_before(except.syntax()))
-                    .append(build_except_table_clause(ctx, &except));
             }
             doc.group()
         }
@@ -13891,6 +13945,7 @@ fn build_alter_subscription_action<'a>(ctx: &Ctx, action: ast::AlterSubscription
             }
             doc.group()
         }
+        ast::AlterSubscriptionAction::RefreshSequences(_) => Doc::text("refresh sequences"),
         ast::AlterSubscriptionAction::EnableSubscription(_) => Doc::text("enable"),
         ast::AlterSubscriptionAction::DisableSubscription(_) => Doc::text("disable"),
         ast::AlterSubscriptionAction::SkipSubscription(action) => {

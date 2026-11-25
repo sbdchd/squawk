@@ -1,0 +1,21 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/explain_refresh_materialized_view.sql
+---
+SOURCE_FILE
+  EXPLAIN
+    EXPLAIN_KW "explain"
+    WHITESPACE " "
+    REFRESH
+      REFRESH_KW "refresh"
+      WHITESPACE " "
+      MATERIALIZED_KW "materialized"
+      WHITESPACE " "
+      VIEW_KW "view"
+      WHITESPACE " "
+      VIEW_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "m"
+      SEMICOLON ";"
+  WHITESPACE "\n"

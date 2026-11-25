@@ -418,7 +418,8 @@ SOURCE_FILE@0..1001
       RESET_FUNC_OPTION@870..879
         RESET_KW@870..875 "reset"
         WHITESPACE@875..876 " "
-        ALL_KW@876..879 "all"
+        ALL@876..879
+          ALL_KW@876..879 "all"
     SEMICOLON@879..880 ";"
   WHITESPACE@880..882 "\n\n"
   COMMENT@882..917 "-- the routine body i ..."

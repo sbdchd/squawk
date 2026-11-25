@@ -1,0 +1,45 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/user_mapping_user.sql
+---
+SOURCE_FILE
+  ALTER_USER_MAPPING
+    ALTER_KW "alter"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    MAPPING_KW "mapping"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    USER_MAPPING_ROLE
+      USER_KW "user"
+    WHITESPACE " "
+    SERVER_CLAUSE
+      SERVER_KW "server"
+      WHITESPACE " "
+      SERVER_REF
+        IDENT "s"
+    WHITESPACE " "
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ADD_FOREIGN_OPTION
+        FOREIGN_OPTION_NAME
+          IDENT "x"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_USER
+    CREATE_KW "create"
+    WHITESPACE " "
+    USER_KW "user"
+    WHITESPACE " "
+    ROLE
+      MAPPING_KW "mapping"
+    SEMICOLON ";"
+  WHITESPACE "\n"

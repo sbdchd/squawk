@@ -49,3 +49,7 @@ set an_intentionally_long_config_namespace.an_intentionally_long_config_group.an
 SET /* before time */ TIME /* before zone */ ZONE /* before timezone value */ DEFAULT /* before timezone semicolon */;
 
 SET /* before xml */ XML /* before option */ OPTION /* before document */ DOCUMENT /* before xml semicolon */;
+
+set names 'utf8';
+
+set names default;

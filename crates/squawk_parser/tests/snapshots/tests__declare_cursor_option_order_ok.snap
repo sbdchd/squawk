@@ -1,0 +1,30 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/declare_cursor_option_order.sql
+---
+SOURCE_FILE
+  DECLARE
+    DECLARE_KW "declare"
+    WHITESPACE " "
+    CURSOR
+      IDENT "c"
+    WHITESPACE " "
+    INSENSITIVE
+      INSENSITIVE_KW "insensitive"
+    WHITESPACE " "
+    BINARY_KW "binary"
+    WHITESPACE " "
+    CURSOR_KW "cursor"
+    WHITESPACE " "
+    FOR_KW "for"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            LITERAL
+              INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"

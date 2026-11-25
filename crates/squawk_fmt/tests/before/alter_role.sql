@@ -7,3 +7,7 @@ alter role current_user rename /* to */ to /* target */ renamed_user;
 alter role r "reset" /* parameter */ param;
 
 alter role all reset /* all */ all;
+
+alter role x reset session authorization;
+
+alter role x reset transaction isolation level;

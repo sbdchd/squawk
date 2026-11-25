@@ -1,4 +1,4 @@
-create publication everything for all tables, all sequences except (table audit.secret_events, internal_jobs) with (publish = 'insert, update, delete, truncate', publish_via_partition_root = true);
+create publication everything for all tables except (table audit.secret_events, internal_jobs), all sequences with (publish = 'insert, update, delete, truncate', publish_via_partition_root = true);
 
 create publication selected_tables for table only public.accounts (id, email) where (id > 100), table (public.orders)*, tables in schema reporting where (tenant_id = 42), current_schema;
 

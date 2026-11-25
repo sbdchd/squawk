@@ -1,0 +1,202 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/keyword_names.sql
+---
+SOURCE_FILE
+  SELECT_INTO
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    INTO_CLAUSE
+      INTO_KW "into"
+      WHITESPACE " "
+      TABLE_NAME
+        PATH
+          PATH_SEGMENT
+            TEMP_KW "temp"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_INDEX
+    CREATE_KW "create"
+    WHITESPACE " "
+    INDEX_KW "index"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    PARTITION_ITEM_LIST
+      L_PAREN "("
+      PARTITION_ITEM
+        NAME_REF
+          IDENT "x"
+        WHITESPACE " "
+        OP_CLASS_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              BETWEEN_KW "between"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  FETCH
+    FETCH_KW "fetch"
+    WHITESPACE " "
+    LITERAL
+      INT_NUMBER "1"
+    WHITESPACE " "
+    CURSOR_REF
+      ESCAPE_KW "escape"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  RESET
+    RESET_KW "reset"
+    WHITESPACE " "
+    CONFIG_PARAMETER_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          TIME_KW "time"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SHOW
+    SHOW_KW "show"
+    WHITESPACE " "
+    CONFIG_PARAMETER_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          SESSION_KW "session"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  REVOKE
+    REVOKE_KW "revoke"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        ROLE_REF
+          ROLE_NAME_REF
+            INHERIT_KW "inherit"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_TABLE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "x"
+    COMMA ","
+    WHITESPACE " "
+    TABLE_NAME_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          RESTRICT_KW "restrict"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          INT_KW "int"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "''"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DELETE
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    USING_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+        WHITESPACE " "
+        TABLESAMPLE_CLAUSE
+          TABLESAMPLE_KW "tablesample"
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              OPERATOR_KW "operator"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        ONLY_KW "only"
+        WHITESPACE " "
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              TREAT_KW "treat"
+    SEMICOLON ";"
+  WHITESPACE "\n"
