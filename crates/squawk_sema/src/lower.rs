@@ -103,7 +103,7 @@ impl Lowerer {
             aggregate_calls: vec![],
             outer_aggregates: vec![],
             srf_calls: vec![],
-            array_cast: false,
+            array_cast: ArrayCast::None,
             foreign_keys: vec![],
             pending_foreign_keys: vec![],
             generated_refs: vec![],
@@ -417,7 +417,7 @@ pub(crate) struct Lowerer {
     aggregate_calls: Vec<AggregateCall>,
     outer_aggregates: Vec<usize>,
     srf_calls: Vec<SrfCall>,
-    array_cast: bool,
+    array_cast: ArrayCast,
     foreign_keys: Vec<ForeignKey>,
     pending_foreign_keys: Vec<PendingForeignKey>,
     generated_refs: Vec<GeneratedRefs>,
@@ -508,6 +508,17 @@ enum ConstraintPass {
 struct ReservedConstraintName {
     name: Name,
     pass: ConstraintPass,
+}
+
+#[derive(Clone, Copy, Default, PartialEq, Eq)]
+enum ArrayCast {
+    #[default]
+    None,
+    Unknown,
+    Array {
+        array: Ty,
+        element: Ty,
+    },
 }
 
 struct InsertValue {
@@ -725,6 +736,17 @@ impl TypeLookup {
 }
 
 const MAX_CANDIDATES: usize = 5;
+
+fn param_types_match<'a>(
+    mut params: impl Iterator<Item = &'a Param>,
+    arg_types: &[Option<Ty>],
+) -> bool {
+    arg_types.iter().all(|arg_type| {
+        params
+            .next()
+            .is_some_and(|param| arg_type.is_none() || *arg_type == param.ty)
+    }) && params.next().is_none()
+}
 
 fn call_kind(kind: RoutineKind) -> FunctionKind {
     match kind {
@@ -1478,6 +1500,11 @@ impl Lowerer {
                         self.index.types[*target].name_ptr == self.index.types[ty].name_ptr
                     })
                 };
+                let is_constructor = |function: FunctionId| {
+                    targets.iter().any(|(_, target)| {
+                        self.index.types[*target].ptr == self.index.functions[function].ptr
+                    })
+                };
                 let blocked =
                     self.type_dependents(*ty)
                         .into_iter()
@@ -1487,8 +1514,11 @@ impl Lowerer {
                                 self.index.constraints[constraint].owner,
                                 ConstraintOwner::Domain(domain) if is_target(domain)
                             ),
-                            Object::Function(_)
-                            | Object::ColumnExpr(_)
+                            Object::Function(function) => {
+                                !is_constructor(function)
+                                    || !self.dependents(Object::Function(function)).is_empty()
+                            }
+                            Object::ColumnExpr(_)
                             | Object::OperatorFamilyMember(_)
                             | Object::Table(_)
                             | Object::Trigger(_)
@@ -2413,7 +2443,11 @@ impl Lowerer {
                     let path = column.path_ref()?;
                     let segment = path.segment()?;
                     let table = self
-                        .lower_qualified_column_ref(&path, TableLookup::TableOrForeignTable)
+                        .lower_qualified_column_ref(
+                            &path,
+                            TableLookup::TableOrForeignTable,
+                            IfMissing::Error,
+                        )
                         .table?;
                     Some(SequenceOwner {
                         table,
@@ -2443,6 +2477,7 @@ impl Lowerer {
         &mut self,
         path: &ast::PathRef,
         lookup: TableLookup,
+        if_missing: IfMissing,
     ) -> QualifiedColumn {
         let Some(segment) = path.segment() else {
             return QualifiedColumn {
@@ -2455,7 +2490,7 @@ impl Lowerer {
             && self.find_composite_type(&qualifier).is_some()
         {
             let ty = self.lower_type_path_ref(&qualifier, IfMissing::Error, None);
-            let column = self.lower_type_attribute_ref(ty, &segment, IfMissing::Error);
+            let column = self.lower_type_attribute_ref(ty, &segment, if_missing);
             return QualifiedColumn {
                 table: None,
                 column,
@@ -2463,7 +2498,7 @@ impl Lowerer {
         }
         let table = path
             .qualifier()
-            .and_then(|table| self.lower_table_ref(&table, IfMissing::Error, lookup));
+            .and_then(|table| self.lower_table_ref(&table, if_missing, lookup));
         let name = self.intern(&segment.text());
         let column = table.and_then(|table| self.find_table_column(table, name));
         let resolution = match (table, column) {
@@ -2471,7 +2506,10 @@ impl Lowerer {
                 source: None,
                 column,
             },
-            (Some(table), None) if self.index.tables[table].columns.complete => {
+            (Some(table), None)
+                if self.index.tables[table].columns.complete
+                    && matches!(if_missing, IfMissing::Error) =>
+            {
                 let Table {
                     name: relation,
                     columns,
@@ -4815,10 +4853,11 @@ impl Lowerer {
         if_missing: IfMissing,
         role_refs: ast::AstChildren<ast::RoleRef>,
     ) {
-        for role_ref in role_refs {
-            if let Some(role) = self.lower_role_ref(&role_ref, if_missing) {
-                self.drop_role(role);
-            }
+        let roles: SmallVec<[RoleId; 4]> = role_refs
+            .filter_map(|role_ref| self.lower_role_ref(&role_ref, if_missing))
+            .collect();
+        for role in roles {
+            self.drop_role(role);
         }
     }
 
@@ -5159,6 +5198,30 @@ impl Lowerer {
     ) -> Option<AccessMethodId> {
         let access_method_ref = using_method.access_method_ref()?;
         self.lower_access_method_ref(&access_method_ref, Some(kind), IfMissing::Error)
+    }
+
+    fn lower_index_method_ref(
+        &mut self,
+        access_method_ref: &ast::AccessMethodRef,
+    ) -> Option<AccessMethodId> {
+        let name = self.intern(&access_method_ref.text());
+        if self.index.names.resolve(name) == "rtree" && self.find_access_method(name).is_none() {
+            let gist = self.intern("gist");
+            let access_method = self.find_access_method(gist);
+            let resolution = access_method.map_or(Resolution::Unresolved, Resolution::AccessMethod);
+            self.add_ref(
+                name,
+                ReferenceKind::AccessMethod,
+                access_method_ref.syntax(),
+                resolution,
+            );
+            return access_method;
+        }
+        self.lower_access_method_ref(
+            access_method_ref,
+            Some(AccessMethodKind::Index),
+            IfMissing::Error,
+        )
     }
 
     fn lower_access_method_ref(
@@ -6145,7 +6208,7 @@ impl Lowerer {
     ) -> Option<OperatorFamilyId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let family = self
             .search_path(schema, Lookup::OperatorClass)
             .find_map(|schema| self.find_operator_family_in(schema, name, access_method));
@@ -6171,7 +6234,7 @@ impl Lowerer {
     ) -> Option<OperatorClassId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let class = self
             .search_path(schema, Lookup::OperatorClass)
             .find_map(|schema| self.find_operator_class_in(schema, name, access_method));
@@ -6456,7 +6519,7 @@ impl Lowerer {
     ) -> Option<StatisticsId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let statistics = self
             .search_path(schema, Lookup::Statistics)
             .find_map(|schema| self.find_statistics_in(schema, name));
@@ -6922,7 +6985,7 @@ impl Lowerer {
     ) -> Option<TextSearchId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let text_search = self
             .search_path(schema, Lookup::TextSearch)
             .find_map(|schema| self.find_text_search_in(kind, schema, name));
@@ -8313,7 +8376,7 @@ impl Lowerer {
     ) -> Option<ConversionId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let conversion = self
             .search_path(schema, Lookup::Conversion)
             .find_map(|schema| self.find_conversion_in(schema, name));
@@ -9700,6 +9763,9 @@ impl Lowerer {
             let Some(id) = self.lower_operator_ref(&op, left, right, if_missing) else {
                 continue;
             };
+            if left == Operand::Unknown || right == Operand::Unknown {
+                continue;
+            }
             if cascade {
                 self.drop_operator_with_dependents(id);
             } else if self.dependents(Object::Operator(id)).is_empty() {
@@ -9858,7 +9924,8 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> Option<OperatorId> {
         let path = op.path_ref();
-        let schema = self.lower_schema_qualifier(path.as_ref().and_then(|path| path.qualifier()));
+        let schema = self
+            .lower_schema_qualifier_or(path.as_ref().and_then(|path| path.qualifier()), if_missing);
         let range = op.operator_range();
         let text = op.operator_text();
         self.add_operator_ref(range, schema, &text, left, right, if_missing)
@@ -10147,16 +10214,16 @@ impl Lowerer {
         drop: Option<DropRoutine>,
     ) -> Option<FunctionId> {
         let segment = path.segment()?;
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let name = self.intern(&segment.text());
         let resolution = match param_list {
             Some(param_list) => {
                 let mut arg_types: SmallVec<[Option<Ty>; 4]> = SmallVec::new();
                 let mut missing = false;
                 for param in param_list.params() {
-                    let ty = param
-                        .func_type()
-                        .map_or(TypeLookup::Unknown, |ty| self.lower_func_type_lookup(&ty));
+                    let ty = param.func_type().map_or(TypeLookup::Unknown, |ty| {
+                        self.lower_func_type_lookup(&ty, if_missing)
+                    });
                     missing |= matches!(ty, TypeLookup::Missing);
                     if !matches!(param.mode(), Some(ast::ParamMode::ParamOut(_))) {
                         arg_types.push(ty.ty());
@@ -10167,9 +10234,9 @@ impl Lowerer {
                     .iter()
                     .flat_map(|order_by| order_by.params())
                 {
-                    let ty = param
-                        .func_type()
-                        .map_or(TypeLookup::Unknown, |ty| self.lower_func_type_lookup(&ty));
+                    let ty = param.func_type().map_or(TypeLookup::Unknown, |ty| {
+                        self.lower_func_type_lookup(&ty, if_missing)
+                    });
                     missing |= matches!(ty, TypeLookup::Missing);
                     arg_types.push(ty.ty());
                 }
@@ -10191,10 +10258,23 @@ impl Lowerer {
                             &segment, schema, name, aggregate, drop,
                         );
                     }
-                    match function {
-                        Some(function) => Some(Resolution::Function(function)),
-                        None if matches!(if_missing, IfMissing::Error)
-                            && arg_types.iter().all(Option::is_some) =>
+                    let procedure = self.find_procedure_with_all_arg_types(
+                        schema,
+                        name,
+                        kind,
+                        &param_list,
+                        &arg_types,
+                    );
+                    match (function, procedure) {
+                        (Some(function), Some(procedure)) if function != procedure => {
+                            Some(Resolution::Ambiguous)
+                        }
+                        (Some(function), _) | (None, Some(function)) => {
+                            Some(Resolution::Function(function))
+                        }
+                        (None, None)
+                            if matches!(if_missing, IfMissing::Error)
+                                && arg_types.iter().all(Option::is_some) =>
                         {
                             let start = self.index.errors.args.next_idx();
                             for ty in arg_types.iter().flatten() {
@@ -10228,7 +10308,7 @@ impl Lowerer {
                             );
                             Some(Resolution::Unknown)
                         }
-                        None => None,
+                        (None, None) => None,
                     }
                 }
             }
@@ -10270,6 +10350,26 @@ impl Lowerer {
     ) -> Option<FunctionId> {
         self.find_function_by(schema, name, |function| {
             kind.matches(function.kind) && self.has_arg_types(function, arg_types)
+        })
+    }
+
+    fn find_procedure_with_all_arg_types(
+        &self,
+        schema: Option<Name>,
+        name: Name,
+        kind: RoutineKind,
+        param_list: &ast::ParamList,
+        arg_types: &[Option<Ty>],
+    ) -> Option<FunctionId> {
+        match kind {
+            RoutineKind::Procedure | RoutineKind::Routine => {}
+            RoutineKind::Function | RoutineKind::Aggregate => return None,
+        }
+        if param_list.params().any(|param| param.mode().is_some()) {
+            return None;
+        }
+        self.find_function_by(schema, name, |function| {
+            function.kind == FunctionKind::Procedure && self.has_all_arg_types(function, arg_types)
         })
     }
 
@@ -10594,7 +10694,7 @@ impl Lowerer {
         } = self.index.functions[function];
         if self
             .find_function_by(Some(schema), name, |function| {
-                self.same_signature((function.kind, function.params), (kind, params))
+                self.same_signature(function.params, params)
             })
             .is_some()
         {
@@ -10690,16 +10790,17 @@ impl Lowerer {
     }
 
     fn has_arg_types(&self, function: &Function, arg_types: &[Option<Ty>]) -> bool {
-        let mut inputs = function
+        let inputs = function
             .params
             .iter()
             .map(|id| &self.index.params[id])
             .filter(|param| param.mode != ParamMode::Out);
-        arg_types.iter().all(|arg_type| {
-            inputs
-                .next()
-                .is_some_and(|param| arg_type.is_none() || *arg_type == param.ty)
-        }) && inputs.next().is_none()
+        param_types_match(inputs, arg_types)
+    }
+
+    fn has_all_arg_types(&self, function: &Function, arg_types: &[Option<Ty>]) -> bool {
+        let params = function.params.iter().map(|id| &self.index.params[id]);
+        param_types_match(params, arg_types)
     }
 
     fn lower_database_options(&mut self, options: &ast::DatabaseOptionList) {
@@ -10815,8 +10916,11 @@ impl Lowerer {
             let Some(path) = parent.path_ref() else {
                 continue;
             };
-            let Some(parent) = self.lower_table_ref(&path, IfMissing::Error, TableLookup::Table)
-            else {
+            let lookup = match inheritance_kind {
+                InheritanceKind::Inherits => TableLookup::TableOrForeignTable,
+                InheritanceKind::Partition => TableLookup::Table,
+            };
+            let Some(parent) = self.lower_table_ref(&path, IfMissing::Error, lookup) else {
                 complete = false;
                 continue;
             };
@@ -11979,8 +12083,77 @@ impl Lowerer {
         );
         types.set_category(range, category, preferred, collatable);
         if let Some(multirange_name) = multirange_name {
-            self.alloc_multirange_type(range, multirange_name);
+            let multirange = self.alloc_multirange_type(range, multirange_name);
+            if self.file_id != FileId::Builtins.into()
+                && let Some(segment) = path.segment()
+            {
+                self.alloc_range_constructors(
+                    range,
+                    multirange,
+                    subtype,
+                    create_type.syntax(),
+                    &segment,
+                );
+            }
         }
+    }
+
+    fn alloc_range_constructors(
+        &mut self,
+        range: TypeId,
+        multirange: TypeId,
+        subtype: Option<Ty>,
+        node: &SyntaxNode,
+        segment: &ast::PathSegment,
+    ) {
+        let range_ty = Some(Ty::Type(range));
+        let array = Some(Ty::Type(range).array());
+        let text = self.builtin_type("text");
+        let ptr = self.ptr(node);
+        let param = |mode, ty| Param {
+            name: None,
+            mode,
+            ty,
+            has_default: false,
+            ptr,
+            name_ptr: None,
+        };
+        let bound = || param(ParamMode::In, subtype);
+        let flags = param(ParamMode::In, text);
+        let element = param(ParamMode::In, range_ty);
+        let elements = param(ParamMode::Variadic, array);
+        self.alloc_type_constructor(range, [bound(), bound()], node, segment);
+        self.alloc_type_constructor(range, [bound(), bound(), flags], node, segment);
+        self.alloc_type_constructor(multirange, [], node, segment);
+        self.alloc_type_constructor(multirange, [element], node, segment);
+        self.alloc_type_constructor(multirange, [elements], node, segment);
+    }
+
+    fn alloc_type_constructor(
+        &mut self,
+        ty: TypeId,
+        params: impl IntoIterator<Item = Param>,
+        node: &SyntaxNode,
+        segment: &ast::PathSegment,
+    ) {
+        let params = self.index.params.alloc_many(params);
+        let Type { schema, name, .. } = self.index.types[ty];
+        let function = self.index.functions.alloc(Function {
+            kind: FunctionKind::Function,
+            window: false,
+            schema,
+            name,
+            ptr: self.ptr(node),
+            name_ptr: self.ast_ptr(segment),
+            params,
+            aggregate_kind: None,
+            ret: Some(Ty::Type(ty)),
+            returns: ReturnKind::Single,
+            columns: None,
+        });
+        self.index.set_param_function(params, function);
+        self.dependencies
+            .add_dependency(Object::Function(function), Object::Type(ty));
     }
 
     fn generated_subscript_results(&mut self, node: &SyntaxNode) -> Option<SubscriptResults> {
@@ -13659,7 +13832,7 @@ impl Lowerer {
                         if_missing,
                     ),
                     None => {
-                        let schema = self.lower_schema_qualifier(qualifier);
+                        let schema = self.lower_schema_qualifier_or(qualifier, if_missing);
                         self.lookup_type_name(segment.syntax(), schema, &segment.text(), if_missing)
                     }
                 };
@@ -13710,6 +13883,7 @@ impl Lowerer {
             Some(TypeMatch::Array(owner)) => (owner.resolution(), true),
             None => (Resolution::Unresolved, false),
         };
+        let missing = resolution == Resolution::Unresolved;
         let resolution = match (resolution, if_missing) {
             (Resolution::Unresolved, IfMissing::Ignore) => Resolution::Unknown,
             (resolution, IfMissing::Error | IfMissing::Ignore) => resolution,
@@ -13724,10 +13898,12 @@ impl Lowerer {
                 candidates: TypeCandidates::TypeName,
             },
         );
+        if missing {
+            return TypeLookup::Missing;
+        }
         match resolution {
             Resolution::Type(ty) => found(Ty::Type(ty)),
             Resolution::Table(table) => found(Ty::Table(table)),
-            Resolution::Unresolved => TypeLookup::Missing,
             Resolution::Column { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
@@ -13769,6 +13945,7 @@ impl Lowerer {
             | Resolution::Extension(_)
             | Resolution::Operator(_)
             | Resolution::Unknown
+            | Resolution::Unresolved
             | Resolution::Ambiguous => TypeLookup::Unknown,
         }
     }
@@ -13798,23 +13975,35 @@ impl Lowerer {
     }
 
     fn lower_func_type(&mut self, func_type: &ast::FuncType) -> Option<Ty> {
-        self.lower_func_type_lookup(func_type).ty()
+        self.lower_func_type_lookup(func_type, IfMissing::Error)
+            .ty()
     }
 
-    fn lower_func_type_lookup(&mut self, func_type: &ast::FuncType) -> TypeLookup {
+    fn lower_func_type_lookup(
+        &mut self,
+        func_type: &ast::FuncType,
+        if_missing: IfMissing,
+    ) -> TypeLookup {
         match func_type {
-            ast::FuncType::Type(ty) => self.lower_type_lookup(ty, IfMissing::Error),
-            ast::FuncType::PercentType(percent_type) => match self.percent_type(percent_type) {
-                Some(ty) => TypeLookup::Found(ty),
-                None => TypeLookup::Unknown,
-            },
+            ast::FuncType::Type(ty) => self.lower_type_lookup(ty, if_missing),
+            ast::FuncType::PercentType(percent_type) => {
+                match self.percent_type(percent_type, if_missing) {
+                    Some(ty) => TypeLookup::Found(ty),
+                    None if matches!(if_missing, IfMissing::Ignore) => TypeLookup::Missing,
+                    None => TypeLookup::Unknown,
+                }
+            }
         }
     }
 
-    fn percent_type(&mut self, percent_type: &ast::PercentType) -> Option<Ty> {
+    fn percent_type(
+        &mut self,
+        percent_type: &ast::PercentType,
+        if_missing: IfMissing,
+    ) -> Option<Ty> {
         let path = percent_type.path_ref()?;
         let column = self
-            .lower_qualified_column_ref(&path, TableLookup::Any)
+            .lower_qualified_column_ref(&path, TableLookup::Any, if_missing)
             .column?;
         let ty = self.index.columns[column].ty?;
         if percent_type.array_token().is_some() || percent_type.array_bounds().next().is_some() {
@@ -13832,7 +14021,7 @@ impl Lowerer {
     ) -> Option<TypeId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let found = self
             .search_path(schema, Lookup::Type)
             .find_map(|schema| self.find_type_in(schema, name));
@@ -14321,8 +14510,16 @@ impl Lowerer {
     }
 
     fn lower_schema_qualifier(&mut self, qualifier: Option<ast::PathRef>) -> Option<Name> {
+        self.lower_schema_qualifier_or(qualifier, IfMissing::Error)
+    }
+
+    fn lower_schema_qualifier_or(
+        &mut self,
+        qualifier: Option<ast::PathRef>,
+        if_missing: IfMissing,
+    ) -> Option<Name> {
         let segment = qualifier?.segment()?;
-        Some(self.lower_schema_ref(segment.syntax(), &segment.text()))
+        Some(self.lower_schema_ref_or(segment.syntax(), &segment.text(), if_missing))
     }
 
     fn lower_set_schema_ref(&mut self, schema_ref: &ast::SchemaRef) -> Option<Name> {
@@ -14331,10 +14528,21 @@ impl Lowerer {
     }
 
     fn lower_schema_ref(&mut self, node: &SyntaxNode, text: &str) -> Name {
+        self.lower_schema_ref_or(node, text, IfMissing::Error)
+    }
+
+    fn lower_schema_ref_or(
+        &mut self,
+        node: &SyntaxNode,
+        text: &str,
+        if_missing: IfMissing,
+    ) -> Name {
         let name = self.intern_schema(text);
-        let resolution = self
-            .find_schema(name)
-            .map_or(Resolution::Unresolved, Resolution::Schema);
+        let resolution = match (self.find_schema(name), if_missing) {
+            (Some(schema), _) => Resolution::Schema(schema),
+            (None, IfMissing::Ignore) => Resolution::Unknown,
+            (None, IfMissing::Error) => Resolution::Unresolved,
+        };
         self.add_ref(name, ReferenceKind::Schema, node, resolution);
         name
     }
@@ -14354,22 +14562,16 @@ impl Lowerer {
             .unwrap_or(self.public)
     }
 
-    fn same_signature(
-        &self,
-        a: (FunctionKind, IdxRange<Param>),
-        b: (FunctionKind, IdxRange<Param>),
-    ) -> bool {
-        let signature_types = |(kind, params): (FunctionKind, IdxRange<Param>)| {
+    fn same_signature(&self, a: IdxRange<Param>, b: IdxRange<Param>) -> bool {
+        let input_types = |params: IdxRange<Param>| {
             params
                 .iter()
                 .map(|id| &self.index.params[id])
-                .filter(move |param| {
-                    kind == FunctionKind::Procedure || param.mode != ParamMode::Out
-                })
+                .filter(|param| param.mode != ParamMode::Out)
                 .map(|param| param.ty)
         };
-        let mut a = signature_types(a);
-        let mut b = signature_types(b);
+        let mut a = input_types(a);
+        let mut b = input_types(b);
         loop {
             match (a.next(), b.next()) {
                 (None, None) => return true,
@@ -15492,6 +15694,69 @@ impl Lowerer {
             ast::SelectVariant::CompoundSelect(_)
             | ast::SelectVariant::SelectInto(_)
             | ast::SelectVariant::Table(_) => {}
+        }
+    }
+
+    fn array_cast_target(&self, ty: Option<Ty>) -> ArrayCast {
+        let Some(array) = ty.and_then(|ty| self.index.base_type(ty)) else {
+            return ArrayCast::Unknown;
+        };
+        match self.index.element_type(array) {
+            Some(element) => ArrayCast::Array { array, element },
+            None => ArrayCast::None,
+        }
+    }
+
+    fn lower_cast_array_elements(&mut self, array: &ast::ArrayExpr, target: Ty, element: Ty) {
+        let mut multidimensional = false;
+        let mut types: SmallVec<[Option<Ty>; 8]> = SmallVec::new();
+        for expr in array.exprs() {
+            if is_array_literal(&expr) {
+                self.array_cast = ArrayCast::Array {
+                    array: target,
+                    element,
+                };
+            }
+            let ty = self.lower_expr(&expr);
+            self.array_cast = ArrayCast::None;
+            multidimensional |= ty.is_some_and(|ty| self.is_subarray(ty));
+            types.push(ty);
+        }
+        let element = if multidimensional { target } else { element };
+        for (expr, source) in array.exprs().zip(types) {
+            if expr.is_unknown_literal() {
+                self.record_unknown_literal(&expr, element);
+            } else if let Some(source) = source {
+                self.check_explicit_cast(source, element, expr.syntax());
+            }
+        }
+    }
+
+    fn is_subarray(&self, ty: Ty) -> bool {
+        match ty {
+            Ty::Array(_) => true,
+            Ty::Type(id) => {
+                self.index.element_type(ty).is_some()
+                    && !(self.index.types[id].schema == self.pg_catalog
+                        && matches!(
+                            self.index.names.resolve(self.index.types[id].name),
+                            "int2vector" | "oidvector"
+                        ))
+            }
+            Ty::Table(_) | Ty::Cte(_) => false,
+        }
+    }
+
+    fn check_explicit_cast(&mut self, source: Ty, target: Ty, node: &SyntaxNode) {
+        let coercion = self
+            .overloads()
+            .coercion(source, target, CastContext::Explicit);
+        if coercion == Coercion::No {
+            let error = SemaError::CannotCast {
+                source: self.index.ty_name(source),
+                target: self.index.ty_name(target),
+            };
+            self.push_error(node, error);
         }
     }
 
@@ -17715,7 +17980,7 @@ impl Lowerer {
     ) -> Option<TableId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let found = self.find_table(schema, name);
         if found.is_none()
             && matches!(lookup, TableLookup::CopyTo | TableLookup::CopyFrom)
@@ -18986,7 +19251,9 @@ impl Lowerer {
         let refs = self.index.references.next_idx();
         let start = self.index.indexes.next_idx();
         let access_method = match create_index.using_method() {
-            Some(using_method) => self.lower_using_method(&using_method, AccessMethodKind::Index),
+            Some(using_method) => using_method
+                .access_method_ref()
+                .and_then(|method| self.lower_index_method_ref(&method)),
             None => {
                 let btree = self.intern("btree");
                 self.find_access_method(btree)
@@ -19413,7 +19680,7 @@ impl Lowerer {
         let path = relation_name_ref.path_ref()?;
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let table = self.find_table(schema, name);
         let resolution = match (table, if_missing) {
             (Some(table), _) => Resolution::Table(table),
@@ -20245,7 +20512,7 @@ impl Lowerer {
             }
             ast::CommentObject::ObjectColumn(object) => {
                 if let Some(path) = object.name().and_then(|name| name.path_ref()) {
-                    self.lower_qualified_column_ref(&path, TableLookup::Any);
+                    self.lower_qualified_column_ref(&path, TableLookup::Any, IfMissing::Error);
                 }
                 None
             }
@@ -20772,7 +21039,7 @@ impl Lowerer {
     fn lower_index_ref(&mut self, path: &ast::PathRef, if_missing: IfMissing) -> Option<IndexId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let index = self.find_index(schema, name);
         let resolution = match index {
             Some(index) => Resolution::Index(index),
@@ -20915,12 +21182,17 @@ impl Lowerer {
     ) -> Option<CollationId> {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier(path.qualifier());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let collation = self
             .search_path(schema, Lookup::Collation)
             .find_map(|schema| self.find_collation_in(schema, name));
         let resolution = match collation {
             Some(collation) => Resolution::Collation(collation),
+            None if schema.is_none_or(|schema| schema == self.pg_catalog)
+                && self.index.names.resolve(name).ends_with("-x-icu") =>
+            {
+                Resolution::Unknown
+            }
             None => match if_missing {
                 IfMissing::Ignore => Resolution::Unknown,
                 IfMissing::Error => Resolution::Unresolved,
@@ -22131,11 +22403,7 @@ impl Lowerer {
             .constraint_index_method()
             .and_then(|method| method.access_method_ref())
         {
-            Some(access_method_ref) => self.lower_access_method_ref(
-                &access_method_ref,
-                Some(AccessMethodKind::Index),
-                IfMissing::Error,
-            ),
+            Some(access_method_ref) => self.lower_index_method_ref(&access_method_ref),
             None => {
                 let btree = self.intern("btree");
                 self.find_access_method(btree)
@@ -24088,17 +24356,29 @@ impl Lowerer {
             }
             ast::Expr::ArrayExpr(array) => {
                 let array_cast = std::mem::take(&mut self.array_cast);
-                if !array_cast && array.select_variant().is_none() && array.exprs().next().is_none()
+                if array_cast == ArrayCast::None
+                    && array.select_variant().is_none()
+                    && array.exprs().next().is_none()
                 {
                     self.push_error(array.syntax(), SemaError::EmptyArrayType { cast: None });
                 }
                 let mut element = None;
                 let mut common = CommonType::new(ArgType::UnknownLiteral);
+                if let ArrayCast::Array {
+                    array: target,
+                    element,
+                } = array_cast
+                    && array.select_variant().is_none()
+                {
+                    self.lower_cast_array_elements(array, target, element);
+                    return Some(target);
+                }
                 for expr in array.exprs() {
-                    self.array_cast =
-                        array_cast && matches!(expr.unparen(), ast::Expr::ArrayExpr(_));
+                    if is_array_literal(&expr) {
+                        self.array_cast = array_cast;
+                    }
                     let ty = self.lower_expr(&expr);
-                    self.array_cast = false;
+                    self.array_cast = ArrayCast::None;
                     common.push(&self.overloads(), expr_arg_type(Some(&expr), ty));
                     element = element.or(ty);
                 }
@@ -24305,28 +24585,16 @@ impl Lowerer {
                 }
                 let ty = cast.ty().and_then(|ty| self.lower_type(&ty));
                 if let Some(expr) = cast.expr() {
-                    self.array_cast = matches!(expr.unparen(), ast::Expr::ArrayExpr(_))
-                        && ty.is_none_or(|ty| {
-                            self.index
-                                .base_type(ty)
-                                .is_none_or(|ty| matches!(ty, Ty::Array(_)))
-                        });
+                    if is_array_literal(&expr) {
+                        self.array_cast = self.array_cast_target(ty);
+                    }
                     let source = self.lower_expr(&expr);
-                    self.array_cast = false;
+                    self.array_cast = ArrayCast::None;
                     if let Some(source) = source
                         && let Some(target) = ty
                         && !expr.is_unknown_literal()
                     {
-                        let coercion =
-                            self.overloads()
-                                .coercion(source, target, CastContext::Explicit);
-                        if coercion == Coercion::No {
-                            let error = SemaError::CannotCast {
-                                source: self.index.ty_name(source),
-                                target: self.index.ty_name(target),
-                            };
-                            self.push_error(cast.syntax(), error);
-                        }
+                        self.check_explicit_cast(source, target, cast.syntax());
                     }
                 }
                 self.lower_exprs(cast.literal().map(ast::Expr::Literal));
@@ -26602,6 +26870,7 @@ impl Lowerer {
             self.pg_catalog,
             self.builtin_types,
             &self.dropped_casts,
+            &self.inheritances,
         )
     }
 
@@ -27685,7 +27954,11 @@ impl Lowerer {
         id
     }
 
-    fn alloc_multirange_type(&mut self, range_id: TypeId, multirange_name: MultirangeName) {
+    fn alloc_multirange_type(
+        &mut self,
+        range_id: TypeId,
+        multirange_name: MultirangeName,
+    ) -> TypeId {
         let range = &self.index.types[range_id];
         let (ptr, name_ptr, range_schema) = (range.ptr, range.name_ptr, range.schema);
         let range_name = range.name;
@@ -27726,7 +27999,7 @@ impl Lowerer {
                 array_name,
             },
             &self.index.columns,
-        );
+        )
     }
 
     fn subscripted(&self, ty: Ty, slice: bool) -> Option<Ty> {
@@ -27849,7 +28122,7 @@ impl Lowerer {
         }
         let mut replaced = None;
         if let Some(existing) = self.find_function_by(Some(schema), name, |function| {
-            self.same_signature((function.kind, function.params), (kind, params))
+            self.same_signature(function.params, params)
         }) {
             match if_exists {
                 IfExists::Error => {
@@ -29003,6 +29276,10 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => false,
     }
+}
+
+fn is_array_literal(expr: &ast::Expr) -> bool {
+    matches!(expr.unparen(), ast::Expr::ArrayExpr(array) if array.select_variant().is_none())
 }
 
 fn index_column_names(create_index: &ast::CreateIndex) -> String {

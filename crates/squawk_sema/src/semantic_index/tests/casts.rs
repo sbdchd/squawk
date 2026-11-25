@@ -422,3 +422,48 @@ select array_length(treat(1 as int4[]), 1);
       ╰ hint: consider adding explicit type casts
     ");
 }
+
+#[test]
+fn array_literal_elements() {
+    assert_snapshot!(check("
+create table base (i int);
+create table derived () inherits (base);
+create table other (i int);
+create domain bd as base[];
+select array[derived]::base[] from derived;
+select cast(array[array[derived]] as base[]) from derived;
+select array[derived]::bd from derived;
+select array[(array[derived])]::base[] from derived;
+select array[1]::int2vector;
+select array[]::int2vector;
+select array[array[]]::int[];
+select array[other]::base[] from other;
+select array[array[1], null]::point[];
+select array[(select array[1])]::point[];
+select array(select derived from derived)::base[];
+select array[]::point;
+"), @"
+    error: cannot cast type `other` to `base`
+       ╭▸ 
+    13 │ select array[other]::base[] from other;
+       ╰╴             ━━━━━
+    error: cannot cast type `int4` to `point`
+       ╭▸ 
+    14 │ select array[array[1], null]::point[];
+       ╰╴                   ━
+    error: cannot cast type `int4[]` to `point[]`
+       ╭▸ 
+    15 │ select array[(select array[1])]::point[];
+       ╰╴             ━━━━━━━━━━━━━━━━━
+    error: cannot cast type `derived[]` to `base[]`
+       ╭▸ 
+    16 │ select array(select derived from derived)::base[];
+       ╰╴       ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: cannot determine type of empty array
+       ╭▸ 
+    17 │ select array[]::point;
+       │        ━━━━━━━
+       │
+       ╰ hint: explicitly cast to the desired type, for example `array[]::integer[]`
+    ");
+}

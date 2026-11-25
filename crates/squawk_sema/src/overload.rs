@@ -2,6 +2,7 @@ use rustc_hash::FxHashSet;
 use smallvec::{SmallVec, smallvec};
 
 use crate::{
+    inheritance_graph::InheritanceGraph,
     interner::Name,
     ir::{
         CastContext, CastId, CastMethod, CastTypes, Function, FunctionId, FunctionKind, Operand,
@@ -227,6 +228,7 @@ pub(crate) struct Overloads<'a> {
     pg_catalog: Name,
     builtin_types: BuiltinTypes,
     dropped_casts: &'a FxHashSet<CastId>,
+    inheritances: &'a InheritanceGraph,
 }
 
 impl<'a> Overloads<'a> {
@@ -235,12 +237,14 @@ impl<'a> Overloads<'a> {
         pg_catalog: Name,
         builtin_types: BuiltinTypes,
         dropped_casts: &'a FxHashSet<CastId>,
+        inheritances: &'a InheritanceGraph,
     ) -> Overloads<'a> {
         Overloads {
             index,
             pg_catalog,
             builtin_types,
             dropped_casts,
+            inheritances,
         }
     }
 
@@ -264,9 +268,29 @@ impl<'a> Overloads<'a> {
             {
                 continue;
             }
+            if let Some(other) = viable.iter_mut().find(|other| {
+                other.params == candidate.params && other.params.iter().all(Option::is_some)
+            }) {
+                let existing = &self.index.functions[other.id];
+                let existing_expanded = self.expands_variadic(existing, args);
+                if existing_expanded != self.expands_variadic(function, args) {
+                    if existing_expanded && existing.schema == function.schema {
+                        *other = candidate;
+                    }
+                    continue;
+                }
+            }
             viable.push(candidate);
         }
         self.choose(viable, args, Resolution::Function)
+    }
+
+    fn expands_variadic(&self, function: &Function, args: &[CallArg]) -> bool {
+        !args.iter().any(|arg| arg.variadic)
+            && self
+                .inputs(function)
+                .last()
+                .is_some_and(|param| param.mode == ParamMode::Variadic)
     }
 
     pub(crate) fn select_operator(
@@ -520,7 +544,7 @@ impl<'a> Overloads<'a> {
         ]
         .into_iter()
         .filter(|(pseudo, _)| variadic == Some(*pseudo) || ret == Some(*pseudo))
-        .find_map(|(_, element)| element.filter(|element| self.is_array(*element)))
+        .find_map(|(_, element)| element.filter(|element| array_of(*element).is_none()))
     }
 
     pub(crate) fn return_type(&self, function: &Function, args: &[CallArg]) -> Option<Ty> {
@@ -599,13 +623,13 @@ impl<'a> Overloads<'a> {
         match pseudo {
             Pseudo::Any | Pseudo::Record => None,
             Pseudo::AnyElement | Pseudo::AnyNonArray | Pseudo::AnyEnum => solution.element,
-            Pseudo::AnyArray => solution.array.or_else(|| self.array_of(solution.element?)),
+            Pseudo::AnyArray => solution.array.or_else(|| array_of(solution.element?)),
             Pseudo::AnyRange => solution.range,
             Pseudo::AnyMultirange => solution
                 .multirange
                 .or_else(|| self.multirange_of(solution.range?)),
             Pseudo::AnyCompatible | Pseudo::AnyCompatibleNonArray => compatible(),
-            Pseudo::AnyCompatibleArray => self.array_of(compatible()?),
+            Pseudo::AnyCompatibleArray => array_of(compatible()?),
             Pseudo::AnyCompatibleRange => solution.compatible_range,
             Pseudo::AnyCompatibleMultirange => solution
                 .compatible_multirange
@@ -765,6 +789,9 @@ impl<'a> Overloads<'a> {
     }
 
     pub(crate) fn coercion(&self, source: Ty, target: Ty, context: CastContext) -> Coercion {
+        if self.inherits(source, target) {
+            return Coercion::Yes;
+        }
         match self.coercion_path(source, target, context) {
             CoercionPath::Relabel
             | CoercionPath::Function
@@ -875,7 +902,24 @@ impl<'a> Overloads<'a> {
         }
     }
 
+    fn inherits(&self, child: Ty, parent: Ty) -> bool {
+        let (Some(Ty::Table(child)), Ty::Table(parent)) = (self.index.base_type(child), parent)
+        else {
+            return false;
+        };
+        self.inheritances
+            .ancestors(child, |_| true)
+            .contains(&parent)
+    }
+
     fn coerce(&self, arg: Ty, param: Ty) -> Option<Match> {
+        if self.inherits(arg, param) {
+            return Some(Match::Implicit);
+        }
+        self.coerce_type(arg, param)
+    }
+
+    fn coerce_type(&self, arg: Ty, param: Ty) -> Option<Match> {
         if arg == param {
             return Some(Match::Exact);
         }
@@ -935,7 +979,7 @@ impl<'a> Overloads<'a> {
         }
         let arg_element = self.index.element_type(arg_base)?;
         let param_element = self.index.element_type(param_base)?;
-        match self.coerce(arg_element, param_element)? {
+        match self.coerce_type(arg_element, param_element)? {
             Match::Exact | Match::DomainBase | Match::Implicit => Some(Match::Implicit),
             Match::Uncertain => Some(Match::Uncertain),
             Match::Polymorphic | Match::UnknownLiteral => None,
@@ -1127,10 +1171,6 @@ impl<'a> Overloads<'a> {
         self.index
             .base_type(ty)
             .is_some_and(|base| self.type_kind(base) == Some(TypeKind::Enum))
-    }
-
-    fn array_of(&self, element: Ty) -> Option<Ty> {
-        (!self.is_array(element)).then(|| element.array())
     }
 
     fn multirange_of(&self, range: Ty) -> Option<Ty> {
@@ -1351,6 +1391,13 @@ fn retain_max<Id>(viable: &mut Viable<Id>, score: impl Fn(&Candidate<Id>) -> usi
         return;
     };
     viable.retain(|candidate| score(candidate) == max);
+}
+
+fn array_of(element: Ty) -> Option<Ty> {
+    match element {
+        Ty::Type(_) | Ty::Table(_) | Ty::Cte(_) => Some(element.array()),
+        Ty::Array(_) => None,
+    }
 }
 
 fn unify(slot: &mut Option<Ty>, ty: Ty) -> Option<()> {

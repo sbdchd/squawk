@@ -898,11 +898,11 @@ create function f(a int) returns int language sql as 'select 1';
 "), @"
     error: function `p` already exists with same argument types
       ╭▸ 
-    4 │ create procedure p(a int, out b int) language sql as 'select 1';
+    3 │ create procedure p(a int) language sql as 'select 1';
       ╰╴                 ━
     error: function `p` already exists with same argument types
       ╭▸ 
-    5 │ create procedure p(a int, inout b int) language sql as 'select 1';
+    4 │ create procedure p(a int, out b int) language sql as 'select 1';
       ╰╴                 ━
     error: function `f` already exists with same argument types
       ╭▸ 
@@ -1791,5 +1791,83 @@ create function g(t onek) returns int as $$ select t.nope; $$ language sql;
       ╭▸ 
     4 │ create function g(t onek) returns int as $$ select t.nope; $$ language sql;
       ╰╴                                                     ━━━━
+    ");
+}
+
+#[test]
+fn procedure_signature_lookup() {
+    assert_snapshot!(check("
+create procedure p(out a int, in b int)
+  language sql
+  as 'select 1';
+create procedure p(in a int, in b int)
+  language sql
+  as 'select 1';
+create or replace procedure p(in b int, out a int)
+  language sql
+  as 'select 1';
+drop procedure p(int, int);
+drop procedure p(out int, in int);
+drop procedure p(int, int);
+drop procedure p(int, int);
+create procedure q(out a int, in b int)
+  language sql
+  as 'select 1';
+drop routine q(int, int);
+create procedure r(out a int, in b int)
+  language sql
+  as 'select 1';
+drop procedure r(in int, in int);
+drop procedure r(int);
+create procedure u(out a int, in b int)
+  language sql
+  as 'select 1';
+create function u(b int) returns int
+  language sql
+  as 'select 1';
+"), @"
+    error: procedure `p` is not unique
+       ╭▸ 
+    11 │ drop procedure p(int, int);
+       ╰╴               ━
+    error: procedure `p(int4, int4)` does not exist
+       ╭▸ 
+    14 │ drop procedure p(int, int);
+       ╰╴               ━
+    error: procedure `r(int4, int4)` does not exist
+       ╭▸ 
+    22 │ drop procedure r(in int, in int);
+       ╰╴               ━
+    error: function `u` already exists with same argument types
+       ╭▸ 
+    27 │ create function u(b int) returns int
+       ╰╴                ━
+    ");
+}
+
+#[test]
+fn drop_if_exists_missing_arg_type() {
+    assert_snapshot!(check("
+create function foo(int) returns int
+  language sql
+  as 'select 1';
+drop function if exists foo(no_such_type);
+drop function if exists foo(no_such_type[]);
+select foo(1);
+drop aggregate if exists foo(no_such_type);
+drop aggregate if exists foo(int order by no_such_type);
+drop procedure if exists foo(no_such_type);
+drop routine if exists foo(no_such_type);
+drop function foo(no_such_type);
+alter function foo(no_such_type) immutable;
+"), @"
+    error: type `no_such_type` does not exist
+       ╭▸ 
+    12 │ drop function foo(no_such_type);
+       ╰╴                  ━━━━━━━━━━━━
+    error: type `no_such_type` does not exist
+       ╭▸ 
+    13 │ alter function foo(no_such_type) immutable;
+       ╰╴                   ━━━━━━━━━━━━
     ");
 }
