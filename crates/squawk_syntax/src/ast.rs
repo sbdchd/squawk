@@ -42,9 +42,9 @@ pub use self::node_ext::{
 pub use self::{
     generated::tokens::*,
     node_ext::{
-        BinOp, CastKind, FunctionLikeKeyword, InList, IntegerRadix, LitKind, OpSigOperand,
-        PartitionStrategyKind, PostfixOp, PrefixOp, RangeBoundKeyword, RoleKind, RuleEventKind,
-        SqlValueFunction, UnnestCall, VertexOrEdgeKind,
+        BinOp, CastKind, FunctionLikeKeyword, InList, IntegerRadix, IntervalFields, LitKind,
+        OpSigOperand, PartitionStrategyKind, PostfixOp, PrefixOp, RangeBoundKeyword, RoleKind,
+        RuleEventKind, SqlValueFunction, UnnestCall, VertexOrEdgeKind,
     },
     nodes::*,
     traits::{HasCreateTable, HasPathRef, HasSelectTail, HasWithClause, NameLike},

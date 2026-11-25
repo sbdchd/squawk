@@ -6,7 +6,7 @@ use crate::arena::{IdxRange, LayeredArena, LayeredMultimap};
 use crate::file::InIrFile;
 use crate::interner::{Name, QualifiedName};
 use crate::ir::{
-    Column, ColumnTypeRef, Columns, Subscript, Ty, Type, TypeCategory, TypeId, Typmod,
+    Column, ColumnType, ColumnTypeRef, Columns, Subscript, Ty, Type, TypeCategory, TypeId,
 };
 
 type NamePtr = InIrFile<SyntaxNodePtr>;
@@ -183,10 +183,11 @@ impl TypeIndex {
         }
     }
 
-    pub(crate) fn set_base(&mut self, id: TypeId, base: Option<Ty>, typmod: Option<Typmod>) {
+    pub(crate) fn set_base(&mut self, id: TypeId, base: ColumnType) {
         let ty = self.local_mut(id);
-        ty.base = base;
-        ty.typmod = typmod;
+        ty.base = base.ty;
+        ty.typmod = base.typmod;
+        ty.collation = base.collation;
     }
 
     pub(crate) fn set_element(&mut self, id: TypeId, element: Option<Ty>, subtype: Option<Ty>) {

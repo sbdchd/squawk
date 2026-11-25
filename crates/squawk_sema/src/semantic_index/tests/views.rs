@@ -468,6 +468,277 @@ select c from v;
 }
 
 #[test]
+fn create_or_replace_view_typmod_and_collation() {
+    assert_snapshot!(check(r#"
+create table t (
+  a varchar(10),
+  b text
+);
+create view v as
+  select a, b from t;
+create or replace view v as
+  select a::varchar(20), b from t;
+create or replace view v as
+  select a, b collate "C" from t;
+create or replace view v as
+  select a::varchar, b from t;
+create or replace view v as
+  select t.a, b collate "default" from t;
+create view w (x, y) as
+  select a, b from t;
+create or replace view w (x, y) as
+  select a::varchar(20), b from t;
+create or replace view w (x, y) as
+  select a, b collate "C" from t;
+create or replace view v as
+  select q.a, q.b from (select * from t) as q;
+"#), @r#"
+    error: cannot change type of view column `a` from `varchar(10)` to `varchar(20)`
+      ╭▸ 
+    9 │   select a::varchar(20), b from t;
+      ╰╴         ━
+    error: cannot change collation of view column `b` from `default` to `C`
+       ╭▸ 
+    11 │   select a, b collate "C" from t;
+       ╰╴            ━
+    error: cannot change type of view column `a` from `varchar(10)` to `varchar`
+       ╭▸ 
+    13 │   select a::varchar, b from t;
+       ╰╴         ━
+    error: cannot change type of view column `x` from `varchar(10)` to `varchar(20)`
+       ╭▸ 
+    18 │ create or replace view w (x, y) as
+       ╰╴                          ━
+    error: cannot change collation of view column `y` from `default` to `C`
+       ╭▸ 
+    20 │ create or replace view w (x, y) as
+       ╰╴                             ━
+    "#);
+}
+
+#[test]
+fn create_or_replace_view_typmods() {
+    assert_snapshot!(check("
+create type ct as (
+  f varchar(4)
+);
+create table t (
+  n numeric(5, 2),
+  c char,
+  b bit varying(4),
+  ts timestamp(3) with time zone,
+  i interval day to second(3),
+  arr varchar(3)[],
+  comp ct
+);
+create view v1 as
+  select n from t;
+create or replace view v1 as
+  select n + 1 as n from t;
+create or replace view v1 as
+  select round(n) as n from t;
+create or replace view v1 as
+  select n::numeric(5, 2) from t;
+create or replace view v1 as
+  select n::decimal(5, 2) from t;
+create view v2 as
+  select c from t;
+create or replace view v2 as
+  select c::char(1) from t;
+create or replace view v2 as
+  select c::bpchar from t;
+create view v3 as
+  select b from t;
+create or replace view v3 as
+  select b::varbit(5) as b from t;
+create view v4 as
+  select ts from t;
+create or replace view v4 as
+  select ts::timestamptz(3) from t;
+create or replace view v4 as
+  select ts::timestamptz from t;
+create view v5 as
+  select i from t;
+create or replace view v5 as
+  select i::interval from t;
+create or replace view v5 as
+  select i::interval(3) from t;
+create or replace view v5 as
+  select i::interval day to second(3) from t;
+create or replace view v5 as
+  select interval '1' day as i from t;
+create view v6 as
+  select arr from t;
+create or replace view v6 as
+  select arr::varchar(4)[] from t;
+create view v7 as
+  select (comp).f from t;
+create or replace view v7 as
+  select (comp).f::varchar(5) as f from t;
+"), @"
+    error: cannot change type of view column `n` from `numeric(5, 2)` to `numeric`
+       ╭▸ 
+    17 │   select n + 1 as n from t;
+       ╰╴                  ━
+    error: cannot change type of view column `n` from `numeric(5, 2)` to `numeric`
+       ╭▸ 
+    19 │   select round(n) as n from t;
+       ╰╴                     ━
+    error: cannot change type of view column `c` from `bpchar(1)` to `bpchar`
+       ╭▸ 
+    29 │   select c::bpchar from t;
+       ╰╴         ━
+    error: cannot change type of view column `b` from `varbit(4)` to `varbit(5)`
+       ╭▸ 
+    33 │   select b::varbit(5) as b from t;
+       ╰╴                         ━
+    error: cannot change type of view column `ts` from `timestamptz(3)` to `timestamptz`
+       ╭▸ 
+    39 │   select ts::timestamptz from t;
+       ╰╴         ━━
+    error: cannot change type of view column `i` from `interval day to second(3)` to `interval`
+       ╭▸ 
+    43 │   select i::interval from t;
+       ╰╴         ━
+    error: cannot change type of view column `i` from `interval day to second(3)` to `interval(3)`
+       ╭▸ 
+    45 │   select i::interval(3) from t;
+       ╰╴         ━
+    error: cannot change type of view column `i` from `interval day to second(3)` to `interval day`
+       ╭▸ 
+    49 │   select interval '1' day as i from t;
+       ╰╴                             ━
+    error: cannot change type of view column `arr` from `varchar(3)[]` to `varchar(4)[]`
+       ╭▸ 
+    53 │   select arr::varchar(4)[] from t;
+       ╰╴         ━━━
+    error: cannot change type of view column `f` from `varchar(4)` to `varchar(5)`
+       ╭▸ 
+    57 │   select (comp).f::varchar(5) as f from t;
+       ╰╴                                 ━
+    ");
+}
+
+#[test]
+fn create_or_replace_view_combined_typmods() {
+    assert_snapshot!(check("
+create table t (
+  a varchar(10),
+  n numeric(5, 2)
+);
+create table u (
+  a varchar(20),
+  n numeric(5, 2)
+);
+create view v1 as
+  select a, n from t join u using (a, n);
+create or replace view v1 as
+  select a::varchar, n from t;
+create or replace view v1 as
+  select a, n from t;
+create view v2 as
+  select a from t union select a from u;
+create or replace view v2 as
+  select a::varchar from t;
+create or replace view v2 as
+  select a from t;
+create view v3 as
+  select coalesce(a, 'x') as a from t;
+create or replace view v3 as
+  select a from t;
+create view v4 as
+  select a from t;
+alter table u alter column a type varchar(10);
+create or replace view v4 as
+  select a from u;
+"), @"
+    error: cannot change type of view column `a` from `varchar` to `varchar(10)`
+       ╭▸ 
+    15 │   select a, n from t;
+       ╰╴         ━
+    error: cannot change type of view column `a` from `varchar` to `varchar(10)`
+       ╭▸ 
+    21 │   select a from t;
+       ╰╴         ━
+    ");
+}
+
+#[test]
+fn create_or_replace_view_collations() {
+    assert_snapshot!(check(r#"
+create schema s;
+create collation s.c1 (
+  locale = 'C'
+);
+create domain d as text collate "C";
+create table t (
+  a text,
+  b text collate "C",
+  n name,
+  d d,
+  o text collate s.c1
+);
+create view v1 as
+  select a, b, n, d, o from t;
+create or replace view v1 as
+  select a, b, n, d, o from t;
+create or replace view v1 as
+  select a, b::text, n, d, o from t;
+create view v2 as
+  select b::varchar as b from t;
+create or replace view v2 as
+  select (b collate "C")::varchar as b from t;
+create or replace view v2 as
+  select a::varchar as b from t;
+create view v3 as
+  select n from t;
+create or replace view v3 as
+  select n collate "C" from t;
+create or replace view v3 as
+  select n collate "default" from t;
+create view v4 as
+  select d::text as x from t;
+create or replace view v4 as
+  select 'x'::text as x;
+create view v5 as
+  select a || b as x from t;
+create or replace view v5 as
+  select b as x from t;
+create view v6 as
+  select o from t;
+alter collation s.c1 rename to c2;
+create or replace view v6 as
+  select o collate s.c2 from t;
+create view v7 as
+  select 1::text as x;
+create or replace view v7 as
+  select a as x from t;
+alter table t add column z text collate "POSIX";
+create view v8 as
+  select z from t;
+create or replace view v8 as
+  select a as z from t;
+"#), @r#"
+    error: cannot change collation of view column `b` from `C` to `default`
+       ╭▸ 
+    25 │   select a::varchar as b from t;
+       ╰╴                       ━
+    error: cannot change collation of view column `n` from `C` to `default`
+       ╭▸ 
+    31 │   select n collate "default" from t;
+       ╰╴         ━
+    error: cannot change collation of view column `x` from `C` to `default`
+       ╭▸ 
+    35 │   select 'x'::text as x;
+       ╰╴                      ━
+    error: cannot change collation of view column `z` from `POSIX` to `default`
+       ╭▸ 
+    53 │   select a as z from t;
+       ╰╴              ━
+    "#);
+}
+
+#[test]
 fn create_or_replace_view_rename_qualified() {
     assert_snapshot!(check("
 create schema s;
