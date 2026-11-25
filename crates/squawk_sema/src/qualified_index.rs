@@ -1,18 +1,21 @@
 use std::ops::Index;
 
 use la_arena::Idx;
+use smallvec::SmallVec;
 
 use crate::arena::{IdxRange, LayeredArena, LayeredMultimap};
 use crate::interner::{Name, QualifiedName};
 use crate::ir::{
     Collation, Conversion, Function, FunctionId, Operator, OperatorClass, OperatorFamily,
-    OperatorId, Statistics, TextSearch, Ty,
+    OperatorId, Statistics, Table, TextSearch, Ty,
 };
 
 pub trait Qualified {
     fn name(&self) -> Name;
 
     fn schema(&self) -> Name;
+
+    fn name_mut(&mut self) -> &mut Name;
 
     fn schema_mut(&mut self) -> &mut Name;
 }
@@ -72,37 +75,49 @@ impl<T: Qualified> QualifiedIndex<T> {
         self.arena.range_from(start)
     }
 
+    pub(crate) fn is_local(&self, id: Idx<T>) -> bool {
+        self.arena.is_local(id)
+    }
+
+    pub(crate) fn local_mut(&mut self, id: Idx<T>) -> &mut T {
+        &mut self.arena[id]
+    }
+
     pub(crate) fn set_schema(&mut self, id: Idx<T>, schema: Name) -> bool {
         if !self.arena.is_local(id) {
             return false;
         }
-        self.move_schema(id, schema);
+        let name = self.arena[id].name();
+        self.requalify(id, QualifiedName { schema, name });
         true
     }
 
+    pub(crate) fn take_schema(&mut self, schema: Name) -> SmallVec<[Idx<T>; 1]> {
+        self.by_schema.take(schema)
+    }
+
     pub(crate) fn rename_schema(&mut self, from: Name, to: Name) {
-        for id in self.by_schema.take(from) {
-            self.move_schema(id, to);
+        for id in self.take_schema(from) {
+            let name = self.arena[id].name();
+            self.requalify(id, QualifiedName { schema: to, name });
         }
     }
 
-    fn move_schema(&mut self, id: Idx<T>, schema: Name) {
+    pub(crate) fn requalify(&mut self, id: Idx<T>, current: QualifiedName) -> QualifiedName {
         let value = &mut self.arena[id];
-        let name = value.name();
-        let previous = std::mem::replace(value.schema_mut(), schema);
-        if previous == schema {
-            return;
+        let previous = QualifiedName {
+            schema: std::mem::replace(value.schema_mut(), current.schema),
+            name: std::mem::replace(value.name_mut(), current.name),
+        };
+        if previous != current {
+            self.by_name.remove(previous, id);
+            self.by_name.insert(current, id);
         }
-        self.by_name.remove(
-            QualifiedName {
-                schema: previous,
-                name,
-            },
-            id,
-        );
-        self.by_name.insert(QualifiedName { schema, name }, id);
-        self.by_schema.remove(previous, id);
-        self.by_schema.insert(schema, id);
+        if previous.schema != current.schema {
+            self.by_schema.remove(previous.schema, id);
+            self.by_schema.insert(current.schema, id);
+        }
+        previous
     }
 
     pub(crate) fn shrink_to_fit(&mut self) {
@@ -156,6 +171,10 @@ macro_rules! qualified {
                     self.schema
                 }
 
+                fn name_mut(&mut self) -> &mut Name {
+                    &mut self.name
+                }
+
                 fn schema_mut(&mut self) -> &mut Name {
                     &mut self.schema
                 }
@@ -168,9 +187,11 @@ qualified!(
     Collation,
     Conversion,
     Function,
+    crate::ir::Index,
     Operator,
     OperatorClass,
     OperatorFamily,
     Statistics,
+    Table,
     TextSearch,
 );

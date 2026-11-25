@@ -5,37 +5,27 @@ use crate::arena::{IdxRange, LayeredArena, LayeredMultimap};
 use crate::file::InIrFile;
 use crate::interner::{Name, QualifiedName};
 use crate::ir::{Index, IndexId, TableId};
+use crate::qualified_index::QualifiedIndex;
 
 #[derive(Debug, Default)]
 pub struct IndexIndex {
-    arena: LayeredArena<Index>,
+    indexes: QualifiedIndex<Index>,
     keys: LayeredArena<Name>,
-    by_name: LayeredMultimap<QualifiedName, IndexId>,
-    by_schema: LayeredMultimap<Name, IndexId>,
     by_table: LayeredMultimap<TableId, IndexId>,
 }
 
 impl IndexIndex {
     pub(crate) fn on_top_of(base: &'static IndexIndex) -> Self {
         IndexIndex {
-            arena: LayeredArena::on_top_of(&base.arena),
+            indexes: QualifiedIndex::on_top_of(&base.indexes),
             keys: LayeredArena::on_top_of(&base.keys),
-            by_name: LayeredMultimap::on_top_of(&base.by_name),
-            by_schema: LayeredMultimap::on_top_of(&base.by_schema),
             by_table: LayeredMultimap::on_top_of(&base.by_table),
         }
     }
 
     pub(crate) fn alloc(&mut self, index: Index) -> IndexId {
-        let Index {
-            schema,
-            name,
-            table,
-            ..
-        } = index;
-        let id = self.arena.alloc(index);
-        self.by_name.insert(QualifiedName { schema, name }, id);
-        self.by_schema.insert(schema, id);
+        let table = index.table;
+        let id = self.indexes.alloc(index);
         if let Some(table) = table {
             self.by_table.insert(table, id);
         }
@@ -65,7 +55,7 @@ impl IndexIndex {
     }
 
     pub(crate) fn key(&self, id: IndexId) -> Option<impl Iterator<Item = Name> + '_> {
-        let key = self.arena[id].key?;
+        let key = self.indexes[id].key?;
         Some(key.iter().map(|column| self.keys[column]))
     }
 
@@ -74,30 +64,30 @@ impl IndexIndex {
         id: IndexId,
         key: Option<IdxRange<Name>>,
     ) -> Option<IdxRange<Name>> {
-        std::mem::replace(&mut self.local_mut(id).key, key)
+        std::mem::replace(&mut self.indexes.local_mut(id).key, key)
     }
 
     pub(crate) fn columns(&self, id: IndexId) -> impl Iterator<Item = Name> + '_ {
-        self.arena[id]
+        self.indexes[id]
             .columns
             .iter()
             .map(|column| self.keys[column])
     }
 
     pub(crate) fn set_columns(&mut self, id: IndexId, columns: IdxRange<Name>) -> IdxRange<Name> {
-        std::mem::replace(&mut self.local_mut(id).columns, columns)
+        std::mem::replace(&mut self.indexes.local_mut(id).columns, columns)
     }
 
     pub(crate) fn set_parent(&mut self, id: IndexId, parent: Option<IndexId>) -> Option<IndexId> {
-        std::mem::replace(&mut self.local_mut(id).parent, parent)
+        std::mem::replace(&mut self.indexes.local_mut(id).parent, parent)
     }
 
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = IndexId> + '_ {
-        self.by_name.get(QualifiedName { schema, name })
+        self.indexes.named(schema, name)
     }
 
     pub(crate) fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = IndexId> + '_ {
-        self.by_schema.get(schema)
+        self.indexes.in_schema(schema)
     }
 
     pub(crate) fn on_table(&self, table: TableId) -> SmallVec<[IndexId; 4]> {
@@ -105,15 +95,15 @@ impl IndexIndex {
     }
 
     pub(crate) fn next_idx(&self) -> IndexId {
-        self.arena.next_idx()
+        self.indexes.next_idx()
     }
 
     pub(crate) fn range_from(&self, start: IndexId) -> IdxRange<Index> {
-        self.arena.range_from(start)
+        self.indexes.range_from(start)
     }
 
     pub(crate) fn is_local(&self, id: IndexId) -> bool {
-        self.arena.is_local(id)
+        self.indexes.is_local(id)
     }
 
     pub(crate) fn move_to(
@@ -123,54 +113,21 @@ impl IndexIndex {
         name: Name,
         name_ptr: InIrFile<SyntaxNodePtr>,
     ) {
-        self.local_mut(id).name_ptr = name_ptr;
-        self.requalify(id, QualifiedName { schema, name });
+        self.indexes.local_mut(id).name_ptr = name_ptr;
+        self.indexes.requalify(id, QualifiedName { schema, name });
     }
 
     pub(crate) fn set_schema(&mut self, id: IndexId, schema: Name) -> bool {
-        let Some(index) = self.arena.get_local_mut(id) else {
-            return false;
-        };
-        let name = index.name;
-        self.requalify(id, QualifiedName { schema, name });
-        true
+        self.indexes.set_schema(id, schema)
     }
 
     pub(crate) fn rename_schema(&mut self, from: Name, to: Name) {
-        for id in self.by_schema.take(from) {
-            let name = self.arena[id].name;
-            self.requalify(id, QualifiedName { schema: to, name });
-        }
-    }
-
-    fn requalify(&mut self, id: IndexId, current: QualifiedName) {
-        let index = self.local_mut(id);
-        let previous = QualifiedName {
-            schema: std::mem::replace(&mut index.schema, current.schema),
-            name: std::mem::replace(&mut index.name, current.name),
-        };
-        if previous == current {
-            return;
-        }
-        self.by_name.remove(previous, id);
-        self.by_name.insert(current, id);
-        if previous.schema != current.schema {
-            self.by_schema.remove(previous.schema, id);
-            self.by_schema.insert(current.schema, id);
-        }
-    }
-
-    fn local_mut(&mut self, id: IndexId) -> &mut Index {
-        self.arena
-            .get_local_mut(id)
-            .expect("base layer is immutable")
+        self.indexes.rename_schema(from, to);
     }
 
     pub(crate) fn shrink_to_fit(&mut self) {
-        self.arena.shrink_to_fit();
+        self.indexes.shrink_to_fit();
         self.keys.shrink_to_fit();
-        self.by_name.shrink_to_fit();
-        self.by_schema.shrink_to_fit();
         self.by_table.shrink_to_fit();
     }
 }
@@ -179,6 +136,6 @@ impl std::ops::Index<IndexId> for IndexIndex {
     type Output = Index;
 
     fn index(&self, id: IndexId) -> &Index {
-        &self.arena[id]
+        &self.indexes[id]
     }
 }
