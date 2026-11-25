@@ -1118,3 +1118,77 @@ alter table p6 alter column a type text;
        ╰ note: key columns `a` and `a` are of incompatible types: `text` and `int4`
     ");
 }
+
+#[test]
+fn check_constraint_name_with_field_selection() {
+    assert_snapshot!(check("
+create type attbl as (
+  a int,
+  b int
+);
+create table atref (b attbl check ((b).a is not null));
+alter table atref drop constraint atref_b_check;
+create table two (
+  b attbl,
+  c attbl,
+  check ((b).a = (c).a),
+  check ((b).a = (b).b)
+);
+alter table two drop constraint two_check;
+alter table two drop constraint two_b_check;
+alter table two drop constraint two_c_check;
+"), @"
+    error: constraint `two_c_check` does not exist
+       ╭▸ 
+    16 │ alter table two drop constraint two_c_check;
+       ╰╴                                ━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn not_null_constraint_name_collision() {
+    assert_snapshot!(check("
+create table t (
+  col integer not null,
+  constraint t_col_not_null check (col is not null)
+);
+alter table t drop constraint t_col_not_null1;
+create table u (
+  a int primary key,
+  b int,
+  constraint u_a_not_null check (a > 0),
+  constraint u_pkey check (b > 0)
+);
+alter index u_pkey1 rename to renamed;
+create table v (
+  a int references u,
+  b int constraint v_a_fkey unique
+);
+alter table v drop constraint v_a_fkey1;
+create table w (
+  a int check (a > 0),
+  constraint w_a_check check (a > 1)
+);
+create table x (
+  a int not null,
+  b int constraint x_a_not_null not null
+);
+create table y (
+  a int not null,
+  b int constraint y_a_not_null unique
+);
+"), @"
+    error: constraint `w_a_check` for relation `w` already exists
+       ╭▸ 
+    21 │   constraint w_a_check check (a > 1)
+       ╰╴             ━━━━━━━━━
+    error: constraint `x_a_not_null` for relation `x` already exists
+       ╭▸ 
+    25 │   b int constraint x_a_not_null not null
+       ╰╴                   ━━━━━━━━━━━━
+    error: constraint `y_a_not_null` for relation `y` already exists
+       ╭▸ 
+    29 │   b int constraint y_a_not_null unique
+       ╰╴                   ━━━━━━━━━━━━
+    ");
+}

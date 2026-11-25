@@ -395,3 +395,23 @@ alter foreign table ft rename to ft2;
 select b from ft2;
 "), @"no diagnostics");
 }
+
+#[test]
+fn drop_fdw_cascade_drops_servers() {
+    assert_snapshot!(check("
+create foreign data wrapper foo;
+create server s1 foreign data wrapper foo;
+drop foreign data wrapper foo cascade;
+create foreign data wrapper foo;
+create server s1 foreign data wrapper foo;
+alter foreign data wrapper foo rename to bar;
+alter server s1 rename to s2;
+drop foreign data wrapper bar cascade;
+create server s2 foreign data wrapper nope;
+"), @"
+    error: foreign-data wrapper `nope` does not exist
+       ╭▸ 
+    10 │ create server s2 foreign data wrapper nope;
+       ╰╴                                      ━━━━
+    ");
+}

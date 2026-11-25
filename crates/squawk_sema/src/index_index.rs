@@ -88,6 +88,10 @@ impl IndexIndex {
         std::mem::replace(&mut self.local_mut(id).columns, columns)
     }
 
+    pub(crate) fn set_parent(&mut self, id: IndexId, parent: Option<IndexId>) -> Option<IndexId> {
+        std::mem::replace(&mut self.local_mut(id).parent, parent)
+    }
+
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = IndexId> + '_ {
         self.by_name.get(QualifiedName { schema, name })
     }

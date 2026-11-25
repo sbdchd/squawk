@@ -1322,3 +1322,29 @@ insert into t (a) (values ('1'), ('1000'));
       ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
     ");
 }
+
+#[test]
+fn on_conflict_index_collation_and_op_class() {
+    assert_snapshot!(check(r#"
+create table t (n char(4));
+create unique index on t (n collate "C" bpchar_pattern_ops);
+insert into t values ('a') on conflict (n) do nothing;
+alter index t_n_idx rename to x;
+create table tt (n text);
+create unique index on tt ((n collate "C"));
+insert into tt values ('a') on conflict (n) do nothing;
+alter index tt_n_idx rename to x2;
+create table ttt (
+  n text,
+  m text
+);
+create unique index on ttt ((n || m) collate "C");
+insert into ttt values ('a') on conflict (n) do nothing;
+create table fk (a text references tt (n));
+"#), @"
+    error: there is no unique or exclusion constraint matching the `on conflict` specification
+       ╭▸ 
+    15 │ insert into ttt values ('a') on conflict (n) do nothing;
+       ╰╴                                         ━━━
+    ");
+}
