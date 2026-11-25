@@ -60,13 +60,10 @@ pub(super) fn rewrite_normalize_as_function_call(
 
 fn normal_form(expr: &ast::Expr) -> Option<(squawk_rowan::TextRange, String)> {
     let name = expr.as_name_ref()?;
-    let token = name.syntax().first_token()?;
-    if !matches!(
-        token.kind(),
-        SyntaxKind::NFC_KW | SyntaxKind::NFD_KW | SyntaxKind::NFKC_KW | SyntaxKind::NFKD_KW
-    ) {
+    if !name.is_unicode_normal_form() {
         return None;
     }
+    let token = name.syntax().first_token()?;
     Some((
         expr.syntax().text_range(),
         token.text().to_ascii_uppercase(),

@@ -6,6 +6,8 @@ use squawk_sema::file::InFile;
 mod add_explicit_alias;
 mod add_schema;
 mod convert_comment;
+mod explicit_cast;
+mod index_element;
 mod name;
 mod qualify_column;
 mod quote_identifier;

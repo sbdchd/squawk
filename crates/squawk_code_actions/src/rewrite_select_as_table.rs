@@ -226,4 +226,16 @@ mod test {
             "table foo$0;"
         ));
     }
+
+    #[test]
+    fn rewrite_select_as_table_not_applicable_value_function() {
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            r#"select * from user$0;"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_select_as_table,
+            r#"select * from current_date$0;"#
+        ));
+    }
 }

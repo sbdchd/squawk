@@ -169,4 +169,20 @@ mod test {
             @"create table T(x int);"
         );
     }
+
+    #[test]
+    fn unquote_identifier_not_applicable_col_name_keyword() {
+        assert!(code_action_not_applicable(
+            unquote_identifier,
+            r#"select '1'::"char$0";"#
+        ));
+        assert!(code_action_not_applicable(
+            unquote_identifier,
+            r#"call "int$0"();"#
+        ));
+        assert!(code_action_not_applicable(
+            unquote_identifier,
+            r#"select "coalesce$0"(1);"#
+        ));
+    }
 }

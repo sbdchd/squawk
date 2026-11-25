@@ -6,7 +6,9 @@ use squawk_syntax::ast::{self, AstNode};
 use squawk_ide_db::Db;
 use squawk_ide_db::offsets::token_from_offset;
 
-use super::{ActionKind, CodeAction};
+use super::{
+    ActionKind, CodeAction, explicit_cast::explicit_cast_type, index_element::is_index_element,
+};
 
 pub(super) fn rewrite_cast_to_double_colon(
     db: &dyn Db,
@@ -20,11 +22,18 @@ pub(super) fn rewrite_cast_to_double_colon(
         return None;
     }
 
+    let parent = cast_expr.syntax().parent()?;
+    if ast::ExprFromItem::can_cast(parent.kind())
+        || ast::RowsFromArg::can_cast(parent.kind())
+        || is_index_element(cast_expr.syntax())
+    {
+        return None;
+    }
+
     let expr = cast_expr.expr()?;
-    let ty = cast_expr.ty()?;
 
     let expr_text = expr.syntax().text();
-    let type_text = ty.syntax().text();
+    let type_text = explicit_cast_type(&cast_expr)?;
 
     let replacement = format!("{expr_text}::{type_text}");
 
@@ -122,5 +131,63 @@ mod test {
             rewrite_cast_to_double_colon,
             "select fo$0o from t;"
         ));
+    }
+
+    #[test]
+    fn rewrite_typed_literal_without_length() {
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            r#"select ch$0ar 'abc';"#),
+            @r#"select 'abc'::bpchar;"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            r#"select na$0tional character 'abc';"#),
+            @r#"select 'abc'::bpchar;"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            r#"select ch$0ar(2) 'abc';"#),
+            @r#"select 'abc'::char(2);"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            r#"select bi$0t '101';"#),
+            @r#"select '101'::"bit";"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            r#"select va$0rchar 'abc';"#),
+            @r#"select 'abc'::varchar;"#
+        );
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_not_applicable_func_expr() {
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"select from ca$0st(e as e);"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"select from rows from (ca$0st(1 as int));"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"create index on t (ca$0st(b as text));"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"create index on t (ca$0st(b as text) collate "C");"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"insert into t values (1) on conflict (ca$0st(b as text)) do nothing;"#
+        ));
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            r#"create index on t ((ca$0st(b as text)));"#),
+            @r#"create index on t ((b::text));"#
+        );
     }
 }

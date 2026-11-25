@@ -54,7 +54,7 @@ pub fn unquote_ident(node: &SyntaxNode) -> Option<String> {
 
     let text = &text[1..text.len() - 1];
 
-    if is_reserved_word(text) || is_type_func_name_word(text) {
+    if is_reserved_word(text) || is_type_func_name_word(text) || is_col_name_word(text) {
         return None;
     }
 
