@@ -1,11 +1,11 @@
 use std::borrow::Cow;
 
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::ast::{self, AstNode, CastKind};
 
 pub(crate) fn explicit_cast_type(cast: &ast::CastExpr) -> Option<Cow<'static, str>> {
     let ty = cast.ty()?;
     let type_text = || Cow::Owned(ty.syntax().to_string());
-    if cast.colon_colon().is_some() || cast.as_token().is_some() {
+    if cast.kind() != Some(CastKind::TypeLiteral) {
         return Some(type_text());
     }
     let text = match &ty {

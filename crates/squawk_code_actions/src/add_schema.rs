@@ -1,7 +1,7 @@
 use squawk_diagnostics::Edit;
 use squawk_rowan::{TextRange, TextSize};
 use squawk_sema::{file::InFile, ir::Item};
-use squawk_syntax::ast::{self, AstNode};
+use squawk_syntax::ast::{self, AstNode, CastKind};
 
 use super::{ActionKind, CodeAction};
 use squawk_ide_db::offsets::token_from_offset;
@@ -83,6 +83,12 @@ struct BuiltinTypeEdit {
 
 fn builtin_type_edit(ty: &ast::Type) -> Option<BuiltinTypeEdit> {
     let name = ty.builtin_type_name()?;
+    let typed_literal = ty
+        .syntax()
+        .parent()
+        .and_then(ast::CastExpr::cast)
+        .filter(|cast| cast.kind() == Some(CastKind::TypeLiteral));
+    let implied_length = if typed_literal.is_some() { "" } else { "(1)" };
     let modifier = match ty {
         ast::Type::ArrayType(_) | ast::Type::SetofType(_) => return None,
         ast::Type::PathType(path_type) => {
@@ -97,12 +103,14 @@ fn builtin_type_edit(ty: &ast::Type) -> Option<BuiltinTypeEdit> {
                 text: format!("pg_catalog.{name}"),
             });
         }
-        ast::Type::BitType(bit) => bit
-            .arg_list()
-            .map_or_else(|| "(1)".to_owned(), |args| args.syntax().to_string()),
-        ast::Type::CharacterType(character) => character
-            .arg_list()
-            .map_or_else(|| "(1)".to_owned(), |args| args.syntax().to_string()),
+        ast::Type::BitType(bit) => bit.arg_list().map_or_else(
+            || implied_length.to_owned(),
+            |args| args.syntax().to_string(),
+        ),
+        ast::Type::CharacterType(character) => character.arg_list().map_or_else(
+            || implied_length.to_owned(),
+            |args| args.syntax().to_string(),
+        ),
         ast::Type::BitVaryingType(bit) => bit
             .arg_list()
             .map_or_else(String::new, |args| args.syntax().to_string()),
@@ -111,11 +119,7 @@ fn builtin_type_edit(ty: &ast::Type) -> Option<BuiltinTypeEdit> {
             .map_or_else(String::new, |args| args.syntax().to_string()),
         ast::Type::DoubleType(_) => String::new(),
         ast::Type::IntervalType(interval) => {
-            let literal_qualifier = interval
-                .syntax()
-                .parent()
-                .and_then(ast::CastExpr::cast)
-                .and_then(|cast| cast.interval_qualifier());
+            let literal_qualifier = typed_literal.and_then(|cast| cast.interval_qualifier());
             if interval.interval_qualifier().is_some()
                 || interval.literal().is_some()
                 || literal_qualifier.is_some()
@@ -577,5 +581,39 @@ select myschema.f$0();"
             add_schema,
             r#"select interval$0 '1' month;"#
         ));
+    }
+
+    #[test]
+    fn add_schema_typed_literal_without_length() {
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            r#"select char$0 'abc';"#),
+            @r#"select pg_catalog.bpchar 'abc';"#
+        );
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            r#"select national$0 character 'abc';"#),
+            @r#"select pg_catalog.bpchar 'abc';"#
+        );
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            r#"select char$0(2) 'abc';"#),
+            @r#"select pg_catalog.bpchar(2) 'abc';"#
+        );
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            r#"select bit$0 '101';"#),
+            @r#"select pg_catalog.bit '101';"#
+        );
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            r#"select cast('abc' as char$0);"#),
+            @r#"select cast('abc' as pg_catalog.bpchar(1));"#
+        );
+        assert_snapshot!(apply_code_action(
+            add_schema,
+            r#"select '101'::bit$0;"#),
+            @r#"select '101'::pg_catalog.bit(1);"#
+        );
     }
 }
