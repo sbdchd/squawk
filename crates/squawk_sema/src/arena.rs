@@ -185,6 +185,25 @@ impl<K: Copy + Eq + Hash, V: Copy + Ord> LayeredMultimap<K, V> {
         }
     }
 
+    pub(crate) fn insert_keys(&mut self, id: V, keys: impl IntoIterator<Item = K>) {
+        for key in keys {
+            self.insert(key, id);
+        }
+    }
+
+    pub(crate) fn remove_keys(&mut self, id: V, keys: impl IntoIterator<Item = K>) {
+        for key in keys {
+            self.remove(key, id);
+        }
+    }
+
+    pub(crate) fn replace_key(&mut self, id: V, previous: Option<K>, current: Option<K>) {
+        if previous != current {
+            self.remove_keys(id, previous);
+            self.insert_keys(id, current);
+        }
+    }
+
     pub(crate) fn take(&mut self, key: K) -> SmallVec<[V; 1]> {
         self.local.remove(&key).unwrap_or_default()
     }

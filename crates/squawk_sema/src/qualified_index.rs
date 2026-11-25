@@ -8,7 +8,7 @@ use crate::file::IrFileId;
 use crate::interner::{Name, QualifiedName};
 use crate::ir::{
     Collation, Conversion, Function, FunctionId, Operator, OperatorClass, OperatorFamily,
-    OperatorId, Statistics, Table, TextSearch, Ty,
+    OperatorId, Statistics, Table, TextSearch, Ty, Type,
 };
 
 pub trait Qualified {
@@ -107,10 +107,22 @@ impl<T: Qualified> QualifiedIndex<T> {
     }
 
     pub(crate) fn requalify(&mut self, id: Idx<T>, current: QualifiedName) -> QualifiedName {
-        let value = &mut self.arena[id];
-        let previous = QualifiedName {
+        self.rekey(id, |value| QualifiedName {
             schema: std::mem::replace(value.schema_mut(), current.schema),
             name: std::mem::replace(value.name_mut(), current.name),
+        })
+    }
+
+    pub(crate) fn rekey<R>(&mut self, id: Idx<T>, f: impl FnOnce(&mut T) -> R) -> R {
+        let value = &mut self.arena[id];
+        let previous = QualifiedName {
+            schema: value.schema(),
+            name: value.name(),
+        };
+        let result = f(value);
+        let current = QualifiedName {
+            schema: value.schema(),
+            name: value.name(),
         };
         if previous != current {
             self.by_name.remove(previous, id);
@@ -120,7 +132,7 @@ impl<T: Qualified> QualifiedIndex<T> {
             self.by_schema.remove(previous.schema, id);
             self.by_schema.insert(current.schema, id);
         }
-        previous
+        result
     }
 
     pub(crate) fn shrink_to_fit(&mut self) {
@@ -201,4 +213,5 @@ qualified!(
     Statistics,
     Table,
     TextSearch,
+    Type,
 );

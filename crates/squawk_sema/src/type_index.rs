@@ -9,13 +9,13 @@ use crate::ir::{
     Column, ColumnType, ColumnTypeRef, Columns, Subscript, Ty, Type, TypeCategory, TypeId,
 };
 
+use crate::qualified_index::QualifiedIndex;
+
 type NamePtr = InIrFile<SyntaxNodePtr>;
 
 #[derive(Debug, Default)]
 pub struct TypeIndex {
-    arena: LayeredArena<Type>,
-    by_name: LayeredMultimap<QualifiedName, TypeId>,
-    by_schema: LayeredMultimap<Name, TypeId>,
+    types: QualifiedIndex<Type>,
     by_range: LayeredMultimap<TypeId, TypeId>,
     by_column_type: LayeredMultimap<ColumnTypeRef, TypeId>,
     by_array_name: LayeredMultimap<QualifiedName, TypeId>,
@@ -23,7 +23,6 @@ pub struct TypeIndex {
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 struct Keys {
-    name: QualifiedName,
     range: Option<TypeId>,
     array_name: Option<QualifiedName>,
 }
@@ -31,10 +30,6 @@ struct Keys {
 impl Keys {
     fn of(ty: &Type) -> Keys {
         Keys {
-            name: QualifiedName {
-                schema: ty.schema,
-                name: ty.name,
-            },
             range: ty.range,
             array_name: ty.array_name.map(|name| QualifiedName {
                 schema: ty.schema,
@@ -47,9 +42,7 @@ impl Keys {
 impl TypeIndex {
     pub(crate) fn on_top_of(base: &'static TypeIndex) -> Self {
         TypeIndex {
-            arena: LayeredArena::on_top_of(&base.arena),
-            by_name: LayeredMultimap::on_top_of(&base.by_name),
-            by_schema: LayeredMultimap::on_top_of(&base.by_schema),
+            types: QualifiedIndex::on_top_of(&base.types),
             by_range: LayeredMultimap::on_top_of(&base.by_range),
             by_column_type: LayeredMultimap::on_top_of(&base.by_column_type),
             by_array_name: LayeredMultimap::on_top_of(&base.by_array_name),
@@ -59,10 +52,8 @@ impl TypeIndex {
     pub(crate) fn alloc(&mut self, ty: Type, columns: &LayeredArena<Column>) -> TypeId {
         let keys = Keys::of(&ty);
         let type_columns = ty.columns;
-        let id = self.arena.alloc(ty);
+        let id = self.types.alloc(ty);
         self.index_columns(id, type_columns, columns);
-        self.by_name.insert(keys.name, id);
-        self.by_schema.insert(keys.name.schema, id);
         if let Some(range) = keys.range {
             self.by_range.insert(range, id);
         }
@@ -73,7 +64,7 @@ impl TypeIndex {
     }
 
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = TypeId> + '_ {
-        self.by_name.get(QualifiedName { schema, name })
+        self.types.named(schema, name)
     }
 
     pub(crate) fn with_array_name(
@@ -85,7 +76,7 @@ impl TypeIndex {
     }
 
     pub(crate) fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = TypeId> + '_ {
-        self.by_schema.get(schema)
+        self.types.in_schema(schema)
     }
 
     pub(crate) fn with_range(&self, range: TypeId) -> impl Iterator<Item = TypeId> + '_ {
@@ -100,15 +91,15 @@ impl TypeIndex {
     }
 
     pub(crate) fn next_idx(&self) -> TypeId {
-        self.arena.next_idx()
+        self.types.next_idx()
     }
 
     pub(crate) fn range_from(&self, start: TypeId) -> IdxRange<Type> {
-        self.arena.range_from(start)
+        self.types.range_from(start)
     }
 
     pub(crate) fn is_local(&self, id: TypeId) -> bool {
-        self.arena.is_local(id)
+        self.types.is_local(id)
     }
 
     pub(crate) fn replace(&mut self, id: TypeId, ty: Type, columns: &LayeredArena<Column>) -> Type {
@@ -132,7 +123,7 @@ impl TypeIndex {
     }
 
     pub(crate) fn set_schema(&mut self, id: TypeId, schema: Name) -> bool {
-        if !self.arena.is_local(id) {
+        if !self.types.is_local(id) {
             return false;
         }
         self.rekey(id, |ty| ty.schema = schema);
@@ -140,7 +131,7 @@ impl TypeIndex {
     }
 
     pub(crate) fn rename_schema(&mut self, from: Name, to: Name) {
-        for id in self.by_schema.take(from) {
+        for id in self.types.take_schema(from) {
             self.rekey(id, |ty| ty.schema = to);
         }
     }
@@ -164,9 +155,8 @@ impl TypeIndex {
         arena: &LayeredArena<Column>,
     ) {
         if let Some(columns) = columns {
-            for column_type in ColumnTypeRef::in_columns(arena, columns.range) {
-                self.by_column_type.insert(column_type, id);
-            }
+            self.by_column_type
+                .insert_keys(id, ColumnTypeRef::in_columns(arena, columns.range));
         }
     }
 
@@ -177,9 +167,8 @@ impl TypeIndex {
         arena: &LayeredArena<Column>,
     ) {
         if let Some(columns) = columns {
-            for column_type in ColumnTypeRef::in_columns(arena, columns.range) {
-                self.by_column_type.remove(column_type, id);
-            }
+            self.by_column_type
+                .remove_keys(id, ColumnTypeRef::in_columns(arena, columns.range));
         }
     }
 
@@ -223,47 +212,21 @@ impl TypeIndex {
     }
 
     fn rekey<R>(&mut self, id: TypeId, f: impl FnOnce(&mut Type) -> R) -> R {
-        let ty = self.local_mut(id);
-        let previous = Keys::of(ty);
-        let result = f(ty);
-        let current = Keys::of(ty);
-        if previous.name != current.name {
-            self.by_name.remove(previous.name, id);
-            self.by_name.insert(current.name, id);
-        }
-        if previous.name.schema != current.name.schema {
-            self.by_schema.remove(previous.name.schema, id);
-            self.by_schema.insert(current.name.schema, id);
-        }
-        if previous.range != current.range {
-            if let Some(range) = previous.range {
-                self.by_range.remove(range, id);
-            }
-            if let Some(range) = current.range {
-                self.by_range.insert(range, id);
-            }
-        }
-        if previous.array_name != current.array_name {
-            if let Some(array_name) = previous.array_name {
-                self.by_array_name.remove(array_name, id);
-            }
-            if let Some(array_name) = current.array_name {
-                self.by_array_name.insert(array_name, id);
-            }
-        }
+        let previous = Keys::of(&self.types[id]);
+        let result = self.types.rekey(id, f);
+        let current = Keys::of(&self.types[id]);
+        self.by_range.replace_key(id, previous.range, current.range);
+        self.by_array_name
+            .replace_key(id, previous.array_name, current.array_name);
         result
     }
 
     fn local_mut(&mut self, id: TypeId) -> &mut Type {
-        self.arena
-            .get_local_mut(id)
-            .expect("base layer is immutable")
+        self.types.local_mut(id)
     }
 
     pub(crate) fn shrink_to_fit(&mut self) {
-        self.arena.shrink_to_fit();
-        self.by_name.shrink_to_fit();
-        self.by_schema.shrink_to_fit();
+        self.types.shrink_to_fit();
         self.by_range.shrink_to_fit();
         self.by_column_type.shrink_to_fit();
         self.by_array_name.shrink_to_fit();
@@ -274,6 +237,6 @@ impl Index<TypeId> for TypeIndex {
     type Output = Type;
 
     fn index(&self, id: TypeId) -> &Type {
-        &self.arena[id]
+        &self.types[id]
     }
 }
