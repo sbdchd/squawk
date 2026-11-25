@@ -129,6 +129,8 @@ impl Lowerer {
             view_column_deps: vec![],
             generated_column_deps: vec![],
             reserved_constraint_names: SmallVec::new(),
+            merge_action_fn: MergeActionFn::Disallowed,
+            query_contexts: vec![],
             record_columns: FxHashMap::default(),
             view_bases: FxHashMap::default(),
             insert_values: vec![],
@@ -444,6 +446,8 @@ pub(crate) struct Lowerer {
     view_column_deps: Vec<ViewColumnDep>,
     generated_column_deps: Vec<GeneratedColumnDep>,
     reserved_constraint_names: SmallVec<[ReservedConstraintName; 2]>,
+    merge_action_fn: MergeActionFn,
+    query_contexts: Vec<QueryContext>,
     record_columns: FxHashMap<InIrFile<SyntaxNodePtr>, RecordColumns>,
     view_bases: FxHashMap<TableId, TableId>,
     insert_values: Vec<InsertValue>,
@@ -521,6 +525,30 @@ enum ArrayCast {
         array: Ty,
         element: Ty,
     },
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum MergeActionFn {
+    Allowed,
+    Disallowed,
+}
+
+#[derive(Clone, Copy)]
+struct QueryContext {
+    depth: usize,
+    context: ExprContext,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Certainty {
+    Certain,
+    Uncertain,
+}
+
+#[derive(Clone, Copy)]
+struct AggregateOwner {
+    depth: usize,
+    certainty: Certainty,
 }
 
 struct InsertValue {
@@ -14651,9 +14679,7 @@ impl Lowerer {
         query: ast::SelectVariant,
         recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
-        self.with_expr_context(ExprContext::Unrestricted, |this| {
-            this.lower_cte_query_inner(query, recursive_cte)
-        })
+        self.with_query_context(|this| this.lower_cte_query_inner(query, recursive_cte))
     }
 
     fn lower_cte_query_inner(
@@ -15406,7 +15432,10 @@ impl Lowerer {
         }
 
         if let Some(returning_clause) = merge.returning_clause() {
+            let merge_action_fn =
+                std::mem::replace(&mut self.merge_action_fn, MergeActionFn::Allowed);
             let columns = self.lower_returning(id, target, &returning_clause);
+            self.merge_action_fn = merge_action_fn;
             self.index.queries[id].columns = columns;
         }
 
@@ -16734,9 +16763,7 @@ impl Lowerer {
         query: &ast::WithQuery,
         recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
-        self.with_expr_context(ExprContext::Unrestricted, |this| {
-            this.lower_with_query_inner(query, recursive_cte)
-        })
+        self.with_query_context(|this| this.lower_with_query_inner(query, recursive_cte))
     }
 
     fn lower_with_query_inner(
@@ -17203,7 +17230,9 @@ impl Lowerer {
         query: ast::SelectVariant,
     ) -> QueryId {
         if paren.lateral_token().is_some() {
-            return self.with_lateral_sources(|this| this.lower_query(query));
+            return self.with_lateral_sources(|this| {
+                this.with_expr_context(ExprContext::FromSubquery, |this| this.lower_query(query))
+            });
         }
         self.from_subqueries.push(FromSubquery {
             scope: self.scopes.len() - 1,
@@ -17668,7 +17697,7 @@ impl Lowerer {
                         self.push_error(outer.syntax(), SemaError::DuplicateColumnDefList);
                     }
                     let srf_calls = self.srf_calls.len();
-                    let LoweredCall { args, callee, .. } =
+                    let LoweredCall { args, callee, ty } =
                         self.with_from_function(|this| this.lower_call_with_args(&call));
                     self.check_from_set_returning(srf_calls, Some(&call));
                     if let Some(Callee {
@@ -17676,9 +17705,13 @@ impl Lowerer {
                         ..
                     }) = callee
                     {
-                        self.check_column_def_list(function, &args, &list);
+                        if !self.is_aggregate_call(&call, Some(function)) {
+                            self.check_column_def_list(function, &args, &list);
+                        }
                     } else if let Some(keyword) = call.function_like_keyword() {
                         let ty = self.keyword_call_type(&call, keyword, &args);
+                        self.check_value_column_defs(call.syntax(), ty, ColumnDefs::List(&list));
+                    } else if ty.is_some() && !is_json_aggregate(&call) {
                         self.check_value_column_defs(call.syntax(), ty, ColumnDefs::List(&list));
                     }
                     FunctionColumns {
@@ -17748,12 +17781,17 @@ impl Lowerer {
             return self.lower_expanded_unnest(call, &name_ref);
         }
         let srf_calls = self.srf_calls.len();
-        let LoweredCall { args, callee, .. } =
+        let LoweredCall { args, callee, ty } =
             self.with_from_function(|this| this.lower_call_with_args(call));
         self.check_from_set_returning(srf_calls, Some(call));
-        if let Some(keyword) = call.function_like_keyword() {
-            let ty = self.keyword_call_type(call, keyword, &args);
-            self.check_value_column_defs(call.syntax(), ty, column_defs);
+        let value_ty = match call.function_like_keyword() {
+            Some(keyword) => Some(self.keyword_call_type(call, keyword, &args)),
+            None => ty.map(Some),
+        };
+        if let Some(ty) = value_ty {
+            if !is_json_aggregate(call) {
+                self.check_value_column_defs(call.syntax(), ty, column_defs);
+            }
             let name = self.inferred_name(ast::Expr::CallExpr(call.clone()));
             let FunctionColumns { columns, scalar } =
                 self.value_columns(name, ty, call.syntax(), scalar_alias);
@@ -17792,7 +17830,11 @@ impl Lowerer {
             };
         }
         match column_defs {
-            ColumnDefs::List(list) => self.check_column_def_list(function, &args, list),
+            ColumnDefs::List(list) => {
+                if !self.is_aggregate_call(call, Some(function)) {
+                    self.check_column_def_list(function, &args, list);
+                }
+            }
             ColumnDefs::None => {
                 if self.call_returns_anonymous_record(function, &args) {
                     self.push_error(call.syntax(), SemaError::MissingColumnDefList);
@@ -25910,11 +25952,19 @@ impl Lowerer {
             self.lower_sequence_arg(&arg);
         }
         self.lower_named_args(function, named_args);
-        self.check_set_returning_call(call, function, srf_calls);
-        self.check_aggregate_call(call, function, refs, aggregate_calls);
-        if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
-            self.lower_condition(ConditionKind::Filter, &expr);
+        if call.function_like_keyword() == Some(ast::FunctionLikeKeyword::MergeAction)
+            && self.merge_action_fn == MergeActionFn::Disallowed
+        {
+            self.push_error(call.syntax(), SemaError::MisplacedMergeAction);
         }
+        let json_aggregate = is_json_aggregate(call).then(|| self.lower_special_fn(call));
+        self.check_set_returning_call(call, function, srf_calls);
+        if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
+            let filter_calls = self.aggregate_calls.len();
+            self.lower_condition(ConditionKind::Filter, &expr);
+            self.aggregate_calls.truncate(filter_calls);
+        }
+        self.check_aggregate_call(call, function, refs, aggregate_calls);
         if call.over_clause().is_some()
             && let Some(arg_list) = call.arg_list()
         {
@@ -25935,7 +25985,11 @@ impl Lowerer {
             }
             None => {}
         }
-        self.lower_special_fn(call).unwrap_or(LoweredCall {
+        let special = match json_aggregate {
+            Some(special) => special,
+            None => self.lower_special_fn(call),
+        };
+        special.unwrap_or(LoweredCall {
             args,
             callee: target,
             ty: target.and_then(|target| target.ty),
@@ -26094,9 +26148,7 @@ impl Lowerer {
     ) {
         let construct = if call.over_clause().is_some() {
             Some(SetReturningConstruct::Window)
-        } else if function
-            .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
-        {
+        } else if self.is_aggregate_call(call, function) {
             Some(SetReturningConstruct::Aggregate)
         } else if call.function_like_keyword() == Some(ast::FunctionLikeKeyword::Coalesce) {
             Some(SetReturningConstruct::Coalesce)
@@ -26157,6 +26209,13 @@ impl Lowerer {
         self.srf_calls.truncate(start);
     }
 
+    fn is_aggregate_call(&self, call: &ast::CallExpr, function: Option<FunctionId>) -> bool {
+        is_json_aggregate(call)
+            || function.is_some_and(|function| {
+                self.index.functions[function].kind == FunctionKind::Aggregate
+            })
+    }
+
     fn check_aggregate_call(
         &mut self,
         call: &ast::CallExpr,
@@ -26178,31 +26237,34 @@ impl Lowerer {
         }
         let kind = if call.over_clause().is_some() {
             AggregateCallKind::Window
-        } else if function
-            .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
-        {
+        } else if self.is_aggregate_call(call, function) {
             AggregateCallKind::Aggregate
         } else {
             return;
         };
-        if kind == AggregateCallKind::Aggregate {
-            let depth = self.aggregate_depth(refs);
-            if depth != self.scopes.len() {
-                self.outer_aggregates.push(depth);
+        let owner = match kind {
+            AggregateCallKind::Aggregate => self.aggregate_owner(refs),
+            AggregateCallKind::Window => AggregateOwner {
+                depth: self.scopes.len(),
+                certainty: Certainty::Certain,
+            },
+        };
+        let depth = owner.depth;
+        if depth != self.scopes.len() {
+            self.outer_aggregates.push(depth);
+            if owner.certainty == Certainty::Uncertain {
                 return;
             }
         }
         let ptr = self.ptr(call.syntax());
-        let context = self.expr_context;
+        let context = self.owner_context(depth);
         let misplaced = match kind {
-            AggregateCallKind::Aggregate => {
-                (!context.allows_aggregates()).then_some(SemaError::MisplacedAggregate { context })
-            }
+            AggregateCallKind::Aggregate if context.allows_aggregates() => None,
+            AggregateCallKind::Aggregate => Some(SemaError::MisplacedAggregate { context }),
             AggregateCallKind::Window => {
                 (!context.allows_windows()).then_some(SemaError::MisplacedWindow { context })
             }
         };
-        let depth = self.scopes.len();
         if let Some(error) = misplaced {
             self.push_error_ptr(ptr, error);
         } else {
@@ -26233,13 +26295,18 @@ impl Lowerer {
             .push(AggregateCall { kind, depth, ptr });
     }
 
-    fn aggregate_depth(&self, refs: RefId) -> usize {
+    fn aggregate_owner(&self, refs: RefId) -> AggregateOwner {
         let depth = self.scopes.len();
+        let own = AggregateOwner {
+            depth,
+            certainty: Certainty::Certain,
+        };
         let Some(scope) = self.scopes.last() else {
-            return depth;
+            return own;
         };
         let sources = &self.index.queries[scope.query].sources;
         let mut owner = None;
+        let mut certainty = Certainty::Certain;
         for id in self.index.references.range_from(refs) {
             let reference = &self.index.references[id];
             if reference.scope != Some(scope.scope) {
@@ -26252,26 +26319,66 @@ impl Lowerer {
                 }
                 | Resolution::Source(source) => {
                     if sources.contains(&source) {
-                        return depth;
+                        return own;
                     }
-                    self.scopes[..depth - 1]
-                        .iter()
-                        .rposition(|scope| {
-                            self.index.queries[scope.query].sources.contains(&source)
-                        })
-                        .map_or(depth - 1, |position| position + 1)
+                    let position = self.scopes[..depth - 1].iter().rposition(|scope| {
+                        self.index.queries[scope.query].sources.contains(&source)
+                    });
+                    if position.is_none() {
+                        certainty = Certainty::Uncertain;
+                    }
+                    position.map_or(depth - 1, |position| position + 1)
                 }
-                Resolution::Column { source: None, .. } => return depth,
+                Resolution::Column {
+                    source: None,
+                    column,
+                } => {
+                    let position = self
+                        .scopes
+                        .iter()
+                        .rposition(|scope| scope.merges.iter().any(|merge| merge.column == column));
+                    match position {
+                        Some(position) if position + 1 < depth => position + 1,
+                        Some(_) => return own,
+                        None => {
+                            return AggregateOwner {
+                                depth,
+                                certainty: Certainty::Uncertain,
+                            };
+                        }
+                    }
+                }
                 Resolution::Unresolved | Resolution::Unknown | Resolution::Ambiguous
                     if reference.kind == ReferenceKind::Column =>
                 {
+                    certainty = Certainty::Uncertain;
                     depth - 1
                 }
                 _ => continue,
             };
             owner = owner.max(Some(outer));
         }
-        owner.unwrap_or(depth)
+        owner.map_or(own, |depth| AggregateOwner { depth, certainty })
+    }
+
+    fn with_query_context<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        self.query_contexts.push(QueryContext {
+            depth: self.scopes.len(),
+            context: self.expr_context,
+        });
+        let result = self.with_expr_context(ExprContext::Unrestricted, f);
+        self.query_contexts.pop();
+        result
+    }
+
+    fn owner_context(&self, depth: usize) -> ExprContext {
+        if depth == self.scopes.len() {
+            return self.expr_context;
+        }
+        self.query_contexts
+            .iter()
+            .find(|query| query.depth == depth)
+            .map_or(ExprContext::Unrestricted, |query| query.context)
     }
 
     fn with_expr_context<T>(&mut self, context: ExprContext, f: impl FnOnce(&mut Self) -> T) -> T {
@@ -29639,6 +29746,10 @@ fn is_row_constructor(expr: &ast::Expr) -> bool {
         expr = inner.unparen();
     }
     matches!(expr, ast::Expr::TupleExpr(_))
+}
+
+fn is_json_aggregate(call: &ast::CallExpr) -> bool {
+    call.json_array_agg_fn().is_some() || call.json_object_agg_fn().is_some()
 }
 
 fn is_opaque_record(expr: &ast::Expr) -> bool {

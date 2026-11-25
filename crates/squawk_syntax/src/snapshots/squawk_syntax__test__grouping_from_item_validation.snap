@@ -1,0 +1,67 @@
+---
+source: crates/squawk_syntax/src/test.rs
+input_file: crates/squawk_syntax/test_data/validation/grouping_from_item.sql
+---
+SOURCE_FILE@0..66
+  SELECT@0..26
+    SELECT_CLAUSE@0..8
+      SELECT_KW@0..6 "select"
+      WHITESPACE@6..7 " "
+      TARGET_LIST@7..8
+        TARGET@7..8
+          STAR@7..8 "*"
+    WHITESPACE@8..9 " "
+    FROM_CLAUSE@9..25
+      FROM_KW@9..13 "from"
+      WHITESPACE@13..14 " "
+      FUNCTION_FROM_ITEM@14..25
+        CALL_EXPR@14..25
+          NAME_REF@14..22
+            GROUPING_KW@14..22 "grouping"
+          ARG_LIST@22..25
+            L_PAREN@22..23 "("
+            ARG@23..24
+              LITERAL@23..24
+                INT_NUMBER@23..24 "1"
+            R_PAREN@24..25 ")"
+    SEMICOLON@25..26 ";"
+  WHITESPACE@26..27 "\n"
+  SELECT@27..65
+    SELECT_CLAUSE@27..35
+      SELECT_KW@27..33 "select"
+      WHITESPACE@33..34 " "
+      TARGET_LIST@34..35
+        TARGET@34..35
+          STAR@34..35 "*"
+    WHITESPACE@35..36 " "
+    FROM_CLAUSE@36..64
+      FROM_KW@36..40 "from"
+      WHITESPACE@40..41 " "
+      ROWS_FROM_ITEM@41..64
+        ROWS_KW@41..45 "rows"
+        WHITESPACE@45..46 " "
+        FROM_KW@46..50 "from"
+        WHITESPACE@50..51 " "
+        L_PAREN@51..52 "("
+        ROWS_FROM_ARG@52..63
+          CALL_EXPR@52..63
+            NAME_REF@52..60
+              GROUPING_KW@52..60 "grouping"
+            ARG_LIST@60..63
+              L_PAREN@60..61 "("
+              ARG@61..62
+                LITERAL@61..62
+                  INT_NUMBER@61..62 "1"
+              R_PAREN@62..63 ")"
+        R_PAREN@63..64 ")"
+    SEMICOLON@64..65 ";"
+  WHITESPACE@65..66 "\n"
+
+error[syntax-error]: `grouping` cannot be used in a `from` clause
+  ╭▸ 
+1 │ select * from grouping(1);
+  ╰╴              ━━━━━━━━━━━
+error[syntax-error]: `grouping` cannot be used in a `from` clause
+  ╭▸ 
+2 │ select * from rows from (grouping(1));
+  ╰╴                         ━━━━━━━━━━━

@@ -93,6 +93,7 @@ pub enum DiagnosticKind {
     InvalidArgument,
     GroupingError,
     WindowingError,
+    MisplacedMergeAction,
     DuplicateAssignment,
     DuplicateCte,
     DuplicateSource,
