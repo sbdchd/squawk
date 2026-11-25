@@ -5510,9 +5510,9 @@ fn build_name_items<'a>(items: impl Iterator<Item = SyntaxNode>) -> Doc<'a> {
     .unwrap_or_else(Doc::nil)
 }
 
-fn append_privilege_items<'a>(ctx: &Ctx, prefix: Doc<'a>, items: Doc<'a>) -> Doc<'a> {
+fn append_nested_group<'a>(ctx: &Ctx, prefix: Doc<'a>, body: Doc<'a>) -> Doc<'a> {
     prefix
-        .append(Doc::line_or_space().append(items).nest(ctx.indent))
+        .append(Doc::line_or_space().append(body).nest(ctx.indent))
         .group()
 }
 
@@ -5562,7 +5562,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
     match objects {
         ast::PrivilegeObjects::PrivilegeAllFunctionsInSchema(node) => {
             let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5575,7 +5575,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeAllProceduresInSchema(node) => {
             let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5588,7 +5588,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeAllRoutinesInSchema(node) => {
             let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5601,7 +5601,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeAllSequencesInSchema(node) => {
             let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5614,7 +5614,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeAllTablesInSchema(node) => {
             let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.all_token(), "all"),
@@ -5627,7 +5627,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeDatabase(node) => {
             let items = build_name_items(node.database_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.database_token(), "database")]),
                 items,
@@ -5644,7 +5644,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 let syntax = item.syntax().clone();
                 item.path_ref().map(|path| (syntax, path))
             }));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.domain_token(), "domain")]),
                 items,
@@ -5655,7 +5655,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 node.foreign_data_wrapper_refs()
                     .map(|item| item.syntax().clone()),
             );
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.foreign_token(), "foreign"),
@@ -5667,7 +5667,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeForeignServer(node) => {
             let items = build_name_items(node.server_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.foreign_token(), "foreign"),
@@ -5678,7 +5678,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeLanguage(node) => {
             let items = build_name_items(node.language_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.language_token(), "language")]),
                 items,
@@ -5696,7 +5696,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                     })
                 }))
                 .unwrap_or_else(Doc::nil);
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.parameter_token(), "parameter")]),
                 items,
@@ -5707,7 +5707,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 let syntax = item.syntax().clone();
                 item.path_ref().map(|path| (syntax, path))
             }));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.property_token(), "property"),
@@ -5718,7 +5718,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeSchema(node) => {
             let items = build_name_items(node.schema_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.schema_token(), "schema")]),
                 items,
@@ -5729,7 +5729,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 let syntax = item.syntax().clone();
                 item.path_ref().map(|path| (syntax, path))
             }));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.sequence_token(), "sequence")]),
                 items,
@@ -5740,7 +5740,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 let syntax = item.syntax().clone();
                 item.path_ref().map(|path| (syntax, path))
             }));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.table_token(), "table")]),
                 items,
@@ -5748,7 +5748,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
         }
         ast::PrivilegeObjects::PrivilegeTablespace(node) => {
             let items = build_name_items(node.tablespace_refs().map(|item| item.syntax().clone()));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.tablespace_token(), "tablespace")]),
                 items,
@@ -5759,7 +5759,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 let syntax = item.syntax().clone();
                 item.path_ref().map(|path| (syntax, path))
             }));
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.type_token(), "type")]),
                 items,
@@ -5774,7 +5774,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 )
             }))
             .unwrap_or_else(Doc::nil);
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([
                     (node.large_token(), "large"),
@@ -5801,7 +5801,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 })
                 .unwrap_or_else(Doc::nil);
             let items = list_leading.append(items);
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.function_token(), "function")]),
                 items,
@@ -5825,7 +5825,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 })
                 .unwrap_or_else(Doc::nil);
             let items = list_leading.append(items);
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.procedure_token(), "procedure")]),
                 items,
@@ -5849,7 +5849,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
                 })
                 .unwrap_or_else(Doc::nil);
             let items = list_leading.append(items);
-            append_privilege_items(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.routine_token(), "routine")]),
                 items,
@@ -6224,12 +6224,6 @@ fn build_reset_session_auth<'a>(reset: &ast::ResetSessionAuth) -> Doc<'a> {
     doc.append(build_semicolon(reset.semicolon_token()))
 }
 
-fn append_security_object_value<'a>(ctx: &Ctx, prefix: Doc<'a>, value: Doc<'a>) -> Doc<'a> {
-    prefix
-        .append(Doc::line_or_space().append(value).nest(ctx.indent))
-        .group()
-}
-
 fn build_security_object_value<'a>(node: &impl AstNode, value: Doc<'a>) -> Doc<'a> {
     leading_comments(node.syntax()).append(value)
 }
@@ -6257,7 +6251,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                     build_security_object_value(&value, doc)
                 })
                 .unwrap_or_else(Doc::nil);
-            append_security_object_value(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.aggregate_token(), "aggregate")]),
                 value,
@@ -6268,27 +6262,27 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 .name()
                 .map(|name| build_extension_path_value(&name))
                 .unwrap_or_else(Doc::nil);
-            append_security_object_value(
+            append_nested_group(
                 ctx,
                 build_keyword_tokens([(node.column_token(), "column")]),
                 value,
             )
         }
-        ast::SecurityLabelObject::ObjectDatabase(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectDatabase(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.database_token(), "database")]),
             node.database_ref()
                 .map(|name| build_security_object_value(&name, build_name(name.syntax())))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectDomain(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectDomain(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.domain_token(), "domain")]),
             node.domain_ref()
                 .map(|name| build_extension_path_value(&name))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectEventTrigger(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectEventTrigger(node) => append_nested_group(
             ctx,
             build_keyword_tokens([
                 (node.event_token(), "event"),
@@ -6298,7 +6292,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 .map(|name| build_security_object_value(&name, build_name(name.syntax())))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectForeignTable(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectForeignTable(node) => append_nested_group(
             ctx,
             build_keyword_tokens([
                 (node.foreign_token(), "foreign"),
@@ -6308,7 +6302,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 .map(|name| build_extension_path_value(&name))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectFunction(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectFunction(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.function_token(), "function")]),
             node.function_sig()
@@ -6318,7 +6312,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 })
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectLanguage(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectLanguage(node) => append_nested_group(
             ctx,
             build_keyword_tokens([
                 (node.procedural_token(), "procedural"),
@@ -6328,7 +6322,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 .map(|name| build_security_object_value(&name, build_name(name.syntax())))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectLargeObject(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectLargeObject(node) => append_nested_group(
             ctx,
             build_keyword_tokens([
                 (node.large_token(), "large"),
@@ -6341,7 +6335,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 })
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectMaterializedView(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectMaterializedView(node) => append_nested_group(
             ctx,
             build_keyword_tokens([
                 (node.materialized_token(), "materialized"),
@@ -6351,7 +6345,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 .map(|name| build_extension_path_value(&name))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectProcedure(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectProcedure(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.procedure_token(), "procedure")]),
             node.procedure_sig()
@@ -6361,14 +6355,14 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 })
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectPublication(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectPublication(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.publication_token(), "publication")]),
             node.publication_ref()
                 .map(|name| build_security_object_value(&name, build_name(name.syntax())))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectRole(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectRole(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.role_token(), "role")]),
             node.role_ref()
@@ -6378,7 +6372,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 })
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectRoutine(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectRoutine(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.routine_token(), "routine")]),
             node.routine_sig()
@@ -6388,49 +6382,49 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 })
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectSchema(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectSchema(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.schema_token(), "schema")]),
             node.schema_ref()
                 .map(|name| build_security_object_value(&name, build_name(name.syntax())))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectSequence(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectSequence(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.sequence_token(), "sequence")]),
             node.sequence_ref()
                 .map(|name| build_extension_path_value(&name))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectSubscription(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectSubscription(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.subscription_token(), "subscription")]),
             node.subscription_ref()
                 .map(|name| build_security_object_value(&name, build_name(name.syntax())))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectTable(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectTable(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.table_token(), "table")]),
             node.table_name_ref()
                 .map(|name| build_extension_path_value(&name))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectTablespace(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectTablespace(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.tablespace_token(), "tablespace")]),
             node.tablespace_ref()
                 .map(|name| build_security_object_value(&name, build_name(name.syntax())))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectType(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectType(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.type_token(), "type")]),
             node.type_name_ref()
                 .map(|name| build_extension_path_value(&name))
                 .unwrap_or_else(Doc::nil),
         ),
-        ast::SecurityLabelObject::ObjectView(node) => append_security_object_value(
+        ast::SecurityLabelObject::ObjectView(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.view_token(), "view")]),
             node.view_ref()
@@ -9950,7 +9944,7 @@ fn build_alter_foreign_table_action<'a>(ctx: &Ctx, action: ast::AlterTableAction
             doc
         }
         ast::AlterTableAction::OptionItemList(node) => build_option_item_list(ctx, &node),
-        ast::AlterTableAction::OwnerTo(node) => build_owner_to_role(&node),
+        ast::AlterTableAction::OwnerTo(node) => build_owner_to(&node),
         ast::AlterTableAction::RenameColumn(node) => {
             let mut doc = build_keyword_tokens([
                 (node.rename_token(), "rename"),
@@ -10382,7 +10376,7 @@ fn build_alter_foreign_data_wrapper<'a>(ctx: &Ctx, stmt: &ast::AlterForeignDataW
                     .map(|name| leading_comments(name.syntax()).append(build_name(name.syntax())));
                 build_rename_to(rename.to_token(), target)
             }
-            ast::AlterForeignDataWrapperAction::OwnerTo(owner) => build_owner_to_role(&owner),
+            ast::AlterForeignDataWrapperAction::OwnerTo(owner) => build_owner_to(&owner),
         };
         doc = append_nested_clause(ctx, doc, &action_syntax, action_doc);
     }
@@ -10487,7 +10481,7 @@ fn build_alter_function<'a>(ctx: &Ctx, stmt: &ast::AlterFunction) -> Doc<'a> {
                 });
                 build_rename_to(node.to_token(), target)
             }
-            ast::AlterFunctionAction::OwnerTo(node) => build_owner_to_role(&node),
+            ast::AlterFunctionAction::OwnerTo(node) => build_owner_to(&node),
             ast::AlterFunctionAction::SetSchema(node) => build_set_schema(&node),
         };
         doc = append_nested_clause(ctx, doc, &action_syntax, action_doc);
@@ -10531,7 +10525,7 @@ fn build_alter_procedure<'a>(ctx: &Ctx, stmt: &ast::AlterProcedure) -> Doc<'a> {
                 n.extension_ref(),
             ),
             ast::AlterProcedureAction::FuncOptionList(n) => build_alter_function_options(ctx, n),
-            ast::AlterProcedureAction::OwnerTo(n) => build_owner_to_role(n),
+            ast::AlterProcedureAction::OwnerTo(n) => build_owner_to(n),
             ast::AlterProcedureAction::ProcedureRenameTo(n) => {
                 let target = n.procedure_name().map(|x| {
                     leading_comments(x.syntax())
@@ -10577,7 +10571,7 @@ fn build_alter_routine<'a>(ctx: &Ctx, stmt: &ast::AlterRoutine) -> Doc<'a> {
                 n.extension_ref(),
             ),
             ast::AlterRoutineAction::FuncOptionList(n) => build_alter_function_options(ctx, n),
-            ast::AlterRoutineAction::OwnerTo(n) => build_owner_to_role(n),
+            ast::AlterRoutineAction::OwnerTo(n) => build_owner_to(n),
             ast::AlterRoutineAction::RoutineRenameTo(n) => {
                 let target = n.routine_name().map(|x| {
                     leading_comments(x.syntax())
@@ -10646,7 +10640,7 @@ fn build_alter_schema<'a>(ctx: &Ctx, stmt: &ast::AlterSchema) -> Doc<'a> {
     }
     if let Some(action) = stmt.action() {
         let action_doc = match &action {
-            ast::AlterSchemaAction::OwnerTo(owner) => build_owner_to_role(owner),
+            ast::AlterSchemaAction::OwnerTo(owner) => build_owner_to(owner),
             ast::AlterSchemaAction::SchemaRenameTo(rename) => {
                 let target = rename.schema().map(|schema| {
                     leading_comments(schema.syntax()).append(build_name(schema.syntax()))
@@ -10671,7 +10665,7 @@ fn build_alter_sequence<'a>(ctx: &Ctx, stmt: &ast::AlterSequence) -> Doc<'a> {
     for action in stmt.actions() {
         let part = leading_comments(action.syntax());
         let part = part.append(match action {
-            ast::AlterSequenceAction::OwnerTo(owner) => build_owner_to_role(&owner),
+            ast::AlterSequenceAction::OwnerTo(owner) => build_owner_to(&owner),
             ast::AlterSequenceAction::SequenceRenameTo(rename) => {
                 let target = rename.sequence().map(|sequence| {
                     leading_comments(sequence.syntax()).append(
@@ -10714,7 +10708,7 @@ fn build_alter_server<'a>(ctx: &Ctx, stmt: &ast::AlterServer) -> Doc<'a> {
             ast::AlterServerAction::AlterOptionList(options) => {
                 build_alter_option_list(ctx, options)
             }
-            ast::AlterServerAction::OwnerTo(owner) => build_owner_to_role(owner),
+            ast::AlterServerAction::OwnerTo(owner) => build_owner_to(owner),
             ast::AlterServerAction::ServerRenameTo(rename) => {
                 let target = rename.server().map(|server| {
                     leading_comments(server.syntax()).append(build_name(server.syntax()))
@@ -10741,7 +10735,7 @@ fn build_alter_statistics<'a>(ctx: &Ctx, stmt: &ast::AlterStatistics) -> Doc<'a>
     doc = append_commented_path_ref(doc, stmt.statistics_ref());
     if let Some(action) = stmt.action() {
         let action_doc = match &action {
-            ast::AlterStatisticsAction::OwnerTo(action) => build_owner_to_role(action),
+            ast::AlterStatisticsAction::OwnerTo(action) => build_owner_to(action),
             ast::AlterStatisticsAction::SetSchema(action) => build_set_schema(action),
             ast::AlterStatisticsAction::SetStatistics(action) => {
                 let mut action_doc = build_keyword_tokens([
@@ -10832,7 +10826,7 @@ fn build_alter_tablespace<'a>(ctx: &Ctx, stmt: &ast::AlterTablespace) -> Doc<'a>
     }
     if let Some(action) = stmt.action() {
         let action_doc = match &action {
-            ast::AlterTablespaceAction::OwnerTo(action) => build_owner_to_role(action),
+            ast::AlterTablespaceAction::OwnerTo(action) => build_owner_to(action),
             ast::AlterTablespaceAction::ResetOptions(action) => {
                 let mut action_doc = Doc::text("reset");
                 if let Some(attributes) = action.attribute_list() {
@@ -10877,7 +10871,7 @@ fn build_alter_text_search_configuration<'a>(
             ast::AlterTextSearchConfigurationAction::DropMapping(action) => {
                 build_drop_mapping(ctx, action)
             }
-            ast::AlterTextSearchConfigurationAction::OwnerTo(action) => build_owner_to_role(action),
+            ast::AlterTextSearchConfigurationAction::OwnerTo(action) => build_owner_to(action),
             ast::AlterTextSearchConfigurationAction::SetSchema(action) => build_set_schema(action),
             ast::AlterTextSearchConfigurationAction::TextSearchConfigurationRenameTo(action) => {
                 let target = action.text_search_configuration().map(|name| {
@@ -10915,7 +10909,7 @@ fn build_alter_text_search_dictionary<'a>(
             ast::AlterTextSearchDictionaryAction::AttributeList(action) => {
                 build_attribute_list(ctx, action)
             }
-            ast::AlterTextSearchDictionaryAction::OwnerTo(action) => build_owner_to_role(action),
+            ast::AlterTextSearchDictionaryAction::OwnerTo(action) => build_owner_to(action),
             ast::AlterTextSearchDictionaryAction::SetSchema(action) => build_set_schema(action),
             ast::AlterTextSearchDictionaryAction::TextSearchDictionaryRenameTo(action) => {
                 let target = action.text_search_dictionary().map(|name| {
@@ -11093,7 +11087,7 @@ fn build_alter_type_action<'a>(ctx: &Ctx, action: ast::AlterTypeAction) -> Doc<'
             });
             build_comma_separated_docs(actions).unwrap_or_else(Doc::nil)
         }
-        ast::AlterTypeAction::OwnerTo(action) => build_owner_to_role(&action),
+        ast::AlterTypeAction::OwnerTo(action) => build_owner_to(&action),
         ast::AlterTypeAction::RenameAttribute(action) => {
             let mut doc = build_keyword_tokens([
                 (action.rename_token(), "rename"),
@@ -11603,7 +11597,7 @@ fn build_alter_property_graph_action<'a>(
     action: ast::AlterPropertyGraphAction,
 ) -> Doc<'a> {
     match action {
-        ast::AlterPropertyGraphAction::OwnerTo(n) => build_owner_to_role(&n),
+        ast::AlterPropertyGraphAction::OwnerTo(n) => build_owner_to(&n),
         ast::AlterPropertyGraphAction::SetSchema(n) => build_set_schema(&n),
         ast::AlterPropertyGraphAction::PropertyGraphRenameTo(n) => {
             let target = n.property_graph().map(|x| {
@@ -11725,25 +11719,9 @@ fn build_vertex_or_edge<'a>(n: Option<ast::VertexOrEdge>) -> Doc<'a> {
     };
     leading_comments(n.syntax()).append(Doc::text(keyword))
 }
-fn append_element_ref(mut doc: Doc<'_>, x: Option<ast::ElementTableRef>) -> Doc<'_> {
-    if let Some(x) = x {
-        doc = doc
-            .append(space_before(x.syntax()))
-            .append(build_name(x.syntax()));
-    }
-    doc
-}
 fn build_alter_label<'a>(n: &ast::AlterLabel) -> Doc<'a> {
     let doc = build_keyword_tokens([(n.alter_token(), "alter"), (n.label_token(), "label")]);
-    append_label_ref(doc, n.label_ref())
-}
-fn append_label_ref(mut doc: Doc<'_>, x: Option<ast::LabelRef>) -> Doc<'_> {
-    if let Some(x) = x {
-        doc = doc
-            .append(space_before(x.syntax()))
-            .append(build_name(x.syntax()));
-    }
-    doc
+    append_commented_name(doc, n.label_ref())
 }
 fn build_alter_element_labels<'a>(ctx: &Ctx, n: &ast::AlterVertexEdgeLabels) -> Doc<'a> {
     let mut doc = Doc::text("alter")
@@ -11752,7 +11730,7 @@ fn build_alter_element_labels<'a>(ctx: &Ctx, n: &ast::AlterVertexEdgeLabels) -> 
     if let Some(t) = n.table_token() {
         doc = doc.append(space_before(&t)).append(Doc::text("table"));
     }
-    doc = append_element_ref(doc, n.element_table_ref());
+    doc = append_commented_name(doc, n.element_table_ref());
     for x in n.add_labels() {
         let mut part = build_keyword_tokens([(x.add_token(), "add"), (x.label_token(), "label")]);
         if let Some(label) = x.label() {
@@ -11776,7 +11754,7 @@ fn build_add_element_properties<'a>(ctx: &Ctx, n: &ast::AddVertexEdgeLabelProper
     if let Some(t) = n.table_token() {
         doc = doc.append(space_before(&t)).append(Doc::text("table"));
     }
-    doc = append_element_ref(doc, n.element_table_ref());
+    doc = append_commented_name(doc, n.element_table_ref());
     if let Some(x) = n.alter_label() {
         doc = doc
             .append(space_before(x.syntax()))
@@ -11803,13 +11781,13 @@ fn build_drop_element_label<'a>(n: &ast::DropVertexEdgeLabel) -> Doc<'a> {
         doc = doc.append(leading_comments(&token));
     }
     doc = doc.append(Doc::text("table"));
-    doc = append_element_ref(doc, n.element_table_ref());
+    doc = append_commented_name(doc, n.element_table_ref());
     for (token, keyword) in [(n.drop_token(), "drop"), (n.label_token(), "label")] {
         if let Some(token) = token {
             doc = doc.append(space_before(&token)).append(Doc::text(keyword));
         }
     }
-    doc = append_label_ref(doc, n.label_ref());
+    doc = append_commented_name(doc, n.label_ref());
     if let Some(x) = n.drop_behavior() {
         doc = doc
             .append(space_before(x.syntax()))
@@ -11826,7 +11804,7 @@ fn build_drop_element_properties<'a>(ctx: &Ctx, n: &ast::DropVertexEdgeLabelProp
         doc = doc.append(leading_comments(&token));
     }
     doc = doc.append(Doc::text("table"));
-    doc = append_element_ref(doc, n.element_table_ref());
+    doc = append_commented_name(doc, n.element_table_ref());
 
     let mut detail = n
         .alter_label()
@@ -12192,19 +12170,6 @@ fn build_expr_property_list<'a>(ctx: &Ctx, n: &ast::ExprAsPropertyNameList) -> D
         .group()
 }
 
-fn build_owner_to_role<'a>(owner: &ast::OwnerTo) -> Doc<'a> {
-    let mut doc = Doc::text("owner");
-    if let Some(to) = owner.to_token() {
-        doc = doc.append(space_before(&to)).append(Doc::text("to"));
-    }
-    if let Some(role) = owner.role_ref() {
-        doc = doc
-            .append(space_before(role.syntax()))
-            .append(build_role_ref(&role));
-    }
-    doc
-}
-
 fn build_depends_on_extension<'a>(
     no: bool,
     depends: Option<SyntaxToken>,
@@ -12468,7 +12433,7 @@ fn build_alter_language<'a>(ctx: &Ctx, stmt: &ast::AlterLanguage) -> Doc<'a> {
                 });
                 build_rename_to(action.to_token(), target)
             }
-            ast::AlterLanguageAction::OwnerTo(action) => build_owner_to_role(action),
+            ast::AlterLanguageAction::OwnerTo(action) => build_owner_to(action),
         };
         doc = append_nested_clause(ctx, doc, action.syntax(), action_doc);
     }
@@ -15491,7 +15456,7 @@ fn build_join<'a>(ctx: &Ctx, join: &ast::Join) -> Doc<'a> {
             ast::JoinCondition::OnClause(on_clause) => {
                 doc = doc
                     .append(space_before(on_clause.syntax()))
-                    .append(build_join_on_clause(ctx, &on_clause));
+                    .append(build_on_clause(ctx, &on_clause));
             }
             ast::JoinCondition::JoinUsingClause(using) => {
                 let condition_doc =
@@ -15499,14 +15464,6 @@ fn build_join<'a>(ctx: &Ctx, join: &ast::Join) -> Doc<'a> {
                 doc = doc.append(Doc::line_or_space().append(condition_doc).nest(ctx.indent));
             }
         }
-    }
-    doc.group()
-}
-
-fn build_join_on_clause<'a>(ctx: &Ctx, on_clause: &ast::OnClause) -> Doc<'a> {
-    let mut doc = Doc::text("on");
-    if let Some(expr) = on_clause.expr() {
-        doc = append_condition_body(ctx, doc, expr);
     }
     doc.group()
 }
