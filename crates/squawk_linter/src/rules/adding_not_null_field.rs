@@ -3,7 +3,7 @@ use smallvec::SmallVec;
 
 use squawk_syntax::ast::{self, AstNode, NameLike};
 
-use crate::name::{Name, path_ref_name};
+use crate::name::{Name, path_name};
 use crate::transactions::TablesCreatedInTransaction;
 use crate::{Linter, Rule, Version, Violation};
 
@@ -65,7 +65,7 @@ pub(crate) fn adding_not_null_field(ctx: &mut Linter, file: &ast::SourceFile) {
                 continue;
             };
             let created_in_transaction = tables_created.contains(&path);
-            let table = path_ref_name(&path);
+            let table = path_name(path.segments());
 
             for action in alter_table.actions() {
                 match action {

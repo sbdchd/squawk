@@ -106,44 +106,30 @@ pub fn needs_quoting(text: &str) -> bool {
     false
 }
 
-pub fn is_reserved_word(text: &str) -> bool {
-    RESERVED_KEYWORDS
+fn is_keyword_in(keywords: &[&str], text: &str) -> bool {
+    keywords
         .binary_search_by(|keyword| {
             keyword
                 .bytes()
                 .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
         })
         .is_ok()
+}
+
+pub fn is_reserved_word(text: &str) -> bool {
+    is_keyword_in(RESERVED_KEYWORDS, text)
 }
 
 pub(crate) fn is_col_name_word(text: &str) -> bool {
-    COL_NAME_KEYWORDS
-        .binary_search_by(|keyword| {
-            keyword
-                .bytes()
-                .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
-        })
-        .is_ok()
+    is_keyword_in(COL_NAME_KEYWORDS, text)
 }
 
 pub(crate) fn is_type_func_name_word(text: &str) -> bool {
-    TYPE_FUNC_NAME_KEYWORDS
-        .binary_search_by(|keyword| {
-            keyword
-                .bytes()
-                .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
-        })
-        .is_ok()
+    is_keyword_in(TYPE_FUNC_NAME_KEYWORDS, text)
 }
 
 fn is_as_label_word(text: &str) -> bool {
-    AS_LABEL_KEYWORDS
-        .binary_search_by(|keyword| {
-            keyword
-                .bytes()
-                .cmp(text.bytes().map(|b| b.to_ascii_lowercase()))
-        })
-        .is_ok()
+    is_keyword_in(AS_LABEL_KEYWORDS, text)
 }
 
 pub fn strip_quotes(text: &str) -> Option<&str> {

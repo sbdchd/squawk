@@ -1,14 +1,8 @@
-use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{Linter, Rule, Violation, transactions::TablesCreatedInTransaction};
-
-fn concurrently_fix(create_index: &ast::CreateIndex) -> Option<Fix> {
-    let index_token = create_index.index_token()?;
-    let at = index_token.text_range().end();
-    let edit = Edit::insert(" concurrently", at);
-    Some(Fix::new("Add `concurrently`", vec![edit]))
-}
+use crate::{
+    Linter, Rule, Violation, fixes::add_concurrently, transactions::TablesCreatedInTransaction,
+};
 
 pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut tables_created = TablesCreatedInTransaction::new(ctx.settings.assume_in_transaction);
@@ -22,7 +16,9 @@ pub(crate) fn require_concurrent_index_creation(ctx: &mut Linter, file: &ast::So
             && create_index.concurrently_token().is_none()
             && !tables_created.contains(&table_name)
         {
-            let fix = concurrently_fix(&create_index);
+            let fix = create_index
+                .index_token()
+                .map(|token| add_concurrently(token.text_range().end()));
 
             ctx.report(Violation::for_node(
                         Rule::RequireConcurrentIndexCreation,

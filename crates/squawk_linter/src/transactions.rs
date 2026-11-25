@@ -2,7 +2,7 @@ use rustc_hash::FxHashSet;
 use smallvec::SmallVec;
 use squawk_syntax::ast;
 
-use crate::name::{Name, path_name, path_ref_name};
+use crate::name::{Name, path_name};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum TransactionControl {
@@ -84,11 +84,11 @@ impl TablesCreatedInTransaction {
         if let Some(path) = table.and_then(|table| table.path())
             && path.segment().is_some()
         {
-            self.names.insert(path_name(&path));
+            self.names.insert(path_name(path.segments()));
         }
     }
 
     pub(crate) fn contains(&self, path: &ast::PathRef) -> bool {
-        !self.names.is_empty() && self.names.contains(&path_ref_name(path))
+        !self.names.is_empty() && self.names.contains(&path_name(path.segments()))
     }
 }

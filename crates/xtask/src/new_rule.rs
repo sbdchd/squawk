@@ -221,15 +221,22 @@ fn docs_create_rule(name: &str) -> Result<()> {
     Ok(())
 }
 
+fn insert_before_marker(path: &str, marker: &str, text: &str) -> Result<()> {
+    let path = project_root().join(path);
+    let file_content = fs::read_to_string(&path)?;
+    fs::write(
+        &path,
+        file_content.replace(marker, &format!("{text}{marker}")),
+    )?;
+    Ok(())
+}
+
 fn docs_update_page_index(name: &str) -> Result<()> {
     let name_kebab = name.to_case(Case::Kebab);
-    let root = project_root();
-    let rule_sidebars = root.join("docs/src/pages/index.js");
-    let mut file_content = fs::read_to_string(&rule_sidebars)?;
-
-    let replacements = [(
+    insert_before_marker(
+        "docs/src/pages/index.js",
         "// xtask:new-rule:rule-doc-meta",
-        format!(
+        &format!(
             r#"{{
     name: "{name_kebab}",
     tags: ["TODO"],
@@ -237,34 +244,17 @@ fn docs_update_page_index(name: &str) -> Result<()> {
   }},
   "#
         ),
-    )];
-
-    for (marker, replacement) in replacements {
-        file_content = file_content.replace(marker, &(replacement + marker));
-    }
-
-    fs::write(&rule_sidebars, file_content)?;
-    Ok(())
+    )
 }
 
 fn docs_update_sidebar(name: &str) -> Result<()> {
     let name_kebab = name.to_case(Case::Kebab);
-    let root = project_root();
-    let rule_sidebars = root.join("docs/sidebars.js");
-    let mut file_content = fs::read_to_string(&rule_sidebars)?;
-
-    let replacements = [(
+    insert_before_marker(
+        "docs/sidebars.js",
         "// xtask:new-rule:error-name",
-        format!(
+        &format!(
             r#""{name_kebab}",
       "#
         ),
-    )];
-
-    for (marker, replacement) in replacements {
-        file_content = file_content.replace(marker, &(replacement + marker));
-    }
-
-    fs::write(&rule_sidebars, file_content)?;
-    Ok(())
+    )
 }

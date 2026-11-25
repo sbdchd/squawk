@@ -1,14 +1,6 @@
-use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{Linter, Rule, Violation, transactions::TransactionState};
-
-fn concurrently_fix(drop_index: &ast::DropIndex) -> Option<Fix> {
-    let index_token = drop_index.index_token()?;
-    let at = index_token.text_range().end();
-    let edit = Edit::insert(" concurrently", at);
-    Some(Fix::new("Add `concurrently`", vec![edit]))
-}
+use crate::{Linter, Rule, Violation, fixes::add_concurrently, transactions::TransactionState};
 
 pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
@@ -31,9 +23,11 @@ pub(crate) fn require_concurrent_index_deletion(ctx: &mut Linter, file: &ast::So
                     "drop the dependent objects first, then drop the index `concurrently` without `cascade`",
                 )
             } else {
-                violation
-                    .help("drop the index `concurrently`")
-                    .fix(concurrently_fix(&drop_index))
+                violation.help("drop the index `concurrently`").fix(
+                    drop_index
+                        .index_token()
+                        .map(|token| add_concurrently(token.text_range().end())),
+                )
             };
             ctx.report(violation);
         }

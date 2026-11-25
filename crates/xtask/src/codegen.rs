@@ -1325,20 +1325,9 @@ const KEYWORD_OPERATORS: &[&str] = &[
     "or",
 ];
 
-fn keyword_phrases_match() -> String {
-    let patterns: Vec<String> = KEYWORD_PHRASES
-        .iter()
-        .map(|p| p.replace(' ', "\\s+"))
-        .collect();
+fn phrases_match(phrases: &[&str]) -> String {
+    let patterns: Vec<String> = phrases.iter().map(|p| p.replace(' ', "\\s+")).collect();
     format!("(?i)\\b({})\\b", patterns.join("|"))
-}
-
-fn operator_match() -> String {
-    let operator_patterns: Vec<String> = KEYWORD_OPERATORS
-        .iter()
-        .map(|op| op.replace(' ', "\\s+"))
-        .collect();
-    format!("(?i)\\b({})\\b", operator_patterns.join("|"))
 }
 
 fn keywords_match(all_keywords: &[String]) -> String {
@@ -1365,8 +1354,9 @@ fn update_textmate_keywords(all_keywords: &[String]) -> Result<()> {
     let content = std::fs::read_to_string(&tmlanguage_path)?;
     let mut json: serde_json::Value = serde_json::from_str(&content)?;
 
-    json["repository"]["keywords"]["patterns"][0]["match"] = keyword_phrases_match().into();
-    json["repository"]["keywords"]["patterns"][1]["match"] = operator_match().into();
+    json["repository"]["keywords"]["patterns"][0]["match"] = phrases_match(KEYWORD_PHRASES).into();
+    json["repository"]["keywords"]["patterns"][1]["match"] =
+        phrases_match(KEYWORD_OPERATORS).into();
     json["repository"]["keywords"]["patterns"][2]["match"] = keywords_match(all_keywords).into();
 
     let output = serde_json::to_string_pretty(&json)?;

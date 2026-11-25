@@ -9116,18 +9116,6 @@ impl Lowerer {
         }
     }
 
-    fn lower_tablespace_clause(&mut self, clause: &ast::TablespaceClause) {
-        if let Some(tablespace) = clause.tablespace_ref() {
-            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
-        }
-    }
-
-    fn lower_constraint_index_tablespace(&mut self, clause: &ast::ConstraintIndexTablespace) {
-        if let Some(tablespace) = clause.tablespace_ref() {
-            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
-        }
-    }
-
     fn lower_tablespace_ref(
         &mut self,
         tablespace: &ast::TablespaceRef,
@@ -10925,8 +10913,8 @@ impl Lowerer {
         if let Some(using_method) = using_method {
             self.lower_using_method(&using_method, AccessMethodKind::Table);
         }
-        if let Some(tablespace) = tablespace {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = tablespace.and_then(|clause| clause.tablespace_ref()) {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let Some(path) = create_table.table_name().and_then(|name| name.path()) else {
             return;
@@ -11871,8 +11859,11 @@ impl Lowerer {
         if let Some(using_method) = create_view.using_method() {
             self.lower_using_method(&using_method, AccessMethodKind::Table);
         }
-        if let Some(tablespace) = create_view.tablespace_clause() {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = create_view
+            .tablespace_clause()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let Some(path) = create_view.view().and_then(|view| view.path()) else {
             return;
@@ -11908,8 +11899,11 @@ impl Lowerer {
         if let Some(using_method) = create_table_as.using_method() {
             self.lower_using_method(&using_method, AccessMethodKind::Table);
         }
-        if let Some(tablespace) = create_table_as.tablespace_clause() {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = create_table_as
+            .tablespace_clause()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let Some(path) = create_table_as.table_name().and_then(|name| name.path()) else {
             return;
@@ -19527,8 +19521,11 @@ impl Lowerer {
                 self.find_access_method(btree)
             }
         };
-        if let Some(tablespace) = create_index.tablespace_clause() {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = create_index
+            .tablespace_clause()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let query = self.alloc_query(QueryKind::Index, create_index.syntax());
         self.push_scope(query);
@@ -22676,8 +22673,11 @@ impl Lowerer {
                 self.find_access_method(btree)
             }
         };
-        if let Some(tablespace) = exclude.constraint_index_tablespace() {
-            self.lower_constraint_index_tablespace(&tablespace);
+        if let Some(tablespace) = exclude
+            .constraint_index_tablespace()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let mut addition = String::new();
         for exclusion in exclude
@@ -23668,8 +23668,11 @@ impl Lowerer {
             let key_len = columns.len();
             return IndexColumns { columns, key_len };
         };
-        if let Some(tablespace) = params.constraint_index_tablespace() {
-            self.lower_constraint_index_tablespace(&tablespace);
+        if let Some(tablespace) = params
+            .constraint_index_tablespace()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         for column_ref in params
             .column_list()

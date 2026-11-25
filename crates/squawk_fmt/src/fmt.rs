@@ -2451,22 +2451,26 @@ fn build_discard<'a>(ctx: &Ctx, discard: &ast::Discard) -> Doc<'a> {
         .append(build_semicolon(discard.semicolon_token()))
 }
 
+fn append_cursor_from_or_in<'a>(ctx: &Ctx, doc: Doc<'a>, token: &SyntaxToken) -> Doc<'a> {
+    let keyword = if token.kind() == SyntaxKind::FROM_KW {
+        "from"
+    } else {
+        "in"
+    };
+    doc.append(
+        line_before(token)
+            .append(Doc::text(keyword))
+            .nest(ctx.indent),
+    )
+}
+
 fn build_fetch<'a>(ctx: &Ctx, fetch: &ast::Fetch) -> Doc<'a> {
     let mut doc = Doc::text("fetch");
     if let Some(action) = fetch.cursor_action() {
         doc = append_nested_node(ctx, doc, action, |value| build_cursor_action(ctx, value));
     }
     if let Some(token) = fetch.from_token().or_else(|| fetch.in_token()) {
-        let keyword = if token.kind() == SyntaxKind::FROM_KW {
-            "from"
-        } else {
-            "in"
-        };
-        doc = doc.append(
-            line_before(&token)
-                .append(Doc::text(keyword))
-                .nest(ctx.indent),
-        );
+        doc = append_cursor_from_or_in(ctx, doc, &token);
     }
     if let Some(cursor) = fetch.cursor_ref() {
         doc = append_nested_clause(ctx, doc, cursor.syntax(), build_name(cursor.syntax()));
@@ -4335,12 +4339,9 @@ fn build_create_role<'a>(ctx: &Ctx, stmt: &ast::CreateRole) -> Doc<'a> {
             .append(build_name(role.syntax()));
     }
     if let Some(options) = stmt.role_option_list() {
-        doc = append_nested_clause(
-            ctx,
-            doc,
-            options.syntax(),
-            build_role_option_list(ctx, &options),
-        );
+        doc = append_nested_node(ctx, doc, options, |options| {
+            build_role_option_list(ctx, &options)
+        });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -4354,12 +4355,9 @@ fn build_create_user<'a>(ctx: &Ctx, stmt: &ast::CreateUser) -> Doc<'a> {
             .append(build_name(role.syntax()));
     }
     if let Some(options) = stmt.role_option_list() {
-        doc = append_nested_clause(
-            ctx,
-            doc,
-            options.syntax(),
-            build_role_option_list(ctx, &options),
-        );
+        doc = append_nested_node(ctx, doc, options, |options| {
+            build_role_option_list(ctx, &options)
+        });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -5013,12 +5011,9 @@ fn build_create_group<'a>(ctx: &Ctx, stmt: &ast::CreateGroup) -> Doc<'a> {
         doc = append_nested_clause(ctx, doc, role.syntax(), build_name(role.syntax()));
     }
     if let Some(options) = stmt.role_option_list() {
-        doc = append_nested_clause(
-            ctx,
-            doc,
-            options.syntax(),
-            build_role_option_list(ctx, &options),
-        );
+        doc = append_nested_node(ctx, doc, options, |options| {
+            build_role_option_list(ctx, &options)
+        });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -6093,16 +6088,7 @@ fn build_move<'a>(ctx: &Ctx, move_stmt: &ast::Move) -> Doc<'a> {
         doc = append_nested_node(ctx, doc, action, |value| build_cursor_action(ctx, value));
     }
     if let Some(token) = move_stmt.from_token().or_else(|| move_stmt.in_token()) {
-        let keyword = if token.kind() == SyntaxKind::FROM_KW {
-            "from"
-        } else {
-            "in"
-        };
-        doc = doc.append(
-            line_before(&token)
-                .append(Doc::text(keyword))
-                .nest(ctx.indent),
-        );
+        doc = append_cursor_from_or_in(ctx, doc, &token);
     }
     if let Some(cursor) = move_stmt.cursor_ref() {
         doc = append_nested_clause(ctx, doc, cursor.syntax(), build_name(cursor.syntax()));
@@ -11248,21 +11234,15 @@ fn build_alter_user<'a>(ctx: &Ctx, stmt: &ast::AlterUser) -> Doc<'a> {
     } else if let Some(all) = stmt.all_token() {
         doc = doc.append(space_before(&all)).append(Doc::text("all"));
     }
-    if let Some(database) = stmt.in_database() {
-        let mut database_doc = build_keyword_tokens([
-            (database.in_token(), "in"),
-            (database.database_token(), "database"),
-        ]);
-        if let Some(name) = database.database_ref() {
-            database_doc = database_doc
-                .append(space_before(name.syntax()))
-                .append(build_name(name.syntax()));
-        }
-        doc = append_nested_clause(ctx, doc, database.syntax(), database_doc);
+    if let Some(in_database) = stmt.in_database() {
+        doc = append_nested_node(ctx, doc, in_database, |in_database| {
+            build_in_database(&in_database)
+        });
     }
     if let Some(action) = stmt.action() {
-        let action_doc = build_alter_role_action(ctx, action.clone().into());
-        doc = append_nested_clause(ctx, doc, action.syntax(), action_doc);
+        doc = append_nested_node(ctx, doc, action, |action| {
+            build_alter_role_action(ctx, action.into())
+        });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
 }
@@ -11428,21 +11408,30 @@ fn build_alter_role<'a>(ctx: &Ctx, stmt: &ast::AlterRole) -> Doc<'a> {
     } else if let Some(all) = stmt.all_token() {
         doc = doc.append(space_before(&all)).append(Doc::text("all"));
     }
-    if let Some(db) = stmt.in_database() {
-        let mut part =
-            build_keyword_tokens([(db.in_token(), "in"), (db.database_token(), "database")]);
-        if let Some(name) = db.database_ref() {
-            part = part
-                .append(space_before(name.syntax()))
-                .append(build_name(name.syntax()));
-        }
-        doc = append_nested_clause(ctx, doc, db.syntax(), part);
+    if let Some(in_database) = stmt.in_database() {
+        doc = append_nested_node(ctx, doc, in_database, |in_database| {
+            build_in_database(&in_database)
+        });
     }
     if let Some(action) = stmt.action() {
-        let action_doc = build_alter_role_action(ctx, action.clone());
-        doc = append_nested_clause(ctx, doc, action.syntax(), action_doc);
+        doc = append_nested_node(ctx, doc, action, |action| {
+            build_alter_role_action(ctx, action)
+        });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
+}
+
+fn build_in_database<'a>(in_database: &ast::InDatabase) -> Doc<'a> {
+    let mut doc = build_keyword_tokens([
+        (in_database.in_token(), "in"),
+        (in_database.database_token(), "database"),
+    ]);
+    if let Some(name) = in_database.database_ref() {
+        doc = doc
+            .append(space_before(name.syntax()))
+            .append(build_name(name.syntax()));
+    }
+    doc
 }
 
 fn build_alter_role_action<'a>(ctx: &Ctx, action: ast::AlterRoleAction) -> Doc<'a> {
@@ -15833,9 +15822,7 @@ fn build_json_table<'a>(ctx: &Ctx, json_table: &ast::JsonTable) -> Doc<'a> {
             .append(build_expr(ctx, document));
     }
     if let Some(format) = json_table.json_format_clause() {
-        body = body
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        body = append_json_format_clause(body, &format);
     }
     if let Some(comma) = json_table.comma_token() {
         body = body
@@ -18016,9 +18003,7 @@ fn build_json_fn<'a>(ctx: &Ctx, json_fn: &ast::JsonFn) -> Doc<'a> {
             .append(build_expr(ctx, expr));
     }
     if let Some(format) = json_fn.json_format_clause() {
-        body = body
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        body = append_json_format_clause(body, &format);
     }
     if let Some(unique) = json_fn.json_keys_unique_clause() {
         body = body
@@ -18059,9 +18044,7 @@ fn build_json_serialize_fn<'a>(ctx: &Ctx, json_serialize_fn: &ast::JsonSerialize
             .append(build_expr(ctx, expr));
     }
     if let Some(format) = json_serialize_fn.json_format_clause() {
-        body = body
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        body = append_json_format_clause(body, &format);
     }
     if let Some(returning) = json_serialize_fn.json_returning_clause() {
         body = body
@@ -18179,9 +18162,7 @@ fn build_json_document_path_fn<'a>(
             .append(build_expr(ctx, document));
     }
     if let Some(format) = format {
-        body = body
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        body = append_json_format_clause(body, &format);
     }
     if let Some(comma) = comma {
         body = body
@@ -18212,9 +18193,7 @@ fn build_json_exists_fn<'a>(ctx: &Ctx, json_exists_fn: &ast::JsonExistsFn) -> Do
             .append(build_expr(ctx, document));
     }
     if let Some(format) = json_exists_fn.json_format_clause() {
-        body = body
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        body = append_json_format_clause(body, &format);
     }
     if let Some(comma) = json_exists_fn.comma_token() {
         body = body
@@ -18517,9 +18496,7 @@ fn build_json_expr_format<'a>(ctx: &Ctx, value: &ast::JsonExprFormat) -> Doc<'a>
         .map(|value| build_expr(ctx, value))
         .unwrap_or_else(Doc::nil);
     if let Some(format) = value.json_format_clause() {
-        doc = doc
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        doc = append_json_format_clause(doc, &format);
     }
     doc.group()
 }
@@ -18530,9 +18507,7 @@ fn build_json_select_format<'a>(ctx: &Ctx, select: &ast::JsonSelectFormat) -> Do
         .map(|value| build_select_variant(ctx, value))
         .unwrap_or_else(Doc::nil);
     if let Some(format) = select.json_format_clause() {
-        doc = doc
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        doc = append_json_format_clause(doc, &format);
     }
     doc.group()
 }
@@ -18581,11 +18556,14 @@ fn build_json_value_expr<'a>(ctx: &Ctx, value: &ast::JsonValueExpr) -> Doc<'a> {
         .map(|value| build_expr(ctx, value))
         .unwrap_or_else(Doc::nil);
     if let Some(format) = value.json_format_clause() {
-        doc = doc
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        doc = append_json_format_clause(doc, &format);
     }
     doc.group()
+}
+
+fn append_json_format_clause<'a>(doc: Doc<'a>, format: &ast::JsonFormatClause) -> Doc<'a> {
+    doc.append(line_before(format.syntax()))
+        .append(build_json_format_clause(format))
 }
 
 fn build_json_format_clause<'a>(format: &ast::JsonFormatClause) -> Doc<'a> {
@@ -18643,9 +18621,7 @@ fn build_json_returning_clause<'a>(ctx: &Ctx, returning: &ast::JsonReturningClau
             .append(build_type(ctx, ty));
     }
     if let Some(format) = returning.json_format_clause() {
-        doc = doc
-            .append(line_before(format.syntax()))
-            .append(build_json_format_clause(&format));
+        doc = append_json_format_clause(doc, &format);
     }
     doc.nest(ctx.indent).group()
 }
