@@ -1051,7 +1051,7 @@ impl<'a> Overloads<'a> {
             is_enum |= pseudo == Pseudo::AnyEnum;
             compatible_nonarray |= pseudo == Pseudo::AnyCompatibleNonArray;
             let actual = match arg.ty {
-                ArgType::Known(ty) if self.pseudo(ty).is_none() => ty,
+                ArgType::Known(ty) if self.pseudo(ty).is_none() || self.is_record(ty) => ty,
                 ArgType::UnknownLiteral => continue,
                 ArgType::Known(_) | ArgType::Untyped => {
                     solution.uncertain = true;

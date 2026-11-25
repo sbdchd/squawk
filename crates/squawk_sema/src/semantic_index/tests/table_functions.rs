@@ -383,3 +383,132 @@ select trg();
       ╰╴                         ━━━━━
     ");
 }
+
+#[test]
+fn column_def_list_for_record_argument() {
+    assert_snapshot!(check("
+create function anyf(anyelement) returns anyelement
+  language sql
+  as 'select $1';
+select * from unnest(array[(1, 2), (3, 4)]) as t (a int, b int);
+select * from anyf(row(1)) as f (x int);
+select * from anyf(1) as f (x);
+select (x).f1 from unnest(array[row(1)]) as x;
+select * from unnest(array[row(1)], array[1]);
+select * from anyf(row(1));
+select * from json_populate_record(null::record, '{}');
+"), @"
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    8 │ select (x).f1 from unnest(array[row(1)]) as x;
+      ╰╴                   ━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    9 │ select * from unnest(array[row(1)], array[1]);
+      ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+       ╭▸ 
+    10 │ select * from anyf(row(1));
+       ╰╴              ━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+       ╭▸ 
+    11 │ select * from json_populate_record(null::record, '{}');
+       ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn keyword_function_column_def_list() {
+    assert_snapshot!(check("
+select * from coalesce(row(1)) as t (a int);
+select * from greatest(row(1)) as t (a int);
+select * from coalesce(1) as t (a);
+select relname from coalesce(null::pg_class);
+select * from coalesce(row(1));
+select * from nullif(row(1), row(2));
+select * from rows from (greatest(row(1), row(2)));
+select * from coalesce(1) as t (a int);
+select * from coalesce(null::pg_class) as t (a int);
+"), @"
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    6 │ select * from coalesce(row(1));
+      ╰╴              ━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    7 │ select * from nullif(row(1), row(2));
+      ╰╴              ━━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    8 │ select * from rows from (greatest(row(1), row(2)));
+      ╰╴                         ━━━━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+      ╭▸ 
+    9 │ select * from coalesce(1) as t (a int);
+      ╰╴                               ━━━━━━━
+    error: a column definition list is redundant for a function returning a named composite type
+       ╭▸ 
+    10 │ select * from coalesce(null::pg_class) as t (a int);
+       ╰╴                                            ━━━━━━━
+    ");
+}
+
+#[test]
+fn value_from_items() {
+    assert_snapshot!(check(r#"
+select t.relname, relkind from coalesce(null::pg_class) as t;
+select t.b + 1 from coalesce(1) as t (b);
+select coalesce from coalesce(1);
+select t + 1, int4 from cast(1 as int) as t, cast(2 as int);
+select relname from cast(null as pg_class);
+select t + 1, current_date from current_date as t;
+select * from current_user, current_schema as s;
+select * from cast(null as record) as t (a int);
+select t.nope from coalesce(null::pg_class) as t;
+select t.nope from coalesce(1) as t;
+select t.nope from cast(1 as int) as t (a);
+select t.nope from current_date as t (a);
+select * from cast(1 as int) as t (a int);
+select * from cast(row(1) as record) as t (a int);
+select * from cast(null as record);
+select * from current_date as t (a int);
+select * from "current_date";
+"#), @r#"
+    error: column `t.nope` does not exist
+       ╭▸ 
+    10 │ select t.nope from coalesce(null::pg_class) as t;
+       ╰╴         ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    11 │ select t.nope from coalesce(1) as t;
+       ╰╴         ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    12 │ select t.nope from cast(1 as int) as t (a);
+       ╰╴         ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    13 │ select t.nope from current_date as t (a);
+       ╰╴         ━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    14 │ select * from cast(1 as int) as t (a int);
+       ╰╴                                  ━━━━━━━
+    error: a column definition list is redundant for a row constructor
+       ╭▸ 
+    15 │ select * from cast(row(1) as record) as t (a int);
+       ╰╴                                          ━━━━━━━
+    error: a column definition list is required for functions returning `record`
+       ╭▸ 
+    16 │ select * from cast(null as record);
+       ╰╴              ━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    17 │ select * from current_date as t (a int);
+       ╰╴                                ━━━━━━━
+    error: relation `current_date` does not exist
+       ╭▸ 
+    18 │ select * from "current_date";
+       ╰╴              ━━━━━━━━━━━━━━
+    "#);
+}
