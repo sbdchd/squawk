@@ -18794,7 +18794,11 @@ fn relation_name(p: &mut Parser<'_>) {
     }
 }
 
-fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn opt_only_relation(
+    p: &mut Parser<'_>,
+    name_ref: fn(&mut Parser<'_>),
+    kind: SyntaxKind,
+) -> Option<CompletedMarker> {
     if !p.at_ts(RELATION_NAME_FIRST) {
         return None;
     }
@@ -18802,15 +18806,19 @@ fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if p.eat(ONLY_KW) {
         let trailing_paren = p.eat(L_PAREN);
-        relation_name_ref(p);
+        name_ref(p);
         if trailing_paren {
             p.expect(R_PAREN);
         }
     } else {
-        relation_name_ref(p);
+        name_ref(p);
         p.eat(STAR);
     }
-    Some(m.complete(p, RELATION_NAME))
+    Some(m.complete(p, kind))
+}
+
+fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    opt_only_relation(p, relation_name_ref, RELATION_NAME)
 }
 
 fn table_relation_name(p: &mut Parser<'_>) {
@@ -18820,22 +18828,7 @@ fn table_relation_name(p: &mut Parser<'_>) {
 }
 
 fn opt_table_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if !p.at_ts(RELATION_NAME_FIRST) {
-        return None;
-    }
-
-    let m = p.start();
-    if p.eat(ONLY_KW) {
-        let trailing_paren = p.eat(L_PAREN);
-        table_name_ref(p);
-        if trailing_paren {
-            p.expect(R_PAREN);
-        }
-    } else {
-        table_name_ref(p);
-        p.eat(STAR);
-    }
-    Some(m.complete(p, TABLE_RELATION_NAME))
+    opt_only_relation(p, table_name_ref, TABLE_RELATION_NAME)
 }
 
 // ALTER TABLE [ IF EXISTS ] [ ONLY ] name [ * ]
