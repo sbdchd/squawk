@@ -17744,7 +17744,7 @@ impl Lowerer {
         match column_defs {
             ColumnDefs::List(list) => self.check_column_def_list(function, &args, list),
             ColumnDefs::None => {
-                if self.returns_anonymous_record(function) {
+                if self.call_returns_anonymous_record(function, &args) {
                     self.push_error(call.syntax(), SemaError::MissingColumnDefList);
                 }
             }
@@ -17793,7 +17793,12 @@ impl Lowerer {
             let resolution =
                 self.find_routine(Some(self.pg_catalog), name, arg, FunctionKind::Function);
             let columns = match resolution {
-                Resolution::Function(function) => self.function_columns(function, arg, call, None),
+                Resolution::Function(function) => {
+                    if self.call_returns_anonymous_record(function, arg) {
+                        self.push_error(call.syntax(), SemaError::MissingColumnDefList);
+                    }
+                    self.function_columns(function, arg, call, None)
+                }
                 _ => FunctionColumns {
                     columns: self.unknown_columns(),
                     scalar: None,
@@ -17836,9 +17841,8 @@ impl Lowerer {
         call: &ast::CallExpr,
         scalar_alias: Option<&ast::TableAlias>,
     ) -> FunctionColumns {
-        let record = self.builtin_type("record");
-        let ret = self.index.functions[function].ret;
-        if ret.is_none() || ret == record {
+        let ty = self.call_type(function, args);
+        if self.index.functions[function].ret.is_none() || self.is_record(ty) {
             return FunctionColumns {
                 columns: self.unknown_columns(),
                 scalar: None,
@@ -17849,7 +17853,6 @@ impl Lowerer {
             (None, Some(expr)) => (self.index.functions[function].name, self.ptr(expr.syntax())),
             (None, None) => (self.index.functions[function].name, self.ptr(call.syntax())),
         };
-        let ty = self.call_type(function, args);
         let range = IdxRange::single(self.index.columns.alloc(Column {
             name: Some(name),
             ptr,
@@ -17916,6 +17919,11 @@ impl Lowerer {
             .into_iter()
             .any(|name| self.builtin_type(name) == Some(ty));
         (!supported).then_some(ty)
+    }
+
+    fn call_returns_anonymous_record(&mut self, function: FunctionId, args: &[CallArg]) -> bool {
+        let ty = self.call_type(function, args);
+        self.index.functions[function].columns.is_none() && self.is_record(ty)
     }
 
     fn returns_anonymous_record(&mut self, function: FunctionId) -> bool {

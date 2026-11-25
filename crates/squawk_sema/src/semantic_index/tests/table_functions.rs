@@ -383,3 +383,36 @@ select trg();
       ╰╴                         ━━━━━
     ");
 }
+
+#[test]
+fn column_def_list_for_record_argument() {
+    assert_snapshot!(check("
+create function anyf(anyelement) returns anyelement
+  language sql
+  as 'select $1';
+select * from unnest(array[(1, 2), (3, 4)]) as t (a int, b int);
+select * from anyf(row(1)) as f (x int);
+select * from anyf(1) as f (x);
+select (x).f1 from unnest(array[row(1)]) as x;
+select * from unnest(array[row(1)], array[1]);
+select * from anyf(row(1));
+select * from json_populate_record(null::record, '{}');
+"), @"
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    8 │ select (x).f1 from unnest(array[row(1)]) as x;
+      ╰╴                   ━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+      ╭▸ 
+    9 │ select * from unnest(array[row(1)], array[1]);
+      ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+       ╭▸ 
+    10 │ select * from anyf(row(1));
+       ╰╴              ━━━━━━━━━━━━
+    error: a column definition list is required for functions returning `record`
+       ╭▸ 
+    11 │ select * from json_populate_record(null::record, '{}');
+       ╰╴              ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    ");
+}
