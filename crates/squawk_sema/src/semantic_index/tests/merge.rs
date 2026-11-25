@@ -285,3 +285,55 @@ when not matched then
        ╰ note: a field with precision 3 and scale 0 must round to an absolute value less than `10^3`
     ");
 }
+
+#[test]
+fn merge_action_placement() {
+    assert_snapshot!(check("
+create table t (a int);
+merge into t
+using t as s on true
+when matched then
+  delete
+returning merge_action(), (select x from merge_action() as x);
+with m as (
+  merge into t
+  using t as s on true
+  when matched then
+    delete
+  returning merge_action() as x
+)
+select x from m;
+select merge_action();
+select * from merge_action();
+merge into t
+using (select merge_action() as x) as s on true
+when matched then
+  delete;
+merge into t
+using t as s on true
+when matched and merge_action() = 'a' then
+  delete;
+insert into t values (1) returning merge_action();
+"), @"
+    error: `merge_action` is only allowed in the `returning` list of a `merge`
+       ╭▸ 
+    16 │ select merge_action();
+       ╰╴       ━━━━━━━━━━━━━━
+    error: `merge_action` is only allowed in the `returning` list of a `merge`
+       ╭▸ 
+    17 │ select * from merge_action();
+       ╰╴              ━━━━━━━━━━━━━━
+    error: `merge_action` is only allowed in the `returning` list of a `merge`
+       ╭▸ 
+    19 │ using (select merge_action() as x) as s on true
+       ╰╴              ━━━━━━━━━━━━━━
+    error: `merge_action` is only allowed in the `returning` list of a `merge`
+       ╭▸ 
+    24 │ when matched and merge_action() = 'a' then
+       ╰╴                 ━━━━━━━━━━━━━━
+    error: `merge_action` is only allowed in the `returning` list of a `merge`
+       ╭▸ 
+    26 │ insert into t values (1) returning merge_action();
+       ╰╴                                   ━━━━━━━━━━━━━━
+    ");
+}

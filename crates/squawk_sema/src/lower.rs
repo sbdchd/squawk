@@ -129,6 +129,7 @@ impl Lowerer {
             view_column_deps: vec![],
             generated_column_deps: vec![],
             reserved_constraint_names: SmallVec::new(),
+            merge_action_fn: MergeActionFn::Disallowed,
             record_columns: FxHashMap::default(),
             view_bases: FxHashMap::default(),
             insert_values: vec![],
@@ -444,6 +445,7 @@ pub(crate) struct Lowerer {
     view_column_deps: Vec<ViewColumnDep>,
     generated_column_deps: Vec<GeneratedColumnDep>,
     reserved_constraint_names: SmallVec<[ReservedConstraintName; 2]>,
+    merge_action_fn: MergeActionFn,
     record_columns: FxHashMap<InIrFile<SyntaxNodePtr>, RecordColumns>,
     view_bases: FxHashMap<TableId, TableId>,
     insert_values: Vec<InsertValue>,
@@ -521,6 +523,12 @@ enum ArrayCast {
         array: Ty,
         element: Ty,
     },
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum MergeActionFn {
+    Allowed,
+    Disallowed,
 }
 
 struct InsertValue {
@@ -15406,7 +15414,10 @@ impl Lowerer {
         }
 
         if let Some(returning_clause) = merge.returning_clause() {
+            let merge_action_fn =
+                std::mem::replace(&mut self.merge_action_fn, MergeActionFn::Allowed);
             let columns = self.lower_returning(id, target, &returning_clause);
+            self.merge_action_fn = merge_action_fn;
             self.index.queries[id].columns = columns;
         }
 
@@ -17676,11 +17687,13 @@ impl Lowerer {
                         ..
                     }) = callee
                     {
-                        self.check_column_def_list(function, &args, &list);
+                        if !self.is_aggregate_call(&call, Some(function)) {
+                            self.check_column_def_list(function, &args, &list);
+                        }
                     } else if let Some(keyword) = call.function_like_keyword() {
                         let ty = self.keyword_call_type(&call, keyword, &args);
                         self.check_value_column_defs(call.syntax(), ty, ColumnDefs::List(&list));
-                    } else if ty.is_some() {
+                    } else if ty.is_some() && !is_json_aggregate(&call) {
                         self.check_value_column_defs(call.syntax(), ty, ColumnDefs::List(&list));
                     }
                     FunctionColumns {
@@ -17758,7 +17771,9 @@ impl Lowerer {
             None => ty.map(Some),
         };
         if let Some(ty) = value_ty {
-            self.check_value_column_defs(call.syntax(), ty, column_defs);
+            if !is_json_aggregate(call) {
+                self.check_value_column_defs(call.syntax(), ty, column_defs);
+            }
             let name = self.inferred_name(ast::Expr::CallExpr(call.clone()));
             let FunctionColumns { columns, scalar } =
                 self.value_columns(name, ty, call.syntax(), scalar_alias);
@@ -17797,7 +17812,11 @@ impl Lowerer {
             };
         }
         match column_defs {
-            ColumnDefs::List(list) => self.check_column_def_list(function, &args, list),
+            ColumnDefs::List(list) => {
+                if !self.is_aggregate_call(call, Some(function)) {
+                    self.check_column_def_list(function, &args, list);
+                }
+            }
             ColumnDefs::None => {
                 if self.call_returns_anonymous_record(function, &args) {
                     self.push_error(call.syntax(), SemaError::MissingColumnDefList);
@@ -25915,6 +25934,12 @@ impl Lowerer {
             self.lower_sequence_arg(&arg);
         }
         self.lower_named_args(function, named_args);
+        if call.function_like_keyword() == Some(ast::FunctionLikeKeyword::MergeAction)
+            && self.merge_action_fn == MergeActionFn::Disallowed
+        {
+            self.push_error(call.syntax(), SemaError::MisplacedMergeAction);
+        }
+        let json_aggregate = is_json_aggregate(call).then(|| self.lower_special_fn(call));
         self.check_set_returning_call(call, function, srf_calls);
         self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
@@ -25940,7 +25965,11 @@ impl Lowerer {
             }
             None => {}
         }
-        self.lower_special_fn(call).unwrap_or(LoweredCall {
+        let special = match json_aggregate {
+            Some(special) => special,
+            None => self.lower_special_fn(call),
+        };
+        special.unwrap_or(LoweredCall {
             args,
             callee: target,
             ty: target.and_then(|target| target.ty),
@@ -26099,9 +26128,7 @@ impl Lowerer {
     ) {
         let construct = if call.over_clause().is_some() {
             Some(SetReturningConstruct::Window)
-        } else if function
-            .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
-        {
+        } else if self.is_aggregate_call(call, function) {
             Some(SetReturningConstruct::Aggregate)
         } else if call.function_like_keyword() == Some(ast::FunctionLikeKeyword::Coalesce) {
             Some(SetReturningConstruct::Coalesce)
@@ -26162,6 +26189,13 @@ impl Lowerer {
         self.srf_calls.truncate(start);
     }
 
+    fn is_aggregate_call(&self, call: &ast::CallExpr, function: Option<FunctionId>) -> bool {
+        is_json_aggregate(call)
+            || function.is_some_and(|function| {
+                self.index.functions[function].kind == FunctionKind::Aggregate
+            })
+    }
+
     fn check_aggregate_call(
         &mut self,
         call: &ast::CallExpr,
@@ -26183,9 +26217,7 @@ impl Lowerer {
         }
         let kind = if call.over_clause().is_some() {
             AggregateCallKind::Window
-        } else if function
-            .is_some_and(|function| self.index.functions[function].kind == FunctionKind::Aggregate)
-        {
+        } else if self.is_aggregate_call(call, function) {
             AggregateCallKind::Aggregate
         } else {
             return;
@@ -29644,6 +29676,10 @@ fn is_row_constructor(expr: &ast::Expr) -> bool {
         expr = inner.unparen();
     }
     matches!(expr, ast::Expr::TupleExpr(_))
+}
+
+fn is_json_aggregate(call: &ast::CallExpr) -> bool {
+    call.json_array_agg_fn().is_some() || call.json_object_agg_fn().is_some()
 }
 
 fn is_opaque_record(expr: &ast::Expr) -> bool {

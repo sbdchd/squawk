@@ -796,6 +796,7 @@ pub(crate) enum SemaError {
     },
     WindowAggregateOrderBy,
     WindowDistinct,
+    MisplacedMergeAction,
     TriggerReturnType {
         name: Name,
         kind: TriggerFunctionKind,
@@ -1559,6 +1560,7 @@ impl SemaError {
             | SemaError::WindowFrameCopy { .. }
             | SemaError::WindowAggregateOrderBy
             | SemaError::WindowDistinct => DiagnosticKind::WindowingError,
+            SemaError::MisplacedMergeAction => DiagnosticKind::MisplacedMergeAction,
             SemaError::Duplicate { object, .. }
             | SemaError::DuplicateInSchema { object, .. }
             | SemaError::DuplicateForAccessMethod { object, .. } => object.duplicate_kind(),
@@ -2412,6 +2414,9 @@ impl SemaError {
                 Some("aggregate `order by` is not implemented for window functions")
             }
             SemaError::WindowDistinct => Some("`distinct` is not implemented for window functions"),
+            SemaError::MisplacedMergeAction => {
+                Some("`merge_action` is only allowed in the `returning` list of a `merge`")
+            }
             SemaError::RowLengthMismatch => Some("unequal number of entries in row expressions"),
             SemaError::DefaultColumnReference => {
                 Some("cannot use column reference in `default` expression")
@@ -2759,6 +2764,7 @@ impl fmt::Display for ErrorMessage<'_> {
             | SemaError::MissingShellType
             | SemaError::WindowAggregateOrderBy
             | SemaError::WindowDistinct
+            | SemaError::MisplacedMergeAction
             | SemaError::RowLengthMismatch
             | SemaError::DefaultColumnReference
             | SemaError::SubqueryNotSingleColumn

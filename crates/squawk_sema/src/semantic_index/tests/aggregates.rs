@@ -882,3 +882,56 @@ select h2(1) within group (order by 1, 2);
        ╰ hint: each hypothetical argument must have a matching ordering column
     ");
 }
+
+#[test]
+fn json_aggregate_placement() {
+    assert_snapshot!(check("
+create table t (a int);
+select json_arrayagg(a), json_objectagg(a: 1) from t;
+select json_arrayagg(a) over () from t;
+select 1 from t having json_arrayagg(a) is not null;
+select * from json_objectagg('a': 1) as t (a int);
+select * from rows from (json_arrayagg(1) as (a int));
+select * from sum(1) as t (a int);
+select 1 from t where json_arrayagg(1) is null;
+select json_arrayagg(sum(1));
+select json_objectagg('a': json_arrayagg(1));
+select json_arrayagg(generate_series(1, 2));
+select json_arrayagg(a) filter (where json_arrayagg(1) is null) from t;
+"), @"
+    error: aggregate functions are not allowed in functions in `from`
+      ╭▸ 
+    6 │ select * from json_objectagg('a': 1) as t (a int);
+      ╰╴              ━━━━━━━━━━━━━━━━━━━━━━
+    error: aggregate functions are not allowed in functions in `from`
+      ╭▸ 
+    7 │ select * from rows from (json_arrayagg(1) as (a int));
+      ╰╴                         ━━━━━━━━━━━━━━━━
+    error: aggregate functions are not allowed in functions in `from`
+      ╭▸ 
+    8 │ select * from sum(1) as t (a int);
+      ╰╴              ━━━━━━
+    error: aggregate functions are not allowed in `where`
+      ╭▸ 
+    9 │ select 1 from t where json_arrayagg(1) is null;
+      ╰╴                      ━━━━━━━━━━━━━━━━
+    error: aggregate calls cannot be nested
+       ╭▸ 
+    10 │ select json_arrayagg(sum(1));
+       ╰╴                     ━━━━━━
+    error: aggregate calls cannot be nested
+       ╭▸ 
+    11 │ select json_objectagg('a': json_arrayagg(1));
+       ╰╴                           ━━━━━━━━━━━━━━━━
+    error: aggregate calls cannot contain set-returning function calls
+       ╭▸ 
+    12 │ select json_arrayagg(generate_series(1, 2));
+       │                      ━━━━━━━━━━━━━━━━━━━━━
+       │
+       ╰ hint: you might be able to move the set-returning function into a `lateral` `from` item
+    error: aggregate functions are not allowed in `filter`
+       ╭▸ 
+    13 │ select json_arrayagg(a) filter (where json_arrayagg(1) is null) from t;
+       ╰╴                                      ━━━━━━━━━━━━━━━━
+    ");
+}
