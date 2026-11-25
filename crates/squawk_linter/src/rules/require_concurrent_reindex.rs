@@ -1,7 +1,7 @@
 use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{Linter, Rule, Violation, transactions::TransactionState};
+use crate::{Linter, Rule, Violation, fixes::add_concurrently, transactions::TransactionState};
 
 fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
     if let Some(options) = reindex.reindex_option_list()
@@ -24,8 +24,7 @@ fn concurrently_fix(reindex: &ast::Reindex) -> Option<Fix> {
         ast::ReindexTarget::ReindexTargetTable(it) => it.table_token(),
     }?;
     let at = kw_token.text_range().end();
-    let edit = Edit::insert(" concurrently", at);
-    Some(Fix::new("Add `concurrently`", vec![edit]))
+    Some(add_concurrently(at))
 }
 
 pub(crate) fn require_concurrent_reindex(ctx: &mut Linter, file: &ast::SourceFile) {

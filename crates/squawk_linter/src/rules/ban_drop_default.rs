@@ -1,47 +1,25 @@
 use squawk_syntax::ast::{self, AstNode};
 
+use crate::visitors::{DefaultAction, visit_default_actions};
 use crate::{Linter, Rule, Violation};
 
 pub(crate) fn ban_drop_default(ctx: &mut Linter, file: &ast::SourceFile) {
-    for stmt in file.stmts() {
-        if let ast::Stmt::AlterDomain(domain) = &stmt
-            && let Some(ast::AlterDomainAction::DropDefault(node)) = domain.action()
-        {
-            ctx.report(Violation::for_node(
-                Rule::BanDropDefault,
-                "dropping a domain default may break existing clients".into(),
-                node.syntax(),
-            ));
-        }
-        if let ast::Stmt::AlterView(view) = &stmt
-            && let Some(ast::AlterViewAction::AlterViewColumn(column)) = view.action()
-            && let Some(ast::AlterViewColumnAction::DropDefault(node)) =
-                column.alter_view_column_action()
-        {
-            ctx.report(Violation::for_node(
-                Rule::BanDropDefault,
-                "dropping a column default may break existing clients".into(),
-                node.syntax(),
-            ));
-        }
-        let actions = match stmt {
-            ast::Stmt::AlterTable(table) => table.actions(),
-            ast::Stmt::AlterForeignTable(table) => table.actions(),
-            _ => continue,
-        };
-        for action in actions {
-            if let ast::AlterTableAction::AlterColumn(alter_column) = action
-                && let Some(ast::AlterColumnOption::DropDefault(drop_default)) =
-                    alter_column.option()
-            {
-                ctx.report(Violation::for_node(
-                    Rule::BanDropDefault,
-                    "dropping a column default may break existing clients".into(),
-                    drop_default.syntax(),
-                ));
+    visit_default_actions(file, |action| {
+        let (node, message) = match action {
+            DefaultAction::DropDomain(node) => {
+                (node, "dropping a domain default may break existing clients")
             }
-        }
-    }
+            DefaultAction::DropColumn(node) => {
+                (node, "dropping a column default may break existing clients")
+            }
+            DefaultAction::SetDomain(_) | DefaultAction::SetColumn(_) => return,
+        };
+        ctx.report(Violation::for_node(
+            Rule::BanDropDefault,
+            message.into(),
+            node.syntax(),
+        ));
+    });
 }
 
 #[cfg(test)]

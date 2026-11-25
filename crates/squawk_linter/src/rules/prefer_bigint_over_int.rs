@@ -4,8 +4,8 @@ use squawk_syntax::ast::AstNode;
 
 use crate::{Linter, Rule, Violation};
 
-use crate::visitors::check_not_allowed_types;
 use crate::visitors::is_not_valid_int_type;
+use crate::visitors::visit_not_allowed_types;
 
 fn is_int_name(name: &str) -> bool {
     matches!(name, "int" | "integer" | "int4" | "serial" | "serial4")
@@ -77,7 +77,7 @@ fn check_ty_for_big_int(ctx: &mut Linter, ty: Option<ast::Type>) {
 
 // TODO: we should have this be a config option instead of having a bunch of prefer_$int rules
 pub(crate) fn prefer_bigint_over_int(ctx: &mut Linter, file: &ast::SourceFile) {
-    check_not_allowed_types(ctx, file, check_ty_for_big_int);
+    visit_not_allowed_types(file, |ty| check_ty_for_big_int(ctx, ty));
 }
 
 #[cfg(test)]

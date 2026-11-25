@@ -24,7 +24,7 @@ use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_M
 use crate::inheritance_graph::{Inheritance, InheritanceGraph, InheritanceKind};
 use crate::interner::Name;
 use crate::ir::{ArrayOwner, SubscriptResults};
-use crate::keyed_index::GraphElementIndex;
+use crate::keyed_index::{GraphElementIndex, Keyed, KeyedIndex};
 use crate::lookup::{Lookup, RefSource, RelationLookup, TableLookup, TypeCandidates};
 use crate::partition_bound::{
     BoundKeyType, ListValue, PartitionBound, PartitionKey, RangeValue, partition_bounds_overlap,
@@ -34,6 +34,7 @@ use crate::pg_float::{FloatInputError, FloatType};
 use crate::pg_int::{IntInputError, IntType};
 use crate::pg_json::{JsonInputError, JsonType};
 use crate::pg_numeric::{NumericInputError, NumericTypmod};
+use crate::qualified_index::{Qualified, QualifiedIndex};
 use crate::undo::{OpenSavepoint, OpenTransaction, Snapshot, Undo};
 use squawk_syntax::comments::preceding_comment;
 
@@ -1022,6 +1023,95 @@ impl IfMissing {
         match if_exists {
             Some(_) => IfMissing::Ignore,
             None => IfMissing::Error,
+        }
+    }
+
+    fn resolution(self) -> Resolution {
+        match self {
+            IfMissing::Error => Resolution::Unresolved,
+            IfMissing::Ignore => Resolution::Unknown,
+        }
+    }
+}
+
+struct NewName {
+    name: Name,
+    taken: bool,
+}
+
+enum AlterRoutineAction {
+    Rename(Option<ast::Path>),
+    SetSchema(ast::SetSchema),
+    Options(ast::FuncOptionList),
+    Owner(ast::OwnerTo),
+    Extension(Option<ast::ExtensionRef>),
+}
+
+impl From<ast::AlterFunctionAction> for AlterRoutineAction {
+    fn from(action: ast::AlterFunctionAction) -> Self {
+        match action {
+            ast::AlterFunctionAction::FunctionRenameTo(rename) => {
+                AlterRoutineAction::Rename(rename.function_name().and_then(|name| name.path()))
+            }
+            ast::AlterFunctionAction::SetSchema(set_schema) => {
+                AlterRoutineAction::SetSchema(set_schema)
+            }
+            ast::AlterFunctionAction::FuncOptionList(options) => {
+                AlterRoutineAction::Options(options)
+            }
+            ast::AlterFunctionAction::OwnerTo(owner_to) => AlterRoutineAction::Owner(owner_to),
+            ast::AlterFunctionAction::DependsOnExtension(depends) => {
+                AlterRoutineAction::Extension(depends.extension_ref())
+            }
+            ast::AlterFunctionAction::NoDependsOnExtension(depends) => {
+                AlterRoutineAction::Extension(depends.extension_ref())
+            }
+        }
+    }
+}
+
+impl From<ast::AlterProcedureAction> for AlterRoutineAction {
+    fn from(action: ast::AlterProcedureAction) -> Self {
+        match action {
+            ast::AlterProcedureAction::ProcedureRenameTo(rename) => {
+                AlterRoutineAction::Rename(rename.procedure_name().and_then(|name| name.path()))
+            }
+            ast::AlterProcedureAction::SetSchema(set_schema) => {
+                AlterRoutineAction::SetSchema(set_schema)
+            }
+            ast::AlterProcedureAction::FuncOptionList(options) => {
+                AlterRoutineAction::Options(options)
+            }
+            ast::AlterProcedureAction::OwnerTo(owner_to) => AlterRoutineAction::Owner(owner_to),
+            ast::AlterProcedureAction::DependsOnExtension(depends) => {
+                AlterRoutineAction::Extension(depends.extension_ref())
+            }
+            ast::AlterProcedureAction::NoDependsOnExtension(depends) => {
+                AlterRoutineAction::Extension(depends.extension_ref())
+            }
+        }
+    }
+}
+
+impl From<ast::AlterRoutineAction> for AlterRoutineAction {
+    fn from(action: ast::AlterRoutineAction) -> Self {
+        match action {
+            ast::AlterRoutineAction::RoutineRenameTo(rename) => {
+                AlterRoutineAction::Rename(rename.routine_name().and_then(|name| name.path()))
+            }
+            ast::AlterRoutineAction::SetSchema(set_schema) => {
+                AlterRoutineAction::SetSchema(set_schema)
+            }
+            ast::AlterRoutineAction::FuncOptionList(options) => {
+                AlterRoutineAction::Options(options)
+            }
+            ast::AlterRoutineAction::OwnerTo(owner_to) => AlterRoutineAction::Owner(owner_to),
+            ast::AlterRoutineAction::DependsOnExtension(depends) => {
+                AlterRoutineAction::Extension(depends.extension_ref())
+            }
+            ast::AlterRoutineAction::NoDependsOnExtension(depends) => {
+                AlterRoutineAction::Extension(depends.extension_ref())
+            }
         }
     }
 }
@@ -2176,7 +2266,6 @@ impl Lowerer {
         name: Name,
         name_ptr: InIrFile<SyntaxNodePtr>,
     ) {
-        let in_transaction = self.in_transaction();
         if !self.index.tables.is_local(table) {
             return;
         }
@@ -2189,14 +2278,13 @@ impl Lowerer {
         let previous = Undo::MoveTable(table, current.schema, current.name, current.name_ptr);
         let previous_name = current.name_ptr.file_range();
         self.index.tables.move_to(table, schema, name, name_ptr);
-        if in_transaction {
+        if self.in_transaction() {
             self.undo.push(previous);
         }
         self.index
             .record_rename(Item::Table(table), previous_name, name_ptr.file_range());
-        if renamed && self.index.tables[table].array_name.is_some() {
-            let array_name = self.choose_array_name(schema, name);
-            self.set_array_name(ArrayOwner::Table(table), Some(array_name));
+        if renamed {
+            self.rename_array(ArrayOwner::Table(table), schema, name);
         }
     }
 
@@ -4070,10 +4158,7 @@ impl Lowerer {
     }
 
     fn find_cast(&self, types: CastTypes) -> Option<CastId> {
-        self.index
-            .casts
-            .get(types)
-            .find(|cast| !self.dropped_casts.contains(cast))
+        find_live(&self.index.casts, &self.dropped_casts, types)
     }
 
     fn drop_cast(&mut self, cast: CastId) {
@@ -4969,35 +5054,24 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> Option<RoleId> {
         let role = self.find_role(name);
-        let resolution = match (role, if_missing) {
-            (Some(role), _) => Resolution::Role(role),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
+        let resolution = role.map_or(if_missing.resolution(), Resolution::Role);
         self.add_ref(name, ReferenceKind::Role, node, resolution);
         role
     }
 
     fn alloc_role(&mut self, node: &SyntaxNode, name_node: &impl NameLike) -> RoleId {
-        let name = self.intern(&name_node.text());
-        if self.find_role(name).is_some() {
-            self.report_duplicate(ObjectKind::Role, name_node.syntax(), name);
-        }
+        let NewName { name, .. } = self.new_name(ObjectKind::Role, name_node, Self::find_role);
         let id = self.index.roles.alloc(Role {
             name,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
-        self.record_comment(node, Item::Role(id));
-        self.add_item(name_node.syntax(), Item::Role(id));
+        self.add_commented_item(node, name_node.syntax(), Item::Role(id));
         id
     }
 
     fn find_role(&self, name: Name) -> Option<RoleId> {
-        self.index
-            .roles
-            .get(name)
-            .find(|id| !self.dropped_roles.contains(id))
+        find_live(&self.index.roles, &self.dropped_roles, name)
     }
 
     fn lower_create_policy(&mut self, create_policy: &ast::CreatePolicy) {
@@ -5157,15 +5231,14 @@ impl Lowerer {
         policy_ref: &ast::PolicyRef,
         if_missing: IfMissing,
     ) -> Option<PolicyId> {
-        let name = self.intern(&policy_ref.text());
-        let policy = table.and_then(|table| self.find_policy(table, name));
-        let resolution = match (policy, table, if_missing) {
-            (Some(policy), _, _) => Resolution::Policy(policy),
-            (None, Some(_), IfMissing::Error) => Resolution::Unresolved,
-            (None, Some(_), IfMissing::Ignore) | (None, None, _) => Resolution::Unknown,
-        };
-        self.add_ref(name, ReferenceKind::Policy, policy_ref.syntax(), resolution);
-        policy
+        self.lower_scoped_ref(
+            table,
+            policy_ref,
+            ReferenceKind::Policy,
+            if_missing,
+            Self::find_policy,
+            Resolution::Policy,
+        )
     }
 
     fn find_policy(&self, table: TableId, name: Name) -> Option<PolicyId> {
@@ -5267,11 +5340,7 @@ impl Lowerer {
     ) -> Option<AccessMethodId> {
         let name = self.intern(&access_method_ref.text());
         let access_method = self.find_access_method(name);
-        let resolution = match (access_method, if_missing) {
-            (Some(access_method), _) => Resolution::AccessMethod(access_method),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
+        let resolution = access_method.map_or(if_missing.resolution(), Resolution::AccessMethod);
         self.add_ref(
             name,
             ReferenceKind::AccessMethod,
@@ -5293,10 +5362,11 @@ impl Lowerer {
     }
 
     fn find_access_method(&self, name: Name) -> Option<AccessMethodId> {
-        self.index
-            .access_methods
-            .get(name)
-            .find(|id| !self.dropped_access_methods.contains(id))
+        find_live(
+            &self.index.access_methods,
+            &self.dropped_access_methods,
+            name,
+        )
     }
 
     fn lower_create_foreign_table(&mut self, create_table: &ast::CreateForeignTable) {
@@ -5443,17 +5513,17 @@ impl Lowerer {
     }
 
     fn alloc_foreign_data_wrapper(&mut self, node: &SyntaxNode, name_node: &impl NameLike) {
-        let name = self.intern(&name_node.text());
-        if self.find_foreign_data_wrapper(name).is_some() {
-            self.report_duplicate(ObjectKind::ForeignDataWrapper, name_node.syntax(), name);
-        }
+        let NewName { name, .. } = self.new_name(
+            ObjectKind::ForeignDataWrapper,
+            name_node,
+            Self::find_foreign_data_wrapper,
+        );
         let id = self.index.foreign_data_wrappers.alloc(ForeignDataWrapper {
             name,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
-        self.record_comment(node, Item::ForeignDataWrapper(id));
-        self.add_item(name_node.syntax(), Item::ForeignDataWrapper(id));
+        self.add_commented_item(node, name_node.syntax(), Item::ForeignDataWrapper(id));
     }
 
     fn lower_foreign_data_wrapper_ref(
@@ -5461,27 +5531,21 @@ impl Lowerer {
         wrapper_ref: &ast::ForeignDataWrapperRef,
         if_missing: IfMissing,
     ) -> Option<ForeignDataWrapperId> {
-        let name = self.intern(&wrapper_ref.text());
-        let wrapper = self.find_foreign_data_wrapper(name);
-        let resolution = match (wrapper, if_missing) {
-            (Some(wrapper), _) => Resolution::ForeignDataWrapper(wrapper),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_name_ref(
+            wrapper_ref,
             ReferenceKind::ForeignDataWrapper,
-            wrapper_ref.syntax(),
-            resolution,
-        );
-        wrapper
+            if_missing,
+            Self::find_foreign_data_wrapper,
+            Resolution::ForeignDataWrapper,
+        )
     }
 
     fn find_foreign_data_wrapper(&self, name: Name) -> Option<ForeignDataWrapperId> {
-        self.index
-            .foreign_data_wrappers
-            .get(name)
-            .find(|id| !self.dropped_foreign_data_wrappers.contains(id))
+        find_live(
+            &self.index.foreign_data_wrappers,
+            &self.dropped_foreign_data_wrappers,
+            name,
+        )
     }
 
     fn lower_create_server(&mut self, create_server: &ast::CreateServer) {
@@ -5566,22 +5630,17 @@ impl Lowerer {
         server_ref: &ast::ServerRef,
         if_missing: IfMissing,
     ) -> Option<ServerId> {
-        let name = self.intern(&server_ref.text());
-        let server = self.find_server(name);
-        let resolution = match (server, if_missing) {
-            (Some(server), _) => Resolution::Server(server),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(name, ReferenceKind::Server, server_ref.syntax(), resolution);
-        server
+        self.lower_name_ref(
+            server_ref,
+            ReferenceKind::Server,
+            if_missing,
+            Self::find_server,
+            Resolution::Server,
+        )
     }
 
     fn find_server(&self, name: Name) -> Option<ServerId> {
-        self.index
-            .servers
-            .get(name)
-            .find(|id| !self.dropped_servers.contains(id))
+        find_live(&self.index.servers, &self.dropped_servers, name)
     }
 
     fn lower_create_user_mapping(&mut self, create_user_mapping: &ast::CreateUserMapping) {
@@ -6241,24 +6300,14 @@ impl Lowerer {
         access_method: Option<AccessMethodId>,
         if_missing: IfMissing,
     ) -> Option<OperatorFamilyId> {
-        let segment = path.segment()?;
-        let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
-        let family = self
-            .search_path(schema, Lookup::OperatorClass)
-            .find_map(|schema| self.find_operator_family_in(schema, name, access_method));
-        let resolution = match (family, if_missing) {
-            (Some(family), _) => Resolution::OperatorFamily(family),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_path_ref(
+            path,
+            Lookup::OperatorClass,
             ReferenceKind::OperatorFamily,
-            segment.syntax(),
-            resolution,
-        );
-        family
+            if_missing,
+            |this, schema, name| this.find_operator_family_in(schema, name, access_method),
+            Resolution::OperatorFamily,
+        )
     }
 
     fn lower_operator_class_ref(
@@ -6267,24 +6316,40 @@ impl Lowerer {
         access_method: Option<AccessMethodId>,
         if_missing: IfMissing,
     ) -> Option<OperatorClassId> {
-        let segment = path.segment()?;
-        let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
-        let class = self
-            .search_path(schema, Lookup::OperatorClass)
-            .find_map(|schema| self.find_operator_class_in(schema, name, access_method));
-        let resolution = match (class, if_missing) {
-            (Some(class), _) => Resolution::OperatorClass(class),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_path_ref(
+            path,
+            Lookup::OperatorClass,
             ReferenceKind::OperatorClass,
-            segment.syntax(),
-            resolution,
-        );
-        class
+            if_missing,
+            |this, schema, name| this.find_operator_class_in(schema, name, access_method),
+            Resolution::OperatorClass,
+        )
+    }
+
+    fn operator_families_named(
+        &self,
+        schema: Name,
+        name: Name,
+    ) -> impl Iterator<Item = OperatorFamilyId> + '_ {
+        self.live_named(
+            &self.index.operator_families,
+            &self.dropped_operator_families,
+            schema,
+            name,
+        )
+    }
+
+    fn operator_classes_named(
+        &self,
+        schema: Name,
+        name: Name,
+    ) -> impl Iterator<Item = OperatorClassId> + '_ {
+        self.live_named(
+            &self.index.operator_classes,
+            &self.dropped_operator_classes,
+            schema,
+            name,
+        )
     }
 
     fn has_operator_family(
@@ -6294,12 +6359,9 @@ impl Lowerer {
         access_method: Option<AccessMethodId>,
     ) -> bool {
         access_method.is_some()
-            && self.index.operator_families.named(schema, name).any(|id| {
-                let family = &self.index.operator_families[id];
-                family.access_method == access_method
-                    && self.visible(family.schema, family.ptr.file_id)
-                    && !self.dropped_operator_families.contains(&id)
-            })
+            && self
+                .operator_families_named(schema, name)
+                .any(|id| self.index.operator_families[id].access_method == access_method)
     }
 
     fn has_operator_class(
@@ -6309,12 +6371,9 @@ impl Lowerer {
         access_method: Option<AccessMethodId>,
     ) -> bool {
         access_method.is_some()
-            && self.index.operator_classes.named(schema, name).any(|id| {
-                let class = &self.index.operator_classes[id];
-                class.access_method == access_method
-                    && self.visible(class.schema, class.ptr.file_id)
-                    && !self.dropped_operator_classes.contains(&id)
-            })
+            && self
+                .operator_classes_named(schema, name)
+                .any(|id| self.index.operator_classes[id].access_method == access_method)
     }
 
     fn find_operator_family_in(
@@ -6323,11 +6382,11 @@ impl Lowerer {
         name: Name,
         access_method: Option<AccessMethodId>,
     ) -> Option<OperatorFamilyId> {
-        self.index.operator_families.named(schema, name).find(|id| {
-            let family = &self.index.operator_families[*id];
-            same_access_method(family.access_method, access_method)
-                && self.visible(family.schema, family.ptr.file_id)
-                && !self.dropped_operator_families.contains(id)
+        self.operator_families_named(schema, name).find(|id| {
+            same_access_method(
+                self.index.operator_families[*id].access_method,
+                access_method,
+            )
         })
     }
 
@@ -6337,11 +6396,11 @@ impl Lowerer {
         name: Name,
         access_method: Option<AccessMethodId>,
     ) -> Option<OperatorClassId> {
-        self.index.operator_classes.named(schema, name).find(|id| {
-            let class = &self.index.operator_classes[*id];
-            same_access_method(class.access_method, access_method)
-                && self.visible(class.schema, class.ptr.file_id)
-                && !self.dropped_operator_classes.contains(id)
+        self.operator_classes_named(schema, name).find(|id| {
+            same_access_method(
+                self.index.operator_classes[*id].access_method,
+                access_method,
+            )
         })
     }
 
@@ -6553,59 +6612,65 @@ impl Lowerer {
         path: &ast::PathRef,
         if_missing: IfMissing,
     ) -> Option<StatisticsId> {
-        let segment = path.segment()?;
-        let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
-        let statistics = self
-            .search_path(schema, Lookup::Statistics)
-            .find_map(|schema| self.find_statistics_in(schema, name));
-        let resolution = match (statistics, if_missing) {
-            (Some(statistics), _) => Resolution::Statistics(statistics),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_path_ref(
+            path,
+            Lookup::Statistics,
             ReferenceKind::Statistics,
-            segment.syntax(),
-            resolution,
-        );
-        statistics
+            if_missing,
+            |this, schema, name| this.find_statistics_in(schema, name),
+            Resolution::Statistics,
+        )
     }
 
     fn find_statistics_in(&self, schema: Name, name: Name) -> Option<StatisticsId> {
-        self.index.statistics.named(schema, name).find(|id| {
-            let statistics = &self.index.statistics[*id];
-            self.visible(statistics.schema, statistics.ptr.file_id)
-                && !self.dropped_statistics.contains(id)
-                && statistics
-                    .table
-                    .is_none_or(|table| !self.dropped_tables.contains(&table))
+        self.live_named(
+            self.index.statistics.qualified(),
+            &self.dropped_statistics,
+            schema,
+            name,
+        )
+        .find(|id| {
+            self.index.statistics[*id]
+                .table
+                .is_none_or(|table| !self.dropped_tables.contains(&table))
         })
     }
 
-    fn lower_create_text_search_parser(&mut self, create_parser: &ast::CreateTextSearchParser) {
+    fn create_text_search_with_functions(
+        &mut self,
+        kind: TextSearchKind,
+        node: &SyntaxNode,
+        attribute_list: Option<&ast::AttributeList>,
+        path: Option<ast::Path>,
+    ) {
         let refs = self.index.references.next_idx();
         let start = self.index.text_search.next_idx();
-        for option in create_parser
-            .attribute_list()
-            .iter()
+        for option in attribute_list
+            .into_iter()
             .flat_map(|list| list.attribute_options())
         {
             if let Some(path) = attribute_path(&option) {
                 self.lower_function_path_ref(&path, None);
             }
         }
-        if let Some(path) = create_parser
-            .text_search_parser()
-            .and_then(|parser| parser.path())
-        {
-            self.create_text_search(TextSearchKind::Parser, create_parser.syntax(), &path);
+        if let Some(path) = path {
+            self.create_text_search(kind, node, &path);
         }
         self.depend_on_refs(
             refs,
             self.index.text_search.range_from(start),
             Object::TextSearch,
+        );
+    }
+
+    fn lower_create_text_search_parser(&mut self, create_parser: &ast::CreateTextSearchParser) {
+        self.create_text_search_with_functions(
+            TextSearchKind::Parser,
+            create_parser.syntax(),
+            create_parser.attribute_list().as_ref(),
+            create_parser
+                .text_search_parser()
+                .and_then(|parser| parser.path()),
         );
     }
 
@@ -6613,27 +6678,13 @@ impl Lowerer {
         &mut self,
         create_template: &ast::CreateTextSearchTemplate,
     ) {
-        let refs = self.index.references.next_idx();
-        let start = self.index.text_search.next_idx();
-        for option in create_template
-            .attribute_list()
-            .iter()
-            .flat_map(|list| list.attribute_options())
-        {
-            if let Some(path) = attribute_path(&option) {
-                self.lower_function_path_ref(&path, None);
-            }
-        }
-        if let Some(path) = create_template
-            .text_search_template()
-            .and_then(|template| template.path())
-        {
-            self.create_text_search(TextSearchKind::Template, create_template.syntax(), &path);
-        }
-        self.depend_on_refs(
-            refs,
-            self.index.text_search.range_from(start),
-            Object::TextSearch,
+        self.create_text_search_with_functions(
+            TextSearchKind::Template,
+            create_template.syntax(),
+            create_template.attribute_list().as_ref(),
+            create_template
+                .text_search_template()
+                .and_then(|template| template.path()),
         );
     }
 
@@ -6708,12 +6759,9 @@ impl Lowerer {
         match alter_parser.action() {
             Some(ast::AlterTextSearchParserAction::TextSearchParserRenameTo(rename)) => {
                 if let Some(parser) = parser
-                    && let Some(segment) = rename
-                        .text_search_parser()
-                        .and_then(|parser| parser.path())
-                        .and_then(|path| path.segment())
+                    && let Some(path) = rename.text_search_parser().and_then(|parser| parser.path())
                 {
-                    self.rename_text_search(parser, alter_parser.syntax(), &segment);
+                    self.rename_text_search(parser, alter_parser.syntax(), &path);
                 }
             }
             Some(ast::AlterTextSearchParserAction::SetSchema(set_schema)) => {
@@ -6733,12 +6781,11 @@ impl Lowerer {
         match alter_template.action() {
             Some(ast::AlterTextSearchTemplateAction::TextSearchTemplateRenameTo(rename)) => {
                 if let Some(template) = template
-                    && let Some(segment) = rename
+                    && let Some(path) = rename
                         .text_search_template()
                         .and_then(|template| template.path())
-                        .and_then(|path| path.segment())
                 {
-                    self.rename_text_search(template, alter_template.syntax(), &segment);
+                    self.rename_text_search(template, alter_template.syntax(), &path);
                 }
             }
             Some(ast::AlterTextSearchTemplateAction::SetSchema(set_schema)) => {
@@ -6761,12 +6808,11 @@ impl Lowerer {
         match alter_dictionary.action() {
             Some(ast::AlterTextSearchDictionaryAction::TextSearchDictionaryRenameTo(rename)) => {
                 if let Some(dictionary) = dictionary
-                    && let Some(segment) = rename
+                    && let Some(path) = rename
                         .text_search_dictionary()
                         .and_then(|dictionary| dictionary.path())
-                        .and_then(|path| path.segment())
                 {
-                    self.rename_text_search(dictionary, alter_dictionary.syntax(), &segment);
+                    self.rename_text_search(dictionary, alter_dictionary.syntax(), &path);
                 }
             }
             Some(ast::AlterTextSearchDictionaryAction::SetSchema(set_schema)) => {
@@ -6809,12 +6855,11 @@ impl Lowerer {
                 rename,
             )) => {
                 if let Some(configuration) = configuration
-                    && let Some(segment) = rename
+                    && let Some(path) = rename
                         .text_search_configuration()
                         .and_then(|configuration| configuration.path())
-                        .and_then(|path| path.segment())
                 {
-                    self.rename_text_search(configuration, alter_configuration.syntax(), &segment);
+                    self.rename_text_search(configuration, alter_configuration.syntax(), &path);
                 }
             }
             Some(ast::AlterTextSearchConfigurationAction::SetSchema(set_schema)) => {
@@ -6906,8 +6951,11 @@ impl Lowerer {
         &mut self,
         text_search: TextSearchId,
         node: &SyntaxNode,
-        segment: &ast::PathSegment,
+        path: &ast::Path,
     ) {
+        let Some(segment) = path.segment() else {
+            return;
+        };
         let TextSearch { kind, schema, .. } = self.index.text_search[text_search];
         let name = self.intern(&segment.text());
         if self.find_text_search_in(kind, schema, name).is_some() {
@@ -7019,24 +7067,14 @@ impl Lowerer {
         path: &ast::PathRef,
         if_missing: IfMissing,
     ) -> Option<TextSearchId> {
-        let segment = path.segment()?;
-        let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
-        let text_search = self
-            .search_path(schema, Lookup::TextSearch)
-            .find_map(|schema| self.find_text_search_in(kind, schema, name));
-        let resolution = match (text_search, if_missing) {
-            (Some(text_search), _) => Resolution::TextSearch(text_search),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_path_ref(
+            path,
+            Lookup::TextSearch,
             ReferenceKind::TextSearch(kind),
-            segment.syntax(),
-            resolution,
-        );
-        text_search
+            if_missing,
+            |this, schema, name| this.find_text_search_in(kind, schema, name),
+            Resolution::TextSearch,
+        )
     }
 
     fn find_text_search_in(
@@ -7045,12 +7083,13 @@ impl Lowerer {
         schema: Name,
         name: Name,
     ) -> Option<TextSearchId> {
-        self.index.text_search.named(schema, name).find(|id| {
-            let text_search = &self.index.text_search[*id];
-            text_search.kind == kind
-                && self.visible(text_search.schema, text_search.ptr.file_id)
-                && !self.dropped_text_search.contains(id)
-        })
+        self.live_named(
+            &self.index.text_search,
+            &self.dropped_text_search,
+            schema,
+            name,
+        )
+        .find(|id| self.index.text_search[*id].kind == kind)
     }
 
     fn lower_create_publication(&mut self, create_publication: &ast::CreatePublication) {
@@ -7195,17 +7234,14 @@ impl Lowerer {
     }
 
     fn alloc_publication(&mut self, node: &SyntaxNode, name_node: &impl NameLike) -> PublicationId {
-        let name = self.intern(&name_node.text());
-        if self.find_publication(name).is_some() {
-            self.report_duplicate(ObjectKind::Publication, name_node.syntax(), name);
-        }
+        let NewName { name, .. } =
+            self.new_name(ObjectKind::Publication, name_node, Self::find_publication);
         let id = self.index.publications.alloc(Publication {
             name,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
-        self.record_comment(node, Item::Publication(id));
-        self.add_item(name_node.syntax(), Item::Publication(id));
+        self.add_commented_item(node, name_node.syntax(), Item::Publication(id));
         id
     }
 
@@ -7214,27 +7250,17 @@ impl Lowerer {
         publication_ref: &ast::PublicationRef,
         if_missing: IfMissing,
     ) -> Option<PublicationId> {
-        let name = self.intern(&publication_ref.text());
-        let publication = self.find_publication(name);
-        let resolution = match (publication, if_missing) {
-            (Some(publication), _) => Resolution::Publication(publication),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_name_ref(
+            publication_ref,
             ReferenceKind::Publication,
-            publication_ref.syntax(),
-            resolution,
-        );
-        publication
+            if_missing,
+            Self::find_publication,
+            Resolution::Publication,
+        )
     }
 
     fn find_publication(&self, name: Name) -> Option<PublicationId> {
-        self.index
-            .publications
-            .get(name)
-            .find(|id| !self.dropped_publications.contains(id))
+        find_live(&self.index.publications, &self.dropped_publications, name)
     }
 
     fn lower_create_subscription(&mut self, create_subscription: &ast::CreateSubscription) {
@@ -7311,17 +7337,14 @@ impl Lowerer {
         node: &SyntaxNode,
         name_node: &impl NameLike,
     ) -> SubscriptionId {
-        let name = self.intern(&name_node.text());
-        if self.find_subscription(name).is_some() {
-            self.report_duplicate(ObjectKind::Subscription, name_node.syntax(), name);
-        }
+        let NewName { name, .. } =
+            self.new_name(ObjectKind::Subscription, name_node, Self::find_subscription);
         let id = self.index.subscriptions.alloc(Subscription {
             name,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
-        self.record_comment(node, Item::Subscription(id));
-        self.add_item(name_node.syntax(), Item::Subscription(id));
+        self.add_commented_item(node, name_node.syntax(), Item::Subscription(id));
         id
     }
 
@@ -7330,27 +7353,17 @@ impl Lowerer {
         subscription_ref: &ast::SubscriptionRef,
         if_missing: IfMissing,
     ) -> Option<SubscriptionId> {
-        let name = self.intern(&subscription_ref.text());
-        let subscription = self.find_subscription(name);
-        let resolution = match (subscription, if_missing) {
-            (Some(subscription), _) => Resolution::Subscription(subscription),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_name_ref(
+            subscription_ref,
             ReferenceKind::Subscription,
-            subscription_ref.syntax(),
-            resolution,
-        );
-        subscription
+            if_missing,
+            Self::find_subscription,
+            Resolution::Subscription,
+        )
     }
 
     fn find_subscription(&self, name: Name) -> Option<SubscriptionId> {
-        self.index
-            .subscriptions
-            .get(name)
-            .find(|id| !self.dropped_subscriptions.contains(id))
+        find_live(&self.index.subscriptions, &self.dropped_subscriptions, name)
     }
 
     fn lower_create_property_graph(&mut self, create_property_graph: &ast::CreatePropertyGraph) {
@@ -7796,20 +7809,14 @@ impl Lowerer {
         label: Option<GraphLabelId>,
         property_ref: &ast::PropertyNameRef,
     ) -> Option<GraphPropertyId> {
-        let name = self.intern(&property_ref.text());
-        let property = label.and_then(|label| self.find_graph_property(label, name));
-        let resolution = match (property, label) {
-            (Some(property), _) => Resolution::GraphProperty(property),
-            (None, Some(_)) => Resolution::Unresolved,
-            (None, None) => Resolution::Unknown,
-        };
-        self.add_ref(
-            name,
+        self.lower_scoped_ref(
+            label,
+            property_ref,
             ReferenceKind::GraphProperty,
-            property_ref.syntax(),
-            resolution,
-        );
-        property
+            IfMissing::Error,
+            Self::find_graph_property,
+            Resolution::GraphProperty,
+        )
     }
 
     fn find_graph_property(&self, label: GraphLabelId, name: Name) -> Option<GraphPropertyId> {
@@ -7919,20 +7926,14 @@ impl Lowerer {
         element: Option<GraphElementId>,
         label_ref: &ast::LabelRef,
     ) -> Option<GraphLabelId> {
-        let name = self.intern(&label_ref.text());
-        let label = element.and_then(|element| self.find_graph_label(element, name));
-        let resolution = match (label, element) {
-            (Some(label), _) => Resolution::GraphLabel(label),
-            (None, Some(_)) => Resolution::Unresolved,
-            (None, None) => Resolution::Unknown,
-        };
-        self.add_ref(
-            name,
+        self.lower_scoped_ref(
+            element,
+            label_ref,
             ReferenceKind::GraphLabel,
-            label_ref.syntax(),
-            resolution,
-        );
-        label
+            IfMissing::Error,
+            Self::find_graph_label,
+            Resolution::GraphLabel,
+        )
     }
 
     fn find_graph_element(
@@ -8412,32 +8413,24 @@ impl Lowerer {
         path: &ast::PathRef,
         if_missing: IfMissing,
     ) -> Option<ConversionId> {
-        let segment = path.segment()?;
-        let name = self.intern(&segment.text());
-        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
-        let conversion = self
-            .search_path(schema, Lookup::Conversion)
-            .find_map(|schema| self.find_conversion_in(schema, name));
-        let resolution = match (conversion, if_missing) {
-            (Some(conversion), _) => Resolution::Conversion(conversion),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_path_ref(
+            path,
+            Lookup::Conversion,
             ReferenceKind::Conversion,
-            segment.syntax(),
-            resolution,
-        );
-        conversion
+            if_missing,
+            |this, schema, name| this.find_conversion_in(schema, name),
+            Resolution::Conversion,
+        )
     }
 
     fn find_conversion_in(&self, schema: Name, name: Name) -> Option<ConversionId> {
-        self.index.conversions.named(schema, name).find(|id| {
-            let conversion = &self.index.conversions[*id];
-            self.visible(conversion.schema, conversion.ptr.file_id)
-                && !self.dropped_conversions.contains(id)
-        })
+        self.live_named(
+            &self.index.conversions,
+            &self.dropped_conversions,
+            schema,
+            name,
+        )
+        .next()
     }
 
     fn lower_create_language(&mut self, create_language: &ast::CreateLanguage) {
@@ -8636,20 +8629,13 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> Option<LanguageId> {
         let language = self.find_language(name);
-        let resolution = match (language, if_missing) {
-            (Some(language), _) => Resolution::Language(language),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
+        let resolution = language.map_or(if_missing.resolution(), Resolution::Language);
         self.add_ref(name, ReferenceKind::Language, node, resolution);
         language
     }
 
     fn find_language(&self, name: Name) -> Option<LanguageId> {
-        self.index
-            .languages
-            .get(name)
-            .find(|id| !self.dropped_languages.contains(id))
+        find_live(&self.index.languages, &self.dropped_languages, name)
     }
 
     fn lower_create_event_trigger(&mut self, create_event_trigger: &ast::CreateEventTrigger) {
@@ -8723,17 +8709,17 @@ impl Lowerer {
     }
 
     fn alloc_event_trigger(&mut self, node: &SyntaxNode, name_node: &impl NameLike) {
-        let name = self.intern(&name_node.text());
-        if self.find_event_trigger(name).is_some() {
-            self.report_duplicate(ObjectKind::EventTrigger, name_node.syntax(), name);
-        }
+        let NewName { name, .. } = self.new_name(
+            ObjectKind::EventTrigger,
+            name_node,
+            Self::find_event_trigger,
+        );
         let id = self.index.event_triggers.alloc(EventTrigger {
             name,
             ptr: self.ptr(node),
             name_ptr: self.ptr(name_node.syntax()),
         });
-        self.record_comment(node, Item::EventTrigger(id));
-        self.add_item(name_node.syntax(), Item::EventTrigger(id));
+        self.add_commented_item(node, name_node.syntax(), Item::EventTrigger(id));
     }
 
     fn lower_event_trigger_ref(
@@ -8741,27 +8727,21 @@ impl Lowerer {
         event_trigger_ref: &ast::EventTriggerRef,
         if_missing: IfMissing,
     ) -> Option<EventTriggerId> {
-        let name = self.intern(&event_trigger_ref.text());
-        let event_trigger = self.find_event_trigger(name);
-        let resolution = match (event_trigger, if_missing) {
-            (Some(event_trigger), _) => Resolution::EventTrigger(event_trigger),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
-        self.add_ref(
-            name,
+        self.lower_name_ref(
+            event_trigger_ref,
             ReferenceKind::EventTrigger,
-            event_trigger_ref.syntax(),
-            resolution,
-        );
-        event_trigger
+            if_missing,
+            Self::find_event_trigger,
+            Resolution::EventTrigger,
+        )
     }
 
     fn find_event_trigger(&self, name: Name) -> Option<EventTriggerId> {
-        self.index
-            .event_triggers
-            .get(name)
-            .find(|id| !self.dropped_event_triggers.contains(id))
+        find_live(
+            &self.index.event_triggers,
+            &self.dropped_event_triggers,
+            name,
+        )
     }
 
     fn lower_create_schema(&mut self, create_schema: &ast::CreateSchema) {
@@ -9017,13 +8997,7 @@ impl Lowerer {
     ) -> Option<SchemaId> {
         let name = self.intern_schema(&schema_ref.text());
         let schema = self.find_schema(name);
-        let resolution = match schema {
-            Some(schema) => Resolution::Schema(schema),
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
-        };
+        let resolution = schema.map_or(if_missing.resolution(), Resolution::Schema);
         self.add_ref(name, ReferenceKind::Schema, schema_ref.syntax(), resolution);
         schema
     }
@@ -9079,9 +9053,9 @@ impl Lowerer {
     }
 
     fn rename_tablespace(&mut self, tablespace: TablespaceId, new_name: &ast::Tablespace) {
-        let name = self.intern(&new_name.text());
-        if self.find_tablespace(name).is_some() {
-            self.report_duplicate(ObjectKind::Tablespace, new_name.syntax(), name);
+        let NewName { name, taken } =
+            self.new_name(ObjectKind::Tablespace, new_name, Self::find_tablespace);
+        if taken {
             return;
         }
         let ptr = self.index.tablespaces[tablespace].ptr;
@@ -9091,8 +9065,11 @@ impl Lowerer {
             ptr,
             name_ptr: self.ast_ptr(new_name),
         });
-        self.copy_comment(Item::Tablespace(tablespace), Item::Tablespace(id));
-        self.add_item(new_name.syntax(), Item::Tablespace(id));
+        self.add_renamed_item(
+            Item::Tablespace(tablespace),
+            new_name.syntax(),
+            Item::Tablespace(id),
+        );
     }
 
     fn lower_all_in_tablespace(&mut self, all_in_tablespace: &ast::AllInTablespace) {
@@ -9116,39 +9093,18 @@ impl Lowerer {
         }
     }
 
-    fn lower_tablespace_clause(&mut self, clause: &ast::TablespaceClause) {
-        if let Some(tablespace) = clause.tablespace_ref() {
-            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
-        }
-    }
-
-    fn lower_constraint_index_tablespace(&mut self, clause: &ast::ConstraintIndexTablespace) {
-        if let Some(tablespace) = clause.tablespace_ref() {
-            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
-        }
-    }
-
     fn lower_tablespace_ref(
         &mut self,
         tablespace: &ast::TablespaceRef,
         if_missing: IfMissing,
     ) -> Option<TablespaceId> {
-        let name = self.intern(&tablespace.text());
-        let id = self.find_tablespace(name);
-        let resolution = match id {
-            Some(id) => Resolution::Tablespace(id),
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
-        };
-        self.add_ref(
-            name,
+        self.lower_name_ref(
+            tablespace,
             ReferenceKind::Tablespace,
-            tablespace.syntax(),
-            resolution,
-        );
-        id
+            if_missing,
+            Self::find_tablespace,
+            Resolution::Tablespace,
+        )
     }
 
     fn lower_create_database(&mut self, create_database: &ast::CreateDatabase) {
@@ -9208,9 +9164,9 @@ impl Lowerer {
     }
 
     fn rename_database(&mut self, database: DatabaseId, new_name: &ast::Database) {
-        let name = self.intern(&new_name.text());
-        if self.find_database(name).is_some() {
-            self.report_duplicate(ObjectKind::Database, new_name.syntax(), name);
+        let NewName { name, taken } =
+            self.new_name(ObjectKind::Database, new_name, Self::find_database);
+        if taken {
             return;
         }
         let ptr = self.index.databases[database].ptr;
@@ -9220,8 +9176,11 @@ impl Lowerer {
             ptr,
             name_ptr: self.ast_ptr(new_name),
         });
-        self.copy_comment(Item::Database(database), Item::Database(id));
-        self.add_item(new_name.syntax(), Item::Database(id));
+        self.add_renamed_item(
+            Item::Database(database),
+            new_name.syntax(),
+            Item::Database(id),
+        );
     }
 
     fn lower_create_extension(&mut self, create_extension: &ast::CreateExtension) {
@@ -9615,22 +9574,13 @@ impl Lowerer {
         extension: &ast::ExtensionRef,
         if_missing: IfMissing,
     ) -> Option<ExtensionId> {
-        let name = self.intern(&extension.text());
-        let id = self.find_extension(name);
-        let resolution = match id {
-            Some(id) => Resolution::Extension(id),
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
-        };
-        self.add_ref(
-            name,
+        self.lower_name_ref(
+            extension,
             ReferenceKind::Extension,
-            extension.syntax(),
-            resolution,
-        );
-        id
+            if_missing,
+            Self::find_extension,
+            Resolution::Extension,
+        )
     }
 
     fn find_extension(&self, name: Name) -> Option<ExtensionId> {
@@ -10363,10 +10313,7 @@ impl Lowerer {
                 resolution
             }
         };
-        let resolution = resolution.unwrap_or(match if_missing {
-            IfMissing::Error => Resolution::Unresolved,
-            IfMissing::Ignore => Resolution::Unknown,
-        });
+        let resolution = resolution.unwrap_or(if_missing.resolution());
         self.add_ref(
             name,
             ReferenceKind::Function(kind),
@@ -10557,6 +10504,35 @@ impl Lowerer {
         }
     }
 
+    fn lower_alter_routine_action(
+        &mut self,
+        function: Option<FunctionId>,
+        action: AlterRoutineAction,
+        node: &SyntaxNode,
+    ) {
+        match action {
+            AlterRoutineAction::Rename(path) => {
+                if let Some(function) = function
+                    && let Some(path) = path
+                {
+                    self.rename_function(function, &path, node);
+                }
+            }
+            AlterRoutineAction::SetSchema(set_schema) => {
+                self.set_function_schema(function, &set_schema, node);
+            }
+            AlterRoutineAction::Options(options) => {
+                self.lower_func_options(&options);
+            }
+            AlterRoutineAction::Owner(owner_to) => self.lower_owner_to(&owner_to),
+            AlterRoutineAction::Extension(extension) => {
+                if let Some(extension) = extension {
+                    self.lower_extension_ref(&extension, IfMissing::Error);
+                }
+            }
+        }
+    }
+
     fn lower_alter_function(&mut self, alter_function: &ast::AlterFunction) {
         let function = alter_function.function_sig().and_then(|sig| {
             let path = sig.function_name_ref()?.path_ref()?;
@@ -10567,33 +10543,8 @@ impl Lowerer {
                 IfMissing::Error,
             )
         });
-        let node = alter_function.syntax();
-        match alter_function.action() {
-            Some(ast::AlterFunctionAction::FunctionRenameTo(rename)) => {
-                if let Some(function) = function
-                    && let Some(path) = rename.function_name().and_then(|name| name.path())
-                {
-                    self.rename_function(function, &path, node);
-                }
-            }
-            Some(ast::AlterFunctionAction::SetSchema(set_schema)) => {
-                self.set_function_schema(function, &set_schema, node);
-            }
-            Some(ast::AlterFunctionAction::FuncOptionList(options)) => {
-                self.lower_func_options(&options);
-            }
-            Some(ast::AlterFunctionAction::OwnerTo(owner_to)) => self.lower_owner_to(&owner_to),
-            Some(ast::AlterFunctionAction::DependsOnExtension(depends)) => {
-                if let Some(extension) = depends.extension_ref() {
-                    self.lower_extension_ref(&extension, IfMissing::Error);
-                }
-            }
-            Some(ast::AlterFunctionAction::NoDependsOnExtension(depends)) => {
-                if let Some(extension) = depends.extension_ref() {
-                    self.lower_extension_ref(&extension, IfMissing::Error);
-                }
-            }
-            None => {}
+        if let Some(action) = alter_function.action() {
+            self.lower_alter_routine_action(function, action.into(), alter_function.syntax());
         }
     }
 
@@ -10607,33 +10558,8 @@ impl Lowerer {
                 IfMissing::Error,
             )
         });
-        let node = alter_procedure.syntax();
-        match alter_procedure.action() {
-            Some(ast::AlterProcedureAction::ProcedureRenameTo(rename)) => {
-                if let Some(function) = function
-                    && let Some(path) = rename.procedure_name().and_then(|name| name.path())
-                {
-                    self.rename_function(function, &path, node);
-                }
-            }
-            Some(ast::AlterProcedureAction::SetSchema(set_schema)) => {
-                self.set_function_schema(function, &set_schema, node);
-            }
-            Some(ast::AlterProcedureAction::FuncOptionList(options)) => {
-                self.lower_func_options(&options);
-            }
-            Some(ast::AlterProcedureAction::OwnerTo(owner_to)) => self.lower_owner_to(&owner_to),
-            Some(ast::AlterProcedureAction::DependsOnExtension(depends)) => {
-                if let Some(extension) = depends.extension_ref() {
-                    self.lower_extension_ref(&extension, IfMissing::Error);
-                }
-            }
-            Some(ast::AlterProcedureAction::NoDependsOnExtension(depends)) => {
-                if let Some(extension) = depends.extension_ref() {
-                    self.lower_extension_ref(&extension, IfMissing::Error);
-                }
-            }
-            None => {}
+        if let Some(action) = alter_procedure.action() {
+            self.lower_alter_routine_action(function, action.into(), alter_procedure.syntax());
         }
     }
 
@@ -10647,33 +10573,8 @@ impl Lowerer {
                 IfMissing::Error,
             )
         });
-        let node = alter_routine.syntax();
-        match alter_routine.action() {
-            Some(ast::AlterRoutineAction::RoutineRenameTo(rename)) => {
-                if let Some(function) = function
-                    && let Some(path) = rename.routine_name().and_then(|name| name.path())
-                {
-                    self.rename_function(function, &path, node);
-                }
-            }
-            Some(ast::AlterRoutineAction::SetSchema(set_schema)) => {
-                self.set_function_schema(function, &set_schema, node);
-            }
-            Some(ast::AlterRoutineAction::FuncOptionList(options)) => {
-                self.lower_func_options(&options);
-            }
-            Some(ast::AlterRoutineAction::OwnerTo(owner_to)) => self.lower_owner_to(&owner_to),
-            Some(ast::AlterRoutineAction::DependsOnExtension(depends)) => {
-                if let Some(extension) = depends.extension_ref() {
-                    self.lower_extension_ref(&extension, IfMissing::Error);
-                }
-            }
-            Some(ast::AlterRoutineAction::NoDependsOnExtension(depends)) => {
-                if let Some(extension) = depends.extension_ref() {
-                    self.lower_extension_ref(&extension, IfMissing::Error);
-                }
-            }
-            None => {}
+        if let Some(action) = alter_routine.action() {
+            self.lower_alter_routine_action(function, action.into(), alter_routine.syntax());
         }
     }
 
@@ -10882,29 +10783,17 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> Option<DatabaseId> {
         let id = self.find_database(name);
-        let resolution = match id {
-            Some(id) => Resolution::Database(id),
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
-        };
+        let resolution = id.map_or(if_missing.resolution(), Resolution::Database);
         self.add_ref(name, ReferenceKind::Database, node, resolution);
         id
     }
 
     fn find_database(&self, name: Name) -> Option<DatabaseId> {
-        self.index
-            .databases
-            .get(name)
-            .find(|id| !self.dropped_databases.contains(id))
+        find_live(&self.index.databases, &self.dropped_databases, name)
     }
 
     fn find_tablespace(&self, name: Name) -> Option<TablespaceId> {
-        self.index
-            .tablespaces
-            .get(name)
-            .find(|id| !self.dropped_tablespaces.contains(id))
+        find_live(&self.index.tablespaces, &self.dropped_tablespaces, name)
     }
 
     fn lower_create_table(
@@ -10925,8 +10814,8 @@ impl Lowerer {
         if let Some(using_method) = using_method {
             self.lower_using_method(&using_method, AccessMethodKind::Table);
         }
-        if let Some(tablespace) = tablespace {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = tablespace.and_then(|clause| clause.tablespace_ref()) {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let Some(path) = create_table.table_name().and_then(|name| name.path()) else {
             return;
@@ -11871,8 +11760,11 @@ impl Lowerer {
         if let Some(using_method) = create_view.using_method() {
             self.lower_using_method(&using_method, AccessMethodKind::Table);
         }
-        if let Some(tablespace) = create_view.tablespace_clause() {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = create_view
+            .tablespace_clause()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let Some(path) = create_view.view().and_then(|view| view.path()) else {
             return;
@@ -11908,8 +11800,11 @@ impl Lowerer {
         if let Some(using_method) = create_table_as.using_method() {
             self.lower_using_method(&using_method, AccessMethodKind::Table);
         }
-        if let Some(tablespace) = create_table_as.tablespace_clause() {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = create_table_as
+            .tablespace_clause()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let Some(path) = create_table_as.table_name().and_then(|name| name.path()) else {
             return;
@@ -12552,9 +12447,6 @@ impl Lowerer {
     }
 
     fn check_numeric_value(&mut self, typmod: Option<NumericTypmod>, literal: &ast::Literal) {
-        if !literal.is_string() {
-            return;
-        }
         let Some(value) = literal.string_value() else {
             return;
         };
@@ -12585,9 +12477,6 @@ impl Lowerer {
     }
 
     fn check_int_value(&mut self, ty: IntType, literal: &ast::Literal) {
-        if !literal.is_string() {
-            return;
-        }
         let Some(value) = literal.string_value() else {
             return;
         };
@@ -12606,9 +12495,6 @@ impl Lowerer {
     }
 
     fn check_float_value(&mut self, ty: FloatType, literal: &ast::Literal) {
-        if !literal.is_string() {
-            return;
-        }
         let Some(value) = literal.string_value() else {
             return;
         };
@@ -12627,9 +12513,6 @@ impl Lowerer {
     }
 
     fn check_uuid_value(&mut self, literal: &ast::Literal) {
-        if !literal.is_string() {
-            return;
-        }
         let Some(value) = literal.string_value() else {
             return;
         };
@@ -12675,9 +12558,6 @@ impl Lowerer {
     }
 
     fn check_bool_value(&mut self, literal: &ast::Literal) {
-        if !literal.is_string() {
-            return;
-        }
         let Some(value) = literal.string_value() else {
             return;
         };
@@ -12726,9 +12606,6 @@ impl Lowerer {
     }
 
     fn lower_enum_value(&mut self, ty: TypeId, literal: &ast::Literal) {
-        if !literal.is_string() {
-            return;
-        }
         let Some(value) = literal.string_value() else {
             return;
         };
@@ -13215,10 +13092,7 @@ impl Lowerer {
                 source: None,
                 column,
             },
-            (None, Some(columns)) if columns.complete => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
+            (None, Some(columns)) if columns.complete => if_missing.resolution(),
             (None, _) => Resolution::Unknown,
         };
         self.add_ref(name, ReferenceKind::Column, field.syntax(), resolution);
@@ -13864,7 +13738,6 @@ impl Lowerer {
         name: Name,
         name_ptr: InIrFile<SyntaxNodePtr>,
     ) {
-        let in_transaction = self.in_transaction();
         if !self.index.types.is_local(ty) {
             return;
         }
@@ -13876,14 +13749,13 @@ impl Lowerer {
         let previous = Undo::MoveType(ty, current.schema, current.name, current.name_ptr);
         let previous_name = current.name_ptr.file_range();
         self.index.types.move_to(ty, schema, name, name_ptr);
-        if in_transaction {
+        if self.in_transaction() {
             self.undo.push(previous);
         }
         self.index
             .record_rename(Item::Type(ty), previous_name, name_ptr.file_range());
-        if renamed && self.index.types[ty].array_name.is_some() {
-            let array_name = self.choose_array_name(schema, name);
-            self.set_array_name(ArrayOwner::Type(ty), Some(array_name));
+        if renamed {
+            self.rename_array(ArrayOwner::Type(ty), schema, name);
         }
     }
 
@@ -14121,13 +13993,7 @@ impl Lowerer {
         let found = self
             .search_path(schema, Lookup::Type)
             .find_map(|schema| self.find_type_in(schema, name));
-        let resolution = match found {
-            Some(ty) => Resolution::Type(ty),
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
-        };
+        let resolution = found.map_or(if_missing.resolution(), Resolution::Type);
         self.add_ref_from(
             name,
             segment.syntax(),
@@ -14203,6 +14069,17 @@ impl Lowerer {
 
     fn move_array_name_out_of(&mut self, schema: Name, name: Name) {
         if let Some(owner) = self.find_array_owner(schema, name) {
+            let array_name = self.choose_array_name(schema, name);
+            self.set_array_name(owner, Some(array_name));
+        }
+    }
+
+    fn rename_array(&mut self, owner: ArrayOwner, schema: Name, name: Name) {
+        let array_name = match owner {
+            ArrayOwner::Type(ty) => self.index.types[ty].array_name,
+            ArrayOwner::Table(table) => self.index.tables[table].array_name,
+        };
+        if array_name.is_some() {
             let array_name = self.choose_array_name(schema, name);
             self.set_array_name(owner, Some(array_name));
         }
@@ -14623,6 +14500,60 @@ impl Lowerer {
         self.find_schema(name).map(|_| name)
     }
 
+    fn lower_name_ref<T: Copy>(
+        &mut self,
+        name_ref: &impl NameLike,
+        kind: ReferenceKind,
+        if_missing: IfMissing,
+        find: fn(&Self, Name) -> Option<T>,
+        resolution: fn(T) -> Resolution,
+    ) -> Option<T> {
+        let name = self.intern(&name_ref.text());
+        let found = find(self, name);
+        let resolution = found.map_or(if_missing.resolution(), resolution);
+        self.add_ref(name, kind, name_ref.syntax(), resolution);
+        found
+    }
+
+    fn lower_scoped_ref<S: Copy, T: Copy>(
+        &mut self,
+        scope: Option<S>,
+        name_ref: &impl NameLike,
+        kind: ReferenceKind,
+        if_missing: IfMissing,
+        find: fn(&Self, S, Name) -> Option<T>,
+        resolution: fn(T) -> Resolution,
+    ) -> Option<T> {
+        let name = self.intern(&name_ref.text());
+        let found = scope.and_then(|scope| find(self, scope, name));
+        let resolution = match scope {
+            Some(_) => found.map_or(if_missing.resolution(), resolution),
+            None => Resolution::Unknown,
+        };
+        self.add_ref(name, kind, name_ref.syntax(), resolution);
+        found
+    }
+
+    fn lower_path_ref<T: Copy>(
+        &mut self,
+        path: &ast::PathRef,
+        lookup: Lookup,
+        kind: ReferenceKind,
+        if_missing: IfMissing,
+        find: impl Fn(&Self, Name, Name) -> Option<T>,
+        resolution: fn(T) -> Resolution,
+    ) -> Option<T> {
+        let segment = path.segment()?;
+        let name = self.intern(&segment.text());
+        let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
+        let found = self
+            .search_path(schema, lookup)
+            .find_map(|schema| find(self, schema, name));
+        let resolution = found.map_or(if_missing.resolution(), resolution);
+        self.add_ref(name, kind, segment.syntax(), resolution);
+        found
+    }
+
     fn lower_schema_ref(&mut self, node: &SyntaxNode, text: &str) -> Name {
         self.lower_schema_ref_or(node, text, IfMissing::Error)
     }
@@ -14634,20 +14565,15 @@ impl Lowerer {
         if_missing: IfMissing,
     ) -> Name {
         let name = self.intern_schema(text);
-        let resolution = match (self.find_schema(name), if_missing) {
-            (Some(schema), _) => Resolution::Schema(schema),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
+        let resolution = self
+            .find_schema(name)
+            .map_or(if_missing.resolution(), Resolution::Schema);
         self.add_ref(name, ReferenceKind::Schema, node, resolution);
         name
     }
 
     fn find_schema(&self, name: Name) -> Option<SchemaId> {
-        self.index
-            .schemas
-            .get(name)
-            .find(|id| !self.dropped_schemas.contains(id))
+        find_live(&self.index.schemas, &self.dropped_schemas, name)
     }
 
     fn default_creation_schema(&self) -> Name {
@@ -15313,6 +15239,46 @@ impl Lowerer {
         id
     }
 
+    fn push_relation_target(
+        &mut self,
+        relation_name: &ast::RelationName,
+        table_alias: Option<ast::TableAlias>,
+    ) -> SourceId {
+        self.push_target_source(
+            relation_name
+                .relation_name_ref()
+                .and_then(|name| name.path_ref()),
+            table_alias,
+            relation_name.syntax(),
+        )
+    }
+
+    fn lower_target_items(&mut self, items: impl Iterator<Item = ast::FromListItem>) {
+        let target_sources = Range::from(0..self.scope_sources_len());
+        self.push_hidden(target_sources);
+        for item in items {
+            self.lower_from_list_item(item);
+        }
+        self.pop_hidden();
+        let len = self.scope_sources_len();
+        self.set_visible((0..len).into());
+    }
+
+    fn lower_where_clause_or_current_of(&mut self, where_clause: &ast::WhereClauseOrCurrentOf) {
+        match where_clause {
+            ast::WhereClauseOrCurrentOf::WhereClause(where_clause) => {
+                if let Some(expr) = where_clause.expr() {
+                    self.lower_condition(ConditionKind::Where, &expr);
+                }
+            }
+            ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of) => {
+                if let Some(cursor_ref) = current_of.cursor_ref() {
+                    self.lower_cursor_ref(&cursor_ref);
+                }
+            }
+        }
+    }
+
     fn lower_delete(&mut self, delete: &ast::Delete) -> QueryId {
         let mark = self.ctes.len();
         if let Some(with_clause) = delete.with_clause() {
@@ -15323,41 +15289,21 @@ impl Lowerer {
         self.push_scope(id);
 
         let target = delete.relation_name().map(|relation_name| {
-            self.push_target_source(
-                relation_name
-                    .relation_name_ref()
-                    .and_then(|name| name.path_ref()),
-                delete.alias().and_then(|alias| alias.name()),
-                relation_name.syntax(),
-            )
+            let table_alias = delete.alias().and_then(|alias| alias.name());
+            self.push_relation_target(&relation_name, table_alias)
         });
         if let Some(for_portion_of) = delete.for_portion_of() {
             self.lower_for_portion_of(target, &for_portion_of);
         }
-        let target_sources = Range::from(0..self.scope_sources_len());
-        self.push_hidden(target_sources);
-        for item in delete
-            .using_clause()
-            .into_iter()
-            .flat_map(|clause| clause.items())
-        {
-            self.lower_from_list_item(item);
-        }
-        self.pop_hidden();
-        self.set_visible((0..self.index.queries[id].sources.len()).into());
+        self.lower_target_items(
+            delete
+                .using_clause()
+                .into_iter()
+                .flat_map(|clause| clause.items()),
+        );
 
-        match delete.where_clause_or_current_of() {
-            Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
-                if let Some(expr) = where_clause.expr() {
-                    self.lower_condition(ConditionKind::Where, &expr);
-                }
-            }
-            Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
-                if let Some(cursor_ref) = current_of.cursor_ref() {
-                    self.lower_cursor_ref(&cursor_ref);
-                }
-            }
-            None => {}
+        if let Some(where_clause) = delete.where_clause_or_current_of() {
+            self.lower_where_clause_or_current_of(&where_clause);
         }
         if let Some(returning_clause) = delete.returning_clause() {
             let columns = self.lower_returning(id, target, &returning_clause);
@@ -15379,44 +15325,24 @@ impl Lowerer {
         self.push_scope(id);
 
         let target = update.relation_name().map(|relation_name| {
-            self.push_target_source(
-                relation_name
-                    .relation_name_ref()
-                    .and_then(|name| name.path_ref()),
-                update.alias().and_then(|alias| alias.name()),
-                relation_name.syntax(),
-            )
+            let table_alias = update.alias().and_then(|alias| alias.name());
+            self.push_relation_target(&relation_name, table_alias)
         });
         if let Some(for_portion_of) = update.for_portion_of() {
             self.lower_for_portion_of(target, &for_portion_of);
         }
-        let target_sources = Range::from(0..self.scope_sources_len());
-        self.push_hidden(target_sources);
-        for item in update
-            .from_clause()
-            .into_iter()
-            .flat_map(|clause| clause.items())
-        {
-            self.lower_from_list_item(item);
-        }
-        self.pop_hidden();
-        self.set_visible((0..self.index.queries[id].sources.len()).into());
+        self.lower_target_items(
+            update
+                .from_clause()
+                .into_iter()
+                .flat_map(|clause| clause.items()),
+        );
 
         if let Some(set_clause) = update.set_clause() {
             self.lower_set_clause(target, &set_clause);
         }
-        match update.where_clause_or_current_of() {
-            Some(ast::WhereClauseOrCurrentOf::WhereClause(where_clause)) => {
-                if let Some(expr) = where_clause.expr() {
-                    self.lower_condition(ConditionKind::Where, &expr);
-                }
-            }
-            Some(ast::WhereClauseOrCurrentOf::WhereCurrentOf(current_of)) => {
-                if let Some(cursor_ref) = current_of.cursor_ref() {
-                    self.lower_cursor_ref(&cursor_ref);
-                }
-            }
-            None => {}
+        if let Some(where_clause) = update.where_clause_or_current_of() {
+            self.lower_where_clause_or_current_of(&where_clause);
         }
         if let Some(returning_clause) = update.returning_clause() {
             let columns = self.lower_returning(id, target, &returning_clause);
@@ -18273,13 +18199,7 @@ impl Lowerer {
             self.push_error(segment.syntax(), SemaError::CannotOpenIndex { name });
             return None;
         }
-        let resolution = match found {
-            Some(table) => Resolution::Table(table),
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
-        };
+        let resolution = found.map_or(if_missing.resolution(), Resolution::Table);
         self.add_ref_from(
             name,
             segment.syntax(),
@@ -19527,8 +19447,11 @@ impl Lowerer {
                 self.find_access_method(btree)
             }
         };
-        if let Some(tablespace) = create_index.tablespace_clause() {
-            self.lower_tablespace_clause(&tablespace);
+        if let Some(tablespace) = create_index
+            .tablespace_clause()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let query = self.alloc_query(QueryKind::Index, create_index.syntax());
         self.push_scope(query);
@@ -19950,11 +19873,7 @@ impl Lowerer {
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let table = self.find_table(schema, name);
-        let resolution = match (table, if_missing) {
-            (Some(table), _) => Resolution::Table(table),
-            (None, IfMissing::Ignore) => Resolution::Unknown,
-            (None, IfMissing::Error) => Resolution::Unresolved,
-        };
+        let resolution = table.map_or(if_missing.resolution(), Resolution::Table);
         self.add_ref_from(
             name,
             segment.syntax(),
@@ -19973,20 +19892,14 @@ impl Lowerer {
         trigger_ref: &ast::TriggerRef,
         if_missing: IfMissing,
     ) -> Option<TriggerId> {
-        let name = self.intern(&trigger_ref.text());
-        let trigger = table.and_then(|table| self.find_trigger(table, name));
-        let resolution = match (trigger, table, if_missing) {
-            (Some(trigger), _, _) => Resolution::Trigger(trigger),
-            (None, Some(_), IfMissing::Error) => Resolution::Unresolved,
-            (None, Some(_), IfMissing::Ignore) | (None, None, _) => Resolution::Unknown,
-        };
-        self.add_ref(
-            name,
+        self.lower_scoped_ref(
+            table,
+            trigger_ref,
             ReferenceKind::Trigger,
-            trigger_ref.syntax(),
-            resolution,
-        );
-        trigger
+            if_missing,
+            Self::find_trigger,
+            Resolution::Trigger,
+        )
     }
 
     fn lower_drop_trigger(&mut self, drop_trigger: &ast::DropTrigger) {
@@ -20273,15 +20186,14 @@ impl Lowerer {
         rule_ref: &ast::RuleRef,
         if_missing: IfMissing,
     ) -> Option<RuleId> {
-        let name = self.intern(&rule_ref.text());
-        let rule = table.and_then(|table| self.find_rule(table, name));
-        let resolution = match (rule, table, if_missing) {
-            (Some(rule), _, _) => Resolution::Rule(rule),
-            (None, Some(_), IfMissing::Error) => Resolution::Unresolved,
-            (None, Some(_), IfMissing::Ignore) | (None, None, _) => Resolution::Unknown,
-        };
-        self.add_ref(name, ReferenceKind::Rule, rule_ref.syntax(), resolution);
-        rule
+        self.lower_scoped_ref(
+            table,
+            rule_ref,
+            ReferenceKind::Rule,
+            if_missing,
+            Self::find_rule,
+            Resolution::Rule,
+        )
     }
 
     fn lower_drop_rule(&mut self, drop_rule: &ast::DropRule) {
@@ -21309,13 +21221,7 @@ impl Lowerer {
         let name = self.intern(&segment.text());
         let schema = self.lower_schema_qualifier_or(path.qualifier(), if_missing);
         let index = self.find_index(schema, name);
-        let resolution = match index {
-            Some(index) => Resolution::Index(index),
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
-        };
+        let resolution = index.map_or(if_missing.resolution(), Resolution::Index);
         self.add_ref(name, ReferenceKind::Index, segment.syntax(), resolution);
         index
     }
@@ -21460,21 +21366,20 @@ impl Lowerer {
             {
                 Resolution::Unknown
             }
-            None => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
+            None => if_missing.resolution(),
         };
         self.add_ref(name, ReferenceKind::Collation, segment.syntax(), resolution);
         collation
     }
 
     fn find_collation_in(&self, schema: Name, name: Name) -> Option<CollationId> {
-        self.index.collations.named(schema, name).find(|id| {
-            let collation = &self.index.collations[*id];
-            self.visible(collation.schema, collation.ptr.file_id)
-                && !self.dropped_collations.contains(id)
-        })
+        self.live_named(
+            &self.index.collations,
+            &self.dropped_collations,
+            schema,
+            name,
+        )
+        .next()
     }
 
     fn with_table_scope(
@@ -22676,8 +22581,11 @@ impl Lowerer {
                 self.find_access_method(btree)
             }
         };
-        if let Some(tablespace) = exclude.constraint_index_tablespace() {
-            self.lower_constraint_index_tablespace(&tablespace);
+        if let Some(tablespace) = exclude
+            .constraint_index_tablespace()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         let mut addition = String::new();
         for exclusion in exclude
@@ -23668,8 +23576,11 @@ impl Lowerer {
             let key_len = columns.len();
             return IndexColumns { columns, key_len };
         };
-        if let Some(tablespace) = params.constraint_index_tablespace() {
-            self.lower_constraint_index_tablespace(&tablespace);
+        if let Some(tablespace) = params
+            .constraint_index_tablespace()
+            .and_then(|clause| clause.tablespace_ref())
+        {
+            self.lower_tablespace_ref(&tablespace, IfMissing::Error);
         }
         for column_ref in params
             .column_list()
@@ -23793,10 +23704,7 @@ impl Lowerer {
         let constraint = owner.and_then(|owner| self.find_constraint(owner, name));
         let resolution = match (constraint, owner) {
             (Some(constraint), _) => Resolution::Constraint(constraint),
-            (None, Some(owner)) if self.constraints_complete(owner) => match if_missing {
-                IfMissing::Ignore => Resolution::Unknown,
-                IfMissing::Error => Resolution::Unresolved,
-            },
+            (None, Some(owner)) if self.constraints_complete(owner) => if_missing.resolution(),
             (None, _) => Resolution::Unknown,
         };
         self.add_ref(
@@ -23886,13 +23794,16 @@ impl Lowerer {
     }
 
     fn find_index_in(&self, schema: Name, name: Name) -> Option<IndexId> {
-        self.index.indexes.named(schema, name).find(|id| {
-            let index = &self.index.indexes[*id];
-            self.visible(index.schema, index.ptr.file_id)
-                && !self.dropped_indexes.contains(id)
-                && index
-                    .table
-                    .is_none_or(|table| !self.dropped_tables.contains(&table))
+        self.live_named(
+            self.index.indexes.qualified(),
+            &self.dropped_indexes,
+            schema,
+            name,
+        )
+        .find(|id| {
+            self.index.indexes[*id]
+                .table
+                .is_none_or(|table| !self.dropped_tables.contains(&table))
         })
     }
 
@@ -23926,6 +23837,19 @@ impl Lowerer {
                     && *schema != self.dollar_user
                     && (lookup.searches_temp() || *schema != self.pg_temp)
             }))
+    }
+
+    fn live_named<T: Qualified>(
+        &self,
+        index: &QualifiedIndex<T>,
+        dropped: &FxHashSet<Idx<T>>,
+        schema: Name,
+        name: Name,
+    ) -> impl Iterator<Item = Idx<T>> {
+        index.named(schema, name).filter(move |id| {
+            let value = &index[*id];
+            self.visible(value.schema(), value.file_id()) && !dropped.contains(id)
+        })
     }
 
     fn visible(&self, schema: Name, file_id: IrFileId) -> bool {
@@ -28406,17 +28330,18 @@ impl Lowerer {
         create_tablespace: &ast::CreateTablespace,
         tablespace: &ast::Tablespace,
     ) -> TablespaceId {
-        let name = self.intern(&tablespace.text());
-        if self.find_tablespace(name).is_some() {
-            self.report_duplicate(ObjectKind::Tablespace, tablespace.syntax(), name);
-        }
+        let NewName { name, .. } =
+            self.new_name(ObjectKind::Tablespace, tablespace, Self::find_tablespace);
         let id = self.index.tablespaces.alloc(Tablespace {
             name,
             ptr: self.ast_ptr(create_tablespace),
             name_ptr: self.ast_ptr(tablespace),
         });
-        self.record_comment(create_tablespace.syntax(), Item::Tablespace(id));
-        self.add_item(tablespace.syntax(), Item::Tablespace(id));
+        self.add_commented_item(
+            create_tablespace.syntax(),
+            tablespace.syntax(),
+            Item::Tablespace(id),
+        );
         id
     }
 
@@ -28425,17 +28350,18 @@ impl Lowerer {
         create_database: &ast::CreateDatabase,
         database: &ast::Database,
     ) -> DatabaseId {
-        let name = self.intern(&database.text());
-        if self.find_database(name).is_some() {
-            self.report_duplicate(ObjectKind::Database, database.syntax(), name);
-        }
+        let NewName { name, .. } =
+            self.new_name(ObjectKind::Database, database, Self::find_database);
         let id = self.index.databases.alloc(Database {
             name,
             ptr: self.ast_ptr(create_database),
             name_ptr: self.ast_ptr(database),
         });
-        self.record_comment(create_database.syntax(), Item::Database(id));
-        self.add_item(database.syntax(), Item::Database(id));
+        self.add_commented_item(
+            create_database.syntax(),
+            database.syntax(),
+            Item::Database(id),
+        );
         id
     }
 
@@ -29432,6 +29358,30 @@ impl Lowerer {
         }
     }
 
+    fn new_name<T>(
+        &mut self,
+        object: ObjectKind,
+        name_node: &impl NameLike,
+        find: fn(&Self, Name) -> Option<T>,
+    ) -> NewName {
+        let name = self.intern(&name_node.text());
+        let taken = find(self, name).is_some();
+        if taken {
+            self.report_duplicate(object, name_node.syntax(), name);
+        }
+        NewName { name, taken }
+    }
+
+    fn add_commented_item(&mut self, node: &SyntaxNode, name_node: &SyntaxNode, item: Item) {
+        self.record_comment(node, item);
+        self.add_item(name_node, item);
+    }
+
+    fn add_renamed_item(&mut self, from: Item, name_node: &SyntaxNode, to: Item) {
+        self.copy_comment(from, to);
+        self.add_item(name_node, to);
+    }
+
     fn add_item(&mut self, node: &SyntaxNode, item: Item) {
         self.add_item_range(self.ptr(node).file_range(), item);
     }
@@ -29855,6 +29805,14 @@ fn attribute_path(option: &ast::AttributeOption) -> Option<ast::PathRef> {
         ast::FuncType::Type(ty) => ty.path_ref(),
         ast::FuncType::PercentType(_) => None,
     }
+}
+
+fn find_live<T: Keyed>(
+    index: &KeyedIndex<T>,
+    dropped: &FxHashSet<Idx<T>>,
+    key: T::Key,
+) -> Option<Idx<T>> {
+    index.get(key).find(|id| !dropped.contains(id))
 }
 
 fn same_access_method(a: Option<AccessMethodId>, b: Option<AccessMethodId>) -> bool {

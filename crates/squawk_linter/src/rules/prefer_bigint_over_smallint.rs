@@ -5,8 +5,8 @@ use squawk_syntax::ast::AstNode;
 use crate::{Linter, Rule, Violation};
 
 use crate::rules::prefer_bigint_over_int::BigintType;
-use crate::visitors::check_not_allowed_types;
 use crate::visitors::is_not_valid_int_type;
+use crate::visitors::visit_not_allowed_types;
 
 fn is_small_int_name(name: &str) -> bool {
     matches!(name, "smallint" | "int2" | "smallserial" | "serial2")
@@ -48,7 +48,7 @@ fn check_ty_for_small_int(ctx: &mut Linter, ty: Option<ast::Type>) {
 }
 
 pub(crate) fn prefer_bigint_over_smallint(ctx: &mut Linter, file: &ast::SourceFile) {
-    check_not_allowed_types(ctx, file, check_ty_for_small_int);
+    visit_not_allowed_types(file, |ty| check_ty_for_small_int(ctx, ty));
 }
 
 #[cfg(test)]

@@ -1,5 +1,5 @@
 use smallvec::SmallVec;
-use squawk_syntax::ast::{self, NameLike};
+use squawk_syntax::ast::NameLike;
 
 use squawk_syntax::identifier::truncate_identifier;
 
@@ -25,20 +25,8 @@ impl Name {
     }
 }
 
-pub(crate) fn path_name(path: &ast::Path) -> SmallVec<[Name; 2]> {
-    let mut name = path
-        .segments()
-        .map(|segment| Name::from_node(&segment))
-        .collect();
-    strip_public_schema(&mut name);
-    name
-}
-
-pub(crate) fn path_ref_name(path: &ast::PathRef) -> SmallVec<[Name; 2]> {
-    let mut name = path
-        .segments()
-        .map(|segment| Name::from_node(&segment))
-        .collect();
+pub(crate) fn path_name(segments: impl Iterator<Item = impl NameLike>) -> SmallVec<[Name; 2]> {
+    let mut name = segments.map(|segment| Name::from_node(&segment)).collect();
     strip_public_schema(&mut name);
     name
 }

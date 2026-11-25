@@ -618,6 +618,9 @@ impl ast::Literal {
     }
 
     pub fn string_value(&self) -> Option<String> {
+        if !self.is_string() {
+            return None;
+        }
         Some(self.decoded_value()?.into_text())
     }
 

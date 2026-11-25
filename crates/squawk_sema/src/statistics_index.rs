@@ -28,12 +28,8 @@ impl StatisticsIndex {
         id
     }
 
-    pub(crate) fn named(
-        &self,
-        schema: Name,
-        name: Name,
-    ) -> impl Iterator<Item = StatisticsId> + '_ {
-        self.statistics.named(schema, name)
+    pub(crate) fn qualified(&self) -> &QualifiedIndex<Statistics> {
+        &self.statistics
     }
 
     pub(crate) fn in_schema(

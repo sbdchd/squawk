@@ -18,6 +18,7 @@ use squawk_syntax::{Parse, SourceFile, ast::AstNode};
 pub use version::Version;
 
 pub mod analyze;
+mod fixes;
 pub mod ignore;
 mod ignore_index;
 mod name;

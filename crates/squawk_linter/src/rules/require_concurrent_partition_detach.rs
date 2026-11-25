@@ -1,13 +1,12 @@
-use squawk_diagnostics::{Edit, Fix};
+use squawk_diagnostics::Fix;
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::{Linter, Rule, Violation, transactions::TransactionState};
+use crate::{Linter, Rule, Violation, fixes::add_concurrently, transactions::TransactionState};
 
 fn concurrently_fix(detach_partition: &ast::DetachPartition) -> Option<Fix> {
     let path = detach_partition.table_name_ref()?.path_ref()?;
     let at = path.syntax().text_range().end();
-    let edit = Edit::insert(" concurrently", at);
-    Some(Fix::new("Add `concurrently`", vec![edit]))
+    Some(add_concurrently(at))
 }
 
 pub(crate) fn require_concurrent_partition_detach(ctx: &mut Linter, file: &ast::SourceFile) {

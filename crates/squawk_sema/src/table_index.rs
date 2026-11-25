@@ -8,12 +8,11 @@ use crate::file::InIrFile;
 use crate::interner::{Name, QualifiedName};
 use crate::ir::{Column, ColumnTypeRef};
 use crate::ir::{Columns, SequenceOwner, Table, TableId, TypeId};
+use crate::qualified_index::QualifiedIndex;
 
 #[derive(Debug, Default)]
 pub struct TableIndex {
-    arena: LayeredArena<Table>,
-    by_name: LayeredMultimap<QualifiedName, TableId>,
-    by_schema: LayeredMultimap<Name, TableId>,
+    tables: QualifiedIndex<Table>,
     by_owner: LayeredMultimap<TableId, TableId>,
     by_type: LayeredMultimap<TypeId, TableId>,
     by_column_type: LayeredMultimap<ColumnTypeRef, TableId>,
@@ -23,9 +22,7 @@ pub struct TableIndex {
 impl TableIndex {
     pub(crate) fn on_top_of(base: &'static TableIndex) -> Self {
         TableIndex {
-            arena: LayeredArena::on_top_of(&base.arena),
-            by_name: LayeredMultimap::on_top_of(&base.by_name),
-            by_schema: LayeredMultimap::on_top_of(&base.by_schema),
+            tables: QualifiedIndex::on_top_of(&base.tables),
             by_owner: LayeredMultimap::on_top_of(&base.by_owner),
             by_type: LayeredMultimap::on_top_of(&base.by_type),
             by_column_type: LayeredMultimap::on_top_of(&base.by_column_type),
@@ -35,7 +32,6 @@ impl TableIndex {
 
     pub(crate) fn alloc(&mut self, table: Table, columns: &LayeredArena<Column>) -> TableId {
         let Table {
-            name,
             schema,
             sequence_owner,
             of_type,
@@ -43,12 +39,10 @@ impl TableIndex {
             array_name,
             ..
         } = table;
-        let id = self.arena.alloc(table);
+        let id = self.tables.alloc(table);
         for column_type in ColumnTypeRef::in_columns(columns, table_columns.range) {
             self.by_column_type.insert(column_type, id);
         }
-        self.by_name.insert(QualifiedName { schema, name }, id);
-        self.by_schema.insert(schema, id);
         if let Some(owner) = sequence_owner {
             self.by_owner.insert(owner.table, id);
         }
@@ -63,7 +57,7 @@ impl TableIndex {
     }
 
     pub(crate) fn named(&self, schema: Name, name: Name) -> impl Iterator<Item = TableId> + '_ {
-        self.by_name.get(QualifiedName { schema, name })
+        self.tables.named(schema, name)
     }
 
     pub(crate) fn with_array_name(
@@ -75,7 +69,7 @@ impl TableIndex {
     }
 
     pub fn in_schema(&self, schema: Name) -> impl DoubleEndedIterator<Item = TableId> + '_ {
-        self.by_schema.get(schema)
+        self.tables.in_schema(schema)
     }
 
     pub(crate) fn owned_sequences(&self, table: TableId) -> SmallVec<[TableId; 2]> {
@@ -94,15 +88,15 @@ impl TableIndex {
     }
 
     pub(crate) fn next_idx(&self) -> TableId {
-        self.arena.next_idx()
+        self.tables.next_idx()
     }
 
     pub(crate) fn range_from(&self, start: TableId) -> IdxRange<Table> {
-        self.arena.range_from(start)
+        self.tables.range_from(start)
     }
 
     pub(crate) fn is_local(&self, id: TableId) -> bool {
-        self.arena.is_local(id)
+        self.tables.is_local(id)
     }
 
     pub(crate) fn move_to(
@@ -112,12 +106,12 @@ impl TableIndex {
         name: Name,
         name_ptr: InIrFile<SyntaxNodePtr>,
     ) {
-        self.local_mut(id).name_ptr = name_ptr;
+        self.tables.local_mut(id).name_ptr = name_ptr;
         self.requalify(id, QualifiedName { schema, name });
     }
 
     pub(crate) fn set_array_name(&mut self, id: TableId, array_name: Option<Name>) -> Option<Name> {
-        let table = self.local_mut(id);
+        let table = self.tables.local_mut(id);
         let schema = table.schema;
         let previous = std::mem::replace(&mut table.array_name, array_name);
         if previous != array_name {
@@ -134,44 +128,32 @@ impl TableIndex {
     }
 
     pub(crate) fn set_schema(&mut self, id: TableId, schema: Name) -> bool {
-        let Some(table) = self.arena.get_local_mut(id) else {
+        if !self.tables.is_local(id) {
             return false;
-        };
-        let name = table.name;
+        }
+        let name = self[id].name;
         self.requalify(id, QualifiedName { schema, name });
         true
     }
 
     pub(crate) fn rename_schema(&mut self, from: Name, to: Name) {
-        for id in self.by_schema.take(from) {
+        for id in self.tables.take_schema(from) {
             let name = self[id].name;
             self.requalify(id, QualifiedName { schema: to, name });
         }
     }
 
     fn requalify(&mut self, id: TableId, current: QualifiedName) {
-        let table = self.local_mut(id);
-        let array_name = table.array_name;
-        let previous = QualifiedName {
-            schema: std::mem::replace(&mut table.schema, current.schema),
-            name: std::mem::replace(&mut table.name, current.name),
-        };
-        if previous == current {
-            return;
-        }
-        self.by_name.remove(previous, id);
-        self.by_name.insert(current, id);
-        if previous.schema != current.schema {
-            self.by_schema.remove(previous.schema, id);
-            self.by_schema.insert(current.schema, id);
-            if let Some(name) = array_name {
-                let schema = previous.schema;
-                self.by_array_name
-                    .remove(QualifiedName { schema, name }, id);
-                let schema = current.schema;
-                self.by_array_name
-                    .insert(QualifiedName { schema, name }, id);
-            }
+        let previous = self.tables.requalify(id, current);
+        if previous.schema != current.schema
+            && let Some(name) = self[id].array_name
+        {
+            let schema = previous.schema;
+            self.by_array_name
+                .remove(QualifiedName { schema, name }, id);
+            let schema = current.schema;
+            self.by_array_name
+                .insert(QualifiedName { schema, name }, id);
         }
     }
 
@@ -181,7 +163,7 @@ impl TableIndex {
         columns: Columns,
         arena: &LayeredArena<Column>,
     ) -> Columns {
-        let previous = std::mem::replace(&mut self.local_mut(id).columns, columns);
+        let previous = std::mem::replace(&mut self.tables.local_mut(id).columns, columns);
         for column_type in ColumnTypeRef::in_columns(arena, previous.range) {
             self.by_column_type.remove(column_type, id);
         }
@@ -192,7 +174,7 @@ impl TableIndex {
     }
 
     pub(crate) fn set_sequence_owner(&mut self, id: TableId, owner: Option<SequenceOwner>) {
-        let previous = std::mem::replace(&mut self.local_mut(id).sequence_owner, owner);
+        let previous = std::mem::replace(&mut self.tables.local_mut(id).sequence_owner, owner);
         let previous = previous.map(|owner| owner.table);
         let current = owner.map(|owner| owner.table);
         if previous != current {
@@ -206,7 +188,7 @@ impl TableIndex {
     }
 
     pub(crate) fn set_of_type(&mut self, id: TableId, ty: Option<TypeId>) -> Option<TypeId> {
-        let previous = std::mem::replace(&mut self.local_mut(id).of_type, ty);
+        let previous = std::mem::replace(&mut self.tables.local_mut(id).of_type, ty);
         if previous != ty {
             if let Some(previous) = previous {
                 self.by_type.remove(previous, id);
@@ -219,23 +201,15 @@ impl TableIndex {
     }
 
     pub(crate) fn set_constraints_complete(&mut self, id: TableId, complete: bool) {
-        self.local_mut(id).constraints_complete = complete;
+        self.tables.local_mut(id).constraints_complete = complete;
     }
 
     pub(crate) fn set_partitioned(&mut self, id: TableId) {
-        self.local_mut(id).partitioned = true;
-    }
-
-    fn local_mut(&mut self, id: TableId) -> &mut Table {
-        self.arena
-            .get_local_mut(id)
-            .expect("base layer is immutable")
+        self.tables.local_mut(id).partitioned = true;
     }
 
     pub(crate) fn shrink_to_fit(&mut self) {
-        self.arena.shrink_to_fit();
-        self.by_name.shrink_to_fit();
-        self.by_schema.shrink_to_fit();
+        self.tables.shrink_to_fit();
         self.by_owner.shrink_to_fit();
         self.by_type.shrink_to_fit();
         self.by_column_type.shrink_to_fit();
@@ -247,6 +221,6 @@ impl Index<TableId> for TableIndex {
     type Output = Table;
 
     fn index(&self, id: TableId) -> &Table {
-        &self.arena[id]
+        &self.tables[id]
     }
 }

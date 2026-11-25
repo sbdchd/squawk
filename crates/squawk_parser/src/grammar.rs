@@ -1406,21 +1406,19 @@ fn xml_attr(p: &mut Parser<'_>) {
     m.complete(p, XML_ATTR);
 }
 
-fn expr_as_xml_attr_list(p: &mut Parser<'_>) {
-    let m = p.start();
+fn expr_as_items(p: &mut Parser<'_>, item: ListItem, name: fn(&mut Parser<'_>), kind: SyntaxKind) {
     delimited(
         p,
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required(ListItem::Attribute),
+        ListItems::Required(item),
         EXPR_FIRST,
-        opt_expr_as_xml_attr,
+        |p| opt_expr_as(p, name, kind),
     );
-    m.complete(p, EXPR_AS_XML_ATTR_LIST);
 }
 
-fn opt_expr_as_xml_attr(p: &mut Parser<'_>) -> bool {
+fn opt_expr_as(p: &mut Parser<'_>, name: fn(&mut Parser<'_>), kind: SyntaxKind) -> bool {
     let m = p.start();
     if opt_expr(p).is_none() {
         p.error("expected expression");
@@ -1428,66 +1426,28 @@ fn opt_expr_as_xml_attr(p: &mut Parser<'_>) -> bool {
         return false;
     }
     if p.eat(AS_KW) {
-        xml_attr(p);
+        name(p);
     }
-    m.complete(p, EXPR_AS_XML_ATTR);
+    m.complete(p, kind);
     true
+}
+
+fn expr_as_xml_attr_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    expr_as_items(p, ListItem::Attribute, xml_attr, EXPR_AS_XML_ATTR);
+    m.complete(p, EXPR_AS_XML_ATTR_LIST);
 }
 
 fn expr_as_property_name_list(p: &mut Parser<'_>) {
     let m = p.start();
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::Prop),
-        EXPR_FIRST,
-        opt_expr_as_property_name,
-    );
+    expr_as_items(p, ListItem::Prop, property_name, EXPR_AS_PROPERTY_NAME);
     m.complete(p, EXPR_AS_PROPERTY_NAME_LIST);
-}
-
-fn opt_expr_as_property_name(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if opt_expr(p).is_none() {
-        p.error("expected expression");
-        m.abandon(p);
-        return false;
-    }
-    if p.eat(AS_KW) {
-        property_name(p);
-    }
-    m.complete(p, EXPR_AS_PROPERTY_NAME);
-    true
 }
 
 fn expr_as_column_name_list(p: &mut Parser<'_>) {
     let m = p.start();
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::Col),
-        EXPR_FIRST,
-        opt_expr_as_column_name,
-    );
+    expr_as_items(p, ListItem::Col, column_name, EXPR_AS_COLUMN_NAME);
     m.complete(p, EXPR_AS_COLUMN_NAME_LIST);
-}
-
-fn opt_expr_as_column_name(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if opt_expr(p).is_none() {
-        p.error("expected expression");
-        m.abandon(p);
-        return false;
-    }
-    if p.eat(AS_KW) {
-        column_name(p);
-    }
-    m.complete(p, EXPR_AS_COLUMN_NAME);
-    true
 }
 
 // XMLFOREST '(' xml_attribute_list ')'
@@ -1503,30 +1463,8 @@ fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn expr_as_element_tag_list(p: &mut Parser<'_>) {
     let m = p.start();
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::Element),
-        EXPR_FIRST,
-        opt_expr_as_element_tag,
-    );
+    expr_as_items(p, ListItem::Element, element_tag, EXPR_AS_ELEMENT_TAG);
     m.complete(p, EXPR_AS_ELEMENT_TAG_LIST);
-}
-
-fn opt_expr_as_element_tag(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if opt_expr(p).is_none() {
-        p.error("expected expression");
-        m.abandon(p);
-        return false;
-    }
-    if p.eat(AS_KW) {
-        element_tag(p);
-    }
-    m.complete(p, EXPR_AS_ELEMENT_TAG);
-    true
 }
 
 // XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename xml_indent_option ')'
@@ -9744,7 +9682,36 @@ fn opt_update_to(p: &mut Parser<'_>) {
 
 fn extension_member_object(p: &mut Parser<'_>) {
     let m = p.start();
-    match p.current() {
+    let kind = match p.current() {
+        OPERATOR_KW if !matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
+            p.bump(OPERATOR_KW);
+            qual_op(p);
+            p.expect(L_PAREN);
+            type_name(p);
+            p.expect(COMMA);
+            type_name(p);
+            p.expect(R_PAREN);
+            Some(OBJECT_OPERATOR)
+        }
+        TEXT_KW => text_search_object(p),
+        _ => {
+            let kind = opt_object(p).or_else(|| opt_member_object(p));
+            if kind.is_none() {
+                p.error("expected valid extension member object type");
+            }
+            kind
+        }
+    };
+    match kind {
+        Some(kind) => {
+            m.complete(p, kind);
+        }
+        None => m.abandon(p),
+    }
+}
+
+fn opt_object(p: &mut Parser<'_>) -> Option<SyntaxKind> {
+    let kind = match p.current() {
         DOMAIN_KW | TYPE_KW => {
             let is_domain = p.at(DOMAIN_KW);
             let kind = if is_domain {
@@ -9758,127 +9725,125 @@ fn extension_member_object(p: &mut Parser<'_>) {
             } else {
                 type_name_ref(p);
             }
-            m.complete(p, kind);
+            kind
         }
         TABLE_KW => {
             p.bump(TABLE_KW);
             table_name_ref(p);
-            m.complete(p, OBJECT_TABLE);
+            OBJECT_TABLE
         }
         VIEW_KW => {
             p.bump(VIEW_KW);
             view_ref(p);
-            m.complete(p, OBJECT_VIEW);
-        }
-        INDEX_KW => {
-            p.bump(INDEX_KW);
-            index_ref(p);
-            m.complete(p, OBJECT_INDEX);
+            OBJECT_VIEW
         }
         SEQUENCE_KW => {
             p.bump(SEQUENCE_KW);
             sequence_ref(p);
-            m.complete(p, OBJECT_SEQUENCE);
-        }
-        COLLATION_KW => {
-            p.bump(COLLATION_KW);
-            collation_ref(p);
-            m.complete(p, OBJECT_COLLATION);
-        }
-        CONVERSION_KW => {
-            p.bump(CONVERSION_KW);
-            conversion_ref(p);
-            m.complete(p, OBJECT_CONVERSION);
-        }
-        STATISTICS_KW => {
-            p.bump(STATISTICS_KW);
-            statistics_ref(p);
-            m.complete(p, OBJECT_STATISTICS);
+            OBJECT_SEQUENCE
         }
         DATABASE_KW => {
             p.bump(DATABASE_KW);
             database_ref(p);
-            m.complete(p, OBJECT_DATABASE);
-        }
-        EXTENSION_KW => {
-            p.bump(EXTENSION_KW);
-            extension_ref(p);
-            m.complete(p, OBJECT_EXTENSION);
+            OBJECT_DATABASE
         }
         PUBLICATION_KW => {
             p.bump(PUBLICATION_KW);
             publication_ref(p);
-            m.complete(p, OBJECT_PUBLICATION);
+            OBJECT_PUBLICATION
         }
         ROLE_KW => {
             p.bump(ROLE_KW);
             role_ref(p);
-            m.complete(p, OBJECT_ROLE);
+            OBJECT_ROLE
         }
         SCHEMA_KW => {
             p.bump(SCHEMA_KW);
             schema_ref(p);
-            m.complete(p, OBJECT_SCHEMA);
-        }
-        SERVER_KW => {
-            p.bump(SERVER_KW);
-            server_ref(p);
-            m.complete(p, OBJECT_SERVER);
+            OBJECT_SCHEMA
         }
         SUBSCRIPTION_KW => {
             p.bump(SUBSCRIPTION_KW);
             subscription_ref(p);
-            m.complete(p, OBJECT_SUBSCRIPTION);
+            OBJECT_SUBSCRIPTION
         }
         TABLESPACE_KW => {
             p.bump(TABLESPACE_KW);
             tablespace_ref(p);
-            m.complete(p, OBJECT_TABLESPACE);
-        }
-        ACCESS_KW => {
-            p.bump(ACCESS_KW);
-            p.expect(METHOD_KW);
-            access_method_ref(p);
-            m.complete(p, OBJECT_ACCESS_METHOD);
-        }
-        AGGREGATE_KW => {
-            p.bump(AGGREGATE_KW);
-            aggregate(p);
-            m.complete(p, OBJECT_AGGREGATE);
-        }
-        CAST_KW => {
-            p.bump(CAST_KW);
-            cast_sig(p);
-            m.complete(p, OBJECT_CAST);
+            OBJECT_TABLESPACE
         }
         EVENT_KW => {
             p.bump(EVENT_KW);
             p.expect(TRIGGER_KW);
             event_trigger_ref(p);
-            m.complete(p, OBJECT_EVENT_TRIGGER);
-        }
-        FOREIGN_KW => {
-            p.bump(FOREIGN_KW);
-            let kind = if p.eat(DATA_KW) {
-                p.expect(WRAPPER_KW);
-                foreign_data_wrapper_ref(p);
-                OBJECT_FOREIGN_DATA_WRAPPER
-            } else {
-                p.expect(TABLE_KW);
-                table_name_ref(p);
-                OBJECT_FOREIGN_TABLE
-            };
-            m.complete(p, kind);
-        }
-        FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
-            let kind = routine_sig_with_keyword(p);
-            m.complete(p, kind);
+            OBJECT_EVENT_TRIGGER
         }
         MATERIALIZED_KW => {
             p.bump(MATERIALIZED_KW);
             p.expect(VIEW_KW);
             view_ref(p);
-            m.complete(p, OBJECT_MATERIALIZED_VIEW);
+            OBJECT_MATERIALIZED_VIEW
+        }
+        FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => routine_sig_with_keyword(p),
+        AGGREGATE_KW => {
+            p.bump(AGGREGATE_KW);
+            aggregate(p);
+            OBJECT_AGGREGATE
+        }
+        // [ PROCEDURAL ] LANGUAGE object_name
+        LANGUAGE_KW | PROCEDURAL_KW => {
+            p.eat(PROCEDURAL_KW);
+            p.expect(LANGUAGE_KW);
+            language_ref(p);
+            OBJECT_LANGUAGE
+        }
+        _ => return None,
+    };
+    Some(kind)
+}
+
+fn opt_member_object(p: &mut Parser<'_>) -> Option<SyntaxKind> {
+    let kind = match p.current() {
+        INDEX_KW => {
+            p.bump(INDEX_KW);
+            index_ref(p);
+            OBJECT_INDEX
+        }
+        COLLATION_KW => {
+            p.bump(COLLATION_KW);
+            collation_ref(p);
+            OBJECT_COLLATION
+        }
+        CONVERSION_KW => {
+            p.bump(CONVERSION_KW);
+            conversion_ref(p);
+            OBJECT_CONVERSION
+        }
+        STATISTICS_KW => {
+            p.bump(STATISTICS_KW);
+            statistics_ref(p);
+            OBJECT_STATISTICS
+        }
+        EXTENSION_KW => {
+            p.bump(EXTENSION_KW);
+            extension_ref(p);
+            OBJECT_EXTENSION
+        }
+        SERVER_KW => {
+            p.bump(SERVER_KW);
+            server_ref(p);
+            OBJECT_SERVER
+        }
+        ACCESS_KW => {
+            p.bump(ACCESS_KW);
+            p.expect(METHOD_KW);
+            access_method_ref(p);
+            OBJECT_ACCESS_METHOD
+        }
+        CAST_KW => {
+            p.bump(CAST_KW);
+            cast_sig(p);
+            OBJECT_CAST
         }
         OPERATOR_KW if matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
             p.bump(OPERATOR_KW);
@@ -9891,55 +9856,7 @@ fn extension_member_object(p: &mut Parser<'_>) {
                 OBJECT_OPERATOR_CLASS
             };
             opt_using_method(p);
-            m.complete(p, kind);
-        }
-        OPERATOR_KW => {
-            p.bump(OPERATOR_KW);
-            qual_op(p);
-            p.expect(L_PAREN);
-            type_name(p);
-            p.expect(COMMA);
-            type_name(p);
-            p.expect(R_PAREN);
-            m.complete(p, OBJECT_OPERATOR);
-        }
-        LANGUAGE_KW | PROCEDURAL_KW => {
-            p.eat(PROCEDURAL_KW);
-            p.expect(LANGUAGE_KW);
-            language_ref(p);
-            m.complete(p, OBJECT_LANGUAGE);
-        }
-        TEXT_KW => {
-            p.bump(TEXT_KW);
-            p.expect(SEARCH_KW);
-            match p.current() {
-                CONFIGURATION_KW => {
-                    p.bump(CONFIGURATION_KW);
-                    text_search_configuration_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_CONFIG);
-                }
-                DICTIONARY_KW => {
-                    p.bump(DICTIONARY_KW);
-                    text_search_dictionary_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_DICT);
-                }
-                PARSER_KW => {
-                    p.bump(PARSER_KW);
-                    text_search_parser_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_PARSER);
-                }
-                TEMPLATE_KW => {
-                    p.bump(TEMPLATE_KW);
-                    text_search_template_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_TEMPLATE);
-                }
-                _ => {
-                    p.error(
-                        "expected `configuration`, `dictionary`, `parser`, or `template` after `text search`",
-                    );
-                    m.abandon(p);
-                }
-            }
+            kind
         }
         TRANSFORM_KW => {
             p.bump(TRANSFORM_KW);
@@ -9947,11 +9864,54 @@ fn extension_member_object(p: &mut Parser<'_>) {
             type_name(p);
             p.expect(LANGUAGE_KW);
             language_ref(p);
-            m.complete(p, OBJECT_TRANSFORM);
+            OBJECT_TRANSFORM
+        }
+        FOREIGN_KW => {
+            p.bump(FOREIGN_KW);
+            if p.eat(DATA_KW) {
+                p.expect(WRAPPER_KW);
+                foreign_data_wrapper_ref(p);
+                OBJECT_FOREIGN_DATA_WRAPPER
+            } else {
+                p.expect(TABLE_KW);
+                table_name_ref(p);
+                OBJECT_FOREIGN_TABLE
+            }
+        }
+        _ => return None,
+    };
+    Some(kind)
+}
+
+fn text_search_object(p: &mut Parser<'_>) -> Option<SyntaxKind> {
+    p.bump(TEXT_KW);
+    p.expect(SEARCH_KW);
+    match p.current() {
+        CONFIGURATION_KW => {
+            p.bump(CONFIGURATION_KW);
+            text_search_configuration_ref(p);
+            Some(OBJECT_TEXT_SEARCH_CONFIG)
+        }
+        DICTIONARY_KW => {
+            p.bump(DICTIONARY_KW);
+            text_search_dictionary_ref(p);
+            Some(OBJECT_TEXT_SEARCH_DICT)
+        }
+        PARSER_KW => {
+            p.bump(PARSER_KW);
+            text_search_parser_ref(p);
+            Some(OBJECT_TEXT_SEARCH_PARSER)
+        }
+        TEMPLATE_KW => {
+            p.bump(TEMPLATE_KW);
+            text_search_template_ref(p);
+            Some(OBJECT_TEXT_SEARCH_TEMPLATE)
         }
         _ => {
-            p.error("expected valid extension member object type");
-            m.abandon(p);
+            p.error(
+                "expected `configuration`, `dictionary`, `parser`, or `template` after `text search`",
+            );
+            None
         }
     }
 }
@@ -11388,117 +11348,11 @@ fn opt_option_list(p: &mut Parser<'_>) {
 //   [ [ argmode ] [ argname ] argtype [ , ... ] ] ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
 fn comment_object(p: &mut Parser<'_>) {
     let m = p.start();
-    match p.current() {
-        ACCESS_KW => {
-            p.bump(ACCESS_KW);
-            p.expect(METHOD_KW);
-            access_method_ref(p);
-            m.complete(p, OBJECT_ACCESS_METHOD);
-        }
-        AGGREGATE_KW => {
-            p.bump(AGGREGATE_KW);
-            aggregate(p);
-            m.complete(p, OBJECT_AGGREGATE);
-        }
-        CAST_KW => {
-            p.bump(CAST_KW);
-            cast_sig(p);
-            m.complete(p, OBJECT_CAST);
-        }
-        DOMAIN_KW | TYPE_KW => {
-            let is_domain = p.at(DOMAIN_KW);
-            let kind = if is_domain {
-                OBJECT_DOMAIN
-            } else {
-                OBJECT_TYPE
-            };
-            p.bump_any();
-            if is_domain {
-                domain_ref(p);
-            } else {
-                type_name_ref(p);
-            }
-            m.complete(p, kind);
-        }
-        TABLE_KW => {
-            p.bump(TABLE_KW);
-            table_name_ref(p);
-            m.complete(p, OBJECT_TABLE);
-        }
-        VIEW_KW => {
-            p.bump(VIEW_KW);
-            view_ref(p);
-            m.complete(p, OBJECT_VIEW);
-        }
-        INDEX_KW => {
-            p.bump(INDEX_KW);
-            index_ref(p);
-            m.complete(p, OBJECT_INDEX);
-        }
-        SEQUENCE_KW => {
-            p.bump(SEQUENCE_KW);
-            sequence_ref(p);
-            m.complete(p, OBJECT_SEQUENCE);
-        }
-        COLLATION_KW => {
-            p.bump(COLLATION_KW);
-            collation_ref(p);
-            m.complete(p, OBJECT_COLLATION);
-        }
-        CONVERSION_KW => {
-            p.bump(CONVERSION_KW);
-            conversion_ref(p);
-            m.complete(p, OBJECT_CONVERSION);
-        }
-        STATISTICS_KW => {
-            p.bump(STATISTICS_KW);
-            statistics_ref(p);
-            m.complete(p, OBJECT_STATISTICS);
-        }
-        DATABASE_KW => {
-            p.bump(DATABASE_KW);
-            database_ref(p);
-            m.complete(p, OBJECT_DATABASE);
-        }
-        EXTENSION_KW => {
-            p.bump(EXTENSION_KW);
-            extension_ref(p);
-            m.complete(p, OBJECT_EXTENSION);
-        }
-        PUBLICATION_KW => {
-            p.bump(PUBLICATION_KW);
-            publication_ref(p);
-            m.complete(p, OBJECT_PUBLICATION);
-        }
-        ROLE_KW => {
-            p.bump(ROLE_KW);
-            role_ref(p);
-            m.complete(p, OBJECT_ROLE);
-        }
-        SCHEMA_KW => {
-            p.bump(SCHEMA_KW);
-            schema_ref(p);
-            m.complete(p, OBJECT_SCHEMA);
-        }
-        SERVER_KW => {
-            p.bump(SERVER_KW);
-            server_ref(p);
-            m.complete(p, OBJECT_SERVER);
-        }
-        SUBSCRIPTION_KW => {
-            p.bump(SUBSCRIPTION_KW);
-            subscription_ref(p);
-            m.complete(p, OBJECT_SUBSCRIPTION);
-        }
-        TABLESPACE_KW => {
-            p.bump(TABLESPACE_KW);
-            tablespace_ref(p);
-            m.complete(p, OBJECT_TABLESPACE);
-        }
+    let kind = match p.current() {
         COLUMN_KW => {
             p.bump(COLUMN_KW);
             qualified_column_name_ref(p);
-            m.complete(p, OBJECT_COLUMN);
+            Some(OBJECT_COLUMN)
         }
         CONSTRAINT_KW => {
             p.bump(CONSTRAINT_KW);
@@ -11509,30 +11363,7 @@ fn comment_object(p: &mut Parser<'_>) {
             } else {
                 table_name_ref(p);
             }
-            m.complete(p, OBJECT_CONSTRAINT);
-        }
-        EVENT_KW => {
-            p.bump(EVENT_KW);
-            p.expect(TRIGGER_KW);
-            event_trigger_ref(p);
-            m.complete(p, OBJECT_EVENT_TRIGGER);
-        }
-        FOREIGN_KW if p.nth_at(1, DATA_KW) => {
-            p.bump(FOREIGN_KW);
-            p.bump(DATA_KW);
-            p.expect(WRAPPER_KW);
-            foreign_data_wrapper_ref(p);
-            m.complete(p, OBJECT_FOREIGN_DATA_WRAPPER);
-        }
-        FOREIGN_KW => {
-            p.bump(FOREIGN_KW);
-            p.expect(TABLE_KW);
-            table_name_ref(p);
-            m.complete(p, OBJECT_FOREIGN_TABLE);
-        }
-        FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
-            let kind = routine_sig_with_keyword(p);
-            m.complete(p, kind);
+            Some(OBJECT_CONSTRAINT)
         }
         LARGE_KW => {
             p.bump(LARGE_KW);
@@ -11540,28 +11371,9 @@ fn comment_object(p: &mut Parser<'_>) {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected object oid");
             }
-            m.complete(p, OBJECT_LARGE_OBJECT);
+            Some(OBJECT_LARGE_OBJECT)
         }
-        MATERIALIZED_KW => {
-            p.bump(MATERIALIZED_KW);
-            p.expect(VIEW_KW);
-            view_ref(p);
-            m.complete(p, OBJECT_MATERIALIZED_VIEW);
-        }
-        OPERATOR_KW if matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
-            p.bump(OPERATOR_KW);
-            let kind = if p.eat(FAMILY_KW) {
-                op_family_ref(p);
-                OBJECT_OPERATOR_FAMILY
-            } else {
-                p.bump(CLASS_KW);
-                op_class_ref(p);
-                OBJECT_OPERATOR_CLASS
-            };
-            opt_using_method(p);
-            m.complete(p, kind);
-        }
-        OPERATOR_KW => {
+        OPERATOR_KW if !matches!(p.nth(1), CLASS_KW | FAMILY_KW) => {
             p.bump(OPERATOR_KW);
             qual_op(p);
             p.eat(L_PAREN);
@@ -11569,83 +11381,49 @@ fn comment_object(p: &mut Parser<'_>) {
             p.expect(COMMA);
             type_name(p);
             p.eat(R_PAREN);
-            m.complete(p, OBJECT_OPERATOR);
+            Some(OBJECT_OPERATOR)
         }
         POLICY_KW => {
             p.bump(POLICY_KW);
             policy_ref(p);
             p.expect(ON_KW);
             table_name_ref(p);
-            m.complete(p, OBJECT_POLICY);
+            Some(OBJECT_POLICY)
         }
         RULE_KW => {
             p.bump(RULE_KW);
             rule_ref(p);
             p.expect(ON_KW);
             relation_name_ref(p);
-            m.complete(p, OBJECT_RULE);
+            Some(OBJECT_RULE)
         }
         TRIGGER_KW => {
             p.bump(TRIGGER_KW);
             trigger_ref(p);
             p.expect(ON_KW);
             relation_name_ref(p);
-            m.complete(p, OBJECT_TRIGGER);
+            Some(OBJECT_TRIGGER)
         }
         PROPERTY_KW => {
             p.bump(PROPERTY_KW);
             p.expect(GRAPH_KW);
             property_graph_ref(p);
-            m.complete(p, OBJECT_PROPERTY_GRAPH);
+            Some(OBJECT_PROPERTY_GRAPH)
         }
-        LANGUAGE_KW | PROCEDURAL_KW => {
-            p.eat(PROCEDURAL_KW);
-            p.expect(LANGUAGE_KW);
-            language_ref(p);
-            m.complete(p, OBJECT_LANGUAGE);
-        }
-        TEXT_KW => {
-            p.bump(TEXT_KW);
-            p.expect(SEARCH_KW);
-            match p.current() {
-                CONFIGURATION_KW => {
-                    p.bump(CONFIGURATION_KW);
-                    text_search_configuration_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_CONFIG);
-                }
-                DICTIONARY_KW => {
-                    p.bump(DICTIONARY_KW);
-                    text_search_dictionary_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_DICT);
-                }
-                PARSER_KW => {
-                    p.bump(PARSER_KW);
-                    text_search_parser_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_PARSER);
-                }
-                TEMPLATE_KW => {
-                    p.bump(TEMPLATE_KW);
-                    text_search_template_ref(p);
-                    m.complete(p, OBJECT_TEXT_SEARCH_TEMPLATE);
-                }
-                _ => {
-                    p.error("expected `configuration`, `dictionary`, `parser`, or `template`");
-                    m.abandon(p);
-                }
-            }
-        }
-        TRANSFORM_KW => {
-            p.bump(TRANSFORM_KW);
-            p.expect(FOR_KW);
-            type_name(p);
-            p.expect(LANGUAGE_KW);
-            language_ref(p);
-            m.complete(p, OBJECT_TRANSFORM);
-        }
+        TEXT_KW => text_search_object(p),
         _ => {
-            p.err_and_bump("unexpected token");
-            m.abandon(p);
+            let kind = opt_object(p).or_else(|| opt_member_object(p));
+            if kind.is_none() {
+                p.err_and_bump("unexpected token");
+            }
+            kind
         }
+    };
+    match kind {
+        Some(kind) => {
+            m.complete(p, kind);
+        }
+        None => m.abandon(p),
     }
 }
 
@@ -11966,41 +11744,33 @@ fn alter_vertex_edge_table(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
-fn drop_edge_tables(p: &mut Parser<'_>) {
-    assert!(p.at(DROP_KW) && p.nth_at_ts(1, EDGE));
-    let m = p.start();
+fn drop_element_tables(p: &mut Parser<'_>, item: ListItem) {
     p.bump(DROP_KW);
-    p.bump_any(); // EDGE/RELATIONSHIP
+    p.bump_any(); // EDGE/RELATIONSHIP/VERTEX/NODE
     p.expect(TABLES_KW);
     delimited(
         p,
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required(ListItem::EdgeTable),
+        ListItems::Required(item),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
     );
     opt_cascade_or_restrict(p);
+}
+
+fn drop_edge_tables(p: &mut Parser<'_>) {
+    assert!(p.at(DROP_KW) && p.nth_at_ts(1, EDGE));
+    let m = p.start();
+    drop_element_tables(p, ListItem::EdgeTable);
     m.complete(p, DROP_EDGE_TABLES);
 }
 
 fn drop_vertex_tables(p: &mut Parser<'_>) {
     assert!(p.at(DROP_KW) && p.nth_at_ts(1, VERTEX));
     let m = p.start();
-    p.bump(DROP_KW);
-    p.bump_any(); // VERTEX/NODE
-    p.expect(TABLES_KW);
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::VertexTable),
-        NAME_REF_FIRST,
-        |p| opt_element_table_ref(p).is_some(),
-    );
-    opt_cascade_or_restrict(p);
+    drop_element_tables(p, ListItem::VertexTable);
     m.complete(p, DROP_VERTEX_TABLES);
 }
 
@@ -15532,90 +15302,17 @@ fn role_name(p: &mut Parser<'_>, role_kind: SyntaxKind) {
 // [ [ argmode ] [ argname ] argtype [ , ... ] ] ORDER BY [ argmode ] [ argname ] argtype [ , ... ]
 fn security_label_object(p: &mut Parser<'_>) {
     let m = p.start();
-    match p.current() {
-        DOMAIN_KW | TYPE_KW => {
-            let is_domain = p.at(DOMAIN_KW);
-            let kind = if is_domain {
-                OBJECT_DOMAIN
-            } else {
-                OBJECT_TYPE
-            };
-            p.bump_any();
-            if is_domain {
-                domain_ref(p);
-            } else {
-                type_name_ref(p);
-            }
-            m.complete(p, kind);
-        }
-        TABLE_KW => {
-            p.bump(TABLE_KW);
-            table_name_ref(p);
-            m.complete(p, OBJECT_TABLE);
-        }
-        VIEW_KW => {
-            p.bump(VIEW_KW);
-            view_ref(p);
-            m.complete(p, OBJECT_VIEW);
-        }
-        SEQUENCE_KW => {
-            p.bump(SEQUENCE_KW);
-            sequence_ref(p);
-            m.complete(p, OBJECT_SEQUENCE);
-        }
-        DATABASE_KW => {
-            p.bump(DATABASE_KW);
-            database_ref(p);
-            m.complete(p, OBJECT_DATABASE);
-        }
-        PUBLICATION_KW => {
-            p.bump(PUBLICATION_KW);
-            publication_ref(p);
-            m.complete(p, OBJECT_PUBLICATION);
-        }
-        ROLE_KW => {
-            p.bump(ROLE_KW);
-            role_ref(p);
-            m.complete(p, OBJECT_ROLE);
-        }
-        SCHEMA_KW => {
-            p.bump(SCHEMA_KW);
-            schema_ref(p);
-            m.complete(p, OBJECT_SCHEMA);
-        }
-        SUBSCRIPTION_KW => {
-            p.bump(SUBSCRIPTION_KW);
-            subscription_ref(p);
-            m.complete(p, OBJECT_SUBSCRIPTION);
-        }
-        TABLESPACE_KW => {
-            p.bump(TABLESPACE_KW);
-            tablespace_ref(p);
-            m.complete(p, OBJECT_TABLESPACE);
-        }
+    let kind = match p.current() {
         COLUMN_KW => {
             p.bump(COLUMN_KW);
             qualified_column_name_ref(p);
-            m.complete(p, OBJECT_COLUMN);
-        }
-        EVENT_KW => {
-            p.bump(EVENT_KW);
-            p.expect(TRIGGER_KW);
-            event_trigger_ref(p);
-            m.complete(p, OBJECT_EVENT_TRIGGER);
+            Some(OBJECT_COLUMN)
         }
         FOREIGN_KW => {
             p.bump(FOREIGN_KW);
             p.expect(TABLE_KW);
             table_name_ref(p);
-            m.complete(p, OBJECT_FOREIGN_TABLE);
-        }
-        // [ PROCEDURAL ] LANGUAGE object_name
-        PROCEDURAL_KW | LANGUAGE_KW => {
-            p.eat(PROCEDURAL_KW);
-            p.expect(LANGUAGE_KW);
-            language_ref(p);
-            m.complete(p, OBJECT_LANGUAGE);
+            Some(OBJECT_FOREIGN_TABLE)
         }
         // LARGE OBJECT large_object_oid
         LARGE_KW => {
@@ -15624,27 +15321,21 @@ fn security_label_object(p: &mut Parser<'_>) {
             if opt_numeric_literal(p).is_none() {
                 p.error("expected a large object OID");
             }
-            m.complete(p, OBJECT_LARGE_OBJECT);
-        }
-        MATERIALIZED_KW => {
-            p.bump(MATERIALIZED_KW);
-            p.expect(VIEW_KW);
-            view_ref(p);
-            m.complete(p, OBJECT_MATERIALIZED_VIEW);
-        }
-        FUNCTION_KW | PROCEDURE_KW | ROUTINE_KW => {
-            let kind = routine_sig_with_keyword(p);
-            m.complete(p, kind);
-        }
-        AGGREGATE_KW => {
-            p.bump(AGGREGATE_KW);
-            aggregate(p);
-            m.complete(p, OBJECT_AGGREGATE);
+            Some(OBJECT_LARGE_OBJECT)
         }
         _ => {
-            p.error("expected database object name");
-            m.abandon(p);
+            let kind = opt_object(p);
+            if kind.is_none() {
+                p.error("expected database object name");
+            }
+            kind
         }
+    };
+    match kind {
+        Some(kind) => {
+            m.complete(p, kind);
+        }
+        None => m.abandon(p),
     }
 }
 
@@ -19103,7 +18794,11 @@ fn relation_name(p: &mut Parser<'_>) {
     }
 }
 
-fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn opt_only_relation(
+    p: &mut Parser<'_>,
+    name_ref: fn(&mut Parser<'_>),
+    kind: SyntaxKind,
+) -> Option<CompletedMarker> {
     if !p.at_ts(RELATION_NAME_FIRST) {
         return None;
     }
@@ -19111,15 +18806,19 @@ fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     if p.eat(ONLY_KW) {
         let trailing_paren = p.eat(L_PAREN);
-        relation_name_ref(p);
+        name_ref(p);
         if trailing_paren {
             p.expect(R_PAREN);
         }
     } else {
-        relation_name_ref(p);
+        name_ref(p);
         p.eat(STAR);
     }
-    Some(m.complete(p, RELATION_NAME))
+    Some(m.complete(p, kind))
+}
+
+fn opt_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    opt_only_relation(p, relation_name_ref, RELATION_NAME)
 }
 
 fn table_relation_name(p: &mut Parser<'_>) {
@@ -19129,22 +18828,7 @@ fn table_relation_name(p: &mut Parser<'_>) {
 }
 
 fn opt_table_relation_name(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if !p.at_ts(RELATION_NAME_FIRST) {
-        return None;
-    }
-
-    let m = p.start();
-    if p.eat(ONLY_KW) {
-        let trailing_paren = p.eat(L_PAREN);
-        table_name_ref(p);
-        if trailing_paren {
-            p.expect(R_PAREN);
-        }
-    } else {
-        table_name_ref(p);
-        p.eat(STAR);
-    }
-    Some(m.complete(p, TABLE_RELATION_NAME))
+    opt_only_relation(p, table_name_ref, TABLE_RELATION_NAME)
 }
 
 // ALTER TABLE [ IF EXISTS ] [ ONLY ] name [ * ]
