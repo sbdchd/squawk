@@ -6,7 +6,7 @@ use squawk_syntax::ast::{self, AstNode};
 use squawk_ide_db::Db;
 use squawk_ide_db::offsets::token_from_offset;
 
-use super::{ActionKind, CodeAction};
+use super::{ActionKind, CodeAction, explicit_cast::explicit_cast_type};
 
 pub(super) fn rewrite_double_colon_to_cast(
     db: &dyn Db,
@@ -21,10 +21,9 @@ pub(super) fn rewrite_double_colon_to_cast(
     }
 
     let expr = cast_expr.expr()?;
-    let ty = cast_expr.ty()?;
 
     let expr_text = expr.syntax().text();
-    let type_text = ty.syntax().text();
+    let type_text = explicit_cast_type(&cast_expr)?;
 
     let replacement = format!("cast({expr_text} as {type_text})");
 
@@ -122,5 +121,34 @@ mod test {
             rewrite_double_colon_to_cast,
             "select fo$0o from t;"
         ));
+    }
+
+    #[test]
+    fn rewrite_typed_literal_without_length() {
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            r#"select ch$0ar 'abc';"#),
+            @r#"select cast('abc' as bpchar);"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            r#"select na$0tional character 'abc';"#),
+            @r#"select cast('abc' as bpchar);"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            r#"select ch$0ar(2) 'abc';"#),
+            @r#"select cast('abc' as char(2));"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            r#"select bi$0t '101';"#),
+            @r#"select cast('101' as "bit");"#
+        );
+        assert_snapshot!(apply_code_action(
+            rewrite_double_colon_to_cast,
+            r#"select va$0rchar 'abc';"#),
+            @r#"select cast('abc' as varchar);"#
+        );
     }
 }
