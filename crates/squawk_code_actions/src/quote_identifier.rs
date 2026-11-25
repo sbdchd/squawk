@@ -1,7 +1,10 @@
 use squawk_diagnostics::Edit;
 use squawk_rowan::TextSize;
 use squawk_sema::file::InFile;
-use squawk_syntax::ast::{self, AstNode, NameLike};
+use squawk_syntax::{
+    ast::{self, AstNode, NameLike},
+    quote::quote_ident_always,
+};
 
 use squawk_ide_db::Db;
 use squawk_ide_db::offsets::token_from_offset;
@@ -22,7 +25,13 @@ pub(super) fn quote_identifier(
         return None;
     }
 
-    let quoted = format!(r#""{}""#, name.text());
+    if let ast::AnyName::NameRef(name_ref) = &name
+        && name_ref.is_unicode_normal_form()
+    {
+        return None;
+    }
+
+    let quoted = quote_ident_always(&name.text());
 
     actions.push(CodeAction {
         title: "Quote identifier".to_owned(),
@@ -126,5 +135,13 @@ mod test {
             "create table T(X$0 int);"),
             @r#"create table T("x" int);"#
         );
+    }
+
+    #[test]
+    fn quote_identifier_normal_form() {
+        assert!(code_action_not_applicable(
+            quote_identifier,
+            r#"select normalize('', nfc$0);"#
+        ));
     }
 }
