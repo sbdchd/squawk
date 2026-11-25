@@ -10,6 +10,7 @@ import * as stylex from "@stylexjs/stylex"
 import {
   LintError,
   Fix,
+  SubMessage,
   useDumpCst,
   useDumpTokens,
   useErrors,
@@ -953,7 +954,8 @@ function convertSeverity(x: LintError["severity"]): monaco.MarkerSeverity {
 type Marker = monaco.editor.IMarkerData & {
   range_start: number
   range_end: number
-  messages: string[]
+  summary: string
+  messages: SubMessage[]
   fix?: Fix
 }
 
@@ -983,6 +985,14 @@ function SyntaxTreePanel({ text, version }: { text: string; version: number }) {
       }}
     />
   )
+}
+
+function markerMessage({ message, messages }: LintError): string {
+  if (messages.length === 0) {
+    return message
+  }
+  const details = messages.map(({ label, text }) => `${label}: ${text}`)
+  return `${message}\n\n${details.join("\n")}`
 }
 
 function useMarkers(text: string, version: number): Array<Marker> {
@@ -1017,7 +1027,8 @@ function useMarkers(text: string, version: number): Array<Marker> {
       // doesn't support markdown -- vscode does tho :/
       // https://github.com/microsoft/monaco-editor/issues/1264
       // https://stackoverflow.com/questions/62362741/using-markdown-in-imarkerdata
-      message: x.message,
+      message: markerMessage(x),
+      summary: x.message,
       source: "squawk",
     }
   })
@@ -1048,15 +1059,15 @@ function ErrorList({ errors }: { errors: Marker[] }) {
               {code}
             </a>
           )}
-          :{x.startLineNumber}:{x.startColumn}: {x.message}
+          :{x.startLineNumber}:{x.startColumn}: {x.summary}
         </div>
         {x.messages.length > 0 && (
           <div {...stylex.props(styles.errorNotes)}>
-            {x.messages.map((note) => {
+            {x.messages.map(({ label, text }) => {
               return (
-                <div key={note}>
-                  <span {...stylex.props(styles.errorNoteLabel)}>help:</span>{" "}
-                  {note}
+                <div key={text}>
+                  <span {...stylex.props(styles.errorNoteLabel)}>{label}:</span>{" "}
+                  {text}
                 </div>
               )
             })}

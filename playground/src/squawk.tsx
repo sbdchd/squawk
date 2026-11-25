@@ -14,6 +14,11 @@ export type Fix = {
   edits: TextEdit[]
 }
 
+export type SubMessage = {
+  label: "note" | "hint" | "help"
+  text: string
+}
+
 export type LintError = {
   code: string
   message: string
@@ -24,7 +29,7 @@ export type LintError = {
   end_column: number
   range_start: number
   range_end: number
-  messages: string[]
+  messages: SubMessage[]
   fix?: Fix
 }
 
