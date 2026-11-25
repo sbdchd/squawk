@@ -40,9 +40,8 @@ impl TableIndex {
             ..
         } = table;
         let id = self.tables.alloc(table);
-        for column_type in ColumnTypeRef::in_columns(columns, table_columns.range) {
-            self.by_column_type.insert(column_type, id);
-        }
+        self.by_column_type
+            .insert_keys(id, ColumnTypeRef::in_columns(columns, table_columns.range));
         if let Some(owner) = sequence_owner {
             self.by_owner.insert(owner.table, id);
         }
@@ -114,16 +113,11 @@ impl TableIndex {
         let table = self.tables.local_mut(id);
         let schema = table.schema;
         let previous = std::mem::replace(&mut table.array_name, array_name);
-        if previous != array_name {
-            if let Some(name) = previous {
-                self.by_array_name
-                    .remove(QualifiedName { schema, name }, id);
-            }
-            if let Some(name) = array_name {
-                self.by_array_name
-                    .insert(QualifiedName { schema, name }, id);
-            }
-        }
+        self.by_array_name.replace_key(
+            id,
+            previous.map(|name| QualifiedName { schema, name }),
+            array_name.map(|name| QualifiedName { schema, name }),
+        );
         previous
     }
 
@@ -164,12 +158,10 @@ impl TableIndex {
         arena: &LayeredArena<Column>,
     ) -> Columns {
         let previous = std::mem::replace(&mut self.tables.local_mut(id).columns, columns);
-        for column_type in ColumnTypeRef::in_columns(arena, previous.range) {
-            self.by_column_type.remove(column_type, id);
-        }
-        for column_type in ColumnTypeRef::in_columns(arena, columns.range) {
-            self.by_column_type.insert(column_type, id);
-        }
+        self.by_column_type
+            .remove_keys(id, ColumnTypeRef::in_columns(arena, previous.range));
+        self.by_column_type
+            .insert_keys(id, ColumnTypeRef::in_columns(arena, columns.range));
         previous
     }
 
@@ -177,26 +169,12 @@ impl TableIndex {
         let previous = std::mem::replace(&mut self.tables.local_mut(id).sequence_owner, owner);
         let previous = previous.map(|owner| owner.table);
         let current = owner.map(|owner| owner.table);
-        if previous != current {
-            if let Some(table) = previous {
-                self.by_owner.remove(table, id);
-            }
-            if let Some(table) = current {
-                self.by_owner.insert(table, id);
-            }
-        }
+        self.by_owner.replace_key(id, previous, current);
     }
 
     pub(crate) fn set_of_type(&mut self, id: TableId, ty: Option<TypeId>) -> Option<TypeId> {
         let previous = std::mem::replace(&mut self.tables.local_mut(id).of_type, ty);
-        if previous != ty {
-            if let Some(previous) = previous {
-                self.by_type.remove(previous, id);
-            }
-            if let Some(ty) = ty {
-                self.by_type.insert(ty, id);
-            }
-        }
+        self.by_type.replace_key(id, previous, ty);
         previous
     }
 
