@@ -1406,21 +1406,19 @@ fn xml_attr(p: &mut Parser<'_>) {
     m.complete(p, XML_ATTR);
 }
 
-fn expr_as_xml_attr_list(p: &mut Parser<'_>) {
-    let m = p.start();
+fn expr_as_items(p: &mut Parser<'_>, item: ListItem, name: fn(&mut Parser<'_>), kind: SyntaxKind) {
     delimited(
         p,
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required(ListItem::Attribute),
+        ListItems::Required(item),
         EXPR_FIRST,
-        opt_expr_as_xml_attr,
+        |p| opt_expr_as(p, name, kind),
     );
-    m.complete(p, EXPR_AS_XML_ATTR_LIST);
 }
 
-fn opt_expr_as_xml_attr(p: &mut Parser<'_>) -> bool {
+fn opt_expr_as(p: &mut Parser<'_>, name: fn(&mut Parser<'_>), kind: SyntaxKind) -> bool {
     let m = p.start();
     if opt_expr(p).is_none() {
         p.error("expected expression");
@@ -1428,66 +1426,28 @@ fn opt_expr_as_xml_attr(p: &mut Parser<'_>) -> bool {
         return false;
     }
     if p.eat(AS_KW) {
-        xml_attr(p);
+        name(p);
     }
-    m.complete(p, EXPR_AS_XML_ATTR);
+    m.complete(p, kind);
     true
+}
+
+fn expr_as_xml_attr_list(p: &mut Parser<'_>) {
+    let m = p.start();
+    expr_as_items(p, ListItem::Attribute, xml_attr, EXPR_AS_XML_ATTR);
+    m.complete(p, EXPR_AS_XML_ATTR_LIST);
 }
 
 fn expr_as_property_name_list(p: &mut Parser<'_>) {
     let m = p.start();
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::Prop),
-        EXPR_FIRST,
-        opt_expr_as_property_name,
-    );
+    expr_as_items(p, ListItem::Prop, property_name, EXPR_AS_PROPERTY_NAME);
     m.complete(p, EXPR_AS_PROPERTY_NAME_LIST);
-}
-
-fn opt_expr_as_property_name(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if opt_expr(p).is_none() {
-        p.error("expected expression");
-        m.abandon(p);
-        return false;
-    }
-    if p.eat(AS_KW) {
-        property_name(p);
-    }
-    m.complete(p, EXPR_AS_PROPERTY_NAME);
-    true
 }
 
 fn expr_as_column_name_list(p: &mut Parser<'_>) {
     let m = p.start();
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::Col),
-        EXPR_FIRST,
-        opt_expr_as_column_name,
-    );
+    expr_as_items(p, ListItem::Col, column_name, EXPR_AS_COLUMN_NAME);
     m.complete(p, EXPR_AS_COLUMN_NAME_LIST);
-}
-
-fn opt_expr_as_column_name(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if opt_expr(p).is_none() {
-        p.error("expected expression");
-        m.abandon(p);
-        return false;
-    }
-    if p.eat(AS_KW) {
-        column_name(p);
-    }
-    m.complete(p, EXPR_AS_COLUMN_NAME);
-    true
 }
 
 // XMLFOREST '(' xml_attribute_list ')'
@@ -1503,30 +1463,8 @@ fn xmlforest_fn(p: &mut Parser<'_>) -> CompletedMarker {
 
 fn expr_as_element_tag_list(p: &mut Parser<'_>) {
     let m = p.start();
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::Element),
-        EXPR_FIRST,
-        opt_expr_as_element_tag,
-    );
+    expr_as_items(p, ListItem::Element, element_tag, EXPR_AS_ELEMENT_TAG);
     m.complete(p, EXPR_AS_ELEMENT_TAG_LIST);
-}
-
-fn opt_expr_as_element_tag(p: &mut Parser<'_>) -> bool {
-    let m = p.start();
-    if opt_expr(p).is_none() {
-        p.error("expected expression");
-        m.abandon(p);
-        return false;
-    }
-    if p.eat(AS_KW) {
-        element_tag(p);
-    }
-    m.complete(p, EXPR_AS_ELEMENT_TAG);
-    true
 }
 
 // XMLSERIALIZE '(' document_or_content a_expr AS SimpleTypename xml_indent_option ')'
