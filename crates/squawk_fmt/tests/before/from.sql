@@ -102,3 +102,9 @@ select * from foo() as t (a int, -- from alias column defs
 b int);
 
 select * from f() as (a int, b text);
+
+SELECT * FROM LATERAL /* a */ CURRENT_DATE /* b */ WITH /* c */ ORDINALITY /* d */ AS t (a, b);
+
+SELECT * FROM CAST(1 AS int) /* a */ WITH ORDINALITY t;
+
+SELECT * FROM ROWS FROM (/* a */ CURRENT_DATE, CAST(1 AS int) /* b */) WITH ORDINALITY;

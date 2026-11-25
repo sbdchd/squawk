@@ -1,0 +1,316 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/select_from_value_functions.sql
+---
+SOURCE_FILE
+  COMMENT "-- sql value functions"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        NAME_REF
+          CURRENT_DATE_KW "current_date"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        NAME_REF
+          LOCALTIME_KW "localtime"
+        WHITESPACE " "
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
+        WHITESPACE " "
+        FROM_ALIAS
+          AS_KW "as"
+          WHITESPACE " "
+          TABLE_ALIAS
+            IDENT "t"
+          COLUMN_LIST
+            L_PAREN "("
+            COLUMN_NAME
+              IDENT "a"
+            COMMA ","
+            WHITESPACE " "
+            COLUMN_NAME
+              IDENT "b"
+            R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      FUNCTION_FROM_ITEM
+        CALL_EXPR
+          NAME_REF
+            CURRENT_TIME_KW "current_time"
+          ARG_LIST
+            L_PAREN "("
+            ARG
+              LITERAL
+                INT_NUMBER "2"
+            R_PAREN ")"
+        WHITESPACE " "
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "pg_class"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "c"
+      COMMA ","
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        LATERAL_KW "lateral"
+        WHITESPACE " "
+        NAME_REF
+          CURRENT_DATE_KW "current_date"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- casts"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        CAST_EXPR
+          CAST_KW "cast"
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+          R_PAREN ")"
+        WHITESPACE " "
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        LATERAL_KW "lateral"
+        WHITESPACE " "
+        CAST_EXPR
+          CAST_KW "cast"
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+          R_PAREN ")"
+        WHITESPACE " "
+        FROM_ALIAS
+          TABLE_ALIAS
+            IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- collation for"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        CALL_EXPR
+          COLLATION_FOR_FN
+            COLLATION_KW "collation"
+            WHITESPACE " "
+            FOR_KW "for"
+            WHITESPACE " "
+            L_PAREN "("
+            LITERAL
+              STRING "'a'"
+            R_PAREN ")"
+        WHITESPACE " "
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- rows from"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      ROWS_FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        ROWS_FROM_ARG
+          NAME_REF
+            CURRENT_DATE_KW "current_date"
+        COMMA ","
+        WHITESPACE " "
+        ROWS_FROM_ARG
+          CAST_EXPR
+            CAST_KW "cast"
+            L_PAREN "("
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  INT_KW "int"
+            R_PAREN ")"
+        R_PAREN ")"
+        WHITESPACE " "
+        WITH_ORDINALITY
+          WITH_KW "with"
+          WHITESPACE " "
+          ORDINALITY_KW "ordinality"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      ROWS_FROM_ITEM
+        ROWS_KW "rows"
+        WHITESPACE " "
+        FROM_KW "from"
+        WHITESPACE " "
+        L_PAREN "("
+        ROWS_FROM_ARG
+          CAST_EXPR
+            CAST_KW "cast"
+            L_PAREN "("
+            LITERAL
+              NULL_KW "null"
+            WHITESPACE " "
+            AS_KW "as"
+            WHITESPACE " "
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "record"
+            R_PAREN ")"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          COLUMN_DEF_LIST
+            L_PAREN "("
+            COLUMN_DEF
+              COLUMN_NAME
+                IDENT "a"
+              WHITESPACE " "
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    INT_KW "int"
+            R_PAREN ")"
+        R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"

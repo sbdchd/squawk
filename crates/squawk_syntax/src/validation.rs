@@ -50,7 +50,8 @@ pub(crate) fn validate(root: &SyntaxNode, errors: &mut Vec<SyntaxError>) {
                 ast::DistinctOn(it) => validate_distinct_on(&it, errors),
                 ast::ExceptTableClause(it) => validate_except_table_clause(&it, errors),
                 ast::FuncOptionList(it) => validate_func_option_list(&it, errors),
-                ast::FunctionFromItem(it) => validate_function_from_item(&it, errors),
+                ast::FunctionFromItem(it) => validate_function_only(it.only_token(), errors),
+                ast::ExprFromItem(it) => validate_function_only(it.only_token(), errors),
                 ast::FunctionSig(it) => validate_param_defaults(it.param_list(), errors),
                 ast::PrefixExpr(it) => validate_prefix_expr(&it, errors),
                 ast::ProcedureSig(it) => validate_param_defaults(it.param_list(), errors),
@@ -139,8 +140,8 @@ fn validate_except_table_clause(clause: &ast::ExceptTableClause, acc: &mut Vec<S
     }
 }
 
-fn validate_function_from_item(item: &ast::FunctionFromItem, acc: &mut Vec<SyntaxError>) {
-    if let Some(only) = item.only_token() {
+fn validate_function_only(only: Option<SyntaxToken>, acc: &mut Vec<SyntaxError>) {
+    if let Some(only) = only {
         acc.push(SyntaxError::new(
             "`only` cannot be used with a function call",
             only.text_range(),

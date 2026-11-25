@@ -1,0 +1,126 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/select_from_value_functions.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        NAME_REF
+          CURRENT_DATE_KW "current_date"
+  WHITESPACE " "
+  ERROR
+    STAR "*"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        NAME_REF
+          CURRENT_DATE_KW "current_date"
+  WHITESPACE " "
+  ERROR
+    TABLESAMPLE_KW "tablesample"
+  WHITESPACE " "
+  ERROR
+    SYSTEM_KW "system"
+  WHITESPACE " "
+  ERROR
+    L_PAREN "("
+  ERROR
+    INT_NUMBER "1"
+  ERROR
+    R_PAREN ")"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      EXPR_FROM_ITEM
+        CAST_EXPR
+          CAST_KW "cast"
+          L_PAREN "("
+          LITERAL
+            INT_NUMBER "1"
+          WHITESPACE " "
+          AS_KW "as"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+          R_PAREN ")"
+  ERROR
+    COLON ":"
+  ERROR
+    COLON ":"
+  ERROR
+    TEXT_KW "text"
+  EMPTY_STMT
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected command, found `*`
+  ╭▸ 
+1 │ select * from current_date *;
+  ╰╴                           ━
+error[syntax-error]: expected command, found `tablesample`
+  ╭▸ 
+2 │ select * from current_date tablesample system (1);
+  ╰╴                           ━
+error[syntax-error]: expected command, found `system`
+  ╭▸ 
+2 │ select * from current_date tablesample system (1);
+  ╰╴                                       ━
+error[syntax-error]: expected command, found `(`
+  ╭▸ 
+2 │ select * from current_date tablesample system (1);
+  ╰╴                                              ━
+error[syntax-error]: expected command, found integer literal
+  ╭▸ 
+2 │ select * from current_date tablesample system (1);
+  ╰╴                                               ━
+error[syntax-error]: expected command, found `)`
+  ╭▸ 
+2 │ select * from current_date tablesample system (1);
+  ╰╴                                                ━
+error[syntax-error]: expected command, found `:`
+  ╭▸ 
+3 │ select * from cast(1 as int)::text;
+  ╰╴                            ━
+error[syntax-error]: expected command, found `:`
+  ╭▸ 
+3 │ select * from cast(1 as int)::text;
+  ╰╴                             ━
+error[syntax-error]: expected command, found `text`
+  ╭▸ 
+3 │ select * from cast(1 as int)::text;
+  ╰╴                              ━
