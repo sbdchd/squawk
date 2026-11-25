@@ -6,7 +6,9 @@ use squawk_syntax::ast::{self, AstNode};
 use squawk_ide_db::Db;
 use squawk_ide_db::offsets::token_from_offset;
 
-use super::{ActionKind, CodeAction, explicit_cast::explicit_cast_type};
+use super::{
+    ActionKind, CodeAction, explicit_cast::explicit_cast_type, index_element::is_index_element,
+};
 
 pub(super) fn rewrite_cast_to_double_colon(
     db: &dyn Db,
@@ -17,6 +19,14 @@ pub(super) fn rewrite_cast_to_double_colon(
     let cast_expr = token.parent_ancestors().find_map(ast::CastExpr::cast)?;
 
     if cast_expr.colon_colon().is_some() {
+        return None;
+    }
+
+    let parent = cast_expr.syntax().parent()?;
+    if ast::ExprFromItem::can_cast(parent.kind())
+        || ast::RowsFromArg::can_cast(parent.kind())
+        || is_index_element(cast_expr.syntax())
+    {
         return None;
     }
 
@@ -149,6 +159,35 @@ mod test {
             rewrite_cast_to_double_colon,
             r#"select va$0rchar 'abc';"#),
             @r#"select 'abc'::varchar;"#
+        );
+    }
+
+    #[test]
+    fn rewrite_cast_to_double_colon_not_applicable_func_expr() {
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"select from ca$0st(e as e);"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"select from rows from (ca$0st(1 as int));"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"create index on t (ca$0st(b as text));"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"create index on t (ca$0st(b as text) collate "C");"#
+        ));
+        assert!(code_action_not_applicable(
+            rewrite_cast_to_double_colon,
+            r#"insert into t values (1) on conflict (ca$0st(b as text)) do nothing;"#
+        ));
+        assert_snapshot!(apply_code_action(
+            rewrite_cast_to_double_colon,
+            r#"create index on t ((ca$0st(b as text)));"#),
+            @r#"create index on t ((b::text));"#
         );
     }
 }
