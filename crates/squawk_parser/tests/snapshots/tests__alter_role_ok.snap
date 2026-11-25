@@ -286,7 +286,8 @@ SOURCE_FILE
     RESET_CONFIG_PARAM
       RESET_KW "reset"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- in_database"
@@ -353,6 +354,7 @@ SOURCE_FILE
     RESET_CONFIG_PARAM
       RESET_KW "reset"
       WHITESPACE " "
-      ALL_KW "all"
+      ALL
+        ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"

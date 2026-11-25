@@ -37,3 +37,9 @@ create /* or */ or /* replace */ replace /* rule */ rule /* name */ audit_change
       /* column */ changed
         /* equals */ = /* value */ true /* second semicolon */; /* action right */
   ) /* end */;
+
+create rule r as on insert
+  to t
+  do (
+    ;
+  );

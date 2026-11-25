@@ -698,6 +698,10 @@ pub struct AllPublicationTables {
 }
 impl AllPublicationTables {
     #[inline]
+    pub fn except_table_clause(&self) -> Option<ExceptTableClause> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn all_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
@@ -2268,11 +2272,11 @@ impl AlterUserMapping {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn role_ref(&self) -> Option<RoleRef> {
+    pub fn server_clause(&self) -> Option<ServerClause> {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn server_clause(&self) -> Option<ServerClause> {
+    pub fn user_mapping_role(&self) -> Option<UserMappingRole> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -11401,10 +11405,6 @@ impl ForAllPublicationObjects {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn except_table_clause(&self) -> Option<ExceptTableClause> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn for_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FOR_KW)
     }
@@ -11928,6 +11928,10 @@ pub struct FromTable {
     pub(crate) syntax: SyntaxNode,
 }
 impl FromTable {
+    #[inline]
+    pub fn from_alias(&self) -> Option<FromAlias> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn table_name_ref(&self) -> Option<TableNameRef> {
         support::child(&self.syntax)
@@ -17093,8 +17097,16 @@ pub struct ObjectType {
 }
 impl ObjectType {
     #[inline]
+    pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
+        support::children(&self.syntax)
+    }
+    #[inline]
     pub fn type_name_ref(&self) -> Option<TypeNameRef> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn array_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
     }
     #[inline]
     pub fn type_token(&self) -> Option<SyntaxToken> {
@@ -22978,6 +22990,21 @@ impl RefreshPublication {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct RefreshSequences {
+    pub(crate) syntax: SyntaxNode,
+}
+impl RefreshSequences {
+    #[inline]
+    pub fn refresh_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::REFRESH_KW)
+    }
+    #[inline]
+    pub fn sequences_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SEQUENCES_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct RefreshVersion {
     pub(crate) syntax: SyntaxNode,
 }
@@ -23066,6 +23093,10 @@ pub struct ReindexOptionTablespace {
     pub(crate) syntax: SyntaxNode,
 }
 impl ReindexOptionTablespace {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
     #[inline]
     pub fn tablespace_ref(&self) -> Option<TablespaceRef> {
         support::child(&self.syntax)
@@ -23611,12 +23642,8 @@ pub struct ResetConfigParam {
 }
 impl ResetConfigParam {
     #[inline]
-    pub fn config_parameter_ref(&self) -> Option<ConfigParameterRef> {
+    pub fn reset_target(&self) -> Option<ResetTarget> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn all_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
     #[inline]
     pub fn reset_token(&self) -> Option<SyntaxToken> {
@@ -23630,12 +23657,8 @@ pub struct ResetFuncOption {
 }
 impl ResetFuncOption {
     #[inline]
-    pub fn config_parameter_ref(&self) -> Option<ConfigParameterRef> {
+    pub fn reset_target(&self) -> Option<ResetTarget> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn all_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ALL_KW)
     }
     #[inline]
     pub fn reset_token(&self) -> Option<SyntaxToken> {
@@ -25535,10 +25558,6 @@ impl SetAllPublicationObjectList {
         support::children(&self.syntax)
     }
     #[inline]
-    pub fn except_table_clause(&self) -> Option<ExceptTableClause> {
-        support::child(&self.syntax)
-    }
-    #[inline]
     pub fn set_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::SET_KW)
     }
@@ -25630,6 +25649,14 @@ impl SetConfigParam {
     }
     #[inline]
     pub fn config_parameter_ref(&self) -> Option<ConfigParameterRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_names(&self) -> Option<SetNames> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_time_zone(&self) -> Option<SetTimeZone> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25871,6 +25898,25 @@ impl SetMultipleColumns {
     #[inline]
     pub fn eq_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::EQ)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetNames {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetNames {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn default_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+    #[inline]
+    pub fn names_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NAMES_KW)
     }
 }
 
@@ -26254,6 +26300,10 @@ pub struct SetTransaction {
 impl SetTransaction {
     #[inline]
     pub fn session_characteristics(&self) -> Option<SessionCharacteristics> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_scope(&self) -> Option<SetScope> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -30490,6 +30540,7 @@ pub enum AlterSubscriptionAction {
     EnableSubscription(EnableSubscription),
     OwnerTo(OwnerTo),
     RefreshPublication(RefreshPublication),
+    RefreshSequences(RefreshSequences),
     ServerClause(ServerClause),
     SetOptions(SetOptions),
     SetPublication(SetPublication),
@@ -31121,6 +31172,7 @@ pub enum ExplainStmt {
     Insert(Insert),
     Merge(Merge),
     ParenSelect(ParenSelect),
+    Refresh(Refresh),
     Select(Select),
     SelectInto(SelectInto),
     Table(Table),
@@ -31470,6 +31522,7 @@ pub enum LockStrength {
     ForNoKeyUpdate(ForNoKeyUpdate),
     ForShare(ForShare),
     ForUpdate(ForUpdate),
+    ReadOnly(ReadOnly),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -31816,6 +31869,7 @@ pub enum ResetTarget {
     ConfigParameterRef(ConfigParameterRef),
     ResetTimeZone(ResetTimeZone),
     ResetTransactionIsolation(ResetTransactionIsolation),
+    SessionAuthorization(SessionAuthorization),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -31885,6 +31939,7 @@ pub enum RuleAction {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum RuleStmt {
     Delete(Delete),
+    EmptyStmt(EmptyStmt),
     Insert(Insert),
     Notify(Notify),
     Update(Update),
@@ -32024,6 +32079,7 @@ pub enum SetSessionAuthTarget {
 pub enum SetTarget {
     SetCatalog(SetCatalog),
     SetConfig(SetConfig),
+    SetNames(SetNames),
     SetSchemaValue(SetSchemaValue),
     SetTimeZone(SetTimeZone),
     SetXmlOption(SetXmlOption),
@@ -51598,6 +51654,24 @@ impl AstNode for RefreshPublication {
         &self.syntax
     }
 }
+impl AstNode for RefreshSequences {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::REFRESH_SEQUENCES
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for RefreshVersion {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -54302,6 +54376,24 @@ impl AstNode for SetMultipleColumns {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SET_MULTIPLE_COLUMNS
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetNames {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_NAMES
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -60995,6 +61087,7 @@ impl AstNode for AlterSubscriptionAction {
                 | SyntaxKind::ENABLE_SUBSCRIPTION
                 | SyntaxKind::OWNER_TO
                 | SyntaxKind::REFRESH_PUBLICATION
+                | SyntaxKind::REFRESH_SEQUENCES
                 | SyntaxKind::SERVER_CLAUSE
                 | SyntaxKind::SET_OPTIONS
                 | SyntaxKind::SET_PUBLICATION
@@ -61026,6 +61119,9 @@ impl AstNode for AlterSubscriptionAction {
             SyntaxKind::REFRESH_PUBLICATION => {
                 AlterSubscriptionAction::RefreshPublication(RefreshPublication { syntax })
             }
+            SyntaxKind::REFRESH_SEQUENCES => {
+                AlterSubscriptionAction::RefreshSequences(RefreshSequences { syntax })
+            }
             SyntaxKind::SERVER_CLAUSE => {
                 AlterSubscriptionAction::ServerClause(ServerClause { syntax })
             }
@@ -61055,6 +61151,7 @@ impl AstNode for AlterSubscriptionAction {
             AlterSubscriptionAction::EnableSubscription(it) => &it.syntax,
             AlterSubscriptionAction::OwnerTo(it) => &it.syntax,
             AlterSubscriptionAction::RefreshPublication(it) => &it.syntax,
+            AlterSubscriptionAction::RefreshSequences(it) => &it.syntax,
             AlterSubscriptionAction::ServerClause(it) => &it.syntax,
             AlterSubscriptionAction::SetOptions(it) => &it.syntax,
             AlterSubscriptionAction::SetPublication(it) => &it.syntax,
@@ -61103,6 +61200,12 @@ impl From<RefreshPublication> for AlterSubscriptionAction {
     #[inline]
     fn from(node: RefreshPublication) -> AlterSubscriptionAction {
         AlterSubscriptionAction::RefreshPublication(node)
+    }
+}
+impl From<RefreshSequences> for AlterSubscriptionAction {
+    #[inline]
+    fn from(node: RefreshSequences) -> AlterSubscriptionAction {
+        AlterSubscriptionAction::RefreshSequences(node)
     }
 }
 impl From<ServerClause> for AlterSubscriptionAction {
@@ -66103,6 +66206,7 @@ impl AstNode for ExplainStmt {
                 | SyntaxKind::INSERT
                 | SyntaxKind::MERGE
                 | SyntaxKind::PAREN_SELECT
+                | SyntaxKind::REFRESH
                 | SyntaxKind::SELECT
                 | SyntaxKind::SELECT_INTO
                 | SyntaxKind::TABLE
@@ -66124,6 +66228,7 @@ impl AstNode for ExplainStmt {
             SyntaxKind::INSERT => ExplainStmt::Insert(Insert { syntax }),
             SyntaxKind::MERGE => ExplainStmt::Merge(Merge { syntax }),
             SyntaxKind::PAREN_SELECT => ExplainStmt::ParenSelect(ParenSelect { syntax }),
+            SyntaxKind::REFRESH => ExplainStmt::Refresh(Refresh { syntax }),
             SyntaxKind::SELECT => ExplainStmt::Select(Select { syntax }),
             SyntaxKind::SELECT_INTO => ExplainStmt::SelectInto(SelectInto { syntax }),
             SyntaxKind::TABLE => ExplainStmt::Table(Table { syntax }),
@@ -66147,6 +66252,7 @@ impl AstNode for ExplainStmt {
             ExplainStmt::Insert(it) => &it.syntax,
             ExplainStmt::Merge(it) => &it.syntax,
             ExplainStmt::ParenSelect(it) => &it.syntax,
+            ExplainStmt::Refresh(it) => &it.syntax,
             ExplainStmt::Select(it) => &it.syntax,
             ExplainStmt::SelectInto(it) => &it.syntax,
             ExplainStmt::Table(it) => &it.syntax,
@@ -66207,6 +66313,12 @@ impl From<ParenSelect> for ExplainStmt {
     #[inline]
     fn from(node: ParenSelect) -> ExplainStmt {
         ExplainStmt::ParenSelect(node)
+    }
+}
+impl From<Refresh> for ExplainStmt {
+    #[inline]
+    fn from(node: Refresh) -> ExplainStmt {
+        ExplainStmt::Refresh(node)
     }
 }
 impl From<Select> for ExplainStmt {
@@ -68876,6 +68988,7 @@ impl AstNode for LockStrength {
                 | SyntaxKind::FOR_NO_KEY_UPDATE
                 | SyntaxKind::FOR_SHARE
                 | SyntaxKind::FOR_UPDATE
+                | SyntaxKind::READ_ONLY
         )
     }
     #[inline]
@@ -68887,6 +69000,7 @@ impl AstNode for LockStrength {
             }
             SyntaxKind::FOR_SHARE => LockStrength::ForShare(ForShare { syntax }),
             SyntaxKind::FOR_UPDATE => LockStrength::ForUpdate(ForUpdate { syntax }),
+            SyntaxKind::READ_ONLY => LockStrength::ReadOnly(ReadOnly { syntax }),
             _ => {
                 return None;
             }
@@ -68900,6 +69014,7 @@ impl AstNode for LockStrength {
             LockStrength::ForNoKeyUpdate(it) => &it.syntax,
             LockStrength::ForShare(it) => &it.syntax,
             LockStrength::ForUpdate(it) => &it.syntax,
+            LockStrength::ReadOnly(it) => &it.syntax,
         }
     }
 }
@@ -68925,6 +69040,12 @@ impl From<ForUpdate> for LockStrength {
     #[inline]
     fn from(node: ForUpdate) -> LockStrength {
         LockStrength::ForUpdate(node)
+    }
+}
+impl From<ReadOnly> for LockStrength {
+    #[inline]
+    fn from(node: ReadOnly) -> LockStrength {
+        LockStrength::ReadOnly(node)
     }
 }
 impl AstNode for LockWait {
@@ -71629,6 +71750,7 @@ impl AstNode for ResetTarget {
                 | SyntaxKind::CONFIG_PARAMETER_REF
                 | SyntaxKind::RESET_TIME_ZONE
                 | SyntaxKind::RESET_TRANSACTION_ISOLATION
+                | SyntaxKind::SESSION_AUTHORIZATION
         )
     }
     #[inline]
@@ -71641,6 +71763,9 @@ impl AstNode for ResetTarget {
             SyntaxKind::RESET_TIME_ZONE => ResetTarget::ResetTimeZone(ResetTimeZone { syntax }),
             SyntaxKind::RESET_TRANSACTION_ISOLATION => {
                 ResetTarget::ResetTransactionIsolation(ResetTransactionIsolation { syntax })
+            }
+            SyntaxKind::SESSION_AUTHORIZATION => {
+                ResetTarget::SessionAuthorization(SessionAuthorization { syntax })
             }
             _ => {
                 return None;
@@ -71655,6 +71780,7 @@ impl AstNode for ResetTarget {
             ResetTarget::ConfigParameterRef(it) => &it.syntax,
             ResetTarget::ResetTimeZone(it) => &it.syntax,
             ResetTarget::ResetTransactionIsolation(it) => &it.syntax,
+            ResetTarget::SessionAuthorization(it) => &it.syntax,
         }
     }
 }
@@ -71680,6 +71806,12 @@ impl From<ResetTransactionIsolation> for ResetTarget {
     #[inline]
     fn from(node: ResetTransactionIsolation) -> ResetTarget {
         ResetTarget::ResetTransactionIsolation(node)
+    }
+}
+impl From<SessionAuthorization> for ResetTarget {
+    #[inline]
+    fn from(node: SessionAuthorization) -> ResetTarget {
+        ResetTarget::SessionAuthorization(node)
     }
 }
 impl AstNode for ReturningOption {
@@ -72164,13 +72296,18 @@ impl AstNode for RuleStmt {
     fn can_cast(kind: SyntaxKind) -> bool {
         matches!(
             kind,
-            SyntaxKind::DELETE | SyntaxKind::INSERT | SyntaxKind::NOTIFY | SyntaxKind::UPDATE
+            SyntaxKind::DELETE
+                | SyntaxKind::EMPTY_STMT
+                | SyntaxKind::INSERT
+                | SyntaxKind::NOTIFY
+                | SyntaxKind::UPDATE
         ) || SelectVariant::can_cast(kind)
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::DELETE => RuleStmt::Delete(Delete { syntax }),
+            SyntaxKind::EMPTY_STMT => RuleStmt::EmptyStmt(EmptyStmt { syntax }),
             SyntaxKind::INSERT => RuleStmt::Insert(Insert { syntax }),
             SyntaxKind::NOTIFY => RuleStmt::Notify(Notify { syntax }),
             SyntaxKind::UPDATE => RuleStmt::Update(Update { syntax }),
@@ -72187,6 +72324,7 @@ impl AstNode for RuleStmt {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             RuleStmt::Delete(it) => &it.syntax,
+            RuleStmt::EmptyStmt(it) => &it.syntax,
             RuleStmt::Insert(it) => &it.syntax,
             RuleStmt::Notify(it) => &it.syntax,
             RuleStmt::Update(it) => &it.syntax,
@@ -72198,6 +72336,12 @@ impl From<Delete> for RuleStmt {
     #[inline]
     fn from(node: Delete) -> RuleStmt {
         RuleStmt::Delete(node)
+    }
+}
+impl From<EmptyStmt> for RuleStmt {
+    #[inline]
+    fn from(node: EmptyStmt) -> RuleStmt {
+        RuleStmt::EmptyStmt(node)
     }
 }
 impl From<Insert> for RuleStmt {
@@ -73267,6 +73411,7 @@ impl AstNode for SetTarget {
             kind,
             SyntaxKind::SET_CATALOG
                 | SyntaxKind::SET_CONFIG
+                | SyntaxKind::SET_NAMES
                 | SyntaxKind::SET_SCHEMA_VALUE
                 | SyntaxKind::SET_TIME_ZONE
                 | SyntaxKind::SET_XML_OPTION
@@ -73277,6 +73422,7 @@ impl AstNode for SetTarget {
         let res = match syntax.kind() {
             SyntaxKind::SET_CATALOG => SetTarget::SetCatalog(SetCatalog { syntax }),
             SyntaxKind::SET_CONFIG => SetTarget::SetConfig(SetConfig { syntax }),
+            SyntaxKind::SET_NAMES => SetTarget::SetNames(SetNames { syntax }),
             SyntaxKind::SET_SCHEMA_VALUE => SetTarget::SetSchemaValue(SetSchemaValue { syntax }),
             SyntaxKind::SET_TIME_ZONE => SetTarget::SetTimeZone(SetTimeZone { syntax }),
             SyntaxKind::SET_XML_OPTION => SetTarget::SetXmlOption(SetXmlOption { syntax }),
@@ -73291,6 +73437,7 @@ impl AstNode for SetTarget {
         match self {
             SetTarget::SetCatalog(it) => &it.syntax,
             SetTarget::SetConfig(it) => &it.syntax,
+            SetTarget::SetNames(it) => &it.syntax,
             SetTarget::SetSchemaValue(it) => &it.syntax,
             SetTarget::SetTimeZone(it) => &it.syntax,
             SetTarget::SetXmlOption(it) => &it.syntax,
@@ -73307,6 +73454,12 @@ impl From<SetConfig> for SetTarget {
     #[inline]
     fn from(node: SetConfig) -> SetTarget {
         SetTarget::SetConfig(node)
+    }
+}
+impl From<SetNames> for SetTarget {
+    #[inline]
+    fn from(node: SetNames) -> SetTarget {
+        SetTarget::SetNames(node)
     }
 }
 impl From<SetSchemaValue> for SetTarget {
@@ -76954,6 +77107,7 @@ impl From<ExplainStmt> for Stmt {
             ExplainStmt::Insert(it) => Stmt::Insert(it),
             ExplainStmt::Merge(it) => Stmt::Merge(it),
             ExplainStmt::ParenSelect(it) => Stmt::ParenSelect(it),
+            ExplainStmt::Refresh(it) => Stmt::Refresh(it),
             ExplainStmt::Select(it) => Stmt::Select(it),
             ExplainStmt::SelectInto(it) => Stmt::SelectInto(it),
             ExplainStmt::Table(it) => Stmt::Table(it),

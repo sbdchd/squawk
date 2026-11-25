@@ -1,0 +1,80 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/for_read_only.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    WHITESPACE " "
+    LOCKING_CLAUSE
+      FOR_KW "for"
+      WHITESPACE " "
+      READ_ONLY
+        READ_KW "read"
+        WHITESPACE " "
+        ONLY_KW "only"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_RULE
+    CREATE_KW "create"
+    WHITESPACE " "
+    RULE_KW "rule"
+    WHITESPACE " "
+    RULE
+      IDENT "r"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    RULE_ON
+      ON_KW "on"
+      WHITESPACE " "
+      RULE_EVENT
+        INSERT_KW "insert"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    RULE_DO
+      DO_KW "do"
+      WHITESPACE " "
+      PAREN_SELECT
+        L_PAREN "("
+        TABLE
+          TABLE_KW "table"
+          WHITESPACE " "
+          RELATION_NAME
+            RELATION_NAME_REF
+              PATH_REF
+                PATH_SEGMENT_REF
+                  IDENT "x"
+        R_PAREN ")"
+        WHITESPACE " "
+        ORDER_BY_CLAUSE
+          ORDER_KW "order"
+          WHITESPACE " "
+          BY_KW "by"
+          WHITESPACE " "
+          SORT_BY_LIST
+            SORT_BY
+              NAME_REF
+                IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n"

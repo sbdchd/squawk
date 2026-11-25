@@ -1689,6 +1689,7 @@ pub enum SyntaxKind {
     REFRESH,
     REFRESH_COLLATION_VERSION,
     REFRESH_PUBLICATION,
+    REFRESH_SEQUENCES,
     REFRESH_VERSION,
     REINDEX,
     REINDEX_OPTION_CONCURRENTLY,
@@ -1841,6 +1842,7 @@ pub enum SyntaxKind {
     SET_GENERATED_OPTIONS,
     SET_LOGGED,
     SET_MULTIPLE_COLUMNS,
+    SET_NAMES,
     SET_NOT_NULL,
     SET_NULL_COLUMNS,
     SET_OPTIONS,
@@ -3769,6 +3771,7 @@ impl SyntaxKind {
             | SyntaxKind::REFRESH
             | SyntaxKind::REFRESH_COLLATION_VERSION
             | SyntaxKind::REFRESH_PUBLICATION
+            | SyntaxKind::REFRESH_SEQUENCES
             | SyntaxKind::REFRESH_VERSION
             | SyntaxKind::REINDEX
             | SyntaxKind::REINDEX_OPTION_CONCURRENTLY
@@ -3921,6 +3924,7 @@ impl SyntaxKind {
             | SyntaxKind::SET_GENERATED_OPTIONS
             | SyntaxKind::SET_LOGGED
             | SyntaxKind::SET_MULTIPLE_COLUMNS
+            | SyntaxKind::SET_NAMES
             | SyntaxKind::SET_NOT_NULL
             | SyntaxKind::SET_NULL_COLUMNS
             | SyntaxKind::SET_OPTIONS
@@ -7076,6 +7080,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::REFRESH => "refresh",
             SyntaxKind::REFRESH_COLLATION_VERSION => "refresh collation version",
             SyntaxKind::REFRESH_PUBLICATION => "refresh publication",
+            SyntaxKind::REFRESH_SEQUENCES => "refresh sequences",
             SyntaxKind::REFRESH_VERSION => "refresh version",
             SyntaxKind::REINDEX => "reindex",
             SyntaxKind::REINDEX_OPTION_CONCURRENTLY => "reindex option concurrently",
@@ -7230,6 +7235,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::SET_GENERATED_OPTIONS => "set generated options",
             SyntaxKind::SET_LOGGED => "set logged",
             SyntaxKind::SET_MULTIPLE_COLUMNS => "set multiple columns",
+            SyntaxKind::SET_NAMES => "set names",
             SyntaxKind::SET_NOT_NULL => "set not null",
             SyntaxKind::SET_NULL_COLUMNS => "set null columns",
             SyntaxKind::SET_OPTIONS => "set options",

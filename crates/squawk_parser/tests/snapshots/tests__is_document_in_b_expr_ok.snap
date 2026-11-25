@@ -1,0 +1,115 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/is_document_in_b_expr.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              IS_KW "is"
+              WHITESPACE " "
+              NAME_REF
+                DOCUMENT_KW "document"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            POSITION_FN
+              POSITION_KW "position"
+              L_PAREN "("
+              BIN_EXPR
+                NAME_REF
+                  IDENT "x"
+                WHITESPACE " "
+                IS_KW "is"
+                WHITESPACE " "
+                NAME_REF
+                  DOCUMENT_KW "document"
+              WHITESPACE " "
+              IN_KW "in"
+              WHITESPACE " "
+              NAME_REF
+                IDENT "x"
+              R_PAREN ")"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BETWEEN_EXPR
+            NAME_REF
+              IDENT "x"
+            WHITESPACE " "
+            BETWEEN_KW "between"
+            WHITESPACE " "
+            BIN_EXPR
+              LITERAL
+                INT_NUMBER "1"
+              WHITESPACE " "
+              IS_NOT
+                IS_KW "is"
+                WHITESPACE " "
+                NOT_KW "not"
+              WHITESPACE " "
+              NAME_REF
+                DOCUMENT_KW "document"
+            WHITESPACE " "
+            AND_KW "and"
+            WHITESPACE " "
+            LITERAL
+              INT_NUMBER "2"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+    SEMICOLON ";"
+  WHITESPACE "\n"

@@ -27,3 +27,5 @@ alter subscription local_sub owner to replication_admin;
 alter subscription local_sub rename to renamed_sub;
 
 alter /* after alter */ subscription /* after subscription */ renamed_sub add /* after add */ publication /* before publication name */ commented_pub, /* after publication comma */ selected_tables with /* before params */ (copy_data = true) /* before semicolon */;
+
+alter subscription s refresh sequences;

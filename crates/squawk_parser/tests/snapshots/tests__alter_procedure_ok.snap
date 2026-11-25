@@ -279,7 +279,8 @@ SOURCE_FILE
       RESET_FUNC_OPTION
         RESET_KW "reset"
         WHITESPACE " "
-        ALL_KW "all"
+        ALL
+          ALL_KW "all"
     WHITESPACE "\n  "
     RESTRICT_KW "restrict"
     SEMICOLON ";"
@@ -434,7 +435,8 @@ SOURCE_FILE
       RESET_FUNC_OPTION
         RESET_KW "reset"
         WHITESPACE " "
-        ALL_KW "all"
+        ALL
+          ALL_KW "all"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- depends"

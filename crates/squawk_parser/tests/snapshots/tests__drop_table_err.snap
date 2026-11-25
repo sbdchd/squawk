@@ -81,22 +81,6 @@ SOURCE_FILE
           IDENT "p"
     ERROR
       COMMA ","
-    WHITESPACE " "
-    CASCADE
-      CASCADE_KW "cascade"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  DROP_TABLE
-    DROP_KW "drop"
-    WHITESPACE " "
-    TABLE_KW "table"
-    WHITESPACE " "
-    TABLE_NAME_REF
-      PATH_REF
-        PATH_SEGMENT_REF
-          IDENT "p"
-    ERROR
-      COMMA ","
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected `,`
@@ -113,9 +97,5 @@ error[syntax-error]: expected a table, found `,`
   ╰╴            ━
 error[syntax-error]: expected a table, found `,`
   ╭▸ 
-9 │ drop table p, cascade;
+9 │ drop table p,
   ╰╴            ━
-error[syntax-error]: expected a table, found `,`
-   ╭▸ 
-10 │ drop table p,
-   ╰╴            ━

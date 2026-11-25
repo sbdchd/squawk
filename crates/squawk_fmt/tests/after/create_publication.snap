@@ -4,9 +4,8 @@ input_file: crates/squawk_fmt/tests/before/create_publication.sql
 ---
 create publication everything
   for
-    all tables,
+    all tables except (table audit.secret_events, internal_jobs),
     all sequences
-  except (table audit.secret_events, internal_jobs)
   with (
     publish = 'insert, update, delete, truncate',
     publish_via_partition_root = true
@@ -24,18 +23,18 @@ create publication no_tables with (publish = 'insert');
 create publication except_table_comments
   for
     all tables
-  except (
-    /* before table */ table /* before only */ only /* before relation */ audit.secret_events,
-    /* before omitted table */ internal_jobs
-  );
+    except (
+      /* before table */ table /* before only */ only /* before relation */ audit.secret_events,
+      /* before omitted table */ internal_jobs
+    );
 
 create publication except_table_line_comment
   for
     all tables
-  except (
-    table -- before relation
-    internal_jobs
-  );
+    except (
+      table -- before relation
+      internal_jobs
+    );
 
 create publication omitted_table_keywords
   for

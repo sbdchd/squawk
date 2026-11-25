@@ -60,3 +60,5 @@ select * from t; -- after statement
 select * from user;
 
 select * from current_date as d;
+
+select * from t for read only;

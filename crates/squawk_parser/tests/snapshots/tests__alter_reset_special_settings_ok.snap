@@ -1,0 +1,130 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/alter_reset_special_settings.sql
+---
+SOURCE_FILE
+  ALTER_DATABASE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    DATABASE_REF
+      IDENT "x"
+    WHITESPACE " "
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      RESET_TIME_ZONE
+        TIME_KW "time"
+        WHITESPACE " "
+        ZONE_KW "zone"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_ROLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    ROLE_REF
+      ROLE_NAME_REF
+        IDENT "x"
+    WHITESPACE " "
+    RESET_CONFIG_PARAM
+      RESET_KW "reset"
+      WHITESPACE " "
+      SESSION_AUTHORIZATION
+        SESSION_KW "session"
+        WHITESPACE " "
+        AUTHORIZATION_KW "authorization"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+      PARAM_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      RESET_FUNC_OPTION
+        RESET_KW "reset"
+        WHITESPACE " "
+        RESET_TIME_ZONE
+          TIME_KW "time"
+          WHITESPACE " "
+          ZONE_KW "zone"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_DATABASE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    DATABASE_REF
+      IDENT "x"
+    WHITESPACE " "
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      SET_NAMES
+        NAMES_KW "names"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      SET_FUNC_OPTION
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          SET_TIME_ZONE
+            TIME_KW "time"
+            WHITESPACE " "
+            ZONE_KW "zone"
+            WHITESPACE " "
+            CAST_EXPR
+              INTERVAL_TYPE
+                INTERVAL_KW "interval"
+              WHITESPACE " "
+              LITERAL
+                STRING "'1 hour'"
+      WHITESPACE " "
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+    WHITESPACE " "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"

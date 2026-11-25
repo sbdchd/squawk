@@ -1,0 +1,10 @@
+select into temp from t;
+create index on t (x between);
+fetch 1 escape;
+reset time;
+show session;
+revoke inherit from x;
+drop table x, restrict;
+create function f() returns int language int as '';
+delete from t using t tablesample operator (1);
+select from only treat;

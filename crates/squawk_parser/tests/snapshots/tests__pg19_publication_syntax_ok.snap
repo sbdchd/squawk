@@ -1,0 +1,56 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/pg19_publication_syntax.sql
+---
+SOURCE_FILE
+  ALTER_PUBLICATION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    PUBLICATION_KW "publication"
+    WHITESPACE " "
+    PUBLICATION_REF
+      IDENT "p"
+    WHITESPACE " "
+    SET_ALL_PUBLICATION_OBJECT_LIST
+      SET_KW "set"
+      WHITESPACE " "
+      ALL_PUBLICATION_TABLES
+        ALL_KW "all"
+        WHITESPACE " "
+        TABLES_KW "tables"
+        WHITESPACE " "
+        EXCEPT_TABLE_CLAUSE
+          EXCEPT_KW "except"
+          WHITESPACE " "
+          L_PAREN "("
+          EXCEPT_TABLE_NAME
+            TABLE_KW "table"
+            WHITESPACE " "
+            TABLE_RELATION_NAME
+              TABLE_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "t"
+          R_PAREN ")"
+      COMMA ","
+      WHITESPACE " "
+      ALL_PUBLICATION_SEQUENCES
+        ALL_KW "all"
+        WHITESPACE " "
+        SEQUENCES_KW "sequences"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_SUBSCRIPTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SUBSCRIPTION_KW "subscription"
+    WHITESPACE " "
+    SUBSCRIPTION_REF
+      IDENT "s"
+    WHITESPACE " "
+    REFRESH_SEQUENCES
+      REFRESH_KW "refresh"
+      WHITESPACE " "
+      SEQUENCES_KW "sequences"
+    SEMICOLON ";"
+  WHITESPACE "\n"

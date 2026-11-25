@@ -44,3 +44,5 @@ alter /* after alter */ subscription /* after subscription */ renamed_sub
   add /* after add */ publication /* before publication name */ commented_pub,
     /* after publication comma */ selected_tables
   with /* before params */ (copy_data = true) /* before semicolon */;
+
+alter subscription s refresh sequences;

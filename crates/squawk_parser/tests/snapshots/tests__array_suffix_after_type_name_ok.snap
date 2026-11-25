@@ -1,0 +1,77 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/array_suffix_after_type_name.sql
+---
+SOURCE_FILE
+  DROP_FUNCTION
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG_LIST
+      FUNCTION_SIG
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "f"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    TEXT_KW "text"
+              WHITESPACE " "
+              ARRAY_KW "array"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG_LIST
+      FUNCTION_SIG
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "f"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "timestamptz"
+              WHITESPACE " "
+              ARRAY_KW "array"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  DROP_FUNCTION
+    DROP_KW "drop"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG_LIST
+      FUNCTION_SIG
+        FUNCTION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "f"
+        PARAM_LIST
+          L_PAREN "("
+          PARAM
+            ARRAY_TYPE
+              PATH_TYPE
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "\"json\""
+              WHITESPACE " "
+              ARRAY_KW "array"
+          R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

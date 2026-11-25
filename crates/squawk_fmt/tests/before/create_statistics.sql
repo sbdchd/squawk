@@ -4,3 +4,5 @@ create statistics if not exists extraordinarily_long_schema_name.extraordinarily
 
 -- comments in every position
 create /* statistics */ statistics /* if */ if /* not */ not /* exists */ exists /* name */ app.orders_stats /* open kinds */ (/* first kind */ ndistinct /* kind comma */, /* second kind */ dependencies /* close kinds */) /* on */ on /* first expression */ customer_id /* expression comma */, /* second expression */ (lower(email)) /* from */ from /* table */ app.orders /* end */;
+
+create statistics s on a, b from t groups;

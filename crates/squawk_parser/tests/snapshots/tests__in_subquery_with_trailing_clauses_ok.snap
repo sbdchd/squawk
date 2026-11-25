@@ -1,0 +1,77 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/in_subquery_with_trailing_clauses.sql
+---
+SOURCE_FILE
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            IN_KW "in"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              PAREN_SELECT
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
+                WHITESPACE " "
+                ORDER_BY_CLAUSE
+                  ORDER_KW "order"
+                  WHITESPACE " "
+                  BY_KW "by"
+                  WHITESPACE " "
+                  SORT_BY_LIST
+                    SORT_BY
+                      LITERAL
+                        INT_NUMBER "1"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              INT_NUMBER "1"
+            WHITESPACE " "
+            IN_KW "in"
+            WHITESPACE " "
+            PAREN_EXPR
+              L_PAREN "("
+              PAREN_SELECT
+                L_PAREN "("
+                SELECT
+                  SELECT_CLAUSE
+                    SELECT_KW "select"
+                    WHITESPACE " "
+                    TARGET_LIST
+                      TARGET
+                        LITERAL
+                          INT_NUMBER "1"
+                R_PAREN ")"
+                WHITESPACE " "
+                LOCKING_CLAUSE
+                  FOR_KW "for"
+                  WHITESPACE " "
+                  FOR_SHARE
+                    SHARE_KW "share"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"

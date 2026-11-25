@@ -282,22 +282,22 @@ SOURCE_FILE
         ALL_KW "all"
         WHITESPACE " "
         TABLES_KW "tables"
-      WHITESPACE " "
-      EXCEPT_TABLE_CLAUSE
-        EXCEPT_KW "except"
         WHITESPACE " "
-        L_PAREN "("
-        EXCEPT_TABLE_NAME
-          TABLE_KW "table"
+        EXCEPT_TABLE_CLAUSE
+          EXCEPT_KW "except"
           WHITESPACE " "
-          TABLE_RELATION_NAME
-            ONLY_KW "only"
+          L_PAREN "("
+          EXCEPT_TABLE_NAME
+            TABLE_KW "table"
             WHITESPACE " "
-            TABLE_NAME_REF
-              PATH_REF
-                PATH_SEGMENT_REF
-                  IDENT "t"
-        R_PAREN ")"
+            TABLE_RELATION_NAME
+              ONLY_KW "only"
+              WHITESPACE " "
+              TABLE_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "t"
+          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
   CREATE_PUBLICATION
@@ -315,37 +315,37 @@ SOURCE_FILE
         ALL_KW "all"
         WHITESPACE " "
         TABLES_KW "tables"
-      WHITESPACE " "
-      EXCEPT_TABLE_CLAUSE
-        EXCEPT_KW "except"
         WHITESPACE " "
-        L_PAREN "("
-        EXCEPT_TABLE_NAME
-          TABLE_KW "table"
+        EXCEPT_TABLE_CLAUSE
+          EXCEPT_KW "except"
           WHITESPACE " "
-          TABLE_RELATION_NAME
-            TABLE_NAME_REF
-              PATH_REF
-                PATH_SEGMENT_REF
-                  IDENT "t"
-        COMMA ","
-        WHITESPACE " "
-        EXCEPT_TABLE_NAME
-          TABLE_RELATION_NAME
-            TABLE_NAME_REF
-              PATH_REF
-                PATH_SEGMENT_REF
-                  IDENT "u"
-        COMMA ","
-        WHITESPACE " "
-        EXCEPT_TABLE_NAME
-          TABLE_KW "table"
+          L_PAREN "("
+          EXCEPT_TABLE_NAME
+            TABLE_KW "table"
+            WHITESPACE " "
+            TABLE_RELATION_NAME
+              TABLE_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "t"
+          COMMA ","
           WHITESPACE " "
-          TABLE_RELATION_NAME
-            TABLE_NAME_REF
-              PATH_REF
-                PATH_SEGMENT_REF
-                  IDENT "k"
-        R_PAREN ")"
+          EXCEPT_TABLE_NAME
+            TABLE_RELATION_NAME
+              TABLE_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "u"
+          COMMA ","
+          WHITESPACE " "
+          EXCEPT_TABLE_NAME
+            TABLE_KW "table"
+            WHITESPACE " "
+            TABLE_RELATION_NAME
+              TABLE_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "k"
+          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

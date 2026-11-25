@@ -659,12 +659,12 @@ SOURCE_FILE
         ALL_KW "all"
         WHITESPACE " "
         TABLES_KW "tables"
-      WHITESPACE " "
-      EXCEPT_TABLE_CLAUSE
-        EXCEPT_KW "except"
         WHITESPACE " "
-        L_PAREN "("
-        R_PAREN ")"
+        EXCEPT_TABLE_CLAUSE
+          EXCEPT_KW "except"
+          WHITESPACE " "
+          L_PAREN "("
+          R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   CREATE_STATISTICS

@@ -68,3 +68,7 @@ set
 
 set
   /* before xml */ xml /* before option */ option /* before document */ document /* before xml semicolon */;
+
+set names 'utf8';
+
+set names default;

@@ -77,3 +77,5 @@ b int) returns table (c int, -- returns table
 d int) as $$ select 1 $$ language sql;
 
 create function f() returns boolean begin atomic ; /* before empty */ ; return false; /* before trailing empty */ ; end;
+
+create function f() returns int set time zone interval '1 hour' language sql return 1;

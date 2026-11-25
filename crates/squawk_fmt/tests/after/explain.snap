@@ -27,3 +27,6 @@ explain (
   "VERBOSE"
 )
   select 1;
+
+explain
+  refresh materialized view m;

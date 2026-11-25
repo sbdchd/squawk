@@ -29,3 +29,5 @@ alter function public.f(integer) rename /* to */ to /* name */ renamed_function;
 alter function public.f(integer) owner /* to */ to /* role */ current_role;
 
 alter function public.f(integer) set /* schema */ schema /* name */ archive;
+
+alter function f() reset time zone;

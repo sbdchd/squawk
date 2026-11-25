@@ -1,0 +1,27 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/comment_on_array_type.sql
+---
+SOURCE_FILE
+  COMMENT_ON
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OBJECT_TYPE
+      TYPE_KW "type"
+      WHITESPACE " "
+      TYPE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+      ARRAY_BOUND
+        L_BRACK "["
+        R_BRACK "]"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"

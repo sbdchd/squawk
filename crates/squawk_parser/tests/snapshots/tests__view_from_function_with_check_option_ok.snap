@@ -1,0 +1,52 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/ok/view_from_function_with_check_option.sql
+---
+SOURCE_FILE
+  CREATE_VIEW
+    CREATE_KW "create"
+    WHITESPACE " "
+    VIEW_KW "view"
+    WHITESPACE " "
+    VIEW
+      PATH
+        PATH_SEGMENT
+          IDENT "v"
+    WHITESPACE " "
+    AS_KW "as"
+    WHITESPACE " "
+    SELECT
+      SELECT_CLAUSE
+        SELECT_KW "select"
+        WHITESPACE " "
+        TARGET_LIST
+          TARGET
+            STAR "*"
+      WHITESPACE " "
+      FROM_CLAUSE
+        FROM_KW "from"
+        WHITESPACE " "
+        FUNCTION_FROM_ITEM
+          CALL_EXPR
+            NAME_REF
+              IDENT "generate_series"
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "1"
+              COMMA ","
+              WHITESPACE " "
+              ARG
+                LITERAL
+                  INT_NUMBER "2"
+              R_PAREN ")"
+    WHITESPACE " "
+    WITH_CHECK_OPTION
+      WITH_KW "with"
+      WHITESPACE " "
+      CHECK_KW "check"
+      WHITESPACE " "
+      OPTION_KW "option"
+    SEMICOLON ";"
+  WHITESPACE "\n"
