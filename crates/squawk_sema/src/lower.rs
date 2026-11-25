@@ -24,7 +24,7 @@ use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_M
 use crate::inheritance_graph::{Inheritance, InheritanceGraph, InheritanceKind};
 use crate::interner::Name;
 use crate::ir::{ArrayOwner, SubscriptResults};
-use crate::keyed_index::GraphElementIndex;
+use crate::keyed_index::{GraphElementIndex, Keyed, KeyedIndex};
 use crate::lookup::{Lookup, RefSource, RelationLookup, TableLookup, TypeCandidates};
 use crate::partition_bound::{
     BoundKeyType, ListValue, PartitionBound, PartitionKey, RangeValue, partition_bounds_overlap,
@@ -4157,10 +4157,7 @@ impl Lowerer {
     }
 
     fn find_cast(&self, types: CastTypes) -> Option<CastId> {
-        self.index
-            .casts
-            .get(types)
-            .find(|cast| !self.dropped_casts.contains(cast))
+        find_live(&self.index.casts, &self.dropped_casts, types)
     }
 
     fn drop_cast(&mut self, cast: CastId) {
@@ -5073,10 +5070,7 @@ impl Lowerer {
     }
 
     fn find_role(&self, name: Name) -> Option<RoleId> {
-        self.index
-            .roles
-            .get(name)
-            .find(|id| !self.dropped_roles.contains(id))
+        find_live(&self.index.roles, &self.dropped_roles, name)
     }
 
     fn lower_create_policy(&mut self, create_policy: &ast::CreatePolicy) {
@@ -5367,10 +5361,11 @@ impl Lowerer {
     }
 
     fn find_access_method(&self, name: Name) -> Option<AccessMethodId> {
-        self.index
-            .access_methods
-            .get(name)
-            .find(|id| !self.dropped_access_methods.contains(id))
+        find_live(
+            &self.index.access_methods,
+            &self.dropped_access_methods,
+            name,
+        )
     }
 
     fn lower_create_foreign_table(&mut self, create_table: &ast::CreateForeignTable) {
@@ -5545,10 +5540,11 @@ impl Lowerer {
     }
 
     fn find_foreign_data_wrapper(&self, name: Name) -> Option<ForeignDataWrapperId> {
-        self.index
-            .foreign_data_wrappers
-            .get(name)
-            .find(|id| !self.dropped_foreign_data_wrappers.contains(id))
+        find_live(
+            &self.index.foreign_data_wrappers,
+            &self.dropped_foreign_data_wrappers,
+            name,
+        )
     }
 
     fn lower_create_server(&mut self, create_server: &ast::CreateServer) {
@@ -5643,10 +5639,7 @@ impl Lowerer {
     }
 
     fn find_server(&self, name: Name) -> Option<ServerId> {
-        self.index
-            .servers
-            .get(name)
-            .find(|id| !self.dropped_servers.contains(id))
+        find_live(&self.index.servers, &self.dropped_servers, name)
     }
 
     fn lower_create_user_mapping(&mut self, create_user_mapping: &ast::CreateUserMapping) {
@@ -7266,10 +7259,7 @@ impl Lowerer {
     }
 
     fn find_publication(&self, name: Name) -> Option<PublicationId> {
-        self.index
-            .publications
-            .get(name)
-            .find(|id| !self.dropped_publications.contains(id))
+        find_live(&self.index.publications, &self.dropped_publications, name)
     }
 
     fn lower_create_subscription(&mut self, create_subscription: &ast::CreateSubscription) {
@@ -7372,10 +7362,7 @@ impl Lowerer {
     }
 
     fn find_subscription(&self, name: Name) -> Option<SubscriptionId> {
-        self.index
-            .subscriptions
-            .get(name)
-            .find(|id| !self.dropped_subscriptions.contains(id))
+        find_live(&self.index.subscriptions, &self.dropped_subscriptions, name)
     }
 
     fn lower_create_property_graph(&mut self, create_property_graph: &ast::CreatePropertyGraph) {
@@ -8645,10 +8632,7 @@ impl Lowerer {
     }
 
     fn find_language(&self, name: Name) -> Option<LanguageId> {
-        self.index
-            .languages
-            .get(name)
-            .find(|id| !self.dropped_languages.contains(id))
+        find_live(&self.index.languages, &self.dropped_languages, name)
     }
 
     fn lower_create_event_trigger(&mut self, create_event_trigger: &ast::CreateEventTrigger) {
@@ -8750,10 +8734,11 @@ impl Lowerer {
     }
 
     fn find_event_trigger(&self, name: Name) -> Option<EventTriggerId> {
-        self.index
-            .event_triggers
-            .get(name)
-            .find(|id| !self.dropped_event_triggers.contains(id))
+        find_live(
+            &self.index.event_triggers,
+            &self.dropped_event_triggers,
+            name,
+        )
     }
 
     fn lower_create_schema(&mut self, create_schema: &ast::CreateSchema) {
@@ -10801,17 +10786,11 @@ impl Lowerer {
     }
 
     fn find_database(&self, name: Name) -> Option<DatabaseId> {
-        self.index
-            .databases
-            .get(name)
-            .find(|id| !self.dropped_databases.contains(id))
+        find_live(&self.index.databases, &self.dropped_databases, name)
     }
 
     fn find_tablespace(&self, name: Name) -> Option<TablespaceId> {
-        self.index
-            .tablespaces
-            .get(name)
-            .find(|id| !self.dropped_tablespaces.contains(id))
+        find_live(&self.index.tablespaces, &self.dropped_tablespaces, name)
     }
 
     fn lower_create_table(
@@ -14591,10 +14570,7 @@ impl Lowerer {
     }
 
     fn find_schema(&self, name: Name) -> Option<SchemaId> {
-        self.index
-            .schemas
-            .get(name)
-            .find(|id| !self.dropped_schemas.contains(id))
+        find_live(&self.index.schemas, &self.dropped_schemas, name)
     }
 
     fn default_creation_schema(&self) -> Name {
@@ -29808,6 +29784,14 @@ fn attribute_path(option: &ast::AttributeOption) -> Option<ast::PathRef> {
         ast::FuncType::Type(ty) => ty.path_ref(),
         ast::FuncType::PercentType(_) => None,
     }
+}
+
+fn find_live<T: Keyed>(
+    index: &KeyedIndex<T>,
+    dropped: &FxHashSet<Idx<T>>,
+    key: T::Key,
+) -> Option<Idx<T>> {
+    index.get(key).find(|id| !dropped.contains(id))
 }
 
 fn same_access_method(a: Option<AccessMethodId>, b: Option<AccessMethodId>) -> bool {
