@@ -16923,7 +16923,30 @@ impl Lowerer {
                     .relation_name_ref()
                     .and_then(|name| name.path_ref())
                 {
-                    Some(path) => self.lower_relation_ref(&path),
+                    Some(path) => match value_function_segment(&path) {
+                        Some(ValueFunctionSegment { segment, function }) => {
+                            let node = segment.syntax();
+                            let ty = self.lower_sql_value_function(function, node);
+                            let list = column_def_list(from_item);
+                            let column_defs =
+                                list.as_ref().map_or(ColumnDefs::None, ColumnDefs::List);
+                            self.check_value_column_defs(node, ty, column_defs);
+                            let name = Some(self.intern(&segment.text()));
+                            let value = self.value_columns(
+                                name,
+                                ty,
+                                node,
+                                scalar_alias(from_item).as_ref(),
+                            );
+                            scalar = value.scalar;
+                            RelationSource {
+                                name,
+                                kind: SourceKind::Other,
+                                columns: value.columns,
+                            }
+                        }
+                        None => self.lower_relation_ref(&path),
+                    },
                     None => self.other_relation_source(),
                 }
             }
@@ -16963,15 +16986,8 @@ impl Lowerer {
                 }
             }
             ast::FromItem::FunctionFromItem(function_item) => {
-                let alias_columns = from_item.alias().and_then(|alias| alias.columns());
-                let scalar_alias = from_item
-                    .alias()
-                    .filter(|_| alias_columns.is_none())
-                    .and_then(|alias| alias.name());
-                let column_def_list = match alias_columns {
-                    Some(ast::FromAliasColumns::ColumnDefList(list)) => Some(list),
-                    Some(ast::FromAliasColumns::ColumnList(_)) | None => None,
-                };
+                let scalar_alias = scalar_alias(from_item);
+                let column_def_list = column_def_list(from_item);
                 let FunctionSource {
                     callee,
                     function,
@@ -17010,8 +17026,15 @@ impl Lowerer {
                     },
                 };
                 scalar = function_scalar;
+                let name = match callee {
+                    Some(callee) => Some(callee.name),
+                    None => function_item
+                        .call_expr()
+                        .filter(|call| call.function_like_keyword().is_some())
+                        .and_then(|call| self.inferred_name(ast::Expr::CallExpr(call))),
+                };
                 RelationSource {
-                    name: callee.map(|callee| callee.name),
+                    name,
                     kind: function.map_or(SourceKind::Other, SourceKind::Function),
                     columns,
                 }
@@ -17050,15 +17073,31 @@ impl Lowerer {
                 }
             }
             ast::FromItem::ExprFromItem(expr_item) => {
-                self.with_from_function(|this| {
-                    if let Some(call) = expr_item.call_expr() {
-                        this.lower_call(&call);
+                let expr = match (expr_item.call_expr(), expr_item.cast_expr()) {
+                    (Some(call), _) => Some(ast::Expr::CallExpr(call)),
+                    (None, Some(cast)) => Some(ast::Expr::CastExpr(cast)),
+                    (None, None) => None,
+                };
+                match expr {
+                    Some(expr) => {
+                        let ty = self.with_from_function(|this| this.lower_expr(&expr));
+                        self.check_expr_column_defs(&expr, ty, from_item);
+                        let name = self.inferred_name(expr.clone());
+                        let value = self.value_columns(
+                            name,
+                            ty,
+                            expr.syntax(),
+                            scalar_alias(from_item).as_ref(),
+                        );
+                        scalar = value.scalar;
+                        RelationSource {
+                            name,
+                            kind: SourceKind::Other,
+                            columns: value.columns,
+                        }
                     }
-                    if let Some(cast) = expr_item.cast_expr() {
-                        this.lower_expr(&ast::Expr::CastExpr(cast));
-                    }
-                });
-                self.other_relation_source()
+                    None => self.other_relation_source(),
+                }
             }
             ast::FromItem::GraphTableFromItem(graph_table_item) => {
                 let columns = match graph_table_item.graph_table_fn() {
@@ -17657,6 +17696,9 @@ impl Lowerer {
                     }) = callee
                     {
                         self.check_column_def_list(function, &args, &list);
+                    } else if let Some(keyword) = call.function_like_keyword() {
+                        let ty = self.keyword_call_type(&call, keyword, &args);
+                        self.check_value_column_defs(call.syntax(), ty, ColumnDefs::List(&list));
                     }
                     FunctionColumns {
                         columns: self.column_def_list_columns(&list),
@@ -17716,7 +17758,16 @@ impl Lowerer {
         self.check_from_set_returning(srf_calls, Some(call));
         if let Some(keyword) = call.function_like_keyword() {
             let ty = self.keyword_call_type(call, keyword, &args);
-            self.check_keyword_column_defs(call, ty, column_defs);
+            self.check_value_column_defs(call.syntax(), ty, column_defs);
+            let name = self.inferred_name(ast::Expr::CallExpr(call.clone()));
+            let FunctionColumns { columns, scalar } =
+                self.value_columns(name, ty, call.syntax(), scalar_alias);
+            return FunctionSource {
+                callee,
+                function: None,
+                columns,
+                scalar,
+            };
         }
         let Some(Callee {
             reference,
@@ -17884,9 +17935,9 @@ impl Lowerer {
         }
     }
 
-    fn check_keyword_column_defs(
+    fn check_value_column_defs(
         &mut self,
-        call: &ast::CallExpr,
+        node: &SyntaxNode,
         ty: Option<Ty>,
         column_defs: ColumnDefs<'_>,
     ) {
@@ -17898,10 +17949,77 @@ impl Lowerer {
             }
             ColumnDefs::None => {
                 if self.is_record(ty) {
-                    self.push_error(call.syntax(), SemaError::MissingColumnDefList);
+                    self.push_error(node, SemaError::MissingColumnDefList);
                 }
             }
             ColumnDefs::Rejected => {}
+        }
+    }
+
+    fn check_expr_column_defs(
+        &mut self,
+        expr: &ast::Expr,
+        ty: Option<Ty>,
+        from_item: &ast::FromItem,
+    ) {
+        let list = column_def_list(from_item);
+        if self.is_record(ty) && is_row_constructor(expr) {
+            if let Some(list) = list {
+                let reason = ColumnDefListReason::RowConstructor;
+                self.push_error(list.syntax(), SemaError::UnexpectedColumnDefList { reason });
+            }
+            return;
+        }
+        let column_defs = list.as_ref().map_or(ColumnDefs::None, ColumnDefs::List);
+        self.check_value_column_defs(expr.syntax(), ty, column_defs);
+    }
+
+    fn inferred_name(&mut self, expr: ast::Expr) -> Option<Name> {
+        let name = ColumnName::inferred_from_expr(expr)?;
+        let text = name.text()?;
+        Some(self.intern(&text))
+    }
+
+    fn value_columns(
+        &mut self,
+        name: Option<Name>,
+        ty: Option<Ty>,
+        node: &SyntaxNode,
+        alias: Option<&ast::TableAlias>,
+    ) -> FunctionColumns {
+        let unknown = FunctionColumns {
+            columns: self.unknown_columns(),
+            scalar: None,
+        };
+        let Some(ty) = ty else {
+            return unknown;
+        };
+        if self.is_record(Some(ty)) {
+            return unknown;
+        }
+        if let Some(columns) = self.ty_columns(ty) {
+            return FunctionColumns {
+                columns: *columns,
+                scalar: None,
+            };
+        }
+        let (name, ptr) = match alias {
+            Some(alias) => (Some(self.intern(&alias.text())), self.ptr(alias.syntax())),
+            None => (name, self.ptr(node)),
+        };
+        let column = self.index.columns.alloc(Column {
+            name,
+            ptr,
+            ty: Some(ty),
+            typmod: None,
+            merge: None,
+        });
+        FunctionColumns {
+            columns: Columns {
+                range: IdxRange::single(column),
+                complete: name.is_some(),
+            },
+            scalar: Some(ty),
         }
     }
 
@@ -24487,15 +24605,22 @@ impl Lowerer {
         self.add_ref(name, ReferenceKind::Column, name_ref.syntax(), resolution);
     }
 
+    fn lower_sql_value_function(
+        &mut self,
+        function: ast::SqlValueFunction,
+        node: &SyntaxNode,
+    ) -> Option<Ty> {
+        match sql_value_function_name(function) {
+            Some(name) => self.lower_system_call(name, &[], node.text_range()),
+            None => self.builtin_type(sql_value_function_type(function)),
+        }
+    }
+
     fn lower_expr(&mut self, expr: &ast::Expr) -> Option<Ty> {
         match expr {
             ast::Expr::NameRef(name_ref) => {
                 if let Some(function) = name_ref.sql_value_function() {
-                    if let Some(name) = sql_value_function_name(function) {
-                        let range = name_ref.syntax().text_range();
-                        return self.lower_system_call(name, &[], range);
-                    }
-                    return self.builtin_type(sql_value_function_type(function));
+                    return self.lower_sql_value_function(function, name_ref.syntax());
                 }
                 let name = self.name_ref_name(name_ref)?;
                 let resolution = self.add_name_ref(name, name_ref.syntax());
@@ -25636,10 +25761,6 @@ impl Lowerer {
             range: self.index.columns.range_from(start),
             complete: true,
         }
-    }
-
-    fn lower_call(&mut self, call: &ast::CallExpr) -> Option<Callee> {
-        self.lower_call_with_args(call).callee
     }
 
     fn lower_call_with_args(&mut self, call: &ast::CallExpr) -> LoweredCall {
@@ -29499,6 +29620,46 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => false,
     }
+}
+
+struct ValueFunctionSegment {
+    segment: ast::PathSegmentRef,
+    function: ast::SqlValueFunction,
+}
+
+fn value_function_segment(path: &ast::PathRef) -> Option<ValueFunctionSegment> {
+    if path.qualifier().is_some() {
+        return None;
+    }
+    let segment = path.segment()?;
+    let function = segment.sql_value_function()?;
+    Some(ValueFunctionSegment { segment, function })
+}
+
+fn column_def_list(from_item: &ast::FromItem) -> Option<ast::ColumnDefList> {
+    match from_item.alias()?.columns()? {
+        ast::FromAliasColumns::ColumnDefList(list) => Some(list),
+        ast::FromAliasColumns::ColumnList(_) => None,
+    }
+}
+
+fn scalar_alias(from_item: &ast::FromItem) -> Option<ast::TableAlias> {
+    let alias = from_item.alias()?;
+    if alias.columns().is_some() {
+        return None;
+    }
+    alias.name()
+}
+
+fn is_row_constructor(expr: &ast::Expr) -> bool {
+    let mut expr = expr.unparen();
+    while let ast::Expr::CastExpr(cast) = &expr {
+        let Some(inner) = cast.expr() else {
+            return false;
+        };
+        expr = inner.unparen();
+    }
+    matches!(expr, ast::Expr::TupleExpr(_))
 }
 
 fn is_opaque_record(expr: &ast::Expr) -> bool {

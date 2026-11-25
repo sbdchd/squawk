@@ -1614,6 +1614,31 @@ impl ast::CompoundSelect {
     }
 }
 
+fn sql_value_function(node: &SyntaxNode) -> Option<SqlValueFunction> {
+    let function = match node.first_token()?.kind() {
+        SyntaxKind::CURRENT_CATALOG_KW => SqlValueFunction::CurrentCatalog,
+        SyntaxKind::CURRENT_DATE_KW => SqlValueFunction::CurrentDate,
+        SyntaxKind::CURRENT_ROLE_KW => SqlValueFunction::CurrentRole,
+        SyntaxKind::CURRENT_SCHEMA_KW => SqlValueFunction::CurrentSchema,
+        SyntaxKind::CURRENT_TIME_KW => SqlValueFunction::CurrentTime,
+        SyntaxKind::CURRENT_TIMESTAMP_KW => SqlValueFunction::CurrentTimestamp,
+        SyntaxKind::CURRENT_USER_KW => SqlValueFunction::CurrentUser,
+        SyntaxKind::LOCALTIME_KW => SqlValueFunction::Localtime,
+        SyntaxKind::LOCALTIMESTAMP_KW => SqlValueFunction::Localtimestamp,
+        SyntaxKind::SESSION_USER_KW => SqlValueFunction::SessionUser,
+        SyntaxKind::SYSTEM_USER_KW => SqlValueFunction::SystemUser,
+        SyntaxKind::USER_KW => SqlValueFunction::User,
+        _ => return None,
+    };
+    Some(function)
+}
+
+impl ast::PathSegmentRef {
+    pub fn sql_value_function(&self) -> Option<SqlValueFunction> {
+        sql_value_function(self.syntax())
+    }
+}
+
 impl ast::NameRef {
     #[inline]
     pub fn text(&self) -> Cow<'_, str> {
@@ -1630,22 +1655,7 @@ impl ast::NameRef {
     }
 
     pub fn sql_value_function(&self) -> Option<SqlValueFunction> {
-        let function = match self.first_token_kind()? {
-            SyntaxKind::CURRENT_CATALOG_KW => SqlValueFunction::CurrentCatalog,
-            SyntaxKind::CURRENT_DATE_KW => SqlValueFunction::CurrentDate,
-            SyntaxKind::CURRENT_ROLE_KW => SqlValueFunction::CurrentRole,
-            SyntaxKind::CURRENT_SCHEMA_KW => SqlValueFunction::CurrentSchema,
-            SyntaxKind::CURRENT_TIME_KW => SqlValueFunction::CurrentTime,
-            SyntaxKind::CURRENT_TIMESTAMP_KW => SqlValueFunction::CurrentTimestamp,
-            SyntaxKind::CURRENT_USER_KW => SqlValueFunction::CurrentUser,
-            SyntaxKind::LOCALTIME_KW => SqlValueFunction::Localtime,
-            SyntaxKind::LOCALTIMESTAMP_KW => SqlValueFunction::Localtimestamp,
-            SyntaxKind::SESSION_USER_KW => SqlValueFunction::SessionUser,
-            SyntaxKind::SYSTEM_USER_KW => SqlValueFunction::SystemUser,
-            SyntaxKind::USER_KW => SqlValueFunction::User,
-            _ => return None,
-        };
-        Some(function)
+        sql_value_function(self.syntax())
     }
 
     pub fn range_bound_keyword(&self) -> Option<RangeBoundKeyword> {

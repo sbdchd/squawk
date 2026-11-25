@@ -452,3 +452,63 @@ select * from coalesce(null::pg_class) as t (a int);
        ╰╴                                            ━━━━━━━
     ");
 }
+
+#[test]
+fn value_from_items() {
+    assert_snapshot!(check(r#"
+select t.relname, relkind from coalesce(null::pg_class) as t;
+select t.b + 1 from coalesce(1) as t (b);
+select coalesce from coalesce(1);
+select t + 1, int4 from cast(1 as int) as t, cast(2 as int);
+select relname from cast(null as pg_class);
+select t + 1, current_date from current_date as t;
+select * from current_user, current_schema as s;
+select * from cast(null as record) as t (a int);
+select t.nope from coalesce(null::pg_class) as t;
+select t.nope from coalesce(1) as t;
+select t.nope from cast(1 as int) as t (a);
+select t.nope from current_date as t (a);
+select * from cast(1 as int) as t (a int);
+select * from cast(row(1) as record) as t (a int);
+select * from cast(null as record);
+select * from current_date as t (a int);
+select * from "current_date";
+"#), @r#"
+    error: column `t.nope` does not exist
+       ╭▸ 
+    10 │ select t.nope from coalesce(null::pg_class) as t;
+       ╰╴         ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    11 │ select t.nope from coalesce(1) as t;
+       ╰╴         ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    12 │ select t.nope from cast(1 as int) as t (a);
+       ╰╴         ━━━━
+    error: column `t.nope` does not exist
+       ╭▸ 
+    13 │ select t.nope from current_date as t (a);
+       ╰╴         ━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    14 │ select * from cast(1 as int) as t (a int);
+       ╰╴                                  ━━━━━━━
+    error: a column definition list is redundant for a row constructor
+       ╭▸ 
+    15 │ select * from cast(row(1) as record) as t (a int);
+       ╰╴                                          ━━━━━━━
+    error: a column definition list is required for functions returning `record`
+       ╭▸ 
+    16 │ select * from cast(null as record);
+       ╰╴              ━━━━━━━━━━━━━━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    17 │ select * from current_date as t (a int);
+       ╰╴                                ━━━━━━━
+    error: relation `current_date` does not exist
+       ╭▸ 
+    18 │ select * from "current_date";
+       ╰╴              ━━━━━━━━━━━━━━
+    "#);
+}

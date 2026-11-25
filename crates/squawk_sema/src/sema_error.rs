@@ -1115,6 +1115,7 @@ pub(crate) struct OrdinalityColumnDefListFix {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ColumnDefListReason {
     OutParams,
+    RowConstructor,
     NamedComposite,
     NotRecord,
 }
@@ -1124,6 +1125,9 @@ impl ColumnDefListReason {
         match self {
             ColumnDefListReason::OutParams => {
                 "a column definition list is redundant for a function with OUT parameters"
+            }
+            ColumnDefListReason::RowConstructor => {
+                "a column definition list is redundant for a row constructor"
             }
             ColumnDefListReason::NamedComposite => {
                 "a column definition list is redundant for a function returning a named composite type"
