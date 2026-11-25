@@ -695,3 +695,106 @@ fn record_field_through_cte() {
 with cte as (select pg_get_keywords() k) select (k).word from cte;
 "), @"no diagnostics");
 }
+
+#[test]
+fn anonymous_record_functions() {
+    assert_snapshot!(check("
+create type ct as (
+  a int
+);
+create function g(ct) returns int
+  language sql
+  as 'select 1';
+create function h(text) returns int
+  language sql
+  as 'select 1';
+create function h(anyelement) returns int
+  language sql
+  as 'select 1';
+create function rr() returns record
+  language sql
+  as 'select 1, 2';
+select (row(1)).pg_typeof, (row(1, 'a')).to_json, (row(1)).count, (row(1)).g;
+select (row(1)).h + 1, (rr()).pg_typeof, (row(1)).f1;
+select (row(1)).nope;
+select (row(1)).ascii;
+select (row(1)).array_ndims;
+"), @"
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    19 │ select (row(1)).nope;
+       ╰╴                ━━━━
+    error: could not identify column `ascii` in type `record`
+       ╭▸ 
+    20 │ select (row(1)).ascii;
+       ╰╴                ━━━━━
+    error: could not identify column `array_ndims` in type `record`
+       ╭▸ 
+    21 │ select (row(1)).array_ndims;
+       ╰╴                ━━━━━━━━━━━
+    ");
+}
+
+#[test]
+fn missing_record_fields() {
+    assert_snapshot!(check("
+create function o(out a int, out b int)
+  language sql
+  as 'select 1, 2';
+select (s.x).f1 + 1, (s.x).f2 || 'b' from (select row(1, 'a') as x) s;
+with c as (
+  select row(1) as x
+)
+select (x).f1 from c;
+select (s.x).a from (select o() as x) s;
+select (o.y).f1 from (select s.x as y from (select row(1) as x) s) o;
+select (row(1)::record).f1;
+select (row(1, s.*)).f3 from (select 1 as a, 2 as b) s;
+select (null::record).nope;
+select (case when true then row(1) end).f1;
+select ((select row(1))).f1;
+select (array[row(1)])[1].f1;
+select (coalesce(row(1), row(2))).f1;
+select (s.x).nope from (select row(1) as x) s;
+select (s.x).nope from (select o() as x) s;
+select (o.y).nope from (select s.x as y from (select row(1) as x) s) o;
+select (row(s.*)).f3 from (select 1 as a, 2 as b) s;
+"), @"
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    14 │ select (null::record).nope;
+       ╰╴                      ━━━━
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    15 │ select (case when true then row(1) end).f1;
+       ╰╴                                        ━━
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    16 │ select ((select row(1))).f1;
+       ╰╴                         ━━
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    17 │ select (array[row(1)])[1].f1;
+       ╰╴                          ━━
+    error: could not identify column `f1` in type `record`
+       ╭▸ 
+    18 │ select (coalesce(row(1), row(2))).f1;
+       ╰╴                                  ━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    19 │ select (s.x).nope from (select row(1) as x) s;
+       ╰╴             ━━━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    20 │ select (s.x).nope from (select o() as x) s;
+       ╰╴             ━━━━
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    21 │ select (o.y).nope from (select s.x as y from (select row(1) as x) s) o;
+       ╰╴             ━━━━
+    error: could not identify column `f3` in type `record`
+       ╭▸ 
+    22 │ select (row(s.*)).f3 from (select 1 as a, 2 as b) s;
+       ╰╴                  ━━
+    ");
+}

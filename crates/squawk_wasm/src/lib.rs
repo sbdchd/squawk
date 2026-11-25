@@ -302,7 +302,7 @@ impl SquawkDatabase {
                 range_end: range_end.into(),
                 messages: x
                     .hint()
-                    .map(|hint| hint.to_owned().into())
+                    .map(|hint| SubMessage::new("hint", hint.to_owned()))
                     .into_iter()
                     .collect(),
                 fix: None,
@@ -320,7 +320,12 @@ impl SquawkDatabase {
                 .to_wide(squawk_line_index::WideEncoding::Utf16, end)
                 .unwrap();
 
-            let messages = x.note.into_iter().chain(x.help).collect();
+            let messages = x
+                .note
+                .map(|note| SubMessage::new("note", note))
+                .into_iter()
+                .chain(x.help.map(|help| SubMessage::new("help", help)))
+                .collect();
 
             let fix = x.fix.map(|fix| convert_fix(line_index, fix));
 
@@ -354,7 +359,7 @@ impl SquawkDatabase {
 
                 let (suggestion_message, fix) = match x.suggestion {
                     Some(suggestion) => (
-                        Some(suggestion.message),
+                        Some(SubMessage::new("help", suggestion.message)),
                         Some(convert_fix(line_index, suggestion.fix)),
                     ),
                     None => (None, None),
@@ -362,7 +367,8 @@ impl SquawkDatabase {
                 let messages = x
                     .notes
                     .into_iter()
-                    .chain(x.hint)
+                    .map(|note| SubMessage::new("note", note))
+                    .chain(x.hint.map(|hint| SubMessage::new("hint", hint)))
                     .chain(suggestion_message)
                     .collect();
 
@@ -862,8 +868,23 @@ struct LintError {
     end_column: u32,
     range_start: usize,
     range_end: usize,
-    messages: Vec<Cow<'static, str>>,
+    messages: Vec<SubMessage>,
     fix: Option<Fix>,
+}
+
+#[derive(Serialize)]
+struct SubMessage {
+    label: &'static str,
+    text: Cow<'static, str>,
+}
+
+impl SubMessage {
+    fn new(label: &'static str, text: impl Into<Cow<'static, str>>) -> Self {
+        SubMessage {
+            label,
+            text: text.into(),
+        }
+    }
 }
 
 #[derive(Serialize)]

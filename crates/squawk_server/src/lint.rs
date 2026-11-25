@@ -69,10 +69,10 @@ fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
     let mut diagnostics = Vec::with_capacity(violations.len() + parse_errors.len());
 
     for error in parse_errors {
-        let message = match error.hint() {
-            Some(hint) => format!("{}\nhint: {hint}", error.message()),
-            None => error.message().to_string(),
-        };
+        let mut message = DiagnosticMessage::new(error.message());
+        if let Some(hint) = error.hint() {
+            message.push("hint", hint);
+        }
         let diagnostic = Diagnostic {
             range: diagnostic_range(line_index, error.range()),
             severity: Some(DiagnosticSeverity::Error),
@@ -81,21 +81,22 @@ fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
                 href: Url::parse("https://squawkhq.com/docs/syntax-error").unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: Message::String(message),
+            message: message.into(),
             ..Default::default()
         };
         diagnostics.push(diagnostic);
     }
 
     for error in semantic_diagnostics(db, file_id) {
-        let mut message = error.message.into_owned();
-        for note in error.notes {
-            message.push_str("\nnote: ");
-            message.push_str(&note);
+        let mut message = DiagnosticMessage::new(error.message);
+        for note in &error.notes {
+            message.push("note", note);
         }
-        if let Some(hint) = error.hint {
-            message.push_str("\nhint: ");
-            message.push_str(&hint);
+        if let Some(hint) = &error.hint {
+            message.push("hint", hint);
+        }
+        if let Some(suggestion) = &error.suggestion {
+            message.push("help", &suggestion.message);
         }
 
         let data = error
@@ -119,7 +120,7 @@ fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
                 href: Url::parse("https://squawkhq.com/docs/semantic-error").unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: Message::String(message),
+            message: message.into(),
             data: data.map(|data| serde_json::to_value(data).unwrap()),
             ..Default::default()
         };
@@ -143,14 +144,12 @@ fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
             .filter_map(|x| to_text_edit(x, line_index))
             .collect();
 
-        let mut message = violation.message.into_owned();
-        if let Some(note) = violation.note {
-            message.push_str("\nnote: ");
-            message.push_str(&note);
+        let mut message = DiagnosticMessage::new(violation.message);
+        if let Some(note) = &violation.note {
+            message.push("note", note);
         }
-        if let Some(help) = violation.help {
-            message.push_str("\nhelp: ");
-            message.push_str(&help);
+        if let Some(help) = &violation.help {
+            message.push("help", help);
         }
 
         let data = AssociatedDiagnosticData {
@@ -168,13 +167,43 @@ fn lint_file(db: &dyn Db, file_id: FileId) -> Vec<Diagnostic> {
                 href: Url::parse(&format!("https://squawkhq.com/docs/{}", violation.code)).unwrap(),
             }),
             source: Some(DIAGNOSTIC_NAME.to_string()),
-            message: Message::String(message),
+            message: message.into(),
             data: Some(serde_json::to_value(data).unwrap()),
             ..Default::default()
         };
         diagnostics.push(diagnostic);
     }
     diagnostics
+}
+
+struct DiagnosticMessage {
+    text: String,
+    has_details: bool,
+}
+
+impl DiagnosticMessage {
+    fn new(text: impl Into<String>) -> Self {
+        DiagnosticMessage {
+            text: text.into(),
+            has_details: false,
+        }
+    }
+
+    fn push(&mut self, label: &str, detail: &str) {
+        if !self.has_details {
+            self.text.push('\n');
+            self.has_details = true;
+        }
+        for part in ["\n", label, ": ", detail] {
+            self.text.push_str(part);
+        }
+    }
+}
+
+impl From<DiagnosticMessage> for Message {
+    fn from(message: DiagnosticMessage) -> Self {
+        Message::String(message.text)
+    }
 }
 
 #[cfg(test)]
@@ -237,9 +266,11 @@ create table t(b int);
         2:13 Error semantic-error: relation `t` already exists
         1:0 Warning prefer-robust-stmts: missing `if not exists`, the migration can't be rerun if it fails part way through
         1:17 Warning prefer-bigint-over-int: using 32-bit integer fields can result in hitting the max `int` limit
+
         help: use 64-bit integer values instead to prevent hitting this limit
         2:0 Warning prefer-robust-stmts: missing `if not exists`, the migration can't be rerun if it fails part way through
         2:17 Warning prefer-bigint-over-int: using 32-bit integer fields can result in hitting the max `int` limit
+
         help: use 64-bit integer values instead to prevent hitting this limit
         ");
     }
@@ -252,7 +283,23 @@ select a, b from t;
 ";
         assert_snapshot!(check(sql), @"
         2:10 Error semantic-error: column `b` does not exist
+
+        help: a column with a similar name exists
         fix: Replace with `a`
+        ");
+    }
+
+    #[test]
+    fn missing_lateral() {
+        let sql = "
+with t as (select 1 a, 2 b)
+select * from t, (values (t.*));
+";
+        assert_snapshot!(check(sql), @"
+        2:26 Error semantic-error: invalid reference to `from` clause entry for table `t`
+
+        help: to reference table `t`, mark the subquery as `lateral`
+        fix: Add `lateral`
         ");
     }
 
@@ -264,6 +311,7 @@ create table t(a varchar(10));
         assert_snapshot!(check(sql), @"
         1:0 Warning prefer-robust-stmts: missing `if not exists`, the migration can't be rerun if it fails part way through
         1:17 Warning prefer-text-field: changing the size of a `varchar` field requires an `access exclusive` lock, that will prevent all reads and writes to the table
+
         help: use a `text` field with a `check` constraint
         ");
     }

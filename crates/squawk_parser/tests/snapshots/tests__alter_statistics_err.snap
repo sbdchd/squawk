@@ -1,0 +1,95 @@
+---
+source: crates/squawk_parser/tests/tests.rs
+input_file: crates/squawk_parser/tests/data/err/alter_statistics.sql
+---
+SOURCE_FILE
+  COMMENT "-- if exists only allowed with set statistics"
+  WHITESPACE "\n"
+  ALTER_STATISTICS
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    OWNER_TO
+      OWNER_KW "owner"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "u"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_STATISTICS
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    STATISTICS_RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      STATISTICS
+        PATH
+          PATH_SEGMENT
+            IDENT "n"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_STATISTICS
+    ALTER_KW "alter"
+    WHITESPACE " "
+    STATISTICS_KW "statistics"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    STATISTICS_REF
+      PATH_REF
+        PATH_SEGMENT_REF
+          IDENT "s"
+    WHITESPACE " "
+    SET_SCHEMA
+      SET_KW "set"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "n"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+---
+error[syntax-error]: expected `set statistics`
+  ╭▸ 
+2 │ alter statistics if exists s owner to u;
+  ╰╴                            ━
+error[syntax-error]: expected `set statistics`
+  ╭▸ 
+3 │ alter statistics if exists s rename to n;
+  ╰╴                            ━
+error[syntax-error]: expected `set statistics`
+  ╭▸ 
+4 │ alter statistics if exists s set schema n;
+  ╰╴                            ━

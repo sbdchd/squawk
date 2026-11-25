@@ -1871,3 +1871,79 @@ alter function foo(no_such_type) immutable;
        ╰╴                   ━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn ambiguous_procedure_out_params() {
+    assert_snapshot!(check("
+create procedure p(out a int, in b int)
+  language sql
+  as 'select 1';
+create procedure p(in a int, in b int)
+  language sql
+  as 'select 1';
+call p(null, 1);
+call p(1, 1);
+call p(a => 1, b => 1);
+create procedure q(out a int, in b int)
+  language sql
+  as 'select 1';
+create procedure q(in b int, in c int)
+  language sql
+  as 'select 1';
+call q(null, 1);
+call q(b => 1, c => 1);
+create procedure r(out a text, in b int)
+  language sql
+  as 'select ''a''';
+create procedure r(in a int, in b int)
+  language sql
+  as 'select 1';
+call r(null, 1);
+call r(1, 1);
+create schema zs;
+create procedure zs.s(out a int, in b int)
+  language sql
+  as 'select 1';
+create procedure s(in a int, in b int)
+  language sql
+  as 'select 1';
+set search_path = zs, public;
+call s(null, 1);
+set search_path = public;
+create procedure u(inout a int, in b int)
+  language sql
+  as 'select 1';
+create procedure u(inout a int, out b int)
+  language sql
+  as 'select 1, 1';
+call u(1, 1);
+create procedure w(out a int, in b int)
+  language sql
+  as 'select 1';
+create or replace procedure w(in b int, out a int)
+  language sql
+  as 'select 1';
+call w(1, null);
+"), @"
+    error: procedure `p` is not unique
+      ╭▸ 
+    8 │ call p(null, 1);
+      ╰╴     ━
+    error: procedure `p` is not unique
+      ╭▸ 
+    9 │ call p(1, 1);
+      ╰╴     ━
+    error: procedure `p` is not unique
+       ╭▸ 
+    10 │ call p(a => 1, b => 1);
+       ╰╴     ━
+    error: procedure `q` is not unique
+       ╭▸ 
+    17 │ call q(null, 1);
+       ╰╴     ━
+    error: procedure `u` is not unique
+       ╭▸ 
+    43 │ call u(1, 1);
+       ╰╴     ━
+    ");
+}

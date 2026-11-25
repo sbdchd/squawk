@@ -11,3 +11,7 @@ ALTER STATISTICS reporting.user_activity_statistics SET STATISTICS DEFAULT;
 ALTER /* statistics */ STATISTICS /* name */ reporting.commented_statistics /* action */ RENAME /* to */ TO /* new name */ reporting.renamed_commented_statistics /* semicolon */;
 
 ALTER STATISTICS reporting.statistics_with_a_very_long_and_descriptive_name SET STATISTICS /* expression */ 10000;
+
+alter /* a */ statistics /* b */ if /* c */ exists /* d */ foo.s /* e */ set /* f */ statistics /* g */ 100;
+
+alter statistics if exists foo.s set statistics default;

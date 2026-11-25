@@ -264,7 +264,7 @@ impl<'a> Overloads<'a> {
             };
             if viable
                 .iter()
-                .any(|other| self.same_signature(&self.index.functions[other.id], function))
+                .any(|other| self.is_shadowed(&self.index.functions[other.id], function))
             {
                 continue;
             }
@@ -691,6 +691,40 @@ impl<'a> Overloads<'a> {
         })
     }
 
+    pub(crate) fn is_record(&self, ty: Ty) -> bool {
+        self.pseudo(ty) == Some(Pseudo::Record)
+    }
+
+    pub(crate) fn accepts_record(&self, function: &Function) -> bool {
+        let Some(param) = self.inputs(function).next() else {
+            return false;
+        };
+        let Some(ty) = param.ty else {
+            return true;
+        };
+        match self.pseudo(ty) {
+            Some(
+                Pseudo::Any
+                | Pseudo::AnyElement
+                | Pseudo::AnyNonArray
+                | Pseudo::AnyCompatible
+                | Pseudo::AnyCompatibleNonArray
+                | Pseudo::Record,
+            ) => true,
+            Some(Pseudo::AnyArray | Pseudo::AnyCompatibleArray) => {
+                param.mode == ParamMode::Variadic
+            }
+            Some(
+                Pseudo::AnyEnum
+                | Pseudo::AnyRange
+                | Pseudo::AnyMultirange
+                | Pseudo::AnyCompatibleRange
+                | Pseudo::AnyCompatibleMultirange,
+            ) => false,
+            None => self.category(ty) == Some(Category::Composite),
+        }
+    }
+
     fn inputs(&self, function: &Function) -> impl Iterator<Item = &'a Param> + use<'a> {
         let params = &self.index.params;
         let procedure = function.kind == FunctionKind::Procedure;
@@ -699,6 +733,20 @@ impl<'a> Overloads<'a> {
             .iter()
             .map(move |id| &params[id])
             .filter(move |param| param.mode != ParamMode::Out || procedure)
+    }
+
+    fn is_shadowed(&self, existing: &Function, function: &Function) -> bool {
+        self.same_signature(existing, function)
+            && (existing.schema != function.schema || self.same_input_types(existing, function))
+    }
+
+    fn same_input_types(&self, a: &Function, b: &Function) -> bool {
+        let input_types = |function: &Function| {
+            self.inputs(function)
+                .filter(|param| param.mode != ParamMode::Out)
+                .map(|param| param.ty)
+        };
+        input_types(a).eq(input_types(b))
     }
 
     fn same_signature(&self, a: &Function, b: &Function) -> bool {

@@ -129,6 +129,7 @@ impl Lowerer {
             view_column_deps: vec![],
             generated_column_deps: vec![],
             reserved_constraint_names: SmallVec::new(),
+            record_columns: FxHashMap::default(),
             view_bases: FxHashMap::default(),
             insert_values: vec![],
             partition_bounds: FxHashMap::default(),
@@ -443,6 +444,7 @@ pub(crate) struct Lowerer {
     view_column_deps: Vec<ViewColumnDep>,
     generated_column_deps: Vec<GeneratedColumnDep>,
     reserved_constraint_names: SmallVec<[ReservedConstraintName; 2]>,
+    record_columns: FxHashMap<InIrFile<SyntaxNodePtr>, RecordColumns>,
     view_bases: FxHashMap<TableId, TableId>,
     insert_values: Vec<InsertValue>,
     partition_bounds: FxHashMap<TableId, PartitionBound>,
@@ -952,13 +954,20 @@ struct IdentPart<'a> {
 #[derive(Clone, Copy)]
 struct FieldFunction {
     function: FunctionId,
-    ty: Option<Ty>,
+    arg: Ty,
+}
+
+#[derive(Clone, Copy)]
+enum RecordColumns {
+    Known(Columns),
+    Opaque,
 }
 
 enum FieldBase {
     Source(Option<SourceId>),
     Scalar(Ty),
     Expr(Option<Ty>),
+    OpaqueRecord(Ty),
     Columns { columns: Columns, ty: Option<Ty> },
 }
 
@@ -6406,10 +6415,11 @@ impl Lowerer {
     }
 
     fn lower_alter_statistics(&mut self, alter_statistics: &ast::AlterStatistics) {
+        let if_missing = IfMissing::from_if_exists(alter_statistics.if_exists().as_ref());
         let statistics = alter_statistics
             .statistics_ref()
             .and_then(|statistics| statistics.path_ref())
-            .and_then(|path| self.lower_statistics_ref(&path, IfMissing::Error));
+            .and_then(|path| self.lower_statistics_ref(&path, if_missing));
         match alter_statistics.action() {
             Some(ast::AlterStatisticsAction::StatisticsRenameTo(rename)) => {
                 if let Some(statistics) = statistics
@@ -24026,10 +24036,26 @@ impl Lowerer {
                 complete &= expanded.complete;
                 continue;
             }
-            let ty = self.lower_expr(&expr);
+            let refs = self.index.references.next_idx();
+            let mut record = None;
+            let ty = if let ast::Expr::TupleExpr(tuple) = expr.unparen() {
+                let columns = self.lower_row_columns(&tuple);
+                record = Some(RecordColumns::Known(columns));
+                self.builtin_type("record")
+            } else {
+                let ty = self.lower_expr(&expr);
+                if self.is_record(ty) {
+                    record = self.expr_record_columns(&expr, refs);
+                }
+                ty
+            };
             let Some((column_name, node)) = ColumnName::from_target(&target) else {
                 continue;
             };
+            if let Some(record) = record {
+                let ptr = self.ptr(&node);
+                self.record_columns.insert(ptr, record);
+            }
             let name = column_name.text().map(|name| self.intern(&name));
             if target.as_name().is_some() {
                 explicit.push(columns.len());
@@ -24051,6 +24077,64 @@ impl Lowerer {
             self.add_item_range(ptr.file_range(), Item::Column(id));
         }
         Columns { range, complete }
+    }
+
+    fn expr_record_columns(&self, expr: &ast::Expr, refs: RefId) -> Option<RecordColumns> {
+        let expr = expr.unparen();
+        if is_opaque_record(&expr) {
+            return Some(RecordColumns::Opaque);
+        }
+        if let ast::Expr::CallExpr(call) = &expr {
+            let end = call.expr()?.syntax().text_range().end();
+            return self
+                .index
+                .references
+                .range_from(refs)
+                .iter()
+                .find_map(|reference| {
+                    let reference = &self.index.references[reference];
+                    if let Resolution::Function(function) = reference.resolution
+                        && reference.range.value.end() == end
+                    {
+                        self.index.functions[function].columns
+                    } else {
+                        None
+                    }
+                })
+                .map(RecordColumns::Known);
+        }
+        if !expr.is_name_path() {
+            return None;
+        }
+        let reference = self.index.references.range_from(refs).iter().next_back()?;
+        let resolution = self.index.references[reference].resolution;
+        if let Resolution::Column { column, .. } = resolution {
+            return self.column_record_columns(column);
+        }
+        if let Resolution::Source(source) = resolution {
+            let columns = self.index.sources[source].columns;
+            return columns.complete.then_some(RecordColumns::Known(columns));
+        }
+        None
+    }
+
+    fn column_record_columns(&self, column: ColumnId) -> Option<RecordColumns> {
+        self.record_columns
+            .get(&self.index.columns[column].ptr)
+            .copied()
+    }
+
+    fn record_field_base(&mut self, ty: Option<Ty>, record: Option<RecordColumns>) -> FieldBase {
+        match (ty, record) {
+            (Some(ty), Some(record)) if self.is_record(Some(ty)) => match record {
+                RecordColumns::Known(columns) => FieldBase::Columns {
+                    columns,
+                    ty: Some(ty),
+                },
+                RecordColumns::Opaque => FieldBase::OpaqueRecord(ty),
+            },
+            (ty, Some(_) | None) => self.expr_field_base(ty),
+        }
     }
 
     fn expr_typmod(&mut self, ty: Ty, expr: &ast::Expr) -> Option<Typmod> {
@@ -24100,6 +24184,7 @@ impl Lowerer {
                 Some(self.index.sources[*source].columns),
             ),
             Some(FieldBase::Scalar(ty)) => (Some(*ty), None),
+            Some(FieldBase::OpaqueRecord(ty)) => (Some(*ty), None),
             Some(FieldBase::Expr(Some(ty))) => (Some(*ty), self.ty_columns(*ty).copied()),
             Some(FieldBase::Columns { columns, ty }) => (*ty, Some(*columns)),
             Some(FieldBase::Source(None) | FieldBase::Expr(None)) | None => (None, None),
@@ -26881,30 +26966,31 @@ impl Lowerer {
 
     fn find_field_function(&self, arg: Ty, name: Name) -> Option<FieldFunction> {
         let args = [CallArg::positional(ArgType::Known(arg))];
-        let Resolution::Function(function) =
-            self.find_routine(None, name, &args, FunctionKind::Function)
-        else {
+        let overloads = self.overloads();
+        let is_record = overloads.is_record(arg);
+        let candidates = self
+            .routine_candidates(None, name, FunctionKind::Function)
+            .filter(|id| !is_record || overloads.accepts_record(&self.index.functions[*id]));
+        let Resolution::Function(function) = overloads.select(candidates, &args) else {
             return None;
         };
-        Some(FieldFunction {
-            function,
-            ty: self.call_type(function, &args),
-        })
+        Some(FieldFunction { function, arg })
     }
 
     fn add_field_function_ref(
         &mut self,
         name: Name,
         field: &ast::NameRef,
-        FieldFunction { function, ty }: FieldFunction,
+        FieldFunction { function, arg }: FieldFunction,
     ) -> Option<Ty> {
-        self.add_ref(
+        let reference = self.add_ref(
             name,
             ReferenceKind::Function(RoutineKind::Function),
             field.syntax(),
             Resolution::Function(function),
         );
-        ty
+        let args = [CallArg::positional(ArgType::Known(arg))];
+        self.record_call(reference, function, &args)
     }
 
     fn source_row_type(&mut self, source: SourceId) -> Option<Ty> {
@@ -27145,7 +27231,7 @@ impl Lowerer {
             FieldBase::Expr(ty) => {
                 let field = field_expr.field()?;
                 if self.is_record(ty) {
-                    return self.add_record_field_ref(None, &field);
+                    return self.add_record_field_ref(ty, None, &field);
                 }
                 if let Some(ty) = ty
                     && let Some(name) = self.name_ref_name(&field)
@@ -27158,10 +27244,18 @@ impl Lowerer {
                 }
                 return self.add_field_ref(ty, &field);
             }
+            FieldBase::OpaqueRecord(ty) => {
+                let field = field_expr.field()?;
+                let columns = Columns {
+                    range: self.index.columns.alloc_many([]),
+                    complete: true,
+                };
+                return self.add_record_field_ref(Some(ty), Some(columns), &field);
+            }
             FieldBase::Columns { columns, ty } => {
                 let field = field_expr.field()?;
                 if self.is_record(ty) {
-                    return self.add_record_field_ref(Some(columns), &field);
+                    return self.add_record_field_ref(ty, Some(columns), &field);
                 }
                 return self.add_columns_field_ref(Some(columns), &field);
             }
@@ -27256,6 +27350,11 @@ impl Lowerer {
                         } if let Some(ty) = self.scalar_sources.get(&source) => {
                             FieldBase::Scalar(*ty)
                         }
+                        Resolution::Column { column, .. } => {
+                            let ty = self.resolution_type(resolution);
+                            let record = self.column_record_columns(column);
+                            self.record_field_base(ty, record)
+                        }
                         _ => self.expr_field_base(self.resolution_type(resolution)),
                     }
                 }
@@ -27318,23 +27417,55 @@ impl Lowerer {
         Some(match qualifier {
             Some(qualifier) => FieldBase::Source(self.lower_qualifier(&qualifier)),
             None => {
+                let refs = self.index.references.next_idx();
                 let ty = self.lower_expr(&base);
                 let ty = if base.is_unknown_literal() {
                     self.builtin_type("unknown")
                 } else {
                     ty
                 };
-                self.expr_field_base(ty)
+                let record = if self.is_record(ty) {
+                    self.expr_record_columns(&base, refs)
+                } else {
+                    None
+                };
+                self.record_field_base(ty, record)
             }
         })
     }
 
     fn lower_row_field_base(&mut self, tuple: &ast::TupleExpr) -> FieldBase {
+        FieldBase::Columns {
+            columns: self.lower_row_columns(tuple),
+            ty: self.builtin_type("record"),
+        }
+    }
+
+    fn lower_row_columns(&mut self, tuple: &ast::TupleExpr) -> Columns {
         let mut columns = Vec::with_capacity(tuple.exprs().count());
-        for (index, expr) in tuple.exprs().enumerate() {
+        let mut complete = true;
+        for expr in tuple.exprs() {
+            if let ast::Expr::FieldExpr(field_expr) = &expr
+                && let Some(star) = field_expr.star_token()
+            {
+                match self.lower_field_star(field_expr, &star).columns {
+                    Some(star_columns) => {
+                        complete &= star_columns.complete;
+                        for id in star_columns.range {
+                            let name = Some(self.intern(&format!("f{}", columns.len() + 1)));
+                            columns.push(Column {
+                                name,
+                                ..self.index.columns[id]
+                            });
+                        }
+                    }
+                    None => complete = false,
+                }
+                continue;
+            }
             let ty = self.lower_expr(&expr);
             columns.push(Column {
-                name: Some(self.intern(&format!("f{}", index + 1))),
+                name: Some(self.intern(&format!("f{}", columns.len() + 1))),
                 ptr: self.ptr(expr.syntax()),
                 ty,
                 typmod: None,
@@ -27342,13 +27473,7 @@ impl Lowerer {
             });
         }
         let range = self.index.columns.alloc_many(columns);
-        FieldBase::Columns {
-            columns: Columns {
-                range,
-                complete: true,
-            },
-            ty: self.builtin_type("record"),
-        }
+        Columns { range, complete }
     }
 
     fn is_record(&mut self, ty: Option<Ty>) -> bool {
@@ -27357,10 +27482,17 @@ impl Lowerer {
 
     fn add_record_field_ref(
         &mut self,
+        ty: Option<Ty>,
         columns: Option<Columns>,
         field: &ast::NameRef,
     ) -> Option<Ty> {
         let column = self.name_ref_name(field)?;
+        if columns.is_none_or(|columns| !self.columns_contain(columns.range, column))
+            && let Some(ty) = ty
+            && let Some(function) = self.find_field_function(ty, column)
+        {
+            return self.add_field_function_ref(column, field, function);
+        }
         let Some(columns) = columns else {
             self.add_ref(
                 column,
@@ -27373,7 +27505,9 @@ impl Lowerer {
         if self.find_column_in(columns.range, column).is_some() {
             return self.add_columns_field_ref(Some(columns), field);
         }
-        self.push_error(field.syntax(), SemaError::UnresolvedRecordColumn { column });
+        if columns.complete {
+            self.push_error(field.syntax(), SemaError::UnresolvedRecordColumn { column });
+        }
         self.add_ref(
             column,
             ReferenceKind::Column,
@@ -27402,7 +27536,7 @@ impl Lowerer {
         let LoweredCall { args, callee, ty } = self.lower_call_with_args(call);
         if let Some(keyword) = call.function_like_keyword() {
             let ty = self.keyword_call_type(call, keyword, &args);
-            return self.expr_field_base(ty);
+            return self.record_field_base(ty, Some(RecordColumns::Opaque));
         }
         if ty.is_some() {
             return self.expr_field_base(ty);
@@ -29275,6 +29409,30 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
         | ast::SelectVariant::CompoundSelect(_)
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => false,
+    }
+}
+
+fn is_opaque_record(expr: &ast::Expr) -> bool {
+    match expr.unparen() {
+        ast::Expr::CaseExpr(_) | ast::Expr::IndexExpr(_) | ast::Expr::ParenExpr(_) => true,
+        ast::Expr::FieldExpr(field_expr) => !ast::Expr::FieldExpr(field_expr).is_name_path(),
+        ast::Expr::CastExpr(cast) => {
+            cast.literal().is_some()
+                || cast
+                    .expr()
+                    .is_some_and(|expr| expr.is_unknown_literal() || is_opaque_record(&expr))
+        }
+        ast::Expr::CallExpr(call) => call.function_like_keyword().is_some(),
+        ast::Expr::ArrayExpr(_)
+        | ast::Expr::BetweenExpr(_)
+        | ast::Expr::BinExpr(_)
+        | ast::Expr::Collate(_)
+        | ast::Expr::Literal(_)
+        | ast::Expr::NameRef(_)
+        | ast::Expr::PostfixExpr(_)
+        | ast::Expr::PrefixExpr(_)
+        | ast::Expr::SliceExpr(_)
+        | ast::Expr::TupleExpr(_) => false,
     }
 }
 
