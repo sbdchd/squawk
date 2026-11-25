@@ -599,3 +599,53 @@ alter table u drop column j;
        ╰ hint: use `drop column ... cascade` to drop the dependent objects too
     ");
 }
+
+#[test]
+fn alter_table_on_view() {
+    assert_snapshot!(check("
+create table t (a int default 1);
+create view v as
+  select a from t;
+alter table v alter a set default 2;
+alter table v alter a drop default;
+alter table v set (security_barrier = true);
+alter table v rename to w;
+alter table w rename column a to b;
+select b from w;
+create sequence q;
+alter table q rename to q2;
+select last_value from q2;
+alter table w add column c int;
+alter table w alter b set not null;
+"), @"
+    error: `w` is not a table or foreign table
+       ╭▸ 
+    14 │ alter table w add column c int;
+       ╰╴            ━
+    error: `w` is not a table or foreign table
+       ╭▸ 
+    15 │ alter table w alter b set not null;
+       ╰╴            ━
+    ");
+}
+
+#[test]
+fn view_over_temp_table_is_temp() {
+    assert_snapshot!(check("
+create temp table w (a int);
+create view v as
+  select a from w;
+create table v (b int);
+select a from v;
+select b from public.v;
+create table w2 (a int);
+create view v2 as
+  select a from w2;
+create table v2 (b int);
+"), @"
+    error: relation `v2` already exists
+       ╭▸ 
+    11 │ create table v2 (b int);
+       ╰╴             ━━
+    ");
+}

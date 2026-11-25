@@ -33,6 +33,7 @@ pub(crate) enum TableLookup {
     Table,
     ForeignTable,
     TableOrForeignTable,
+    TableViewOrForeignTable,
     TableOrView,
     TableOrMaterializedView,
     Any,
@@ -55,6 +56,10 @@ impl TableLookup {
             TableLookup::TableOrForeignTable => {
                 matches!(kind, TableKind::Table | TableKind::ForeignTable)
             }
+            TableLookup::TableViewOrForeignTable => matches!(
+                kind,
+                TableKind::Table | TableKind::View | TableKind::ForeignTable
+            ),
             TableLookup::TableOrView => matches!(kind, TableKind::Table | TableKind::View),
             TableLookup::TableOrMaterializedView => {
                 matches!(kind, TableKind::Table | TableKind::MaterializedView)

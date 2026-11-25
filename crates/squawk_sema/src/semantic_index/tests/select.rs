@@ -794,3 +794,17 @@ select * from (c join d on true) as i, (select 1) s for update of c, s;
       ╰╴                                                      ━
     ");
 }
+
+#[test]
+fn values_star_expansion() {
+    assert_snapshot!(check("
+create table t (a int, b int);
+select v.column3 from t, lateral (values (t.*, 5), (1, 2, 3)) v;
+select * from t, lateral (values (t.*), (1)) v;
+"), @"
+    error: `values` lists must all be the same length
+      ╭▸ 
+    4 │ select * from t, lateral (values (t.*), (1)) v;
+      ╰╴                                        ━━━
+    ");
+}

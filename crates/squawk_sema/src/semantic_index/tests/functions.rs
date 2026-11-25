@@ -1779,3 +1779,17 @@ select percentile_cont('x') within group (order by 1);
       ╰╴                       ━━━
     ");
 }
+
+#[test]
+fn sql_function_composite_param_field() {
+    assert_snapshot!(check("
+create table onek (unique2 int);
+create function f(t onek) returns int as $$ select t.unique2; $$ language sql;
+create function g(t onek) returns int as $$ select t.nope; $$ language sql;
+"), @"
+    error: column `nope` does not exist
+      ╭▸ 
+    4 │ create function g(t onek) returns int as $$ select t.nope; $$ language sql;
+      ╰╴                                                     ━━━━
+    ");
+}

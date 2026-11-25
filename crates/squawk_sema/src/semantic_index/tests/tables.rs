@@ -350,6 +350,42 @@ create table if not exists t as select 1;
 }
 
 #[test]
+fn create_table_if_not_exists_keeps_existing() {
+    assert_snapshot!(check("
+create table t (a int);
+create table if not exists t (b int);
+create table if not exists t as
+  select 1 as c;
+create sequence s;
+create sequence if not exists s;
+select a, b from t;
+select c from t;
+select last_value from s;
+"), @"
+    error: column `b` does not exist
+      ╭▸ 
+    8 │ select a, b from t;
+      │           ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    8 - select a, b from t;
+    8 + select a, a from t;
+      ╰╴
+    error: column `c` does not exist
+      ╭▸ 
+    9 │ select c from t;
+      │        ━
+      ╰╴
+    help: a column with a similar name exists
+      ╭╴
+    9 - select c from t;
+    9 + select a from t;
+      ╰╴
+    ");
+}
+
+#[test]
 fn duplicate_table_after_drop() {
     assert_snapshot!(check("
 create table t (a int);
@@ -740,6 +776,17 @@ select h from t;
     19 + select a from t;
        ╰╴
     ");
+}
+
+#[test]
+fn add_column_if_not_exists_skips_constraints() {
+    assert_snapshot!(check("
+create table t (c int);
+alter table t
+  add column if not exists c integer primary key,
+  add primary key (c);
+alter table t add column if not exists c int not null references nope;
+"), @"no diagnostics");
 }
 
 #[test]

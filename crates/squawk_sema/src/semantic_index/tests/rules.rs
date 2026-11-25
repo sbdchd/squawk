@@ -307,3 +307,19 @@ create rule r4 as on insert to t where old.a < 100 do instead nothing;
       ╰╴                                       ━━━
     ");
 }
+
+#[test]
+fn rule_values_new_star() {
+    assert_snapshot!(check("
+create table t (a int, b text);
+create view v as select * from t;
+create table log (a int, b text);
+create rule r as on update to v do also insert into log values (new.*);
+create rule r2 as on update to v do also insert into log values (old.*, 1);
+"), @"
+    error: `insert` has more expressions than target columns
+      ╭▸ 
+    6 │ create rule r2 as on update to v do also insert into log values (old.*, 1);
+      ╰╴                                                                        ━
+    ");
+}
