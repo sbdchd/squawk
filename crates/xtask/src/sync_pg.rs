@@ -311,29 +311,43 @@ fn sync_kwlist(
 }
 
 fn sync_regression_suite(clone_dir: &Utf8Path) -> Result<()> {
-    let source_dir = clone_dir.join("src/test/regress/sql");
-    let output_dir = project_root().join(SQL_REGRESSION_SUITE_DIR);
+    sync_suite(
+        &clone_dir.join("src/test/regress/sql"),
+        &project_root().join(SQL_REGRESSION_SUITE_DIR),
+        |filename| !filename.contains("psql") || filename == "plpgsql.sql",
+    )
+}
 
+fn sync_plpgsql_suite(clone_dir: &Utf8Path) -> Result<()> {
+    sync_suite(
+        &clone_dir.join("src/pl/plpgsql/src/sql"),
+        &project_root().join(PLPGSQL_REGRESSION_SUITE_DIR),
+        |_| true,
+    )
+}
+
+fn sync_suite(
+    source_dir: &Utf8Path,
+    output_dir: &Utf8Path,
+    include: impl Fn(&str) -> bool,
+) -> Result<()> {
     if output_dir.exists() {
         println!("Cleaning target directory: {output_dir:?}");
-        remove_dir_all(&output_dir)?;
+        remove_dir_all(output_dir)?;
     }
-    create_dir_all(&output_dir)?;
+    create_dir_all(output_dir)?;
 
     let mut files: Vec<Utf8PathBuf> = vec![];
-    for entry in std::fs::read_dir(&source_dir)? {
+    for entry in std::fs::read_dir(source_dir)? {
         let entry = entry?;
         let path = Utf8PathBuf::try_from(entry.path())?;
-        if path.extension() == Some("sql") {
-            let filename = path.file_name().unwrap();
-            if !filename.contains("psql") || filename == "plpgsql.sql" {
-                files.push(path);
-            }
+        if path.extension() == Some("sql") && include(path.file_name().unwrap()) {
+            files.push(path);
         }
     }
 
     files.sort();
-    preprocess_files(&files, &output_dir)
+    preprocess_files(&files, output_dir)
 }
 
 fn preprocess_files(files: &[Utf8PathBuf], output_dir: &Utf8Path) -> Result<()> {
@@ -357,29 +371,6 @@ fn preprocess_files(files: &[Utf8PathBuf], output_dir: &Utf8Path) -> Result<()> 
     }
 
     Ok(())
-}
-
-fn sync_plpgsql_suite(clone_dir: &Utf8Path) -> Result<()> {
-    let source_dir = clone_dir.join("src/pl/plpgsql/src/sql");
-    let output_dir = project_root().join(PLPGSQL_REGRESSION_SUITE_DIR);
-
-    if output_dir.exists() {
-        println!("Cleaning target directory: {output_dir:?}");
-        remove_dir_all(&output_dir)?;
-    }
-    create_dir_all(&output_dir)?;
-
-    let mut files: Vec<Utf8PathBuf> = vec![];
-    for entry in std::fs::read_dir(&source_dir)? {
-        let entry = entry?;
-        let path = Utf8PathBuf::try_from(entry.path())?;
-        if path.extension() == Some("sql") {
-            files.push(path);
-        }
-    }
-
-    files.sort();
-    preprocess_files(&files, &output_dir)
 }
 
 // The regression suite from postgres has a mix of valid and invalid sql. We

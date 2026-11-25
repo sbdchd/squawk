@@ -1,7 +1,7 @@
 use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::ast::{self, AstNode};
 
-use crate::visitors::check_not_allowed_types;
+use crate::visitors::visit_not_allowed_types;
 use crate::{Linter, Rule, Violation};
 
 pub(crate) fn is_not_allowed_timestamp(ty: &ast::Type) -> bool {
@@ -62,7 +62,7 @@ fn check_ty_for_timestamp(ctx: &mut Linter, ty: Option<ast::Type>) {
 }
 
 pub(crate) fn prefer_timestamptz(ctx: &mut Linter, file: &ast::SourceFile) {
-    check_not_allowed_types(ctx, file, check_ty_for_timestamp);
+    visit_not_allowed_types(file, |ty| check_ty_for_timestamp(ctx, ty));
 }
 
 #[cfg(test)]

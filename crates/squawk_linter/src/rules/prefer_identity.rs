@@ -3,7 +3,7 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-use crate::visitors::check_not_allowed_types;
+use crate::visitors::visit_not_allowed_types;
 
 fn replace_serial(serial_type: &str) -> &'static str {
     match serial_type {
@@ -40,7 +40,7 @@ fn check_ty_for_serial(ctx: &mut Linter, ty: Option<ast::Type>) {
 }
 
 pub(crate) fn prefer_identity(ctx: &mut Linter, file: &ast::SourceFile) {
-    check_not_allowed_types(ctx, file, check_ty_for_serial);
+    visit_not_allowed_types(file, |ty| check_ty_for_serial(ctx, ty));
 }
 
 #[cfg(test)]

@@ -1,43 +1,27 @@
-use crate::{Linter, Rule, Violation};
 use squawk_syntax::ast::{self, AstNode};
 
+use crate::visitors::{DefaultAction, visit_default_actions};
+use crate::{Linter, Rule, Violation};
+
 pub(crate) fn ban_set_default(ctx: &mut Linter, file: &ast::SourceFile) {
-    for stmt in file.stmts() {
-        if let ast::Stmt::AlterDomain(domain) = &stmt
-            && let Some(ast::AlterDomainAction::SetDefault(node)) = domain.action()
-        {
-            ctx.report(Violation::for_node(
-                Rule::BanSetDefault,
-                "setting a domain default may silently change values written by existing clients"
-                    .into(),
-                node.syntax(),
-            ));
-        }
-        if let ast::Stmt::AlterView(view) = &stmt
-            && let Some(ast::AlterViewAction::AlterViewColumn(column)) = view.action()
-            && let Some(ast::AlterViewColumnAction::SetDefault(node)) =
-                column.alter_view_column_action()
-        {
-            ctx.report(Violation::for_node(
-                Rule::BanSetDefault,
-                "setting a column default may silently change values written by existing clients"
-                    .into(),
-                node.syntax(),
-            ));
-        }
-        let actions = match stmt {
-            ast::Stmt::AlterTable(table) => table.actions(),
-            ast::Stmt::AlterForeignTable(table) => table.actions(),
-            _ => continue,
+    visit_default_actions(file, |action| {
+        let (node, message) = match action {
+            DefaultAction::SetDomain(node) => (
+                node,
+                "setting a domain default may silently change values written by existing clients",
+            ),
+            DefaultAction::SetColumn(node) => (
+                node,
+                "setting a column default may silently change values written by existing clients",
+            ),
+            DefaultAction::DropDomain(_) | DefaultAction::DropColumn(_) => return,
         };
-        for action in actions {
-            if let ast::AlterTableAction::AlterColumn(column) = action
-                && let Some(ast::AlterColumnOption::SetDefault(node)) = column.option()
-            {
-                ctx.report(Violation::for_node(Rule::BanSetDefault, "setting a column default may silently change values written by existing clients".into(), node.syntax()));
-            }
-        }
-    }
+        ctx.report(Violation::for_node(
+            Rule::BanSetDefault,
+            message.into(),
+            node.syntax(),
+        ));
+    });
 }
 
 #[cfg(test)]

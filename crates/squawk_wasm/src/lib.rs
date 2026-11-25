@@ -231,6 +231,22 @@ impl SquawkDatabase {
             .ok_or_else(|| Error::new("No file open. Call open_file first."))
     }
 
+    fn position(&self, line: u32, col: u32) -> Result<InFile<squawk_rowan::TextSize>, Error> {
+        position_to_offset(&self.db, self.file()?, line, col)
+    }
+
+    fn locations(
+        &self,
+        locations: impl IntoIterator<Item = InFile<TextRange>>,
+    ) -> Result<JsValue, Error> {
+        let locations: Vec<LocationRange> = locations
+            .into_iter()
+            .map(|loc| location_range(&self.db, loc))
+            .collect();
+
+        serde_wasm_bindgen::to_value(&locations).map_err(into_error)
+    }
+
     pub fn dump_cst(&self) -> Result<String, Error> {
         let file = self.file()?;
         let parse = db::parse(&self.db, file);
@@ -397,21 +413,14 @@ impl SquawkDatabase {
     }
 
     pub fn goto_definition(&self, line: u32, col: u32) -> Result<JsValue, Error> {
-        let file = self.file()?;
-        let position = position_to_offset(&self.db, file, line, col)?;
-        let result = squawk_ide::goto_definition::goto_definition(&self.db, position);
-
-        let response: Vec<LocationRange> = result
-            .into_iter()
-            .map(|loc| location_range(&self.db, loc))
-            .collect();
-
-        serde_wasm_bindgen::to_value(&response).map_err(into_error)
+        let position = self.position(line, col)?;
+        self.locations(squawk_ide::goto_definition::goto_definition(
+            &self.db, position,
+        ))
     }
 
     pub fn goto_type_definition(&self, line: u32, col: u32) -> Result<JsValue, Error> {
-        let file = self.file()?;
-        let position = position_to_offset(&self.db, file, line, col)?;
+        let position = self.position(line, col)?;
         let response = squawk_ide::goto_type_definition::goto_type_definition(&self.db, position)
             .map(|loc| location_range(&self.db, loc));
 
@@ -419,8 +428,7 @@ impl SquawkDatabase {
     }
 
     pub fn hover(&self, line: u32, col: u32) -> Result<JsValue, Error> {
-        let file = self.file()?;
-        let position = position_to_offset(&self.db, file, line, col)?;
+        let position = self.position(line, col)?;
         let result = squawk_ide::hover::hover(&self.db, position);
 
         let converted = result.map(|hover| WasmHover {
@@ -433,15 +441,10 @@ impl SquawkDatabase {
     }
 
     pub fn find_references(&self, line: u32, col: u32) -> Result<JsValue, Error> {
-        let file = self.file()?;
-        let position = position_to_offset(&self.db, file, line, col)?;
-        let references = squawk_ide::find_references::find_references(&self.db, position);
-        let locations: Vec<LocationRange> = references
-            .iter()
-            .map(|loc| location_range(&self.db, *loc))
-            .collect();
-
-        serde_wasm_bindgen::to_value(&locations).map_err(into_error)
+        let position = self.position(line, col)?;
+        self.locations(squawk_ide::find_references::find_references(
+            &self.db, position,
+        ))
     }
 
     pub fn document_symbols(&self) -> Result<JsValue, Error> {
@@ -645,8 +648,7 @@ impl SquawkDatabase {
     }
 
     pub fn completion(&self, line: u32, col: u32) -> Result<JsValue, Error> {
-        let file = self.file()?;
-        let position = position_to_offset(&self.db, file, line, col)?;
+        let position = self.position(line, col)?;
         let items = squawk_ide::completion::completion(&self.db, position);
 
         let converted: Vec<WasmCompletionItem> = items

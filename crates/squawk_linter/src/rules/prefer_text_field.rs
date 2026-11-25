@@ -3,7 +3,7 @@ use squawk_syntax::ast::{self, AstNode};
 
 use crate::{Linter, Rule, Violation};
 
-use crate::visitors::check_not_allowed_types;
+use crate::visitors::visit_not_allowed_types;
 
 fn is_not_allowed_varchar(ty: &ast::Type) -> bool {
     match ty.element_type() {
@@ -62,7 +62,7 @@ fn check_ty_for_varchar(ctx: &mut Linter, ty: Option<ast::Type>) {
 }
 
 pub(crate) fn prefer_text_field(ctx: &mut Linter, file: &ast::SourceFile) {
-    check_not_allowed_types(ctx, file, check_ty_for_varchar);
+    visit_not_allowed_types(file, |ty| check_ty_for_varchar(ctx, ty));
 }
 
 #[cfg(test)]
