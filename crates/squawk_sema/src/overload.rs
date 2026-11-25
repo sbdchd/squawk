@@ -691,6 +691,40 @@ impl<'a> Overloads<'a> {
         })
     }
 
+    pub(crate) fn is_record(&self, ty: Ty) -> bool {
+        self.pseudo(ty) == Some(Pseudo::Record)
+    }
+
+    pub(crate) fn accepts_record(&self, function: &Function) -> bool {
+        let Some(param) = self.inputs(function).next() else {
+            return false;
+        };
+        let Some(ty) = param.ty else {
+            return true;
+        };
+        match self.pseudo(ty) {
+            Some(
+                Pseudo::Any
+                | Pseudo::AnyElement
+                | Pseudo::AnyNonArray
+                | Pseudo::AnyCompatible
+                | Pseudo::AnyCompatibleNonArray
+                | Pseudo::Record,
+            ) => true,
+            Some(Pseudo::AnyArray | Pseudo::AnyCompatibleArray) => {
+                param.mode == ParamMode::Variadic
+            }
+            Some(
+                Pseudo::AnyEnum
+                | Pseudo::AnyRange
+                | Pseudo::AnyMultirange
+                | Pseudo::AnyCompatibleRange
+                | Pseudo::AnyCompatibleMultirange,
+            ) => false,
+            None => self.category(ty) == Some(Category::Composite),
+        }
+    }
+
     fn inputs(&self, function: &Function) -> impl Iterator<Item = &'a Param> + use<'a> {
         let params = &self.index.params;
         let procedure = function.kind == FunctionKind::Procedure;

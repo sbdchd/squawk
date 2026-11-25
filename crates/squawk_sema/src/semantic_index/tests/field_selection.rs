@@ -695,3 +695,42 @@ fn record_field_through_cte() {
 with cte as (select pg_get_keywords() k) select (k).word from cte;
 "), @"no diagnostics");
 }
+
+#[test]
+fn anonymous_record_functions() {
+    assert_snapshot!(check("
+create type ct as (
+  a int
+);
+create function g(ct) returns int
+  language sql
+  as 'select 1';
+create function h(text) returns int
+  language sql
+  as 'select 1';
+create function h(anyelement) returns int
+  language sql
+  as 'select 1';
+create function rr() returns record
+  language sql
+  as 'select 1, 2';
+select (row(1)).pg_typeof, (row(1, 'a')).to_json, (row(1)).count, (row(1)).g;
+select (row(1)).h + 1, (rr()).pg_typeof, (row(1)).f1;
+select (row(1)).nope;
+select (row(1)).ascii;
+select (row(1)).array_ndims;
+"), @"
+    error: could not identify column `nope` in type `record`
+       ╭▸ 
+    19 │ select (row(1)).nope;
+       ╰╴                ━━━━
+    error: could not identify column `ascii` in type `record`
+       ╭▸ 
+    20 │ select (row(1)).ascii;
+       ╰╴                ━━━━━
+    error: could not identify column `array_ndims` in type `record`
+       ╭▸ 
+    21 │ select (row(1)).array_ndims;
+       ╰╴                ━━━━━━━━━━━
+    ");
+}

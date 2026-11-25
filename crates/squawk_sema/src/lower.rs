@@ -26882,9 +26882,12 @@ impl Lowerer {
 
     fn find_field_function(&self, arg: Ty, name: Name) -> Option<FieldFunction> {
         let args = [CallArg::positional(ArgType::Known(arg))];
-        let Resolution::Function(function) =
-            self.find_routine(None, name, &args, FunctionKind::Function)
-        else {
+        let overloads = self.overloads();
+        let is_record = overloads.is_record(arg);
+        let candidates = self
+            .routine_candidates(None, name, FunctionKind::Function)
+            .filter(|id| !is_record || overloads.accepts_record(&self.index.functions[*id]));
+        let Resolution::Function(function) = overloads.select(candidates, &args) else {
             return None;
         };
         Some(FieldFunction {
@@ -27146,7 +27149,7 @@ impl Lowerer {
             FieldBase::Expr(ty) => {
                 let field = field_expr.field()?;
                 if self.is_record(ty) {
-                    return self.add_record_field_ref(None, &field);
+                    return self.add_record_field_ref(ty, None, &field);
                 }
                 if let Some(ty) = ty
                     && let Some(name) = self.name_ref_name(&field)
@@ -27162,7 +27165,7 @@ impl Lowerer {
             FieldBase::Columns { columns, ty } => {
                 let field = field_expr.field()?;
                 if self.is_record(ty) {
-                    return self.add_record_field_ref(Some(columns), &field);
+                    return self.add_record_field_ref(ty, Some(columns), &field);
                 }
                 return self.add_columns_field_ref(Some(columns), &field);
             }
@@ -27358,10 +27361,17 @@ impl Lowerer {
 
     fn add_record_field_ref(
         &mut self,
+        ty: Option<Ty>,
         columns: Option<Columns>,
         field: &ast::NameRef,
     ) -> Option<Ty> {
         let column = self.name_ref_name(field)?;
+        if columns.is_none_or(|columns| !self.columns_contain(columns.range, column))
+            && let Some(ty) = ty
+            && let Some(function) = self.find_field_function(ty, column)
+        {
+            return self.add_field_function_ref(column, field, function);
+        }
         let Some(columns) = columns else {
             self.add_ref(
                 column,
