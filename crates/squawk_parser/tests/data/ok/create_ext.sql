@@ -13,3 +13,4 @@ create extension foo
   schema bar
   version 'buzz';
 
+create extension e version cascade;

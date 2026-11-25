@@ -64,10 +64,11 @@ use crate::{
         ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, Comparison, CompoundOp,
         ConflictAction, ConflictRuleEvent, ConflictTargetKey, DefaultChange, DirectArgs,
         DropRelation, ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam,
-        ErrorReturnType, ForeignKeyPair, GeneratedKind, LookupKind, NumericOverflow, ObjectKind,
-        OperandName, OperatorReplacement, OrdinalityColumnDefListFix, OutsideSearchPath,
-        Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn, SimilarType,
-        TriggerFunctionKind, TruncateCascade, UniqueKind, ViewColumnRename, WindowClause,
+        ErrorReturnType, ForeignKeyPair, GeneratedKind, LockStrength, LockedSource, LookupKind,
+        NumericOverflow, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
+        OutsideSearchPath, Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn,
+        SimilarType, TriggerFunctionKind, TruncateCascade, UniqueKind, ViewColumnRename,
+        WindowClause,
     },
     semantic_index::{IndexData, NameVersion},
 };
@@ -235,7 +236,7 @@ struct QueryScope {
     scope: ScopeId,
     merges: Vec<ScopeMerge>,
     windows: Range<usize>,
-    join_aliased_sources: Vec<SourceId>,
+    alias_boundary: usize,
 }
 
 #[derive(Clone, Copy)]
@@ -301,7 +302,7 @@ struct ScopeMerge {
 
 struct JoinColumns<'a> {
     join_merges: &'a [ScopeMerge],
-    from_sources: &'a [SourceId],
+    query: &'a Query,
     source_arena: &'a LayeredArena<Source>,
     column_arena: &'a mut LayeredArena<Column>,
 }
@@ -312,7 +313,7 @@ impl JoinColumns<'_> {
         start: usize,
         mut f: impl FnMut(&mut LayeredArena<Column>, ColumnId),
     ) {
-        self.expand((start..self.from_sources.len()).into(), &mut f);
+        self.expand((start..self.query.sources.len()).into(), &mut f);
     }
 
     fn expand(
@@ -342,8 +343,8 @@ impl JoinColumns<'_> {
                 index = end;
                 continue;
             }
-            let source = &self.source_arena[self.from_sources[index]];
-            if !source.kind.is_qualified_only() {
+            let source = &self.source_arena[self.query.sources[index]];
+            if !source.kind.is_qualified_only() && !self.query.is_aliased(index) {
                 for column in source.columns.range {
                     if !self.is_merged(index, self.column_arena[column].name) {
                         f(self.column_arena, column);
@@ -843,6 +844,31 @@ struct NamedArg {
 struct NameResolution {
     kind: ReferenceKind,
     resolution: Resolution,
+}
+
+#[derive(Clone, Copy)]
+enum RuleRelations {
+    Old,
+    New,
+    OldAndNew,
+}
+
+impl RuleRelations {
+    fn for_event(event: Option<RuleEvent>) -> RuleRelations {
+        match event {
+            Some(RuleEvent::Select | RuleEvent::Delete) => RuleRelations::Old,
+            Some(RuleEvent::Insert) => RuleRelations::New,
+            Some(RuleEvent::Update) | None => RuleRelations::OldAndNew,
+        }
+    }
+
+    fn range(self) -> Range<usize> {
+        match self {
+            RuleRelations::Old => (0..1).into(),
+            RuleRelations::New => (1..2).into(),
+            RuleRelations::OldAndNew => (0..2).into(),
+        }
+    }
 }
 
 struct IdentPart<'a> {
@@ -7593,7 +7619,8 @@ impl Lowerer {
             return;
         };
         let name = self.intern(&ast::normalize_name_node(variable.syntax()));
-        if let Some(existing) = self.find_query_source(query, name) {
+        let len = self.index.queries[query].sources.len();
+        if let Some(existing) = self.find_query_source(query, len, name) {
             self.add_ref(
                 name,
                 ReferenceKind::Relation,
@@ -14119,7 +14146,7 @@ impl Lowerer {
             self.lower_condition(ConditionKind::Having, &expr);
         }
         for clause in parts.tail_clauses {
-            self.lower_tail_clause(clause, &columns);
+            self.lower_tail_clause(clause, id, &columns);
         }
 
         self.scopes.pop();
@@ -15226,7 +15253,7 @@ impl Lowerer {
             ast::ConflictAction::ConflictDoSelect(do_select) => {
                 if let Some(locking) = do_select.locking_clause() {
                     self.set_visible((0..len).into());
-                    self.lower_locking_clause(&locking);
+                    self.lower_locking_clause(&locking, query, len);
                     if target.is_some() {
                         self.set_visible((0..len + 1).into());
                     }
@@ -15734,7 +15761,6 @@ impl Lowerer {
     }
 
     fn lower_recursive_with(&mut self, with_clause: &ast::WithClause) {
-        let mark = self.pending_ctes.len();
         let start = self.ctes.len();
         for with_table in with_clause.with_tables() {
             if let Some(id) = self.alloc_cte(&with_table) {
@@ -15753,9 +15779,16 @@ impl Lowerer {
                 ctes,
             });
         }
-        while self.pending_ctes.len() > mark {
-            let pending = self.pending_ctes.remove(mark);
-            self.lower_pending_cte(&pending);
+        for index in start..ctes {
+            let id = self.ctes[index];
+            if let Some(index) = self
+                .pending_ctes
+                .iter()
+                .position(|pending| pending.id == id)
+            {
+                let pending = self.pending_ctes.remove(index);
+                self.lower_pending_cte(&pending);
+            }
         }
     }
 
@@ -16108,9 +16141,15 @@ impl Lowerer {
                 } else if let Some(paren_expr) = paren.paren_expr() {
                     if let Some(item) = paren_expr.from_list_item() {
                         let start = self.scope_sources_len();
-                        self.lower_from_list_item(item);
-                        if let Some(alias) = paren.alias() {
-                            self.lower_join_alias(from_item, &alias, start);
+                        match paren.alias() {
+                            Some(alias) => {
+                                let alias_boundary =
+                                    std::mem::replace(&mut self.scope_mut().alias_boundary, start);
+                                self.lower_from_list_item(item);
+                                self.scope_mut().alias_boundary = alias_boundary;
+                                self.lower_join_alias(from_item, &alias, start);
+                            }
+                            None => self.lower_from_list_item(item),
                         }
                         return;
                     }
@@ -16316,9 +16355,12 @@ impl Lowerer {
         let Some(name) = name else {
             return;
         };
-        let query = self.scope().query;
-        let sources = &self.index.queries[query].sources;
-        let duplicate = sources.iter().any(|id| {
+        let scope = self.scope();
+        let query = &self.index.queries[scope.query];
+        let duplicate = query.sources.iter().enumerate().any(|(index, id)| {
+            if index < scope.alias_boundary || query.is_aliased(index) {
+                return false;
+            }
             let prev = &self.index.sources[*id];
             if prev.name != Some(name) || prev.kind.is_qualified_only() {
                 return false;
@@ -16370,24 +16412,24 @@ impl Lowerer {
             .last_mut()
             .expect("from items are lowered inside a select scope");
         let index = &mut self.index;
-        let from_sources = &index.queries[scope.query].sources;
+        let query = &index.queries[scope.query];
         let columns_start = index.columns.next_idx();
         JoinColumns {
             join_merges: &scope.merges,
-            from_sources,
+            query,
             source_arena: &index.sources,
             column_arena: &mut index.columns,
         }
         .expand_from(start, |column_arena, id| {
             column_arena.alloc(column_arena[id]);
         });
-        let complete = from_sources[start..]
-            .iter()
-            .all(|&id| index.sources[id].columns.complete);
-        scope
-            .join_aliased_sources
-            .extend_from_slice(&index.queries[scope.query].sources[start..]);
-        index.queries[scope.query].sources.truncate(start);
+        let end = query.sources.len();
+        let complete = (start..end)
+            .filter(|&position| !query.is_aliased(position))
+            .all(|position| index.sources[query.sources[position]].columns.complete);
+        index.queries[scope.query].aliased.push((start..end).into());
+        let aliased = index.queries[scope.query].aliased.len();
+        self.update_scope(|scope| scope.aliased = aliased);
         self.scope_mut()
             .merges
             .retain(|merge| merge.sources.start < start);
@@ -16434,13 +16476,14 @@ impl Lowerer {
             parent: self.scopes.last().map(|scope| scope.scope),
             visible: Range::default(),
             hidden: vec![],
+            aliased: 0,
         });
         self.scopes.push(QueryScope {
             query,
             scope,
             merges: vec![],
             windows: Range::default(),
-            join_aliased_sources: vec![],
+            alias_boundary: 0,
         });
     }
 
@@ -16502,10 +16545,10 @@ impl Lowerer {
     }
 
     fn visible_sources(&self, scope: &QueryScope) -> impl Iterator<Item = SourceId> + Clone + '_ {
-        let sources = &self.index.queries[scope.query].sources;
+        let query = &self.index.queries[scope.query];
         self.index.scopes[scope.scope]
-            .visible_indices()
-            .map(|index| sources[index])
+            .visible_indices(query)
+            .map(|index| query.sources[index])
     }
 
     fn json_table_columns(&mut self, list: &ast::JsonTableColumnList, columns: &mut Vec<Column>) {
@@ -18878,6 +18921,16 @@ impl Lowerer {
         let start = self.index.rules.next_idx();
         let query = self.alloc_query(QueryKind::Rule, create_rule.syntax());
         self.push_scope(query);
+        let event = create_rule
+            .rule_on()
+            .and_then(|rule_on| rule_on.rule_event())
+            .and_then(|event| event.kind())
+            .map(|kind| match kind {
+                ast::RuleEventKind::Select => RuleEvent::Select,
+                ast::RuleEventKind::Insert => RuleEvent::Insert,
+                ast::RuleEventKind::Update => RuleEvent::Update,
+                ast::RuleEventKind::Delete => RuleEvent::Delete,
+            });
         let mut table = None;
         if let Some(rule_on) = create_rule.rule_on() {
             let RelationSource { kind, columns, .. } =
@@ -18898,7 +18951,7 @@ impl Lowerer {
                     columns,
                 });
             }
-            self.set_visible((0..2).into());
+            self.set_visible(RuleRelations::for_event(event).range());
             if let Some(expr) = rule_on.where_clause().and_then(|clause| clause.expr()) {
                 self.lower_condition(ConditionKind::Where, &expr);
             }
@@ -18928,16 +18981,6 @@ impl Lowerer {
         }
         self.scopes.pop();
 
-        let event = create_rule
-            .rule_on()
-            .and_then(|rule_on| rule_on.rule_event())
-            .and_then(|event| event.kind())
-            .map(|kind| match kind {
-                ast::RuleEventKind::Select => RuleEvent::Select,
-                ast::RuleEventKind::Insert => RuleEvent::Insert,
-                ast::RuleEventKind::Update => RuleEvent::Update,
-                ast::RuleEventKind::Delete => RuleEvent::Delete,
-            });
         if let (Some(table), Some(name), Some(event)) = (table, create_rule.rule(), event) {
             let rule_do = create_rule.rule_do();
             let instead = rule_do
@@ -22816,11 +22859,11 @@ impl Lowerer {
     }
 
     fn lower_natural_join(&mut self, start: usize, mid: usize, kind: JoinKind) {
-        let query = self.scope().query;
+        let query = &self.index.queries[self.scope().query];
         let right_sources = || {
-            self.index.queries[query].sources[mid..]
-                .iter()
-                .map(|&source| &self.index.sources[source])
+            (mid..query.sources.len())
+                .filter(|&index| !query.is_aliased(index))
+                .map(|index| &self.index.sources[query.sources[index]])
                 .filter(|source| source.kind != SourceKind::UsingAlias)
         };
         let len = right_sources()
@@ -22833,7 +22876,11 @@ impl Lowerer {
                 .filter_map(|column| self.index.columns[column].name),
         );
         for index in start..mid {
-            let source = &self.index.sources[self.index.queries[query].sources[index]];
+            let query = &self.index.queries[self.scope().query];
+            if query.is_aliased(index) {
+                continue;
+            }
+            let source = &self.index.sources[query.sources[index]];
             if source.kind == SourceKind::UsingAlias {
                 continue;
             }
@@ -22907,8 +22954,17 @@ impl Lowerer {
         kind: JoinKind,
     ) -> MergedColumn {
         let end = self.scope_sources_len();
-        let left = self.lookup_column(self.scope(), start..mid, name);
-        let right = self.lookup_column(self.scope(), mid..end, name);
+        let query = &self.index.queries[self.scope().query];
+        let left = self.lookup_column(
+            self.scope(),
+            (start..mid).filter(|&index| !query.is_aliased(index)),
+            name,
+        );
+        let right = self.lookup_column(
+            self.scope(),
+            (mid..end).filter(|&index| !query.is_aliased(index)),
+            name,
+        );
         match (left, right) {
             (
                 ColumnLookup::Found(Resolution::Column { column: left, .. }),
@@ -23008,10 +23064,10 @@ impl Lowerer {
                     Some(_) | None => &[],
                 };
                 let index = &mut self.index;
-                let from_sources = &index.queries[query].sources;
+                let from_query = &index.queries[query];
                 JoinColumns {
                     join_merges,
-                    from_sources,
+                    query: from_query,
                     source_arena: &index.sources,
                     column_arena: &mut index.columns,
                 }
@@ -23019,10 +23075,16 @@ impl Lowerer {
                     columns.push(column_arena[id]);
                     index.star_columns.alloc(id);
                 });
-                complete &= from_sources.iter().all(|&id| {
-                    let source = &index.sources[id];
-                    source.kind.is_qualified_only() || source.columns.complete
-                });
+                complete &= from_query
+                    .sources
+                    .iter()
+                    .enumerate()
+                    .all(|(position, &id)| {
+                        let source = &index.sources[id];
+                        from_query.is_aliased(position)
+                            || source.kind.is_qualified_only()
+                            || source.columns.complete
+                    });
                 self.add_star(&star, start);
                 continue;
             }
@@ -23134,11 +23196,16 @@ impl Lowerer {
     ) {
         let columns = self.index.queries[query].columns;
         for clause in clauses {
-            self.lower_tail_clause(clause, &columns);
+            self.lower_tail_clause(clause, query, &columns);
         }
     }
 
-    fn lower_tail_clause(&mut self, clause: ast::SelectTailClause, outputs: &Columns) {
+    fn lower_tail_clause(
+        &mut self,
+        clause: ast::SelectTailClause,
+        query: QueryId,
+        outputs: &Columns,
+    ) {
         match clause {
             ast::SelectTailClause::OrderByClause(order_by) => {
                 for sort_by in order_by
@@ -23167,7 +23234,8 @@ impl Lowerer {
                 }
             }
             ast::SelectTailClause::LockingClause(locking) => {
-                self.lower_locking_clause(&locking);
+                let len = self.index.queries[query].sources.len();
+                self.lower_locking_clause(&locking, query, len);
             }
         }
     }
@@ -23188,7 +23256,13 @@ impl Lowerer {
         }
     }
 
-    fn lower_locking_clause(&mut self, locking: &ast::LockingClause) {
+    fn lower_locking_clause(&mut self, locking: &ast::LockingClause, query: QueryId, len: usize) {
+        let strength = locking.lock_strength().map(|strength| match strength {
+            ast::LockStrength::ForUpdate(_) => LockStrength::Update,
+            ast::LockStrength::ForNoKeyUpdate(_) => LockStrength::NoKeyUpdate,
+            ast::LockStrength::ForShare(_) => LockStrength::Share,
+            ast::LockStrength::ForKeyShare(_) => LockStrength::KeyShare,
+        });
         for expr in locking
             .locking_of()
             .into_iter()
@@ -23201,9 +23275,18 @@ impl Lowerer {
             let Some(name) = self.name_ref_name(&name_ref) else {
                 continue;
             };
-            let resolution = self
-                .find_visible_source(name)
-                .map_or(Resolution::Unresolved, Resolution::Source);
+            let source = self.find_query_source(query, len, name);
+            if let Some(source) = source
+                && let Some(strength) = strength
+                && let Some(locked) = locked_source(self.index.sources[source].kind)
+            {
+                let error = SemaError::LockingUnsupportedSource {
+                    strength,
+                    source: locked,
+                };
+                self.push_error(name_ref.syntax(), error);
+            }
+            let resolution = source.map_or(Resolution::Unresolved, Resolution::Source);
             self.add_ref(name, ReferenceKind::Relation, name_ref.syntax(), resolution);
         }
     }
@@ -23852,7 +23935,6 @@ impl Lowerer {
             self.index.queries[scope.query]
                 .sources
                 .iter()
-                .chain(&scope.join_aliased_sources)
                 .any(|source| {
                     let source = &self.index.sources[*source];
                     source.name == Some(name)
@@ -26355,14 +26437,8 @@ impl Lowerer {
             .find(|cte| self.index.ctes[*cte].name == name)
     }
 
-    fn find_visible_source(&self, name: Name) -> Option<SourceId> {
-        self.visible_sources(self.scope())
-            .find(|id| self.index.sources[*id].name == Some(name))
-    }
-
-    fn find_query_source(&self, query: QueryId, name: Name) -> Option<SourceId> {
-        self.index.queries[query]
-            .sources
+    fn find_query_source(&self, query: QueryId, len: usize, name: Name) -> Option<SourceId> {
+        self.index.queries[query].sources[..len]
             .iter()
             .copied()
             .find(|id| self.index.sources[*id].name == Some(name))
@@ -26539,7 +26615,8 @@ impl Lowerer {
 
     fn lookup_scoped_column(&self, name: Name) -> ScopedColumn {
         for scope in self.scopes.iter().rev() {
-            let indices = self.index.scopes[scope.scope].visible_indices();
+            let indices =
+                self.index.scopes[scope.scope].visible_indices(&self.index.queries[scope.query]);
             match self.lookup_column(scope, indices, name) {
                 ColumnLookup::Found(resolution) => return ScopedColumn::Resolved(resolution),
                 ColumnLookup::Ambiguous => return ScopedColumn::Resolved(Resolution::Ambiguous),
@@ -26556,10 +26633,10 @@ impl Lowerer {
     }
 
     fn hidden_source_has_column(&self, scope: &QueryScope, name: Name) -> bool {
-        let sources = &self.index.queries[scope.query].sources;
+        let query = &self.index.queries[scope.query];
         self.index.scopes[scope.scope]
-            .hidden_indices()
-            .map(|index| &self.index.sources[sources[index]])
+            .hidden_indices(query)
+            .map(|index| &self.index.sources[query.sources[index]])
             .filter(|source| !source.kind.is_qualified_only())
             .any(|source| self.columns_contain(source.columns.range, name))
     }
@@ -27459,6 +27536,7 @@ impl Lowerer {
             ptr,
             parent: self.scopes.last().map(|scope| scope.query),
             sources: SmallVec::new(),
+            aliased: vec![],
             columns,
         })
     }
@@ -27575,12 +27653,15 @@ impl Lowerer {
     fn lateral_source(&self, name: Name, column: Option<Name>) -> Option<LateralSource> {
         for subquery in self.from_subqueries.iter().rev() {
             let scope = &self.scopes[subquery.scope];
-            let hidden = &self.index.scopes[scope.scope].hidden;
-            let sources = &self.index.queries[scope.query].sources[..subquery.sources];
-            let mut matches = sources
+            let ir_scope = &self.index.scopes[scope.scope];
+            let query = &self.index.queries[scope.query];
+            let mut matches = query.sources[..subquery.sources]
                 .iter()
                 .enumerate()
-                .filter(|(index, _)| !hidden.iter().any(|range| range.contains(index)))
+                .filter(|&(index, _)| {
+                    !ir_scope.is_aliased(query, index)
+                        && !ir_scope.hidden.iter().any(|range| range.contains(&index))
+                })
                 .map(|(_, source)| &self.index.sources[*source])
                 .filter(|source| match column {
                     Some(column) => {
@@ -28243,5 +28324,21 @@ fn bool_test_condition(op: &ast::BinOp, rhs: &ast::Expr) -> Option<ConditionKind
         ast::BinOp::Is(_) => Some(is),
         ast::BinOp::IsNot(_) => Some(is_not),
         _ => None,
+    }
+}
+
+fn locked_source(kind: SourceKind) -> Option<LockedSource> {
+    match kind {
+        SourceKind::Join | SourceKind::UsingAlias => Some(LockedSource::Join),
+        SourceKind::Function(_) => Some(LockedSource::Function),
+        SourceKind::Cte(_) => Some(LockedSource::Cte),
+        SourceKind::Table(_)
+        | SourceKind::External
+        | SourceKind::Subquery(_)
+        | SourceKind::Returning(_)
+        | SourceKind::Excluded(_)
+        | SourceKind::RuleRelation(_)
+        | SourceKind::ElementVariable
+        | SourceKind::Other => None,
     }
 }

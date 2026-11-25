@@ -415,3 +415,60 @@ select * from o where exists (
       ╰╴                                             ━
     ");
 }
+
+#[test]
+fn join_alias_hides_inner_sources() {
+    assert_snapshot!(check("
+create table a (x int, k int);
+create table c (y int, k int);
+create table d (z int, k int);
+create table e (w int, k int);
+select * from (c join d on true) as i, c;
+select * from a natural join (c join d using (k)) as i;
+select k from a join (c join d using (k)) as i using (k);
+select * from a full join (c join d using (k)) as i using (k);
+select * from (c join d on true) as i for update of c;
+select *
+from ((c join d on true) as x join e on true) as y,
+lateral (select y.w, x.y) s;
+select * from (c join d on true) as i join e on c.y = e.w;
+"), @"
+    error: missing `from` clause entry for table `x`
+       ╭▸ 
+    13 │ lateral (select y.w, x.y) s;
+       ╰╴                     ━
+    error: missing `from` clause entry for table `c`
+       ╭▸ 
+    14 │ select * from (c join d on true) as i join e on c.y = e.w;
+       ╰╴                                                ━
+    ");
+}
+
+#[test]
+fn cross_join_then_join_on_sees_left() {
+    assert_snapshot!(check("
+create table t (a int);
+select * from t x cross join t y join t on x.a = t.a;
+select * from t x natural join t y join t on x.a = t.a;
+"), @"no diagnostics");
+}
+
+#[test]
+fn join_alias_hides_inner_aliases() {
+    assert_snapshot!(check("
+create table t (a int);
+create table u (b int);
+select * from t x join (u x cross join u y) j on a = 1;
+select * from t x join (u x cross join u x) j on true;
+select * from t x join (u x cross join u y) on true;
+"), @"
+    error: table name `x` specified more than once
+      ╭▸ 
+    5 │ select * from t x join (u x cross join u x) j on true;
+      ╰╴                                         ━
+    error: table name `x` specified more than once
+      ╭▸ 
+    6 │ select * from t x join (u x cross join u y) on true;
+      ╰╴                          ━
+    ");
+}

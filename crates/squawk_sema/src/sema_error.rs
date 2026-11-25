@@ -313,6 +313,10 @@ pub(crate) enum SemaError {
         cast: Option<TyName>,
     },
     TablesampleSetArgument,
+    LockingUnsupportedSource {
+        strength: LockStrength,
+        source: LockedSource,
+    },
     MisplacedSubquery {
         context: ExprContext,
     },
@@ -1019,6 +1023,42 @@ pub(crate) enum ConflictAction {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LockStrength {
+    Update,
+    NoKeyUpdate,
+    Share,
+    KeyShare,
+}
+
+impl LockStrength {
+    fn as_str(self) -> &'static str {
+        match self {
+            LockStrength::Update => "for update",
+            LockStrength::NoKeyUpdate => "for no key update",
+            LockStrength::Share => "for share",
+            LockStrength::KeyShare => "for key share",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum LockedSource {
+    Join,
+    Function,
+    Cte,
+}
+
+impl LockedSource {
+    fn as_str(self) -> &'static str {
+        match self {
+            LockedSource::Join => "a join",
+            LockedSource::Function => "a function",
+            LockedSource::Cte => "a `with` query",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum SetReturningConstruct {
     Aggregate,
     Window,
@@ -1480,6 +1520,7 @@ impl SemaError {
             | SemaError::SetReturningFunctionIn { .. }
             | SemaError::SetReturningFunctionNotTopLevel => DiagnosticKind::FeatureNotSupported,
             SemaError::TablesampleSetArgument => DiagnosticKind::TypeMismatch,
+            SemaError::LockingUnsupportedSource { .. } => DiagnosticKind::FeatureNotSupported,
             SemaError::EmptyArrayType { .. } => DiagnosticKind::IndeterminateType,
             SemaError::MisplacedSubquery { .. }
             | SemaError::DefaultColumnReference
@@ -2783,6 +2824,12 @@ impl fmt::Display for ErrorMessage<'_> {
             SemaError::TablesampleSetArgument => {
                 f.write_str("argument of `tablesample` must not return a set")
             }
+            SemaError::LockingUnsupportedSource { strength, source } => write!(
+                f,
+                "`{}` cannot be applied to {}",
+                strength.as_str(),
+                source.as_str()
+            ),
             SemaError::EmptyArrayType { .. } => f.write_str("cannot determine type of empty array"),
             SemaError::MisplacedSubquery { context } => write!(
                 f,

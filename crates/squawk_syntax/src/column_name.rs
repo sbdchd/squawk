@@ -419,7 +419,13 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
                 match column {
                     ColumnName::Column(_) => return Some((column, node)),
                     ColumnName::UnknownColumn(_) => unknown_column = true,
-                    ColumnName::Star => (),
+                    ColumnName::Star => {
+                        if let Some(field_expr) = ast::FieldExpr::cast(node)
+                            && let Some(base) = field_expr.base()
+                        {
+                            return name_from_expr(base, in_type);
+                        }
+                    }
                 }
             }
             if let Some(ty) = cast_expr.ty() {
@@ -677,6 +683,12 @@ fn examples() {
     assert_snapshot!(name("cast('12:00:00' as time(6) with time zone)"), @"timetz");
     assert_snapshot!(name("cast('2024-01-01 12:00:00' as timestamp(6) with time zone)"), @"timestamptz");
     assert_snapshot!(name("cast('2024-01-01 12:00:00' as timestamp(6) without time zone)"), @"timestamp");
+
+    // star field under a cast
+    assert_snapshot!(name("t.*::text"), @"t");
+    assert_snapshot!(name("cast(t.* as text)"), @"t");
+    assert_snapshot!(name("(t.*)::varchar(3)"), @"t");
+    assert_snapshot!(name("s.t.*::text"), @"t");
 
     #[track_caller]
     fn name(sql: &str) -> String {

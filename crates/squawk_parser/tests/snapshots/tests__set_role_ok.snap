@@ -100,3 +100,54 @@ SOURCE_FILE
         DEFAULT_KW "default"
     SEMICOLON ";"
   WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          FALSE_KW "false"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          ON_KW "on"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    LOCAL_SCOPE
+      LOCAL_KW "local"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        TO_KW "to"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+    SEMICOLON ";"
+  WHITESPACE "\n"

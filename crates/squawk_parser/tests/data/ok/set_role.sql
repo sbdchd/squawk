@@ -15,3 +15,6 @@ RESET ROLE;
 
 set role to 4;
 set role to default;
+set role to false;
+set role to on;
+set local role to true;

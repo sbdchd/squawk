@@ -1,6 +1,9 @@
 use insta::assert_snapshot;
+use squawk_syntax::SourceFile;
 
 use super::check;
+use crate::file::{FileId, FileIndex, InFile};
+use crate::semantic_index_builder::SemanticIndexBuilder;
 
 #[test]
 fn cte_unknown_column() {
@@ -453,4 +456,16 @@ select * from r;
        │
        ╰ hint: cast the output of the non-recursive term to the overall type
     ");
+}
+
+#[test]
+fn nested_recursive_cte_recovery_doesnt_panic() {
+    let sql = r#"(with RECURSIVE n with recursive"d"from ONLY("")e""""""n select,:"#;
+    let parse = SourceFile::parse(sql);
+    let mut builder = SemanticIndexBuilder::new();
+    builder.add_file(InFile::new(
+        FileId::File(FileIndex::from_raw(0)),
+        &parse.tree(),
+    ));
+    builder.build();
 }

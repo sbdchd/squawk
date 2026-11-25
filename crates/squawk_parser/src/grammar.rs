@@ -3880,6 +3880,9 @@ fn fetch_quantity(p: &mut Parser<'_>) {
     }
 }
 
+const ROW_OR_ROWS: TokenSet = TokenSet::new(&[ROW_KW, ROWS_KW]);
+const FETCH_QUANTITY_FIRST: TokenSet = TokenSet::new(&[ONLY_KW, WITH_KW]);
+
 // FETCH { FIRST | NEXT } [ count ] { ROW | ROWS } { ONLY | WITH TIES }
 fn opt_fetch_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if !p.at(FETCH_KW) {
@@ -3892,7 +3895,7 @@ fn opt_fetch_clause(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         p.error("expected first or next");
     }
     // [ count ]
-    if !p.at(ROWS_KW) && !p.at(ROW_KW) {
+    if !(p.at_ts(ROW_OR_ROWS) && p.nth_at_ts(1, FETCH_QUANTITY_FIRST)) {
         expr(p);
     }
     // { ROW | ROWS }
@@ -4578,16 +4581,34 @@ fn join(p: &mut Parser<'_>) {
     let is_natural = p.eat(NATURAL_KW);
     let result = join_type(p);
     let join_kind = result.map(|x| x.kind()).unwrap_or(JOIN_INNER);
-    if opt_from_item(p).is_none() {
-        p.error("expected a table, subquery, or function call");
-    }
     let can_have_on_clause = !is_natural && join_kind != JOIN_CROSS;
+    match opt_join_rhs(p) {
+        Some(mut rhs) => {
+            if can_have_on_clause {
+                while p.at_ts(JOIN_FIRST) {
+                    let m = rhs.precede(p);
+                    join(p);
+                    rhs = m.complete(p, JOIN_EXPR);
+                }
+            }
+        }
+        None => p.error("expected a table, subquery, or function call"),
+    }
     if p.at(ON_KW) && can_have_on_clause {
         on_clause(p);
     } else if p.at(USING_KW) {
         join_using_clause(p);
     }
     m.complete(p, JOIN);
+}
+
+fn opt_join_rhs(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+    if !p.at_ts(FROM_ITEM_FIRST) {
+        return None;
+    }
+    let m = p.start();
+    let DataSource { kind, .. } = data_source(p, false);
+    Some(m.complete(p, kind))
 }
 
 // Improve error recovery for wrong joins
@@ -15728,8 +15749,11 @@ fn set_role(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, SET_ROLE)
 }
 
+const GENERIC_SET_ROLE_VALUE_FIRST: TokenSet =
+    TokenSet::new(&[DEFAULT_KW, TRUE_KW, FALSE_KW, ON_KW]);
+
 fn at_generic_set_role(p: &Parser<'_>, n: usize) -> bool {
-    p.nth_at(n, EQ) || (p.nth_at(n, TO_KW) && p.nth_at(n + 1, DEFAULT_KW))
+    p.nth_at(n, EQ) || (p.nth_at(n, TO_KW) && p.nth_at_ts(n + 1, GENERIC_SET_ROLE_VALUE_FIRST))
 }
 
 // RESET ROLE
@@ -18806,7 +18830,7 @@ fn create_extension(p: &mut Parser<'_>) -> CompletedMarker {
         let m = p.start();
         p.bump(VERSION_KW);
         if opt_string_literal(p).is_none() {
-            if p.at(IDENT) {
+            if p.at_ts(NON_RESERVED_WORD) {
                 extension_version(p);
             } else {
                 p.error("expected string literal or identifier");
