@@ -8,7 +8,7 @@ use squawk_syntax::quote::quote_ident;
 use squawk_ide_db::offsets::token_from_offset;
 use squawk_ide_db::{Db, semantic_index};
 
-use super::{ActionKind, CodeAction};
+use super::{ActionKind, CodeAction, index_element::is_index_element};
 
 pub(super) fn qualify_column(
     db: &dyn Db,
@@ -18,13 +18,10 @@ pub(super) fn qualify_column(
     let token = token_from_offset(db, position)?;
     let name_ref = token.parent().and_then(ast::NameRef::cast)?;
 
-    let parent = name_ref.syntax().parent()?;
-    if ast::PartitionItem::can_cast(parent.kind())
-        || ast::ConflictIndexItem::can_cast(parent.kind())
-    {
+    if is_index_element(name_ref.syntax()) {
         return None;
     }
-    if let Some(field_expr) = ast::FieldExpr::cast(parent)
+    if let Some(field_expr) = name_ref.syntax().parent().and_then(ast::FieldExpr::cast)
         && field_expr.field().as_ref() == Some(&name_ref)
     {
         return None;
@@ -387,6 +384,30 @@ create table t (
 
 create index on t (a$0);
 "
+        ));
+    }
+
+    #[test]
+    fn qualify_column_not_applicable_exclude_constraint() {
+        assert!(code_action_not_applicable(
+            qualify_column,
+            r#"create table t (b int, exclude using gist (b$0 with =));"#
+        ));
+        assert!(code_action_not_applicable(
+            qualify_column,
+            r#"create table t (b text, exclude using gist (b$0 collate "C" with =));"#
+        ));
+    }
+
+    #[test]
+    fn qualify_column_not_applicable_index_collate() {
+        assert!(code_action_not_applicable(
+            qualify_column,
+            r#"create table t (b text); create index on t (b$0 collate "C");"#
+        ));
+        assert!(code_action_not_applicable(
+            qualify_column,
+            r#"create table t (b text); insert into t values ('a') on conflict (b$0 collate "C") do nothing;"#
         ));
     }
 }
