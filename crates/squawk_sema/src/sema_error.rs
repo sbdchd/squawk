@@ -4,8 +4,8 @@ use std::fmt;
 use crate::arena::IdxRange;
 use crate::interner::{Interner, Name};
 use crate::ir::{
-    AccessMethodKind, ReferenceKind, Resolution, ReturnKind, RoutineKind, TableKind,
-    TextSearchKind, TypeKind,
+    AccessMethodKind, IntervalTypmod, ReferenceKind, Resolution, ReturnKind, RoutineKind,
+    TableKind, TextSearchKind, TypeKind, Typmod,
 };
 use squawk_diagnostics::{Edit, Fix};
 use squawk_rowan::{TextRange, TextSize};
@@ -52,6 +52,12 @@ pub(crate) enum Similar {
 pub(crate) struct TyName {
     pub(crate) name: Name,
     pub(crate) array: bool,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ColumnTypeName {
+    pub(crate) ty: TyName,
+    pub(crate) typmod: Typmod,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -843,8 +849,13 @@ pub(crate) enum SemaError {
     },
     ViewColumnTypeChanged {
         column: Name,
-        from: TyName,
-        to: TyName,
+        from: ColumnTypeName,
+        to: ColumnTypeName,
+    },
+    ViewColumnCollationChanged {
+        column: Name,
+        from: Name,
+        to: Name,
     },
     ReplaceFunctionReturnType {
         from: ErrorReturnType,
@@ -1540,6 +1551,7 @@ impl SemaError {
             | SemaError::ViewDropColumns
             | SemaError::ViewColumnRenamed { .. }
             | SemaError::ViewColumnTypeChanged { .. }
+            | SemaError::ViewColumnCollationChanged { .. }
             | SemaError::InheritedConstraintRename { .. }
             | SemaError::CannotRenameInheritedColumn { .. }
             | SemaError::CannotRenameInheritedConstraint { .. } => {
@@ -2603,6 +2615,28 @@ impl ErrorMessage<'_> {
         })
     }
 
+    fn column_ty(&self, ColumnTypeName { ty, typmod }: ColumnTypeName) -> impl fmt::Display + '_ {
+        fmt::from_fn(move |f| {
+            f.write_str(self.names.resolve(ty.name))?;
+            match typmod {
+                Typmod::Unknown | Typmod::Unspecified => {}
+                Typmod::Numeric(NumericTypmod { precision, scale }) => {
+                    write!(f, "({precision}, {scale})")?;
+                }
+                Typmod::Length(value) | Typmod::Precision(value) => write!(f, "({value})")?,
+                Typmod::Interval(IntervalTypmod { fields, precision }) => {
+                    if let Some(fields) = fields {
+                        write!(f, " {}", fields.label())?;
+                    }
+                    if let Some(precision) = precision {
+                        write!(f, "({precision})")?;
+                    }
+                }
+            }
+            f.write_str(if ty.array { "[]" } else { "" })
+        })
+    }
+
     fn return_ty(&self, ret: ErrorReturnType) -> impl fmt::Display + '_ {
         fmt::from_fn(move |f| {
             let prefix = match ret.kind {
@@ -3436,8 +3470,15 @@ impl fmt::Display for ErrorMessage<'_> {
                 f,
                 "cannot change type of view column `{}` from `{}` to `{}`",
                 n(column),
-                self.ty(from),
-                self.ty(to)
+                self.column_ty(from),
+                self.column_ty(to)
+            ),
+            SemaError::ViewColumnCollationChanged { column, from, to } => write!(
+                f,
+                "cannot change collation of view column `{}` from `{}` to `{}`",
+                n(column),
+                n(from),
+                n(to)
             ),
             SemaError::InheritedConstraintRename { name } => write!(
                 f,

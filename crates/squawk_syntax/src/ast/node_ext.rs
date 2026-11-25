@@ -86,6 +86,43 @@ impl ast::CustomOp {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum IntervalFields {
+    Year,
+    Month,
+    YearToMonth,
+    Day,
+    Hour,
+    DayToHour,
+    Minute,
+    DayToMinute,
+    HourToMinute,
+    Second,
+    DayToSecond,
+    HourToSecond,
+    MinuteToSecond,
+}
+
+impl IntervalFields {
+    pub fn label(self) -> &'static str {
+        match self {
+            IntervalFields::Year => "year",
+            IntervalFields::Month => "month",
+            IntervalFields::YearToMonth => "year to month",
+            IntervalFields::Day => "day",
+            IntervalFields::Hour => "hour",
+            IntervalFields::DayToHour => "day to hour",
+            IntervalFields::Minute => "minute",
+            IntervalFields::DayToMinute => "day to minute",
+            IntervalFields::HourToMinute => "hour to minute",
+            IntervalFields::Second => "second",
+            IntervalFields::DayToSecond => "day to second",
+            IntervalFields::HourToSecond => "hour to second",
+            IntervalFields::MinuteToSecond => "minute to second",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum CastKind {
     Cast,
     DoubleColon,
@@ -2022,6 +2059,66 @@ impl ast::PathRef {
             }
         })
         .filter_map(|path| path.segment())
+    }
+}
+
+impl ast::Column {
+    pub fn collate(&self) -> Option<ast::Collate> {
+        self.clauses().find_map(|clause| match clause {
+            ast::ColumnClause::Collate(collate) => Some(collate),
+            ast::ColumnClause::AlterOptionList(_)
+            | ast::ColumnClause::ColumnConstraint(_)
+            | ast::ColumnClause::CompressionMethod(_)
+            | ast::ColumnClause::Storage(_)
+            | ast::ColumnClause::WithOptions(_) => None,
+        })
+    }
+}
+
+impl ast::CreateDomain {
+    pub fn collate(&self) -> Option<ast::Collate> {
+        self.domain_qualifiers()
+            .find_map(|qualifier| match qualifier {
+                ast::DomainQualifier::Collate(collate) => Some(collate),
+                ast::DomainQualifier::Constraint(_) => None,
+            })
+    }
+}
+
+impl ast::IntervalQualifier {
+    pub fn fields(&self) -> IntervalFields {
+        match self {
+            ast::IntervalQualifier::IntervalYear(_) => IntervalFields::Year,
+            ast::IntervalQualifier::IntervalMonth(month) => match month.year_token() {
+                Some(_) => IntervalFields::YearToMonth,
+                None => IntervalFields::Month,
+            },
+            ast::IntervalQualifier::IntervalDay(_) => IntervalFields::Day,
+            ast::IntervalQualifier::IntervalHour(hour) => match hour.day_token() {
+                Some(_) => IntervalFields::DayToHour,
+                None => IntervalFields::Hour,
+            },
+            ast::IntervalQualifier::IntervalMinute(minute) => {
+                if minute.day_token().is_some() {
+                    IntervalFields::DayToMinute
+                } else if minute.hour_token().is_some() {
+                    IntervalFields::HourToMinute
+                } else {
+                    IntervalFields::Minute
+                }
+            }
+            ast::IntervalQualifier::IntervalSecond(second) => {
+                if second.day_token().is_some() {
+                    IntervalFields::DayToSecond
+                } else if second.hour_token().is_some() {
+                    IntervalFields::HourToSecond
+                } else if second.minute_token().is_some() {
+                    IntervalFields::MinuteToSecond
+                } else {
+                    IntervalFields::Second
+                }
+            }
+        }
     }
 }
 

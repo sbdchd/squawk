@@ -711,7 +711,73 @@ impl From<ElementTy> for Ty {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum Typmod {
+    Unknown,
+    Unspecified,
     Numeric(NumericTypmod),
+    Length(i32),
+    Precision(i32),
+    Interval(IntervalTypmod),
+}
+
+impl Typmod {
+    pub(crate) fn numeric(self) -> Option<NumericTypmod> {
+        match self {
+            Typmod::Numeric(typmod) => Some(typmod),
+            Typmod::Unknown
+            | Typmod::Unspecified
+            | Typmod::Length(_)
+            | Typmod::Precision(_)
+            | Typmod::Interval(_) => None,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct IntervalTypmod {
+    pub(crate) fields: Option<ast::IntervalFields>,
+    pub(crate) precision: Option<i32>,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ColumnCollation {
+    Unknown,
+    NotCollatable,
+    Known(CollationId),
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) struct ColumnType {
+    pub(crate) ty: Option<Ty>,
+    pub(crate) typmod: Typmod,
+    pub(crate) collation: ColumnCollation,
+}
+
+impl ColumnType {
+    pub(crate) fn common(ty: Option<Ty>, left: ColumnType, right: ColumnType) -> ColumnType {
+        let typmod = match ty {
+            Some(ty)
+                if left.ty.is_some_and(|left| left != ty)
+                    || right.ty.is_some_and(|right| right != ty) =>
+            {
+                Typmod::Unspecified
+            }
+            Some(_) if left.typmod == right.typmod => left.typmod,
+            Some(_) if left.typmod != Typmod::Unknown && right.typmod != Typmod::Unknown => {
+                Typmod::Unspecified
+            }
+            Some(_) | None => Typmod::Unknown,
+        };
+        let collation = if left.ty == ty && right.ty == ty && left.collation == right.collation {
+            left.collation
+        } else {
+            ColumnCollation::Unknown
+        };
+        ColumnType {
+            ty,
+            typmod,
+            collation,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -724,7 +790,8 @@ pub struct Type {
     pub shell_name_ptr: Option<InIrFile<SyntaxNodePtr>>,
     pub columns: Option<Columns>,
     pub base: Option<Ty>,
-    pub(crate) typmod: Option<Typmod>,
+    pub(crate) typmod: Typmod,
+    pub(crate) collation: ColumnCollation,
     pub(crate) element: Option<Ty>,
     pub subtype: Option<Ty>,
     pub(crate) range: Option<TypeId>,
@@ -955,8 +1022,32 @@ pub struct Column {
     pub name: Option<Name>,
     pub ptr: InIrFile<SyntaxNodePtr>,
     pub ty: Option<Ty>,
-    pub(crate) typmod: Option<Typmod>,
+    pub(crate) typmod: Typmod,
+    pub(crate) collation: ColumnCollation,
     pub(crate) merge: Option<MergeId>,
+}
+
+impl Column {
+    pub(crate) fn column_type(&self) -> ColumnType {
+        ColumnType {
+            ty: self.ty,
+            typmod: self.typmod,
+            collation: self.collation,
+        }
+    }
+
+    pub(crate) fn set_type(
+        &mut self,
+        ColumnType {
+            ty,
+            typmod,
+            collation,
+        }: ColumnType,
+    ) {
+        self.ty = ty;
+        self.typmod = typmod;
+        self.collation = collation;
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]

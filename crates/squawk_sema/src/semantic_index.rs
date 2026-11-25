@@ -353,13 +353,16 @@ impl IndexData {
         Some(ty)
     }
 
-    pub(crate) fn domain_typmod(&self, mut ty: Ty) -> Option<Typmod> {
-        let mut typmod = None;
+    pub(crate) fn domain_typmod(&self, mut ty: Ty) -> Typmod {
+        let mut typmod = Typmod::Unspecified;
         while let Ty::Type(id) = ty
             && self.types[id].kind == TypeKind::Domain
         {
             typmod = self.types[id].typmod;
-            ty = self.types[id].base?;
+            let Some(base) = self.types[id].base else {
+                break;
+            };
+            ty = base;
         }
         typmod
     }
