@@ -15582,14 +15582,15 @@ fn build_expr_from_item<'a>(ctx: &Ctx, item: &ast::ExprFromItem) -> Doc<'a> {
             .append(Doc::text("lateral"))
             .append(Doc::space());
     }
-    if let Some(cast) = item.cast_expr() {
+    if let Some(expr) = item.expr() {
         doc = doc
-            .append(leading_comments(cast.syntax()))
-            .append(build_cast_expr(ctx, &cast));
-    } else if let Some(call) = item.call_expr() {
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(ctx, expr));
+    }
+    if let Some(ordinality) = item.with_ordinality() {
         doc = doc
-            .append(leading_comments(call.syntax()))
-            .append(build_call_expr(ctx, &call));
+            .append(space_before(ordinality.syntax()))
+            .append(build_with_ordinality(&ordinality));
     }
     doc.append(build_from_alias(ctx, item.alias()))
 }
@@ -15833,9 +15834,8 @@ fn build_rows_from_item<'a>(ctx: &Ctx, item: &ast::RowsFromItem) -> Doc<'a> {
 
 fn build_rows_from_arg<'a>(ctx: &Ctx, arg: &ast::RowsFromArg) -> Doc<'a> {
     let mut doc = arg
-        .call_expr()
-        .as_ref()
-        .map(|value| build_call_expr(ctx, value))
+        .expr()
+        .map(|expr| build_expr(ctx, expr))
         .unwrap_or_else(Doc::nil);
     if let Some(as_token) = arg.as_token() {
         doc = doc.append(space_before(&as_token)).append(Doc::text("as"));

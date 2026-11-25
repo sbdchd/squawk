@@ -11055,8 +11055,20 @@ impl ExprFromItem {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn with_ordinality(&self) -> Option<WithOrdinality> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn lateral_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::LATERAL_KW)
+    }
+    #[inline]
+    pub fn only_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ONLY_KW)
     }
 }
 
@@ -24678,7 +24690,15 @@ impl RowsFromArg {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn cast_expr(&self) -> Option<CastExpr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn column_def_list(&self) -> Option<ColumnDefList> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn name_ref(&self) -> Option<NameRef> {
         support::child(&self.syntax)
     }
     #[inline]

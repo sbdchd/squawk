@@ -4253,14 +4253,22 @@ fn data_source(p: &mut Parser<'_>, in_parens: bool) -> DataSource {
         }
         IDENT => from_item_name(p),
         CAST_KW | TREAT_KW => {
-            if expr(p).is_none() {
+            if atom_expr(p).is_none() {
                 p.error("expected expression");
             }
+            opt_with_ordinality(p);
             opt_from_alias(p);
             EXPR_FROM_ITEM
         }
         COLLATION_KW if p.nth_at(1, FOR_KW) => {
             collation_for_fn(p);
+            opt_with_ordinality(p);
+            opt_from_alias(p);
+            EXPR_FROM_ITEM
+        }
+        _ if at_sql_value_function(p) => {
+            name_ref_(p);
+            opt_with_ordinality(p);
             opt_from_alias(p);
             EXPR_FROM_ITEM
         }
@@ -4317,12 +4325,39 @@ fn xml_row_passing_clause(p: &mut Parser<'_>) {
     m.complete(p, XML_ROW_PASSING_CLAUSE);
 }
 
+const CAST_FIRST: TokenSet = TokenSet::new(&[CAST_KW, TREAT_KW]);
+
+const SQL_VALUE_FUNCTION: TokenSet = TokenSet::new(&[
+    CURRENT_CATALOG_KW,
+    CURRENT_DATE_KW,
+    CURRENT_ROLE_KW,
+    CURRENT_SCHEMA_KW,
+    CURRENT_TIME_KW,
+    CURRENT_TIMESTAMP_KW,
+    CURRENT_USER_KW,
+    LOCALTIME_KW,
+    LOCALTIMESTAMP_KW,
+    SESSION_USER_KW,
+    SYSTEM_USER_KW,
+    USER_KW,
+]);
+
+fn at_sql_value_function(p: &Parser<'_>) -> bool {
+    p.at_ts(SQL_VALUE_FUNCTION) && !p.nth_at(1, L_PAREN) && !p.nth_at(1, DOT)
+}
+
 fn opt_row_from_expr(p: &mut Parser<'_>) -> bool {
     if !p.at_ts(EXPR_FIRST) {
         return false;
     }
     let m = p.start();
-    call_expr(p);
+    if p.at_ts(CAST_FIRST) {
+        atom_expr(p);
+    } else if at_sql_value_function(p) {
+        name_ref_(p);
+    } else {
+        call_expr(p);
+    }
     if p.eat(AS_KW) && !opt_column_list_with(p, ColumnDefKind::ColumnDef) {
         p.error("expected column definition list");
     }

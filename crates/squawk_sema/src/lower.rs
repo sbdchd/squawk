@@ -16923,30 +16923,7 @@ impl Lowerer {
                     .relation_name_ref()
                     .and_then(|name| name.path_ref())
                 {
-                    Some(path) => match value_function_segment(&path) {
-                        Some(ValueFunctionSegment { segment, function }) => {
-                            let node = segment.syntax();
-                            let ty = self.lower_sql_value_function(function, node);
-                            let list = column_def_list(from_item);
-                            let column_defs =
-                                list.as_ref().map_or(ColumnDefs::None, ColumnDefs::List);
-                            self.check_value_column_defs(node, ty, column_defs);
-                            let name = Some(self.intern(&segment.text()));
-                            let value = self.value_columns(
-                                name,
-                                ty,
-                                node,
-                                scalar_alias(from_item).as_ref(),
-                            );
-                            scalar = value.scalar;
-                            RelationSource {
-                                name,
-                                kind: SourceKind::Other,
-                                columns: value.columns,
-                            }
-                        }
-                        None => self.lower_relation_ref(&path),
-                    },
+                    Some(path) => self.lower_relation_ref(&path),
                     None => self.other_relation_source(),
                 }
             }
@@ -17030,7 +17007,6 @@ impl Lowerer {
                     Some(callee) => Some(callee.name),
                     None => function_item
                         .call_expr()
-                        .filter(|call| call.function_like_keyword().is_some())
                         .and_then(|call| self.inferred_name(ast::Expr::CallExpr(call))),
                 };
                 RelationSource {
@@ -17072,33 +17048,38 @@ impl Lowerer {
                     columns,
                 }
             }
-            ast::FromItem::ExprFromItem(expr_item) => {
-                let expr = match (expr_item.call_expr(), expr_item.cast_expr()) {
-                    (Some(call), _) => Some(ast::Expr::CallExpr(call)),
-                    (None, Some(cast)) => Some(ast::Expr::CastExpr(cast)),
-                    (None, None) => None,
-                };
-                match expr {
-                    Some(expr) => {
-                        let ty = self.with_from_function(|this| this.lower_expr(&expr));
-                        self.check_expr_column_defs(&expr, ty, from_item);
-                        let name = self.inferred_name(expr.clone());
-                        let value = self.value_columns(
-                            name,
-                            ty,
-                            expr.syntax(),
-                            scalar_alias(from_item).as_ref(),
-                        );
-                        scalar = value.scalar;
-                        RelationSource {
-                            name,
-                            kind: SourceKind::Other,
-                            columns: value.columns,
+            ast::FromItem::ExprFromItem(expr_item) => match expr_item.expr() {
+                Some(expr) => {
+                    let ty = self.with_from_function(|this| this.lower_expr(&expr));
+                    let list = column_def_list(from_item);
+                    let column_defs = match &list {
+                        Some(list) if from_item.with_ordinality().is_some() => {
+                            self.push_error(
+                                list.syntax(),
+                                SemaError::OrdinalityColumnDefList { fix: None },
+                            );
+                            ColumnDefs::Rejected
                         }
+                        Some(list) => ColumnDefs::List(list),
+                        None => ColumnDefs::None,
+                    };
+                    self.check_expr_column_defs(&expr, ty, column_defs);
+                    let name = self.inferred_name(expr.clone());
+                    let value = self.value_columns(
+                        name,
+                        ty,
+                        expr.syntax(),
+                        scalar_alias(from_item).as_ref(),
+                    );
+                    scalar = value.scalar;
+                    RelationSource {
+                        name,
+                        kind: SourceKind::Other,
+                        columns: value.columns,
                     }
-                    None => self.other_relation_source(),
                 }
-            }
+                None => self.other_relation_source(),
+            },
             ast::FromItem::GraphTableFromItem(graph_table_item) => {
                 let columns = match graph_table_item.graph_table_fn() {
                     Some(graph_table) => {
@@ -17711,14 +17692,28 @@ impl Lowerer {
                     } = self.lower_function_source(&call, None, outer_column_defs);
                     FunctionColumns { columns, scalar }
                 }
-                (None, Some(list)) => FunctionColumns {
-                    columns: self.column_def_list_columns(&list),
-                    scalar: None,
-                },
-                (None, None) => FunctionColumns {
-                    columns: self.unknown_columns(),
-                    scalar: None,
-                },
+                (None, list) => {
+                    let item_defs = list.as_ref().map_or(outer_column_defs, ColumnDefs::List);
+                    let value = match arg.expr() {
+                        Some(expr) => {
+                            let ty = self.with_from_function(|this| this.lower_expr(&expr));
+                            self.check_expr_column_defs(&expr, ty, item_defs);
+                            let name = self.inferred_name(expr.clone());
+                            self.value_columns(name, ty, expr.syntax(), None)
+                        }
+                        None => FunctionColumns {
+                            columns: self.unknown_columns(),
+                            scalar: None,
+                        },
+                    };
+                    match list {
+                        Some(list) => FunctionColumns {
+                            columns: self.column_def_list_columns(&list),
+                            scalar: None,
+                        },
+                        None => value,
+                    }
+                }
             };
             items.push(columns);
         }
@@ -17960,17 +17955,15 @@ impl Lowerer {
         &mut self,
         expr: &ast::Expr,
         ty: Option<Ty>,
-        from_item: &ast::FromItem,
+        column_defs: ColumnDefs<'_>,
     ) {
-        let list = column_def_list(from_item);
         if self.is_record(ty) && is_row_constructor(expr) {
-            if let Some(list) = list {
+            if let ColumnDefs::List(list) = column_defs {
                 let reason = ColumnDefListReason::RowConstructor;
                 self.push_error(list.syntax(), SemaError::UnexpectedColumnDefList { reason });
             }
             return;
         }
-        let column_defs = list.as_ref().map_or(ColumnDefs::None, ColumnDefs::List);
         self.check_value_column_defs(expr.syntax(), ty, column_defs);
     }
 
@@ -29620,20 +29613,6 @@ fn output_is_unknown_literal(query: &ast::SelectVariant, position: usize) -> boo
         | ast::SelectVariant::SelectInto(_)
         | ast::SelectVariant::Table(_) => false,
     }
-}
-
-struct ValueFunctionSegment {
-    segment: ast::PathSegmentRef,
-    function: ast::SqlValueFunction,
-}
-
-fn value_function_segment(path: &ast::PathRef) -> Option<ValueFunctionSegment> {
-    if path.qualifier().is_some() {
-        return None;
-    }
-    let segment = path.segment()?;
-    let function = segment.sql_value_function()?;
-    Some(ValueFunctionSegment { segment, function })
 }
 
 fn column_def_list(from_item: &ast::FromItem) -> Option<ast::ColumnDefList> {

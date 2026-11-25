@@ -3574,13 +3574,13 @@ XmlTableFromItem =
   'lateral'? XmlTable alias:FromAlias?
 
 ExprFromItem =
-  'lateral'? (CastExpr | CallExpr) alias:FromAlias?
+  'only'? 'lateral'? (CastExpr | CallExpr | NameRef) WithOrdinality? alias:FromAlias?
 
 RowsFromItem =
   'lateral'? 'rows' 'from' '(' (RowsFromArg (',' RowsFromArg)*) ')' WithOrdinality? alias:FromAlias?
 
 RowsFromArg =
-  CallExpr ('as' ColumnDefList)?
+  (CastExpr | CallExpr | NameRef) ('as' ColumnDefList)?
 
 FromClause =
   'from'

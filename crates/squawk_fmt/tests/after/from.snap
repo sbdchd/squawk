@@ -348,3 +348,14 @@ from foo() as t (
 );
 
 select * from f() as (a int, b text);
+
+select *
+from lateral /* a */ current_date /* b */ with /* c */ ordinality /* d */ as t (
+  a,
+  b
+);
+
+select * from cast(1 as int) /* a */ with ordinality t;
+
+select *
+from rows from (/* a */ current_date, cast(1 as int) /* b */) with ordinality;

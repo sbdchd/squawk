@@ -7133,11 +7133,9 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      RELATION_FROM_ITEM
-        RELATION_NAME_REF
-          PATH_REF
-            PATH_SEGMENT_REF
-              USER_KW "user"
+      EXPR_FROM_ITEM
+        NAME_REF
+          USER_KW "user"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- select with aggregates"

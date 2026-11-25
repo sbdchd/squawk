@@ -512,3 +512,35 @@ select * from "current_date";
        ╰╴              ━━━━━━━━━━━━━━
     "#);
 }
+
+#[test]
+fn value_from_item_ordinality() {
+    assert_snapshot!(check("
+select t.a, t.b + 1 from localtime with ordinality as t (a, b);
+select t.ordinality, t.t from cast(1 as int) with ordinality as t;
+select t + 1 from pg_class, lateral current_date as t;
+select t.a, t.b + 1 from rows from (current_date, cast(1 as int)) as t (a, b);
+select t.a from rows from (cast(null as record) as (a int)) as t;
+select t.nope from localtime with ordinality as t (a, b);
+select t.nope from rows from (current_date, cast(1 as int)) as t (a, b);
+select * from rows from (cast(row(1) as record) as (a int));
+select * from rows from (current_date as (a int));
+"), @"
+    error: column `t.nope` does not exist
+      ╭▸ 
+    7 │ select t.nope from localtime with ordinality as t (a, b);
+      ╰╴         ━━━━
+    error: column `t.nope` does not exist
+      ╭▸ 
+    8 │ select t.nope from rows from (current_date, cast(1 as int)) as t (a, b);
+      ╰╴         ━━━━
+    error: a column definition list is redundant for a row constructor
+      ╭▸ 
+    9 │ select * from rows from (cast(row(1) as record) as (a int));
+      ╰╴                                                   ━━━━━━━
+    error: a column definition list is only allowed for functions returning `record`
+       ╭▸ 
+    10 │ select * from rows from (current_date as (a int));
+       ╰╴                                         ━━━━━━━
+    ");
+}
