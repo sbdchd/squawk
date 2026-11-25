@@ -11744,41 +11744,33 @@ fn alter_vertex_edge_table(p: &mut Parser<'_>) {
     m.complete(p, kind);
 }
 
-fn drop_edge_tables(p: &mut Parser<'_>) {
-    assert!(p.at(DROP_KW) && p.nth_at_ts(1, EDGE));
-    let m = p.start();
+fn drop_element_tables(p: &mut Parser<'_>, item: ListItem) {
     p.bump(DROP_KW);
-    p.bump_any(); // EDGE/RELATIONSHIP
+    p.bump_any(); // EDGE/RELATIONSHIP/VERTEX/NODE
     p.expect(TABLES_KW);
     delimited(
         p,
         L_PAREN,
         R_PAREN,
         COMMA,
-        ListItems::Required(ListItem::EdgeTable),
+        ListItems::Required(item),
         NAME_REF_FIRST,
         |p| opt_element_table_ref(p).is_some(),
     );
     opt_cascade_or_restrict(p);
+}
+
+fn drop_edge_tables(p: &mut Parser<'_>) {
+    assert!(p.at(DROP_KW) && p.nth_at_ts(1, EDGE));
+    let m = p.start();
+    drop_element_tables(p, ListItem::EdgeTable);
     m.complete(p, DROP_EDGE_TABLES);
 }
 
 fn drop_vertex_tables(p: &mut Parser<'_>) {
     assert!(p.at(DROP_KW) && p.nth_at_ts(1, VERTEX));
     let m = p.start();
-    p.bump(DROP_KW);
-    p.bump_any(); // VERTEX/NODE
-    p.expect(TABLES_KW);
-    delimited(
-        p,
-        L_PAREN,
-        R_PAREN,
-        COMMA,
-        ListItems::Required(ListItem::VertexTable),
-        NAME_REF_FIRST,
-        |p| opt_element_table_ref(p).is_some(),
-    );
-    opt_cascade_or_restrict(p);
+    drop_element_tables(p, ListItem::VertexTable);
     m.complete(p, DROP_VERTEX_TABLES);
 }
 
