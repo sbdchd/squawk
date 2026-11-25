@@ -935,3 +935,44 @@ select json_arrayagg(a) filter (where json_arrayagg(1) is null) from t;
        ╰╴                                      ━━━━━━━━━━━━━━━━
     ");
 }
+
+#[test]
+fn outer_aggregate_placement() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int
+);
+create table u (x int);
+select (select sum(t.a) from u) from t;
+select 1 from t having (select sum(t.a)) > 1;
+select * from t where (select sum(t.a) filter (where x > 1) from u) = 1;
+select (select sum(a) from u) from t full join t as t2 using (a);
+select * from t where (select sum(t.a) from u) is null;
+select * from t where (select json_arrayagg(t.a)) is null;
+select * from t, lateral (select sum(t.a) from u) as s;
+update t set a = (select sum(t.a));
+select sum((select sum(t.a))) from t;
+"), @"
+    error: aggregate functions are not allowed in `where`
+       ╭▸ 
+    11 │ select * from t where (select sum(t.a) from u) is null;
+       ╰╴                              ━━━━━━━━
+    error: aggregate functions are not allowed in `where`
+       ╭▸ 
+    12 │ select * from t where (select json_arrayagg(t.a)) is null;
+       ╰╴                              ━━━━━━━━━━━━━━━━━━
+    error: aggregate functions are not allowed in the `from` clause of their own query level
+       ╭▸ 
+    13 │ select * from t, lateral (select sum(t.a) from u) as s;
+       ╰╴                                 ━━━━━━━━
+    error: aggregate functions are not allowed in `update`
+       ╭▸ 
+    14 │ update t set a = (select sum(t.a));
+       ╰╴                         ━━━━━━━━
+    error: aggregate calls cannot be nested
+       ╭▸ 
+    15 │ select sum((select sum(t.a))) from t;
+       ╰╴                   ━━━━━━━━
+    ");
+}

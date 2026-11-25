@@ -130,6 +130,7 @@ impl Lowerer {
             generated_column_deps: vec![],
             reserved_constraint_names: SmallVec::new(),
             merge_action_fn: MergeActionFn::Disallowed,
+            query_contexts: vec![],
             record_columns: FxHashMap::default(),
             view_bases: FxHashMap::default(),
             insert_values: vec![],
@@ -446,6 +447,7 @@ pub(crate) struct Lowerer {
     generated_column_deps: Vec<GeneratedColumnDep>,
     reserved_constraint_names: SmallVec<[ReservedConstraintName; 2]>,
     merge_action_fn: MergeActionFn,
+    query_contexts: Vec<QueryContext>,
     record_columns: FxHashMap<InIrFile<SyntaxNodePtr>, RecordColumns>,
     view_bases: FxHashMap<TableId, TableId>,
     insert_values: Vec<InsertValue>,
@@ -529,6 +531,24 @@ enum ArrayCast {
 enum MergeActionFn {
     Allowed,
     Disallowed,
+}
+
+#[derive(Clone, Copy)]
+struct QueryContext {
+    depth: usize,
+    context: ExprContext,
+}
+
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Certainty {
+    Certain,
+    Uncertain,
+}
+
+#[derive(Clone, Copy)]
+struct AggregateOwner {
+    depth: usize,
+    certainty: Certainty,
 }
 
 struct InsertValue {
@@ -14659,9 +14679,7 @@ impl Lowerer {
         query: ast::SelectVariant,
         recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
-        self.with_expr_context(ExprContext::Unrestricted, |this| {
-            this.lower_cte_query_inner(query, recursive_cte)
-        })
+        self.with_query_context(|this| this.lower_cte_query_inner(query, recursive_cte))
     }
 
     fn lower_cte_query_inner(
@@ -16745,9 +16763,7 @@ impl Lowerer {
         query: &ast::WithQuery,
         recursive_cte: Option<RecursiveCte>,
     ) -> QueryId {
-        self.with_expr_context(ExprContext::Unrestricted, |this| {
-            this.lower_with_query_inner(query, recursive_cte)
-        })
+        self.with_query_context(|this| this.lower_with_query_inner(query, recursive_cte))
     }
 
     fn lower_with_query_inner(
@@ -17214,7 +17230,9 @@ impl Lowerer {
         query: ast::SelectVariant,
     ) -> QueryId {
         if paren.lateral_token().is_some() {
-            return self.with_lateral_sources(|this| this.lower_query(query));
+            return self.with_lateral_sources(|this| {
+                this.with_expr_context(ExprContext::FromSubquery, |this| this.lower_query(query))
+            });
         }
         self.from_subqueries.push(FromSubquery {
             scope: self.scopes.len() - 1,
@@ -25941,10 +25959,12 @@ impl Lowerer {
         }
         let json_aggregate = is_json_aggregate(call).then(|| self.lower_special_fn(call));
         self.check_set_returning_call(call, function, srf_calls);
-        self.check_aggregate_call(call, function, refs, aggregate_calls);
         if let Some(expr) = call.filter_clause().and_then(|clause| clause.expr()) {
+            let filter_calls = self.aggregate_calls.len();
             self.lower_condition(ConditionKind::Filter, &expr);
+            self.aggregate_calls.truncate(filter_calls);
         }
+        self.check_aggregate_call(call, function, refs, aggregate_calls);
         if call.over_clause().is_some()
             && let Some(arg_list) = call.arg_list()
         {
@@ -26222,24 +26242,29 @@ impl Lowerer {
         } else {
             return;
         };
-        if kind == AggregateCallKind::Aggregate {
-            let depth = self.aggregate_depth(refs);
-            if depth != self.scopes.len() {
-                self.outer_aggregates.push(depth);
+        let owner = match kind {
+            AggregateCallKind::Aggregate => self.aggregate_owner(refs),
+            AggregateCallKind::Window => AggregateOwner {
+                depth: self.scopes.len(),
+                certainty: Certainty::Certain,
+            },
+        };
+        let depth = owner.depth;
+        if depth != self.scopes.len() {
+            self.outer_aggregates.push(depth);
+            if owner.certainty == Certainty::Uncertain {
                 return;
             }
         }
         let ptr = self.ptr(call.syntax());
-        let context = self.expr_context;
+        let context = self.owner_context(depth);
         let misplaced = match kind {
-            AggregateCallKind::Aggregate => {
-                (!context.allows_aggregates()).then_some(SemaError::MisplacedAggregate { context })
-            }
+            AggregateCallKind::Aggregate if context.allows_aggregates() => None,
+            AggregateCallKind::Aggregate => Some(SemaError::MisplacedAggregate { context }),
             AggregateCallKind::Window => {
                 (!context.allows_windows()).then_some(SemaError::MisplacedWindow { context })
             }
         };
-        let depth = self.scopes.len();
         if let Some(error) = misplaced {
             self.push_error_ptr(ptr, error);
         } else {
@@ -26270,13 +26295,18 @@ impl Lowerer {
             .push(AggregateCall { kind, depth, ptr });
     }
 
-    fn aggregate_depth(&self, refs: RefId) -> usize {
+    fn aggregate_owner(&self, refs: RefId) -> AggregateOwner {
         let depth = self.scopes.len();
+        let own = AggregateOwner {
+            depth,
+            certainty: Certainty::Certain,
+        };
         let Some(scope) = self.scopes.last() else {
-            return depth;
+            return own;
         };
         let sources = &self.index.queries[scope.query].sources;
         let mut owner = None;
+        let mut certainty = Certainty::Certain;
         for id in self.index.references.range_from(refs) {
             let reference = &self.index.references[id];
             if reference.scope != Some(scope.scope) {
@@ -26289,26 +26319,66 @@ impl Lowerer {
                 }
                 | Resolution::Source(source) => {
                     if sources.contains(&source) {
-                        return depth;
+                        return own;
                     }
-                    self.scopes[..depth - 1]
-                        .iter()
-                        .rposition(|scope| {
-                            self.index.queries[scope.query].sources.contains(&source)
-                        })
-                        .map_or(depth - 1, |position| position + 1)
+                    let position = self.scopes[..depth - 1].iter().rposition(|scope| {
+                        self.index.queries[scope.query].sources.contains(&source)
+                    });
+                    if position.is_none() {
+                        certainty = Certainty::Uncertain;
+                    }
+                    position.map_or(depth - 1, |position| position + 1)
                 }
-                Resolution::Column { source: None, .. } => return depth,
+                Resolution::Column {
+                    source: None,
+                    column,
+                } => {
+                    let position = self
+                        .scopes
+                        .iter()
+                        .rposition(|scope| scope.merges.iter().any(|merge| merge.column == column));
+                    match position {
+                        Some(position) if position + 1 < depth => position + 1,
+                        Some(_) => return own,
+                        None => {
+                            return AggregateOwner {
+                                depth,
+                                certainty: Certainty::Uncertain,
+                            };
+                        }
+                    }
+                }
                 Resolution::Unresolved | Resolution::Unknown | Resolution::Ambiguous
                     if reference.kind == ReferenceKind::Column =>
                 {
+                    certainty = Certainty::Uncertain;
                     depth - 1
                 }
                 _ => continue,
             };
             owner = owner.max(Some(outer));
         }
-        owner.unwrap_or(depth)
+        owner.map_or(own, |depth| AggregateOwner { depth, certainty })
+    }
+
+    fn with_query_context<T>(&mut self, f: impl FnOnce(&mut Self) -> T) -> T {
+        self.query_contexts.push(QueryContext {
+            depth: self.scopes.len(),
+            context: self.expr_context,
+        });
+        let result = self.with_expr_context(ExprContext::Unrestricted, f);
+        self.query_contexts.pop();
+        result
+    }
+
+    fn owner_context(&self, depth: usize) -> ExprContext {
+        if depth == self.scopes.len() {
+            return self.expr_context;
+        }
+        self.query_contexts
+            .iter()
+            .find(|query| query.depth == depth)
+            .map_or(ExprContext::Unrestricted, |query| query.context)
     }
 
     fn with_expr_context<T>(&mut self, context: ExprContext, f: impl FnOnce(&mut Self) -> T) -> T {

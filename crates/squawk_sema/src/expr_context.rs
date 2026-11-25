@@ -18,6 +18,7 @@ pub(crate) enum ExprContext {
     Insert,
     Update,
     FromFunction,
+    FromSubquery,
     MergeWhen,
     CheckConstraint,
     Default,
@@ -54,7 +55,8 @@ impl ExprContext {
             | ExprContext::WindowDefinition
             | ExprContext::ValuesSingle
             | ExprContext::Insert
-            | ExprContext::FromFunction => true,
+            | ExprContext::FromFunction
+            | ExprContext::FromSubquery => true,
             ExprContext::Where
             | ExprContext::JoinCondition
             | ExprContext::Having

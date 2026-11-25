@@ -1313,6 +1313,7 @@ impl ExprContext {
             ExprContext::Insert => "`insert`",
             ExprContext::Update => "`update`",
             ExprContext::FromFunction => "functions in `from`",
+            ExprContext::FromSubquery => "the `from` clause of their own query level",
             ExprContext::MergeWhen => "`merge when` conditions",
             ExprContext::CheckConstraint => "check constraints",
             ExprContext::Default => "`default` expressions",
@@ -1363,6 +1364,7 @@ impl ExprContext {
             | ExprContext::Returning
             | ExprContext::Insert
             | ExprContext::Update
+            | ExprContext::FromSubquery
             | ExprContext::FromFunction
             | ExprContext::MergeWhen
             | ExprContext::Policy => None,
