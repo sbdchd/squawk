@@ -20,3 +20,5 @@ create unlogged sequence s;
 
 create local temp sequence s;
 create global temporary sequence s;
+
+create sequence s owned by none.x;

@@ -3,3 +3,5 @@ ALTER /* policy */ POLICY /* name */ account_access_policy /* on */ ON /* table 
 ALTER POLICY account_access_policy ON public.accounts USING (account_identifier = a_very_long_session_account_identifier_function(current_user, current_role));
 
 ALTER POLICY account_access_policy ON public.accounts /* rename */ RENAME /* to */ TO /* new name */ archived_account_access_policy;
+
+alter policy if exists p on t rename to q;

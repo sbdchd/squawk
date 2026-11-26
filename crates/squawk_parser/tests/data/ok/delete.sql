@@ -117,3 +117,5 @@ DELETE FROM t FOR PORTION OF valid_at FROM '2024-01-01' TO '2025-01-01' WHERE id
 
 -- for_portion_of_range
 DELETE FROM t FOR PORTION OF valid_at (period) WHERE id = 1;
+
+delete from t where current collate "C";

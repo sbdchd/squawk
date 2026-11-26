@@ -87,3 +87,5 @@ with deleted_job as (
   returning river_job.*
 )
 select * from deleted_job;
+
+delete from t where current collate "C";

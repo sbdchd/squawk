@@ -79,3 +79,6 @@ d int) as $$ select 1 $$ language sql;
 create function f() returns boolean begin atomic ; /* before empty */ ; return false; /* before trailing empty */ ; end;
 
 create function f() returns int set time zone interval '1 hour' language sql return 1;
+
+create function f() returns int set role x return 1;
+create function f() returns table (full int) language sql as 'select 1';

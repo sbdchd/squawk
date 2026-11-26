@@ -9,3 +9,5 @@ alter server foreign_server_with_a_very_long_descriptive_name version 'postgresq
 alter /* before server */ server /* before name */ commented_server /* before version */ version /* before version value */ '17.0' /* before options */ options /* before left paren */ (/* before add */ add /* before option name */ host /* before option value */ 'db.internal', /* after comma */ set /* before set name */ port /* before set value */ '5432', /* second comma */ drop /* before drop name */ old_port /* before right paren */) /* before semicolon */;
 
 alter server another_commented_server /* before owner */ owner /* before to */ to /* before role */ session_user;
+
+alter server x options (add 'a', set 'b', drop 'c');

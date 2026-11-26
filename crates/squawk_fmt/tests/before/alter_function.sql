@@ -17,3 +17,5 @@ alter function f() reset time zone;
 alter function f rows -1;
 
 alter function f cost -1;
+
+alter function f() set role x;

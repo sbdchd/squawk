@@ -32,3 +32,5 @@ select
   XMLSERIALIZE(CONTENT doc AS text NO INDENT),
   XMLSERIALIZE(CONTENT a_long_xml_serialize_content_expression_that_forces_wrapping AS a_very_long_xml_serialize_return_type NO INDENT),
   /* before serialize */ XMLSERIALIZE /* before opening paren */ ( /* before kind */ CONTENT /* before expression */ doc /* before as */ AS /* before type */ text /* before no */ NO /* before indent */ INDENT /* before closing paren */ ) /* after serialize */;
+
+select * from xmltable('/a' passing by columns a int);

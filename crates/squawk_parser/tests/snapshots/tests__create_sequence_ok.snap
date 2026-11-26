@@ -161,4 +161,29 @@ SOURCE_FILE
         PATH_SEGMENT
           IDENT "s"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_SEQUENCE
+    CREATE_KW "create"
+    WHITESPACE " "
+    SEQUENCE_KW "sequence"
+    WHITESPACE " "
+    SEQUENCE
+      PATH
+        PATH_SEGMENT
+          IDENT "s"
+    WHITESPACE " "
+    OPTION_OWNED_BY
+      OWNED_KW "owned"
+      WHITESPACE " "
+      BY_KW "by"
+      WHITESPACE " "
+      QUALIFIED_COLUMN_NAME_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NONE_KW "none"
+          DOT "."
+          PATH_SEGMENT_REF
+            IDENT "x"
+    SEMICOLON ";"
   WHITESPACE "\n"

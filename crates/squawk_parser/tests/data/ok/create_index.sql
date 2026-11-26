@@ -72,3 +72,5 @@ CREATE INDEX ON tbl (c1) INCLUDE ((c2));
 CREATE INDEX ON tbl (c1) INCLUDE (c2, (c3 + c4), lower(c5));
 
 create index if on t (a);
+
+create index on t (x between (x));

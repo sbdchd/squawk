@@ -32,3 +32,7 @@ from xmltable(
         price numeric(5,2) path 'bk:price' default 0.00,
         discount numeric(5,2) default 0.00 null
 );
+
+select xmlexists('/a' passing by);
+select * from xmltable('/a' passing by columns a int);
+select * from xmltable('/a' passing by ref by columns a int);

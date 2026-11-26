@@ -2429,4 +2429,59 @@ SOURCE_FILE
         WHITESPACE " "
         NOTHING_KW "nothing"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  MERGE
+    MERGE_KW "merge"
+    WHITESPACE " "
+    INTO_KW "into"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "x"
+    WHITESPACE " "
+    USING_ON_CLAUSE
+      USING_KW "using"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        ONLY_KW "only"
+        WHITESPACE " "
+        L_PAREN "("
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+        R_PAREN ")"
+        WHITESPACE " "
+        TABLESAMPLE_CLAUSE
+          TABLESAMPLE_KW "tablesample"
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              IDENT "bernoulli"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "50"
+              R_PAREN ")"
+      WHITESPACE " "
+      ON_CLAUSE
+        ON_KW "on"
+        WHITESPACE " "
+        LITERAL
+          TRUE_KW "true"
+    WHITESPACE " "
+    MERGE_WHEN_MATCHED
+      WHEN_KW "when"
+      WHITESPACE " "
+      MATCHED_KW "matched"
+      WHITESPACE " "
+      THEN_KW "then"
+      WHITESPACE " "
+      MERGE_DELETE
+        DELETE_KW "delete"
+    SEMICOLON ";"
   WHITESPACE "\n"

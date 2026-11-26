@@ -4,3 +4,5 @@ drop event trigger if exists extraordinarily_long_event_trigger_name_used_to_ver
 
 -- comments in every position
 drop /* event */ event /* trigger */ trigger /* if */ if /* exists */ exists /* name */ ddl_audit /* behavior */ restrict /* end */;
+
+drop event trigger if exists a, b restrict;

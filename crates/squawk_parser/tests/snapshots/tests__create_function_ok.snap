@@ -3558,4 +3558,89 @@ SOURCE_FILE
           LITERAL
             STRING "'select 1'"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      SET_FUNC_OPTION
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          SET_ROLE_VALUE
+            ROLE_KW "role"
+            WHITESPACE " "
+            ROLE_REF
+              ROLE_NAME_REF
+                IDENT "x"
+    WHITESPACE " "
+    RETURN_STMT
+      RETURN_KW "return"
+      WHITESPACE " "
+      LITERAL
+        INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_FUNCTION
+    CREATE_KW "create"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "f"
+    PARAM_LIST
+      L_PAREN "("
+      R_PAREN ")"
+    WHITESPACE " "
+    RET_TYPE
+      RETURNS_KW "returns"
+      WHITESPACE " "
+      TABLE_KW "table"
+      WHITESPACE " "
+      RETURN_TABLE_ARG_LIST
+        L_PAREN "("
+        RETURN_TABLE_COLUMN
+          COLUMN_NAME
+            FULL_KW "full"
+          WHITESPACE " "
+          PATH_TYPE
+            PATH_REF
+              PATH_SEGMENT_REF
+                INT_KW "int"
+        R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      LANGUAGE_FUNC_OPTION
+        LANGUAGE_KW "language"
+        WHITESPACE " "
+        LANGUAGE_REF
+          SQL_KW "sql"
+      WHITESPACE " "
+      AS_FUNC_OPTION
+        AS_KW "as"
+        WHITESPACE " "
+        AS_DEFINITION
+          LITERAL
+            STRING "'select 1'"
+    SEMICOLON ";"
   WHITESPACE "\n"

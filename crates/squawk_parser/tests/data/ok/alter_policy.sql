@@ -24,3 +24,5 @@ alter policy p on t
   using (a = b)
   with check (c > d);
 
+
+alter policy if exists p on t rename to q;

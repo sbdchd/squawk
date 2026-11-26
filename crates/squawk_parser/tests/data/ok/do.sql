@@ -11,3 +11,5 @@ END$$;
 -- do_with_language
 do language plpgsql 'select 1';
 
+
+do language 'plpgsql' 'begin end';

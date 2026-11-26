@@ -285,4 +285,39 @@ SOURCE_FILE
         CONFIG_VALUE_NAME
           IDENT "x"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            ROLE_KW "role"
+      WHITESPACE " "
+      FROM_CURRENT
+        FROM_KW "from"
+        WHITESPACE " "
+        CURRENT_KW "current"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SET
+    SET_KW "set"
+    WHITESPACE " "
+    SET_CONFIG
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              NAMES_KW "names"
+          DOT "."
+          PATH_SEGMENT_REF
+            IDENT "x"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n"

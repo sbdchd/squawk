@@ -19,3 +19,6 @@ set session.x = 1;
 set role = 'x';
 set local role = 'x';
 set session role = x;
+
+set role from current;
+set names.x = 1;

@@ -11,3 +11,8 @@ alter role all reset /* all */ all;
 alter role x reset session authorization;
 
 alter role x reset transaction isolation level;
+
+alter role x set xml option content;
+alter role r set session authorization r2;
+alter role r set session authorization default;
+alter role r set role x;

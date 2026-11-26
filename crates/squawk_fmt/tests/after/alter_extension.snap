@@ -90,3 +90,5 @@ alter /* extension */ extension /* name */ an_exceedingly_long_extension_name_fo
       ) /* semicolon */;
 
 alter extension e add type int array;
+
+alter extension e add property graph g;

@@ -45,3 +45,5 @@ WITH deleted_job AS (
     RETURNING river_job.*
 )
 SELECT * FROM deleted_job;
+
+delete from t where current collate "C";

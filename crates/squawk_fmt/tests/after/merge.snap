@@ -98,3 +98,8 @@ when matched then
   insert /* before default */ default /* before default values */ values
 /* before returning */ returning
   /* before return target */ t.id /* before semicolon */;
+
+merge into x
+using only (t) tablesample bernoulli (50) on true
+when matched then
+  delete;

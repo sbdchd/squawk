@@ -183,3 +183,5 @@ alter extension e drop subscription o;
 alter extension e add tablespace o;
 alter extension e drop tablespace o;
 
+
+alter extension e add property graph g;

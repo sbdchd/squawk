@@ -5,6 +5,7 @@ use squawk_fmt::FormatOptions;
 use squawk_fmt::validation::assert_valid_format;
 use squawk_syntax::SyntaxKind;
 use squawk_syntax::ast::{self, AstNode};
+use std::fmt::Write;
 
 #[dir_test(
     dir: "$CARGO_MANIFEST_DIR/tests/before",
@@ -492,4 +493,42 @@ select 1 /* c */;
       |                                              ^^^^^^^
     ");
     }
+}
+
+#[dir_test(
+    dir: "$CARGO_MANIFEST_DIR/tests/before",
+    glob: "*.sql",
+)]
+fn fmt_keeps_interleaved_comments(fixture: Fixture<&str>) {
+    let content = with_interleaved_comments(fixture.into_content());
+    let formatted = squawk_fmt::fmt_str(&content, FormatOptions::default()).unwrap();
+    assert_valid_format(&content, &formatted, FormatOptions::default());
+}
+
+fn with_interleaved_comments(text: &str) -> String {
+    use squawk_lexer::TokenKind;
+    let mut out = String::with_capacity(text.len() * 2);
+    let mut offset = 0;
+    let mut n = 0;
+    let mut prev_ends_line = true;
+    let mut prev_is_literal = false;
+    for token in squawk_lexer::tokenize(text) {
+        let len = token.len as usize;
+        let slice = &text[offset..offset + len];
+        let continues_string = prev_is_literal && slice.contains(['\n', '\r']);
+        if token.kind == TokenKind::Whitespace && !prev_ends_line && !continues_string {
+            n += 1;
+            write!(out, " /* c{n} */").unwrap();
+        }
+        if token.kind != TokenKind::Whitespace {
+            prev_ends_line = matches!(
+                token.kind,
+                TokenKind::LineComment | TokenKind::PsqlCommand { .. }
+            );
+            prev_is_literal = matches!(token.kind, TokenKind::Literal { .. });
+        }
+        out.push_str(slice);
+        offset += len;
+    }
+    out
 }

@@ -1852,11 +1852,13 @@ pub enum SyntaxKind {
     SET_PUBLICATION_OBJECTS,
     SET_ROLE,
     SET_ROLE_NONE,
+    SET_ROLE_VALUE,
     SET_SCHEMA,
     SET_SCHEMA_VALUE,
     SET_SEQUENCE_OPTION,
     SET_SESSION_AUTH,
     SET_SESSION_AUTH_DEFAULT,
+    SET_SESSION_AUTH_VALUE,
     SET_SINGLE_COLUMN,
     SET_STATISTICS,
     SET_STORAGE,
@@ -3934,11 +3936,13 @@ impl SyntaxKind {
             | SyntaxKind::SET_PUBLICATION_OBJECTS
             | SyntaxKind::SET_ROLE
             | SyntaxKind::SET_ROLE_NONE
+            | SyntaxKind::SET_ROLE_VALUE
             | SyntaxKind::SET_SCHEMA
             | SyntaxKind::SET_SCHEMA_VALUE
             | SyntaxKind::SET_SEQUENCE_OPTION
             | SyntaxKind::SET_SESSION_AUTH
             | SyntaxKind::SET_SESSION_AUTH_DEFAULT
+            | SyntaxKind::SET_SESSION_AUTH_VALUE
             | SyntaxKind::SET_SINGLE_COLUMN
             | SyntaxKind::SET_STATISTICS
             | SyntaxKind::SET_STORAGE
@@ -7245,11 +7249,13 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::SET_PUBLICATION_OBJECTS => "set publication objects",
             SyntaxKind::SET_ROLE => "set role",
             SyntaxKind::SET_ROLE_NONE => "set role none",
+            SyntaxKind::SET_ROLE_VALUE => "set role value",
             SyntaxKind::SET_SCHEMA => "set schema",
             SyntaxKind::SET_SCHEMA_VALUE => "set schema value",
             SyntaxKind::SET_SEQUENCE_OPTION => "set sequence option",
             SyntaxKind::SET_SESSION_AUTH => "set session auth",
             SyntaxKind::SET_SESSION_AUTH_DEFAULT => "set session auth default",
+            SyntaxKind::SET_SESSION_AUTH_VALUE => "set session auth value",
             SyntaxKind::SET_SINGLE_COLUMN => "set single column",
             SyntaxKind::SET_STATISTICS => "set statistics",
             SyntaxKind::SET_STORAGE => "set storage",

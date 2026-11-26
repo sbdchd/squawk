@@ -28,17 +28,12 @@ alter default privileges
     cascade;
 
 alter default privileges
-  for role
-  app_owner,
-  migrations
-  in schema
-    public,
-    audit
+  for role app_owner, migrations
+  in schema public, audit
   grant all privileges on sequences to app_user, reporting with grant option;
 
 alter default privileges
-  for user
-  app_owner
+  for user app_owner
   revoke grant option for insert, update on tables from app_user cascade;
 
 alter default privileges grant execute on functions to public;
@@ -64,3 +59,10 @@ alter /* default keyword */ default /* privileges keyword */ privileges
   /* to keyword */ to
     /* grantee */ exceedingly_long_reporting_role
     /* with clause */ with /* grant keyword */ grant /* option keyword */ option /* semicolon */;
+
+alter default privileges in schema s for user x grant all on tables to x;
+alter default privileges
+  for role a
+  in schema s
+  for role b
+  grant select on tables to x;

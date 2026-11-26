@@ -4,3 +4,5 @@ drop access method if exists extraordinarily_long_custom_table_access_method_nam
 
 -- comments in every position
 drop /* access */ access /* method */ method /* if */ if /* exists */ exists /* name */ custom_method /* behavior */ restrict /* end */;
+
+drop access method if exists a, b cascade;

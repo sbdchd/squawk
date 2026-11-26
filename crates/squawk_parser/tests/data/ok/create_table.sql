@@ -456,3 +456,5 @@ create table exclude (exclude int);
 
 -- enforced can be a type name
 create table t (x enforced);
+
+create table t (a int) with (fillfactor = operator);

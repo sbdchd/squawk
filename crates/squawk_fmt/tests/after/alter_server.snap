@@ -32,3 +32,10 @@ alter /* before server */ server /* before name */ commented_server
 
 alter server another_commented_server
   /* before owner */ owner /* before to */ to /* before role */ session_user;
+
+alter server x
+  options (
+    add 'a',
+    set 'b',
+    drop 'c'
+  );

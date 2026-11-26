@@ -314,4 +314,35 @@ SOURCE_FILE
         LITERAL
           FALSE_KW "false"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  ALTER_DATABASE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    DATABASE_REF
+      IDENT "x"
+    WHITESPACE " "
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      CONFIG_PARAMETER_REF
+        PATH_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                TABLESPACE_KW "tablespace"
+            DOT "."
+            PATH_SEGMENT_REF
+              IDENT "x"
+          DOT "."
+          PATH_SEGMENT_REF
+            IDENT "y"
+      WHITESPACE " "
+      TO_CONFIG_VALUE
+        EQ "="
+        WHITESPACE " "
+        LITERAL
+          INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"

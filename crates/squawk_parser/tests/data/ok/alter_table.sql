@@ -284,3 +284,7 @@ alter table t add foreign key (a, b) references t1 match partial;
 alter table t add exclude int;
 
 alter table t alter column a restart with -1;
+
+alter table t add c text compression pglz;
+alter table t add column c text storage external compression pglz;
+alter table t add exclude (time with =);

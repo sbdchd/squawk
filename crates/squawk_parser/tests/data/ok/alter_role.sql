@@ -50,3 +50,6 @@ alter role current_user with nologin;
 -- for_all_roles
 alter role all reset all;
 
+
+alter role x set xml option content;
+alter role r set session authorization r2;

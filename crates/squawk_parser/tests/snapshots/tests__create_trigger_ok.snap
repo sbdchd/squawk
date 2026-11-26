@@ -421,4 +421,54 @@ SOURCE_FILE
         L_PAREN "("
         R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TRIGGER
+    CREATE_KW "create"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    TRIGGER
+      IDENT "tr"
+    WHITESPACE " "
+    TIMING_BEFORE
+      BEFORE_KW "before"
+    WHITESPACE " "
+    TRIGGER_EVENT_LIST
+      TRIGGER_EVENT_INSERT
+        INSERT_KW "insert"
+    WHITESPACE " "
+    ON_RELATION
+      ON_KW "on"
+      WHITESPACE " "
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    FOR_EACH_ROW
+      FOR_KW "for"
+      WHITESPACE " "
+      EACH_KW "each"
+      WHITESPACE " "
+      ROW_KW "row"
+    WHITESPACE " "
+    EXECUTE_KW "execute"
+    WHITESPACE " "
+    PROCEDURE_KW "procedure"
+    WHITESPACE " "
+    CALL_EXPR
+      NAME_REF
+        IDENT "f"
+      ARG_LIST
+        L_PAREN "("
+        ARG
+          NAME_REF
+            NATURAL_KW "natural"
+        COMMA ","
+        WHITESPACE " "
+        ARG
+          NAME_REF
+            IDENT "x"
+        R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

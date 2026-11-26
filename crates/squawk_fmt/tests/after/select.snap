@@ -96,3 +96,14 @@ select * from user;
 select * from current_date as d;
 
 select * from t for read only;
+
+select * from x a join t natural join x b using (b);
+select * from t a join t b cross join t c using (x);
+select 'a' like all((select 'a') for read only);
+select * from only (t) tablesample bernoulli (50);
+select (values);
+
+with merge(x) as (
+  select 1
+)
+select * from merge;

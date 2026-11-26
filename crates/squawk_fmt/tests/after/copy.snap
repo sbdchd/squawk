@@ -57,3 +57,5 @@ to /* before stdout */ stdout;
 
 copy ((select 1)) to stdout;
 copy ((table t)) to stdout;
+
+copy x to stdin;

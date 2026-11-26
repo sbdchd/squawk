@@ -3958,14 +3958,9 @@ fn build_comment_object<'a>(ctx: &Ctx, object: ast::CommentObject) -> Doc<'a> {
             node.table_name_ref()
                 .map(|name| build_extension_path_value(&name)),
         ),
-        ast::CommentObject::ObjectPropertyGraph(node) => build_extension_member_value(
+        ast::CommentObject::ObjectPropertyGraph(node) => build_extension_member_object(
             ctx,
-            build_keyword_tokens([
-                (node.property_token(), "property"),
-                (node.graph_token(), "graph"),
-            ]),
-            node.property_graph_ref()
-                .map(|name| build_extension_path_value(&name)),
+            ast::ExtensionMemberObject::ObjectPropertyGraph(node),
         ),
         ast::CommentObject::ObjectRule(node) => build_comment_object_on(
             ctx,
@@ -4488,9 +4483,14 @@ fn build_rule_action<'a>(ctx: &Ctx, action: ast::RuleAction) -> Doc<'a> {
         ast::RuleAction::Nothing(_) => Doc::text("nothing"),
         ast::RuleAction::RuleStmt(stmt) => build_rule_stmt(ctx, stmt),
         ast::RuleAction::RuleStmtList(list) => {
-            let items = list
-                .rule_stmts()
-                .map(|stmt| leading_comments(stmt.syntax()).append(build_rule_stmt(ctx, stmt)));
+            let items = list.rule_stmts().map(|stmt| match stmt {
+                ast::RuleStmt::EmptyStmt(stmt) => {
+                    let (comments, separator) =
+                        comment_run_before(stmt.syntax()).before_closing_delimiter(Doc::nil());
+                    comments.append(separator).append(build_empty_stmt(&stmt))
+                }
+                stmt => leading_comments(stmt.syntax()).append(build_rule_stmt(ctx, stmt)),
+            });
             let body = Doc::list(Itertools::intersperse(items, Doc::hard_line()).collect());
             list.l_paren_token()
                 .map(|el| comments_before(&el))
@@ -6678,6 +6678,49 @@ fn build_set_config_param<'a>(ctx: &Ctx, set: &ast::SetConfigParam) -> Doc<'a> {
             .append(build_set_literal_target("schema", value.literal()))
             .group();
     }
+    if let Some(xml) = set.set_xml_option() {
+        return doc
+            .append(space_before(xml.syntax()))
+            .append(build_set_xml_option(&xml))
+            .group();
+    }
+    if let Some(catalog) = set.set_catalog() {
+        return doc
+            .append(space_before(catalog.syntax()))
+            .append(build_set_literal_target("catalog", catalog.literal()))
+            .group();
+    }
+    if let Some(value) = set.set_session_auth_value() {
+        let mut target = build_keyword_tokens([
+            (value.session_token(), "session"),
+            (value.authorization_token(), "authorization"),
+        ]);
+        if let Some(value) = value.set_session_auth_target() {
+            target = target
+                .append(space_before(value.syntax()))
+                .append(build_set_session_auth_target(value));
+        }
+        return doc
+            .append(space_before(value.syntax()))
+            .append(target)
+            .group();
+    }
+    if let Some(value) = set.set_role_value() {
+        let mut target = Doc::text("role");
+        if let Some(role) = value.role_ref() {
+            target = target
+                .append(space_before(role.syntax()))
+                .append(build_role_ref(&role));
+        } else if let Some(literal) = value.literal() {
+            target = target
+                .append(space_before(literal.syntax()))
+                .append(build_literal(&literal));
+        }
+        return doc
+            .append(space_before(value.syntax()))
+            .append(target)
+            .group();
+    }
     doc = append_commented_path_ref(doc, set.config_parameter_ref());
     if let Some(assignment) = set.config_assignment() {
         doc = doc
@@ -7588,6 +7631,26 @@ fn build_table_arg<'a>(ctx: &Ctx, arg: &ast::TableArg) -> Doc<'a> {
     }
 }
 
+fn build_storage<'a>(storage: &ast::Storage) -> Doc<'a> {
+    let mut doc = Doc::text("storage");
+    if let Some(mode) = storage.storage_mode() {
+        doc = doc
+            .append(space_before(mode.syntax()))
+            .append(build_keyword_node(mode.syntax()));
+    }
+    doc
+}
+
+fn build_compression_method<'a>(compression: &ast::CompressionMethod) -> Doc<'a> {
+    let mut doc = Doc::text("compression");
+    if let Some(method) = compression.compression_method_name() {
+        doc = doc
+            .append(space_before(method.syntax()))
+            .append(build_keyword_node(method.syntax()));
+    }
+    doc
+}
+
 fn build_column<'a>(ctx: &Ctx, column: &ast::Column) -> Doc<'a> {
     let mut doc = column
         .name()
@@ -7601,23 +7664,9 @@ fn build_column<'a>(ctx: &Ctx, column: &ast::Column) -> Doc<'a> {
     for clause in column.clauses() {
         let syntax = clause.syntax().clone();
         let clause = match clause {
-            ast::ColumnClause::Storage(storage) => {
-                let mut doc = Doc::text("storage");
-                if let Some(mode) = storage.storage_mode() {
-                    doc = doc
-                        .append(space_before(mode.syntax()))
-                        .append(build_keyword_node(mode.syntax()));
-                }
-                doc
-            }
+            ast::ColumnClause::Storage(storage) => build_storage(&storage),
             ast::ColumnClause::CompressionMethod(compression) => {
-                let mut doc = Doc::text("compression");
-                if let Some(method) = compression.compression_method_name() {
-                    doc = doc
-                        .append(space_before(method.syntax()))
-                        .append(build_keyword_node(method.syntax()));
-                }
-                doc
+                build_compression_method(&compression)
             }
             ast::ColumnClause::WithOptions(options) => build_keyword_node(options.syntax()),
             ast::ColumnClause::AlterOptionList(options) => build_alter_option_list(ctx, &options),
@@ -9503,6 +9552,17 @@ fn build_alter_foreign_table_action<'a>(ctx: &Ctx, action: &ast::AlterTableActio
                 doc = doc
                     .append(space_before(ty.syntax()))
                     .append(build_type(ctx, &ty));
+            }
+            if let Some(storage) = node.storage() {
+                doc = append_nested_clause(ctx, doc, storage.syntax(), build_storage(&storage));
+            }
+            if let Some(compression) = node.compression_method() {
+                doc = append_nested_clause(
+                    ctx,
+                    doc,
+                    compression.syntax(),
+                    build_compression_method(&compression),
+                );
             }
             if let Some(options) = node.alter_option_list() {
                 doc = append_nested_clause(
@@ -12494,6 +12554,7 @@ fn build_alter_policy<'a>(ctx: &Ctx, stmt: &ast::AlterPolicy) -> Doc<'a> {
     if let Some(token) = stmt.policy_token() {
         doc = doc.append(space_before(&token)).append(Doc::text("policy"));
     }
+    doc = append_if_exists(doc, stmt.if_exists());
     if let Some(policy) = stmt.policy_ref() {
         doc = doc
             .append(space_before(policy.syntax()))
@@ -12978,30 +13039,10 @@ fn build_alter_default_privileges<'a>(ctx: &Ctx, stmt: &ast::AlterDefaultPrivile
             doc = doc.append(space_before(&token)).append(Doc::text(keyword));
         }
     }
-    if let Some(for_roles) = stmt.for_roles() {
-        let mut clause = build_keyword_tokens([
-            (for_roles.for_token(), "for"),
-            (for_roles.role_token(), "role"),
-            (for_roles.user_token(), "user"),
-        ]);
-        if let Some(roles) = for_roles.role_ref_list() {
-            clause = clause
-                .append(line_before(roles.syntax()))
-                .append(build_role_ref_list(&roles));
-        }
-        doc = append_nested_clause(ctx, doc, for_roles.syntax(), clause);
-    }
-    if let Some(in_schemas) = stmt.in_schemas() {
-        let mut clause = build_keyword_tokens([
-            (in_schemas.in_token(), "in"),
-            (in_schemas.schema_token(), "schema"),
-        ]);
-        let schemas = build_comma_separated_nodes(in_schemas.schema_refs(), |schema| {
-            build_name(schema.syntax())
-        })
-        .unwrap_or_else(Doc::nil);
-        clause = clause.append(Doc::line_or_space().append(schemas).nest(ctx.indent));
-        doc = append_nested_clause(ctx, doc, in_schemas.syntax(), clause);
+    for option in stmt.options() {
+        doc = append_nested_node(ctx, doc, option, |value| {
+            build_default_privileges_option(ctx, value)
+        });
     }
     if let Some(action) = stmt.action() {
         doc = append_nested_node(ctx, doc, action, |value| {
@@ -13009,6 +13050,37 @@ fn build_alter_default_privileges<'a>(ctx: &Ctx, stmt: &ast::AlterDefaultPrivile
         });
     }
     doc.group().append(build_semicolon(stmt.semicolon_token()))
+}
+
+fn build_default_privileges_option<'a>(ctx: &Ctx, option: ast::DefaultPrivilegesOption) -> Doc<'a> {
+    match option {
+        ast::DefaultPrivilegesOption::ForRoles(for_roles) => {
+            let mut clause = build_keyword_tokens([
+                (for_roles.for_token(), "for"),
+                (for_roles.role_token(), "role"),
+                (for_roles.user_token(), "user"),
+            ]);
+            if let Some(roles) = for_roles.role_ref_list() {
+                clause = clause
+                    .append(line_before(roles.syntax()))
+                    .append(build_role_ref_list(&roles));
+            }
+            clause.group()
+        }
+        ast::DefaultPrivilegesOption::InSchemas(in_schemas) => {
+            let clause = build_keyword_tokens([
+                (in_schemas.in_token(), "in"),
+                (in_schemas.schema_token(), "schema"),
+            ]);
+            let schemas = build_comma_separated_nodes(in_schemas.schema_refs(), |schema| {
+                build_name(schema.syntax())
+            })
+            .unwrap_or_else(Doc::nil);
+            clause
+                .append(Doc::line_or_space().append(schemas).nest(ctx.indent))
+                .group()
+        }
+    }
 }
 
 fn build_privilege_target<'a>(target: ast::PrivilegeTarget) -> Doc<'a> {
@@ -13594,6 +13666,15 @@ fn build_extension_member_object<'a>(ctx: &Ctx, object: ast::ExtensionMemberObje
                 .as_ref()
                 .map(|sig| leading_comments(sig.syntax()).append(build_procedure_sig(ctx, sig))),
         ),
+        ast::ExtensionMemberObject::ObjectPropertyGraph(node) => build_extension_member_value(
+            ctx,
+            build_keyword_tokens([
+                (node.property_token(), "property"),
+                (node.graph_token(), "graph"),
+            ]),
+            node.property_graph_ref()
+                .map(|name| build_extension_path_value(&name)),
+        ),
         ast::ExtensionMemberObject::ObjectPublication(node) => build_extension_member_value(
             ctx,
             build_keyword_tokens([(node.publication_token(), "publication")]),
@@ -13954,7 +14035,10 @@ fn build_alter_subscription_action<'a>(ctx: &Ctx, action: ast::AlterSubscription
             }
             doc.group()
         }
-        ast::AlterSubscriptionAction::RefreshSequences(_) => Doc::text("refresh sequences"),
+        ast::AlterSubscriptionAction::RefreshSequences(action) => build_keyword_tokens([
+            (action.refresh_token(), "refresh"),
+            (action.sequences_token(), "sequences"),
+        ]),
         ast::AlterSubscriptionAction::EnableSubscription(_) => Doc::text("enable"),
         ast::AlterSubscriptionAction::DisableSubscription(_) => Doc::text("disable"),
         ast::AlterSubscriptionAction::SkipSubscription(action) => {
@@ -14015,7 +14099,9 @@ fn build_drop_access_method<'a>(ctx: &Ctx, stmt: &ast::DropAccessMethod) -> Doc<
         (stmt.method_token(), "method"),
     ]);
     doc = append_if_exists(doc, stmt.if_exists());
-    doc = append_nested_name(ctx, doc, stmt.access_method_ref());
+    doc = append_node_list(ctx, doc, stmt.access_method_refs(), |name| {
+        build_name(name.syntax())
+    });
     append_drop_behavior(ctx, doc, stmt.drop_behavior())
         .group()
         .append(build_semicolon(stmt.semicolon_token()))
@@ -14144,7 +14230,9 @@ fn build_drop_event_trigger<'a>(ctx: &Ctx, stmt: &ast::DropEventTrigger) -> Doc<
         (stmt.trigger_token(), "trigger"),
     ]);
     doc = append_if_exists(doc, stmt.if_exists());
-    doc = append_nested_name(ctx, doc, stmt.event_trigger_ref());
+    doc = append_node_list(ctx, doc, stmt.event_trigger_refs(), |name| {
+        build_name(name.syntax())
+    });
     append_drop_behavior(ctx, doc, stmt.drop_behavior())
         .group()
         .append(build_semicolon(stmt.semicolon_token()))
@@ -14238,7 +14326,9 @@ fn build_drop_language<'a>(ctx: &Ctx, stmt: &ast::DropLanguage) -> Doc<'a> {
         (stmt.language_token(), "language"),
     ]);
     doc = append_if_exists(doc, stmt.if_exists());
-    doc = append_nested_name(ctx, doc, stmt.language_ref());
+    doc = append_node_list(ctx, doc, stmt.language_refs(), |name| {
+        build_name(name.syntax())
+    });
     append_drop_behavior(ctx, doc, stmt.drop_behavior())
         .group()
         .append(build_semicolon(stmt.semicolon_token()))
@@ -15839,11 +15929,19 @@ fn build_relation_from_item<'a>(ctx: &Ctx, relation: &ast::RelationFromItem) -> 
         Doc::nil()
     };
 
+    if let Some(l_paren) = relation.l_paren_token() {
+        doc = doc
+            .append(leading_comments(&l_paren))
+            .append(Doc::text("("));
+    }
     if let Some(name) = relation.relation_name_ref() {
         doc = doc.append(leading_comments(name.syntax()));
         if let Some(path) = name.path_ref() {
             doc = doc.append(build_path_ref(&path));
         }
+    }
+    if let Some(r_paren) = relation.r_paren_token() {
+        doc = doc.append(comments_before(&r_paren)).append(Doc::text(")"));
     }
     if let Some(star) = relation.star_token() {
         doc = doc.append(space_before(&star)).append(Doc::text("*"));

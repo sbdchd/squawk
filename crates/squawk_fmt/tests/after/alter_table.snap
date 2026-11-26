@@ -213,3 +213,7 @@ alter table itest6
 alter table t alter column a restart with -1;
 
 alter table t alter column a restart -1;
+
+alter table t add c text compression pglz;
+alter table t add column c text storage external compression pglz;
+alter table t add exclude (time with =);

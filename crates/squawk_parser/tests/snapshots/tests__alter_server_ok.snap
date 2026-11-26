@@ -129,4 +129,62 @@ SOURCE_FILE
       LITERAL
         NULL_KW "null"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_SERVER
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    SERVER_REF
+      IDENT "x"
+    WHITESPACE " "
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ADD_FOREIGN_OPTION
+        FOREIGN_OPTION_NAME
+          ADD_KW "add"
+        WHITESPACE " "
+        LITERAL
+          STRING "''"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_SERVER
+    ALTER_KW "alter"
+    WHITESPACE " "
+    SERVER_KW "server"
+    WHITESPACE " "
+    SERVER_REF
+      IDENT "x"
+    WHITESPACE " "
+    ALTER_OPTION_LIST
+      OPTIONS_KW "options"
+      WHITESPACE " "
+      L_PAREN "("
+      ADD_FOREIGN_OPTION
+        FOREIGN_OPTION_NAME
+          ADD_KW "add"
+        WHITESPACE " "
+        LITERAL
+          STRING "'a'"
+      COMMA ","
+      WHITESPACE " "
+      ADD_FOREIGN_OPTION
+        FOREIGN_OPTION_NAME
+          SET_KW "set"
+        WHITESPACE " "
+        LITERAL
+          STRING "'b'"
+      COMMA ","
+      WHITESPACE " "
+      ADD_FOREIGN_OPTION
+        FOREIGN_OPTION_NAME
+          DROP_KW "drop"
+        WHITESPACE " "
+        LITERAL
+          STRING "'c'"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

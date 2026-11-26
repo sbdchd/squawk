@@ -70,3 +70,5 @@ copy country from stdin with binary delimiter as '|' null as '\n' quote '"' esca
 -- parenthesized option arguments
 copy t from stdin with (default ('x'));
 copy t from stdin with (format ('csv', off, on, true, false));
+
+copy x to stdin;
