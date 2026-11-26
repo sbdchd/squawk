@@ -10,7 +10,7 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "t"
@@ -21,7 +21,7 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_REF
           PATH_SEGMENT_REF
@@ -36,19 +36,19 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "a"
     COMMA ","
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "b"
     COMMA ","
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "c"
@@ -64,19 +64,19 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "a"
     COMMA ","
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "b"
     COMMA ","
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "c"
@@ -92,7 +92,7 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "a"
@@ -106,7 +106,7 @@ SOURCE_FILE
     WHITESPACE " "
     TYPE_KW "type"
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "a"
@@ -125,9 +125,38 @@ SOURCE_FILE
       WHITESPACE " "
       EXISTS_KW "exists"
     WHITESPACE " "
-    TYPE_NAME_REF
+    PATH_TYPE
       PATH_REF
         PATH_SEGMENT_REF
           IDENT "foo"
     SEMICOLON ";"
-  WHITESPACE "\n\n\n"
+  WHITESPACE "\n\n\n\n"
+  COMMENT "-- full type names"
+  WHITESPACE "\n"
+  DROP_TYPE
+    DROP_KW "drop"
+    WHITESPACE " "
+    TYPE_KW "type"
+    WHITESPACE " "
+    DOUBLE_TYPE
+      DOUBLE_KW "double"
+      WHITESPACE " "
+      PRECISION_KW "precision"
+    COMMA ","
+    WHITESPACE " "
+    VARCHAR_TYPE
+      CHARACTER_KW "character"
+      WHITESPACE " "
+      VARYING_KW "varying"
+    COMMA ","
+    WHITESPACE " "
+    ARRAY_TYPE
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            INT_KW "int"
+      ARRAY_BOUND
+        L_BRACK "["
+        R_BRACK "]"
+    SEMICOLON ";"
+  WHITESPACE "\n"

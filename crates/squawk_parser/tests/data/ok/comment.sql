@@ -155,3 +155,10 @@ comment on view v is '';
 
 
 comment on large object -1 is 'a';
+
+-- full type names
+comment on type double precision is 'x';
+comment on type character varying is 'x';
+comment on type timestamp with time zone is 'x';
+comment on type varchar(10) is 'x';
+comment on domain double precision is 'x';

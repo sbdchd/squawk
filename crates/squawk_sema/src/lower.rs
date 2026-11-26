@@ -1178,6 +1178,25 @@ struct SelectParts {
     tail_clauses: ast::AstChildren<ast::SelectTailClause>,
 }
 
+fn named_type_path(ty: &ast::Type) -> Option<ast::PathRef> {
+    match ty {
+        ast::Type::PathType(path_type) if path_type.keyword_type_name().is_none() => {
+            path_type.path_ref()
+        }
+        ast::Type::PathType(_)
+        | ast::Type::ArrayType(_)
+        | ast::Type::BitType(_)
+        | ast::Type::BitVaryingType(_)
+        | ast::Type::CharacterType(_)
+        | ast::Type::DoubleType(_)
+        | ast::Type::IntervalType(_)
+        | ast::Type::SetofType(_)
+        | ast::Type::TimeType(_)
+        | ast::Type::TimestampType(_)
+        | ast::Type::VarcharType(_) => None,
+    }
+}
+
 impl Lowerer {
     fn lower_stmt(&mut self, stmt: &ast::Stmt) {
         self.record_search_path(stmt.syntax().text_range().start());
@@ -1582,9 +1601,7 @@ impl Lowerer {
 
     fn lower_drop_type(&mut self, drop_type: &ast::DropType) {
         self.drop_type_refs(
-            drop_type
-                .type_name_refs()
-                .filter_map(|name| name.path_ref()),
+            drop_type.types(),
             IfMissing::from_if_exists(drop_type.if_exists().as_ref()),
             None,
             drop_type.drop_behavior().as_ref(),
@@ -1593,9 +1610,7 @@ impl Lowerer {
 
     fn lower_drop_domain(&mut self, drop_domain: &ast::DropDomain) {
         self.drop_type_refs(
-            drop_domain
-                .domain_refs()
-                .filter_map(|domain| domain.path_ref()),
+            drop_domain.types(),
             IfMissing::from_if_exists(drop_domain.if_exists().as_ref()),
             Some(TypeKind::Domain),
             drop_domain.drop_behavior().as_ref(),
@@ -1604,13 +1619,17 @@ impl Lowerer {
 
     fn drop_type_refs(
         &mut self,
-        paths: impl Iterator<Item = ast::PathRef>,
+        types: impl Iterator<Item = ast::Type>,
         if_missing: IfMissing,
         kind: Option<TypeKind>,
         drop_behavior: Option<&ast::DropBehavior>,
     ) {
         let mut targets: SmallVec<[(ast::PathRef, TypeId); 4]> = SmallVec::new();
-        for path in paths {
+        for ty in types {
+            let Some(path) = named_type_path(&ty) else {
+                self.lower_type_ref(&ty, if_missing);
+                continue;
+            };
             if let Some(ty) = self.lower_type_path_ref(&path, if_missing, kind) {
                 targets.push((path, ty));
             }
@@ -20850,7 +20869,11 @@ impl Lowerer {
                 None
             }
             ast::CommentObject::ObjectDomain(object) => {
-                let path = object.domain_ref()?.path_ref()?;
+                let ty = object.ty()?;
+                let Some(path) = named_type_path(&ty) else {
+                    self.lower_type_ref(&ty, if_missing);
+                    return None;
+                };
                 self.lower_type_path_ref(&path, if_missing, Some(TypeKind::Domain))
                     .map(Object::Type)
             }
@@ -21061,12 +21084,13 @@ impl Lowerer {
                     .map(Object::Trigger)
             }
             ast::CommentObject::ObjectType(object) => {
-                let path = object.type_name_ref()?.path_ref()?;
-                let ty = self.lower_type_path_ref(&path, if_missing, None);
-                if object.array_token().is_some() || object.array_bounds().next().is_some() {
+                let ty = object.ty()?;
+                let Some(path) = named_type_path(&ty) else {
+                    self.lower_type_ref(&ty, if_missing);
                     return None;
-                }
-                ty.map(Object::Type)
+                };
+                self.lower_type_path_ref(&path, if_missing, None)
+                    .map(Object::Type)
             }
             ast::CommentObject::ObjectView(object) => {
                 let path = object.view_ref()?.path_ref()?;

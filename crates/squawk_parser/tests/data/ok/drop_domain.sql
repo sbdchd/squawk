@@ -5,3 +5,6 @@ drop domain s;
 drop domain if exists a, foo.b, c cascade;
 drop domain if exists a, b, c restrict;
 
+
+-- full type names
+drop domain double precision;

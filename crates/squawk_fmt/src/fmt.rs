@@ -6091,9 +6091,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
         ast::SecurityLabelObject::ObjectDomain(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.domain_token(), "domain")]),
-            node.domain_ref()
-                .map(|name| build_extension_path_value(&name))
-                .unwrap_or_else(Doc::nil),
+            build_object_type_value(ctx, node.ty()),
         ),
         ast::SecurityLabelObject::ObjectEventTrigger(node) => append_nested_group(
             ctx,
@@ -6233,7 +6231,7 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
         ast::SecurityLabelObject::ObjectType(node) => append_nested_group(
             ctx,
             build_keyword_tokens([(node.type_token(), "type")]),
-            build_object_type_value(ctx, &node),
+            build_object_type_value(ctx, node.ty()),
         ),
         ast::SecurityLabelObject::ObjectView(node) => append_nested_group(
             ctx,
@@ -13367,20 +13365,9 @@ fn build_extension_member_value<'a>(ctx: &Ctx, prefix: Doc<'a>, value: Option<Do
     }
 }
 
-fn build_object_type_value<'a>(ctx: &Ctx, node: &ast::ObjectType) -> Doc<'a> {
-    let mut doc = node
-        .type_name_ref()
-        .map(|name| build_extension_path_value(&name))
-        .unwrap_or_else(Doc::nil);
-    if let Some(array) = node.array_token() {
-        doc = doc.append(space_before(&array)).append(Doc::text("array"));
-    }
-    for bound in node.array_bounds() {
-        doc = doc
-            .append(comments_before(bound.syntax()))
-            .append(build_array_bound(ctx, &bound));
-    }
-    doc
+fn build_object_type_value<'a>(ctx: &Ctx, ty: Option<ast::Type>) -> Doc<'a> {
+    ty.map(|ty| leading_comments(ty.syntax()).append(build_type(ctx, &ty)))
+        .unwrap_or_else(Doc::nil)
 }
 
 fn build_extension_path_value<'a>(node: &impl ast::HasPathRef) -> Doc<'a> {
@@ -13502,8 +13489,7 @@ fn build_extension_member_object<'a>(ctx: &Ctx, object: ast::ExtensionMemberObje
         ast::ExtensionMemberObject::ObjectDomain(node) => build_extension_member_value(
             ctx,
             build_keyword_tokens([(node.domain_token(), "domain")]),
-            node.domain_ref()
-                .map(|name| build_extension_path_value(&name)),
+            Some(build_object_type_value(ctx, node.ty())),
         ),
         ast::ExtensionMemberObject::ObjectEventTrigger(node) => build_extension_member_value(
             ctx,
@@ -13732,7 +13718,7 @@ fn build_extension_member_object<'a>(ctx: &Ctx, object: ast::ExtensionMemberObje
         ast::ExtensionMemberObject::ObjectType(node) => build_extension_member_value(
             ctx,
             build_keyword_tokens([(node.type_token(), "type")]),
-            Some(build_object_type_value(ctx, &node)),
+            Some(build_object_type_value(ctx, node.ty())),
         ),
         ast::ExtensionMemberObject::ObjectView(node) => build_extension_member_value(
             ctx,
@@ -14145,7 +14131,7 @@ fn build_drop_domain<'a>(ctx: &Ctx, stmt: &ast::DropDomain) -> Doc<'a> {
     let mut doc =
         build_keyword_tokens([(stmt.drop_token(), "drop"), (stmt.domain_token(), "domain")]);
     doc = append_if_exists(doc, stmt.if_exists());
-    doc = append_path_ref_list(ctx, doc, stmt.domain_refs());
+    doc = append_node_list(ctx, doc, stmt.types(), |ty| build_type(ctx, ty));
     append_drop_behavior(ctx, doc, stmt.drop_behavior())
         .group()
         .append(build_semicolon(stmt.semicolon_token()))
@@ -14613,7 +14599,7 @@ fn build_drop_trigger<'a>(ctx: &Ctx, stmt: &ast::DropTrigger) -> Doc<'a> {
 fn build_drop_type<'a>(ctx: &Ctx, stmt: &ast::DropType) -> Doc<'a> {
     let mut doc = build_keyword_tokens([(stmt.drop_token(), "drop"), (stmt.type_token(), "type")]);
     doc = append_if_exists(doc, stmt.if_exists());
-    doc = append_path_ref_list(ctx, doc, stmt.type_name_refs());
+    doc = append_node_list(ctx, doc, stmt.types(), |ty| build_type(ctx, ty));
     append_drop_behavior(ctx, doc, stmt.drop_behavior())
         .group()
         .append(build_semicolon(stmt.semicolon_token()))

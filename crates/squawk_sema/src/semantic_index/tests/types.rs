@@ -472,3 +472,17 @@ select '{a}'::_z;
        ╰╴                        ━
     ");
 }
+
+#[test]
+fn drop_type_full_type_name() {
+    assert_snapshot!(check("
+create domain d as int;
+drop domain d, nosuch;
+drop type if exists double precision, nosuch[];
+"), @"
+    error: type `nosuch` does not exist
+      ╭▸ 
+    3 │ drop domain d, nosuch;
+      ╰╴               ━━━━━━
+    ");
+}

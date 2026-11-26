@@ -9793,13 +9793,8 @@ fn opt_object(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 OBJECT_TYPE
             };
             p.bump_any();
-            if is_domain {
-                domain_ref(p);
-            } else {
-                type_name_ref(p);
-                p.eat(ARRAY_KW);
-                while !p.at(EOF) && opt_array_bound(p) {}
-            }
+            setof_not_allowed(p);
+            type_name(p);
             kind
         }
         TABLE_KW => {
@@ -10865,6 +10860,15 @@ fn domain_ref_list(p: &mut Parser<'_>) {
     domain_ref(p);
     while !p.at(EOF) && p.eat(COMMA) {
         domain_ref(p);
+    }
+}
+
+fn type_name_list(p: &mut Parser<'_>) {
+    setof_not_allowed(p);
+    type_name(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        setof_not_allowed(p);
+        type_name(p);
     }
 }
 
@@ -13960,7 +13964,7 @@ fn drop_domain(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DROP_KW);
     p.bump(DOMAIN_KW);
     opt_if_exists(p);
-    domain_ref_list(p);
+    type_name_list(p);
     opt_cascade_or_restrict(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_DOMAIN)
@@ -17766,7 +17770,7 @@ fn drop_type(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DROP_KW);
     p.bump(TYPE_KW);
     opt_if_exists(p);
-    type_name_ref_list(p);
+    type_name_list(p);
     opt_cascade_or_restrict(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_TYPE)

@@ -10,3 +10,6 @@ drop type a restrict;
 drop type if exists foo;
 
 
+
+-- full type names
+drop type double precision, character varying, int[];

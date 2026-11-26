@@ -99,14 +99,14 @@ error[syntax-error]: expected command, found `)`
     ╭▸ 
 169 │ drop function 314159();
     ╰╴                     ━
-error[syntax-error]: expected path name
+error[syntax-error]: expected type name
     ╭▸ 
 179 │ drop type;
     ╰╴         ━
-error[syntax-error]: expected path name
+error[syntax-error]: expected type name
     ╭▸ 
 182 │ drop type 314159;
-    ╰╴          ━
+    ╰╴         ━
 error[syntax-error]: expected command, found integer literal
     ╭▸ 
 182 │ drop type 314159;
