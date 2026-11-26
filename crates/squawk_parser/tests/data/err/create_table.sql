@@ -88,3 +88,7 @@ create table t partition of p for values in ();
 create table t partition of p for values in (/* c */);
 create table t partition of p for values from () to (1);
 create table t partition of p for values from (1) to ();
+
+-- enforced isn't a type in a typed table
+create table t of ty (x enforced);
+create table t partition of p (x enforced) default;
