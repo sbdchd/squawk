@@ -7,3 +7,5 @@ security label on function public.process_record(bigint, text) is 'trusted';
 /* before security */ SECURITY /* before label */ LABEL /* before for */ FOR /* before provider */ selinux /* before on */ ON /* before foreign */ FOREIGN /* before table */ TABLE /* before name */ public /* before dot */ . /* after dot */ records /* before is */ IS /* before value */ 'trusted' /* before semicolon */;
 
 security label on type int[] is 'a';
+
+security label on large object -1 is 'a';

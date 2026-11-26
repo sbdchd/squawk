@@ -23,3 +23,5 @@ reindex (concurrently true, tablespace an_intentionally_long_tablespace_name, ve
 /* before reindex */ REINDEX /* before left paren */ (/* after left paren */ CONCURRENTLY /* before option value */ TRUE /* before comma */, /* after comma */ TABLESPACE /* before tablespace */ new_tablespace /* before second comma */, /* after second comma */ VERBOSE /* before verbose value */ NO /* before right paren */) /* before target */ TABLE /* before concurrently */ CONCURRENTLY /* before table name */ public /* before dot */ . /* after dot */ records /* before semicolon */;
 
 reindex (tablespace 1) table x;
+
+reindex (tablespace -1) table x;

@@ -2319,4 +2319,38 @@ SOURCE_FILE
         ROLE_NAME_REF
           IDENT "u"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  GRANT
+    GRANT_KW "grant"
+    WHITESPACE " "
+    REVOKE_COMMAND_LIST
+      REVOKE_COMMAND
+        SELECT_KW "select"
+    WHITESPACE " "
+    ON_PRIVILEGE_OBJECTS_CLAUSE
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_LARGE_OBJECT
+        LARGE_KW "large"
+        WHITESPACE " "
+        OBJECT_KW "object"
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "1"
+        COMMA ","
+        WHITESPACE " "
+        PREFIX_EXPR
+          PLUS "+"
+          LITERAL
+            INT_NUMBER "2"
+    WHITESPACE " "
+    TO_KW "to"
+    WHITESPACE " "
+    ROLE_REF_LIST
+      ROLE_REF
+        ROLE_NAME_REF
+          IDENT "x"
+    SEMICOLON ";"
   WHITESPACE "\n"

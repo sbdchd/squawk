@@ -4207,4 +4207,34 @@ SOURCE_FILE
           PATH_SEGMENT_REF
             INT_KW "int"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ALTER_COLUMN
+      ALTER_KW "alter"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      COLUMN_NAME_REF
+        IDENT "a"
+      WHITESPACE " "
+      RESTART
+        RESTART_KW "restart"
+        WHITESPACE " "
+        WITH_KW "with"
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n"

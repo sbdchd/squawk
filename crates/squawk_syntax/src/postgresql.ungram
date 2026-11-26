@@ -3928,7 +3928,7 @@ AlterMaterializedView =
   ) ';'?
 
 AlterLargeObject =
-  'alter' 'large' 'object' Literal 'owner' 'to' RoleRef ';'?
+  'alter' 'large' 'object' Expr 'owner' 'to' RoleRef ';'?
 
 AlterLanguage =
   'alter' 'procedural'? 'language' LanguageRef action:AlterLanguageAction? ';'?
@@ -4316,22 +4316,22 @@ DatabaseOption =
 | DatabaseOptionTemplate
 
 DatabaseOptionConnectionLimit =
-  'connection' 'limit' '='? (Literal | 'default' | ConfigValueName)
+  'connection' 'limit' '='? (Expr | 'default' | ConfigValueName)
 
 DatabaseOptionEncoding =
-  'encoding' '='? (Literal | 'default' | ConfigValueName)
+  'encoding' '='? (Expr | 'default' | ConfigValueName)
 
 DatabaseOptionGeneric =
-  '#ident' '='? (Literal | 'default' | ConfigValueName)
+  '#ident' '='? (Expr | 'default' | ConfigValueName)
 
 DatabaseOptionOwner =
-  'owner' '='? (Literal | 'default' | RoleRef)
+  'owner' '='? (Expr | 'default' | RoleRef)
 
 DatabaseOptionTablespace =
-  'tablespace' '='? (Literal | 'default' | TablespaceRef)
+  'tablespace' '='? (Expr | 'default' | TablespaceRef)
 
 DatabaseOptionTemplate =
-  'template' '='? (Literal | 'default' | DatabaseRef)
+  'template' '='? (Expr | 'default' | DatabaseRef)
 
 SetConfigParam =
   'set' (SetTimeZone | SetNames | (ConfigParameterRef ConfigAssignment))
@@ -4636,7 +4636,7 @@ ObjectConstraint =
   'constraint' ConstraintNameRef 'on' ('domain' DomainRef | TableNameRef)
 
 ObjectLargeObject =
-  'large' 'object' Literal
+  'large' 'object' Expr
 
 ObjectPolicy =
   'policy' PolicyRef 'on' TableNameRef
@@ -5756,7 +5756,7 @@ PrivilegeForeignServer =
   'foreign' 'server' (ServerRef (',' ServerRef)*)
 
 PrivilegeLargeObject =
-  'large' 'object' (Literal (',' Literal)*)
+  'large' 'object' (Expr (',' Expr)*)
 
 PrivilegePropertyGraph =
   'property' 'graph' (PropertyGraphRef (',' PropertyGraphRef)*)
@@ -5908,7 +5908,7 @@ ReindexOptionConcurrently =
   'concurrently' (Literal | '#ident' | 'no' | 'yes')?
 
 ReindexOptionTablespace =
-  'tablespace' (TablespaceRef | Literal)
+  'tablespace' (TablespaceRef | Expr)
 
 ReindexOptionVerbose =
   'verbose' (Literal | '#ident' | 'no' | 'yes')?
@@ -6522,10 +6522,10 @@ ParallelFuncOption =
   'parallel' '#ident'
 
 CostFuncOption =
-  'cost' Literal
+  'cost' Expr
 
 RowsFuncOption =
-  'rows' Literal
+  'rows' Expr
 
 SupportFuncOption =
   'support' FunctionNameRef

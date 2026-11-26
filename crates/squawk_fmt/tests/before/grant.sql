@@ -22,3 +22,5 @@ grant execute on procedure /* before procedure */ p(integer) to app_user;
 grant execute on routine /* before routine */ r(integer) to app_user;
 
 /* before grant */ GRANT /* before select */ SELECT /* before columns */ (/* before column */ payload /* before close */) /* before on */ ON /* before table */ TABLE /* before object */ public /* before dot */ . /* after dot */ records /* before to */ TO /* before role */ app_user /* before with */ WITH /* before grant option */ GRANT /* before option */ OPTION /* before granted */ GRANTED /* before by */ BY /* before grantor */ current_user /* before semicolon */;
+
+grant select on large object -1, +2 to x;

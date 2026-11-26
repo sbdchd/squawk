@@ -1292,7 +1292,7 @@ pub struct AlterLargeObject {
 }
 impl AlterLargeObject {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -5036,7 +5036,7 @@ pub struct CostFuncOption {
 }
 impl CostFuncOption {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7104,7 +7104,7 @@ impl DatabaseOptionConnectionLimit {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7135,7 +7135,7 @@ impl DatabaseOptionEncoding {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7162,7 +7162,7 @@ impl DatabaseOptionGeneric {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7200,7 +7200,7 @@ pub struct DatabaseOptionOwner {
 }
 impl DatabaseOptionOwner {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7227,7 +7227,7 @@ pub struct DatabaseOptionTablespace {
 }
 impl DatabaseOptionTablespace {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7258,7 +7258,7 @@ impl DatabaseOptionTemplate {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -16614,7 +16614,7 @@ pub struct ObjectLargeObject {
 }
 impl ObjectLargeObject {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -22059,7 +22059,7 @@ pub struct PrivilegeLargeObject {
 }
 impl PrivilegeLargeObject {
     #[inline]
-    pub fn literals(&self) -> AstChildren<Literal> {
+    pub fn exprs(&self) -> AstChildren<Expr> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -23094,7 +23094,7 @@ pub struct ReindexOptionTablespace {
 }
 impl ReindexOptionTablespace {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -24775,7 +24775,7 @@ pub struct RowsFuncOption {
 }
 impl RowsFuncOption {
     #[inline]
-    pub fn literal(&self) -> Option<Literal> {
+    pub fn expr(&self) -> Option<Expr> {
         support::child(&self.syntax)
     }
     #[inline]

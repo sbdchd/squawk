@@ -56,3 +56,5 @@ alter function f parallel safe;
 alter function f depends on extension e;
 alter function f no depends on extension e;
 
+
+alter function f rows -1;

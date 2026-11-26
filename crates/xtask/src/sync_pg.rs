@@ -176,6 +176,7 @@ const IGNORED_LINES: &[&str] = &[
     "CREATE VIEW foo AS SELECT 1 INTO int4_tbl;",
     "INSERT INTO int4_tbl SELECT 1 INTO f;",
     "REPACK (CONCURRENTLY) :toast_rel;",
+    "ANALYZE (nonexistent-arg) does_not_exist;",
     r#"SELECT E'wrong: \u061';"#,
     r#"SELECT E'wrong: \U0061';"#,
     r#"SELECT U&'wrong: \061';"#,

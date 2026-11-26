@@ -153,3 +153,5 @@ comment on type t is '';
 -- view
 comment on view v is '';
 
+
+comment on large object -1 is 'a';

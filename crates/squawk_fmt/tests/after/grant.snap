@@ -83,3 +83,5 @@ grant execute on routine /* before routine */ r(integer) to app_user;
   /* before role */ app_user
   /* before with */ with /* before grant option */ grant /* before option */ option
   /* before granted */ granted /* before by */ by /* before grantor */ current_user /* before semicolon */;
+
+grant select on large object -1, +2 to x;

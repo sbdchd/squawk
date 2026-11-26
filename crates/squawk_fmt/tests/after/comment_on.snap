@@ -33,3 +33,5 @@ comment /* on keyword */ on /* object kind */ materialized /* view keyword */ vi
   /* is keyword */ is /* comment value */ 'A deliberately long description of the materialized view used to verify wrapping behavior.' /* semicolon */;
 
 comment on type int[] is 'a';
+
+comment on large object -1 is 'a';

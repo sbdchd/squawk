@@ -976,15 +976,6 @@ impl ast::AlterSetStatistics {
     }
 }
 
-impl ast::Restart {
-    pub fn literal(&self) -> Option<ast::Literal> {
-        match self.expr()? {
-            ast::Expr::Literal(literal) => Some(literal),
-            _ => None,
-        }
-    }
-}
-
 impl ast::ExprFromItem {
     pub fn expr(&self) -> Option<ast::Expr> {
         self.call_expr()

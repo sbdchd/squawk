@@ -13,3 +13,7 @@ ALTER FUNCTION public.f(integer) OWNER /* to */ TO /* role */ current_role;
 ALTER FUNCTION public.f(integer) SET /* schema */ SCHEMA /* name */ archive;
 
 alter function f() reset time zone;
+
+alter function f rows -1;
+
+alter function f cost -1;

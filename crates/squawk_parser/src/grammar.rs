@@ -4678,20 +4678,6 @@ fn join_using_clause(p: &mut Parser<'_>) {
 
 #[must_use]
 fn opt_numeric_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
-    if p.at_ts(NUMERIC_FIRST) {
-        let m = p.start();
-        p.bump_any();
-        Some(m.complete(p, LITERAL))
-    } else if p.at(MINUS) || p.at(PLUS) {
-        // TODO: add validation to check this is a prefix expression with a numeric literal inside
-        expr(p).map(|(cm, _)| cm)
-    } else {
-        None
-    }
-}
-
-#[must_use]
-fn opt_signed_numeric_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     if (p.at(MINUS) || p.at(PLUS)) && p.nth_at_ts(1, NUMERIC_FIRST) {
         let m = p.start();
         p.bump_any();
@@ -4705,7 +4691,7 @@ fn opt_signed_numeric_literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
 }
 
 fn numeric_literal(p: &mut Parser<'_>) {
-    if opt_signed_numeric_literal(p).is_none() {
+    if opt_numeric_literal(p).is_none() {
         let m = p.start();
         p.error("expected numeric literal");
         expr(p);
@@ -4759,7 +4745,7 @@ const SEQUENCE_OPTION_FIRST: TokenSet = TokenSet::new(&[
 ]);
 
 fn opt_restart_value(p: &mut Parser<'_>) {
-    if opt_signed_numeric_literal(p).is_none()
+    if opt_numeric_literal(p).is_none()
         && p.at_ts(EXPR_FIRST)
         && !p.at_ts(SEQUENCE_OPTION_FIRST)
         && !p.at(SET_KW)

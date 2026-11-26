@@ -256,3 +256,5 @@ grant usage on sequence, domain to u;
 grant usage on type t to u;
 grant execute on function f() to u;
 grant usage on schema s to u;
+
+grant select on large object -1, +2 to x;

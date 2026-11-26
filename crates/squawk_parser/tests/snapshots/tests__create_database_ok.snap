@@ -161,4 +161,45 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "1010"
     SEMICOLON ";"
+  WHITESPACE "\n\n\n"
+  CREATE_DATABASE
+    CREATE_KW "create"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    DATABASE
+      IDENT "x"
+    WHITESPACE " "
+    DATABASE_OPTION_LIST
+      DATABASE_OPTION_CONNECTION_LIMIT
+        CONNECTION_KW "connection"
+        WHITESPACE " "
+        LIMIT_KW "limit"
+        WHITESPACE " "
+        PREFIX_EXPR
+          MINUS "-"
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
   WHITESPACE "\n\n"
+  CREATE_DATABASE
+    CREATE_KW "create"
+    WHITESPACE " "
+    DATABASE_KW "database"
+    WHITESPACE " "
+    DATABASE
+      IDENT "x"
+    WHITESPACE " "
+    DATABASE_OPTION_LIST
+      DATABASE_OPTION_GENERIC
+        IDENT "x"
+        WHITESPACE " "
+        EQ "="
+        WHITESPACE " "
+        PREFIX_EXPR
+          PLUS "+"
+          WHITESPACE " "
+          LITERAL
+            INT_NUMBER "1"
+    SEMICOLON ";"
+  WHITESPACE "\n"

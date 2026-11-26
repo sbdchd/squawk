@@ -29,3 +29,5 @@ alter database x set names;
 alter database x set names 'utf8';
 
 alter database x set time zone 'utc';
+
+alter database x with connection limit -1;

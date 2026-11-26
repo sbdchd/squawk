@@ -21,3 +21,5 @@ security label on function public.process_record(bigint, text) is 'trusted';
   /* before is */ is /* before value */ 'trusted' /* before semicolon */;
 
 security label on type int[] is 'a';
+
+security label on large object -1 is 'a';
