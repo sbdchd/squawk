@@ -56,3 +56,26 @@ SOURCE_FILE
       RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  DROP_EVENT_TRIGGER
+    DROP_KW "drop"
+    WHITESPACE " "
+    EVENT_KW "event"
+    WHITESPACE " "
+    TRIGGER_KW "trigger"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    EVENT_TRIGGER_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    EVENT_TRIGGER_REF
+      IDENT "b"
+    WHITESPACE " "
+    RESTRICT
+      RESTRICT_KW "restrict"
+    SEMICOLON ";"
+  WHITESPACE "\n"

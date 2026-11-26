@@ -574,3 +574,9 @@ select array((select 1) union select 2);
 -- operator keywords as bare labels
 select a between, b escape, c in, d like, e ilike, f uescape from t;
 select 1 between;
+
+select * from x a join t natural join x b using (b);
+select * from t a join t b cross join t c using (x);
+select 'a' like all ((select 'a') for read only);
+select * from only (t) tablesample bernoulli (50);
+select (values);

@@ -55,3 +55,6 @@ alter database x set names 'utf8';
 alter database x set time zone 'utc';
 
 alter database x with connection limit -1;
+
+alter database x set tablespace.x.y = 1;
+alter database x set catalog 'c';

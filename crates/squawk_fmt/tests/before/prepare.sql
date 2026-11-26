@@ -17,3 +17,5 @@ prepare p1 as (select 1);
 prepare p1 as ((select 1));
 prepare p1 as (table t);
 prepare p1 as (values (1));
+
+prepare transaction as select 1;

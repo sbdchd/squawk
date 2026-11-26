@@ -3553,7 +3553,7 @@ FromListItem =
 | JoinExpr
 
 RelationFromItem =
-  'only'? 'lateral'? RelationNameRef '*'? alias:FromAlias? TablesampleClause?
+  'only'? 'lateral'? '('? RelationNameRef ')'? '*'? alias:FromAlias? TablesampleClause?
 
 FunctionFromItem =
   'only'? 'lateral'? CallExpr WithOrdinality? alias:FromAlias?
@@ -3825,7 +3825,7 @@ AlterProcedureAction =
 | SetSchema
 
 AlterPolicy =
-  'alter' 'policy' PolicyRef OnTable action:AlterPolicyAction ';'?
+  'alter' 'policy' IfExists? PolicyRef OnTable action:AlterPolicyAction ';'?
 
 AlterPolicyAction =
   AlterPolicyTo
@@ -4092,6 +4092,7 @@ ExtensionMemberObject =
 | ObjectOperatorClass
 | ObjectOperatorFamily
 | ObjectProcedure
+| ObjectPropertyGraph
 | ObjectPublication
 | ObjectRole
 | ObjectRoutine
@@ -4220,9 +4221,12 @@ ObjectTransform =
 
 AlterDefaultPrivileges =
   'alter' 'default' 'privileges'
-  ForRoles?
-  InSchemas?
+  options:DefaultPrivilegesOption*
   action:AlterDefaultPrivilegesAction? ';'?
+
+DefaultPrivilegesOption =
+  ForRoles
+| InSchemas
 
 ForRoles =
   'for' ('role' | 'user') RoleRefList
@@ -4334,7 +4338,13 @@ DatabaseOptionTemplate =
   'template' '='? (Expr | 'default' | DatabaseRef)
 
 SetConfigParam =
-  'set' (SetTimeZone | SetNames | SetSchemaValue | (ConfigParameterRef ConfigAssignment))
+  'set' (SetTimeZone | SetNames | SetSchemaValue | SetXmlOption | SetCatalog | SetSessionAuthValue | SetRoleValue | (ConfigParameterRef ConfigAssignment))
+
+SetSessionAuthValue =
+  'session' 'authorization' SetSessionAuthTarget
+
+SetRoleValue =
+  'role' (RoleRef | Literal)
 
 ResetConfigParam =
   'reset' ResetTarget
@@ -5336,7 +5346,7 @@ CreateUser =
   RoleOptionList? ';'?
 
 DropLanguage =
-  'drop' 'procedural'? 'language' IfExists? LanguageRef
+  'drop' 'procedural'? 'language' IfExists? (LanguageRef (',' LanguageRef)*)
   DropBehavior? ';'?
 
 DropGroup =
@@ -5382,7 +5392,7 @@ DropForeignTable =
   DropBehavior? ';'?
 
 DropAccessMethod =
-  'drop' 'access' 'method' IfExists? AccessMethodRef
+  'drop' 'access' 'method' IfExists? (AccessMethodRef (',' AccessMethodRef)*)
   DropBehavior? ';'?
 
 Aggregate =
@@ -5415,7 +5425,7 @@ DropDomain =
   DropBehavior? ';'?
 
 DropEventTrigger =
-  'drop' 'event' 'trigger' IfExists? EventTriggerRef
+  'drop' 'event' 'trigger' IfExists? (EventTriggerRef (',' EventTriggerRef)*)
   DropBehavior? ';'?
 
 DropExtension =
@@ -6668,7 +6678,7 @@ DropColumn =
  DropBehavior?
 
 AddColumn =
-  'add' 'column'? IfNotExists? ColumnName Type AlterOptionList? Collate? constraints:Constraint*
+  'add' 'column'? IfNotExists? ColumnName Type Storage? CompressionMethod? AlterOptionList? Collate? constraints:Constraint*
 
 PartitionForValuesWith =
   'for' 'values' 'with' '(' bounds:(HashPartitionBound (',' HashPartitionBound)*) ')'
@@ -7075,7 +7085,8 @@ CopySource =
 | CopyProgram
 
 CopyTarget =
-  CopyStdout
+  CopyStdin
+| CopyStdout
 | CopyProgram
 
 AlterViewColumnAction =

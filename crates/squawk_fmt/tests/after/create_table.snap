@@ -204,3 +204,5 @@ create table default_subquery (
     from an_extraordinarily_long_table_name_that_forces_the_subquery_to_wrap
   )
 );
+
+create table t (a int) with (fillfactor = operator);

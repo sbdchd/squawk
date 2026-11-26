@@ -199,3 +199,5 @@ alter default privileges
   from r
   restrict;
 
+
+alter default privileges in schema s for user x grant all on tables to x;

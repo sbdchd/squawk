@@ -227,3 +227,5 @@ merge into t
   on t.id = u.id
   when matched then
     do nothing;
+
+merge into x using only (t) tablesample bernoulli (50) on true when matched then delete;

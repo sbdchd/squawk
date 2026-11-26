@@ -1310,4 +1310,48 @@ SOURCE_FILE
       RESTRICT
         RESTRICT_KW "restrict"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  ALTER_DEFAULT_PRIVILEGES
+    ALTER_KW "alter"
+    WHITESPACE " "
+    DEFAULT_KW "default"
+    WHITESPACE " "
+    PRIVILEGES_KW "privileges"
+    WHITESPACE " "
+    IN_SCHEMAS
+      IN_KW "in"
+      WHITESPACE " "
+      SCHEMA_KW "schema"
+      WHITESPACE " "
+      SCHEMA_REF
+        IDENT "s"
+    WHITESPACE " "
+    FOR_ROLES
+      FOR_KW "for"
+      WHITESPACE " "
+      USER_KW "user"
+      WHITESPACE " "
+      ROLE_REF_LIST
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "x"
+    WHITESPACE " "
+    GRANT_DEFAULT_PRIVILEGES
+      GRANT_KW "grant"
+      WHITESPACE " "
+      ALL_PRIVILEGES
+        ALL_KW "all"
+      WHITESPACE " "
+      ON_KW "on"
+      WHITESPACE " "
+      PRIVILEGE_TARGET_TABLES
+        TABLES_KW "tables"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      ROLE_REF_LIST
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "x"
+    SEMICOLON ";"
+  WHITESPACE "\n"

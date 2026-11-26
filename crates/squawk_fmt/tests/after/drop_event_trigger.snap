@@ -12,3 +12,5 @@ drop event trigger if exists
 drop /* event */ event /* trigger */ trigger /* if */ if /* exists */ exists
   /* name */ ddl_audit
   /* behavior */ restrict /* end */;
+
+drop event trigger if exists a, b restrict;

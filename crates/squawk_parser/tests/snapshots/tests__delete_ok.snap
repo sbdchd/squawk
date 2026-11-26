@@ -1230,4 +1230,30 @@ SOURCE_FILE
         LITERAL
           INT_NUMBER "1"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  DELETE
+    DELETE_KW "delete"
+    WHITESPACE " "
+    FROM_KW "from"
+    WHITESPACE " "
+    RELATION_NAME
+      RELATION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    WHERE_CLAUSE
+      WHERE_KW "where"
+      WHITESPACE " "
+      COLLATE
+        NAME_REF
+          CURRENT_KW "current"
+        WHITESPACE " "
+        COLLATE_KW "collate"
+        WHITESPACE " "
+        COLLATION_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "\"C\""
+    SEMICOLON ";"
   WHITESPACE "\n"

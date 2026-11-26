@@ -26,4 +26,17 @@ SOURCE_FILE
     LITERAL
       STRING "'select 1'"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  DO
+    DO_KW "do"
+    WHITESPACE " "
+    DO_LANGUAGE
+      LANGUAGE_KW "language"
+      WHITESPACE " "
+      LITERAL
+        STRING "'plpgsql'"
+    WHITESPACE " "
+    LITERAL
+      STRING "'begin end'"
+    SEMICOLON ";"
+  WHITESPACE "\n"

@@ -347,17 +347,15 @@ SOURCE_FILE@0..389
       PAREN_FROM_ITEM@375..387
         PAREN_EXPR@375..387
           L_PAREN@375..376 "("
-          PAREN_FROM_ITEM@376..386
+          RELATION_FROM_ITEM@376..386
             ONLY_KW@376..380 "only"
             WHITESPACE@380..381 " "
-            PAREN_EXPR@381..386
-              L_PAREN@381..382 "("
-              RELATION_FROM_ITEM@382..385
-                RELATION_NAME_REF@382..385
-                  PATH_REF@382..385
-                    PATH_SEGMENT_REF@382..385
-                      IDENT@382..385 "foo"
-              R_PAREN@385..386 ")"
+            L_PAREN@381..382 "("
+            RELATION_NAME_REF@382..385
+              PATH_REF@382..385
+                PATH_SEGMENT_REF@382..385
+                  IDENT@382..385 "foo"
+            R_PAREN@385..386 ")"
           R_PAREN@386..387 ")"
     SEMICOLON@387..388 ";"
   WHITESPACE@388..389 "\n"

@@ -14,3 +14,5 @@ copy (/* after query left paren */ select /* after select */ id from records /* 
 
 copy ((select 1)) to stdout;
 copy ((table t)) to stdout;
+
+copy x to stdin;

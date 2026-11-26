@@ -216,12 +216,19 @@ fn validate_name_ref(name_ref: &ast::NameRef, acc: &mut Vec<SyntaxError>) {
         CALL_EXPR => return,
         // okay when it's namespaced `t.left`
         FIELD_EXPR if parent.first_child().as_ref() != Some(name_ref.syntax()) => return,
+        ARG if is_trigger_arg(&parent) => return,
         _ => (),
     }
     acc.push(SyntaxError::new(
         format!("`{}` is a reserved keyword", token.text()),
         token.text_range(),
     ));
+}
+
+fn is_trigger_arg(arg: &SyntaxNode) -> bool {
+    arg.ancestors()
+        .nth(3)
+        .is_some_and(|node| node.kind() == CREATE_TRIGGER)
 }
 
 // err: `create table left ()`

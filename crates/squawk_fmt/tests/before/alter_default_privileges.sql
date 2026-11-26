@@ -23,3 +23,6 @@ alter default privileges grant usage on types to public;
 alter default privileges grant select on large objects to public;
 
 alter /* default keyword */ default /* privileges keyword */ privileges /* for clause */ for /* role keyword */ role /* first role */ exceedingly_long_application_owner, /* second role */ exceedingly_long_migration_owner /* schemas clause */ in /* schema keyword */ schema /* first schema */ exceedingly_long_application_schema, /* second schema */ exceedingly_long_audit_schema /* action */ grant /* privilege */ select, /* another privilege */ update /* on keyword */ on /* target */ tables /* to keyword */ to /* grantee */ exceedingly_long_reporting_role /* with clause */ with /* grant keyword */ grant /* option keyword */ option /* semicolon */;
+
+alter default privileges in schema s for user x grant all on tables to x;
+alter default privileges for role a in schema s for role b grant select on tables to x;

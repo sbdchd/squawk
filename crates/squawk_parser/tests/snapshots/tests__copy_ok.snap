@@ -817,4 +817,20 @@ SOURCE_FILE
             R_PAREN ")"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COPY
+    COPY_KW "copy"
+    WHITESPACE " "
+    COPY_TABLE
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "x"
+    WHITESPACE " "
+    COPY_TO
+      TO_KW "to"
+      WHITESPACE " "
+      COPY_STDIN
+        STDIN_KW "stdin"
+    SEMICOLON ";"
   WHITESPACE "\n"

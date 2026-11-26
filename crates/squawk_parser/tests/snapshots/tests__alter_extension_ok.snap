@@ -2732,4 +2732,26 @@ SOURCE_FILE
         TABLESPACE_REF
           IDENT "o"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  ALTER_EXTENSION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    EXTENSION_KW "extension"
+    WHITESPACE " "
+    EXTENSION_REF
+      IDENT "e"
+    WHITESPACE " "
+    ALTER_EXTENSION_ADD
+      ADD_KW "add"
+      WHITESPACE " "
+      OBJECT_PROPERTY_GRAPH
+        PROPERTY_KW "property"
+        WHITESPACE " "
+        GRAPH_KW "graph"
+        WHITESPACE " "
+        PROPERTY_GRAPH_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "g"
+    SEMICOLON ";"
+  WHITESPACE "\n"

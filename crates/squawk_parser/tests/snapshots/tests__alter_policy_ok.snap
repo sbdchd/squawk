@@ -228,4 +228,34 @@ SOURCE_FILE
             IDENT "d"
         R_PAREN ")"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  ALTER_POLICY
+    ALTER_KW "alter"
+    WHITESPACE " "
+    POLICY_KW "policy"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    POLICY_REF
+      IDENT "p"
+    WHITESPACE " "
+    ON_TABLE
+      ON_KW "on"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    POLICY_RENAME_TO
+      RENAME_KW "rename"
+      WHITESPACE " "
+      TO_KW "to"
+      WHITESPACE " "
+      POLICY
+        IDENT "q"
+    SEMICOLON ";"
+  WHITESPACE "\n"

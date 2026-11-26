@@ -4237,4 +4237,101 @@ SOURCE_FILE
           LITERAL
             INT_NUMBER "1"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_COLUMN
+      ADD_KW "add"
+      WHITESPACE " "
+      COLUMN_NAME
+        IDENT "c"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            TEXT_KW "text"
+      WHITESPACE " "
+      COMPRESSION_METHOD
+        COMPRESSION_KW "compression"
+        WHITESPACE " "
+        COMPRESSION_METHOD_NAME
+          IDENT "pglz"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_COLUMN
+      ADD_KW "add"
+      WHITESPACE " "
+      COLUMN_KW "column"
+      WHITESPACE " "
+      COLUMN_NAME
+        IDENT "c"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            TEXT_KW "text"
+      WHITESPACE " "
+      STORAGE
+        STORAGE_KW "storage"
+        WHITESPACE " "
+        STORAGE_MODE
+          EXTERNAL_KW "external"
+      WHITESPACE " "
+      COMPRESSION_METHOD
+        COMPRESSION_KW "compression"
+        WHITESPACE " "
+        COMPRESSION_METHOD_NAME
+          IDENT "pglz"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_TABLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_RELATION_NAME
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "t"
+    WHITESPACE " "
+    ADD_CONSTRAINT
+      ADD_KW "add"
+      WHITESPACE " "
+      EXCLUDE_CONSTRAINT
+        EXCLUDE_KW "exclude"
+        WHITESPACE " "
+        CONSTRAINT_EXCLUSION_LIST
+          L_PAREN "("
+          CONSTRAINT_EXCLUSION
+            PARTITION_ITEM
+              NAME_REF
+                TIME_KW "time"
+            WHITESPACE " "
+            WITH_KW "with"
+            WHITESPACE " "
+            OP
+              EQ "="
+          R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

@@ -1720,21 +1720,19 @@ SOURCE_FILE
     FROM_CLAUSE
       FROM_KW "from"
       WHITESPACE " "
-      PAREN_FROM_ITEM
+      RELATION_FROM_ITEM
         ONLY_KW "only"
         WHITESPACE " "
-        PAREN_EXPR
-          L_PAREN "("
-          RELATION_FROM_ITEM
-            RELATION_NAME_REF
-              PATH_REF
-                PATH_REF
-                  PATH_SEGMENT_REF
-                    IDENT "foo"
-                DOT "."
-                PATH_SEGMENT_REF
-                  IDENT "bar"
-          R_PAREN ")"
+        L_PAREN "("
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "foo"
+            DOT "."
+            PATH_SEGMENT_REF
+              IDENT "bar"
+        R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"
   COMMENT "-- from qualified table name"
@@ -7653,5 +7651,215 @@ SOURCE_FILE
           AS_NAME
             COLUMN_NAME
               BETWEEN_KW "between"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        RELATION_FROM_ITEM
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "x"
+          WHITESPACE " "
+          FROM_ALIAS
+            TABLE_ALIAS
+              IDENT "a"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          JOIN_EXPR
+            RELATION_FROM_ITEM
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "t"
+            WHITESPACE " "
+            JOIN
+              NATURAL_KW "natural"
+              WHITESPACE " "
+              JOIN_INNER
+                JOIN_KW "join"
+              WHITESPACE " "
+              RELATION_FROM_ITEM
+                RELATION_NAME_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "x"
+                WHITESPACE " "
+                FROM_ALIAS
+                  TABLE_ALIAS
+                    IDENT "b"
+          WHITESPACE " "
+          JOIN_USING_CLAUSE
+            USING_KW "using"
+            WHITESPACE " "
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "b"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      JOIN_EXPR
+        RELATION_FROM_ITEM
+          RELATION_NAME_REF
+            PATH_REF
+              PATH_SEGMENT_REF
+                IDENT "t"
+          WHITESPACE " "
+          FROM_ALIAS
+            TABLE_ALIAS
+              IDENT "a"
+        WHITESPACE " "
+        JOIN
+          JOIN_INNER
+            JOIN_KW "join"
+          WHITESPACE " "
+          JOIN_EXPR
+            RELATION_FROM_ITEM
+              RELATION_NAME_REF
+                PATH_REF
+                  PATH_SEGMENT_REF
+                    IDENT "t"
+              WHITESPACE " "
+              FROM_ALIAS
+                TABLE_ALIAS
+                  IDENT "b"
+            WHITESPACE " "
+            JOIN
+              JOIN_CROSS
+                CROSS_KW "cross"
+                WHITESPACE " "
+                JOIN_KW "join"
+              WHITESPACE " "
+              RELATION_FROM_ITEM
+                RELATION_NAME_REF
+                  PATH_REF
+                    PATH_SEGMENT_REF
+                      IDENT "t"
+                WHITESPACE " "
+                FROM_ALIAS
+                  TABLE_ALIAS
+                    IDENT "c"
+          WHITESPACE " "
+          JOIN_USING_CLAUSE
+            USING_KW "using"
+            WHITESPACE " "
+            COLUMN_REF_LIST
+              L_PAREN "("
+              COLUMN_NAME_REF
+                IDENT "x"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          BIN_EXPR
+            LITERAL
+              STRING "'a'"
+            WHITESPACE " "
+            LIKE_KW "like"
+            WHITESPACE " "
+            CALL_EXPR
+              ALL_FN
+                ALL_KW "all"
+                WHITESPACE " "
+                L_PAREN "("
+                PAREN_SELECT
+                  L_PAREN "("
+                  SELECT
+                    SELECT_CLAUSE
+                      SELECT_KW "select"
+                      WHITESPACE " "
+                      TARGET_LIST
+                        TARGET
+                          LITERAL
+                            STRING "'a'"
+                  R_PAREN ")"
+                  WHITESPACE " "
+                  LOCKING_CLAUSE
+                    FOR_KW "for"
+                    WHITESPACE " "
+                    READ_ONLY
+                      READ_KW "read"
+                      WHITESPACE " "
+                      ONLY_KW "only"
+                R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          STAR "*"
+    WHITESPACE " "
+    FROM_CLAUSE
+      FROM_KW "from"
+      WHITESPACE " "
+      RELATION_FROM_ITEM
+        ONLY_KW "only"
+        WHITESPACE " "
+        L_PAREN "("
+        RELATION_NAME_REF
+          PATH_REF
+            PATH_SEGMENT_REF
+              IDENT "t"
+        R_PAREN ")"
+        WHITESPACE " "
+        TABLESAMPLE_CLAUSE
+          TABLESAMPLE_KW "tablesample"
+          WHITESPACE " "
+          CALL_EXPR
+            NAME_REF
+              IDENT "bernoulli"
+            WHITESPACE " "
+            ARG_LIST
+              L_PAREN "("
+              ARG
+                LITERAL
+                  INT_NUMBER "50"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          PAREN_EXPR
+            L_PAREN "("
+            NAME_REF
+              VALUES_KW "values"
+            R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"

@@ -4762,4 +4762,45 @@ SOURCE_FILE
               ENFORCED_KW "enforced"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "a"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+      R_PAREN ")"
+    WHITESPACE " "
+    WITH_PARAMS
+      WITH_KW "with"
+      WHITESPACE " "
+      ATTRIBUTE_LIST
+        L_PAREN "("
+        ATTRIBUTE_OPTION
+          ATTRIBUTE_NAME
+            IDENT "fillfactor"
+          WHITESPACE " "
+          EQ "="
+          WHITESPACE " "
+          ATTRIBUTE_VALUE
+            PATH_TYPE
+              PATH_REF
+                PATH_SEGMENT_REF
+                  OPERATOR_KW "operator"
+        R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

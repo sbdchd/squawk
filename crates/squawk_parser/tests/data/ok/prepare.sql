@@ -33,3 +33,5 @@ prepare foo as
 prepare foo as
   values (1, 'one'), (2, 'two');
 
+
+prepare transaction as select 1;

@@ -5334,14 +5334,13 @@ impl Lowerer {
     }
 
     fn lower_drop_access_method(&mut self, drop_access_method: &ast::DropAccessMethod) {
-        let Some(access_method_ref) = drop_access_method.access_method_ref() else {
-            return;
-        };
         let if_missing = IfMissing::from_if_exists(drop_access_method.if_exists().as_ref());
-        if let Some(access_method) =
-            self.lower_access_method_ref(&access_method_ref, None, if_missing)
-        {
-            self.drop_access_method(access_method);
+        for access_method_ref in drop_access_method.access_method_refs() {
+            if let Some(access_method) =
+                self.lower_access_method_ref(&access_method_ref, None, if_missing)
+            {
+                self.drop_access_method(access_method);
+            }
         }
     }
 
@@ -8569,12 +8568,11 @@ impl Lowerer {
     }
 
     fn lower_drop_language(&mut self, drop_language: &ast::DropLanguage) {
-        let Some(language_ref) = drop_language.language_ref() else {
-            return;
-        };
         let if_missing = IfMissing::from_if_exists(drop_language.if_exists().as_ref());
-        if let Some(language) = self.lower_language_ref(&language_ref, if_missing) {
-            self.drop_language(language);
+        for language_ref in drop_language.language_refs() {
+            if let Some(language) = self.lower_language_ref(&language_ref, if_missing) {
+                self.drop_language(language);
+            }
         }
     }
 
@@ -8761,12 +8759,13 @@ impl Lowerer {
     }
 
     fn lower_drop_event_trigger(&mut self, drop_event_trigger: &ast::DropEventTrigger) {
-        let Some(event_trigger_ref) = drop_event_trigger.event_trigger_ref() else {
-            return;
-        };
         let if_missing = IfMissing::from_if_exists(drop_event_trigger.if_exists().as_ref());
-        if let Some(event_trigger) = self.lower_event_trigger_ref(&event_trigger_ref, if_missing) {
-            self.drop_event_trigger(event_trigger);
+        for event_trigger_ref in drop_event_trigger.event_trigger_refs() {
+            if let Some(event_trigger) =
+                self.lower_event_trigger_ref(&event_trigger_ref, if_missing)
+            {
+                self.drop_event_trigger(event_trigger);
+            }
         }
     }
 
@@ -9566,6 +9565,9 @@ impl Lowerer {
             }
             ast::ExtensionMemberObject::ObjectProcedure(object) => {
                 ast::CommentObject::ObjectProcedure(object)
+            }
+            ast::ExtensionMemberObject::ObjectPropertyGraph(object) => {
+                ast::CommentObject::ObjectPropertyGraph(object)
             }
             ast::ExtensionMemberObject::ObjectPublication(object) => {
                 ast::CommentObject::ObjectPublication(object)
@@ -20539,20 +20541,23 @@ impl Lowerer {
         &mut self,
         alter_default_privileges: &ast::AlterDefaultPrivileges,
     ) {
-        for role_ref in alter_default_privileges
-            .for_roles()
-            .and_then(|for_roles| for_roles.role_ref_list())
-            .iter()
-            .flat_map(|list| list.role_refs())
-        {
-            self.lower_role_ref(&role_ref, IfMissing::Error);
-        }
-        for schema_ref in alter_default_privileges
-            .in_schemas()
-            .iter()
-            .flat_map(|in_schemas| in_schemas.schema_refs())
-        {
-            self.lower_schema_ref_id(&schema_ref, IfMissing::Error);
+        for option in alter_default_privileges.options() {
+            match option {
+                ast::DefaultPrivilegesOption::ForRoles(for_roles) => {
+                    for role_ref in for_roles
+                        .role_ref_list()
+                        .iter()
+                        .flat_map(|list| list.role_refs())
+                    {
+                        self.lower_role_ref(&role_ref, IfMissing::Error);
+                    }
+                }
+                ast::DefaultPrivilegesOption::InSchemas(in_schemas) => {
+                    for schema_ref in in_schemas.schema_refs() {
+                        self.lower_schema_ref_id(&schema_ref, IfMissing::Error);
+                    }
+                }
+            }
         }
         let grantees = match alter_default_privileges.action() {
             Some(ast::AlterDefaultPrivilegesAction::GrantDefaultPrivileges(grant)) => {

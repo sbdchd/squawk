@@ -573,4 +573,31 @@ SOURCE_FILE
             LITERAL
               STRING "'public'"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  ALTER_FUNCTION
+    ALTER_KW "alter"
+    WHITESPACE " "
+    FUNCTION_KW "function"
+    WHITESPACE " "
+    FUNCTION_SIG
+      FUNCTION_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "f"
+      PARAM_LIST
+        L_PAREN "("
+        R_PAREN ")"
+    WHITESPACE " "
+    FUNC_OPTION_LIST
+      SET_FUNC_OPTION
+        SET_CONFIG_PARAM
+          SET_KW "set"
+          WHITESPACE " "
+          SET_ROLE_VALUE
+            ROLE_KW "role"
+            WHITESPACE " "
+            ROLE_REF
+              ROLE_NAME_REF
+                IDENT "x"
+    SEMICOLON ";"
   WHITESPACE "\n"

@@ -357,4 +357,47 @@ SOURCE_FILE
       ALL
         ALL_KW "all"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  ALTER_ROLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    ROLE_REF
+      ROLE_NAME_REF
+        IDENT "x"
+    WHITESPACE " "
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      SET_XML_OPTION
+        XML_KW "xml"
+        WHITESPACE " "
+        OPTION_KW "option"
+        WHITESPACE " "
+        XML_CONTENT
+          CONTENT_KW "content"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  ALTER_ROLE
+    ALTER_KW "alter"
+    WHITESPACE " "
+    ROLE_KW "role"
+    WHITESPACE " "
+    ROLE_REF
+      ROLE_NAME_REF
+        IDENT "r"
+    WHITESPACE " "
+    SET_CONFIG_PARAM
+      SET_KW "set"
+      WHITESPACE " "
+      SET_SESSION_AUTH_VALUE
+        SESSION_KW "session"
+        WHITESPACE " "
+        AUTHORIZATION_KW "authorization"
+        WHITESPACE " "
+        ROLE_REF
+          ROLE_NAME_REF
+            IDENT "r2"
+    SEMICOLON ";"
+  WHITESPACE "\n"

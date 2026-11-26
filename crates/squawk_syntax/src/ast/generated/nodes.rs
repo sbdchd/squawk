@@ -145,11 +145,19 @@ impl AddColumn {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn compression_method(&self) -> Option<CompressionMethod> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn constraints(&self) -> AstChildren<Constraint> {
         support::children(&self.syntax)
     }
     #[inline]
     pub fn if_not_exists(&self) -> Option<IfNotExists> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn storage(&self) -> Option<Storage> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -918,12 +926,8 @@ impl AlterDefaultPrivileges {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn for_roles(&self) -> Option<ForRoles> {
-        support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn in_schemas(&self) -> Option<InSchemas> {
-        support::child(&self.syntax)
+    pub fn options(&self) -> AstChildren<DefaultPrivilegesOption> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
@@ -1526,6 +1530,10 @@ pub struct AlterPolicy {
 impl AlterPolicy {
     #[inline]
     pub fn action(&self) -> Option<AlterPolicyAction> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -7951,8 +7959,8 @@ pub struct DropAccessMethod {
 }
 impl DropAccessMethod {
     #[inline]
-    pub fn access_method_ref(&self) -> Option<AccessMethodRef> {
-        support::child(&self.syntax)
+    pub fn access_method_refs(&self) -> AstChildren<AccessMethodRef> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn drop_behavior(&self) -> Option<DropBehavior> {
@@ -8334,8 +8342,8 @@ impl DropEventTrigger {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn event_trigger_ref(&self) -> Option<EventTriggerRef> {
-        support::child(&self.syntax)
+    pub fn event_trigger_refs(&self) -> AstChildren<EventTriggerRef> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
@@ -8624,8 +8632,8 @@ impl DropLanguage {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn language_ref(&self) -> Option<LanguageRef> {
-        support::child(&self.syntax)
+    pub fn language_refs(&self) -> AstChildren<LanguageRef> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
@@ -23239,6 +23247,14 @@ impl RelationFromItem {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
     pub fn star_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::STAR)
     }
@@ -25644,7 +25660,15 @@ impl SetConfigParam {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn set_catalog(&self) -> Option<SetCatalog> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn set_names(&self) -> Option<SetNames> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_role_value(&self) -> Option<SetRoleValue> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -25652,7 +25676,15 @@ impl SetConfigParam {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn set_session_auth_value(&self) -> Option<SetSessionAuthValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn set_time_zone(&self) -> Option<SetTimeZone> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_xml_option(&self) -> Option<SetXmlOption> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -26088,6 +26120,25 @@ impl SetRoleNone {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetRoleValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetRoleValue {
+    #[inline]
+    pub fn literal(&self) -> Option<Literal> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn role_ref(&self) -> Option<RoleRef> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn role_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::ROLE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct SetSchema {
     pub(crate) syntax: SyntaxNode,
 }
@@ -26175,6 +26226,25 @@ impl SetSessionAuthDefault {
     #[inline]
     pub fn default_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::DEFAULT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct SetSessionAuthValue {
+    pub(crate) syntax: SyntaxNode,
+}
+impl SetSessionAuthValue {
+    #[inline]
+    pub fn set_session_auth_target(&self) -> Option<SetSessionAuthTarget> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn authorization_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::AUTHORIZATION_KW)
+    }
+    #[inline]
+    pub fn session_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::SESSION_KW)
     }
 }
 
@@ -31028,6 +31098,7 @@ pub enum CopySource {
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum CopyTarget {
     CopyProgram(CopyProgram),
+    CopyStdin(CopyStdin),
     CopyStdout(CopyStdout),
 }
 
@@ -31103,6 +31174,12 @@ pub enum DatabaseOption {
     DatabaseOptionOwner(DatabaseOptionOwner),
     DatabaseOptionTablespace(DatabaseOptionTablespace),
     DatabaseOptionTemplate(DatabaseOptionTemplate),
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum DefaultPrivilegesOption {
+    ForRoles(ForRoles),
+    InSchemas(InSchemas),
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
@@ -31217,6 +31294,7 @@ pub enum ExtensionMemberObject {
     ObjectOperatorClass(ObjectOperatorClass),
     ObjectOperatorFamily(ObjectOperatorFamily),
     ObjectProcedure(ObjectProcedure),
+    ObjectPropertyGraph(ObjectPropertyGraph),
     ObjectPublication(ObjectPublication),
     ObjectRole(ObjectRole),
     ObjectRoutine(ObjectRoutine),
@@ -54566,6 +54644,24 @@ impl AstNode for SetRoleNone {
         &self.syntax
     }
 }
+impl AstNode for SetRoleValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_ROLE_VALUE
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for SetSchema {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -54642,6 +54738,24 @@ impl AstNode for SetSessionAuthDefault {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::SET_SESSION_AUTH_DEFAULT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for SetSessionAuthValue {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::SET_SESSION_AUTH_VALUE
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -65285,12 +65399,16 @@ impl From<CopyStdout> for CopySource {
 impl AstNode for CopyTarget {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
-        matches!(kind, SyntaxKind::COPY_PROGRAM | SyntaxKind::COPY_STDOUT)
+        matches!(
+            kind,
+            SyntaxKind::COPY_PROGRAM | SyntaxKind::COPY_STDIN | SyntaxKind::COPY_STDOUT
+        )
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
         let res = match syntax.kind() {
             SyntaxKind::COPY_PROGRAM => CopyTarget::CopyProgram(CopyProgram { syntax }),
+            SyntaxKind::COPY_STDIN => CopyTarget::CopyStdin(CopyStdin { syntax }),
             SyntaxKind::COPY_STDOUT => CopyTarget::CopyStdout(CopyStdout { syntax }),
             _ => {
                 return None;
@@ -65302,6 +65420,7 @@ impl AstNode for CopyTarget {
     fn syntax(&self) -> &SyntaxNode {
         match self {
             CopyTarget::CopyProgram(it) => &it.syntax,
+            CopyTarget::CopyStdin(it) => &it.syntax,
             CopyTarget::CopyStdout(it) => &it.syntax,
         }
     }
@@ -65310,6 +65429,12 @@ impl From<CopyProgram> for CopyTarget {
     #[inline]
     fn from(node: CopyProgram) -> CopyTarget {
         CopyTarget::CopyProgram(node)
+    }
+}
+impl From<CopyStdin> for CopyTarget {
+    #[inline]
+    fn from(node: CopyStdin) -> CopyTarget {
+        CopyTarget::CopyStdin(node)
     }
 }
 impl From<CopyStdout> for CopyTarget {
@@ -65831,6 +65956,42 @@ impl From<DatabaseOptionTemplate> for DatabaseOption {
     #[inline]
     fn from(node: DatabaseOptionTemplate) -> DatabaseOption {
         DatabaseOption::DatabaseOptionTemplate(node)
+    }
+}
+impl AstNode for DefaultPrivilegesOption {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        matches!(kind, SyntaxKind::FOR_ROLES | SyntaxKind::IN_SCHEMAS)
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        let res = match syntax.kind() {
+            SyntaxKind::FOR_ROLES => DefaultPrivilegesOption::ForRoles(ForRoles { syntax }),
+            SyntaxKind::IN_SCHEMAS => DefaultPrivilegesOption::InSchemas(InSchemas { syntax }),
+            _ => {
+                return None;
+            }
+        };
+        Some(res)
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        match self {
+            DefaultPrivilegesOption::ForRoles(it) => &it.syntax,
+            DefaultPrivilegesOption::InSchemas(it) => &it.syntax,
+        }
+    }
+}
+impl From<ForRoles> for DefaultPrivilegesOption {
+    #[inline]
+    fn from(node: ForRoles) -> DefaultPrivilegesOption {
+        DefaultPrivilegesOption::ForRoles(node)
+    }
+}
+impl From<InSchemas> for DefaultPrivilegesOption {
+    #[inline]
+    fn from(node: InSchemas) -> DefaultPrivilegesOption {
+        DefaultPrivilegesOption::InSchemas(node)
     }
 }
 impl AstNode for DetachPartitionOption {
@@ -66537,6 +66698,7 @@ impl AstNode for ExtensionMemberObject {
                 | SyntaxKind::OBJECT_OPERATOR_CLASS
                 | SyntaxKind::OBJECT_OPERATOR_FAMILY
                 | SyntaxKind::OBJECT_PROCEDURE
+                | SyntaxKind::OBJECT_PROPERTY_GRAPH
                 | SyntaxKind::OBJECT_PUBLICATION
                 | SyntaxKind::OBJECT_ROLE
                 | SyntaxKind::OBJECT_ROUTINE
@@ -66612,6 +66774,9 @@ impl AstNode for ExtensionMemberObject {
             SyntaxKind::OBJECT_PROCEDURE => {
                 ExtensionMemberObject::ObjectProcedure(ObjectProcedure { syntax })
             }
+            SyntaxKind::OBJECT_PROPERTY_GRAPH => {
+                ExtensionMemberObject::ObjectPropertyGraph(ObjectPropertyGraph { syntax })
+            }
             SyntaxKind::OBJECT_PUBLICATION => {
                 ExtensionMemberObject::ObjectPublication(ObjectPublication { syntax })
             }
@@ -66683,6 +66848,7 @@ impl AstNode for ExtensionMemberObject {
             ExtensionMemberObject::ObjectOperatorClass(it) => &it.syntax,
             ExtensionMemberObject::ObjectOperatorFamily(it) => &it.syntax,
             ExtensionMemberObject::ObjectProcedure(it) => &it.syntax,
+            ExtensionMemberObject::ObjectPropertyGraph(it) => &it.syntax,
             ExtensionMemberObject::ObjectPublication(it) => &it.syntax,
             ExtensionMemberObject::ObjectRole(it) => &it.syntax,
             ExtensionMemberObject::ObjectRoutine(it) => &it.syntax,
@@ -66815,6 +66981,12 @@ impl From<ObjectProcedure> for ExtensionMemberObject {
     #[inline]
     fn from(node: ObjectProcedure) -> ExtensionMemberObject {
         ExtensionMemberObject::ObjectProcedure(node)
+    }
+}
+impl From<ObjectPropertyGraph> for ExtensionMemberObject {
+    #[inline]
+    fn from(node: ObjectPropertyGraph) -> ExtensionMemberObject {
+        ExtensionMemberObject::ObjectPropertyGraph(node)
     }
 }
 impl From<ObjectPublication> for ExtensionMemberObject {
@@ -77072,11 +77244,22 @@ impl From<ColumnConstraint> for Constraint {
         }
     }
 }
+impl From<CopySource> for CopyTarget {
+    #[inline]
+    fn from(node: CopySource) -> CopyTarget {
+        match node {
+            CopySource::CopyProgram(it) => CopyTarget::CopyProgram(it),
+            CopySource::CopyStdin(it) => CopyTarget::CopyStdin(it),
+            CopySource::CopyStdout(it) => CopyTarget::CopyStdout(it),
+        }
+    }
+}
 impl From<CopyTarget> for CopySource {
     #[inline]
     fn from(node: CopyTarget) -> CopySource {
         match node {
             CopyTarget::CopyProgram(it) => CopySource::CopyProgram(it),
+            CopyTarget::CopyStdin(it) => CopySource::CopyStdin(it),
             CopyTarget::CopyStdout(it) => CopySource::CopyStdout(it),
         }
     }
@@ -77143,6 +77326,9 @@ impl From<ExtensionMemberObject> for CommentObject {
                 CommentObject::ObjectOperatorFamily(it)
             }
             ExtensionMemberObject::ObjectProcedure(it) => CommentObject::ObjectProcedure(it),
+            ExtensionMemberObject::ObjectPropertyGraph(it) => {
+                CommentObject::ObjectPropertyGraph(it)
+            }
             ExtensionMemberObject::ObjectPublication(it) => CommentObject::ObjectPublication(it),
             ExtensionMemberObject::ObjectRole(it) => CommentObject::ObjectRole(it),
             ExtensionMemberObject::ObjectRoutine(it) => CommentObject::ObjectRoutine(it),

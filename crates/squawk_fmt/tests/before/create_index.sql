@@ -32,3 +32,5 @@ create index on t (
   a /*ba*/ text_pattern_ops /*bb*/ (/*bc*/ strength /*bd*/ = /*be*/ primary /*bf*/, /*bg*/ variant /*bh*/ = /*bi*/ default /*bj*/),
   /*bk*/ b /*bl*/ text_pattern_ops /*bm*/ (/*bn*/ strength /*bo*/ = /*bp*/ primary /*bq*/)
 );
+
+create index on t (x between (x));

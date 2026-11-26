@@ -33,3 +33,5 @@ alter database d is_template false;
 -- with_multiple_options
 alter database d with allow_connections true connection limit 10 is_template false;
 
+
+alter database x set tablespace.x.y = 1;

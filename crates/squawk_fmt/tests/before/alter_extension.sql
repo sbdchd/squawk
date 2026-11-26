@@ -79,3 +79,5 @@ alter extension hstore add view public.active_accounts;
 alter /* extension */ extension /* name */ an_exceedingly_long_extension_name_for_application_features /* action */ add /* object kind */ operator /* operator name */ application_schema.=== /* open paren */ (/* left type */ application_schema.exceedingly_long_left_operand_type, /* right type */ application_schema.exceedingly_long_right_operand_type /* close paren */) /* semicolon */;
 
 alter extension e add type int array;
+
+alter extension e add property graph g;

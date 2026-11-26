@@ -72,3 +72,5 @@ create index on t (
     /*bn*/ strength /*bo*/ = /*bp*/ primary /*bq*/
   )
 );
+
+create index on t (x between (x));

@@ -19,3 +19,6 @@ alter server s
 
 
 alter server s version null;
+
+alter server x options (add '');
+alter server x options (add 'a', set 'b', drop 'c');

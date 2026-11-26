@@ -12,3 +12,5 @@ drop procedural language if exists
 drop /* procedural */ procedural /* language */ language /* if */ if /* exists */ exists
   /* language name */ old_language
   /* behavior */ restrict /* end */;
+
+drop language if exists a, b;

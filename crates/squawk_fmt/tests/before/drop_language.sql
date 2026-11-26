@@ -4,3 +4,5 @@ drop procedural language if exists extraordinarily_long_procedural_language_name
 
 -- comments in every position
 drop /* procedural */ procedural /* language */ language /* if */ if /* exists */ exists /* language name */ old_language /* behavior */ restrict /* end */;
+
+drop language if exists a, b;

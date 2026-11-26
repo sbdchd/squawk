@@ -100,3 +100,10 @@ select
     /* before as */ as /* before type */ text
     /* before no */ no /* before indent */ indent /* before closing paren */
   ) /* after serialize */;
+
+select *
+from xmltable(
+  '/a' passing by
+  columns
+    a int
+);

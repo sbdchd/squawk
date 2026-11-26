@@ -26,3 +26,5 @@ alter policy account_access_policy
 alter policy account_access_policy
   on public.accounts
   /* rename */ rename /* to */ to /* new name */ archived_account_access_policy;
+
+alter policy if exists p on t rename to q;

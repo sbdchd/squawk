@@ -38,3 +38,5 @@ create trigger tr after update on t
   referencing old row as o new row as n
   for each statement
   execute function tf();
+
+create trigger tr before insert on t for each row execute procedure f(natural, x);

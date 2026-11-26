@@ -53,3 +53,6 @@ SET /* before xml */ XML /* before option */ OPTION /* before document */ DOCUME
 set names 'utf8';
 
 set names default;
+
+set role from current;
+set names.x = 1;

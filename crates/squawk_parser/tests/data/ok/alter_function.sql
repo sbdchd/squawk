@@ -61,3 +61,5 @@ alter function f rows -1;
 
 -- set schema config
 alter function f() set schema 'public';
+
+alter function f() set role x;

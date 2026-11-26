@@ -56,3 +56,26 @@ SOURCE_FILE
       RESTRICT_KW "restrict"
     SEMICOLON ";"
   WHITESPACE "\n\n"
+  DROP_ACCESS_METHOD
+    DROP_KW "drop"
+    WHITESPACE " "
+    ACCESS_KW "access"
+    WHITESPACE " "
+    METHOD_KW "method"
+    WHITESPACE " "
+    IF_EXISTS
+      IF_KW "if"
+      WHITESPACE " "
+      EXISTS_KW "exists"
+    WHITESPACE " "
+    ACCESS_METHOD_REF
+      IDENT "a"
+    COMMA ","
+    WHITESPACE " "
+    ACCESS_METHOD_REF
+      IDENT "b"
+    WHITESPACE " "
+    CASCADE
+      CASCADE_KW "cascade"
+    SEMICOLON ";"
+  WHITESPACE "\n"
