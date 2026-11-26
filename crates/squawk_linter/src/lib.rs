@@ -37,6 +37,7 @@ use rules::adding_primary_key_constraint;
 use rules::adding_required_field;
 use rules::ban_alter_domain_with_add_constraint;
 use rules::ban_char_field;
+use rules::ban_concurrent_index_creation_if_not_exists;
 use rules::ban_concurrent_index_creation_in_transaction;
 use rules::ban_create_domain_with_constraint;
 use rules::ban_drop_column;
@@ -161,6 +162,7 @@ pub enum Rule {
     BanAlterSequenceValues,
     BanAlterSystemOptions,
     BanAlterExtension,
+    BanConcurrentIndexCreationIfNotExists,
     // xtask:new-rule:error-name
 }
 
@@ -198,6 +200,7 @@ impl Rule {
                 | Rule::BanAlterSequenceValues
                 | Rule::BanAlterSystemOptions
                 | Rule::BanAlterExtension
+                | Rule::BanConcurrentIndexCreationIfNotExists
         )
     }
 
@@ -298,6 +301,9 @@ impl TryFrom<&str> for Rule {
             "ban-alter-sequence-values" => Ok(Rule::BanAlterSequenceValues),
             "ban-alter-system-options" => Ok(Rule::BanAlterSystemOptions),
             "ban-alter-extension" => Ok(Rule::BanAlterExtension),
+            "ban-concurrent-index-creation-if-not-exists" => {
+                Ok(Rule::BanConcurrentIndexCreationIfNotExists)
+            }
             // xtask:new-rule:str-name
             _ => Err(format!("Unknown violation name: {s}")),
         }
@@ -354,6 +360,9 @@ impl fmt::Display for Rule {
             Rule::AddingRequiredField => "adding-required-field",
             Rule::BanConcurrentIndexCreationInTransaction => {
                 "ban-concurrent-index-creation-in-transaction"
+            }
+            Rule::BanConcurrentIndexCreationIfNotExists => {
+                "ban-concurrent-index-creation-if-not-exists"
             }
             Rule::BanCreateDomainWithConstraint => "ban-create-domain-with-constraint",
             Rule::UnusedIgnore => "unused-ignore",
@@ -722,6 +731,12 @@ impl Linter {
         .any(|rule| self.rules.contains(rule))
         {
             existing_object_compatibility(self, file);
+        }
+        if self
+            .rules
+            .contains(&Rule::BanConcurrentIndexCreationIfNotExists)
+        {
+            ban_concurrent_index_creation_if_not_exists(self, file);
         }
         // xtask:new-rule:rule-call
 

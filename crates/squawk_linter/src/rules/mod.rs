@@ -7,6 +7,7 @@ pub(crate) mod ban_alter_domain_with_add_constraint;
 pub(crate) mod ban_alter_generated_expression;
 pub(crate) mod ban_alter_identity;
 pub(crate) mod ban_char_field;
+pub(crate) mod ban_concurrent_index_creation_if_not_exists;
 pub(crate) mod ban_concurrent_index_creation_in_transaction;
 pub(crate) mod ban_create_domain_with_constraint;
 pub(crate) mod ban_disable_trigger;
@@ -70,6 +71,7 @@ pub(crate) use ban_alter_domain_with_add_constraint::ban_alter_domain_with_add_c
 pub(crate) use ban_alter_generated_expression::ban_alter_generated_expression;
 pub(crate) use ban_alter_identity::ban_alter_identity;
 pub(crate) use ban_char_field::ban_char_field;
+pub(crate) use ban_concurrent_index_creation_if_not_exists::ban_concurrent_index_creation_if_not_exists;
 pub(crate) use ban_concurrent_index_creation_in_transaction::ban_concurrent_index_creation_in_transaction;
 pub(crate) use ban_create_domain_with_constraint::ban_create_domain_with_constraint;
 pub(crate) use ban_disable_trigger::ban_disable_trigger;
