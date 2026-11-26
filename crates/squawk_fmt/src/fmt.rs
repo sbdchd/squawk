@@ -1834,7 +1834,7 @@ fn build_function_option<'a>(ctx: &Ctx, option: ast::FuncOption) -> Doc<'a> {
     match option {
         ast::FuncOption::AsFuncOption(option) => build_as_function_option(&option),
         ast::FuncOption::CostFuncOption(option) => {
-            build_literal_function_option("cost", option.literal())
+            build_expr_function_option(ctx, "cost", option.expr())
         }
         ast::FuncOption::LanguageFuncOption(option) => {
             let mut doc = Doc::text("language");
@@ -1854,7 +1854,7 @@ fn build_function_option<'a>(ctx: &Ctx, option: ast::FuncOption) -> Doc<'a> {
             .map(|target| build_reset_keyword(&target))
             .unwrap_or_else(|| Doc::text("reset")),
         ast::FuncOption::RowsFuncOption(option) => {
-            build_literal_function_option("rows", option.literal())
+            build_expr_function_option(ctx, "rows", option.expr())
         }
         ast::FuncOption::SetFuncOption(option) => option
             .set_config_param()
@@ -2142,11 +2142,11 @@ fn build_reindex_option_list<'a>(ctx: &Ctx, list: &ast::ReindexOptionList) -> Do
         list.l_paren_token(),
         list.reindex_options(),
         list.r_paren_token().as_ref(),
-        build_reindex_option,
+        |option| build_reindex_option(ctx, option),
     )
 }
 
-fn build_reindex_option<'a>(option: &ast::ReindexOption) -> Doc<'a> {
+fn build_reindex_option<'a>(ctx: &Ctx, option: &ast::ReindexOption) -> Doc<'a> {
     match option {
         ast::ReindexOption::ReindexOptionConcurrently(option) => {
             let doc = Doc::text("concurrently");
@@ -2174,10 +2174,10 @@ fn build_reindex_option<'a>(option: &ast::ReindexOption) -> Doc<'a> {
                 doc = doc
                     .append(space_before(tablespace.syntax()))
                     .append(build_name(tablespace.syntax()));
-            } else if let Some(literal) = option.literal() {
+            } else if let Some(expr) = option.expr() {
                 doc = doc
-                    .append(space_before(literal.syntax()))
-                    .append(build_literal(&literal));
+                    .append(space_before(expr.syntax()))
+                    .append(build_expr(ctx, &expr));
             }
             doc.group()
         }
@@ -3513,7 +3513,9 @@ fn build_create_database<'a>(ctx: &Ctx, stmt: &ast::CreateDatabase) -> Doc<'a> {
     }
     if let Some(options) = stmt.database_option_list() {
         if options.with_token().is_some() || options.database_options().next().is_some() {
-            doc = append_nested_node(ctx, doc, options, |list| build_database_option_list(&list));
+            doc = append_nested_node(ctx, doc, options, |list| {
+                build_database_option_list(ctx, &list)
+            });
         } else {
             doc = doc.append(comments_before(options.syntax()));
         }
@@ -3944,9 +3946,8 @@ fn build_comment_object<'a>(ctx: &Ctx, object: ast::CommentObject) -> Doc<'a> {
                 (node.large_token(), "large"),
                 (node.object_token(), "object"),
             ]),
-            node.literal()
-                .as_ref()
-                .map(|literal| leading_comments(literal.syntax()).append(build_literal(literal))),
+            node.expr()
+                .map(|expr| leading_comments(expr.syntax()).append(build_expr(ctx, &expr))),
         ),
         ast::CommentObject::ObjectPolicy(node) => build_comment_object_on(
             ctx,
@@ -4014,15 +4015,16 @@ fn build_return_stmt<'a>(ctx: &Ctx, option: &ast::ReturnStmt) -> Doc<'a> {
     doc.append(build_semicolon(option.semicolon_token()))
 }
 
-fn build_literal_function_option<'a>(
+fn build_expr_function_option<'a>(
+    ctx: &Ctx,
     keyword: &'static str,
-    literal: Option<ast::Literal>,
+    expr: Option<ast::Expr>,
 ) -> Doc<'a> {
     let mut doc = Doc::text(keyword);
-    if let Some(literal) = literal {
+    if let Some(expr) = expr {
         doc = doc
-            .append(space_before(literal.syntax()))
-            .append(build_literal(&literal));
+            .append(space_before(expr.syntax()))
+            .append(build_expr(ctx, &expr));
     }
     doc
 }
@@ -5604,7 +5606,7 @@ fn build_privilege_objects<'a>(ctx: &Ctx, objects: ast::PrivilegeObjects) -> Doc
             )
         }
         ast::PrivilegeObjects::PrivilegeLargeObject(node) => {
-            let items = build_comma_separated_nodes(node.literals(), build_literal)
+            let items = build_comma_separated_nodes(node.exprs(), |expr| build_expr(ctx, expr))
                 .unwrap_or_else(Doc::nil);
             append_nested_group(
                 ctx,
@@ -6139,9 +6141,9 @@ fn build_security_label_object<'a>(ctx: &Ctx, object: ast::SecurityLabelObject) 
                 (node.large_token(), "large"),
                 (node.object_token(), "object"),
             ]),
-            node.literal()
+            node.expr()
                 .map(|value| {
-                    let doc = build_literal(&value);
+                    let doc = build_expr(ctx, &value);
                     build_security_object_value(&value, doc)
                 })
                 .unwrap_or_else(Doc::nil),
@@ -9948,7 +9950,12 @@ fn build_alter_column_option<'a>(ctx: &Ctx, option: ast::AlterColumnOption) -> D
             if let Some(with) = n.with_token() {
                 doc = doc.append(space_before(&with)).append(Doc::text("with"));
             }
-            append_optional_literal(doc, n.literal())
+            match n.expr() {
+                Some(expr) => doc
+                    .append(space_before(expr.syntax()))
+                    .append(build_expr(ctx, &expr)),
+                None => doc,
+            }
         }
         ast::AlterColumnOption::SetGenerated(n) => {
             let mut doc =
@@ -12102,10 +12109,10 @@ fn build_alter_large_object<'a>(ctx: &Ctx, stmt: &ast::AlterLargeObject) -> Doc<
             doc = doc.append(space_before(&token)).append(Doc::text(keyword));
         }
     }
-    if let Some(id) = stmt.literal() {
+    if let Some(id) = stmt.expr() {
         doc = doc
             .append(space_before(id.syntax()))
-            .append(build_literal(&id));
+            .append(build_expr(ctx, &id));
     }
     let mut owner: Option<Doc<'a>> = None;
     for (token, keyword) in [(stmt.owner_token(), "owner"), (stmt.to_token(), "to")] {
@@ -12784,7 +12791,9 @@ fn build_alter_database<'a>(ctx: &Ctx, stmt: &ast::AlterDatabase) -> Doc<'a> {
 
 fn build_alter_database_action<'a>(ctx: &Ctx, action: &ast::AlterDatabaseAction) -> Doc<'a> {
     match action {
-        ast::AlterDatabaseAction::DatabaseOptionList(action) => build_database_option_list(action),
+        ast::AlterDatabaseAction::DatabaseOptionList(action) => {
+            build_database_option_list(ctx, action)
+        }
         ast::AlterDatabaseAction::DatabaseRenameTo(action) => {
             let target = action
                 .database()
@@ -12840,12 +12849,13 @@ fn build_set_tablespace<'a>(action: &ast::SetTablespace) -> Doc<'a> {
     doc
 }
 
-fn build_database_option_list<'a>(list: &ast::DatabaseOptionList) -> Doc<'a> {
+fn build_database_option_list<'a>(ctx: &Ctx, list: &ast::DatabaseOptionList) -> Doc<'a> {
     let mut doc = list
         .with_token()
         .map(|token| leading_comments(&token).append(Doc::text("with")));
     for option in list.database_options() {
-        let option_doc = leading_comments(option.syntax()).append(build_database_option(option));
+        let option_doc =
+            leading_comments(option.syntax()).append(build_database_option(ctx, option));
         doc = Some(match doc {
             Some(doc) => doc.append(Doc::line_or_space().append(option_doc)),
             None => option_doc,
@@ -12854,7 +12864,7 @@ fn build_database_option_list<'a>(list: &ast::DatabaseOptionList) -> Doc<'a> {
     doc.unwrap_or_else(Doc::nil).group()
 }
 
-fn build_database_option<'a>(option: ast::DatabaseOption) -> Doc<'a> {
+fn build_database_option<'a>(ctx: &Ctx, option: ast::DatabaseOption) -> Doc<'a> {
     match option {
         ast::DatabaseOption::DatabaseOptionConnectionLimit(option) => {
             let mut doc = Doc::text("connection");
@@ -12862,9 +12872,10 @@ fn build_database_option<'a>(option: ast::DatabaseOption) -> Doc<'a> {
                 doc = doc.append(space_before(&token)).append(Doc::text("limit"));
             }
             build_database_option_assignment(
+                ctx,
                 doc,
                 option.eq_token(),
-                option.literal(),
+                option.expr(),
                 option.default_token(),
                 option
                     .config_value_name()
@@ -12872,45 +12883,50 @@ fn build_database_option<'a>(option: ast::DatabaseOption) -> Doc<'a> {
             )
         }
         ast::DatabaseOption::DatabaseOptionEncoding(option) => build_database_option_assignment(
+            ctx,
             Doc::text("encoding"),
             option.eq_token(),
-            option.literal(),
+            option.expr(),
             option.default_token(),
             option
                 .config_value_name()
                 .map(|value| build_commented_name(&value)),
         ),
         ast::DatabaseOption::DatabaseOptionGeneric(option) => build_database_option_assignment(
+            ctx,
             build_name(option.syntax()),
             option.eq_token(),
-            option.literal(),
+            option.expr(),
             option.default_token(),
             option
                 .config_value_name()
                 .map(|value| build_commented_name(&value)),
         ),
         ast::DatabaseOption::DatabaseOptionOwner(option) => build_database_option_assignment(
+            ctx,
             Doc::text("owner"),
             option.eq_token(),
-            option.literal(),
+            option.expr(),
             option.default_token(),
             option
                 .role_ref()
                 .map(|value| leading_comments(value.syntax()).append(build_role_ref(&value))),
         ),
         ast::DatabaseOption::DatabaseOptionTablespace(option) => build_database_option_assignment(
+            ctx,
             Doc::text("tablespace"),
             option.eq_token(),
-            option.literal(),
+            option.expr(),
             option.default_token(),
             option
                 .tablespace_ref()
                 .map(|value| build_commented_name(&value)),
         ),
         ast::DatabaseOption::DatabaseOptionTemplate(option) => build_database_option_assignment(
+            ctx,
             Doc::text("template"),
             option.eq_token(),
-            option.literal(),
+            option.expr(),
             option.default_token(),
             option
                 .database_ref()
@@ -12924,19 +12940,20 @@ fn build_commented_name<'a>(node: &impl AstNode) -> Doc<'a> {
 }
 
 fn build_database_option_assignment<'a>(
+    ctx: &Ctx,
     mut doc: Doc<'a>,
     eq_token: Option<SyntaxToken>,
-    literal: Option<ast::Literal>,
+    expr: Option<ast::Expr>,
     default_token: Option<SyntaxToken>,
     named_value: Option<Doc<'a>>,
 ) -> Doc<'a> {
     if let Some(token) = eq_token {
         doc = doc.append(space_before(&token)).append(Doc::text("="));
     }
-    if let Some(literal) = literal {
+    if let Some(expr) = expr {
         doc = doc
-            .append(space_before(literal.syntax()))
-            .append(build_literal(&literal));
+            .append(space_before(expr.syntax()))
+            .append(build_expr(ctx, &expr));
     } else if let Some(token) = default_token {
         doc = doc
             .append(space_before(&token))

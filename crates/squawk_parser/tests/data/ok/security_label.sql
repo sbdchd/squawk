@@ -114,3 +114,5 @@ security label on type foo.bar is null;
 -- view
 security label on view foo.bar is null;
 
+
+security label on large object -1 is 'a';

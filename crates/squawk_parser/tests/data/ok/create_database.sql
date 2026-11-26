@@ -21,3 +21,7 @@ create database d
   is_template = false
   oid 1010;
 
+
+create database x connection limit -1;
+
+create database x x = + 1;

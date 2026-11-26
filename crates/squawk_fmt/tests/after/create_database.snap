@@ -41,3 +41,9 @@ create /* database keyword */ database /* database name */ commented_database
   /* generic option */ locale /* generic equals */ = /* generic value */ 'en_US.UTF-8'
   /* connection option */ connection /* limit keyword */ limit = /* limit value */ 42
   /* tablespace option */ tablespace = /* tablespace value */ commented_space /* semicolon */;
+
+create database x connection limit -1;
+
+create database x x = +1;
+
+create database x encoding = -1;

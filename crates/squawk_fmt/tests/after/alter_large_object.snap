@@ -6,3 +6,5 @@ alter /* large */ large /* object */ object /* id */ 1234567890
   /* owner */ owner /* to */ to /* role */ large_object_owner_with_a_very_long_descriptive_name /* end */;
 
 alter large object 987654321 owner to current_role;
+
+alter large object -1 owner to x;

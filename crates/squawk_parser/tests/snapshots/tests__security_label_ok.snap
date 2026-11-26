@@ -1015,4 +1015,27 @@ SOURCE_FILE
     WHITESPACE " "
     NULL_KW "null"
     SEMICOLON ";"
-  WHITESPACE "\n\n"
+  WHITESPACE "\n\n\n"
+  SECURITY_LABEL
+    SECURITY_KW "security"
+    WHITESPACE " "
+    LABEL_KW "label"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OBJECT_LARGE_OBJECT
+      LARGE_KW "large"
+      WHITESPACE " "
+      OBJECT_KW "object"
+      WHITESPACE " "
+      PREFIX_EXPR
+        MINUS "-"
+        LITERAL
+          INT_NUMBER "1"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n"

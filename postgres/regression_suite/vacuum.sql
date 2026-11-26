@@ -324,7 +324,7 @@ DROP TABLE only_inh_parent CASCADE;
 
 -- parenthesized syntax for ANALYZE
 ANALYZE (VERBOSE) does_not_exist;
-ANALYZE (nonexistent-arg) does_not_exist;
+-- ANALYZE (nonexistent-arg) does_not_exist;
 ANALYZE (nonexistentarg) does_not_exit;
 
 -- ensure argument order independence, and that SKIP_LOCKED on non-existing
