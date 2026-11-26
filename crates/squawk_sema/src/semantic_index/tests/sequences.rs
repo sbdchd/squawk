@@ -649,3 +649,29 @@ alter table t alter column b drop expression;
 alter table t alter column b set default 1;
 "), @"no diagnostics");
 }
+
+#[test]
+fn sequence_has_no_row_type() {
+    assert_snapshot!(check("
+create sequence s;
+create domain s as int;
+create domain d as int;
+create sequence s2;
+alter sequence s2 rename to d;
+create type c as (a int);
+alter sequence d rename to c;
+"), @"
+    error: type `c` already exists
+      ╭▸ 
+    8 │ alter sequence d rename to c;
+      ╰╴                           ━
+    ");
+}
+
+#[test]
+fn drop_sequence_repeated() {
+    assert_snapshot!(check("
+create sequence s;
+drop sequence s, s;
+"), @"no diagnostics");
+}

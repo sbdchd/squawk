@@ -6024,7 +6024,7 @@ const COL_DEF_FIRST: TokenSet = TokenSet::new(&[LIKE_KW])
 //   { column_name data_type [ STORAGE { PLAIN | EXTERNAL | EXTENDED | MAIN | DEFAULT } ] [ COMPRESSION compression_method ] [ COLLATE collation ] [ column_constraint [ ... ] ]
 //     | table_constraint
 //     | LIKE source_table [ like_option ... ] }
-fn opt_col_def(p: &mut Parser<'_>) -> Option<CompletedMarker> {
+fn opt_col_def(p: &mut Parser<'_>, column_types: ColumnTypes) -> Option<CompletedMarker> {
     if !p.at_ts(COL_DEF_FIRST) {
         return None;
     }
@@ -6039,7 +6039,8 @@ fn opt_col_def(p: &mut Parser<'_>) -> Option<CompletedMarker> {
     let m = p.start();
     column_name(p);
     setof_not_allowed(p);
-    if opt_type_name(p) {
+    let constraint_attr = column_types == ColumnTypes::Inherited && p.at(ENFORCED_KW);
+    if !constraint_attr && opt_type_name(p) {
         opt_storage(p);
         opt_compression_method(p);
     }
@@ -6900,7 +6901,13 @@ fn opt_nulls_order(p: &mut Parser<'_>) {
     }
 }
 
-fn table_arg_list(p: &mut Parser<'_>) -> CompletedMarker {
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ColumnTypes {
+    Declared,
+    Inherited,
+}
+
+fn table_arg_list(p: &mut Parser<'_>, column_types: ColumnTypes) -> CompletedMarker {
     assert!(p.at(L_PAREN));
     let m = p.start();
     delimited(
@@ -6910,7 +6917,7 @@ fn table_arg_list(p: &mut Parser<'_>) -> CompletedMarker {
         COMMA,
         ListItems::Optional(ListItem::Col),
         COL_DEF_FIRST,
-        |p| opt_col_def(p).is_some(),
+        |p| opt_col_def(p, column_types).is_some(),
     );
     m.complete(p, TABLE_ARG_LIST)
 }
@@ -7028,18 +7035,21 @@ fn create_table(p: &mut Parser<'_>) -> CompletedMarker {
     opt_if_not_exists(p);
     table_name(p);
     let mut is_partition = false;
+    let mut column_types = ColumnTypes::Declared;
     // OF type_name
     if p.at(OF_KW) {
         of_type(p);
         // TODO: add validation to check that table args don't have data types
+        column_types = ColumnTypes::Inherited;
         // PARTITION OF parent_table
     } else if p.at(PARTITION_KW) {
         partition_of(p);
         // TODO: add validation to check that table args don't have data types
         is_partition = true;
+        column_types = ColumnTypes::Inherited;
     }
     if p.at(L_PAREN) {
-        table_arg_list(p);
+        table_arg_list(p, column_types);
     }
     if is_partition {
         partition_option(p);
@@ -8821,7 +8831,7 @@ fn alter_routine(p: &mut Parser<'_>) -> CompletedMarker {
         OWNER_KW => {
             owner_to(p);
         }
-        SET_KW if p.nth_at(1, SCHEMA_KW) => {
+        SET_KW if p.nth_at(1, SCHEMA_KW) && !p.nth_at_ts(2, STRING_FIRST) => {
             set_schema(p);
         }
         NO_KW | DEPENDS_KW => {
@@ -8998,7 +9008,7 @@ fn alter_procedure(p: &mut Parser<'_>) -> CompletedMarker {
         OWNER_KW => {
             owner_to(p);
         }
-        SET_KW if p.nth_at(1, SCHEMA_KW) => {
+        SET_KW if p.nth_at(1, SCHEMA_KW) && !p.nth_at_ts(2, STRING_FIRST) => {
             set_schema(p);
         }
         DEPENDS_KW | NO_KW => {
@@ -9502,7 +9512,7 @@ fn alter_function(p: &mut Parser<'_>) -> CompletedMarker {
         OWNER_KW => {
             owner_to(p);
         }
-        SET_KW if p.nth_at(1, SCHEMA_KW) => {
+        SET_KW if p.nth_at(1, SCHEMA_KW) && !p.nth_at_ts(2, STRING_FIRST) => {
             set_schema(p);
         }
         DEPENDS_KW | NO_KW => {
@@ -9783,13 +9793,8 @@ fn opt_object(p: &mut Parser<'_>) -> Option<SyntaxKind> {
                 OBJECT_TYPE
             };
             p.bump_any();
-            if is_domain {
-                domain_ref(p);
-            } else {
-                type_name_ref(p);
-                p.eat(ARRAY_KW);
-                while !p.at(EOF) && opt_array_bound(p) {}
-            }
+            setof_not_allowed(p);
+            type_name(p);
             kind
         }
         TABLE_KW => {
@@ -10855,6 +10860,15 @@ fn domain_ref_list(p: &mut Parser<'_>) {
     domain_ref(p);
     while !p.at(EOF) && p.eat(COMMA) {
         domain_ref(p);
+    }
+}
+
+fn type_name_list(p: &mut Parser<'_>) {
+    setof_not_allowed(p);
+    type_name(p);
+    while !p.at(EOF) && p.eat(COMMA) {
+        setof_not_allowed(p);
+        type_name(p);
     }
 }
 
@@ -12578,12 +12592,12 @@ fn create_foreign_table(p: &mut Parser<'_>) -> CompletedMarker {
     if p.at(PARTITION_KW) {
         partition_of(p);
         if p.at(L_PAREN) {
-            table_arg_list(p);
+            table_arg_list(p, ColumnTypes::Inherited);
         }
         partition_option(p);
     } else {
         if p.at(L_PAREN) {
-            table_arg_list(p);
+            table_arg_list(p, ColumnTypes::Declared);
         } else {
             p.error("expected table arg list");
         }
@@ -13950,7 +13964,7 @@ fn drop_domain(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DROP_KW);
     p.bump(DOMAIN_KW);
     opt_if_exists(p);
-    domain_ref_list(p);
+    type_name_list(p);
     opt_cascade_or_restrict(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_DOMAIN)
@@ -17756,7 +17770,7 @@ fn drop_type(p: &mut Parser<'_>) -> CompletedMarker {
     p.bump(DROP_KW);
     p.bump(TYPE_KW);
     opt_if_exists(p);
-    type_name_ref_list(p);
+    type_name_list(p);
     opt_cascade_or_restrict(p);
     p.eat(SEMICOLON);
     m.complete(p, DROP_TYPE)
@@ -18310,12 +18324,23 @@ fn set_configuration_param(p: &mut Parser<'_>) {
         NAMES_KW if !matches!(p.nth(1), TO_KW | EQ) => {
             set_names(p);
         }
+        SCHEMA_KW if p.nth_at_ts(1, STRING_FIRST) => {
+            set_schema_value(p);
+        }
         _ => {
             config_parameter_ref(p);
             config_assignment(p);
         }
     }
     m.complete(p, SET_CONFIG_PARAM);
+}
+
+fn set_schema_value(p: &mut Parser<'_>) {
+    assert!(p.at(SCHEMA_KW));
+    let m = p.start();
+    p.bump(SCHEMA_KW);
+    string_literal(p);
+    m.complete(p, SET_SCHEMA_VALUE);
 }
 
 // RESET configuration_parameter
@@ -18854,16 +18879,13 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
         set_time_zone(p);
     } else if p.at(NAMES_KW) && !matches!(p.nth(1), TO_KW | EQ) {
         set_names(p);
-    } else if p.at(CATALOG_KW) || p.at(SCHEMA_KW) {
+    } else if p.at(CATALOG_KW) {
         let m = p.start();
-        let kind = if p.eat(CATALOG_KW) {
-            SET_CATALOG
-        } else {
-            p.bump(SCHEMA_KW);
-            SET_SCHEMA_VALUE
-        };
+        p.bump(CATALOG_KW);
         string_literal(p);
-        m.complete(p, kind);
+        m.complete(p, SET_CATALOG);
+    } else if p.at(SCHEMA_KW) {
+        set_schema_value(p);
     // configuration_parameter { TO | = } { value | 'value' | DEFAULT }
     } else {
         let m = p.start();

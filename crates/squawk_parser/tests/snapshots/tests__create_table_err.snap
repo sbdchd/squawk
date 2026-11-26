@@ -1020,6 +1020,73 @@ SOURCE_FILE
         L_PAREN "("
         R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- enforced isn't a type in a typed table"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    OF_TYPE
+      OF_KW "of"
+      WHITESPACE " "
+      PATH_TYPE
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "ty"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "x"
+      WHITESPACE " "
+      COLUMN
+        COLUMN_NAME
+          ENFORCED_KW "enforced"
+      R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    PARTITION_OF
+      PARTITION_KW "partition"
+      WHITESPACE " "
+      OF_KW "of"
+      WHITESPACE " "
+      TABLE_NAME_REF
+        PATH_REF
+          PATH_SEGMENT_REF
+            IDENT "p"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "x"
+      WHITESPACE " "
+      COLUMN
+        COLUMN_NAME
+          ENFORCED_KW "enforced"
+      R_PAREN ")"
+    WHITESPACE " "
+    PARTITION_DEFAULT
+      DEFAULT_KW "default"
+    SEMICOLON ";"
   WHITESPACE "\n"
 ---
 error[syntax-error]: expected path name
@@ -1106,3 +1173,11 @@ error[syntax-error]: expected at least one expression
    ╭▸ 
 90 │ create table t partition of p for values from (1) to ();
    ╰╴                                                      ━
+error[syntax-error]: expected `,`
+   ╭▸ 
+93 │ create table t of ty (x enforced);
+   ╰╴                       ━
+error[syntax-error]: expected `,`
+   ╭▸ 
+94 │ create table t partition of p (x enforced) default;
+   ╰╴                                ━

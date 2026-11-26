@@ -1284,4 +1284,30 @@ select * from t join u on $0 join v on true;
          u     | Table  |
         ");
     }
+
+    #[test]
+    fn completion_on_conflict_do_select_where() {
+        assert_snapshot!(completions("
+insert into x default values on conflict do select where $0;
+"), @"
+         label    | kind  | detail 
+        ----------+-------+--------
+         excluded | Table |        
+         x        | Table |
+        ");
+    }
+
+    #[test]
+    fn completion_on_conflict_do_update_where() {
+        assert_snapshot!(completions("
+create table t (a int primary key);
+insert into t values (1) on conflict (a) do update set a = 2 where $0;
+"), @"
+         label    | kind   | detail 
+        ----------+--------+--------
+         a        | Column | int    
+         excluded | Table  |        
+         t        | Table  |
+        ");
+    }
 }

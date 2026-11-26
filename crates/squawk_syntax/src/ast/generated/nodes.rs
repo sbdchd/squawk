@@ -8260,16 +8260,16 @@ pub struct DropDomain {
 }
 impl DropDomain {
     #[inline]
-    pub fn domain_refs(&self) -> AstChildren<DomainRef> {
-        support::children(&self.syntax)
-    }
-    #[inline]
     pub fn drop_behavior(&self) -> Option<DropBehavior> {
         support::child(&self.syntax)
     }
     #[inline]
     pub fn if_exists(&self) -> Option<IfExists> {
         support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn types(&self) -> AstChildren<Type> {
+        support::children(&self.syntax)
     }
     #[inline]
     pub fn semicolon_token(&self) -> Option<SyntaxToken> {
@@ -9654,7 +9654,7 @@ impl DropType {
         support::child(&self.syntax)
     }
     #[inline]
-    pub fn type_name_refs(&self) -> AstChildren<TypeNameRef> {
+    pub fn types(&self) -> AstChildren<Type> {
         support::children(&self.syntax)
     }
     #[inline]
@@ -16474,7 +16474,7 @@ pub struct ObjectDomain {
 }
 impl ObjectDomain {
     #[inline]
-    pub fn domain_ref(&self) -> Option<DomainRef> {
+    pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -17097,16 +17097,8 @@ pub struct ObjectType {
 }
 impl ObjectType {
     #[inline]
-    pub fn array_bounds(&self) -> AstChildren<ArrayBound> {
-        support::children(&self.syntax)
-    }
-    #[inline]
-    pub fn type_name_ref(&self) -> Option<TypeNameRef> {
+    pub fn ty(&self) -> Option<Type> {
         support::child(&self.syntax)
-    }
-    #[inline]
-    pub fn array_token(&self) -> Option<SyntaxToken> {
-        support::token(&self.syntax, SyntaxKind::ARRAY_KW)
     }
     #[inline]
     pub fn type_token(&self) -> Option<SyntaxToken> {
@@ -25653,6 +25645,10 @@ impl SetConfigParam {
     }
     #[inline]
     pub fn set_names(&self) -> Option<SetNames> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn set_schema_value(&self) -> Option<SetSchemaValue> {
         support::child(&self.syntax)
     }
     #[inline]

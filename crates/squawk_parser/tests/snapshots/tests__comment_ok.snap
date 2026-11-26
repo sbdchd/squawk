@@ -350,7 +350,7 @@ SOURCE_FILE
     OBJECT_DOMAIN
       DOMAIN_KW "domain"
       WHITESPACE " "
-      DOMAIN_REF
+      PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
             IDENT "d"
@@ -1333,7 +1333,7 @@ SOURCE_FILE
     OBJECT_TYPE
       TYPE_KW "type"
       WHITESPACE " "
-      TYPE_NAME_REF
+      PATH_TYPE
         PATH_REF
           PATH_SEGMENT_REF
             IDENT "t"
@@ -1384,5 +1384,111 @@ SOURCE_FILE
     WHITESPACE " "
     LITERAL
       STRING "'a'"
+    SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- full type names"
+  WHITESPACE "\n"
+  COMMENT_ON
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OBJECT_TYPE
+      TYPE_KW "type"
+      WHITESPACE " "
+      DOUBLE_TYPE
+        DOUBLE_KW "double"
+        WHITESPACE " "
+        PRECISION_KW "precision"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT_ON
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OBJECT_TYPE
+      TYPE_KW "type"
+      WHITESPACE " "
+      VARCHAR_TYPE
+        CHARACTER_KW "character"
+        WHITESPACE " "
+        VARYING_KW "varying"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT_ON
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OBJECT_TYPE
+      TYPE_KW "type"
+      WHITESPACE " "
+      TIMESTAMP_TYPE
+        TIMESTAMP_KW "timestamp"
+        WHITESPACE " "
+        WITH_TIMEZONE
+          WITH_KW "with"
+          WHITESPACE " "
+          TIME_KW "time"
+          WHITESPACE " "
+          ZONE_KW "zone"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT_ON
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OBJECT_TYPE
+      TYPE_KW "type"
+      WHITESPACE " "
+      VARCHAR_TYPE
+        VARCHAR_KW "varchar"
+        ARG_LIST
+          L_PAREN "("
+          ARG
+            LITERAL
+              INT_NUMBER "10"
+          R_PAREN ")"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "'x'"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  COMMENT_ON
+    COMMENT_KW "comment"
+    WHITESPACE " "
+    ON_KW "on"
+    WHITESPACE " "
+    OBJECT_DOMAIN
+      DOMAIN_KW "domain"
+      WHITESPACE " "
+      DOUBLE_TYPE
+        DOUBLE_KW "double"
+        WHITESPACE " "
+        PRECISION_KW "precision"
+    WHITESPACE " "
+    IS_KW "is"
+    WHITESPACE " "
+    LITERAL
+      STRING "'x'"
     SEMICOLON ";"
   WHITESPACE "\n"

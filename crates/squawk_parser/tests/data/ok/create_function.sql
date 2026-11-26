@@ -434,3 +434,5 @@ create function like() returns int8 as 'select 1' language sql;
 create function f() returns int return 1;
 create function f() returns int begin atomic return 1; end;
 create function f() returns null on null input as 'select 1' language sql;
+
+create function f() returns int language sql set schema 'public' as 'select 1';

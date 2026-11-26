@@ -59,3 +59,6 @@ alter procedure p
 alter procedure p
   no depends on extension e;
 
+
+-- set schema config
+alter procedure f() set schema 'public';

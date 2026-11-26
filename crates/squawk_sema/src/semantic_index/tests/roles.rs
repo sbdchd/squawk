@@ -419,3 +419,28 @@ drop role zr2;
       ╰╴          ━━━
     ");
 }
+
+#[test]
+fn grant_on_table_row_type() {
+    assert_snapshot!(check("
+create table t (a int);
+grant all on type t to public;
+"), @"no diagnostics");
+}
+
+#[test]
+fn grant_on_keyword_type_name() {
+    assert_snapshot!(check("
+grant all on type boolean to public;
+alter type boolean owner to current_user;
+"), @"
+    error: type `boolean` does not exist
+      ╭▸ 
+    2 │ grant all on type boolean to public;
+      ╰╴                  ━━━━━━━
+    error: type `boolean` does not exist
+      ╭▸ 
+    3 │ alter type boolean owner to current_user;
+      ╰╴           ━━━━━━━
+    ");
+}

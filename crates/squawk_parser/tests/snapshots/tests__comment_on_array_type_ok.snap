@@ -11,13 +11,14 @@ SOURCE_FILE
     OBJECT_TYPE
       TYPE_KW "type"
       WHITESPACE " "
-      TYPE_NAME_REF
-        PATH_REF
-          PATH_SEGMENT_REF
-            INT_KW "int"
-      ARRAY_BOUND
-        L_BRACK "["
-        R_BRACK "]"
+      ARRAY_TYPE
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              INT_KW "int"
+        ARRAY_BOUND
+          L_BRACK "["
+          R_BRACK "]"
     WHITESPACE " "
     IS_KW "is"
     WHITESPACE " "

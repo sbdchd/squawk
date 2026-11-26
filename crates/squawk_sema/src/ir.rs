@@ -85,6 +85,23 @@ impl TableKind {
             TableKind::PropertyGraph => "property graph",
         }
     }
+
+    pub fn row_type(self) -> RowType {
+        match self {
+            TableKind::Table
+            | TableKind::ForeignTable
+            | TableKind::View
+            | TableKind::MaterializedView
+            | TableKind::PropertyGraph => RowType::Present,
+            TableKind::Sequence => RowType::Absent,
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum RowType {
+    Present,
+    Absent,
 }
 
 impl std::fmt::Display for TableKind {

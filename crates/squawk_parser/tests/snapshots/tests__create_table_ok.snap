@@ -4737,4 +4737,29 @@ SOURCE_FILE
               INT_KW "int"
       R_PAREN ")"
     SEMICOLON ";"
+  WHITESPACE "\n\n"
+  COMMENT "-- enforced can be a type name"
+  WHITESPACE "\n"
+  CREATE_TABLE
+    CREATE_KW "create"
+    WHITESPACE " "
+    TABLE_KW "table"
+    WHITESPACE " "
+    TABLE_NAME
+      PATH
+        PATH_SEGMENT
+          IDENT "t"
+    WHITESPACE " "
+    TABLE_ARG_LIST
+      L_PAREN "("
+      COLUMN
+        COLUMN_NAME
+          IDENT "x"
+        WHITESPACE " "
+        PATH_TYPE
+          PATH_REF
+            PATH_SEGMENT_REF
+              ENFORCED_KW "enforced"
+      R_PAREN ")"
+    SEMICOLON ";"
   WHITESPACE "\n"

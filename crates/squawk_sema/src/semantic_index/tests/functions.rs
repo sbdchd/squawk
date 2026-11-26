@@ -1947,3 +1947,20 @@ call w(1, null);
        ╰╴     ━
     ");
 }
+
+#[test]
+fn alter_function_set_schema_setting() {
+    assert_snapshot!(check("
+create function f() returns int language sql as 'select 1';
+alter function f() set schema 'public';
+"), @"no diagnostics");
+}
+
+#[test]
+fn drop_function_ignores_out_arg_types() {
+    assert_snapshot!(check("
+create function f() returns int language sql as 'select 1';
+drop function f(out nosuch.a%type);
+drop function if exists f(out nosuch.a%type);
+"), @"no diagnostics");
+}

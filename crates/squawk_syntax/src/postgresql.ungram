@@ -1845,7 +1845,7 @@ IfExists =
  'if' 'exists'
 
 DropType =
-  'drop' 'type' IfExists? (TypeNameRef (',' TypeNameRef)*)
+  'drop' 'type' IfExists? (Type (',' Type)*)
   DropBehavior? ';'?
 
 DropIndex =
@@ -4120,7 +4120,7 @@ ObjectDatabase =
   'database' DatabaseRef
 
 ObjectDomain =
-  'domain' DomainRef
+  'domain' Type
 
 ObjectExtension =
   'extension' ExtensionRef
@@ -4156,7 +4156,7 @@ ObjectTablespace =
   'tablespace' TablespaceRef
 
 ObjectType =
-  'type' TypeNameRef 'array'? ArrayBound*
+  'type' Type
 
 ObjectView =
   'view' ViewRef
@@ -4334,7 +4334,7 @@ DatabaseOptionTemplate =
   'template' '='? (Expr | 'default' | DatabaseRef)
 
 SetConfigParam =
-  'set' (SetTimeZone | SetNames | (ConfigParameterRef ConfigAssignment))
+  'set' (SetTimeZone | SetNames | SetSchemaValue | (ConfigParameterRef ConfigAssignment))
 
 ResetConfigParam =
   'reset' ResetTarget
@@ -5411,7 +5411,7 @@ DropConversion =
   DropBehavior? ';'?
 
 DropDomain =
-  'drop' 'domain' IfExists? (DomainRef (',' DomainRef)*)
+  'drop' 'domain' IfExists? (Type (',' Type)*)
   DropBehavior? ';'?
 
 DropEventTrigger =

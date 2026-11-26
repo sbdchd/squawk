@@ -206,3 +206,35 @@ security label on schema nope is 'x';
        ╰╴                         ━━━━
     ");
 }
+
+#[test]
+fn comment_on_table_row_type() {
+    assert_snapshot!(check("
+create table t (a int);
+comment on type t is 'x';
+create sequence s;
+comment on type s is 'x';
+"), @"
+    error: type `s` does not exist
+      ╭▸ 
+    5 │ comment on type s is 'x';
+      ╰╴                ━
+    ");
+}
+
+#[test]
+fn comment_on_standard_type_name() {
+    assert_snapshot!(check("
+comment on type boolean is 'x';
+comment on type smallint is 'x';
+comment on type double precision is 'x';
+comment on type character varying(3) is 'x';
+comment on type int[] is 'x';
+comment on type nosuch is 'x';
+"), @"
+    error: type `nosuch` does not exist
+      ╭▸ 
+    7 │ comment on type nosuch is 'x';
+      ╰╴                ━━━━━━
+    ");
+}

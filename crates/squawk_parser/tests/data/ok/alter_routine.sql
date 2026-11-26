@@ -60,3 +60,6 @@ alter routine r external security definer;
 alter routine r parallel restricted;
 alter routine r parallel safe;
 
+
+-- set schema config
+alter routine f() set schema 'public';

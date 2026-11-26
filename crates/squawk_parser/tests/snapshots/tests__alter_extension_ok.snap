@@ -458,7 +458,7 @@ SOURCE_FILE
       OBJECT_DOMAIN
         DOMAIN_KW "domain"
         WHITESPACE " "
-        DOMAIN_REF
+        PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
               IDENT "o"
@@ -478,7 +478,7 @@ SOURCE_FILE
       OBJECT_DOMAIN
         DOMAIN_KW "domain"
         WHITESPACE " "
-        DOMAIN_REF
+        PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
               IDENT "o"
@@ -2131,7 +2131,7 @@ SOURCE_FILE
       OBJECT_TYPE
         TYPE_KW "type"
         WHITESPACE " "
-        TYPE_NAME_REF
+        PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
               IDENT "o"
@@ -2151,7 +2151,7 @@ SOURCE_FILE
       OBJECT_TYPE
         TYPE_KW "type"
         WHITESPACE " "
-        TYPE_NAME_REF
+        PATH_TYPE
           PATH_REF
             PATH_SEGMENT_REF
               IDENT "o"

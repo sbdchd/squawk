@@ -453,3 +453,6 @@ create table sequence (a int);
 create table if (a int);
 
 create table exclude (exclude int);
+
+-- enforced can be a type name
+create table t (x enforced);
