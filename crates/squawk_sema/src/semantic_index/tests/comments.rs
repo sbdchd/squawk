@@ -206,3 +206,18 @@ security label on schema nope is 'x';
        ╰╴                         ━━━━
     ");
 }
+
+#[test]
+fn comment_on_table_row_type() {
+    assert_snapshot!(check("
+create table t (a int);
+comment on type t is 'x';
+create sequence s;
+comment on type s is 'x';
+"), @"
+    error: type `s` does not exist
+      ╭▸ 
+    5 │ comment on type s is 'x';
+      ╰╴                ━
+    ");
+}

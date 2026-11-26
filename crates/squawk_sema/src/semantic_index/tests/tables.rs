@@ -1140,3 +1140,31 @@ alter table u alter f2 type text using f1 * 10;
        ╰ hint: consider adding explicit type casts
     ");
 }
+
+#[test]
+fn if_not_exists_skips_references() {
+    assert_snapshot!(check("
+create table t (a int);
+create table if not exists t (a int) tablespace nosuch;
+create table if not exists t partition of nosuch for values in (1);
+create table if not exists t as execute nosuch;
+"), @"no diagnostics");
+}
+
+#[test]
+fn if_exists_skips_references() {
+    assert_snapshot!(check("
+alter table if exists nosuch detach partition other;
+alter table if exists nosuch set schema nosuch_schema;
+alter sequence if exists nosuch owned by nosuch.a;
+"), @"no diagnostics");
+}
+
+#[test]
+fn rename_through_other_relation_kind() {
+    assert_snapshot!(check("
+create table t (a int);
+alter index t rename to u;
+alter view u rename a to b;
+"), @"no diagnostics");
+}

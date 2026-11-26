@@ -8821,7 +8821,7 @@ fn alter_routine(p: &mut Parser<'_>) -> CompletedMarker {
         OWNER_KW => {
             owner_to(p);
         }
-        SET_KW if p.nth_at(1, SCHEMA_KW) => {
+        SET_KW if p.nth_at(1, SCHEMA_KW) && !p.nth_at_ts(2, STRING_FIRST) => {
             set_schema(p);
         }
         NO_KW | DEPENDS_KW => {
@@ -8998,7 +8998,7 @@ fn alter_procedure(p: &mut Parser<'_>) -> CompletedMarker {
         OWNER_KW => {
             owner_to(p);
         }
-        SET_KW if p.nth_at(1, SCHEMA_KW) => {
+        SET_KW if p.nth_at(1, SCHEMA_KW) && !p.nth_at_ts(2, STRING_FIRST) => {
             set_schema(p);
         }
         DEPENDS_KW | NO_KW => {
@@ -9502,7 +9502,7 @@ fn alter_function(p: &mut Parser<'_>) -> CompletedMarker {
         OWNER_KW => {
             owner_to(p);
         }
-        SET_KW if p.nth_at(1, SCHEMA_KW) => {
+        SET_KW if p.nth_at(1, SCHEMA_KW) && !p.nth_at_ts(2, STRING_FIRST) => {
             set_schema(p);
         }
         DEPENDS_KW | NO_KW => {
@@ -18310,12 +18310,23 @@ fn set_configuration_param(p: &mut Parser<'_>) {
         NAMES_KW if !matches!(p.nth(1), TO_KW | EQ) => {
             set_names(p);
         }
+        SCHEMA_KW if p.nth_at_ts(1, STRING_FIRST) => {
+            set_schema_value(p);
+        }
         _ => {
             config_parameter_ref(p);
             config_assignment(p);
         }
     }
     m.complete(p, SET_CONFIG_PARAM);
+}
+
+fn set_schema_value(p: &mut Parser<'_>) {
+    assert!(p.at(SCHEMA_KW));
+    let m = p.start();
+    p.bump(SCHEMA_KW);
+    string_literal(p);
+    m.complete(p, SET_SCHEMA_VALUE);
 }
 
 // RESET configuration_parameter
@@ -18854,16 +18865,13 @@ fn set(p: &mut Parser<'_>) -> CompletedMarker {
         set_time_zone(p);
     } else if p.at(NAMES_KW) && !matches!(p.nth(1), TO_KW | EQ) {
         set_names(p);
-    } else if p.at(CATALOG_KW) || p.at(SCHEMA_KW) {
+    } else if p.at(CATALOG_KW) {
         let m = p.start();
-        let kind = if p.eat(CATALOG_KW) {
-            SET_CATALOG
-        } else {
-            p.bump(SCHEMA_KW);
-            SET_SCHEMA_VALUE
-        };
+        p.bump(CATALOG_KW);
         string_literal(p);
-        m.complete(p, kind);
+        m.complete(p, SET_CATALOG);
+    } else if p.at(SCHEMA_KW) {
+        set_schema_value(p);
     // configuration_parameter { TO | = } { value | 'value' | DEFAULT }
     } else {
         let m = p.start();

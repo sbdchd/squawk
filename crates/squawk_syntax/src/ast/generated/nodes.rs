@@ -25656,6 +25656,10 @@ impl SetConfigParam {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn set_schema_value(&self) -> Option<SetSchemaValue> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn set_time_zone(&self) -> Option<SetTimeZone> {
         support::child(&self.syntax)
     }

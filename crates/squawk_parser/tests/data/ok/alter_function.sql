@@ -58,3 +58,6 @@ alter function f no depends on extension e;
 
 
 alter function f rows -1;
+
+-- set schema config
+alter function f() set schema 'public';

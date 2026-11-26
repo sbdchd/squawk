@@ -4334,7 +4334,7 @@ DatabaseOptionTemplate =
   'template' '='? (Expr | 'default' | DatabaseRef)
 
 SetConfigParam =
-  'set' (SetTimeZone | SetNames | (ConfigParameterRef ConfigAssignment))
+  'set' (SetTimeZone | SetNames | SetSchemaValue | (ConfigParameterRef ConfigAssignment))
 
 ResetConfigParam =
   'reset' ResetTarget

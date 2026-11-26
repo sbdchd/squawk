@@ -204,3 +204,11 @@ select a collate "en-icu", a collate public."en-x-icu" from t;
       ╰╴                                            ━━━━━━━━━━
     "#);
 }
+
+#[test]
+fn drop_collation_repeated() {
+    assert_snapshot!(check("
+create collation c (locale = 'C');
+drop collation c, c;
+"), @"no diagnostics");
+}

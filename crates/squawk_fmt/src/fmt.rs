@@ -6674,6 +6674,12 @@ fn build_set_config_param<'a>(ctx: &Ctx, set: &ast::SetConfigParam) -> Doc<'a> {
             .append(build_set_names(&names))
             .group();
     }
+    if let Some(value) = set.set_schema_value() {
+        return doc
+            .append(space_before(value.syntax()))
+            .append(build_set_literal_target("schema", value.literal()))
+            .group();
+    }
     doc = append_commented_path_ref(doc, set.config_parameter_ref());
     if let Some(assignment) = set.config_assignment() {
         doc = doc

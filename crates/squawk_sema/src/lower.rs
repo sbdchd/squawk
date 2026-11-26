@@ -23,7 +23,7 @@ use crate::file::{FileId, InFile, InIrFile, IrFileId, IrFileRange};
 use crate::generated::non_unique_index_access_methods::NON_UNIQUE_INDEX_ACCESS_METHODS;
 use crate::inheritance_graph::{Inheritance, InheritanceGraph, InheritanceKind};
 use crate::interner::Name;
-use crate::ir::{ArrayOwner, SubscriptResults};
+use crate::ir::{ArrayOwner, RowType, SubscriptResults};
 use crate::keyed_index::{GraphElementIndex, Keyed, KeyedIndex};
 use crate::lookup::{Lookup, RefSource, RelationLookup, TableLookup, TypeCandidates};
 use crate::partition_bound::{
@@ -1012,7 +1012,7 @@ enum MultirangeName {
     String(String),
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 enum IfMissing {
     Error,
     Ignore,
@@ -1793,6 +1793,14 @@ impl Lowerer {
     }
 
     fn lower_alter_view(&mut self, alter_view: &ast::AlterView) {
+        let lookup = if matches!(
+            alter_view.action(),
+            Some(ast::AlterViewAction::RenameColumn(_))
+        ) {
+            TableLookup::Any
+        } else {
+            TableLookup::View
+        };
         let view = alter_view
             .view_ref()
             .and_then(|view| view.path_ref())
@@ -1800,7 +1808,7 @@ impl Lowerer {
                 self.lower_table_ref(
                     &path,
                     IfMissing::from_if_exists(alter_view.if_exists().as_ref()),
-                    TableLookup::View,
+                    lookup,
                 )
             });
         match alter_view.action() {
@@ -2172,8 +2180,8 @@ impl Lowerer {
             return;
         };
         let name = self.intern(&segment.text());
-        let schema = self.index.tables[table].schema;
-        if self.report_relation_name_taken(schema, name, segment.syntax()) {
+        let Table { schema, kind, .. } = self.index.tables[table];
+        if self.report_relation_name_taken(schema, name, segment.syntax(), kind.row_type()) {
             return;
         }
         self.move_table(table, schema, name, self.ptr(segment.syntax()));
@@ -2194,12 +2202,13 @@ impl Lowerer {
             name,
             name_ptr,
             array_name,
+            kind,
             ..
         } = self.index.tables[table];
         if self.index.tables[table].schema == schema {
             return;
         }
-        if self.report_relation_name_taken(schema, name, schema_ref.syntax()) {
+        if self.report_relation_name_taken(schema, name, schema_ref.syntax(), kind.row_type()) {
             return;
         }
         if let Some(array_name) = array_name
@@ -2219,6 +2228,7 @@ impl Lowerer {
                     schema,
                     self.index.tables[sequence].name,
                     schema_ref.syntax(),
+                    RowType::Absent,
                 )
             {
                 return;
@@ -2247,11 +2257,23 @@ impl Lowerer {
         }
     }
 
-    fn report_relation_name_taken(&mut self, schema: Name, name: Name, node: &SyntaxNode) -> bool {
+    fn report_relation_name_taken(
+        &mut self,
+        schema: Name,
+        name: Name,
+        node: &SyntaxNode,
+        row_type: RowType,
+    ) -> bool {
         if self.relation_exists(schema, name) {
             self.report_duplicate(ObjectKind::Relation, node, name);
             true
-        } else if self.find_type_in(schema, name).is_some() {
+        } else if self
+            .find_type_in(schema, name)
+            .is_some_and(|ty| match row_type {
+                RowType::Present => true,
+                RowType::Absent => self.index.types[ty].columns.is_some(),
+            })
+        {
             self.report_duplicate(ObjectKind::Type, node, name);
             true
         } else {
@@ -2503,16 +2525,14 @@ impl Lowerer {
     }
 
     fn lower_alter_sequence(&mut self, alter_sequence: &ast::AlterSequence) {
+        let if_missing = IfMissing::from_if_exists(alter_sequence.if_exists().as_ref());
         let sequence = alter_sequence
             .sequence_ref()
             .and_then(|sequence| sequence.path_ref())
-            .and_then(|path| {
-                self.lower_table_ref(
-                    &path,
-                    IfMissing::from_if_exists(alter_sequence.if_exists().as_ref()),
-                    TableLookup::Sequence,
-                )
-            });
+            .and_then(|path| self.lower_table_ref(&path, if_missing, TableLookup::Sequence));
+        if sequence.is_none() && if_missing == IfMissing::Ignore {
+            return;
+        }
         for action in alter_sequence.actions() {
             match action {
                 ast::AlterSequenceAction::SequenceOption(option) => {
@@ -2541,6 +2561,7 @@ impl Lowerer {
             .sequence_token()
             .filter(|_| drop_sequence.sequence_refs().nth(1).is_none())
             .map(|token| self.token_range(&token));
+        let mut sequences: SmallVec<[TableId; 4]> = SmallVec::new();
         for path in drop_sequence
             .sequence_refs()
             .filter_map(|sequence| sequence.path_ref())
@@ -2548,8 +2569,11 @@ impl Lowerer {
             if let Some(sequence) =
                 self.lower_drop_table_ref(&path, if_missing, TableLookup::Sequence, keyword_range)
             {
-                self.drop_table(sequence);
+                sequences.push(sequence);
             }
+        }
+        for sequence in sequences {
+            self.drop_table(sequence);
         }
     }
 
@@ -10228,11 +10252,13 @@ impl Lowerer {
                 let mut arg_types: SmallVec<[Option<Ty>; 4]> = SmallVec::new();
                 let mut missing = false;
                 for param in param_list.params() {
+                    let out = matches!(param.mode(), Some(ast::ParamMode::ParamOut(_)));
+                    let param_if_missing = if out { IfMissing::Ignore } else { if_missing };
                     let ty = param.func_type().map_or(TypeLookup::Unknown, |ty| {
-                        self.lower_func_type_lookup(&ty, if_missing)
+                        self.lower_func_type_lookup(&ty, param_if_missing)
                     });
-                    missing |= matches!(ty, TypeLookup::Missing);
-                    if !matches!(param.mode(), Some(ast::ParamMode::ParamOut(_))) {
+                    if !out {
+                        missing |= matches!(ty, TypeLookup::Missing);
                         arg_types.push(ty.ty());
                     }
                 }
@@ -10827,6 +10853,12 @@ impl Lowerer {
         partition_by: Option<ast::PartitionBy>,
         of_type: Option<ast::OfType>,
     ) {
+        if let Some(path) = create_table.table_name().and_then(|name| name.path()) {
+            let persistence = Persistence::from_ast(create_table.persistence().as_ref());
+            if self.skips_existing_relation(if_exists, persistence, &path) {
+                return;
+            }
+        }
         if let Some(partition_type) = partition_type {
             self.lower_partition_type(partition_type);
         }
@@ -11813,6 +11845,13 @@ impl Lowerer {
     }
 
     fn lower_create_table_as(&mut self, create_table_as: &ast::CreateTableAs) {
+        let if_exists = IfExists::from_if_not_exists(create_table_as.if_not_exists().as_ref());
+        let persistence = Persistence::from_ast(create_table_as.persistence().as_ref());
+        if let Some(path) = create_table_as.table_name().and_then(|name| name.path())
+            && self.skips_existing_relation(if_exists, persistence, &path)
+        {
+            return;
+        }
         let columns = create_table_as
             .query()
             .map(|query| self.lower_create_table_as_query(query));
@@ -11843,11 +11882,10 @@ impl Lowerer {
             ),
             None => columns,
         };
-        let persistence = Persistence::from_ast(create_table_as.persistence().as_ref());
         self.alloc_table(
             TableKind::Table,
             persistence,
-            IfExists::from_if_not_exists(create_table_as.if_not_exists().as_ref()),
+            if_exists,
             create_table_as.syntax(),
             &path,
             columns,
@@ -12831,9 +12869,13 @@ impl Lowerer {
             .qualifier()
             .and_then(|qualifier| qualifier.segment())
             .map(|segment| self.intern_schema(&segment.text()));
-        let Some(Resolution::Table(table)) = self
-            .search_path(schema, Lookup::Type)
-            .find_map(|schema| self.find_type_in_schema(schema, name))
+        let Some(Resolution::Table(table)) =
+            self.search_path(schema, Lookup::Type).find_map(|schema| {
+                if let Some(ty) = self.find_type_in(schema, name) {
+                    return Some(Resolution::Type(ty));
+                }
+                self.find_table(Some(schema), name).map(Resolution::Table)
+            })
         else {
             return None;
         };
@@ -13611,7 +13653,7 @@ impl Lowerer {
         }
         if let Some(index) = index {
             let schema = self.index.indexes[index].schema;
-            if self.report_relation_name_taken(schema, new_name, name.syntax()) {
+            if self.report_relation_name_taken(schema, new_name, name.syntax(), RowType::Absent) {
                 return;
             }
             self.move_index(index, new_name, name.syntax());
@@ -13679,7 +13721,7 @@ impl Lowerer {
         };
         let name = self.intern(&segment.text());
         let schema = self.index.indexes[index].schema;
-        if self.report_relation_name_taken(schema, name, segment.syntax()) {
+        if self.report_relation_name_taken(schema, name, segment.syntax(), RowType::Absent) {
             return;
         }
         self.move_index(index, name, segment.syntax());
@@ -13747,7 +13789,8 @@ impl Lowerer {
     }
 
     fn type_name_taken(&self, schema: Name, name: Name) -> bool {
-        self.find_type_in(schema, name).is_some() || self.find_table(Some(schema), name).is_some()
+        self.find_type_in(schema, name).is_some()
+            || self.find_row_type_table(schema, name).is_some()
     }
 
     fn move_type(
@@ -14012,7 +14055,14 @@ impl Lowerer {
         let found = self
             .search_path(schema, Lookup::Type)
             .find_map(|schema| self.find_type_in(schema, name));
-        let resolution = found.map_or(if_missing.resolution(), Resolution::Type);
+        let resolution = match found {
+            Some(ty) => Resolution::Type(ty),
+            None if kind.is_none() => self
+                .search_path(schema, Lookup::Type)
+                .find_map(|schema| self.find_row_type_table(schema, name))
+                .map_or(if_missing.resolution(), Resolution::Table),
+            None => if_missing.resolution(),
+        };
         self.add_ref_from(
             name,
             segment.syntax(),
@@ -14138,7 +14188,13 @@ impl Lowerer {
         if let Some(ty) = self.find_type_in(schema, name) {
             return Some(Resolution::Type(ty));
         }
-        self.find_table(Some(schema), name).map(Resolution::Table)
+        self.find_row_type_table(schema, name)
+            .map(Resolution::Table)
+    }
+
+    fn find_row_type_table(&self, schema: Name, name: Name) -> Option<TableId> {
+        self.find_table(Some(schema), name)
+            .filter(|table| self.index.tables[*table].kind.row_type() == RowType::Present)
     }
 
     fn find_type_in(&self, schema: Name, name: Name) -> Option<TypeId> {
@@ -14313,10 +14369,24 @@ impl Lowerer {
         &mut self,
         param: &ast::SetConfigParam,
     ) -> Option<SmallVec<[Name; 4]>> {
+        if let Some(value) = param.set_schema_value() {
+            return self.lower_set_schema_value(&value);
+        }
         if !is_search_path(param.config_parameter_ref()) {
             return None;
         }
         self.lower_search_path(param.config_assignment()?)
+    }
+
+    fn lower_set_schema_value(
+        &mut self,
+        value: &ast::SetSchemaValue,
+    ) -> Option<SmallVec<[Name; 4]>> {
+        let literal = value.literal()?;
+        let schema = literal.string_value()?;
+        Some(smallvec![
+            self.lower_search_path_schema(literal.syntax(), &schema)
+        ])
     }
 
     fn lower_set(&mut self, set: &ast::Set) {
@@ -14332,12 +14402,7 @@ impl Lowerer {
                     .config_assignment()
                     .and_then(|assignment| self.lower_search_path(assignment))
             }
-            Some(ast::SetTarget::SetSchemaValue(value)) => value.literal().and_then(|literal| {
-                let schema = literal.string_value()?;
-                Some(smallvec![
-                    self.lower_search_path_schema(literal.syntax(), &schema),
-                ])
-            }),
+            Some(ast::SetTarget::SetSchemaValue(value)) => self.lower_set_schema_value(&value),
             Some(ast::SetTarget::SetCatalog(catalog)) => {
                 self.push_error(catalog.syntax(), SemaError::CannotChangeDatabase);
                 None
@@ -16107,8 +16172,9 @@ impl Lowerer {
         if let Some(expr) = where_clause.and_then(|clause| clause.expr()) {
             self.lower_condition(ConditionKind::Where, &expr);
         }
-        self.index.queries[query].sources.truncate(len);
-        self.set_visible((0..len).into());
+        if target.is_some() {
+            self.push_hidden((len..len + 1).into());
+        }
     }
 
     fn target_table(&self, target: Option<SourceId>) -> Option<TableId> {
@@ -18299,11 +18365,18 @@ impl Lowerer {
                 }
                 None
             }
-            None => self.lower_table_ref(
-                &path,
-                IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
-                alter_table_lookup(alter_table.actions()),
-            ),
+            None => {
+                let if_missing = IfMissing::from_if_exists(alter_table.if_exists().as_ref());
+                let table = self.lower_table_ref(
+                    &path,
+                    if_missing,
+                    alter_table_lookup(alter_table.actions()),
+                );
+                if table.is_none() && if_missing == IfMissing::Ignore {
+                    return;
+                }
+                table
+            }
         };
         let recurse = relation_name.is_some_and(|name| name.only_token().is_none());
         self.lower_alter_table_actions(table, recurse, alter_table.actions(), alter_table.syntax());
@@ -20304,6 +20377,9 @@ impl Lowerer {
             self.lower_all_in_tablespace(&all_in_tablespace);
             return;
         }
+        if self.lower_alter_index_rename_table(alter_index) {
+            return;
+        }
         let index = alter_index
             .index_ref()
             .and_then(|index| index.path_ref())
@@ -20350,6 +20426,33 @@ impl Lowerer {
             )
             | None => {}
         }
+    }
+
+    fn lower_alter_index_rename_table(&mut self, alter_index: &ast::AlterIndex) -> bool {
+        let Some(ast::AlterIndexAction::IndexRenameTo(rename)) = alter_index.action() else {
+            return false;
+        };
+        let Some(path) = alter_index.index_ref().and_then(|index| index.path_ref()) else {
+            return false;
+        };
+        let Some(segment) = path.segment() else {
+            return false;
+        };
+        let name = self.intern(&segment.text());
+        let schema = path
+            .qualifier()
+            .and_then(|qualifier| qualifier.segment())
+            .map(|segment| self.intern_schema(&segment.text()));
+        if self.find_index(schema, name).is_some() || self.find_table(schema, name).is_none() {
+            return false;
+        }
+        let Some(table) = self.lower_table_ref(&path, IfMissing::Error, TableLookup::Any) else {
+            return false;
+        };
+        if let Some(new_name) = rename.index().and_then(|index| index.path()) {
+            self.rename_table(table, &new_name);
+        }
+        true
     }
 
     fn lower_drop_index(&mut self, drop_index: &ast::DropIndex) {
@@ -21356,13 +21459,17 @@ impl Lowerer {
 
     fn lower_drop_collation(&mut self, drop_collation: &ast::DropCollation) {
         let if_missing = IfMissing::from_if_exists(drop_collation.if_exists().as_ref());
+        let mut collations: SmallVec<[CollationId; 4]> = SmallVec::new();
         for path in drop_collation
             .collation_refs()
             .filter_map(|collation| collation.path_ref())
         {
             if let Some(collation) = self.lower_collation_ref(&path, if_missing) {
-                self.drop_collation(collation);
+                collations.push(collation);
             }
+        }
+        for collation in collations {
+            self.drop_collation(collation);
         }
     }
 
@@ -28482,6 +28589,27 @@ impl Lowerer {
         Some(id)
     }
 
+    fn skips_existing_relation(
+        &mut self,
+        if_exists: IfExists,
+        persistence: Persistence,
+        path: &ast::Path,
+    ) -> bool {
+        if if_exists != IfExists::Ignore {
+            return false;
+        }
+        let Some(segment) = path.segment() else {
+            return false;
+        };
+        let name = self.intern(&segment.text());
+        let schema = match path.qualifier().and_then(|qualifier| qualifier.segment()) {
+            Some(qualifier) => self.intern_schema(&qualifier.text()),
+            None if persistence == Persistence::Temp => self.pg_temp,
+            None => self.default_creation_schema(),
+        };
+        self.relation_exists(schema, name)
+    }
+
     fn alloc_table(
         &mut self,
         kind: TableKind,
@@ -28533,7 +28661,7 @@ impl Lowerer {
         }
         let array_name = match replaced {
             Some(replaced) => self.index.tables[replaced].array_name,
-            None => self.new_array_name(schema, name, kind != TableKind::Sequence),
+            None => self.new_array_name(schema, name, kind.row_type() == RowType::Present),
         };
         let id = self.index.tables.alloc(
             Table {
@@ -28638,9 +28766,7 @@ impl Lowerer {
         let segment = path.segment()?;
         let name = self.intern(&segment.text());
         let schema = self.creation_schema(path);
-        if self.find_type_in(schema, name).is_some()
-            || self.find_table(Some(schema), name).is_some()
-        {
+        if self.type_name_taken(schema, name) {
             self.report_duplicate(ObjectKind::Type, segment.syntax(), name);
         }
         let id = self.alloc_named_type(kind, node, segment.syntax(), schema, name, columns);
