@@ -20885,7 +20885,7 @@ impl Lowerer {
             }
             ast::CommentObject::ObjectDatabase(object) => {
                 if let Some(database) = object.database_ref() {
-                    self.lower_database_ref(&database, if_missing);
+                    self.lower_database_ref(&database, IfMissing::Ignore);
                 }
                 None
             }

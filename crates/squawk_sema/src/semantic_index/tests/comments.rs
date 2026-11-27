@@ -238,3 +238,10 @@ comment on type nosuch is 'x';
       ╰╴                ━━━━━━
     ");
 }
+
+#[test]
+fn comment_on_missing_database() {
+    assert_snapshot!(check("
+comment on database nosuch is 'x';
+"), @"no diagnostics");
+}
