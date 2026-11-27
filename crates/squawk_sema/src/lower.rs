@@ -14,6 +14,7 @@ use squawk_syntax::{
 };
 
 use crate::arena::{IdxRange, LayeredArena};
+use crate::builtin_am::BuiltinAm;
 use crate::builtin_fn::BuiltinFn;
 use crate::builtin_ty::BuiltinTy;
 use crate::column_exprs::{ColumnExpr, ColumnExprId, ColumnExprKind, ColumnExprs, ColumnKey};
@@ -5371,8 +5372,7 @@ impl Lowerer {
     ) -> Option<AccessMethodId> {
         let name = self.intern(&access_method_ref.text());
         if self.index.names.resolve(name) == "rtree" && self.find_access_method(name).is_none() {
-            let gist = self.intern("gist");
-            let access_method = self.find_access_method(gist);
+            let access_method = self.builtin_am(BuiltinAm::Gist);
             let resolution = access_method.map_or(Resolution::Unresolved, Resolution::AccessMethod);
             self.add_ref(
                 name,
@@ -11220,8 +11220,11 @@ impl Lowerer {
             .partition_strategy()
             .and_then(|strategy| strategy.kind())
             == Some(ast::PartitionStrategyKind::Hash);
-        let access_method = self.intern(if hash { "hash" } else { "btree" });
-        let access_method = self.find_access_method(access_method);
+        let access_method = self.builtin_am(if hash {
+            BuiltinAm::Hash
+        } else {
+            BuiltinAm::Btree
+        });
         let columns: Option<SmallVec<[Name; 4]>> = partition_by
             .partition_item_list()
             .into_iter()
@@ -12053,8 +12056,7 @@ impl Lowerer {
                             if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = ty
                                 && let Some(path) = path_type.path_ref()
                             {
-                                let btree = self.intern("btree");
-                                let access_method = self.find_access_method(btree);
+                                let access_method = self.builtin_am(BuiltinAm::Btree);
                                 self.lower_operator_class_ref(
                                     &path,
                                     access_method,
@@ -19626,10 +19628,7 @@ impl Lowerer {
             Some(using_method) => using_method
                 .access_method_ref()
                 .and_then(|method| self.lower_index_method_ref(&method)),
-            None => {
-                let btree = self.intern("btree");
-                self.find_access_method(btree)
-            }
+            None => self.builtin_am(BuiltinAm::Btree),
         };
         if let Some(tablespace) = create_index
             .tablespace_clause()
@@ -22821,10 +22820,7 @@ impl Lowerer {
             .and_then(|method| method.access_method_ref())
         {
             Some(access_method_ref) => self.lower_index_method_ref(&access_method_ref),
-            None => {
-                let btree = self.intern("btree");
-                self.find_access_method(btree)
-            }
+            None => self.builtin_am(BuiltinAm::Btree),
         };
         if let Some(tablespace) = exclude
             .constraint_index_tablespace()
@@ -23280,7 +23276,7 @@ impl Lowerer {
         if ty == referenced_ty {
             return true;
         }
-        let Some(btree) = self.btree() else {
+        let Some(btree) = self.builtin_am(BuiltinAm::Btree) else {
             return true;
         };
         let class = match self.default_operator_class(btree, referenced_ty) {
@@ -23331,7 +23327,7 @@ impl Lowerer {
     }
 
     fn check_key_operator_classes(&mut self, table: TableId, columns: &[Name], node: &SyntaxNode) {
-        let Some(btree) = self.btree() else {
+        let Some(btree) = self.builtin_am(BuiltinAm::Btree) else {
             return;
         };
         let range = self.index.tables[table].columns.range;
@@ -23345,10 +23341,10 @@ impl Lowerer {
         }
     }
 
-    fn btree(&self) -> Option<AccessMethodId> {
+    fn builtin_am(&self, am: BuiltinAm) -> Option<AccessMethodId> {
         self.index
             .names
-            .lookup("btree")
+            .lookup(am.name())
             .and_then(|name| self.find_access_method(name))
     }
 
