@@ -14,6 +14,7 @@ use squawk_syntax::{
 };
 
 use crate::arena::{IdxRange, LayeredArena};
+use crate::builtin_fn::BuiltinFn;
 use crate::builtin_ty::BuiltinTy;
 use crate::column_exprs::{ColumnExpr, ColumnExprId, ColumnExprKind, ColumnExprs, ColumnKey};
 use crate::dependency_graph::{DependencyGraph, Object, rename_schema_objects, set_object_schema};
@@ -18032,7 +18033,7 @@ impl Lowerer {
         let CallArgs { args, .. } =
             self.with_from_function(|this| this.lower_call_args(call.arg_list()));
         self.check_from_set_returning(srf_calls, None);
-        let name = self.intern("unnest");
+        let name = self.intern(BuiltinFn::Unnest.name());
         let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
         let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in &args {
@@ -22162,9 +22163,9 @@ impl Lowerer {
             && (similar || pattern)
         {
             let function = if similar {
-                "similar_to_escape"
+                BuiltinFn::SimilarToEscape
             } else {
-                "like_escape"
+                BuiltinFn::LikeEscape
             };
             let args = [
                 self.lower_positional_arg(escape.lhs()),
@@ -22198,7 +22199,7 @@ impl Lowerer {
         let arg = expr_arg_type(Some(rhs), self.lower_expr(rhs));
         if similar {
             return self
-                .system_call_type("similar_to_escape", &[CallArg::positional(arg)])
+                .system_call_type(BuiltinFn::SimilarToEscape, &[CallArg::positional(arg)])
                 .map_or(ArgType::Untyped, ArgType::Known);
         }
         arg
@@ -25171,7 +25172,7 @@ impl Lowerer {
                     let expr = self.lower_positional_arg(bin.lhs());
                     let zone = self.lower_positional_arg(bin.rhs());
                     return self.lower_system_call(
-                        "timezone",
+                        BuiltinFn::Timezone,
                         &[zone, expr],
                         at_time_zone.syntax().text_range(),
                     );
@@ -25376,7 +25377,7 @@ impl Lowerer {
                 Some(ast::PostfixOp::AtLocal(at_local)) => {
                     let expr = self.lower_positional_arg(postfix.expr());
                     return self.lower_system_call(
-                        "timezone",
+                        BuiltinFn::Timezone,
                         &[expr],
                         at_local.syntax().text_range(),
                     );
@@ -25820,7 +25821,7 @@ impl Lowerer {
                 return None;
             };
             let range = collation.text_range().cover(for_token.text_range());
-            return Some(self.lower_special_call("pg_collation_for", smallvec![arg], range));
+            return Some(self.lower_special_call(BuiltinFn::PgCollationFor, smallvec![arg], range));
         }
         if let Some(extract_fn) = call.extract_fn() {
             let field = CallArg {
@@ -25830,7 +25831,7 @@ impl Lowerer {
             let expr = self.lower_positional_arg(extract_fn.expr());
             let token = extract_fn.extract_token()?;
             return Some(self.lower_special_call(
-                "extract",
+                BuiltinFn::Extract,
                 smallvec![field, expr],
                 token.text_range(),
             ));
@@ -25840,7 +25841,7 @@ impl Lowerer {
             let string = self.lower_positional_arg(position_fn.string());
             let token = position_fn.position_token()?;
             return Some(self.lower_special_call(
-                "position",
+                BuiltinFn::Position,
                 smallvec![string, substring],
                 token.text_range(),
             ));
@@ -25854,7 +25855,7 @@ impl Lowerer {
                 });
             }
             let token = normalize_fn.normalize_token()?;
-            return Some(self.lower_special_call("normalize", args, token.text_range()));
+            return Some(self.lower_special_call(BuiltinFn::Normalize, args, token.text_range()));
         }
         if let Some(overlay_fn) = call.overlay_fn() {
             let args = match overlay_fn.overlay_args() {
@@ -25875,7 +25876,7 @@ impl Lowerer {
                 None => smallvec![],
             };
             let token = overlay_fn.overlay_token()?;
-            return Some(self.lower_special_call("overlay", args, token.text_range()));
+            return Some(self.lower_special_call(BuiltinFn::Overlay, args, token.text_range()));
         }
         if let Some(substring_fn) = call.substring_fn() {
             let args = match substring_fn.substring_args() {
@@ -25914,13 +25915,13 @@ impl Lowerer {
                 None => smallvec![],
             };
             let token = substring_fn.substring_token()?;
-            return Some(self.lower_special_call("substring", args, token.text_range()));
+            return Some(self.lower_special_call(BuiltinFn::Substring, args, token.text_range()));
         }
         if let Some(trim_fn) = call.trim_fn() {
             let function = match trim_fn.trim_side() {
-                Some(ast::TrimSide::TrimBoth(_)) | None => "btrim",
-                Some(ast::TrimSide::TrimLeading(_)) => "ltrim",
-                Some(ast::TrimSide::TrimTrailing(_)) => "rtrim",
+                Some(ast::TrimSide::TrimBoth(_)) | None => BuiltinFn::Btrim,
+                Some(ast::TrimSide::TrimLeading(_)) => BuiltinFn::Ltrim,
+                Some(ast::TrimSide::TrimTrailing(_)) => BuiltinFn::Rtrim,
             };
             let args = match trim_fn.trim_args() {
                 Some(ast::TrimArgs::TrimExprFrom(args)) => {
@@ -26076,7 +26077,7 @@ impl Lowerer {
             );
             let token = xml_exists.xmlexists_token()?;
             return Some(self.lower_special_call(
-                "xmlexists",
+                BuiltinFn::Xmlexists,
                 smallvec![path, document],
                 token.text_range(),
             ));
@@ -27308,7 +27309,7 @@ impl Lowerer {
                 self.lower_exprs(side);
             }
         }
-        self.lower_system_call("overlaps", &args, overlaps.text_range())
+        self.lower_system_call(BuiltinFn::Overlaps, &args, overlaps.text_range())
     }
 
     fn lower_is_normalized(
@@ -27324,9 +27325,9 @@ impl Lowerer {
                 ty: ArgType::UnknownLiteral,
                 ..CallArg::default()
             };
-            self.lower_system_call("is_normalized", &[expr, form], range)
+            self.lower_system_call(BuiltinFn::IsNormalized, &[expr, form], range)
         } else {
-            self.lower_system_call("is_normalized", &[expr], range)
+            self.lower_system_call(BuiltinFn::IsNormalized, &[expr], range)
         }
     }
 
@@ -27348,7 +27349,7 @@ impl Lowerer {
 
     fn lower_system_call(
         &mut self,
-        function: &str,
+        function: BuiltinFn,
         args: &[CallArg],
         range: TextRange,
     ) -> Option<Ty> {
@@ -27381,11 +27382,11 @@ impl Lowerer {
 
     fn lower_system_function_ref(
         &mut self,
-        function: &str,
+        function: BuiltinFn,
         args: &[CallArg],
         range: TextRange,
     ) -> Callee {
-        let name = self.intern(function);
+        let name = self.intern(function.name());
         let resolution =
             self.find_routine(Some(self.pg_catalog), name, args, FunctionKind::Function);
         let reference = self.add_ref_at(
@@ -27402,8 +27403,8 @@ impl Lowerer {
         }
     }
 
-    fn system_call_type(&mut self, function: &str, args: &[CallArg]) -> Option<Ty> {
-        let name = self.intern(function);
+    fn system_call_type(&mut self, function: BuiltinFn, args: &[CallArg]) -> Option<Ty> {
+        let name = self.intern(function.name());
         let Resolution::Function(function) =
             self.find_routine(Some(self.pg_catalog), name, args, FunctionKind::Function)
         else {
@@ -27414,7 +27415,7 @@ impl Lowerer {
 
     fn lower_special_call(
         &mut self,
-        function: &str,
+        function: BuiltinFn,
         args: SmallVec<[CallArg; 4]>,
         range: TextRange,
     ) -> LoweredCall {
@@ -30261,16 +30262,16 @@ fn is_temp_schema_alias(schema: &str) -> bool {
         .is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit()))
 }
 
-fn sql_value_function_name(function: ast::SqlValueFunction) -> Option<&'static str> {
+fn sql_value_function_name(function: ast::SqlValueFunction) -> Option<BuiltinFn> {
     match function {
-        ast::SqlValueFunction::CurrentCatalog => Some("current_database"),
+        ast::SqlValueFunction::CurrentCatalog => Some(BuiltinFn::CurrentDatabase),
         ast::SqlValueFunction::CurrentRole
         | ast::SqlValueFunction::CurrentUser
-        | ast::SqlValueFunction::User => Some("current_user"),
-        ast::SqlValueFunction::CurrentSchema => Some("current_schema"),
-        ast::SqlValueFunction::SessionUser => Some("session_user"),
-        ast::SqlValueFunction::SystemUser => Some("system_user"),
-        ast::SqlValueFunction::CurrentTimestamp => Some("now"),
+        | ast::SqlValueFunction::User => Some(BuiltinFn::CurrentUser),
+        ast::SqlValueFunction::CurrentSchema => Some(BuiltinFn::CurrentSchema),
+        ast::SqlValueFunction::SessionUser => Some(BuiltinFn::SessionUser),
+        ast::SqlValueFunction::SystemUser => Some(BuiltinFn::SystemUser),
+        ast::SqlValueFunction::CurrentTimestamp => Some(BuiltinFn::Now),
         ast::SqlValueFunction::CurrentDate
         | ast::SqlValueFunction::CurrentTime
         | ast::SqlValueFunction::Localtime
