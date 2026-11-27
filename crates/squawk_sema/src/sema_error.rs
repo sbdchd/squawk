@@ -2,6 +2,7 @@ use std::borrow::Cow;
 use std::fmt;
 
 use crate::arena::IdxRange;
+use crate::builtin_ty::BuiltinTy;
 use crate::interner::{Interner, Name};
 use crate::ir::{
     AccessMethodKind, IntervalTypmod, ReferenceKind, Resolution, ReturnKind, RoutineKind,
@@ -1158,10 +1159,10 @@ pub(crate) enum TriggerFunctionKind {
 }
 
 impl TriggerFunctionKind {
-    pub(crate) fn return_type(self) -> &'static str {
+    pub(crate) fn return_type(self) -> BuiltinTy {
         match self {
-            TriggerFunctionKind::Trigger => "trigger",
-            TriggerFunctionKind::EventTrigger => "event_trigger",
+            TriggerFunctionKind::Trigger => BuiltinTy::Trigger,
+            TriggerFunctionKind::EventTrigger => BuiltinTy::EventTrigger,
         }
     }
 }
