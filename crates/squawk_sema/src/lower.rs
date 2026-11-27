@@ -10317,14 +10317,9 @@ impl Lowerer {
                 } else {
                     let function =
                         self.find_function_with_arg_types(schema, name, kind, &arg_types);
-                    if function.is_none()
-                        && let Some(drop) = drop
-                        && let Some(aggregate) = self.find_function_with_arg_types(
-                            schema,
-                            name,
-                            RoutineKind::Aggregate,
-                            &arg_types,
-                        )
+                    if let Some(drop) = drop
+                        && let Some(aggregate) = function
+                            .filter(|function| self.is_aggregate_as_function(kind, *function))
                     {
                         return self.aggregate_dropped_as_function(
                             &segment, schema, name, aggregate, drop,
@@ -10386,10 +10381,9 @@ impl Lowerer {
             }
             None => {
                 let resolution = self.find_unique_function(schema, name, kind);
-                if resolution.is_none()
-                    && let Some(drop) = drop
-                    && let Some(Resolution::Function(aggregate)) =
-                        self.find_unique_function(schema, name, RoutineKind::Aggregate)
+                if let Some(drop) = drop
+                    && let Some(Resolution::Function(aggregate)) = resolution
+                    && self.is_aggregate_as_function(kind, aggregate)
                 {
                     return self
                         .aggregate_dropped_as_function(&segment, schema, name, aggregate, drop);
@@ -10408,6 +10402,11 @@ impl Lowerer {
             Resolution::Function(function) => Some(function),
             _ => None,
         }
+    }
+
+    fn is_aggregate_as_function(&self, kind: RoutineKind, function: FunctionId) -> bool {
+        kind == RoutineKind::Function
+            && self.index.functions[function].kind == FunctionKind::Aggregate
     }
 
     fn find_function_with_arg_types(

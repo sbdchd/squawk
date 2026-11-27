@@ -976,3 +976,40 @@ select sum((select sum(t.a))) from t;
        ╰╴                   ━━━━━━━━
     ");
 }
+
+#[test]
+fn grant_on_function_aggregate() {
+    assert_snapshot!(check("
+create aggregate agg1(int) (
+  sfunc = int4pl,
+  stype = int
+);
+create procedure p(int)
+  language sql
+  as 'select 1';
+grant all privileges on function agg1(int) to public;
+revoke execute on function agg1 from public;
+grant execute on function p(int) to public;
+drop function agg1(int);
+"), @"
+    error: function `p(int4)` does not exist
+       ╭▸ 
+    11 │ grant execute on function p(int) to public;
+       │                           ━
+       ╰╴
+    help: a function with a similar name exists
+       ╭╴
+    11 │ grant execute on function pi(int) to public;
+       ╰╴                           +
+    error: `agg1` is an aggregate function
+       ╭▸ 
+    12 │ drop function agg1(int);
+       │               ━━━━
+       ╰╴
+    help: use `drop aggregate` to drop aggregate functions
+       ╭╴
+    12 - drop function agg1(int);
+    12 + drop aggregate agg1(int);
+       ╰╴
+    ");
+}

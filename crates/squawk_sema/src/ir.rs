@@ -873,7 +873,7 @@ pub(crate) enum RoutineKind {
 impl RoutineKind {
     pub(crate) fn matches(self, kind: FunctionKind) -> bool {
         match self {
-            RoutineKind::Function => kind == FunctionKind::Function,
+            RoutineKind::Function => kind != FunctionKind::Procedure,
             RoutineKind::Aggregate => kind == FunctionKind::Aggregate,
             RoutineKind::Procedure => kind == FunctionKind::Procedure,
             RoutineKind::Routine => true,
