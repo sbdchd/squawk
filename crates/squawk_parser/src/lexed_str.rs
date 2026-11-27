@@ -453,7 +453,7 @@ impl<'a> Converter<'a> {
                 }
                 SyntaxKind::NATIONAL_STRING
             }
-            squawk_lexer::LiteralKind::ByteStr { terminated } => {
+            squawk_lexer::LiteralKind::HexStr { terminated } => {
                 if !terminated {
                     err = Some(
                         "missing trailing `'` symbol to terminate the hex bit string literal"
@@ -463,7 +463,7 @@ impl<'a> Converter<'a> {
                     self.validate_prefixed_string_content(token_text, 2, PrefixedStringKind::Byte);
                     self.prefixed_string_continuation = Some(PrefixedStringKind::Byte);
                 }
-                SyntaxKind::BYTE_STRING
+                SyntaxKind::HEX_STRING
             }
             squawk_lexer::LiteralKind::BitStr { terminated } => {
                 if !terminated {

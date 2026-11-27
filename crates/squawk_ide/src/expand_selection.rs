@@ -331,7 +331,7 @@ fn is_string_or_comment(kind: SyntaxKind) -> bool {
         kind,
         SyntaxKind::COMMENT
             | SyntaxKind::STRING
-            | SyntaxKind::BYTE_STRING
+            | SyntaxKind::HEX_STRING
             | SyntaxKind::UNICODE_ESC_STRING
             | SyntaxKind::BIT_STRING
             | SyntaxKind::DOLLAR_QUOTED_STRING

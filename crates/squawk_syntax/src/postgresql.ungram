@@ -569,7 +569,7 @@ Literal =
   | '@null'
   | '@numeric_number'
   | '@int_number'
-  | '@byte_string'
+  | '@hex_string'
   | '@bit_string'
   | '@dollar_quoted_string'
   | '@unicode_esc_string'

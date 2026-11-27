@@ -130,7 +130,7 @@ impl Cursor<'_> {
 
             // hexadecimal byte string
             'x' | 'X' => self.prefixed_string(
-                |terminated| LiteralKind::ByteStr { terminated },
+                |terminated| LiteralKind::HexStr { terminated },
                 false,
                 false,
             ),

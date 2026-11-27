@@ -867,7 +867,7 @@ fn validate_literal(lit: &ast::Literal, acc: &mut Vec<SyntaxError>) {
                             STRING
                                 | ESC_STRING
                                 | BIT_STRING
-                                | BYTE_STRING
+                                | HEX_STRING
                                 | UNICODE_ESC_STRING
                                 | NATIONAL_STRING
                         ) {

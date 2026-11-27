@@ -583,7 +583,7 @@ fn lexical_token_type(kind: SyntaxKind) -> Option<SemanticTokenType> {
     match kind {
         SyntaxKind::TRUE_KW | SyntaxKind::FALSE_KW => Some(SemanticTokenType::Bool),
         SyntaxKind::BIT_STRING
-        | SyntaxKind::BYTE_STRING
+        | SyntaxKind::HEX_STRING
         | SyntaxKind::DOLLAR_QUOTED_STRING
         | SyntaxKind::ESC_STRING
         | SyntaxKind::NATIONAL_STRING

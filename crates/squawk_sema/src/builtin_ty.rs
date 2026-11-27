@@ -45,7 +45,7 @@ impl BuiltinTy {
             | ast::LitKind::EscString(_)
             | ast::LitKind::NationalString(_)
             | ast::LitKind::UnicodeEscString(_) => BuiltinTy::Text,
-            ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => BuiltinTy::Bit,
+            ast::LitKind::BitString(_) | ast::LitKind::HexString(_) => BuiltinTy::Bit,
             ast::LitKind::True(_) | ast::LitKind::False(_) => BuiltinTy::Bool,
             ast::LitKind::Default(_)
             | ast::LitKind::Null(_)

@@ -72,7 +72,7 @@ SOURCE_FILE
         TARGET
           CAST_EXPR
             LITERAL
-              BYTE_STRING "x'0a'"
+              HEX_STRING "x'0a'"
             COLON_COLON
               COLON ":"
               COLON ":"

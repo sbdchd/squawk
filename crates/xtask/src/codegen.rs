@@ -461,7 +461,7 @@ fn generate_syntax_kinds(grammar: KindsSrc) -> String {
 fn literal_display(name: &str) -> &'static str {
     match name {
         "BIT_STRING" => "bit string literal",
-        "BYTE_STRING" => "hexadecimal string literal",
+        "HEX_STRING" => "hexadecimal string literal",
         "DOLLAR_QUOTED_STRING" => "dollar-quoted string literal",
         "ESC_STRING" => "escape string literal",
         "INT_NUMBER" => "integer literal",

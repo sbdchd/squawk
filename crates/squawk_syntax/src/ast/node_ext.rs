@@ -251,7 +251,7 @@ impl IntegerRadix {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum LitKind {
     BitString(SyntaxToken),
-    ByteString(SyntaxToken),
+    HexString(SyntaxToken),
     Default(SyntaxToken),
     DollarQuotedString(SyntaxToken),
     EscString(SyntaxToken),
@@ -277,7 +277,7 @@ impl LitKind {
             | LitKind::UnicodeEscString(_)
             | LitKind::NationalString(_) => true,
             LitKind::BitString(_)
-            | LitKind::ByteString(_)
+            | LitKind::HexString(_)
             | LitKind::Default(_)
             | LitKind::False(_)
             | LitKind::IntNumber(_)
@@ -497,7 +497,7 @@ impl ast::Literal {
         let token = self.syntax().first_child_or_token()?.into_token()?;
         let kind = match token.kind() {
             SyntaxKind::BIT_STRING => LitKind::BitString(token),
-            SyntaxKind::BYTE_STRING => LitKind::ByteString(token),
+            SyntaxKind::HEX_STRING => LitKind::HexString(token),
             SyntaxKind::DEFAULT_KW => LitKind::Default(token),
             SyntaxKind::DOLLAR_QUOTED_STRING => LitKind::DollarQuotedString(token),
             SyntaxKind::ESC_STRING => LitKind::EscString(token),
@@ -630,7 +630,7 @@ impl ast::Literal {
                     out.push_str(inner, start + TextSize::new(2));
                     decoding = Some(StringDecoding::BitOrByte);
                 }
-                SyntaxKind::BYTE_STRING => {
+                SyntaxKind::HEX_STRING => {
                     let inner = strip_prefixed_quotes(token.text(), ['x', 'X'])?;
                     out.push_str(inner, start + TextSize::new(2));
                     decoding = Some(StringDecoding::BitOrByte);

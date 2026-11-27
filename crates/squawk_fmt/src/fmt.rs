@@ -19723,7 +19723,7 @@ fn build_literal<'a>(lit: &ast::Literal) -> Doc<'a> {
         LitKind::PositionalParam(t) => Doc::text(t.text().to_string()),
         LitKind::True(_) => Doc::text("true"),
         LitKind::BitString(_)
-        | LitKind::ByteString(_)
+        | LitKind::HexString(_)
         | LitKind::DollarQuotedString(_)
         | LitKind::EscString(_)
         | LitKind::NationalString(_)

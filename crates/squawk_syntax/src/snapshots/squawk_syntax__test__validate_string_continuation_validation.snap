@@ -116,7 +116,7 @@ SOURCE_FILE@0..1305
       TARGET_LIST@276..286
         TARGET@276..286
           LITERAL@276..286
-            BYTE_STRING@276..281 "x'1F'"
+            HEX_STRING@276..281 "x'1F'"
             WHITESPACE@281..282 "\n"
             STRING@282..286 "'10'"
     SEMICOLON@286..287 ";"
@@ -128,7 +128,7 @@ SOURCE_FILE@0..1305
       TARGET_LIST@295..317
         TARGET@295..317
           LITERAL@295..317
-            BYTE_STRING@295..301 "x'1F1'"
+            HEX_STRING@295..301 "x'1F1'"
             WHITESPACE@301..302 " "
             COMMENT@302..312 "-- comment"
             WHITESPACE@312..313 "\n"
@@ -420,7 +420,7 @@ SOURCE_FILE@0..1305
       TARGET_LIST@1098..1108
         TARGET@1098..1108
           LITERAL@1098..1108
-            BYTE_STRING@1098..1103 "x'0F'"
+            HEX_STRING@1098..1103 "x'0F'"
             WHITESPACE@1103..1104 " "
             STRING@1104..1108 "'10'"
     SEMICOLON@1108..1109 ";"
@@ -432,7 +432,7 @@ SOURCE_FILE@0..1305
       TARGET_LIST@1117..1141
         TARGET@1117..1141
           LITERAL@1117..1141
-            BYTE_STRING@1117..1122 "x'01'"
+            HEX_STRING@1117..1122 "x'01'"
             WHITESPACE@1122..1123 " "
             COMMENT@1123..1136 "/* comment */"
             WHITESPACE@1136..1137 " "
@@ -446,7 +446,7 @@ SOURCE_FILE@0..1305
       TARGET_LIST@1150..1201
         TARGET@1150..1201
           LITERAL@1150..1201
-            BYTE_STRING@1150..1155 "x'01'"
+            HEX_STRING@1150..1155 "x'01'"
             WHITESPACE@1155..1156 " "
             COMMENT@1156..1169 "/* comment */"
             WHITESPACE@1169..1170 " "
@@ -464,7 +464,7 @@ SOURCE_FILE@0..1305
       TARGET_LIST@1210..1225
         TARGET@1210..1225
           LITERAL@1210..1225
-            BYTE_STRING@1210..1215 "x'1F'"
+            HEX_STRING@1210..1215 "x'1F'"
             WHITESPACE@1215..1216 " "
             STRING@1216..1220 "'F0'"
             WHITESPACE@1220..1221 " "
@@ -478,7 +478,7 @@ SOURCE_FILE@0..1305
       TARGET_LIST@1234..1244
         TARGET@1234..1244
           LITERAL@1234..1244
-            BYTE_STRING@1234..1239 "x'1F'"
+            HEX_STRING@1234..1239 "x'1F'"
             WHITESPACE@1239..1240 "\n"
             STRING@1240..1244 "'G0'"
     SEMICOLON@1244..1245 ";"

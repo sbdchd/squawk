@@ -32,7 +32,7 @@ pub(crate) fn hover_literal(literal: &ast::Literal) -> Option<LiteralHover> {
             let hex = binary_to_hex(&binary)?;
             Some(bit_comment(&hex, &binary))
         }
-        LitKind::ByteString(_) => {
+        LitKind::HexString(_) => {
             let hex = literal.decoded_value()?.into_text();
             let binary = hex_to_binary(&hex)?;
             Some(bit_comment(&hex, &binary))

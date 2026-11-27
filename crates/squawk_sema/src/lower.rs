@@ -14550,7 +14550,7 @@ impl Lowerer {
             Some(ast::LitKind::False(_)) => SearchPathScope::Session,
             Some(
                 ast::LitKind::BitString(_)
-                | ast::LitKind::ByteString(_)
+                | ast::LitKind::HexString(_)
                 | ast::LitKind::Default(_)
                 | ast::LitKind::DollarQuotedString(_)
                 | ast::LitKind::EscString(_)
