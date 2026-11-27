@@ -1820,16 +1820,14 @@ impl Lowerer {
         } else {
             TableLookup::View
         };
+        let if_missing = IfMissing::from_if_exists(alter_view.if_exists().as_ref());
         let view = alter_view
             .view_ref()
             .and_then(|view| view.path_ref())
-            .and_then(|path| {
-                self.lower_table_ref(
-                    &path,
-                    IfMissing::from_if_exists(alter_view.if_exists().as_ref()),
-                    lookup,
-                )
-            });
+            .and_then(|path| self.lower_table_ref(&path, if_missing, lookup));
+        if view.is_none() && if_missing == IfMissing::Ignore {
+            return;
+        }
         match alter_view.action() {
             Some(ast::AlterViewAction::AlterViewColumn(alter_column)) => {
                 let column = alter_column
@@ -5416,6 +5414,12 @@ impl Lowerer {
     }
 
     fn lower_create_foreign_table(&mut self, create_table: &ast::CreateForeignTable) {
+        let if_exists = IfExists::from_if_not_exists(create_table.if_not_exists().as_ref());
+        if let Some(path) = create_table.table_name().and_then(|name| name.path())
+            && self.skips_existing_relation(if_exists, Persistence::Permanent, &path)
+        {
+            return;
+        }
         if let Some(server_ref) = create_table
             .server_clause()
             .and_then(|clause| clause.server_ref())
@@ -5425,7 +5429,7 @@ impl Lowerer {
         self.lower_create_table(
             create_table,
             TableKind::ForeignTable,
-            IfExists::from_if_not_exists(create_table.if_not_exists().as_ref()),
+            if_exists,
             create_table.partition_of(),
             create_table.partition_type().as_ref(),
             None,
@@ -5595,20 +5599,22 @@ impl Lowerer {
     }
 
     fn lower_create_server(&mut self, create_server: &ast::CreateServer) {
+        let server = create_server.server();
+        let name = server.as_ref().map(|server| self.intern(&server.text()));
+        let exists = name.is_some_and(|name| self.find_server(name).is_some());
+        if exists && create_server.if_not_exists().is_some() {
+            return;
+        }
         let wrapper = create_server
             .foreign_data_wrapper_ref()
             .and_then(|wrapper_ref| {
                 self.lower_foreign_data_wrapper_ref(&wrapper_ref, IfMissing::Error)
             });
-        let Some(server) = create_server.server() else {
+        let (Some(server), Some(name)) = (server, name) else {
             return;
         };
         let name_node = server.syntax();
-        let name = self.intern(&server.text());
-        if self.find_server(name).is_some() {
-            if create_server.if_not_exists().is_some() {
-                return;
-            }
+        if exists {
             self.report_duplicate(ObjectKind::Server, name_node, name);
         }
         let server = self.alloc_server(create_server.syntax(), name_node, name);
@@ -11828,6 +11834,12 @@ impl Lowerer {
     }
 
     fn lower_create_materialized_view(&mut self, create_view: &ast::CreateMaterializedView) {
+        let if_exists = IfExists::from_if_not_exists(create_view.if_not_exists().as_ref());
+        if let Some(path) = create_view.view().and_then(|view| view.path())
+            && self.skips_existing_relation(if_exists, Persistence::Permanent, &path)
+        {
+            return;
+        }
         let refs = self.index.references.next_idx();
         let stars = self.index.star_columns.next_idx();
         let start = self.index.tables.next_idx();
@@ -11857,7 +11869,7 @@ impl Lowerer {
         if let Some(table) = self.alloc_table(
             TableKind::MaterializedView,
             Persistence::Permanent,
-            IfExists::from_if_not_exists(create_view.if_not_exists().as_ref()),
+            if_exists,
             create_view.syntax(),
             &path,
             columns,
@@ -18534,11 +18546,11 @@ impl Lowerer {
         else {
             return;
         };
-        let table = self.lower_table_ref(
-            &path,
-            IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
-            TableLookup::ForeignTable,
-        );
+        let if_missing = IfMissing::from_if_exists(alter_table.if_exists().as_ref());
+        let table = self.lower_table_ref(&path, if_missing, TableLookup::ForeignTable);
+        if table.is_none() && if_missing == IfMissing::Ignore {
+            return;
+        }
         let recurse = relation_name.is_some_and(|name| name.only_token().is_none());
         self.lower_alter_table_actions(table, recurse, alter_table.actions(), alter_table.syntax());
     }

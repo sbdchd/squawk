@@ -1148,6 +1148,17 @@ create table t (a int);
 create table if not exists t (a int) tablespace nosuch;
 create table if not exists t partition of nosuch for values in (1);
 create table if not exists t as execute nosuch;
+create foreign data wrapper w;
+create server s foreign data wrapper w;
+create server if not exists s foreign data wrapper nosuch;
+create foreign table ft () server s;
+create foreign table if not exists ft () server nosuch;
+create materialized view mv as
+  select 1;
+create materialized view if not exists mv
+  using nosuch
+  as
+  select 1;
 "), @"no diagnostics");
 }
 
@@ -1157,6 +1168,8 @@ fn if_exists_skips_references() {
 alter table if exists nosuch detach partition other;
 alter table if exists nosuch set schema nosuch_schema;
 alter sequence if exists nosuch owned by nosuch.a;
+alter view if exists nosuch set schema nosuch_schema;
+alter foreign table if exists nosuch set schema nosuch_schema;
 "), @"no diagnostics");
 }
 
