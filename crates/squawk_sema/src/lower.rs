@@ -57,8 +57,8 @@ use crate::{
         Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule, RuleBehavior, RuleEnabled,
         RuleEvent, RuleId, RuleMode, Savepoint, Schema, SchemaId, Scope, ScopeId, SearchPathChange,
         SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star, Statistics,
-        StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId, TableKind,
-        Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
+        StatisticsId, Subscript, Subscription, SubscriptionId, SystemColumn, Table, TableId,
+        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
         TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
         TypeCategory, TypeId, TypeKind, Typmod, Window, WindowClauses, WindowId,
     },
@@ -1820,16 +1820,14 @@ impl Lowerer {
         } else {
             TableLookup::View
         };
+        let if_missing = IfMissing::from_if_exists(alter_view.if_exists().as_ref());
         let view = alter_view
             .view_ref()
             .and_then(|view| view.path_ref())
-            .and_then(|path| {
-                self.lower_table_ref(
-                    &path,
-                    IfMissing::from_if_exists(alter_view.if_exists().as_ref()),
-                    lookup,
-                )
-            });
+            .and_then(|path| self.lower_table_ref(&path, if_missing, lookup));
+        if view.is_none() && if_missing == IfMissing::Ignore {
+            return;
+        }
         match alter_view.action() {
             Some(ast::AlterViewAction::AlterViewColumn(alter_column)) => {
                 let column = alter_column
@@ -3846,6 +3844,7 @@ impl Lowerer {
                 Resolution::Type(ty) if self.index.types.is_local(ty) => Object::Type(ty),
                 Resolution::Table(_)
                 | Resolution::Column { .. }
+                | Resolution::SystemColumn { .. }
                 | Resolution::Source(_)
                 | Resolution::Cte(_)
                 | Resolution::Param(_)
@@ -4825,7 +4824,9 @@ impl Lowerer {
                 }
             }
             ast::ExplainStmt::Refresh(refresh) => {
-                self.lower_refresh(&refresh);
+                if let Some(path) = refresh.view_ref().and_then(|view| view.path_ref()) {
+                    self.lower_table_ref(&path, IfMissing::Ignore, TableLookup::Any);
+                }
             }
         }
     }
@@ -5415,6 +5416,12 @@ impl Lowerer {
     }
 
     fn lower_create_foreign_table(&mut self, create_table: &ast::CreateForeignTable) {
+        let if_exists = IfExists::from_if_not_exists(create_table.if_not_exists().as_ref());
+        if let Some(path) = create_table.table_name().and_then(|name| name.path())
+            && self.skips_existing_relation(if_exists, Persistence::Permanent, &path)
+        {
+            return;
+        }
         if let Some(server_ref) = create_table
             .server_clause()
             .and_then(|clause| clause.server_ref())
@@ -5424,7 +5431,7 @@ impl Lowerer {
         self.lower_create_table(
             create_table,
             TableKind::ForeignTable,
-            IfExists::from_if_not_exists(create_table.if_not_exists().as_ref()),
+            if_exists,
             create_table.partition_of(),
             create_table.partition_type().as_ref(),
             None,
@@ -5594,20 +5601,22 @@ impl Lowerer {
     }
 
     fn lower_create_server(&mut self, create_server: &ast::CreateServer) {
+        let server = create_server.server();
+        let name = server.as_ref().map(|server| self.intern(&server.text()));
+        let exists = name.is_some_and(|name| self.find_server(name).is_some());
+        if exists && create_server.if_not_exists().is_some() {
+            return;
+        }
         let wrapper = create_server
             .foreign_data_wrapper_ref()
             .and_then(|wrapper_ref| {
                 self.lower_foreign_data_wrapper_ref(&wrapper_ref, IfMissing::Error)
             });
-        let Some(server) = create_server.server() else {
+        let (Some(server), Some(name)) = (server, name) else {
             return;
         };
         let name_node = server.syntax();
-        let name = self.intern(&server.text());
-        if self.find_server(name).is_some() {
-            if create_server.if_not_exists().is_some() {
-                return;
-            }
+        if exists {
             self.report_duplicate(ObjectKind::Server, name_node, name);
         }
         let server = self.alloc_server(create_server.syntax(), name_node, name);
@@ -6056,6 +6065,7 @@ impl Lowerer {
                     Resolution::Function(function) => Object::Function(function),
                     Resolution::Operator(operator) => Object::Operator(operator),
                     Resolution::Column { .. }
+                    | Resolution::SystemColumn { .. }
                     | Resolution::Source(_)
                     | Resolution::Cte(_)
                     | Resolution::Table(_)
@@ -11454,6 +11464,7 @@ impl Lowerer {
                 Some(table)
             }
             Resolution::Column { .. }
+            | Resolution::SystemColumn { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
             | Resolution::Function(_)
@@ -11825,6 +11836,12 @@ impl Lowerer {
     }
 
     fn lower_create_materialized_view(&mut self, create_view: &ast::CreateMaterializedView) {
+        let if_exists = IfExists::from_if_not_exists(create_view.if_not_exists().as_ref());
+        if let Some(path) = create_view.view().and_then(|view| view.path())
+            && self.skips_existing_relation(if_exists, Persistence::Permanent, &path)
+        {
+            return;
+        }
         let refs = self.index.references.next_idx();
         let stars = self.index.star_columns.next_idx();
         let start = self.index.tables.next_idx();
@@ -11854,7 +11871,7 @@ impl Lowerer {
         if let Some(table) = self.alloc_table(
             TableKind::MaterializedView,
             Persistence::Permanent,
-            IfExists::from_if_not_exists(create_view.if_not_exists().as_ref()),
+            if_exists,
             create_view.syntax(),
             &path,
             columns,
@@ -13956,6 +13973,7 @@ impl Lowerer {
             Resolution::Type(ty) => found(Ty::Type(ty)),
             Resolution::Table(table) => found(Ty::Table(table)),
             Resolution::Column { .. }
+            | Resolution::SystemColumn { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
             | Resolution::Function(_)
@@ -18530,11 +18548,11 @@ impl Lowerer {
         else {
             return;
         };
-        let table = self.lower_table_ref(
-            &path,
-            IfMissing::from_if_exists(alter_table.if_exists().as_ref()),
-            TableLookup::ForeignTable,
-        );
+        let if_missing = IfMissing::from_if_exists(alter_table.if_exists().as_ref());
+        let table = self.lower_table_ref(&path, if_missing, TableLookup::ForeignTable);
+        if table.is_none() && if_missing == IfMissing::Ignore {
+            return;
+        }
         let recurse = relation_name.is_some_and(|name| name.only_token().is_none());
         self.lower_alter_table_actions(table, recurse, alter_table.actions(), alter_table.syntax());
     }
@@ -20869,7 +20887,7 @@ impl Lowerer {
             }
             ast::CommentObject::ObjectDatabase(object) => {
                 if let Some(database) = object.database_ref() {
-                    self.lower_database_ref(&database, if_missing);
+                    self.lower_database_ref(&database, IfMissing::Ignore);
                 }
                 None
             }
@@ -24073,7 +24091,8 @@ impl Lowerer {
             );
             match resolution {
                 Resolution::Column { column, .. } => columns.push(column),
-                Resolution::Source(_)
+                Resolution::SystemColumn { .. }
+                | Resolution::Source(_)
                 | Resolution::Cte(_)
                 | Resolution::Table(_)
                 | Resolution::Function(_)
@@ -25293,7 +25312,9 @@ impl Lowerer {
                     );
                 }
                 Some(
-                    ast::PostfixOp::IsJson(_)
+                    ast::PostfixOp::IsDocument(_)
+                    | ast::PostfixOp::IsNotDocument(_)
+                    | ast::PostfixOp::IsJson(_)
                     | ast::PostfixOp::IsJsonArray(_)
                     | ast::PostfixOp::IsJsonObject(_)
                     | ast::PostfixOp::IsJsonScalar(_)
@@ -25336,6 +25357,12 @@ impl Lowerer {
     fn resolution_type(&self, resolution: Resolution) -> Option<Ty> {
         match resolution {
             Resolution::Column { column, .. } => self.index.columns[column].ty,
+            Resolution::SystemColumn { column, .. } => self
+                .index
+                .names
+                .lookup(column.type_name())
+                .and_then(|name| self.find_type_in(self.pg_catalog, name))
+                .map(Ty::Type),
             Resolution::Source(source) => self
                 .scalar_sources
                 .get(&source)
@@ -25716,6 +25743,17 @@ impl Lowerer {
                 smallvec![string, substring],
                 token.text_range(),
             ));
+        }
+        if let Some(normalize_fn) = call.normalize_fn() {
+            let mut args = smallvec![self.lower_positional_arg(normalize_fn.expr())];
+            if normalize_fn.unicode_normal_form().is_some() {
+                args.push(CallArg {
+                    ty: ArgType::UnknownLiteral,
+                    ..CallArg::default()
+                });
+            }
+            let token = normalize_fn.normalize_token()?;
+            return Some(self.lower_special_call("normalize", args, token.text_range()));
         }
         if let Some(overlay_fn) = call.overlay_fn() {
             let args = match overlay_fn.overlay_args() {
@@ -26144,6 +26182,7 @@ impl Lowerer {
             Some(Resolution::Function(function)) => Some(function),
             Some(
                 Resolution::Column { .. }
+                | Resolution::SystemColumn { .. }
                 | Resolution::Source(_)
                 | Resolution::Cte(_)
                 | Resolution::Table(_)
@@ -27084,7 +27123,9 @@ impl Lowerer {
         let name_ref = arg.expr()?.as_name_ref()?;
         let name = self.name_ref_name(&name_ref)?;
         match self.resolve_column(name) {
-            Resolution::Column { .. } | Resolution::Ambiguous => None,
+            Resolution::Column { .. } | Resolution::SystemColumn { .. } | Resolution::Ambiguous => {
+                None
+            }
             Resolution::Source(_)
             | Resolution::Cte(_)
             | Resolution::Table(_)
@@ -27891,6 +27932,10 @@ impl Lowerer {
                     column,
                 },
             ),
+            None if let Some(column) = self.source_system_column(source, name) => (
+                ReferenceKind::Column,
+                Resolution::SystemColumn { source, column },
+            ),
             None => match self.find_row_function(source, name) {
                 Some(function) => (
                     ReferenceKind::Function(RoutineKind::Function),
@@ -28378,11 +28423,61 @@ impl Lowerer {
                 }
                 ColumnLookup::Missing { complete: true } => {}
             }
+            if let Some(resolution) = self.lookup_system_column(scope, name) {
+                return ScopedColumn::Resolved(resolution);
+            }
             if self.hidden_source_has_column(scope, name) {
                 return ScopedColumn::Hidden;
             }
         }
         ScopedColumn::Resolved(Resolution::Unresolved)
+    }
+
+    fn lookup_system_column(&self, scope: &QueryScope, name: Name) -> Option<Resolution> {
+        let column = SystemColumn::from_name(self.index.names.resolve(name))?;
+        let query = &self.index.queries[scope.query];
+        let mut sources = self.index.scopes[scope.scope]
+            .visible_indices(query)
+            .map(|index| query.sources[index])
+            .filter(|source| !self.index.sources[*source].kind.is_qualified_only());
+        let source = sources
+            .clone()
+            .find(|source| self.has_system_columns(*source))?;
+        if sources.nth(1).is_some() {
+            return Some(Resolution::Unknown);
+        }
+        Some(Resolution::SystemColumn { source, column })
+    }
+
+    fn source_system_column(&self, source: SourceId, name: Name) -> Option<SystemColumn> {
+        if !self.has_system_columns(source) {
+            return None;
+        }
+        SystemColumn::from_name(self.index.names.resolve(name))
+    }
+
+    fn has_system_columns(&self, source: SourceId) -> bool {
+        match self.index.sources[source].kind {
+            SourceKind::Table(table) => match self.index.tables[table].kind {
+                TableKind::Table
+                | TableKind::ForeignTable
+                | TableKind::MaterializedView
+                | TableKind::Sequence => true,
+                TableKind::View | TableKind::PropertyGraph => false,
+            },
+            SourceKind::Returning(target) | SourceKind::RuleRelation(target) => {
+                self.has_system_columns(target)
+            }
+            SourceKind::Cte(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::Excluded(_)
+            | SourceKind::ElementVariable
+            | SourceKind::Other => false,
+        }
     }
 
     fn hidden_source_has_column(&self, scope: &QueryScope, name: Name) -> bool {

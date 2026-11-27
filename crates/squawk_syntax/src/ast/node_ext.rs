@@ -1121,12 +1121,14 @@ pub enum BinOp {
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PostfixOp {
     AtLocal(ast::AtLocal),
+    IsDocument(ast::IsDocument),
     IsJson(ast::IsJson),
     IsJsonArray(ast::IsJsonArray),
     IsJsonObject(ast::IsJsonObject),
     IsJsonScalar(ast::IsJsonScalar),
     IsJsonValue(ast::IsJsonValue),
     IsNormalized(ast::IsNormalized),
+    IsNotDocument(ast::IsNotDocument),
     IsNotJson(ast::IsNotJson),
     IsNotJsonArray(ast::IsNotJsonArray),
     IsNotJsonObject(ast::IsNotJsonObject),
@@ -1141,12 +1143,14 @@ impl PostfixOp {
     pub fn syntax_element(&self) -> SyntaxElement {
         match self {
             PostfixOp::AtLocal(node) => node.syntax().clone().into(),
+            PostfixOp::IsDocument(node) => node.syntax().clone().into(),
             PostfixOp::IsJson(node) => node.syntax().clone().into(),
             PostfixOp::IsJsonArray(node) => node.syntax().clone().into(),
             PostfixOp::IsJsonObject(node) => node.syntax().clone().into(),
             PostfixOp::IsJsonScalar(node) => node.syntax().clone().into(),
             PostfixOp::IsJsonValue(node) => node.syntax().clone().into(),
             PostfixOp::IsNormalized(node) => node.syntax().clone().into(),
+            PostfixOp::IsNotDocument(node) => node.syntax().clone().into(),
             PostfixOp::IsNotJson(node) => node.syntax().clone().into(),
             PostfixOp::IsNotJsonArray(node) => node.syntax().clone().into(),
             PostfixOp::IsNotJsonObject(node) => node.syntax().clone().into(),
@@ -1327,6 +1331,12 @@ impl ast::PostfixExpr {
                 NodeOrToken::Node(node) => {
                     let op = match node.kind() {
                         SyntaxKind::AT_LOCAL => PostfixOp::AtLocal(ast::AtLocal { syntax: node }),
+                        SyntaxKind::IS_DOCUMENT => {
+                            PostfixOp::IsDocument(ast::IsDocument { syntax: node })
+                        }
+                        SyntaxKind::IS_NOT_DOCUMENT => {
+                            PostfixOp::IsNotDocument(ast::IsNotDocument { syntax: node })
+                        }
                         SyntaxKind::IS_JSON => PostfixOp::IsJson(ast::IsJson { syntax: node }),
                         SyntaxKind::IS_JSON_ARRAY => {
                             PostfixOp::IsJsonArray(ast::IsJsonArray { syntax: node })
@@ -1669,15 +1679,6 @@ impl ast::CompoundSelect {
 }
 
 impl ast::NameRef {
-    pub fn is_unicode_normal_form(&self) -> bool {
-        matches!(
-            self.first_token_kind(),
-            Some(
-                SyntaxKind::NFC_KW | SyntaxKind::NFD_KW | SyntaxKind::NFKC_KW | SyntaxKind::NFKD_KW
-            )
-        )
-    }
-
     #[inline]
     pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())

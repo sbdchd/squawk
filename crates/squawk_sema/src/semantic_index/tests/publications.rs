@@ -164,3 +164,12 @@ drop subscription if exists sub4;
        ╰╴                                 ━━━━
     ");
 }
+
+#[test]
+fn publication_is_document() {
+    assert_snapshot!(check("
+create table t (a xml);
+create publication p for table t where (a is document);
+select a is document, a is not document from t;
+"), @"no diagnostics");
+}

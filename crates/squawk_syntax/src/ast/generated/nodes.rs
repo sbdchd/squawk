@@ -3386,6 +3386,10 @@ impl CallExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn normalize_fn(&self) -> Option<NormalizeFn> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn null_treatment(&self) -> Option<NullTreatment> {
         support::child(&self.syntax)
     }
@@ -13304,6 +13308,21 @@ impl IsDistinctFrom {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsDocument {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsDocument {
+    #[inline]
+    pub fn document_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOCUMENT_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsJson {
     pub(crate) syntax: SyntaxNode,
 }
@@ -13475,6 +13494,25 @@ impl IsNotDistinctFrom {
     #[inline]
     pub fn from_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotDocument {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotDocument {
+    #[inline]
+    pub fn document_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOCUMENT_KW)
     }
     #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
@@ -16009,6 +16047,37 @@ impl NonStandardParam {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NormalizeFn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NormalizeFn {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn unicode_normal_form(&self) -> Option<UnicodeNormalForm> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn normalize_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NORMALIZE_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct NotDeferrable {
     pub(crate) syntax: SyntaxNode,
 }
@@ -17409,6 +17478,10 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn is_document(&self) -> Option<IsDocument> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn is_json(&self) -> Option<IsJson> {
         support::child(&self.syntax)
     }
@@ -17438,6 +17511,10 @@ impl Op {
     }
     #[inline]
     pub fn is_not_distinct_from(&self) -> Option<IsNotDistinctFrom> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_document(&self) -> Option<IsNotDocument> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -42782,6 +42859,24 @@ impl AstNode for IsDistinctFrom {
         &self.syntax
     }
 }
+impl AstNode for IsDocument {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_DOCUMENT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for IsJson {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -42930,6 +43025,24 @@ impl AstNode for IsNotDistinctFrom {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::IS_NOT_DISTINCT_FROM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotDocument {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_DOCUMENT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
@@ -45180,6 +45293,24 @@ impl AstNode for NonStandardParam {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NON_STANDARD_PARAM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NormalizeFn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NORMALIZE_FN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

@@ -601,9 +601,8 @@ SOURCE_FILE@0..703
       TARGET_LIST@670..681
         TARGET@670..681
           CALL_EXPR@670..681
-            NAME_REF@670..679
+            NORMALIZE_FN@670..681
               NORMALIZE_KW@670..679 "normalize"
-            ARG_LIST@679..681
               L_PAREN@679..680 "("
               R_PAREN@680..681 ")"
     SEMICOLON@681..682 ";"
@@ -763,10 +762,10 @@ error[syntax-error]: `least` takes at least one argument
    ╭▸ 
 35 │ select least();
    ╰╴       ━━━━━
-error[syntax-error]: `normalize` takes at least one argument
+error[syntax-error]: expected an expression, found `)`
    ╭▸ 
 36 │ select normalize();
-   ╰╴       ━━━━━━━━━
+   ╰╴                 ━
 error[syntax-error]: `xmlconcat` takes at least one argument
    ╭▸ 
 37 │ select xmlconcat();

@@ -48213,6 +48213,48 @@ create cast (xml as character varying) without function as assignment;
 
 create cast (xml as text) without function as assignment;
 
+create index pg_auth_members_grantor_index
+  on pg_catalog.pg_auth_members using btree (grantor);
+
+create index pg_class_tblspc_relfilenode_index
+  on pg_catalog.pg_class using btree (reltablespace, relfilenode);
+
+create index pg_constraint_conname_nsp_index
+  on pg_catalog.pg_constraint using btree (conname, connamespace);
+
+create index pg_constraint_conparentid_index
+  on pg_catalog.pg_constraint using btree (conparentid);
+
+create index pg_constraint_contypid_index
+  on pg_catalog.pg_constraint using btree (contypid);
+
+create index pg_depend_depender_index
+  on pg_catalog.pg_depend using btree (classid, objid, objsubid);
+
+create index pg_depend_reference_index
+  on pg_catalog.pg_depend using btree (refclassid, refobjid, refobjsubid);
+
+create index pg_index_indrelid_index
+  on pg_catalog.pg_index using btree (indrelid);
+
+create index pg_inherits_parent_index
+  on pg_catalog.pg_inherits using btree (inhparent);
+
+create index pg_publication_rel_prpubid_index
+  on pg_catalog.pg_publication_rel using btree (prpubid);
+
+create index pg_shdepend_depender_index
+  on pg_catalog.pg_shdepend using btree (dbid, classid, objid, objsubid);
+
+create index pg_shdepend_reference_index
+  on pg_catalog.pg_shdepend using btree (refclassid, refobjid);
+
+create index pg_statistic_ext_relid_index
+  on pg_catalog.pg_statistic_ext using btree (stxrelid);
+
+create index pg_trigger_tgconstraint_index
+  on pg_catalog.pg_trigger using btree (tgconstraint);
+
 alter domain information_schema.cardinal_number
   add constraint cardinal_number_domain_check check ((value >= 0));
 

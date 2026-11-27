@@ -2,7 +2,6 @@ use squawk_diagnostics::Edit;
 use squawk_rowan::TextSize;
 use squawk_sema::file::InFile;
 use squawk_syntax::{
-    SyntaxKind,
     ast::{self, AstNode},
     quote::quote_string_literal,
 };
@@ -18,35 +17,23 @@ pub(super) fn rewrite_normalize_as_function_call(
     actions: &mut Vec<CodeAction>,
 ) -> Option<()> {
     let token = token_from_offset(db, position)?;
-    let (name, normal_form) = token.parent_ancestors().find_map(|node| {
-        let call = ast::CallExpr::cast(node)?;
-        let name = call.expr()?.as_name_ref()?;
-        if name.syntax().first_token()?.kind() != SyntaxKind::NORMALIZE_KW {
-            return None;
-        }
-
-        let args = call.arg_list()?.args().collect::<Vec<_>>();
-        let normal_form = match args.as_slice() {
-            [arg] => {
-                arg.expr()?;
-                None
-            }
-            [arg, form] => {
-                arg.expr()?;
-                Some(normal_form(&form.expr()?)?)
-            }
-            _ => return None,
-        };
-
-        Some((name, normal_form))
-    })?;
+    let normalize_fn = token.parent_ancestors().find_map(ast::NormalizeFn::cast)?;
+    normalize_fn.expr()?;
+    let form = normalize_fn.unicode_normal_form();
+    if normalize_fn.comma_token().is_some() && form.is_none() {
+        return None;
+    }
 
     let mut edits = vec![Edit::replace(
-        name.syntax().text_range(),
+        normalize_fn.normalize_token()?.text_range(),
         "pg_catalog.normalize",
     )];
-    if let Some((range, form)) = normal_form {
-        edits.push(Edit::replace(range, quote_string_literal(&form)));
+    if let Some(form) = form {
+        let text = form.syntax().text().to_string().to_ascii_uppercase();
+        edits.push(Edit::replace(
+            form.syntax().text_range(),
+            quote_string_literal(&text),
+        ));
     }
 
     actions.push(CodeAction {
@@ -58,23 +45,13 @@ pub(super) fn rewrite_normalize_as_function_call(
     Some(())
 }
 
-fn normal_form(expr: &ast::Expr) -> Option<(squawk_rowan::TextRange, String)> {
-    let name = expr.as_name_ref()?;
-    if !name.is_unicode_normal_form() {
-        return None;
-    }
-    let token = name.syntax().first_token()?;
-    Some((
-        expr.syntax().text_range(),
-        token.text().to_ascii_uppercase(),
-    ))
-}
-
 #[cfg(test)]
 mod test {
     use insta::assert_snapshot;
 
-    use crate::test_utils::{apply_code_action, code_action_not_applicable};
+    use crate::test_utils::{
+        apply_code_action, code_action_not_applicable, code_action_not_applicable_with_errors,
+    };
 
     use super::rewrite_normalize_as_function_call;
 
@@ -132,7 +109,7 @@ mod test {
 
     #[test]
     fn not_applicable_to_non_normal_form_argument() {
-        assert!(code_action_not_applicable(
+        assert!(code_action_not_applicable_with_errors(
             rewrite_normalize_as_function_call,
             "select normalize(value, fo$0rm);"
         ));

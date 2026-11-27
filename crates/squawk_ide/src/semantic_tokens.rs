@@ -202,7 +202,9 @@ impl Highlighter<'_> {
             Resolution::Source(_) | Resolution::Cte(_) | Resolution::GraphElement(_) => {
                 Some(SemanticTokenType::Table)
             }
-            Resolution::Column { .. } => Some(SemanticTokenType::Column),
+            Resolution::Column { .. } | Resolution::SystemColumn { .. } => {
+                Some(SemanticTokenType::Column)
+            }
             Resolution::Table(table) => Some(self.table_type(table)),
             Resolution::Function(_) => Some(SemanticTokenType::Function),
             Resolution::Param(_) => Some(SemanticTokenType::Parameter),

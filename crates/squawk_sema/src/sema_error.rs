@@ -1520,6 +1520,7 @@ impl SemaError {
             | Resolution::PreparedTransaction(_)
             | Resolution::PreparedStatement(_)
             | Resolution::Channel(_)
+            | Resolution::SystemColumn { .. }
             | Resolution::Unknown => None,
         }
     }

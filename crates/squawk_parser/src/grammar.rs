@@ -414,6 +414,29 @@ fn position_fn(p: &mut Parser<'_>) -> CompletedMarker {
     m.complete(p, CALL_EXPR)
 }
 
+const UNICODE_NORMAL_FORM_FIRST: TokenSet = TokenSet::new(&[NFC_KW, NFD_KW, NFKC_KW, NFKD_KW]);
+
+fn normalize_fn(p: &mut Parser<'_>) -> CompletedMarker {
+    assert!(p.at(NORMALIZE_KW));
+    let m = p.start();
+    p.expect(NORMALIZE_KW);
+    p.expect(L_PAREN);
+    expr(p);
+    if p.eat(COMMA) {
+        if p.at_ts(UNICODE_NORMAL_FORM_FIRST) {
+            let m = p.start();
+            p.bump_any();
+            m.complete(p, UNICODE_NORMAL_FORM);
+        } else {
+            p.err_recover("expected unicode normal form", TokenSet::new(&[R_PAREN]));
+        }
+    }
+    p.expect(R_PAREN);
+    let m = m.complete(p, NORMALIZE_FN).precede(p);
+    opt_agg_clauses(p);
+    m.complete(p, CALL_EXPR)
+}
+
 fn opt_trim_side(p: &mut Parser<'_>) {
     let kind = match p.current() {
         BOTH_KW => TRIM_BOTH,
@@ -1198,6 +1221,7 @@ fn atom_expr(p: &mut Parser<'_>) -> Option<(CompletedMarker, ExprKind)> {
         (JSON_KW, L_PAREN) => json_fn(p),
         (SUBSTRING_KW, L_PAREN) => substring_fn(p),
         (POSITION_KW, L_PAREN) => position_fn(p),
+        (NORMALIZE_KW, L_PAREN) => normalize_fn(p),
         (OVERLAY_KW, L_PAREN) => overlay_fn(p),
         (TRIM_KW, L_PAREN) => trim_fn(p),
         (XMLROOT_KW, L_PAREN) => xmlroot_fn(p),
@@ -3137,9 +3161,9 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
         // is not distinct from
         IS_KW if p.at(IS_NOT_DISTINCT_FROM) => (4, IS_NOT_DISTINCT_FROM, Left),
         // is document
-        IS_KW if p.nth_at(1, DOCUMENT_KW) => (4, IS_KW, Left),
+        IS_KW if p.at(IS_DOCUMENT) => (4, IS_DOCUMENT, Left),
         // is not document
-        IS_KW if p.nth_at(1, NOT_KW) && p.nth_at(2, DOCUMENT_KW) => (4, IS_NOT, Left),
+        IS_KW if p.at(IS_NOT_DOCUMENT) => (4, IS_NOT_DOCUMENT, Left),
         // is not json object
         IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_OBJECT) => (4, IS_NOT_JSON_OBJECT, Left),
         // is not json array
@@ -3217,6 +3241,8 @@ fn is_postfix_op(kind: SyntaxKind) -> bool {
             | AT_LOCAL
             | IS_NORMALIZED
             | IS_NOT_NORMALIZED
+            | IS_DOCUMENT
+            | IS_NOT_DOCUMENT
             | IS_JSON
             | IS_JSON_OBJECT
             | IS_JSON_ARRAY

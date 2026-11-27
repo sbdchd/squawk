@@ -12,71 +12,17 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CALL_EXPR
-            NAME_REF
+            NORMALIZE_FN
               NORMALIZE_KW "normalize"
-            ARG_LIST
               L_PAREN "("
-              ARG
-                BIN_EXPR
-                  LITERAL
-                    STRING "'a'"
-                  WHITESPACE " "
-                  PLUS "+"
-                  WHITESPACE " "
-                  LITERAL
-                    STRING "'b'"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            NAME_REF
-              NORMALIZE_KW "normalize"
-            ARG_LIST
-              L_PAREN "("
-              ARG
-                BIN_EXPR
-                  LITERAL
-                    STRING "'a'"
-                  WHITESPACE " "
-                  CUSTOM_OP
-                    PIPE "|"
-                    PIPE "|"
-                  WHITESPACE " "
-                  LITERAL
-                    STRING "'b'"
-              COMMA ","
-              WHITESPACE " "
-              ARG
-                NAME_REF
-                  NFC_KW "nfc"
-              R_PAREN ")"
-    SEMICOLON ";"
-  WHITESPACE "\n"
-  SELECT
-    SELECT_CLAUSE
-      SELECT_KW "select"
-      WHITESPACE " "
-      TARGET_LIST
-        TARGET
-          CALL_EXPR
-            NAME_REF
-              NORMALIZE_KW "normalize"
-            ARG_LIST
-              L_PAREN "("
-              ARG
+              BIN_EXPR
                 LITERAL
-                  STRING "'c'"
-              COMMA ","
-              WHITESPACE " "
-              ARG
-                NAME_REF
-                  NFD_KW "nfd"
+                  STRING "'a'"
+                WHITESPACE " "
+                PLUS "+"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'b'"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -87,18 +33,23 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CALL_EXPR
-            NAME_REF
+            NORMALIZE_FN
               NORMALIZE_KW "normalize"
-            ARG_LIST
               L_PAREN "("
-              ARG
+              BIN_EXPR
                 LITERAL
-                  STRING "'d'"
+                  STRING "'a'"
+                WHITESPACE " "
+                CUSTOM_OP
+                  PIPE "|"
+                  PIPE "|"
+                WHITESPACE " "
+                LITERAL
+                  STRING "'b'"
               COMMA ","
               WHITESPACE " "
-              ARG
-                NAME_REF
-                  NFKC_KW "nfkc"
+              UNICODE_NORMAL_FORM
+                NFC_KW "nfc"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n"
@@ -109,18 +60,53 @@ SOURCE_FILE
       TARGET_LIST
         TARGET
           CALL_EXPR
-            NAME_REF
+            NORMALIZE_FN
               NORMALIZE_KW "normalize"
-            ARG_LIST
               L_PAREN "("
-              ARG
-                LITERAL
-                  STRING "'e'"
+              LITERAL
+                STRING "'c'"
               COMMA ","
               WHITESPACE " "
-              ARG
-                NAME_REF
-                  NFKD_KW "nfkd"
+              UNICODE_NORMAL_FORM
+                NFD_KW "nfd"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NORMALIZE_FN
+              NORMALIZE_KW "normalize"
+              L_PAREN "("
+              LITERAL
+                STRING "'d'"
+              COMMA ","
+              WHITESPACE " "
+              UNICODE_NORMAL_FORM
+                NFKC_KW "nfkc"
+              R_PAREN ")"
+    SEMICOLON ";"
+  WHITESPACE "\n"
+  SELECT
+    SELECT_CLAUSE
+      SELECT_KW "select"
+      WHITESPACE " "
+      TARGET_LIST
+        TARGET
+          CALL_EXPR
+            NORMALIZE_FN
+              NORMALIZE_KW "normalize"
+              L_PAREN "("
+              LITERAL
+                STRING "'e'"
+              COMMA ","
+              WHITESPACE " "
+              UNICODE_NORMAL_FORM
+                NFKD_KW "nfkd"
               R_PAREN ")"
     SEMICOLON ";"
   WHITESPACE "\n\n"

@@ -418,13 +418,11 @@ SOURCE_FILE@0..591
       TARGET_LIST@519..535
         TARGET@519..535
           CALL_EXPR@519..535
-            NAME_REF@519..528
+            NORMALIZE_FN@519..535
               NORMALIZE_KW@519..528 "normalize"
-            ARG_LIST@528..535
               L_PAREN@528..529 "("
-              ARG@529..534
-                LITERAL@529..534
-                  STRING@529..534 "'abc'"
+              LITERAL@529..534
+                STRING@529..534 "'abc'"
               R_PAREN@534..535 ")"
     SEMICOLON@535..536 ";"
   WHITESPACE@536..537 "\n"

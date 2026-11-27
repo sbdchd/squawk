@@ -270,13 +270,11 @@ fn validate_call_expr(call_expr: &ast::CallExpr, acc: &mut Vec<SyntaxError>) {
     let message = match token.kind() {
         NULLIF_KW if arg_count != 2 => "`nullif` takes two arguments".to_string(),
         MERGE_ACTION_KW if arg_count != 0 => "`merge_action` takes no arguments".to_string(),
-        COALESCE_KW | GREATEST_KW | GROUPING_KW | LEAST_KW | NORMALIZE_KW | XMLCONCAT_KW
-            if arg_count == 0 =>
-        {
+        COALESCE_KW | GREATEST_KW | GROUPING_KW | LEAST_KW | XMLCONCAT_KW if arg_count == 0 => {
             format!("`{}` takes at least one argument", token.text())
         }
         COALESCE_KW | GRAPH_TABLE_KW | GREATEST_KW | GROUPING_KW | LEAST_KW | MERGE_ACTION_KW
-        | NORMALIZE_KW | NULLIF_KW | XMLCONCAT_KW => return,
+        | NULLIF_KW | XMLCONCAT_KW => return,
         // `current_time` and `current_time(0)` both valid
         CURRENT_TIME_KW | CURRENT_TIMESTAMP_KW | LOCALTIME_KW | LOCALTIMESTAMP_KW => return,
         _ => format!("`{}` is not a valid function name", token.text()),

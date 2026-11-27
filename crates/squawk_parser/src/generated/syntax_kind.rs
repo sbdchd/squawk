@@ -1192,6 +1192,7 @@ pub enum SyntaxKind {
     IN_DATABASE,
     IN_SCHEMAS,
     IS_DISTINCT_FROM,
+    IS_DOCUMENT,
     IS_JSON,
     IS_JSON_ARRAY,
     IS_JSON_OBJECT,
@@ -1201,6 +1202,7 @@ pub enum SyntaxKind {
     IS_NORMALIZED,
     IS_NOT,
     IS_NOT_DISTINCT_FROM,
+    IS_NOT_DOCUMENT,
     IS_NOT_JSON,
     IS_NOT_JSON_ARRAY,
     IS_NOT_JSON_OBJECT,
@@ -1317,6 +1319,7 @@ pub enum SyntaxKind {
     NEW_TABLE,
     NEXT,
     NON_STANDARD_PARAM,
+    NORMALIZE_FN,
     NOTHING,
     NOTIFY,
     NOT_DEFERRABLE,
@@ -3276,6 +3279,7 @@ impl SyntaxKind {
             | SyntaxKind::IN_DATABASE
             | SyntaxKind::IN_SCHEMAS
             | SyntaxKind::IS_DISTINCT_FROM
+            | SyntaxKind::IS_DOCUMENT
             | SyntaxKind::IS_JSON
             | SyntaxKind::IS_JSON_ARRAY
             | SyntaxKind::IS_JSON_OBJECT
@@ -3285,6 +3289,7 @@ impl SyntaxKind {
             | SyntaxKind::IS_NORMALIZED
             | SyntaxKind::IS_NOT
             | SyntaxKind::IS_NOT_DISTINCT_FROM
+            | SyntaxKind::IS_NOT_DOCUMENT
             | SyntaxKind::IS_NOT_JSON
             | SyntaxKind::IS_NOT_JSON_ARRAY
             | SyntaxKind::IS_NOT_JSON_OBJECT
@@ -3401,6 +3406,7 @@ impl SyntaxKind {
             | SyntaxKind::NEW_TABLE
             | SyntaxKind::NEXT
             | SyntaxKind::NON_STANDARD_PARAM
+            | SyntaxKind::NORMALIZE_FN
             | SyntaxKind::NOTHING
             | SyntaxKind::NOTIFY
             | SyntaxKind::NOT_DEFERRABLE
@@ -6581,6 +6587,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::IN_DATABASE => "in database",
             SyntaxKind::IN_SCHEMAS => "in schemas",
             SyntaxKind::IS_DISTINCT_FROM => "is distinct from",
+            SyntaxKind::IS_DOCUMENT => "is document",
             SyntaxKind::IS_JSON => "is json",
             SyntaxKind::IS_JSON_ARRAY => "is json array",
             SyntaxKind::IS_JSON_OBJECT => "is json object",
@@ -6590,6 +6597,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::IS_NORMALIZED => "is normalized",
             SyntaxKind::IS_NOT => "is not",
             SyntaxKind::IS_NOT_DISTINCT_FROM => "is not distinct from",
+            SyntaxKind::IS_NOT_DOCUMENT => "is not document",
             SyntaxKind::IS_NOT_JSON => "is not json",
             SyntaxKind::IS_NOT_JSON_ARRAY => "is not json array",
             SyntaxKind::IS_NOT_JSON_OBJECT => "is not json object",
@@ -6706,6 +6714,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::NEW_TABLE => "new table",
             SyntaxKind::NEXT => "next",
             SyntaxKind::NON_STANDARD_PARAM => "non standard param",
+            SyntaxKind::NORMALIZE_FN => "normalize fn",
             SyntaxKind::NOTHING => "nothing",
             SyntaxKind::NOTIFY => "notify",
             SyntaxKind::NOT_DEFERRABLE => "not deferrable",
