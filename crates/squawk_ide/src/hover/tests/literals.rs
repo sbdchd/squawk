@@ -315,7 +315,7 @@ select b'$0';
 }
 
 #[test]
-fn byte_string() {
+fn hex_string() {
     assert_snapshot!(hover(r"
 select x'1A$03F';
 "), @"
@@ -330,7 +330,7 @@ select x'1A$03F';
 }
 
 #[test]
-fn byte_string_keeps_width() {
+fn hex_string_keeps_width() {
     assert_snapshot!(hover(r"
 select x'0F$0F';
 "), @"
@@ -345,7 +345,7 @@ select x'0F$0F';
 }
 
 #[test]
-fn byte_string_empty() {
+fn hex_string_empty() {
     assert_snapshot!(hover(r"
 select x'$0';
 "), @"

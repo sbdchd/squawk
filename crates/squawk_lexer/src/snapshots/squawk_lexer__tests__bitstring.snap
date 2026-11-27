@@ -8,8 +8,8 @@ expression: "lex(r#\"\nB'1001'\nb'1001'\nX'1FF'\nx'1FF'\n\"#)"
     "\n" @ Whitespace,
     "b'1001'" @ Literal { kind: BitStr { terminated: true } },
     "\n" @ Whitespace,
-    "X'1FF'" @ Literal { kind: ByteStr { terminated: true } },
+    "X'1FF'" @ Literal { kind: HexStr { terminated: true } },
     "\n" @ Whitespace,
-    "x'1FF'" @ Literal { kind: ByteStr { terminated: true } },
+    "x'1FF'" @ Literal { kind: HexStr { terminated: true } },
     "\n" @ Whitespace,
 ]

@@ -14,6 +14,9 @@ use squawk_syntax::{
 };
 
 use crate::arena::{IdxRange, LayeredArena};
+use crate::builtin_am::BuiltinAm;
+use crate::builtin_fn::BuiltinFn;
+use crate::builtin_ty::BuiltinTy;
 use crate::column_exprs::{ColumnExpr, ColumnExprId, ColumnExprKind, ColumnExprs, ColumnKey};
 use crate::dependency_graph::{DependencyGraph, Object, rename_schema_objects, set_object_schema};
 use crate::edit_distance::{find_best_match_for_name, find_best_match_for_name_with_substrings};
@@ -63,11 +66,12 @@ use crate::{
         TypeCategory, TypeId, TypeKind, Typmod, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, ColumnTypeName, Comparison,
-        CompoundOp, ConflictAction, ConflictRuleEvent, ConflictTargetKey, DefaultChange,
-        DirectArgs, DropRelation, ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam,
-        ErrorReturnType, ForeignKeyPair, GeneratedKind, LockStrength, LockedSource, LookupKind,
-        NumericOverflow, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
+        ArgKeyword, ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, ColumnListKind,
+        ColumnTypeName, Comparison, CompoundOp, ConflictAction, ConflictRuleEvent,
+        ConflictTargetKey, DefaultChange, DirectArgs, DocumentTest, DomainConstraint, DropRelation,
+        ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType,
+        ForeignKeyPair, GeneratedKind, LockStrength, LockedSource, LookupKind, NumericOverflow,
+        ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
         OutsideSearchPath, Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn,
         SimilarType, TriggerFunctionKind, TruncateCascade, UniqueKind, ViewColumnRename,
         WindowClause,
@@ -2515,8 +2519,8 @@ impl Lowerer {
     }
 
     fn sequence_columns(&mut self, ptr: InIrFile<SyntaxNodePtr>) -> Columns {
-        let int8 = self.builtin_type("int8");
-        let bool = self.builtin_type("bool");
+        let int8 = self.builtin_ty(BuiltinTy::Int8);
+        let bool = self.builtin_ty(BuiltinTy::Bool);
         let columns = [
             Column {
                 name: Some(self.intern("last_value")),
@@ -2821,8 +2825,8 @@ impl Lowerer {
             }
         }
         let inputs = aggregated.unwrap_or(direct);
-        let internal = self.builtin_type("internal");
-        let bytea = self.builtin_type("bytea");
+        let internal = self.builtin_ty(BuiltinTy::Internal);
+        let bytea = self.builtin_ty(BuiltinTy::Bytea);
         let (final_inputs, final_extra_inputs) = match aggregated {
             Some(_) => (direct, all_inputs),
             None => (&[][..], inputs),
@@ -5311,7 +5315,7 @@ impl Lowerer {
             .and_then(|handler| handler.function_name_ref())
             .and_then(|function| function.path_ref())
         {
-            let internal = self.builtin_type("internal");
+            let internal = self.builtin_ty(BuiltinTy::Internal);
             self.lower_function_path_ref(&path, Some(&[internal]));
         }
         let kind = match create_access_method.access_method_type() {
@@ -5368,8 +5372,7 @@ impl Lowerer {
     ) -> Option<AccessMethodId> {
         let name = self.intern(&access_method_ref.text());
         if self.index.names.resolve(name) == "rtree" && self.find_access_method(name).is_none() {
-            let gist = self.intern("gist");
-            let access_method = self.find_access_method(gist);
+            let access_method = self.builtin_am(BuiltinAm::Gist);
             let resolution = access_method.map_or(Resolution::Unresolved, Resolution::AccessMethod);
             self.add_ref(
                 name,
@@ -5554,8 +5557,8 @@ impl Lowerer {
                 }
                 ast::FdwOption::OptionValidator(validator) => {
                     if let Some(path) = validator.function_name_ref().and_then(|f| f.path_ref()) {
-                        let text_array = self.builtin_type("text").map(Ty::array);
-                        let oid = self.builtin_type("oid");
+                        let text_array = self.builtin_ty(BuiltinTy::Text).map(Ty::array);
+                        let oid = self.builtin_ty(BuiltinTy::Oid);
                         self.lower_function_path_ref(&path, Some(&[text_array, oid]));
                     }
                 }
@@ -8344,10 +8347,10 @@ impl Lowerer {
             .function_name_ref()
             .and_then(|function| function.path_ref())
         {
-            let int4 = self.builtin_type("int4");
-            let cstring = self.builtin_type("cstring");
-            let internal = self.builtin_type("internal");
-            let bool = self.builtin_type("bool");
+            let int4 = self.builtin_ty(BuiltinTy::Int4);
+            let cstring = self.builtin_ty(BuiltinTy::Cstring);
+            let internal = self.builtin_ty(BuiltinTy::Internal);
+            let bool = self.builtin_ty(BuiltinTy::Bool);
             self.lower_function_path_ref(&path, Some(&[int4, int4, cstring, internal, int4, bool]));
         }
         let Some(path) = create_conversion
@@ -8527,7 +8530,7 @@ impl Lowerer {
             .and_then(|inline| inline.function_name_ref())
             .and_then(|function| function.path_ref())
         {
-            let internal = self.builtin_type("internal");
+            let internal = self.builtin_ty(BuiltinTy::Internal);
             self.lower_function_path_ref(&path, Some(&[internal]));
         }
         if let Some(path) = create_language
@@ -8535,7 +8538,7 @@ impl Lowerer {
             .and_then(|validator| validator.function_name_ref())
             .and_then(|function| function.path_ref())
         {
-            let oid = self.builtin_type("oid");
+            let oid = self.builtin_ty(BuiltinTy::Oid);
             self.lower_function_path_ref(&path, Some(&[oid]));
         }
         if let Some(language) = create_language.language() {
@@ -8622,7 +8625,7 @@ impl Lowerer {
                         .function_name_ref()
                         .and_then(|function| function.path_ref())
                     {
-                        let internal = self.builtin_type("internal");
+                        let internal = self.builtin_ty(BuiltinTy::Internal);
                         self.lower_function_path_ref(&path, Some(&[internal]));
                     }
                 }
@@ -11217,8 +11220,11 @@ impl Lowerer {
             .partition_strategy()
             .and_then(|strategy| strategy.kind())
             == Some(ast::PartitionStrategyKind::Hash);
-        let access_method = self.intern(if hash { "hash" } else { "btree" });
-        let access_method = self.find_access_method(access_method);
+        let access_method = self.builtin_am(if hash {
+            BuiltinAm::Hash
+        } else {
+            BuiltinAm::Btree
+        });
         let columns: Option<SmallVec<[Name; 4]>> = partition_by
             .partition_item_list()
             .into_iter()
@@ -12050,8 +12056,7 @@ impl Lowerer {
                             if let Some(ast::FuncType::Type(ast::Type::PathType(path_type))) = ty
                                 && let Some(path) = path_type.path_ref()
                             {
-                                let btree = self.intern("btree");
-                                let access_method = self.find_access_method(btree);
+                                let access_method = self.builtin_am(BuiltinAm::Btree);
                                 self.lower_operator_class_ref(
                                     &path,
                                     access_method,
@@ -12166,7 +12171,7 @@ impl Lowerer {
     ) {
         let range_ty = Some(Ty::Type(range));
         let array = Some(Ty::Type(range).array());
-        let text = self.builtin_type("text");
+        let text = self.builtin_ty(BuiltinTy::Text);
         let ptr = self.ptr(node);
         let param = |mode, ty| Param {
             name: None,
@@ -12489,7 +12494,7 @@ impl Lowerer {
         {
             return self.index.types[id].collation;
         }
-        let name = self.builtin_type("name");
+        let name = self.builtin_ty(BuiltinTy::Name);
         let collation = if name == Some(ty) || name.map(Ty::array) == Some(ty) {
             "C"
         } else {
@@ -13551,7 +13556,7 @@ impl Lowerer {
     }
 
     fn lower_domain_constraint(&mut self, domain: Option<TypeId>, constraint: &ast::Constraint) {
-        let what = match constraint {
+        let kind = match constraint {
             ast::Constraint::CheckConstraint(check) => {
                 self.lower_domain_check_constraint(domain, check);
                 return;
@@ -13570,17 +13575,17 @@ impl Lowerer {
                 return;
             }
             ast::Constraint::NullConstraint(_) => return,
-            ast::Constraint::PrimaryKeyConstraint(_) => "primary key constraints",
-            ast::Constraint::UniqueConstraint(_) => "unique constraints",
+            ast::Constraint::PrimaryKeyConstraint(_) => DomainConstraint::PrimaryKey,
+            ast::Constraint::UniqueConstraint(_) => DomainConstraint::Unique,
             ast::Constraint::ForeignKeyConstraint(_) | ast::Constraint::ReferencesConstraint(_) => {
-                "foreign key constraints"
+                DomainConstraint::ForeignKey
             }
-            ast::Constraint::ExcludeConstraint(_) => "exclusion constraints",
-            ast::Constraint::GeneratedConstraint(_) => "generated columns",
+            ast::Constraint::ExcludeConstraint(_) => DomainConstraint::Exclusion,
+            ast::Constraint::GeneratedConstraint(_) => DomainConstraint::Generated,
         };
         self.push_error(
             constraint.syntax(),
-            SemaError::InvalidDomainConstraint { what },
+            SemaError::InvalidDomainConstraint { constraint: kind },
         );
     }
 
@@ -14026,13 +14031,13 @@ impl Lowerer {
         }
     }
 
-    fn builtin_type(&mut self, name: &str) -> Option<Ty> {
-        let name = self.intern(name);
+    fn builtin_ty(&mut self, ty: BuiltinTy) -> Option<Ty> {
+        let name = self.intern(ty.name());
         self.find_type_in(self.pg_catalog, name).map(Ty::Type)
     }
 
     fn literal_type(&mut self, literal: &ast::Literal) -> Option<Ty> {
-        let ty = self.builtin_type(literal.type_name()?)?;
+        let ty = self.builtin_ty(BuiltinTy::from(literal)?)?;
         self.record_literal_type(literal, ty);
         Some(ty)
     }
@@ -14545,7 +14550,7 @@ impl Lowerer {
             Some(ast::LitKind::False(_)) => SearchPathScope::Session,
             Some(
                 ast::LitKind::BitString(_)
-                | ast::LitKind::ByteString(_)
+                | ast::LitKind::HexString(_)
                 | ast::LitKind::Default(_)
                 | ast::LitKind::DollarQuotedString(_)
                 | ast::LitKind::EscString(_)
@@ -16860,9 +16865,9 @@ impl Lowerer {
             }
             if let Some(column_ref) = search.set_column().and_then(|set| set.column_name_ref()) {
                 let ty = match search.search_order() {
-                    Some(ast::SearchOrder::BreadthFirst(_)) => self.builtin_type("record"),
+                    Some(ast::SearchOrder::BreadthFirst(_)) => self.builtin_ty(BuiltinTy::Record),
                     Some(ast::SearchOrder::DepthFirst(_)) => {
-                        self.builtin_type("record").map(Ty::array)
+                        self.builtin_ty(BuiltinTy::Record).map(Ty::array)
                     }
                     None => None,
                 };
@@ -16886,14 +16891,14 @@ impl Lowerer {
                         }
                         ty
                     }
-                    None => self.builtin_type("bool"),
+                    None => self.builtin_ty(BuiltinTy::Bool),
                 };
                 if let Some(column_ref) = set.column_name_ref() {
                     self.alloc_column_def_ref(&column_ref, ty);
                 }
             }
             if let Some(column_ref) = cycle.path().and_then(|path| path.column_name_ref()) {
-                let ty = self.builtin_type("record").map(Ty::array);
+                let ty = self.builtin_ty(BuiltinTy::Record).map(Ty::array);
                 self.alloc_column_def_ref(&column_ref, ty);
             }
         }
@@ -17057,7 +17062,7 @@ impl Lowerer {
         };
         let schema = schema.map(|schema| self.lower_schema_ref(schema.syntax(), &schema.text()));
         let name = self.intern(&name_ref.text());
-        let internal = self.builtin_type("internal");
+        let internal = self.builtin_ty(BuiltinTy::Internal);
         let function = self.find_function_by(schema, name, |function| {
             self.has_arg_types(function, &[internal])
         });
@@ -17696,16 +17701,16 @@ impl Lowerer {
         let Some(extra) = list.range.iter().nth(available) else {
             return;
         };
-        let too_long = |what, name| SemaError::ColumnListTooLong {
-            what,
+        let too_long = |owner, name| SemaError::ColumnListTooLong {
+            owner,
             name,
             available,
             specified,
         };
         let error = match owner {
-            ColumnListOwner::Cte(name) => too_long("`with` query", name),
-            ColumnListOwner::Table(Some(name)) => too_long("table", name),
-            ColumnListOwner::Join(Some(name)) => too_long("join expression", name),
+            ColumnListOwner::Cte(name) => too_long(ColumnListKind::Cte, name),
+            ColumnListOwner::Table(Some(name)) => too_long(ColumnListKind::Table, name),
+            ColumnListOwner::Join(Some(name)) => too_long(ColumnListKind::Join, name),
             ColumnListOwner::Table(None) | ColumnListOwner::Join(None) => return,
             ColumnListOwner::View => SemaError::ViewTooManyColumnNames,
             ColumnListOwner::CreateAs => SemaError::CreateAsTooManyColumnNames,
@@ -18026,7 +18031,7 @@ impl Lowerer {
         let CallArgs { args, .. } =
             self.with_from_function(|this| this.lower_call_args(call.arg_list()));
         self.check_from_set_returning(srf_calls, None);
-        let name = self.intern("unnest");
+        let name = self.intern(BuiltinFn::Unnest.name());
         let mut resolutions: SmallVec<[Resolution; 4]> = smallvec![];
         let mut items: SmallVec<[FunctionColumns; 4]> = smallvec![];
         for arg in &args {
@@ -18214,7 +18219,7 @@ impl Lowerer {
         function: FunctionId,
         args: &[CallArg],
     ) -> Option<ColumnDefListReason> {
-        let record = self.builtin_type("record");
+        let record = self.builtin_ty(BuiltinTy::Record);
         if self.index.functions[function].columns.is_some()
             && self.index.functions[function].ret == record
         {
@@ -18236,7 +18241,7 @@ impl Lowerer {
     }
 
     fn is_pseudo_column_type(&mut self, ty: Ty) -> bool {
-        let record = self.builtin_type("record");
+        let record = self.builtin_ty(BuiltinTy::Record);
         Some(ty) != record
             && matches!(ty, Ty::Type(id) if self.index.types[id].category == Some(TypeCategory::Pseudo))
     }
@@ -18249,9 +18254,9 @@ impl Lowerer {
         if self.index.types[id].category != Some(TypeCategory::Pseudo) {
             return None;
         }
-        let supported = ["record", "void", "cstring"]
+        let supported = [BuiltinTy::Record, BuiltinTy::Void, BuiltinTy::Cstring]
             .into_iter()
-            .any(|name| self.builtin_type(name) == Some(ty));
+            .any(|builtin| self.builtin_ty(builtin) == Some(ty));
         (!supported).then_some(ty)
     }
 
@@ -18261,7 +18266,7 @@ impl Lowerer {
     }
 
     fn returns_anonymous_record(&mut self, function: FunctionId) -> bool {
-        let record = self.builtin_type("record");
+        let record = self.builtin_ty(BuiltinTy::Record);
         let function = &self.index.functions[function];
         function.columns.is_none() && function.ret.is_some() && function.ret == record
     }
@@ -18281,7 +18286,7 @@ impl Lowerer {
         let start = self.index.columns.next_idx();
         self.index.columns.alloc_copies(columns.range);
         let name = self.intern("ordinality");
-        let ty = self.builtin_type("int8");
+        let ty = self.builtin_ty(BuiltinTy::Int8);
         self.index.columns.alloc(Column {
             name: Some(name),
             ptr: self.ptr(with_ordinality.syntax()),
@@ -19619,10 +19624,7 @@ impl Lowerer {
             Some(using_method) => using_method
                 .access_method_ref()
                 .and_then(|method| self.lower_index_method_ref(&method)),
-            None => {
-                let btree = self.intern("btree");
-                self.find_access_method(btree)
-            }
+            None => self.builtin_am(BuiltinAm::Btree),
         };
         if let Some(tablespace) = create_index
             .tablespace_clause()
@@ -19876,7 +19878,7 @@ impl Lowerer {
             ..
         }) = self.lower_callee(callee, &[], None, CalleeKind::Plain, None)
             && let Some(ret) = self.index.functions[function].ret
-            && let Some(expected) = self.builtin_type(kind.return_type())
+            && let Some(expected) = self.builtin_ty(kind.return_type())
             && ret != expected
         {
             self.push_error(callee.syntax(), SemaError::TriggerReturnType { name, kind });
@@ -22118,7 +22120,7 @@ impl Lowerer {
             }
             ast::BinOp::And(_) | ast::BinOp::Is(_) | ast::BinOp::IsNot(_) | ast::BinOp::Or(_) => {
                 LoweredOperator {
-                    ty: self.builtin_type("bool"),
+                    ty: self.builtin_ty(BuiltinTy::Bool),
                     operator: None,
                 }
             }
@@ -22156,9 +22158,9 @@ impl Lowerer {
             && (similar || pattern)
         {
             let function = if similar {
-                "similar_to_escape"
+                BuiltinFn::SimilarToEscape
             } else {
-                "like_escape"
+                BuiltinFn::LikeEscape
             };
             let args = [
                 self.lower_positional_arg(escape.lhs()),
@@ -22192,7 +22194,7 @@ impl Lowerer {
         let arg = expr_arg_type(Some(rhs), self.lower_expr(rhs));
         if similar {
             return self
-                .system_call_type("similar_to_escape", &[CallArg::positional(arg)])
+                .system_call_type(BuiltinFn::SimilarToEscape, &[CallArg::positional(arg)])
                 .map_or(ArgType::Untyped, ArgType::Known);
         }
         arg
@@ -22291,7 +22293,7 @@ impl Lowerer {
             if let (ArgType::Known(left), ArgType::Known(right)) = (left, common) {
                 self.check_comparison(comparison, rhs.syntax(), left, right, found.ty);
             }
-            return self.builtin_type("bool");
+            return self.builtin_ty(BuiltinTy::Bool);
         }
         for (expr, right) in list.exprs().zip(elements) {
             let Some(OperatorRef {
@@ -22320,7 +22322,7 @@ impl Lowerer {
                 self.check_comparison(comparison, expr.syntax(), left, right, found);
             }
         }
-        self.builtin_type("bool")
+        self.builtin_ty(BuiltinTy::Bool)
     }
 
     fn lower_in_list(&mut self, tuple: &ast::TupleExpr, left: ArgType) -> ArgType {
@@ -22354,8 +22356,8 @@ impl Lowerer {
                 }
                 ty
             }
-            ast::FunctionLikeKeyword::Grouping => self.builtin_type("int4"),
-            ast::FunctionLikeKeyword::MergeAction => self.builtin_type("text"),
+            ast::FunctionLikeKeyword::Grouping => self.builtin_ty(BuiltinTy::Int4),
+            ast::FunctionLikeKeyword::MergeAction => self.builtin_ty(BuiltinTy::Text),
             ast::FunctionLikeKeyword::XmlConcat => self.xmlconcat_type(call, args),
         }
     }
@@ -22372,7 +22374,7 @@ impl Lowerer {
     }
 
     fn xmlconcat_type(&mut self, call: &ast::CallExpr, args: &[CallArg]) -> Option<Ty> {
-        let xml = self.builtin_type("xml")?;
+        let xml = self.builtin_ty(BuiltinTy::Xml)?;
         for (arg, node) in args
             .iter()
             .zip(call.arg_list().into_iter().flat_map(|list| list.args()))
@@ -22381,7 +22383,7 @@ impl Lowerer {
                 && self.overloads().rejects_arg(arg.ty, xml)
             {
                 let error = SemaError::KeywordArgType {
-                    keyword: "xmlconcat",
+                    keyword: ArgKeyword::Xmlconcat,
                     expected: self.index.ty_name(xml),
                     found: self.index.ty_name(found),
                 };
@@ -22394,11 +22396,11 @@ impl Lowerer {
     fn lower_document_test(&mut self, expr: &ast::Expr, test: DocumentTest) {
         let arg = expr_arg_type(Some(expr), self.lower_expr(expr));
         if let ArgType::Known(found) = arg
-            && let Some(xml) = self.builtin_type("xml")
+            && let Some(xml) = self.builtin_ty(BuiltinTy::Xml)
             && self.overloads().rejects_arg(arg, xml)
         {
             let error = SemaError::KeywordArgType {
-                keyword: test.keyword(),
+                keyword: ArgKeyword::Document(test),
                 expected: self.index.ty_name(xml),
                 found: self.index.ty_name(found),
             };
@@ -22507,7 +22509,7 @@ impl Lowerer {
             ast::PrefixOp::OperatorCall(operator_call) => {
                 self.lower_operator_call(operator_call, None, right).ty
             }
-            ast::PrefixOp::Not(_) => self.builtin_type("bool"),
+            ast::PrefixOp::Not(_) => self.builtin_ty(BuiltinTy::Bool),
         }
     }
 
@@ -22814,10 +22816,7 @@ impl Lowerer {
             .and_then(|method| method.access_method_ref())
         {
             Some(access_method_ref) => self.lower_index_method_ref(&access_method_ref),
-            None => {
-                let btree = self.intern("btree");
-                self.find_access_method(btree)
-            }
+            None => self.builtin_am(BuiltinAm::Btree),
         };
         if let Some(tablespace) = exclude
             .constraint_index_tablespace()
@@ -23273,7 +23272,7 @@ impl Lowerer {
         if ty == referenced_ty {
             return true;
         }
-        let Some(btree) = self.btree() else {
+        let Some(btree) = self.builtin_am(BuiltinAm::Btree) else {
             return true;
         };
         let class = match self.default_operator_class(btree, referenced_ty) {
@@ -23324,7 +23323,7 @@ impl Lowerer {
     }
 
     fn check_key_operator_classes(&mut self, table: TableId, columns: &[Name], node: &SyntaxNode) {
-        let Some(btree) = self.btree() else {
+        let Some(btree) = self.builtin_am(BuiltinAm::Btree) else {
             return;
         };
         let range = self.index.tables[table].columns.range;
@@ -23338,10 +23337,10 @@ impl Lowerer {
         }
     }
 
-    fn btree(&self) -> Option<AccessMethodId> {
+    fn builtin_am(&self, am: BuiltinAm) -> Option<AccessMethodId> {
         self.index
             .names
-            .lookup("btree")
+            .lookup(am.name())
             .and_then(|name| self.find_access_method(name))
     }
 
@@ -24485,7 +24484,7 @@ impl Lowerer {
             let (ty, record) = if let ast::Expr::TupleExpr(tuple) = expr.unparen() {
                 let columns = self.lower_row_columns(&tuple);
                 (
-                    self.builtin_type("record"),
+                    self.builtin_ty(BuiltinTy::Record),
                     Some(RecordColumns::Known(columns)),
                 )
             } else {
@@ -24601,7 +24600,7 @@ impl Lowerer {
     }
 
     fn record_field_base(&mut self, ty: Option<Ty>, record: Option<RecordColumns>) -> FieldBase {
-        let record_ty = self.builtin_type("record");
+        let record_ty = self.builtin_ty(BuiltinTy::Record);
         if ty.is_some() && ty != record_ty {
             return self.expr_field_base(ty);
         }
@@ -24891,7 +24890,7 @@ impl Lowerer {
 
     fn lower_limit_expr(&mut self, context: ExprContext, expr: &ast::Expr) {
         self.lower_expr_in(context, expr);
-        if let Some(ty) = self.builtin_type("int8") {
+        if let Some(ty) = self.builtin_ty(BuiltinTy::Int8) {
             self.record_unknown_literal(expr, ty);
         }
         self.check_unknown_literal_expr(LiteralTarget::Int(IntType::Int8), expr);
@@ -25041,7 +25040,7 @@ impl Lowerer {
     ) -> Option<Ty> {
         match sql_value_function_name(function) {
             Some(name) => self.lower_system_call(name, &[], node.text_range()),
-            None => self.builtin_type(sql_value_function_type(function)),
+            None => self.builtin_ty(sql_value_function_type(function)),
         }
     }
 
@@ -25157,7 +25156,7 @@ impl Lowerer {
                         }
                     }
                 }
-                return self.builtin_type("bool");
+                return self.builtin_ty(BuiltinTy::Bool);
             }
             ast::Expr::BinExpr(bin) => {
                 let op = bin.op();
@@ -25165,7 +25164,7 @@ impl Lowerer {
                     let expr = self.lower_positional_arg(bin.lhs());
                     let zone = self.lower_positional_arg(bin.rhs());
                     return self.lower_system_call(
-                        "timezone",
+                        BuiltinFn::Timezone,
                         &[zone, expr],
                         at_time_zone.syntax().text_range(),
                     );
@@ -25370,7 +25369,7 @@ impl Lowerer {
                 Some(ast::PostfixOp::AtLocal(at_local)) => {
                     let expr = self.lower_positional_arg(postfix.expr());
                     return self.lower_system_call(
-                        "timezone",
+                        BuiltinFn::Timezone,
                         &[expr],
                         at_local.syntax().text_range(),
                     );
@@ -25393,13 +25392,13 @@ impl Lowerer {
                     if let Some(expr) = postfix.expr() {
                         self.lower_document_test(&expr, DocumentTest::Is);
                     }
-                    return self.builtin_type("bool");
+                    return self.builtin_ty(BuiltinTy::Bool);
                 }
                 Some(ast::PostfixOp::IsNotDocument(_)) => {
                     if let Some(expr) = postfix.expr() {
                         self.lower_document_test(&expr, DocumentTest::IsNot);
                     }
-                    return self.builtin_type("bool");
+                    return self.builtin_ty(BuiltinTy::Bool);
                 }
                 Some(
                     ast::PostfixOp::IsJson(_)
@@ -25416,7 +25415,7 @@ impl Lowerer {
                     | ast::PostfixOp::NotNull(_),
                 ) => {
                     self.lower_exprs(postfix.expr());
-                    return self.builtin_type("bool");
+                    return self.builtin_ty(BuiltinTy::Bool);
                 }
                 None => self.lower_exprs(postfix.expr()),
             },
@@ -25429,7 +25428,7 @@ impl Lowerer {
                         expr.as_ref().map(|expr| expr.unparen())
                     && let Some(value) = literal.integer_value_u64()
                 {
-                    return self.builtin_type(negated_integer_type(value));
+                    return self.builtin_ty(negated_integer_type(value));
                 }
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
                     self.check_condition(ConditionKind::Not, expr, ty);
@@ -25443,7 +25442,7 @@ impl Lowerer {
             }
             ast::Expr::TupleExpr(tuple) => {
                 self.lower_exprs(tuple.exprs());
-                return self.builtin_type("record");
+                return self.builtin_ty(BuiltinTy::Record);
             }
         }
         None
@@ -25783,7 +25782,7 @@ impl Lowerer {
         if let Some(ast::Expr::NameRef(name_ref)) = call.expr()
             && let Some(function) = name_ref.sql_value_function()
         {
-            let ty = self.builtin_type(sql_value_function_type(function));
+            let ty = self.builtin_ty(sql_value_function_type(function));
             return Some(LoweredCall::typed(ty));
         }
         if let Some(graph_table) = call.graph_table_fn() {
@@ -25803,7 +25802,7 @@ impl Lowerer {
         }
         if let Some(exists_fn) = call.exists_fn() {
             self.lower_opt_sublink(exists_fn.select_variant());
-            return Some(LoweredCall::typed(self.builtin_type("bool")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Bool)));
         }
         if let Some(collation_for_fn) = call.collation_for_fn() {
             let arg = self.lower_positional_arg(collation_for_fn.expr());
@@ -25814,7 +25813,7 @@ impl Lowerer {
                 return None;
             };
             let range = collation.text_range().cover(for_token.text_range());
-            return Some(self.lower_special_call("pg_collation_for", smallvec![arg], range));
+            return Some(self.lower_special_call(BuiltinFn::PgCollationFor, smallvec![arg], range));
         }
         if let Some(extract_fn) = call.extract_fn() {
             let field = CallArg {
@@ -25824,7 +25823,7 @@ impl Lowerer {
             let expr = self.lower_positional_arg(extract_fn.expr());
             let token = extract_fn.extract_token()?;
             return Some(self.lower_special_call(
-                "extract",
+                BuiltinFn::Extract,
                 smallvec![field, expr],
                 token.text_range(),
             ));
@@ -25834,7 +25833,7 @@ impl Lowerer {
             let string = self.lower_positional_arg(position_fn.string());
             let token = position_fn.position_token()?;
             return Some(self.lower_special_call(
-                "position",
+                BuiltinFn::Position,
                 smallvec![string, substring],
                 token.text_range(),
             ));
@@ -25848,7 +25847,7 @@ impl Lowerer {
                 });
             }
             let token = normalize_fn.normalize_token()?;
-            return Some(self.lower_special_call("normalize", args, token.text_range()));
+            return Some(self.lower_special_call(BuiltinFn::Normalize, args, token.text_range()));
         }
         if let Some(overlay_fn) = call.overlay_fn() {
             let args = match overlay_fn.overlay_args() {
@@ -25869,7 +25868,7 @@ impl Lowerer {
                 None => smallvec![],
             };
             let token = overlay_fn.overlay_token()?;
-            return Some(self.lower_special_call("overlay", args, token.text_range()));
+            return Some(self.lower_special_call(BuiltinFn::Overlay, args, token.text_range()));
         }
         if let Some(substring_fn) = call.substring_fn() {
             let args = match substring_fn.substring_args() {
@@ -25883,7 +25882,7 @@ impl Lowerer {
                         Some(start) => self.lower_positional_arg(Some(start)),
                         None => CallArg {
                             ty: self
-                                .builtin_type("int4")
+                                .builtin_ty(BuiltinTy::Int4)
                                 .map_or(ArgType::Untyped, ArgType::Known),
                             ..CallArg::default()
                         },
@@ -25908,13 +25907,13 @@ impl Lowerer {
                 None => smallvec![],
             };
             let token = substring_fn.substring_token()?;
-            return Some(self.lower_special_call("substring", args, token.text_range()));
+            return Some(self.lower_special_call(BuiltinFn::Substring, args, token.text_range()));
         }
         if let Some(trim_fn) = call.trim_fn() {
             let function = match trim_fn.trim_side() {
-                Some(ast::TrimSide::TrimBoth(_)) | None => "btrim",
-                Some(ast::TrimSide::TrimLeading(_)) => "ltrim",
-                Some(ast::TrimSide::TrimTrailing(_)) => "rtrim",
+                Some(ast::TrimSide::TrimBoth(_)) | None => BuiltinFn::Btrim,
+                Some(ast::TrimSide::TrimLeading(_)) => BuiltinFn::Ltrim,
+                Some(ast::TrimSide::TrimTrailing(_)) => BuiltinFn::Rtrim,
             };
             let args = match trim_fn.trim_args() {
                 Some(ast::TrimArgs::TrimExprFrom(args)) => {
@@ -25946,7 +25945,8 @@ impl Lowerer {
                     .and_then(|value| value.expr()),
             );
             self.lower_order_by(json_array_agg.order_by_clause());
-            let ty = self.lower_json_returning(json_array_agg.json_returning_clause(), "json");
+            let ty =
+                self.lower_json_returning(json_array_agg.json_returning_clause(), BuiltinTy::Json);
             return Some(LoweredCall::typed(ty));
         }
         if let Some(json_array) = call.json_array_fn() {
@@ -25956,7 +25956,7 @@ impl Lowerer {
             for format in json_array.json_select_formats() {
                 self.lower_opt_sublink(format.select_variant());
             }
-            let ty = self.lower_json_returning(json_array.json_returning_clause(), "json");
+            let ty = self.lower_json_returning(json_array.json_returning_clause(), BuiltinTy::Json);
             return Some(LoweredCall::typed(ty));
         }
         if let Some(json_exists) = call.json_exists_fn() {
@@ -25971,17 +25971,18 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
-            return Some(LoweredCall::typed(self.builtin_type("bool")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Bool)));
         }
         if let Some(json_fn) = call.json_fn() {
             self.lower_exprs(json_fn.expr());
-            return Some(LoweredCall::typed(self.builtin_type("json")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Json)));
         }
         if let Some(json_object_agg) = call.json_object_agg_fn() {
             if let Some(key_value) = json_object_agg.json_key_value() {
                 self.lower_json_key_value(&key_value);
             }
-            let ty = self.lower_json_returning(json_object_agg.json_returning_clause(), "json");
+            let ty =
+                self.lower_json_returning(json_object_agg.json_returning_clause(), BuiltinTy::Json);
             return Some(LoweredCall::typed(ty));
         }
         if let Some(json_object) = call.json_object_fn() {
@@ -25991,7 +25992,8 @@ impl Lowerer {
             for key_value in json_object.json_key_values() {
                 self.lower_json_key_value(&key_value);
             }
-            let ty = self.lower_json_returning(json_object.json_returning_clause(), "json");
+            let ty =
+                self.lower_json_returning(json_object.json_returning_clause(), BuiltinTy::Json);
             return Some(LoweredCall::typed(ty));
         }
         if let Some(json_query) = call.json_query_fn() {
@@ -26011,7 +26013,8 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
-            let ty = self.lower_json_returning(json_query.json_returning_clause(), "jsonb");
+            let ty =
+                self.lower_json_returning(json_query.json_returning_clause(), BuiltinTy::Jsonb);
             return Some(LoweredCall::typed(ty));
         }
         if let Some(json_value) = call.json_value_fn() {
@@ -26031,16 +26034,17 @@ impl Lowerer {
                     .json_on_error_clause()
                     .and_then(|clause| clause.json_behavior()),
             );
-            let ty = self.lower_json_returning(json_value.json_returning_clause(), "text");
+            let ty = self.lower_json_returning(json_value.json_returning_clause(), BuiltinTy::Text);
             return Some(LoweredCall::typed(ty));
         }
         if let Some(json_scalar) = call.json_scalar_fn() {
             self.lower_exprs(json_scalar.expr());
-            return Some(LoweredCall::typed(self.builtin_type("json")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Json)));
         }
         if let Some(json_serialize) = call.json_serialize_fn() {
             self.lower_exprs(json_serialize.expr());
-            let ty = self.lower_json_returning(json_serialize.json_returning_clause(), "text");
+            let ty =
+                self.lower_json_returning(json_serialize.json_returning_clause(), BuiltinTy::Text);
             return Some(LoweredCall::typed(ty));
         }
         if let Some(xml_element) = call.xml_element_fn() {
@@ -26052,7 +26056,7 @@ impl Lowerer {
                 self.lower_exprs(attr.expr());
             }
             self.lower_exprs(xml_element.exprs());
-            return Some(LoweredCall::typed(self.builtin_type("xml")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Xml)));
         }
         if let Some(xml_exists) = call.xml_exists_fn() {
             let passing = xml_exists.xml_row_passing_clause();
@@ -26065,7 +26069,7 @@ impl Lowerer {
             );
             let token = xml_exists.xmlexists_token()?;
             return Some(self.lower_special_call(
-                "xmlexists",
+                BuiltinFn::Xmlexists,
                 smallvec![path, document],
                 token.text_range(),
             ));
@@ -26078,19 +26082,19 @@ impl Lowerer {
             {
                 self.lower_exprs(tag.expr());
             }
-            return Some(LoweredCall::typed(self.builtin_type("xml")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Xml)));
         }
         if let Some(xml_parse) = call.xml_parse_fn() {
             self.lower_exprs(xml_parse.expr());
-            return Some(LoweredCall::typed(self.builtin_type("xml")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Xml)));
         }
         if let Some(xml_pi) = call.xml_pi_fn() {
             self.lower_exprs(xml_pi.expr());
-            return Some(LoweredCall::typed(self.builtin_type("xml")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Xml)));
         }
         if let Some(xml_root) = call.xml_root_fn() {
             self.lower_exprs(xml_root.expr());
-            return Some(LoweredCall::typed(self.builtin_type("xml")));
+            return Some(LoweredCall::typed(self.builtin_ty(BuiltinTy::Xml)));
         }
         if let Some(xml_serialize) = call.xml_serialize_fn() {
             self.lower_exprs(xml_serialize.expr());
@@ -26103,11 +26107,11 @@ impl Lowerer {
     fn lower_json_returning(
         &mut self,
         returning: Option<ast::JsonReturningClause>,
-        default: &str,
+        default: BuiltinTy,
     ) -> Option<Ty> {
         match returning {
             Some(returning) => self.lower_type(&returning.ty()?),
-            None => self.builtin_type(default),
+            None => self.builtin_ty(default),
         }
     }
 
@@ -26211,7 +26215,7 @@ impl Lowerer {
         for column in xml_columns {
             let ty = match (column.ty(), column.ordinality_token()) {
                 (Some(ty), _) => self.lower_type(&ty),
-                (None, Some(_)) => self.builtin_type("int4"),
+                (None, Some(_)) => self.builtin_ty(BuiltinTy::Int4),
                 (None, None) => None,
             };
             if let Some(column_name) = column.column_name() {
@@ -26840,7 +26844,7 @@ impl Lowerer {
         found: Option<Ty>,
     ) {
         if let Some(found) = found
-            && let Some(bool) = self.builtin_type("bool")
+            && let Some(bool) = self.builtin_ty(BuiltinTy::Bool)
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
         {
             let error = SemaError::NonBoolComparison {
@@ -26861,11 +26865,11 @@ impl Lowerer {
             return;
         }
         if let Some(found) = found
-            && let Some(bool) = self.builtin_type("bool")
+            && let Some(bool) = self.builtin_ty(BuiltinTy::Bool)
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
         {
             let error = SemaError::KeywordArgType {
-                keyword: condition.keyword(),
+                keyword: ArgKeyword::Condition(condition),
                 expected: self.index.ty_name(bool),
                 found: self.index.ty_name(found),
             };
@@ -27297,7 +27301,7 @@ impl Lowerer {
                 self.lower_exprs(side);
             }
         }
-        self.lower_system_call("overlaps", &args, overlaps.text_range())
+        self.lower_system_call(BuiltinFn::Overlaps, &args, overlaps.text_range())
     }
 
     fn lower_is_normalized(
@@ -27313,9 +27317,9 @@ impl Lowerer {
                 ty: ArgType::UnknownLiteral,
                 ..CallArg::default()
             };
-            self.lower_system_call("is_normalized", &[expr, form], range)
+            self.lower_system_call(BuiltinFn::IsNormalized, &[expr, form], range)
         } else {
-            self.lower_system_call("is_normalized", &[expr], range)
+            self.lower_system_call(BuiltinFn::IsNormalized, &[expr], range)
         }
     }
 
@@ -27337,7 +27341,7 @@ impl Lowerer {
 
     fn lower_system_call(
         &mut self,
-        function: &str,
+        function: BuiltinFn,
         args: &[CallArg],
         range: TextRange,
     ) -> Option<Ty> {
@@ -27370,11 +27374,11 @@ impl Lowerer {
 
     fn lower_system_function_ref(
         &mut self,
-        function: &str,
+        function: BuiltinFn,
         args: &[CallArg],
         range: TextRange,
     ) -> Callee {
-        let name = self.intern(function);
+        let name = self.intern(function.name());
         let resolution =
             self.find_routine(Some(self.pg_catalog), name, args, FunctionKind::Function);
         let reference = self.add_ref_at(
@@ -27391,8 +27395,8 @@ impl Lowerer {
         }
     }
 
-    fn system_call_type(&mut self, function: &str, args: &[CallArg]) -> Option<Ty> {
-        let name = self.intern(function);
+    fn system_call_type(&mut self, function: BuiltinFn, args: &[CallArg]) -> Option<Ty> {
+        let name = self.intern(function.name());
         let Resolution::Function(function) =
             self.find_routine(Some(self.pg_catalog), name, args, FunctionKind::Function)
         else {
@@ -27403,7 +27407,7 @@ impl Lowerer {
 
     fn lower_special_call(
         &mut self,
-        function: &str,
+        function: BuiltinFn,
         args: SmallVec<[CallArg; 4]>,
         range: TextRange,
     ) -> LoweredCall {
@@ -27758,7 +27762,7 @@ impl Lowerer {
             | SourceKind::Excluded(_)
             | SourceKind::RuleRelation(_)
             | SourceKind::ElementVariable
-            | SourceKind::Other => self.builtin_type("record"),
+            | SourceKind::Other => self.builtin_ty(BuiltinTy::Record),
         }
     }
 
@@ -28196,7 +28200,7 @@ impl Lowerer {
                 let refs = self.index.references.next_idx();
                 let ty = self.lower_expr(&base);
                 let ty = if base.is_unknown_literal() {
-                    self.builtin_type("unknown")
+                    self.builtin_ty(BuiltinTy::Unknown)
                 } else {
                     ty
                 };
@@ -28209,7 +28213,7 @@ impl Lowerer {
     fn lower_row_field_base(&mut self, tuple: &ast::TupleExpr) -> FieldBase {
         FieldBase::Columns {
             columns: self.lower_row_columns(tuple),
-            ty: self.builtin_type("record"),
+            ty: self.builtin_ty(BuiltinTy::Record),
         }
     }
 
@@ -28250,7 +28254,7 @@ impl Lowerer {
     }
 
     fn is_record(&mut self, ty: Option<Ty>) -> bool {
-        ty.is_some() && ty == self.builtin_type("record")
+        ty.is_some() && ty == self.builtin_ty(BuiltinTy::Record)
     }
 
     fn add_record_field_ref(
@@ -29128,7 +29132,7 @@ impl Lowerer {
         {
             ret = match columns.range.len() {
                 1 => self.index.columns[columns.range.start()].ty,
-                _ => self.builtin_type("record"),
+                _ => self.builtin_ty(BuiltinTy::Record),
             };
         }
 
@@ -29272,7 +29276,7 @@ impl Lowerer {
     ) {
         let expected = match columns.range.len() {
             1 => self.index.columns[columns.range.start()].ty,
-            _ => self.builtin_type("record"),
+            _ => self.builtin_ty(BuiltinTy::Record),
         };
         let Some(expected) = expected else {
             return;
@@ -29335,7 +29339,7 @@ impl Lowerer {
             .and_then(|value| value.func_type())
         {
             let lowered = self.lower_func_type(&ty);
-            if lowered.is_some() && lowered == self.builtin_type("any") {
+            if lowered.is_some() && lowered == self.builtin_ty(BuiltinTy::Any) {
                 return self.index.params.range_from(start);
             }
             self.index.params.alloc(Param {
@@ -30106,13 +30110,13 @@ fn numeric_typmod(args: &ast::ArgList) -> Option<NumericTypmod> {
     NumericTypmod::new(precision, scale)
 }
 
-fn negated_integer_type(value: u64) -> &'static str {
+fn negated_integer_type(value: u64) -> BuiltinTy {
     if value <= u64::from(i32::MIN.unsigned_abs()) {
-        "int4"
+        BuiltinTy::Int4
     } else if value <= i64::MIN.unsigned_abs() {
-        "int8"
+        BuiltinTy::Int8
     } else {
-        "numeric"
+        BuiltinTy::Numeric
     }
 }
 
@@ -30250,16 +30254,16 @@ fn is_temp_schema_alias(schema: &str) -> bool {
         .is_some_and(|n| !n.is_empty() && n.bytes().all(|b| b.is_ascii_digit()))
 }
 
-fn sql_value_function_name(function: ast::SqlValueFunction) -> Option<&'static str> {
+fn sql_value_function_name(function: ast::SqlValueFunction) -> Option<BuiltinFn> {
     match function {
-        ast::SqlValueFunction::CurrentCatalog => Some("current_database"),
+        ast::SqlValueFunction::CurrentCatalog => Some(BuiltinFn::CurrentDatabase),
         ast::SqlValueFunction::CurrentRole
         | ast::SqlValueFunction::CurrentUser
-        | ast::SqlValueFunction::User => Some("current_user"),
-        ast::SqlValueFunction::CurrentSchema => Some("current_schema"),
-        ast::SqlValueFunction::SessionUser => Some("session_user"),
-        ast::SqlValueFunction::SystemUser => Some("system_user"),
-        ast::SqlValueFunction::CurrentTimestamp => Some("now"),
+        | ast::SqlValueFunction::User => Some(BuiltinFn::CurrentUser),
+        ast::SqlValueFunction::CurrentSchema => Some(BuiltinFn::CurrentSchema),
+        ast::SqlValueFunction::SessionUser => Some(BuiltinFn::SessionUser),
+        ast::SqlValueFunction::SystemUser => Some(BuiltinFn::SystemUser),
+        ast::SqlValueFunction::CurrentTimestamp => Some(BuiltinFn::Now),
         ast::SqlValueFunction::CurrentDate
         | ast::SqlValueFunction::CurrentTime
         | ast::SqlValueFunction::Localtime
@@ -30267,20 +30271,20 @@ fn sql_value_function_name(function: ast::SqlValueFunction) -> Option<&'static s
     }
 }
 
-fn sql_value_function_type(function: ast::SqlValueFunction) -> &'static str {
+fn sql_value_function_type(function: ast::SqlValueFunction) -> BuiltinTy {
     match function {
-        ast::SqlValueFunction::CurrentDate => "date",
-        ast::SqlValueFunction::CurrentTime => "timetz",
-        ast::SqlValueFunction::CurrentTimestamp => "timestamptz",
-        ast::SqlValueFunction::Localtime => "time",
-        ast::SqlValueFunction::Localtimestamp => "timestamp",
-        ast::SqlValueFunction::SystemUser => "text",
+        ast::SqlValueFunction::CurrentDate => BuiltinTy::Date,
+        ast::SqlValueFunction::CurrentTime => BuiltinTy::Timetz,
+        ast::SqlValueFunction::CurrentTimestamp => BuiltinTy::Timestamptz,
+        ast::SqlValueFunction::Localtime => BuiltinTy::Time,
+        ast::SqlValueFunction::Localtimestamp => BuiltinTy::Timestamp,
+        ast::SqlValueFunction::SystemUser => BuiltinTy::Text,
         ast::SqlValueFunction::CurrentCatalog
         | ast::SqlValueFunction::CurrentRole
         | ast::SqlValueFunction::CurrentSchema
         | ast::SqlValueFunction::CurrentUser
         | ast::SqlValueFunction::SessionUser
-        | ast::SqlValueFunction::User => "name",
+        | ast::SqlValueFunction::User => BuiltinTy::Name,
     }
 }
 
@@ -30548,21 +30552,6 @@ fn values_row_expr(row: &ast::Row, position: usize) -> Option<ast::Expr> {
         return None;
     }
     row.exprs().nth(position)
-}
-
-#[derive(Clone, Copy)]
-enum DocumentTest {
-    Is,
-    IsNot,
-}
-
-impl DocumentTest {
-    fn keyword(self) -> &'static str {
-        match self {
-            DocumentTest::Is => "is document",
-            DocumentTest::IsNot => "is not document",
-        }
-    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]

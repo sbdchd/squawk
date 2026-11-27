@@ -152,7 +152,7 @@ pub enum LiteralKind {
     /// Hexadecimal Bit String, e.g., `X'1FF'`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>
-    ByteStr { terminated: bool },
+    HexStr { terminated: bool },
     /// Bit String, e.g., `B'1001'`
     ///
     /// see: <https://www.postgresql.org/docs/16/sql-syntax-lexical.html#SQL-SYNTAX-BIT-STRINGS>

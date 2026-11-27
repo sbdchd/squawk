@@ -47,7 +47,7 @@ fn literal(p: &mut Parser<'_>) -> Option<CompletedMarker> {
         || p.eat(STRING)
         || p.eat(ESC_STRING)
         || p.eat(BIT_STRING)
-        || p.eat(BYTE_STRING)
+        || p.eat(HEX_STRING)
     {
         while !p.at(EOF) && p.eat(STRING) {}
     } else {
@@ -1144,7 +1144,7 @@ fn at_type_literal(p: &Parser<'_>) -> bool {
 fn type_literal_string(p: &mut Parser<'_>) {
     let error = match p.current() {
         BIT_STRING => Some("bit string literals cannot be used in type literals"),
-        BYTE_STRING => Some("hexadecimal string literals cannot be used in type literals"),
+        HEX_STRING => Some("hexadecimal string literals cannot be used in type literals"),
         NATIONAL_STRING => {
             Some("national character string literals cannot be used in type literals")
         }
@@ -6658,7 +6658,7 @@ const NUMERIC_FIRST: TokenSet = TokenSet::new(&[INT_NUMBER, NUMERIC_NUMBER]);
 
 const STRING_FIRST: TokenSet = TokenSet::new(&[
     STRING,
-    BYTE_STRING,
+    HEX_STRING,
     UNICODE_ESC_STRING,
     BIT_STRING,
     DOLLAR_QUOTED_STRING,

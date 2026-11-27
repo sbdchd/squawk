@@ -609,9 +609,9 @@ pub enum SyntaxKind {
     WARNING_KW,
     WHILE_KW,
     BIT_STRING,
-    BYTE_STRING,
     DOLLAR_QUOTED_STRING,
     ESC_STRING,
+    HEX_STRING,
     INT_NUMBER,
     NATIONAL_STRING,
     NULL,
@@ -2696,9 +2696,9 @@ impl SyntaxKind {
             | SyntaxKind::MINUS
             | SyntaxKind::BACKTICK
             | SyntaxKind::BIT_STRING
-            | SyntaxKind::BYTE_STRING
             | SyntaxKind::DOLLAR_QUOTED_STRING
             | SyntaxKind::ESC_STRING
+            | SyntaxKind::HEX_STRING
             | SyntaxKind::INT_NUMBER
             | SyntaxKind::NATIONAL_STRING
             | SyntaxKind::NULL
@@ -6000,9 +6000,9 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::WARNING_KW => "`warning`",
             SyntaxKind::WHILE_KW => "`while`",
             SyntaxKind::BIT_STRING => "bit string literal",
-            SyntaxKind::BYTE_STRING => "hexadecimal string literal",
             SyntaxKind::DOLLAR_QUOTED_STRING => "dollar-quoted string literal",
             SyntaxKind::ESC_STRING => "escape string literal",
+            SyntaxKind::HEX_STRING => "hexadecimal string literal",
             SyntaxKind::INT_NUMBER => "integer literal",
             SyntaxKind::NATIONAL_STRING => "national character string literal",
             SyntaxKind::NULL => "`null`",

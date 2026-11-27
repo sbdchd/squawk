@@ -1,6 +1,7 @@
 use std::fmt::{self, Write as _};
 
 use squawk_rowan::TextSize;
+use squawk_sema::builtin_ty::BuiltinTy;
 use squawk_syntax::ast::{self, AstNode, LitKind};
 
 pub(crate) struct LiteralHover {
@@ -9,7 +10,7 @@ pub(crate) struct LiteralHover {
 }
 
 pub(crate) fn hover_literal(literal: &ast::Literal) -> Option<LiteralHover> {
-    let snippet = literal.type_name()?;
+    let snippet = BuiltinTy::from(literal)?.name();
     let comment = match literal.kind()? {
         LitKind::String(_)
         | LitKind::EscString(_)
@@ -31,7 +32,7 @@ pub(crate) fn hover_literal(literal: &ast::Literal) -> Option<LiteralHover> {
             let hex = binary_to_hex(&binary)?;
             Some(bit_comment(&hex, &binary))
         }
-        LitKind::ByteString(_) => {
+        LitKind::HexString(_) => {
             let hex = literal.decoded_value()?.into_text();
             let binary = hex_to_binary(&hex)?;
             Some(bit_comment(&hex, &binary))

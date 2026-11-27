@@ -77,7 +77,7 @@ SOURCE_FILE
             WHITESPACE " "
             ERROR
               LITERAL
-                BYTE_STRING "x'0a'"
+                HEX_STRING "x'0a'"
     SEMICOLON ";"
   WHITESPACE "\n"
 ---

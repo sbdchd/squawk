@@ -2,6 +2,7 @@ use std::borrow::Cow;
 use std::fmt;
 
 use crate::arena::IdxRange;
+use crate::builtin_ty::BuiltinTy;
 use crate::interner::{Interner, Name};
 use crate::ir::{
     AccessMethodKind, IntervalTypmod, ReferenceKind, Resolution, ReturnKind, RoutineKind,
@@ -12,7 +13,7 @@ use squawk_rowan::{TextRange, TextSize};
 use squawk_syntax::ast;
 use squawk_syntax::quote::{quote_ident, quote_string_literal};
 
-use crate::expr_context::ExprContext;
+use crate::expr_context::{ConditionKind, ExprContext};
 use crate::lookup::TableLookup;
 use crate::lower::OutputClause;
 use crate::pg_float::FloatType;
@@ -622,7 +623,7 @@ pub(crate) enum SemaError {
         name: Name,
     },
     InvalidDomainConstraint {
-        what: &'static str,
+        constraint: DomainConstraint,
     },
     CompoundColumnCount {
         op: CompoundOp,
@@ -639,7 +640,7 @@ pub(crate) enum SemaError {
         overall: TyName,
     },
     ColumnListTooLong {
-        what: &'static str,
+        owner: ColumnListKind,
         name: Name,
         available: usize,
         specified: usize,
@@ -770,7 +771,7 @@ pub(crate) enum SemaError {
         ty: TyName,
     },
     KeywordArgType {
-        keyword: &'static str,
+        keyword: ArgKeyword,
         expected: TyName,
         found: TyName,
     },
@@ -1003,6 +1004,68 @@ impl fmt::Display for Quantifier {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum DomainConstraint {
+    PrimaryKey,
+    Unique,
+    ForeignKey,
+    Exclusion,
+    Generated,
+}
+
+impl fmt::Display for DomainConstraint {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            DomainConstraint::PrimaryKey => "primary key constraints",
+            DomainConstraint::Unique => "unique constraints",
+            DomainConstraint::ForeignKey => "foreign key constraints",
+            DomainConstraint::Exclusion => "exclusion constraints",
+            DomainConstraint::Generated => "generated columns",
+        })
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ColumnListKind {
+    Cte,
+    Table,
+    Join,
+}
+
+impl fmt::Display for ColumnListKind {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            ColumnListKind::Cte => "`with` query",
+            ColumnListKind::Table => "table",
+            ColumnListKind::Join => "join expression",
+        })
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum DocumentTest {
+    Is,
+    IsNot,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub(crate) enum ArgKeyword {
+    Xmlconcat,
+    Document(DocumentTest),
+    Condition(ConditionKind),
+}
+
+impl fmt::Display for ArgKeyword {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            ArgKeyword::Xmlconcat => "xmlconcat",
+            ArgKeyword::Document(DocumentTest::Is) => "is document",
+            ArgKeyword::Document(DocumentTest::IsNot) => "is not document",
+            ArgKeyword::Condition(condition) => condition.keyword(),
+        })
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum CompoundOp {
     Union,
     Intersect,
@@ -1158,10 +1221,10 @@ pub(crate) enum TriggerFunctionKind {
 }
 
 impl TriggerFunctionKind {
-    pub(crate) fn return_type(self) -> &'static str {
+    pub(crate) fn return_type(self) -> BuiltinTy {
         match self {
-            TriggerFunctionKind::Trigger => "trigger",
-            TriggerFunctionKind::EventTrigger => "event_trigger",
+            TriggerFunctionKind::Trigger => BuiltinTy::Trigger,
+            TriggerFunctionKind::EventTrigger => BuiltinTy::EventTrigger,
         }
     }
 }
@@ -3598,8 +3661,8 @@ impl fmt::Display for ErrorMessage<'_> {
                 "cannot alter type `{}` because it is the type of a typed table",
                 n(name)
             ),
-            SemaError::InvalidDomainConstraint { what } => {
-                write!(f, "{what} not possible for domains")
+            SemaError::InvalidDomainConstraint { constraint } => {
+                write!(f, "{constraint} not possible for domains")
             }
             SemaError::CompoundColumnCount { op } => {
                 write!(f, "each `{op}` query must have the same number of columns")
@@ -3623,13 +3686,13 @@ impl fmt::Display for ErrorMessage<'_> {
                 self.ty(right)
             ),
             SemaError::ColumnListTooLong {
-                what,
+                owner,
                 name,
                 available,
                 specified,
             } => write!(
                 f,
-                "{what} `{}` has {available} {} available but {specified} {} specified",
+                "{owner} `{}` has {available} {} available but {specified} {} specified",
                 n(name),
                 plural_columns(available),
                 plural_columns(specified),

@@ -1,6 +1,6 @@
 ---
 source: crates/squawk_syntax/src/test.rs
-input_file: crates/squawk_syntax/test_data/validation/byte_string.sql
+input_file: crates/squawk_syntax/test_data/validation/hex_string.sql
 ---
 SOURCE_FILE@0..124
   COMMENT@0..5 "-- ok"
@@ -12,7 +12,7 @@ SOURCE_FILE@0..124
       TARGET_LIST@13..18
         TARGET@13..18
           LITERAL@13..18
-            BYTE_STRING@13..18 "x'1F'"
+            HEX_STRING@13..18 "x'1F'"
     SEMICOLON@18..19 ";"
   WHITESPACE@19..20 "\n"
   SELECT@20..39
@@ -22,7 +22,7 @@ SOURCE_FILE@0..124
       TARGET_LIST@27..38
         TARGET@27..38
           LITERAL@27..38
-            BYTE_STRING@27..38 "X'deadBEEF'"
+            HEX_STRING@27..38 "X'deadBEEF'"
     SEMICOLON@38..39 ";"
   WHITESPACE@39..40 "\n"
   SELECT@40..51
@@ -32,7 +32,7 @@ SOURCE_FILE@0..124
       TARGET_LIST@47..50
         TARGET@47..50
           LITERAL@47..50
-            BYTE_STRING@47..50 "x''"
+            HEX_STRING@47..50 "x''"
     SEMICOLON@50..51 ";"
   WHITESPACE@51..53 "\n\n"
   COMMENT@53..62 "-- errors"
@@ -44,7 +44,7 @@ SOURCE_FILE@0..124
       TARGET_LIST@70..76
         TARGET@70..76
           LITERAL@70..76
-            BYTE_STRING@70..76 "x'1FZ'"
+            HEX_STRING@70..76 "x'1FZ'"
     SEMICOLON@76..77 ";"
   WHITESPACE@77..78 "\n"
   SELECT@78..91
@@ -54,7 +54,7 @@ SOURCE_FILE@0..124
       TARGET_LIST@85..90
         TARGET@85..90
           LITERAL@85..90
-            BYTE_STRING@85..90 "x'1G'"
+            HEX_STRING@85..90 "x'1G'"
     SEMICOLON@90..91 ";"
   WHITESPACE@91..92 "\n"
   SELECT@92..107
@@ -64,7 +64,7 @@ SOURCE_FILE@0..124
       TARGET_LIST@99..106
         TARGET@99..106
           LITERAL@99..106
-            BYTE_STRING@99..106 "x'1G2H'"
+            HEX_STRING@99..106 "x'1G2H'"
     SEMICOLON@106..107 ";"
   WHITESPACE@107..108 "\n"
   SELECT@108..123
@@ -74,7 +74,7 @@ SOURCE_FILE@0..124
       TARGET_LIST@115..122
         TARGET@115..122
           LITERAL@115..122
-            BYTE_STRING@115..122 "X'GHIJ'"
+            HEX_STRING@115..122 "X'GHIJ'"
     SEMICOLON@122..123 ";"
   WHITESPACE@123..124 "\n"
 

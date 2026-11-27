@@ -273,7 +273,7 @@ fn tokens_equivalent(before: (TokenKind, &str), after: (TokenKind, &str)) -> boo
         if let TokenKind::Literal {
             kind:
                 LiteralKind::NationalStr { .. }
-                | LiteralKind::ByteStr { .. }
+                | LiteralKind::HexStr { .. }
                 | LiteralKind::BitStr { .. }
                 | LiteralKind::UnicodeEscStr { .. }
                 | LiteralKind::EscStr { .. },
