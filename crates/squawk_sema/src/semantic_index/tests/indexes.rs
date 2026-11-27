@@ -537,3 +537,11 @@ drop index i;
       ╰╴           ━
     ");
 }
+
+#[test]
+fn catalog_index() {
+    assert_snapshot!(check("
+reindex index pg_index_indrelid_index;
+reindex index pg_catalog.pg_depend_reference_index;
+"), @"no diagnostics");
+}

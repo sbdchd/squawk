@@ -325,6 +325,17 @@ struct RelationQuery {
     columns: Vec<Column>,
     #[serde(deserialize_with = "deserialize_json_string")]
     constraints: Vec<String>,
+    #[serde(deserialize_with = "deserialize_json_string")]
+    indexes: Vec<IndexDef>,
+}
+
+#[derive(Deserialize)]
+struct IndexDef {
+    name: String,
+    unique: bool,
+    method: String,
+    columns: String,
+    predicate: String,
 }
 
 impl Query for RelationQuery {
@@ -355,7 +366,33 @@ select
       where conrelid = c.oid and contype in ('p', 'u', 'f', 'c', 'x')
     ),
     '[]'
-  ) as constraints
+  ) as constraints,
+  coalesce(
+    (
+      select json_agg(
+        json_build_object(
+          'name', ic.relname,
+          'unique', i.indisunique,
+          'method', am.amname,
+          'columns', (
+            select string_agg(
+              pg_get_indexdef(i.indexrelid, k, true),
+              ', ' order by k
+            )
+            from generate_series(1, i.indnkeyatts) k
+          ),
+          'predicate', coalesce(pg_get_expr(i.indpred, i.indrelid, true), '')
+        ) order by ic.relname
+      )
+      from pg_index i
+        join pg_class ic on ic.oid = i.indexrelid
+        join pg_am am on am.oid = ic.relam
+      where
+        i.indrelid = c.oid
+        and not exists(select from pg_constraint where conindid = i.indexrelid)
+    ),
+    '[]'
+  ) as indexes
 from pg_class c
   join pg_namespace n on n.oid = c.relnamespace
   join pg_attribute a on a.attrelid = c.oid
@@ -2306,6 +2343,7 @@ struct TableDef {
     description: String,
     columns: Vec<Column>,
     constraints: Vec<String>,
+    indexes: Vec<IndexDef>,
 }
 
 impl WriteSql for TableDef {
@@ -2351,6 +2389,28 @@ impl WriteSql for TableDef {
         }
         writeln!(f, ");")?;
         writeln!(f)?;
+        Ok(())
+    }
+}
+
+struct TableIndexes<'a>(&'a TableDef);
+
+impl WriteSql for TableIndexes<'_> {
+    fn write_sql<W: Write>(&self, f: &mut W) -> io::Result<()> {
+        let TableIndexes(table) = self;
+        for index in &table.indexes {
+            let unique = if index.unique { "unique " } else { "" };
+            write!(
+                f,
+                "create {unique}index {} on {}{} using {} ({})",
+                index.name, table.schema, table.name, index.method, index.columns
+            )?;
+            if !index.predicate.is_empty() {
+                write!(f, " where {}", index.predicate)?;
+            }
+            writeln!(f, ";")?;
+            writeln!(f)?;
+        }
         Ok(())
     }
 }
@@ -2967,6 +3027,10 @@ impl Module {
             cast.write_sql(f)?;
         }
 
+        for table in &self.tables {
+            TableIndexes(table).write_sql(f)?;
+        }
+
         for domain in &self.domains {
             domain.write_qualifiers(f)?;
         }
@@ -3164,6 +3228,7 @@ fn query_relations(modules: &mut BTreeMap<String, Module>) -> Result<()> {
             "r" => module.tables.push(TableDef {
                 columns: row.columns,
                 constraints: row.constraints,
+                indexes: row.indexes,
                 description: row.description,
                 name: row.name,
                 schema: row.schema,
