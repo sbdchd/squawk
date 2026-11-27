@@ -14032,16 +14032,12 @@ impl Lowerer {
     }
 
     fn builtin_ty(&mut self, ty: BuiltinTy) -> Option<Ty> {
-        self.pg_catalog_type(ty.name())
-    }
-
-    fn pg_catalog_type(&mut self, name: &str) -> Option<Ty> {
-        let name = self.intern(name);
+        let name = self.intern(ty.name());
         self.find_type_in(self.pg_catalog, name).map(Ty::Type)
     }
 
     fn literal_type(&mut self, literal: &ast::Literal) -> Option<Ty> {
-        let ty = self.pg_catalog_type(literal.type_name()?)?;
+        let ty = self.builtin_ty(BuiltinTy::from(literal)?)?;
         self.record_literal_type(literal, ty);
         Some(ty)
     }

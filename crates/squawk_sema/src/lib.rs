@@ -1,7 +1,7 @@
 pub mod arena;
 mod builtin_am;
 mod builtin_fn;
-mod builtin_ty;
+pub mod builtin_ty;
 pub mod builtins;
 mod column_exprs;
 pub mod constraint_index;

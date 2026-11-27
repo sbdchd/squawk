@@ -1,8 +1,11 @@
 use std::fmt;
 
+use squawk_syntax::ast;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
-pub(crate) enum BuiltinTy {
+pub enum BuiltinTy {
     Any,
+    Bit,
     Bool,
     Bytea,
     Cstring,
@@ -29,9 +32,34 @@ pub(crate) enum BuiltinTy {
 }
 
 impl BuiltinTy {
-    pub(crate) fn name(self) -> &'static str {
+    pub fn from(lit: &ast::Literal) -> Option<BuiltinTy> {
+        let ty = match lit.kind()? {
+            ast::LitKind::IntNumber(_) => match lit.integer_value_u64() {
+                Some(value) if i32::try_from(value).is_ok() => BuiltinTy::Int4,
+                Some(value) if i64::try_from(value).is_ok() => BuiltinTy::Int8,
+                Some(_) | None => BuiltinTy::Numeric,
+            },
+            ast::LitKind::NumericNumber(_) => BuiltinTy::Numeric,
+            ast::LitKind::String(_)
+            | ast::LitKind::DollarQuotedString(_)
+            | ast::LitKind::EscString(_)
+            | ast::LitKind::NationalString(_)
+            | ast::LitKind::UnicodeEscString(_) => BuiltinTy::Text,
+            ast::LitKind::BitString(_) | ast::LitKind::ByteString(_) => BuiltinTy::Bit,
+            ast::LitKind::True(_) | ast::LitKind::False(_) => BuiltinTy::Bool,
+            ast::LitKind::Default(_)
+            | ast::LitKind::Null(_)
+            | ast::LitKind::Off(_)
+            | ast::LitKind::On(_)
+            | ast::LitKind::PositionalParam(_) => return None,
+        };
+        Some(ty)
+    }
+
+    pub fn name(self) -> &'static str {
         match self {
             BuiltinTy::Any => "any",
+            BuiltinTy::Bit => "bit",
             BuiltinTy::Bool => "bool",
             BuiltinTy::Bytea => "bytea",
             BuiltinTy::Cstring => "cstring",
