@@ -88,7 +88,7 @@ impl ExprContext {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub(crate) enum ConditionKind {
     Where,
     Having,

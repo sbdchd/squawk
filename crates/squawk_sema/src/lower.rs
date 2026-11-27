@@ -64,11 +64,12 @@ use crate::{
         TypeCategory, TypeId, TypeKind, Typmod, Window, WindowClauses, WindowId,
     },
     sema_error::{
-        ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, ColumnTypeName, Comparison,
-        CompoundOp, ConflictAction, ConflictRuleEvent, ConflictTargetKey, DefaultChange,
-        DirectArgs, DropRelation, ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam,
-        ErrorReturnType, ForeignKeyPair, GeneratedKind, LockStrength, LockedSource, LookupKind,
-        NumericOverflow, ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
+        ArgKeyword, ArgLabel, AssignmentCast, CandidateReason, ColumnDefListReason, ColumnListKind,
+        ColumnTypeName, Comparison, CompoundOp, ConflictAction, ConflictRuleEvent,
+        ConflictTargetKey, DefaultChange, DirectArgs, DocumentTest, DomainConstraint, DropRelation,
+        ErrorArg, ErrorArgs, ErrorCandidate, ErrorCandidates, ErrorParam, ErrorReturnType,
+        ForeignKeyPair, GeneratedKind, LockStrength, LockedSource, LookupKind, NumericOverflow,
+        ObjectKind, OperandName, OperatorReplacement, OrdinalityColumnDefListFix,
         OutsideSearchPath, Quantifier, SemaError, SetReturningConstruct, Similar, SimilarColumn,
         SimilarType, TriggerFunctionKind, TruncateCascade, UniqueKind, ViewColumnRename,
         WindowClause,
@@ -13552,7 +13553,7 @@ impl Lowerer {
     }
 
     fn lower_domain_constraint(&mut self, domain: Option<TypeId>, constraint: &ast::Constraint) {
-        let what = match constraint {
+        let kind = match constraint {
             ast::Constraint::CheckConstraint(check) => {
                 self.lower_domain_check_constraint(domain, check);
                 return;
@@ -13571,17 +13572,17 @@ impl Lowerer {
                 return;
             }
             ast::Constraint::NullConstraint(_) => return,
-            ast::Constraint::PrimaryKeyConstraint(_) => "primary key constraints",
-            ast::Constraint::UniqueConstraint(_) => "unique constraints",
+            ast::Constraint::PrimaryKeyConstraint(_) => DomainConstraint::PrimaryKey,
+            ast::Constraint::UniqueConstraint(_) => DomainConstraint::Unique,
             ast::Constraint::ForeignKeyConstraint(_) | ast::Constraint::ReferencesConstraint(_) => {
-                "foreign key constraints"
+                DomainConstraint::ForeignKey
             }
-            ast::Constraint::ExcludeConstraint(_) => "exclusion constraints",
-            ast::Constraint::GeneratedConstraint(_) => "generated columns",
+            ast::Constraint::ExcludeConstraint(_) => DomainConstraint::Exclusion,
+            ast::Constraint::GeneratedConstraint(_) => DomainConstraint::Generated,
         };
         self.push_error(
             constraint.syntax(),
-            SemaError::InvalidDomainConstraint { what },
+            SemaError::InvalidDomainConstraint { constraint: kind },
         );
     }
 
@@ -17701,16 +17702,16 @@ impl Lowerer {
         let Some(extra) = list.range.iter().nth(available) else {
             return;
         };
-        let too_long = |what, name| SemaError::ColumnListTooLong {
-            what,
+        let too_long = |owner, name| SemaError::ColumnListTooLong {
+            owner,
             name,
             available,
             specified,
         };
         let error = match owner {
-            ColumnListOwner::Cte(name) => too_long("`with` query", name),
-            ColumnListOwner::Table(Some(name)) => too_long("table", name),
-            ColumnListOwner::Join(Some(name)) => too_long("join expression", name),
+            ColumnListOwner::Cte(name) => too_long(ColumnListKind::Cte, name),
+            ColumnListOwner::Table(Some(name)) => too_long(ColumnListKind::Table, name),
+            ColumnListOwner::Join(Some(name)) => too_long(ColumnListKind::Join, name),
             ColumnListOwner::Table(None) | ColumnListOwner::Join(None) => return,
             ColumnListOwner::View => SemaError::ViewTooManyColumnNames,
             ColumnListOwner::CreateAs => SemaError::CreateAsTooManyColumnNames,
@@ -22386,7 +22387,7 @@ impl Lowerer {
                 && self.overloads().rejects_arg(arg.ty, xml)
             {
                 let error = SemaError::KeywordArgType {
-                    keyword: "xmlconcat",
+                    keyword: ArgKeyword::Xmlconcat,
                     expected: self.index.ty_name(xml),
                     found: self.index.ty_name(found),
                 };
@@ -22403,7 +22404,7 @@ impl Lowerer {
             && self.overloads().rejects_arg(arg, xml)
         {
             let error = SemaError::KeywordArgType {
-                keyword: test.keyword(),
+                keyword: ArgKeyword::Document(test),
                 expected: self.index.ty_name(xml),
                 found: self.index.ty_name(found),
             };
@@ -26875,7 +26876,7 @@ impl Lowerer {
             && self.overloads().rejects_arg(ArgType::Known(found), bool)
         {
             let error = SemaError::KeywordArgType {
-                keyword: condition.keyword(),
+                keyword: ArgKeyword::Condition(condition),
                 expected: self.index.ty_name(bool),
                 found: self.index.ty_name(found),
             };
@@ -30558,21 +30559,6 @@ fn values_row_expr(row: &ast::Row, position: usize) -> Option<ast::Expr> {
         return None;
     }
     row.exprs().nth(position)
-}
-
-#[derive(Clone, Copy)]
-enum DocumentTest {
-    Is,
-    IsNot,
-}
-
-impl DocumentTest {
-    fn keyword(self) -> &'static str {
-        match self {
-            DocumentTest::Is => "is document",
-            DocumentTest::IsNot => "is not document",
-        }
-    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
