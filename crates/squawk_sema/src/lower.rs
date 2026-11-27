@@ -22391,6 +22391,21 @@ impl Lowerer {
         Some(xml)
     }
 
+    fn lower_document_test(&mut self, expr: &ast::Expr, test: DocumentTest) {
+        let arg = expr_arg_type(Some(expr), self.lower_expr(expr));
+        if let ArgType::Known(found) = arg
+            && let Some(xml) = self.builtin_type("xml")
+            && self.overloads().rejects_arg(arg, xml)
+        {
+            let error = SemaError::KeywordArgType {
+                keyword: test.keyword(),
+                expected: self.index.ty_name(xml),
+                found: self.index.ty_name(found),
+            };
+            self.push_error(expr.syntax(), error);
+        }
+    }
+
     fn nullif_type(&self, args: &[CallArg]) -> Option<Ty> {
         let [left, right] = args else {
             return None;
@@ -25374,10 +25389,20 @@ impl Lowerer {
                         is_not_normalized.syntax(),
                     );
                 }
+                Some(ast::PostfixOp::IsDocument(_)) => {
+                    if let Some(expr) = postfix.expr() {
+                        self.lower_document_test(&expr, DocumentTest::Is);
+                    }
+                    return self.builtin_type("bool");
+                }
+                Some(ast::PostfixOp::IsNotDocument(_)) => {
+                    if let Some(expr) = postfix.expr() {
+                        self.lower_document_test(&expr, DocumentTest::IsNot);
+                    }
+                    return self.builtin_type("bool");
+                }
                 Some(
-                    ast::PostfixOp::IsDocument(_)
-                    | ast::PostfixOp::IsNotDocument(_)
-                    | ast::PostfixOp::IsJson(_)
+                    ast::PostfixOp::IsJson(_)
                     | ast::PostfixOp::IsJsonArray(_)
                     | ast::PostfixOp::IsJsonObject(_)
                     | ast::PostfixOp::IsJsonScalar(_)
@@ -30523,6 +30548,21 @@ fn values_row_expr(row: &ast::Row, position: usize) -> Option<ast::Expr> {
         return None;
     }
     row.exprs().nth(position)
+}
+
+#[derive(Clone, Copy)]
+enum DocumentTest {
+    Is,
+    IsNot,
+}
+
+impl DocumentTest {
+    fn keyword(self) -> &'static str {
+        match self {
+            DocumentTest::Is => "is document",
+            DocumentTest::IsNot => "is not document",
+        }
+    }
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
