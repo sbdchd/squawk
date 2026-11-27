@@ -1199,10 +1199,47 @@ pub struct Source {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SystemColumn {
+    TableOid,
+    Ctid,
+    Xmin,
+    Xmax,
+    Cmin,
+    Cmax,
+}
+
+impl SystemColumn {
+    pub(crate) fn from_name(name: &str) -> Option<SystemColumn> {
+        Some(match name {
+            "tableoid" => SystemColumn::TableOid,
+            "ctid" => SystemColumn::Ctid,
+            "xmin" => SystemColumn::Xmin,
+            "xmax" => SystemColumn::Xmax,
+            "cmin" => SystemColumn::Cmin,
+            "cmax" => SystemColumn::Cmax,
+            _ => return None,
+        })
+    }
+
+    pub(crate) fn type_name(self) -> &'static str {
+        match self {
+            SystemColumn::TableOid => "oid",
+            SystemColumn::Ctid => "tid",
+            SystemColumn::Xmin | SystemColumn::Xmax => "xid",
+            SystemColumn::Cmin | SystemColumn::Cmax => "cid",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Resolution {
     Column {
         source: Option<SourceId>,
         column: ColumnId,
+    },
+    SystemColumn {
+        source: SourceId,
+        column: SystemColumn,
     },
     Source(SourceId),
     Cte(CteId),
@@ -1295,7 +1332,10 @@ impl Resolution {
             Resolution::PreparedTransaction(prepared) => Item::PreparedTransaction(prepared),
             Resolution::PreparedStatement(prepared) => Item::PreparedStatement(prepared),
             Resolution::Channel(channel) => Item::Channel(channel),
-            Resolution::Unknown | Resolution::Unresolved | Resolution::Ambiguous => return None,
+            Resolution::SystemColumn { .. }
+            | Resolution::Unknown
+            | Resolution::Unresolved
+            | Resolution::Ambiguous => return None,
         })
     }
 }

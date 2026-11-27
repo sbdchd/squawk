@@ -808,3 +808,31 @@ select * from t, lateral (values (t.*), (1)) v;
       ╰╴                                        ━━━
     ");
 }
+
+#[test]
+fn system_columns() {
+    assert_snapshot!(check("
+create table t (a int);
+create view v as
+  select 1 a;
+select tableoid, ctid, xmin, xmax, cmin, cmax from t;
+select t.ctid, ctid = '(0,1)'::tid from t;
+update t set a = 1 returning old.ctid, new.xmin, ctid;
+select ctid from v;
+select v.xmin from v;
+select t.nosuch from t;
+"), @"
+    error: column `ctid` does not exist
+      ╭▸ 
+    8 │ select ctid from v;
+      ╰╴       ━━━━
+    error: column `v.xmin` does not exist
+      ╭▸ 
+    9 │ select v.xmin from v;
+      ╰╴         ━━━━
+    error: column `t.nosuch` does not exist
+       ╭▸ 
+    10 │ select t.nosuch from t;
+       ╰╴         ━━━━━━
+    ");
+}

@@ -57,8 +57,8 @@ use crate::{
         Resolution, ReturnKind, Role, RoleId, RoutineKind, Rule, RuleBehavior, RuleEnabled,
         RuleEvent, RuleId, RuleMode, Savepoint, Schema, SchemaId, Scope, ScopeId, SearchPathChange,
         SequenceOwner, Server, ServerId, Source, SourceId, SourceKind, Star, Statistics,
-        StatisticsId, Subscript, Subscription, SubscriptionId, Table, TableId, TableKind,
-        Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
+        StatisticsId, Subscript, Subscription, SubscriptionId, SystemColumn, Table, TableId,
+        TableKind, Tablespace, TablespaceId, TextSearch, TextSearchId, TextSearchKind, Transaction,
         TransactionId, Transform, TransformId, TransformKey, Trigger, TriggerId, Ty, Type,
         TypeCategory, TypeId, TypeKind, Typmod, Window, WindowClauses, WindowId,
     },
@@ -3846,6 +3846,7 @@ impl Lowerer {
                 Resolution::Type(ty) if self.index.types.is_local(ty) => Object::Type(ty),
                 Resolution::Table(_)
                 | Resolution::Column { .. }
+                | Resolution::SystemColumn { .. }
                 | Resolution::Source(_)
                 | Resolution::Cte(_)
                 | Resolution::Param(_)
@@ -6056,6 +6057,7 @@ impl Lowerer {
                     Resolution::Function(function) => Object::Function(function),
                     Resolution::Operator(operator) => Object::Operator(operator),
                     Resolution::Column { .. }
+                    | Resolution::SystemColumn { .. }
                     | Resolution::Source(_)
                     | Resolution::Cte(_)
                     | Resolution::Table(_)
@@ -11454,6 +11456,7 @@ impl Lowerer {
                 Some(table)
             }
             Resolution::Column { .. }
+            | Resolution::SystemColumn { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
             | Resolution::Function(_)
@@ -13956,6 +13959,7 @@ impl Lowerer {
             Resolution::Type(ty) => found(Ty::Type(ty)),
             Resolution::Table(table) => found(Ty::Table(table)),
             Resolution::Column { .. }
+            | Resolution::SystemColumn { .. }
             | Resolution::Source(_)
             | Resolution::Cte(_)
             | Resolution::Function(_)
@@ -24073,7 +24077,8 @@ impl Lowerer {
             );
             match resolution {
                 Resolution::Column { column, .. } => columns.push(column),
-                Resolution::Source(_)
+                Resolution::SystemColumn { .. }
+                | Resolution::Source(_)
                 | Resolution::Cte(_)
                 | Resolution::Table(_)
                 | Resolution::Function(_)
@@ -25336,6 +25341,12 @@ impl Lowerer {
     fn resolution_type(&self, resolution: Resolution) -> Option<Ty> {
         match resolution {
             Resolution::Column { column, .. } => self.index.columns[column].ty,
+            Resolution::SystemColumn { column, .. } => self
+                .index
+                .names
+                .lookup(column.type_name())
+                .and_then(|name| self.find_type_in(self.pg_catalog, name))
+                .map(Ty::Type),
             Resolution::Source(source) => self
                 .scalar_sources
                 .get(&source)
@@ -26144,6 +26155,7 @@ impl Lowerer {
             Some(Resolution::Function(function)) => Some(function),
             Some(
                 Resolution::Column { .. }
+                | Resolution::SystemColumn { .. }
                 | Resolution::Source(_)
                 | Resolution::Cte(_)
                 | Resolution::Table(_)
@@ -27084,7 +27096,9 @@ impl Lowerer {
         let name_ref = arg.expr()?.as_name_ref()?;
         let name = self.name_ref_name(&name_ref)?;
         match self.resolve_column(name) {
-            Resolution::Column { .. } | Resolution::Ambiguous => None,
+            Resolution::Column { .. } | Resolution::SystemColumn { .. } | Resolution::Ambiguous => {
+                None
+            }
             Resolution::Source(_)
             | Resolution::Cte(_)
             | Resolution::Table(_)
@@ -27891,6 +27905,10 @@ impl Lowerer {
                     column,
                 },
             ),
+            None if let Some(column) = self.source_system_column(source, name) => (
+                ReferenceKind::Column,
+                Resolution::SystemColumn { source, column },
+            ),
             None => match self.find_row_function(source, name) {
                 Some(function) => (
                     ReferenceKind::Function(RoutineKind::Function),
@@ -28378,11 +28396,61 @@ impl Lowerer {
                 }
                 ColumnLookup::Missing { complete: true } => {}
             }
+            if let Some(resolution) = self.lookup_system_column(scope, name) {
+                return ScopedColumn::Resolved(resolution);
+            }
             if self.hidden_source_has_column(scope, name) {
                 return ScopedColumn::Hidden;
             }
         }
         ScopedColumn::Resolved(Resolution::Unresolved)
+    }
+
+    fn lookup_system_column(&self, scope: &QueryScope, name: Name) -> Option<Resolution> {
+        let column = SystemColumn::from_name(self.index.names.resolve(name))?;
+        let query = &self.index.queries[scope.query];
+        let mut sources = self.index.scopes[scope.scope]
+            .visible_indices(query)
+            .map(|index| query.sources[index])
+            .filter(|source| !self.index.sources[*source].kind.is_qualified_only());
+        let source = sources
+            .clone()
+            .find(|source| self.has_system_columns(*source))?;
+        if sources.nth(1).is_some() {
+            return Some(Resolution::Unknown);
+        }
+        Some(Resolution::SystemColumn { source, column })
+    }
+
+    fn source_system_column(&self, source: SourceId, name: Name) -> Option<SystemColumn> {
+        if !self.has_system_columns(source) {
+            return None;
+        }
+        SystemColumn::from_name(self.index.names.resolve(name))
+    }
+
+    fn has_system_columns(&self, source: SourceId) -> bool {
+        match self.index.sources[source].kind {
+            SourceKind::Table(table) => match self.index.tables[table].kind {
+                TableKind::Table
+                | TableKind::ForeignTable
+                | TableKind::MaterializedView
+                | TableKind::Sequence => true,
+                TableKind::View | TableKind::PropertyGraph => false,
+            },
+            SourceKind::Returning(target) | SourceKind::RuleRelation(target) => {
+                self.has_system_columns(target)
+            }
+            SourceKind::Cte(_)
+            | SourceKind::External
+            | SourceKind::Subquery(_)
+            | SourceKind::Function(_)
+            | SourceKind::Join
+            | SourceKind::UsingAlias
+            | SourceKind::Excluded(_)
+            | SourceKind::ElementVariable
+            | SourceKind::Other => false,
+        }
     }
 
     fn hidden_source_has_column(&self, scope: &QueryScope, name: Name) -> bool {
