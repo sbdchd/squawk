@@ -434,6 +434,10 @@ jobs:
     if: startsWith(github.ref, 'refs/tags/')
     needs: [build]
     runs-on: ubuntu-22.04
+    environment: marketplace
+    permissions:
+      contents: read
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
@@ -461,9 +465,9 @@ jobs:
 
       - name: Publish Extension (VS Code Marketplace)
         working-directory: ./squawk-vscode
-        run: pnpm exec vsce publish --pat ${{ secrets.MARKETPLACE_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing] trusted publishing isn't possible
+        run: pnpm exec vsce publish --oidc --packagePath ../dist/squawk-vscode-*/*.vsix
 
       - name: Publish Extension (Open VSX)
         working-directory: ./squawk-vscode
-        run: pnpm exec ovsx publish --pat ${{ secrets.OPENVSX_TOKEN }} --packagePath ../dist/squawk-vscode-*/*.vsix # zizmor: ignore[use-trusted-publishing] trusted publishing isn't possible
+        run: pnpm exec ovsx publish --trusted-publishing --packagePath ../dist/squawk-vscode-*/*.vsix
         timeout-minutes: 2
