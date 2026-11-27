@@ -675,3 +675,20 @@ create sequence s;
 drop sequence s, s;
 "), @"no diagnostics");
 }
+
+#[test]
+fn set_logged_on_sequence() {
+    assert_snapshot!(check("
+create sequence s;
+alter table s set unlogged;
+alter table s set logged;
+create view v as
+  select 1 a;
+alter table v set unlogged;
+"), @"
+    error: `v` is not a table or sequence
+      ╭▸ 
+    7 │ alter table v set unlogged;
+      ╰╴            ━
+    ");
+}

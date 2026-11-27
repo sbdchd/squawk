@@ -1179,5 +1179,14 @@ fn rename_through_other_relation_kind() {
 create table t (a int);
 alter index t rename to u;
 alter view u rename a to b;
-"), @"no diagnostics");
+alter foreign table u rename b to c;
+alter materialized view u rename c to d;
+create sequence s;
+alter table s rename last_value to x;
+"), @"
+    error: `s` is not a table, view, materialized view, or foreign table
+      ╭▸ 
+    8 │ alter table s rename last_value to x;
+      ╰╴            ━
+    ");
 }

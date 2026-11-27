@@ -1755,6 +1755,14 @@ impl Lowerer {
             self.lower_all_in_tablespace(&all_in_tablespace);
             return;
         }
+        let mut actions = alter_view.action();
+        let lookup = if let (Some(ast::AlterMaterializedViewAction::RenameColumn(_)), None) =
+            (actions.next(), actions.next())
+        {
+            TableLookup::RenameColumn
+        } else {
+            TableLookup::MaterializedView
+        };
         let view = alter_view
             .view_ref()
             .and_then(|view| view.path_ref())
@@ -1762,7 +1770,7 @@ impl Lowerer {
                 self.lower_table_ref(
                     &path,
                     IfMissing::from_if_exists(alter_view.if_exists().as_ref()),
-                    TableLookup::MaterializedView,
+                    lookup,
                 )
             });
         for action in alter_view.action() {
@@ -6468,7 +6476,7 @@ impl Lowerer {
             .and_then(|from| from.table_name_ref())
             .and_then(|name| name.path_ref())
             .and_then(|path| {
-                self.lower_table_ref(&path, IfMissing::Error, TableLookup::TableOrForeignTable)
+                self.lower_table_ref(&path, IfMissing::Error, TableLookup::Statistics)
             });
         let on_clause = create_statistics.statistics_on_clause();
         if let Some(on_clause) = &on_clause {
@@ -18359,6 +18367,9 @@ impl Lowerer {
             | TableLookup::ForeignTable
             | TableLookup::TableOrForeignTable
             | TableLookup::TableViewOrForeignTable
+            | TableLookup::RenameColumn
+            | TableLookup::TableOrSequence
+            | TableLookup::Statistics
             | TableLookup::TableOrView
             | TableLookup::TableOrMaterializedView
             | TableLookup::Any
@@ -18549,7 +18560,15 @@ impl Lowerer {
             return;
         };
         let if_missing = IfMissing::from_if_exists(alter_table.if_exists().as_ref());
-        let table = self.lower_table_ref(&path, if_missing, TableLookup::ForeignTable);
+        let mut actions = alter_table.actions();
+        let lookup = if let (Some(ast::AlterTableAction::RenameColumn(_)), None) =
+            (actions.next(), actions.next())
+        {
+            TableLookup::RenameColumn
+        } else {
+            TableLookup::ForeignTable
+        };
+        let table = self.lower_table_ref(&path, if_missing, lookup);
         if table.is_none() && if_missing == IfMissing::Ignore {
             return;
         }
@@ -30428,7 +30447,9 @@ fn values_row_expr(row: &ast::Row, position: usize) -> Option<ast::Expr> {
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum AlterTableTarget {
     AnyRelation,
+    RenameColumn,
     TableViewOrForeignTable,
+    TableOrSequence,
     TableOrForeignTable,
 }
 
@@ -30439,7 +30460,9 @@ fn alter_table_lookup(actions: impl Iterator<Item = ast::AlterTableAction>) -> T
         .unwrap_or(AlterTableTarget::TableOrForeignTable)
     {
         AlterTableTarget::AnyRelation => TableLookup::Any,
+        AlterTableTarget::RenameColumn => TableLookup::RenameColumn,
         AlterTableTarget::TableViewOrForeignTable => TableLookup::TableViewOrForeignTable,
+        AlterTableTarget::TableOrSequence => TableLookup::TableOrSequence,
         AlterTableTarget::TableOrForeignTable => TableLookup::TableOrForeignTable,
     }
 }
@@ -30449,9 +30472,10 @@ fn alter_table_target(action: &ast::AlterTableAction) -> AlterTableTarget {
         ast::AlterTableAction::TableRenameTo(_)
         | ast::AlterTableAction::OwnerTo(_)
         | ast::AlterTableAction::SetSchema(_) => AlterTableTarget::AnyRelation,
-        ast::AlterTableAction::RenameColumn(_)
-        | ast::AlterTableAction::SetOptions(_)
-        | ast::AlterTableAction::ResetOptions(_) => AlterTableTarget::TableViewOrForeignTable,
+        ast::AlterTableAction::RenameColumn(_) => AlterTableTarget::RenameColumn,
+        ast::AlterTableAction::SetOptions(_) | ast::AlterTableAction::ResetOptions(_) => {
+            AlterTableTarget::TableViewOrForeignTable
+        }
         ast::AlterTableAction::AlterColumn(alter_column) => match alter_column.option() {
             Some(
                 ast::AlterColumnOption::SetDefault(_) | ast::AlterColumnOption::DropDefault(_),
@@ -30479,6 +30503,9 @@ fn alter_table_target(action: &ast::AlterTableAction) -> AlterTableTarget {
             )
             | None => AlterTableTarget::TableOrForeignTable,
         },
+        ast::AlterTableAction::SetLogged(_) | ast::AlterTableAction::SetUnlogged(_) => {
+            AlterTableTarget::TableOrSequence
+        }
         ast::AlterTableAction::AddColumn(_)
         | ast::AlterTableAction::AddConstraint(_)
         | ast::AlterTableAction::AlterConstraint(_)
@@ -30509,9 +30536,7 @@ fn alter_table_target(action: &ast::AlterTableAction) -> AlterTableTarget {
         | ast::AlterTableAction::RenameConstraint(_)
         | ast::AlterTableAction::ReplicaIdentity(_)
         | ast::AlterTableAction::SetAccessMethod(_)
-        | ast::AlterTableAction::SetLogged(_)
         | ast::AlterTableAction::SetTablespace(_)
-        | ast::AlterTableAction::SetUnlogged(_)
         | ast::AlterTableAction::SetWithoutCluster(_)
         | ast::AlterTableAction::SetWithoutOids(_)
         | ast::AlterTableAction::SplitPartition(_)
