@@ -81,3 +81,21 @@ explain execute p;
       ╰╴                ━
     ");
 }
+
+#[test]
+fn explain_refresh_is_not_run() {
+    assert_snapshot!(check("
+create table t (a int);
+explain
+  refresh materialized view nosuch;
+explain
+  analyze
+  refresh materialized view t;
+refresh materialized view nosuch;
+"), @"
+    error: relation `nosuch` does not exist
+      ╭▸ 
+    8 │ refresh materialized view nosuch;
+      ╰╴                          ━━━━━━
+    ");
+}

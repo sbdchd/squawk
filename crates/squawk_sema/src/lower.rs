@@ -4824,7 +4824,9 @@ impl Lowerer {
                 }
             }
             ast::ExplainStmt::Refresh(refresh) => {
-                self.lower_refresh(&refresh);
+                if let Some(path) = refresh.view_ref().and_then(|view| view.path_ref()) {
+                    self.lower_table_ref(&path, IfMissing::Ignore, TableLookup::Any);
+                }
             }
         }
     }
