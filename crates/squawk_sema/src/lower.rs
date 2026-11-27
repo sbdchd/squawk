@@ -17221,7 +17221,7 @@ impl Lowerer {
                     complete: true,
                 };
                 RelationSource {
-                    name: None,
+                    name: Some(self.intern("json_table")),
                     kind: SourceKind::Other,
                     columns,
                 }
@@ -17291,7 +17291,7 @@ impl Lowerer {
                     None => self.unknown_columns(),
                 };
                 RelationSource {
-                    name: None,
+                    name: Some(self.intern("xmltable")),
                     kind: SourceKind::Other,
                     columns,
                 }
