@@ -23986,10 +23986,17 @@ impl Lowerer {
             };
             let name = self.intern(&segment.text());
             let schema = self.lower_schema_qualifier(path.qualifier());
-            let constraint = self
+            let resolution = self
                 .search_path(schema, Lookup::Relation)
-                .find_map(|schema| self.find_constraint_in(schema, name));
-            let resolution = constraint.map_or(Resolution::Unresolved, Resolution::Constraint);
+                .find_map(|schema| {
+                    self.find_constraint_in(schema, name)
+                        .map(Resolution::Constraint)
+                        .or_else(|| {
+                            self.find_constraint_trigger_in(schema, name)
+                                .map(Resolution::Trigger)
+                        })
+                })
+                .unwrap_or(Resolution::Unresolved);
             self.add_ref(
                 name,
                 ReferenceKind::Constraint,
@@ -23997,6 +24004,19 @@ impl Lowerer {
                 resolution,
             );
         }
+    }
+
+    fn find_constraint_trigger_in(&self, schema: Name, name: Name) -> Option<TriggerId> {
+        self.index.triggers.iter().find_map(|(id, trigger)| {
+            let table = &self.index.tables[trigger.table];
+            (trigger.constraint
+                && trigger.name == name
+                && table.schema == schema
+                && self.visible(table.schema, table.ptr.file_id)
+                && !self.dropped_triggers.contains(&id)
+                && !self.dropped_tables.contains(&trigger.table))
+            .then_some(id)
+        })
     }
 
     fn find_constraint_in(&self, schema: Name, name: Name) -> Option<ConstraintId> {
