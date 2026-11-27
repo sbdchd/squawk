@@ -25355,6 +25355,13 @@ impl Lowerer {
                 let expr = prefix.expr();
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
+                if let ast::PrefixOp::Minus(_) = op
+                    && let Some(ast::Expr::Literal(literal)) =
+                        expr.as_ref().map(|expr| expr.unparen())
+                    && let Some(value) = literal.integer_value_u64()
+                {
+                    return self.builtin_type(negated_integer_type(value));
+                }
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
                     self.check_condition(ConditionKind::Not, expr, ty);
                 }
@@ -30008,6 +30015,16 @@ fn numeric_typmod(args: &ast::ArgList) -> Option<NumericTypmod> {
         return None;
     }
     NumericTypmod::new(precision, scale)
+}
+
+fn negated_integer_type(value: u64) -> &'static str {
+    if value <= u64::from(i32::MIN.unsigned_abs()) {
+        "int4"
+    } else if value <= i64::MIN.unsigned_abs() {
+        "int8"
+    } else {
+        "numeric"
+    }
 }
 
 fn typmod_value(expr: &ast::Expr) -> Option<i64> {
