@@ -144,3 +144,20 @@ alter statistics missing set statistics 100;
       ╰╴                 ━━━━━━━
     ");
 }
+
+#[test]
+fn statistics_on_materialized_view() {
+    assert_snapshot!(check("
+create materialized view mv as
+  select 1 a, 2 b;
+create statistics st on a, b from mv;
+create view v as
+  select 1 a, 2 b;
+create statistics st2 on a, b from v;
+"), @"
+    error: `v` is not a table, materialized view, or foreign table
+      ╭▸ 
+    7 │ create statistics st2 on a, b from v;
+      ╰╴                                   ━
+    ");
+}

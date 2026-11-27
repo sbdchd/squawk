@@ -1179,5 +1179,43 @@ fn rename_through_other_relation_kind() {
 create table t (a int);
 alter index t rename to u;
 alter view u rename a to b;
-"), @"no diagnostics");
+alter foreign table u rename b to c;
+alter materialized view u rename c to d;
+create sequence s;
+alter table s rename last_value to x;
+"), @"
+    error: `s` is not a table, view, materialized view, or foreign table
+      ╭▸ 
+    8 │ alter table s rename last_value to x;
+      ╰╴            ━
+    ");
+}
+
+#[test]
+fn typed_table_row_type() {
+    assert_snapshot!(check("
+create type person_type as (
+  name text
+);
+create type other_type as (
+  name text
+);
+create function namelen(person_type) returns int
+  language sql
+  as $$ select length($1.name) $$;
+create function othlen(other_type) returns int
+  language sql
+  as $$ select length($1.name) $$;
+create table persons
+  of person_type;
+select namelen(persons) from persons;
+select othlen(persons) from persons;
+"), @"
+    error: argument 1 of `othlen` has type `persons`, expected `other_type`
+       ╭▸ 
+    17 │ select othlen(persons) from persons;
+       │               ━━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
 }

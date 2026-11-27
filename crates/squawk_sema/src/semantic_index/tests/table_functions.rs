@@ -578,3 +578,42 @@ select * from rows from (json_array(1) as (a int));
       ╰╴                                          ━━━━━━━
     ");
 }
+
+#[test]
+fn unaliased_table_functions() {
+    assert_snapshot!(check("
+select xmltable.*
+from xmltable(
+  '/r' passing '<r/>'
+  columns
+    x int
+);
+select xmltable.x
+from xmltable(
+  '/r' passing '<r/>'
+  columns
+    x int
+);
+select json_table.x from json_table('[1]', '$[*]' columns (x int path '$'));
+select 1
+from xmltable(
+    '/r' passing '<r/>'
+    columns
+      x int
+  ),
+  xmltable(
+    '/r' passing '<r/>'
+    columns
+      y int
+  );
+"), @"
+    error: table name `xmltable` specified more than once
+       ╭▸ 
+    21 │ ┏   xmltable(
+    22 │ ┃     '/r' passing '<r/>'
+    23 │ ┃     columns
+    24 │ ┃       y int
+    25 │ ┃   );
+       ╰╴┗━━━┛
+    ");
+}

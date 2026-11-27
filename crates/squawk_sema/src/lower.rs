@@ -1755,6 +1755,14 @@ impl Lowerer {
             self.lower_all_in_tablespace(&all_in_tablespace);
             return;
         }
+        let mut actions = alter_view.action();
+        let lookup = if let (Some(ast::AlterMaterializedViewAction::RenameColumn(_)), None) =
+            (actions.next(), actions.next())
+        {
+            TableLookup::RenameColumn
+        } else {
+            TableLookup::MaterializedView
+        };
         let view = alter_view
             .view_ref()
             .and_then(|view| view.path_ref())
@@ -1762,7 +1770,7 @@ impl Lowerer {
                 self.lower_table_ref(
                     &path,
                     IfMissing::from_if_exists(alter_view.if_exists().as_ref()),
-                    TableLookup::MaterializedView,
+                    lookup,
                 )
             });
         for action in alter_view.action() {
@@ -6468,7 +6476,7 @@ impl Lowerer {
             .and_then(|from| from.table_name_ref())
             .and_then(|name| name.path_ref())
             .and_then(|path| {
-                self.lower_table_ref(&path, IfMissing::Error, TableLookup::TableOrForeignTable)
+                self.lower_table_ref(&path, IfMissing::Error, TableLookup::Statistics)
             });
         let on_clause = create_statistics.statistics_on_clause();
         if let Some(on_clause) = &on_clause {
@@ -10309,14 +10317,9 @@ impl Lowerer {
                 } else {
                     let function =
                         self.find_function_with_arg_types(schema, name, kind, &arg_types);
-                    if function.is_none()
-                        && let Some(drop) = drop
-                        && let Some(aggregate) = self.find_function_with_arg_types(
-                            schema,
-                            name,
-                            RoutineKind::Aggregate,
-                            &arg_types,
-                        )
+                    if let Some(drop) = drop
+                        && let Some(aggregate) = function
+                            .filter(|function| self.is_aggregate_as_function(kind, *function))
                     {
                         return self.aggregate_dropped_as_function(
                             &segment, schema, name, aggregate, drop,
@@ -10378,10 +10381,9 @@ impl Lowerer {
             }
             None => {
                 let resolution = self.find_unique_function(schema, name, kind);
-                if resolution.is_none()
-                    && let Some(drop) = drop
-                    && let Some(Resolution::Function(aggregate)) =
-                        self.find_unique_function(schema, name, RoutineKind::Aggregate)
+                if let Some(drop) = drop
+                    && let Some(Resolution::Function(aggregate)) = resolution
+                    && self.is_aggregate_as_function(kind, aggregate)
                 {
                     return self
                         .aggregate_dropped_as_function(&segment, schema, name, aggregate, drop);
@@ -10400,6 +10402,11 @@ impl Lowerer {
             Resolution::Function(function) => Some(function),
             _ => None,
         }
+    }
+
+    fn is_aggregate_as_function(&self, kind: RoutineKind, function: FunctionId) -> bool {
+        kind == RoutineKind::Function
+            && self.index.functions[function].kind == FunctionKind::Aggregate
     }
 
     fn find_function_with_arg_types(
@@ -16297,17 +16304,42 @@ impl Lowerer {
                         .column_target_list()
                         .into_iter()
                         .flat_map(|list| list.column_targets());
+                    let mut paired = true;
                     for set_expr in multiple
                         .set_expr_list()
                         .into_iter()
                         .flat_map(|list| list.set_exprs())
                     {
-                        let column_target = column_targets.next();
                         let Some(expr) = set_expr.expr() else {
+                            column_targets.next();
                             continue;
                         };
+                        if let ast::Expr::FieldExpr(field_expr) = &expr
+                            && let Some(star) = field_expr.star_token()
+                        {
+                            let columns = self.with_expr_context(ExprContext::Update, |this| {
+                                this.lower_field_star(field_expr, &star).columns
+                            });
+                            let Some(columns) = columns.filter(|columns| columns.complete) else {
+                                paired = false;
+                                continue;
+                            };
+                            for column in columns.range {
+                                let column_target = column_targets.next();
+                                if paired
+                                    && let Some(table) = table
+                                    && let Some(column_target) = column_target
+                                {
+                                    let ty = self.index.columns[column].ty;
+                                    self.check_set_assignment(table, &column_target, &expr, ty);
+                                }
+                            }
+                            continue;
+                        }
+                        let column_target = column_targets.next();
                         let ty = self.lower_expr_in(ExprContext::Update, &expr);
-                        if let Some(table) = table
+                        if paired
+                            && let Some(table) = table
                             && let Some(column_target) = column_target
                         {
                             self.check_set_assignment(table, &column_target, &expr, ty);
@@ -17189,7 +17221,7 @@ impl Lowerer {
                     complete: true,
                 };
                 RelationSource {
-                    name: None,
+                    name: Some(self.intern("json_table")),
                     kind: SourceKind::Other,
                     columns,
                 }
@@ -17259,7 +17291,7 @@ impl Lowerer {
                     None => self.unknown_columns(),
                 };
                 RelationSource {
-                    name: None,
+                    name: Some(self.intern("xmltable")),
                     kind: SourceKind::Other,
                     columns,
                 }
@@ -18359,6 +18391,9 @@ impl Lowerer {
             | TableLookup::ForeignTable
             | TableLookup::TableOrForeignTable
             | TableLookup::TableViewOrForeignTable
+            | TableLookup::RenameColumn
+            | TableLookup::TableOrSequence
+            | TableLookup::Statistics
             | TableLookup::TableOrView
             | TableLookup::TableOrMaterializedView
             | TableLookup::Any
@@ -18549,7 +18584,15 @@ impl Lowerer {
             return;
         };
         let if_missing = IfMissing::from_if_exists(alter_table.if_exists().as_ref());
-        let table = self.lower_table_ref(&path, if_missing, TableLookup::ForeignTable);
+        let mut actions = alter_table.actions();
+        let lookup = if let (Some(ast::AlterTableAction::RenameColumn(_)), None) =
+            (actions.next(), actions.next())
+        {
+            TableLookup::RenameColumn
+        } else {
+            TableLookup::ForeignTable
+        };
+        let table = self.lower_table_ref(&path, if_missing, lookup);
         if table.is_none() && if_missing == IfMissing::Ignore {
             return;
         }
@@ -22348,6 +22391,21 @@ impl Lowerer {
         Some(xml)
     }
 
+    fn lower_document_test(&mut self, expr: &ast::Expr, test: DocumentTest) {
+        let arg = expr_arg_type(Some(expr), self.lower_expr(expr));
+        if let ArgType::Known(found) = arg
+            && let Some(xml) = self.builtin_type("xml")
+            && self.overloads().rejects_arg(arg, xml)
+        {
+            let error = SemaError::KeywordArgType {
+                keyword: test.keyword(),
+                expected: self.index.ty_name(xml),
+                found: self.index.ty_name(found),
+            };
+            self.push_error(expr.syntax(), error);
+        }
+    }
+
     fn nullif_type(&self, args: &[CallArg]) -> Option<Ty> {
         let [left, right] = args else {
             return None;
@@ -23942,10 +24000,17 @@ impl Lowerer {
             };
             let name = self.intern(&segment.text());
             let schema = self.lower_schema_qualifier(path.qualifier());
-            let constraint = self
+            let resolution = self
                 .search_path(schema, Lookup::Relation)
-                .find_map(|schema| self.find_constraint_in(schema, name));
-            let resolution = constraint.map_or(Resolution::Unresolved, Resolution::Constraint);
+                .find_map(|schema| {
+                    self.find_constraint_in(schema, name)
+                        .map(Resolution::Constraint)
+                        .or_else(|| {
+                            self.find_constraint_trigger_in(schema, name)
+                                .map(Resolution::Trigger)
+                        })
+                })
+                .unwrap_or(Resolution::Unresolved);
             self.add_ref(
                 name,
                 ReferenceKind::Constraint,
@@ -23953,6 +24018,19 @@ impl Lowerer {
                 resolution,
             );
         }
+    }
+
+    fn find_constraint_trigger_in(&self, schema: Name, name: Name) -> Option<TriggerId> {
+        self.index.triggers.iter().find_map(|(id, trigger)| {
+            let table = &self.index.tables[trigger.table];
+            (trigger.constraint
+                && trigger.name == name
+                && table.schema == schema
+                && self.visible(table.schema, table.ptr.file_id)
+                && !self.dropped_triggers.contains(&id)
+                && !self.dropped_tables.contains(&trigger.table))
+            .then_some(id)
+        })
     }
 
     fn find_constraint_in(&self, schema: Name, name: Name) -> Option<ConstraintId> {
@@ -25311,10 +25389,20 @@ impl Lowerer {
                         is_not_normalized.syntax(),
                     );
                 }
+                Some(ast::PostfixOp::IsDocument(_)) => {
+                    if let Some(expr) = postfix.expr() {
+                        self.lower_document_test(&expr, DocumentTest::Is);
+                    }
+                    return self.builtin_type("bool");
+                }
+                Some(ast::PostfixOp::IsNotDocument(_)) => {
+                    if let Some(expr) = postfix.expr() {
+                        self.lower_document_test(&expr, DocumentTest::IsNot);
+                    }
+                    return self.builtin_type("bool");
+                }
                 Some(
-                    ast::PostfixOp::IsDocument(_)
-                    | ast::PostfixOp::IsNotDocument(_)
-                    | ast::PostfixOp::IsJson(_)
+                    ast::PostfixOp::IsJson(_)
                     | ast::PostfixOp::IsJsonArray(_)
                     | ast::PostfixOp::IsJsonObject(_)
                     | ast::PostfixOp::IsJsonScalar(_)
@@ -25336,6 +25424,13 @@ impl Lowerer {
                 let expr = prefix.expr();
                 let ty = expr.as_ref().and_then(|expr| self.lower_expr(expr));
                 let op = prefix.op()?;
+                if let ast::PrefixOp::Minus(_) = op
+                    && let Some(ast::Expr::Literal(literal)) =
+                        expr.as_ref().map(|expr| expr.unparen())
+                    && let Some(value) = literal.integer_value_u64()
+                {
+                    return self.builtin_type(negated_integer_type(value));
+                }
                 if let (ast::PrefixOp::Not(_), Some(expr)) = (&op, &expr) {
                     self.check_condition(ConditionKind::Not, expr, ty);
                 }
@@ -27872,6 +27967,21 @@ impl Lowerer {
                 if let Some(function) = self.find_field_function(ty, column) {
                     return self.add_field_function_ref(column, &field, function);
                 }
+                let args = [CallArg::positional(ArgType::Known(ty))];
+                if let Some(FunctionStyleCast { resolution, ty }) =
+                    self.function_style_cast(None, column, &args)
+                {
+                    self.add_ref_from(
+                        column,
+                        field.syntax(),
+                        resolution,
+                        RefSource::Type {
+                            schema: None,
+                            candidates: TypeCandidates::TypeName,
+                        },
+                    );
+                    return Some(ty);
+                }
                 let error = SemaError::ColumnNotationNotComposite {
                     column,
                     ty: self.index.ty_name(ty),
@@ -28034,6 +28144,11 @@ impl Lowerer {
         {
             let resolution = Resolution::Param(param);
             self.add_ref(name, ReferenceKind::Param, name_ref.syntax(), resolution);
+            return Some(self.expr_field_base(self.resolution_type(resolution)));
+        }
+        if let ast::Expr::FieldExpr(inner) = &base
+            && let Some(resolution) = self.lower_param_field(inner)
+        {
             return Some(self.expr_field_base(self.resolution_type(resolution)));
         }
         let qualifier = match &base {
@@ -29991,6 +30106,16 @@ fn numeric_typmod(args: &ast::ArgList) -> Option<NumericTypmod> {
     NumericTypmod::new(precision, scale)
 }
 
+fn negated_integer_type(value: u64) -> &'static str {
+    if value <= u64::from(i32::MIN.unsigned_abs()) {
+        "int4"
+    } else if value <= i64::MIN.unsigned_abs() {
+        "int8"
+    } else {
+        "numeric"
+    }
+}
+
 fn typmod_value(expr: &ast::Expr) -> Option<i64> {
     if let ast::Expr::PrefixExpr(prefix) = expr
         && let Some(ast::PrefixOp::Minus(_)) = prefix.op()
@@ -30425,10 +30550,27 @@ fn values_row_expr(row: &ast::Row, position: usize) -> Option<ast::Expr> {
     row.exprs().nth(position)
 }
 
+#[derive(Clone, Copy)]
+enum DocumentTest {
+    Is,
+    IsNot,
+}
+
+impl DocumentTest {
+    fn keyword(self) -> &'static str {
+        match self {
+            DocumentTest::Is => "is document",
+            DocumentTest::IsNot => "is not document",
+        }
+    }
+}
+
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 enum AlterTableTarget {
     AnyRelation,
+    RenameColumn,
     TableViewOrForeignTable,
+    TableOrSequence,
     TableOrForeignTable,
 }
 
@@ -30439,7 +30581,9 @@ fn alter_table_lookup(actions: impl Iterator<Item = ast::AlterTableAction>) -> T
         .unwrap_or(AlterTableTarget::TableOrForeignTable)
     {
         AlterTableTarget::AnyRelation => TableLookup::Any,
+        AlterTableTarget::RenameColumn => TableLookup::RenameColumn,
         AlterTableTarget::TableViewOrForeignTable => TableLookup::TableViewOrForeignTable,
+        AlterTableTarget::TableOrSequence => TableLookup::TableOrSequence,
         AlterTableTarget::TableOrForeignTable => TableLookup::TableOrForeignTable,
     }
 }
@@ -30449,9 +30593,10 @@ fn alter_table_target(action: &ast::AlterTableAction) -> AlterTableTarget {
         ast::AlterTableAction::TableRenameTo(_)
         | ast::AlterTableAction::OwnerTo(_)
         | ast::AlterTableAction::SetSchema(_) => AlterTableTarget::AnyRelation,
-        ast::AlterTableAction::RenameColumn(_)
-        | ast::AlterTableAction::SetOptions(_)
-        | ast::AlterTableAction::ResetOptions(_) => AlterTableTarget::TableViewOrForeignTable,
+        ast::AlterTableAction::RenameColumn(_) => AlterTableTarget::RenameColumn,
+        ast::AlterTableAction::SetOptions(_) | ast::AlterTableAction::ResetOptions(_) => {
+            AlterTableTarget::TableViewOrForeignTable
+        }
         ast::AlterTableAction::AlterColumn(alter_column) => match alter_column.option() {
             Some(
                 ast::AlterColumnOption::SetDefault(_) | ast::AlterColumnOption::DropDefault(_),
@@ -30479,6 +30624,9 @@ fn alter_table_target(action: &ast::AlterTableAction) -> AlterTableTarget {
             )
             | None => AlterTableTarget::TableOrForeignTable,
         },
+        ast::AlterTableAction::SetLogged(_) | ast::AlterTableAction::SetUnlogged(_) => {
+            AlterTableTarget::TableOrSequence
+        }
         ast::AlterTableAction::AddColumn(_)
         | ast::AlterTableAction::AddConstraint(_)
         | ast::AlterTableAction::AlterConstraint(_)
@@ -30509,9 +30657,7 @@ fn alter_table_target(action: &ast::AlterTableAction) -> AlterTableTarget {
         | ast::AlterTableAction::RenameConstraint(_)
         | ast::AlterTableAction::ReplicaIdentity(_)
         | ast::AlterTableAction::SetAccessMethod(_)
-        | ast::AlterTableAction::SetLogged(_)
         | ast::AlterTableAction::SetTablespace(_)
-        | ast::AlterTableAction::SetUnlogged(_)
         | ast::AlterTableAction::SetWithoutCluster(_)
         | ast::AlterTableAction::SetWithoutOids(_)
         | ast::AlterTableAction::SplitPartition(_)

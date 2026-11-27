@@ -1996,3 +1996,31 @@ select
   normalize('a', nfkd);
 "), @"no diagnostics");
 }
+
+#[test]
+fn function_qualified_param_field() {
+    assert_snapshot!(check("
+create type ht as (
+  name text
+);
+create table equipment (
+  name text,
+  hobby text
+);
+create function equipment_named(hobby ht) returns setof equipment
+  language sql
+  as $$
+  select * from equipment eq where eq.hobby = equipment_named.hobby.name
+$$;
+create function equipment_named_bad(hobby ht) returns setof equipment
+  language sql
+  as $$
+  select * from equipment eq where eq.hobby = equipment_named_bad.hobby.nosuch
+$$;
+"), @"
+    error: column `nosuch` does not exist
+       ╭▸ 
+    17 │   select * from equipment eq where eq.hobby = equipment_named_bad.hobby.nosuch
+       ╰╴                                                                        ━━━━━━
+    ");
+}

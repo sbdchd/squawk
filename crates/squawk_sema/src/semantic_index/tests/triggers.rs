@@ -366,3 +366,31 @@ alter table p2 enable trigger renamed;
        ╰╴                              ━━━━━━━
     ");
 }
+
+#[test]
+fn set_constraints_constraint_trigger() {
+    assert_snapshot!(check("
+create table t (a int);
+create function f() returns trigger
+  language plpgsql
+  as $$ begin return null; end $$;
+create constraint trigger ctrig
+  after insert
+  on t
+  deferrable
+  for each row
+  execute function f();
+create trigger plain
+  after insert
+  on t
+  for each row
+  execute function f();
+set constraints ctrig deferred;
+set constraints plain deferred;
+"), @"
+    error: constraint `plain` does not exist
+       ╭▸ 
+    18 │ set constraints plain deferred;
+       ╰╴                ━━━━━
+    ");
+}

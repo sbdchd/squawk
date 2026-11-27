@@ -95,3 +95,21 @@ select 1 fetch first '99999999999999999999' rows only;
       ╰ hint: `int8` values range from `-9223372036854775808` to `9223372036854775807`
     ");
 }
+
+#[test]
+fn negated_int_literal_folds() {
+    assert_snapshot!(check("
+select '[]'::jsonb -> -2147483648;
+select '[]'::jsonb -> (-2147483648);
+select '[]'::jsonb -> -(2147483648);
+select '[]'::jsonb -> 2147483648;
+select pg_catalog.int8send(-9223372036854775808);
+"), @"
+    error: operator does not exist: `jsonb -> int8`
+      ╭▸ 
+    5 │ select '[]'::jsonb -> 2147483648;
+      │                    ━━
+      │
+      ╰ hint: consider adding explicit type casts
+    ");
+}

@@ -318,3 +318,53 @@ update t x set a = 1 from t;
       ╰╴                        ━
     ");
 }
+
+#[test]
+fn row_star_in_multi_column_set() {
+    assert_snapshot!(check("
+create table t (
+  a int,
+  b int,
+  c int,
+  unique (a, b)
+);
+create table u (
+  a text,
+  b text,
+  c text
+);
+insert into t
+values (1, 2, 3)
+on conflict (a, b) do update set (a, b, c) = row(excluded.*);
+update t set (a, b, c) = row(u.*) from u;
+update t set (b, c, a) = row(1, t.*);
+"), @"
+    error: column `a` is of type `int4` but expression is of type `text`
+       ╭▸ 
+    16 │ update t set (a, b, c) = row(u.*) from u;
+       │                              ━━━
+       ╰╴
+    help: cast the expression to the column's type
+       ╭╴
+    16 │ update t set (a, b, c) = row(u.*::int4) from u;
+       ╰╴                                ++++++
+    error: column `b` is of type `int4` but expression is of type `text`
+       ╭▸ 
+    16 │ update t set (a, b, c) = row(u.*) from u;
+       │                              ━━━
+       ╰╴
+    help: cast the expression to the column's type
+       ╭╴
+    16 │ update t set (a, b, c) = row(u.*::int4) from u;
+       ╰╴                                ++++++
+    error: column `c` is of type `int4` but expression is of type `text`
+       ╭▸ 
+    16 │ update t set (a, b, c) = row(u.*) from u;
+       │                              ━━━
+       ╰╴
+    help: cast the expression to the column's type
+       ╭╴
+    16 │ update t set (a, b, c) = row(u.*::int4) from u;
+       ╰╴                                ++++++
+    ");
+}

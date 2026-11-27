@@ -951,13 +951,17 @@ impl<'a> Overloads<'a> {
     }
 
     fn inherits(&self, child: Ty, parent: Ty) -> bool {
-        let (Some(Ty::Table(child)), Ty::Table(parent)) = (self.index.base_type(child), parent)
-        else {
+        let Some(Ty::Table(child)) = self.index.base_type(child) else {
             return false;
         };
-        self.inheritances
-            .ancestors(child, |_| true)
-            .contains(&parent)
+        match parent {
+            Ty::Table(parent) => self
+                .inheritances
+                .ancestors(child, |_| true)
+                .contains(&parent),
+            Ty::Type(parent) => self.index.tables[child].of_type == Some(parent),
+            Ty::Cte(_) | Ty::Array(_) => false,
+        }
     }
 
     fn coerce(&self, arg: Ty, param: Ty) -> Option<Match> {

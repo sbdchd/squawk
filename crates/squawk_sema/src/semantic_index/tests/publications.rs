@@ -173,3 +173,33 @@ create publication p for table t where (a is document);
 select a is document, a is not document from t;
 "), @"no diagnostics");
 }
+
+#[test]
+fn is_document_requires_xml() {
+    assert_snapshot!(check("
+create domain xd as xml;
+create table t (
+  a xml,
+  b text,
+  c xd
+);
+select
+  a is document,
+  b is document,
+  c is not document,
+  '<a/>' is document,
+  null is document,
+  1 is not document,
+  b::xml is document
+from t;
+"), @"
+    error: argument of `is document` must be type `xml`, not type `text`
+       ╭▸ 
+    10 │   b is document,
+       ╰╴  ━
+    error: argument of `is not document` must be type `xml`, not type `int4`
+       ╭▸ 
+    14 │   1 is not document,
+       ╰╴  ━
+    ");
+}
