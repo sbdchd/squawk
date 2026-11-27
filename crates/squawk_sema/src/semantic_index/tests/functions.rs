@@ -1964,3 +1964,35 @@ drop function f(out nosuch.a%type);
 drop function if exists f(out nosuch.a%type);
 "), @"no diagnostics");
 }
+
+#[test]
+fn normalize_ignores_user_functions() {
+    assert_snapshot!(check(r#"
+create schema zz;
+set search_path = zz, public;
+create function zz.normalize(int) returns int
+  language sql
+  as 'select $1';
+create function "normalize"(int, int) returns int
+  language sql
+  as 'select $1 + $2';
+select zz.normalize(1), "normalize"(1), "normalize"(1, 2);
+select normalize(1);
+"#), @"
+    error: function `normalize` does not exist
+       ╭▸ 
+    11 │ select normalize(1);
+       ╰╴       ━━━━━━━━━
+    ");
+}
+
+#[test]
+fn normalize_form() {
+    assert_snapshot!(check("
+select
+  normalize('a', nfc),
+  normalize('a', nfd),
+  normalize('a', nfkc),
+  normalize('a', nfkd);
+"), @"no diagnostics");
+}

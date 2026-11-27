@@ -1317,6 +1317,7 @@ pub enum SyntaxKind {
     NEW_TABLE,
     NEXT,
     NON_STANDARD_PARAM,
+    NORMALIZE_FN,
     NOTHING,
     NOTIFY,
     NOT_DEFERRABLE,
@@ -3401,6 +3402,7 @@ impl SyntaxKind {
             | SyntaxKind::NEW_TABLE
             | SyntaxKind::NEXT
             | SyntaxKind::NON_STANDARD_PARAM
+            | SyntaxKind::NORMALIZE_FN
             | SyntaxKind::NOTHING
             | SyntaxKind::NOTIFY
             | SyntaxKind::NOT_DEFERRABLE
@@ -6706,6 +6708,7 @@ impl std::fmt::Display for SyntaxKind {
             SyntaxKind::NEW_TABLE => "new table",
             SyntaxKind::NEXT => "next",
             SyntaxKind::NON_STANDARD_PARAM => "non standard param",
+            SyntaxKind::NORMALIZE_FN => "normalize fn",
             SyntaxKind::NOTHING => "nothing",
             SyntaxKind::NOTIFY => "notify",
             SyntaxKind::NOT_DEFERRABLE => "not deferrable",

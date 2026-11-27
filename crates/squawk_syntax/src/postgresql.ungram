@@ -108,6 +108,7 @@ CallExpr =
 | JsonFn
 | SubstringFn
 | PositionFn
+| NormalizeFn
 | OverlayFn
 | TrimFn
 | XmlRootFn
@@ -361,6 +362,9 @@ SubstringExprs =
 
 PositionFn =
   'position' '(' pos:Expr 'in' string:Expr ')'
+
+NormalizeFn =
+  'normalize' '(' Expr (',' UnicodeNormalForm)? ')'
 
 OverlayFn =
   'overlay' '(' OverlayArgs? ')'

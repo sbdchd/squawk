@@ -313,6 +313,12 @@ fn name_from_expr(expr: ast::Expr, in_type: bool) -> Option<(ColumnName, SyntaxN
             if let Some(position_fn) = call_expr.position_fn() {
                 return Some((ColumnName::column("position"), position_fn.syntax().clone()));
             }
+            if let Some(normalize_fn) = call_expr.normalize_fn() {
+                return Some((
+                    ColumnName::column("normalize"),
+                    normalize_fn.syntax().clone(),
+                ));
+            }
             if let Some(overlay_fn) = call_expr.overlay_fn() {
                 return Some((ColumnName::column("overlay"), overlay_fn.syntax().clone()));
             }

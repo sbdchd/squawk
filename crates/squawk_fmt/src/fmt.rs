@@ -16588,6 +16588,8 @@ fn build_call_expr_with_spacing<'a>(
         build_overlay_fn(ctx, &overlay_fn)
     } else if let Some(position_fn) = call_expr.position_fn() {
         build_position_fn(ctx, &position_fn)
+    } else if let Some(normalize_fn) = call_expr.normalize_fn() {
+        build_normalize_fn(ctx, &normalize_fn)
     } else if let Some(some_fn) = call_expr.some_fn() {
         build_parenthesized_expr_or_select_fn(
             ctx,
@@ -18400,6 +18402,32 @@ fn build_comma_separated_exprs<'a>(
     exprs: impl Iterator<Item = ast::Expr>,
 ) -> Option<Doc<'a>> {
     build_comma_separated_nodes(exprs, |expr| build_expr(ctx, expr)).map(Doc::group)
+}
+
+fn build_normalize_fn<'a>(ctx: &Ctx, normalize_fn: &ast::NormalizeFn) -> Doc<'a> {
+    let mut doc = Doc::text("normalize");
+    if let Some(l_paren) = normalize_fn.l_paren_token() {
+        doc = doc.append(comments_before(&l_paren));
+    }
+    doc = doc.append(Doc::text("("));
+
+    let mut body = Doc::nil();
+    if let Some(expr) = normalize_fn.expr() {
+        body = body
+            .append(leading_comments(expr.syntax()))
+            .append(build_expr(ctx, &expr));
+    }
+    if let Some(comma) = normalize_fn.comma_token() {
+        body = body.append(comments_before(&comma)).append(Doc::text(","));
+    }
+    if let Some(form) = normalize_fn.unicode_normal_form() {
+        body = body
+            .append(line_before(form.syntax()))
+            .append(build_keyword_node(form.syntax()));
+    }
+    doc.append(wrap_body(ctx, body, normalize_fn.r_paren_token().as_ref()))
+        .append(Doc::text(")"))
+        .group()
 }
 
 fn build_position_fn<'a>(ctx: &Ctx, position_fn: &ast::PositionFn) -> Doc<'a> {

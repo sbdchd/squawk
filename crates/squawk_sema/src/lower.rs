@@ -25728,6 +25728,17 @@ impl Lowerer {
                 token.text_range(),
             ));
         }
+        if let Some(normalize_fn) = call.normalize_fn() {
+            let mut args = smallvec![self.lower_positional_arg(normalize_fn.expr())];
+            if normalize_fn.unicode_normal_form().is_some() {
+                args.push(CallArg {
+                    ty: ArgType::UnknownLiteral,
+                    ..CallArg::default()
+                });
+            }
+            let token = normalize_fn.normalize_token()?;
+            return Some(self.lower_special_call("normalize", args, token.text_range()));
+        }
         if let Some(overlay_fn) = call.overlay_fn() {
             let args = match overlay_fn.overlay_args() {
                 Some(ast::OverlayArgs::OverlayExprs(exprs)) => {

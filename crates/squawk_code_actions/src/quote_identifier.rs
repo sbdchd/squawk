@@ -25,12 +25,6 @@ pub(super) fn quote_identifier(
         return None;
     }
 
-    if let ast::AnyName::NameRef(name_ref) = &name
-        && name_ref.is_unicode_normal_form()
-    {
-        return None;
-    }
-
     let quoted = quote_ident_always(&name.text());
 
     actions.push(CodeAction {

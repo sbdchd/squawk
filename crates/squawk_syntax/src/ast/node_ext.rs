@@ -1669,15 +1669,6 @@ impl ast::CompoundSelect {
 }
 
 impl ast::NameRef {
-    pub fn is_unicode_normal_form(&self) -> bool {
-        matches!(
-            self.first_token_kind(),
-            Some(
-                SyntaxKind::NFC_KW | SyntaxKind::NFD_KW | SyntaxKind::NFKC_KW | SyntaxKind::NFKD_KW
-            )
-        )
-    }
-
     #[inline]
     pub fn text(&self) -> Cow<'_, str> {
         normalize_name_node(self.syntax())

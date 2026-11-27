@@ -3386,6 +3386,10 @@ impl CallExpr {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn normalize_fn(&self) -> Option<NormalizeFn> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn null_treatment(&self) -> Option<NullTreatment> {
         support::child(&self.syntax)
     }
@@ -16005,6 +16009,37 @@ impl NonStandardParam {
     #[inline]
     pub fn colon_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::COLON)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct NormalizeFn {
+    pub(crate) syntax: SyntaxNode,
+}
+impl NormalizeFn {
+    #[inline]
+    pub fn expr(&self) -> Option<Expr> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn unicode_normal_form(&self) -> Option<UnicodeNormalForm> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn l_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::L_PAREN)
+    }
+    #[inline]
+    pub fn r_paren_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::R_PAREN)
+    }
+    #[inline]
+    pub fn comma_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::COMMA)
+    }
+    #[inline]
+    pub fn normalize_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NORMALIZE_KW)
     }
 }
 
@@ -45180,6 +45215,24 @@ impl AstNode for NonStandardParam {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::NON_STANDARD_PARAM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for NormalizeFn {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::NORMALIZE_FN
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {
