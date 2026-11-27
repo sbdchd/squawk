@@ -318,7 +318,7 @@ impl SquawkDatabase {
                 range_end: range_end.into(),
                 messages: x
                     .hint()
-                    .map(|hint| SubMessage::new("hint", hint.to_owned()))
+                    .map(|hint| SubMessage::new(SubMessageLabel::Hint, hint.to_owned()))
                     .into_iter()
                     .collect(),
                 fix: None,
@@ -338,9 +338,12 @@ impl SquawkDatabase {
 
             let messages = x
                 .note
-                .map(|note| SubMessage::new("note", note))
+                .map(|note| SubMessage::new(SubMessageLabel::Note, note))
                 .into_iter()
-                .chain(x.help.map(|help| SubMessage::new("help", help)))
+                .chain(
+                    x.help
+                        .map(|help| SubMessage::new(SubMessageLabel::Help, help)),
+                )
                 .collect();
 
             let fix = x.fix.map(|fix| convert_fix(line_index, fix));
@@ -375,7 +378,7 @@ impl SquawkDatabase {
 
                 let (suggestion_message, fix) = match x.suggestion {
                     Some(suggestion) => (
-                        Some(SubMessage::new("help", suggestion.message)),
+                        Some(SubMessage::new(SubMessageLabel::Help, suggestion.message)),
                         Some(convert_fix(line_index, suggestion.fix)),
                     ),
                     None => (None, None),
@@ -383,8 +386,11 @@ impl SquawkDatabase {
                 let messages = x
                     .notes
                     .into_iter()
-                    .map(|note| SubMessage::new("note", note))
-                    .chain(x.hint.map(|hint| SubMessage::new("hint", hint)))
+                    .map(|note| SubMessage::new(SubMessageLabel::Note, note))
+                    .chain(
+                        x.hint
+                            .map(|hint| SubMessage::new(SubMessageLabel::Hint, hint)),
+                    )
                     .chain(suggestion_message)
                     .collect();
 
@@ -875,13 +881,21 @@ struct LintError {
 }
 
 #[derive(Serialize)]
+#[serde(rename_all = "lowercase")]
+enum SubMessageLabel {
+    Help,
+    Hint,
+    Note,
+}
+
+#[derive(Serialize)]
 struct SubMessage {
-    label: &'static str,
+    label: SubMessageLabel,
     text: Cow<'static, str>,
 }
 
 impl SubMessage {
-    fn new(label: &'static str, text: impl Into<Cow<'static, str>>) -> Self {
+    fn new(label: SubMessageLabel, text: impl Into<Cow<'static, str>>) -> Self {
         SubMessage {
             label,
             text: text.into(),
