@@ -914,3 +914,16 @@ from (
        ╰╴             ━━━━
     ");
 }
+
+#[test]
+fn field_function_style_cast() {
+    assert_snapshot!(check(r#"
+select ('{"name": "alice"}'::jsonb).name, ('{}'::jsonb).text, ('1'::text).int4;
+select ('{}'::jsonb).nope;
+"#), @"
+    error: column notation `.nope` applied to type `jsonb`, which is not a composite type
+      ╭▸ 
+    3 │ select ('{}'::jsonb).nope;
+      ╰╴                     ━━━━
+    ");
+}

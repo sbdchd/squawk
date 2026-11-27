@@ -27942,6 +27942,21 @@ impl Lowerer {
                 if let Some(function) = self.find_field_function(ty, column) {
                     return self.add_field_function_ref(column, &field, function);
                 }
+                let args = [CallArg::positional(ArgType::Known(ty))];
+                if let Some(FunctionStyleCast { resolution, ty }) =
+                    self.function_style_cast(None, column, &args)
+                {
+                    self.add_ref_from(
+                        column,
+                        field.syntax(),
+                        resolution,
+                        RefSource::Type {
+                            schema: None,
+                            candidates: TypeCandidates::TypeName,
+                        },
+                    );
+                    return Some(ty);
+                }
                 let error = SemaError::ColumnNotationNotComposite {
                     column,
                     ty: self.index.ty_name(ty),
