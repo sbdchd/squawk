@@ -1190,3 +1190,32 @@ alter table s rename last_value to x;
       ╰╴            ━
     ");
 }
+
+#[test]
+fn typed_table_row_type() {
+    assert_snapshot!(check("
+create type person_type as (
+  name text
+);
+create type other_type as (
+  name text
+);
+create function namelen(person_type) returns int
+  language sql
+  as $$ select length($1.name) $$;
+create function othlen(other_type) returns int
+  language sql
+  as $$ select length($1.name) $$;
+create table persons
+  of person_type;
+select namelen(persons) from persons;
+select othlen(persons) from persons;
+"), @"
+    error: argument 1 of `othlen` has type `persons`, expected `other_type`
+       ╭▸ 
+    17 │ select othlen(persons) from persons;
+       │               ━━━━━━━
+       │
+       ╰ hint: consider adding explicit type casts
+    ");
+}
