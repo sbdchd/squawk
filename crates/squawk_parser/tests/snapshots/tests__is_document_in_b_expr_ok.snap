@@ -15,13 +15,13 @@ SOURCE_FILE
             WHITESPACE " "
             BETWEEN_KW "between"
             WHITESPACE " "
-            BIN_EXPR
+            POSTFIX_EXPR
               LITERAL
                 INT_NUMBER "1"
               WHITESPACE " "
-              IS_KW "is"
-              WHITESPACE " "
-              NAME_REF
+              IS_DOCUMENT
+                IS_KW "is"
+                WHITESPACE " "
                 DOCUMENT_KW "document"
             WHITESPACE " "
             AND_KW "and"
@@ -49,13 +49,13 @@ SOURCE_FILE
             POSITION_FN
               POSITION_KW "position"
               L_PAREN "("
-              BIN_EXPR
+              POSTFIX_EXPR
                 NAME_REF
                   IDENT "x"
                 WHITESPACE " "
-                IS_KW "is"
-                WHITESPACE " "
-                NAME_REF
+                IS_DOCUMENT
+                  IS_KW "is"
+                  WHITESPACE " "
                   DOCUMENT_KW "document"
               WHITESPACE " "
               IN_KW "in"
@@ -86,16 +86,15 @@ SOURCE_FILE
             WHITESPACE " "
             BETWEEN_KW "between"
             WHITESPACE " "
-            BIN_EXPR
+            POSTFIX_EXPR
               LITERAL
                 INT_NUMBER "1"
               WHITESPACE " "
-              IS_NOT
+              IS_NOT_DOCUMENT
                 IS_KW "is"
                 WHITESPACE " "
                 NOT_KW "not"
-              WHITESPACE " "
-              NAME_REF
+                WHITESPACE " "
                 DOCUMENT_KW "document"
             WHITESPACE " "
             AND_KW "and"

@@ -324,6 +324,21 @@ impl<'t> Parser<'t> {
                 m.complete(self, SyntaxKind::COLON_COLON);
                 return true;
             }
+            SyntaxKind::IS_DOCUMENT => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::DOCUMENT_KW);
+                m.complete(self, SyntaxKind::IS_DOCUMENT);
+                return true;
+            }
+            SyntaxKind::IS_NOT_DOCUMENT => {
+                let m = self.start();
+                self.bump(SyntaxKind::IS_KW);
+                self.bump(SyntaxKind::NOT_KW);
+                self.bump(SyntaxKind::DOCUMENT_KW);
+                m.complete(self, SyntaxKind::IS_NOT_DOCUMENT);
+                return true;
+            }
             SyntaxKind::IS_JSON => {
                 let m = self.start();
                 self.bump(SyntaxKind::IS_KW);
@@ -873,6 +888,20 @@ impl<'t> Parser<'t> {
                 SyntaxKind::OPERATOR_KW,
                 SyntaxKind::L_PAREN,
                 TriviaBetween::Allowed,
+            ),
+            // is document
+            SyntaxKind::IS_DOCUMENT => self.at_composite2(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::DOCUMENT_KW,
+                TriviaBetween::Allowed,
+            ),
+            // is not document
+            SyntaxKind::IS_NOT_DOCUMENT => self.at_composite3(
+                n,
+                SyntaxKind::IS_KW,
+                SyntaxKind::NOT_KW,
+                SyntaxKind::DOCUMENT_KW,
             ),
             // is json
             SyntaxKind::IS_JSON => self.at_composite2(

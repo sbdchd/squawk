@@ -18951,6 +18951,14 @@ fn build_postfix_op<'a>(op: ast::PostfixOp) -> Doc<'a> {
         }
         ast::PostfixOp::IsNull(_) => Doc::text("isnull"),
         ast::PostfixOp::NotNull(_) => Doc::text("notnull"),
+        ast::PostfixOp::IsDocument(n) => {
+            build_postfix_keywords([(n.is_token(), "is"), (n.document_token(), "document")])
+        }
+        ast::PostfixOp::IsNotDocument(n) => build_postfix_keywords([
+            (n.is_token(), "is"),
+            (n.not_token(), "not"),
+            (n.document_token(), "document"),
+        ]),
         ast::PostfixOp::IsJson(n) => build_json_postfix(
             [(n.is_token(), "is"), (n.json_token(), "json")],
             n.json_keys_unique_clause(),

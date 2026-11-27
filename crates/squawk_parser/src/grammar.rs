@@ -3161,9 +3161,9 @@ fn current_op(p: &Parser<'_>, r: Restrictions) -> (u8, SyntaxKind, Associativity
         // is not distinct from
         IS_KW if p.at(IS_NOT_DISTINCT_FROM) => (4, IS_NOT_DISTINCT_FROM, Left),
         // is document
-        IS_KW if p.nth_at(1, DOCUMENT_KW) => (4, IS_KW, Left),
+        IS_KW if p.at(IS_DOCUMENT) => (4, IS_DOCUMENT, Left),
         // is not document
-        IS_KW if p.nth_at(1, NOT_KW) && p.nth_at(2, DOCUMENT_KW) => (4, IS_NOT, Left),
+        IS_KW if p.at(IS_NOT_DOCUMENT) => (4, IS_NOT_DOCUMENT, Left),
         // is not json object
         IS_KW if !r.is_disabled && p.at(IS_NOT_JSON_OBJECT) => (4, IS_NOT_JSON_OBJECT, Left),
         // is not json array
@@ -3241,6 +3241,8 @@ fn is_postfix_op(kind: SyntaxKind) -> bool {
             | AT_LOCAL
             | IS_NORMALIZED
             | IS_NOT_NORMALIZED
+            | IS_DOCUMENT
+            | IS_NOT_DOCUMENT
             | IS_JSON
             | IS_JSON_OBJECT
             | IS_JSON_ARRAY

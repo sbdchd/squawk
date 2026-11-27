@@ -25298,7 +25298,9 @@ impl Lowerer {
                     );
                 }
                 Some(
-                    ast::PostfixOp::IsJson(_)
+                    ast::PostfixOp::IsDocument(_)
+                    | ast::PostfixOp::IsNotDocument(_)
+                    | ast::PostfixOp::IsJson(_)
                     | ast::PostfixOp::IsJsonArray(_)
                     | ast::PostfixOp::IsJsonObject(_)
                     | ast::PostfixOp::IsJsonScalar(_)

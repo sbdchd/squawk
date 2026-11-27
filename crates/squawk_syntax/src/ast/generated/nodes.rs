@@ -13308,6 +13308,21 @@ impl IsDistinctFrom {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsDocument {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsDocument {
+    #[inline]
+    pub fn document_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOCUMENT_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct IsJson {
     pub(crate) syntax: SyntaxNode,
 }
@@ -13479,6 +13494,25 @@ impl IsNotDistinctFrom {
     #[inline]
     pub fn from_token(&self) -> Option<SyntaxToken> {
         support::token(&self.syntax, SyntaxKind::FROM_KW)
+    }
+    #[inline]
+    pub fn is_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::IS_KW)
+    }
+    #[inline]
+    pub fn not_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::NOT_KW)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct IsNotDocument {
+    pub(crate) syntax: SyntaxNode,
+}
+impl IsNotDocument {
+    #[inline]
+    pub fn document_token(&self) -> Option<SyntaxToken> {
+        support::token(&self.syntax, SyntaxKind::DOCUMENT_KW)
     }
     #[inline]
     pub fn is_token(&self) -> Option<SyntaxToken> {
@@ -17444,6 +17478,10 @@ impl Op {
         support::child(&self.syntax)
     }
     #[inline]
+    pub fn is_document(&self) -> Option<IsDocument> {
+        support::child(&self.syntax)
+    }
+    #[inline]
     pub fn is_json(&self) -> Option<IsJson> {
         support::child(&self.syntax)
     }
@@ -17473,6 +17511,10 @@ impl Op {
     }
     #[inline]
     pub fn is_not_distinct_from(&self) -> Option<IsNotDistinctFrom> {
+        support::child(&self.syntax)
+    }
+    #[inline]
+    pub fn is_not_document(&self) -> Option<IsNotDocument> {
         support::child(&self.syntax)
     }
     #[inline]
@@ -42817,6 +42859,24 @@ impl AstNode for IsDistinctFrom {
         &self.syntax
     }
 }
+impl AstNode for IsDocument {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_DOCUMENT
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
 impl AstNode for IsJson {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
@@ -42965,6 +43025,24 @@ impl AstNode for IsNotDistinctFrom {
     #[inline]
     fn can_cast(kind: SyntaxKind) -> bool {
         kind == SyntaxKind::IS_NOT_DISTINCT_FROM
+    }
+    #[inline]
+    fn cast(syntax: SyntaxNode) -> Option<Self> {
+        if Self::can_cast(syntax.kind()) {
+            Some(Self { syntax })
+        } else {
+            None
+        }
+    }
+    #[inline]
+    fn syntax(&self) -> &SyntaxNode {
+        &self.syntax
+    }
+}
+impl AstNode for IsNotDocument {
+    #[inline]
+    fn can_cast(kind: SyntaxKind) -> bool {
+        kind == SyntaxKind::IS_NOT_DOCUMENT
     }
     #[inline]
     fn cast(syntax: SyntaxNode) -> Option<Self> {

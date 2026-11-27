@@ -675,6 +675,7 @@ Op =
   | '=>'
   | '>='
   | IsDistinctFrom
+  | IsDocument
   | IsJson
   | IsJsonArray
   | IsJsonObject
@@ -683,6 +684,7 @@ Op =
   | IsNormalized
   | IsNot
   | IsNotDistinctFrom
+  | IsNotDocument
   | IsNotJson
   | IsNotJsonArray
   | IsNotJsonObject
@@ -699,6 +701,12 @@ Op =
   | OperatorCall
   | SimilarTo
   )
+
+IsDocument =
+  'is' 'document'
+
+IsNotDocument =
+  'is' 'not' 'document'
 
 IsJson =
   'is' 'json' JsonKeysUniqueClause?
