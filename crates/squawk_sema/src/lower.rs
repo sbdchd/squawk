@@ -28106,6 +28106,11 @@ impl Lowerer {
             self.add_ref(name, ReferenceKind::Param, name_ref.syntax(), resolution);
             return Some(self.expr_field_base(self.resolution_type(resolution)));
         }
+        if let ast::Expr::FieldExpr(inner) = &base
+            && let Some(resolution) = self.lower_param_field(inner)
+        {
+            return Some(self.expr_field_base(self.resolution_type(resolution)));
+        }
         let qualifier = match &base {
             ast::Expr::NameRef(name_ref) => Some(name_ref.clone()),
             ast::Expr::FieldExpr(inner) => match inner.base() {
