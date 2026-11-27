@@ -16305,17 +16305,42 @@ impl Lowerer {
                         .column_target_list()
                         .into_iter()
                         .flat_map(|list| list.column_targets());
+                    let mut paired = true;
                     for set_expr in multiple
                         .set_expr_list()
                         .into_iter()
                         .flat_map(|list| list.set_exprs())
                     {
-                        let column_target = column_targets.next();
                         let Some(expr) = set_expr.expr() else {
+                            column_targets.next();
                             continue;
                         };
+                        if let ast::Expr::FieldExpr(field_expr) = &expr
+                            && let Some(star) = field_expr.star_token()
+                        {
+                            let columns = self.with_expr_context(ExprContext::Update, |this| {
+                                this.lower_field_star(field_expr, &star).columns
+                            });
+                            let Some(columns) = columns.filter(|columns| columns.complete) else {
+                                paired = false;
+                                continue;
+                            };
+                            for column in columns.range {
+                                let column_target = column_targets.next();
+                                if paired
+                                    && let Some(table) = table
+                                    && let Some(column_target) = column_target
+                                {
+                                    let ty = self.index.columns[column].ty;
+                                    self.check_set_assignment(table, &column_target, &expr, ty);
+                                }
+                            }
+                            continue;
+                        }
+                        let column_target = column_targets.next();
                         let ty = self.lower_expr_in(ExprContext::Update, &expr);
-                        if let Some(table) = table
+                        if paired
+                            && let Some(table) = table
                             && let Some(column_target) = column_target
                         {
                             self.check_set_assignment(table, &column_target, &expr, ty);
