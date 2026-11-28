@@ -91,6 +91,7 @@ module.exports = {
       "ban-alter-sequence-values",
       "ban-alter-system-options",
       "ban-alter-extension",
+      "ban-concurrent-index-creation-if-not-exists",
       // xtask:new-rule:error-name
     ],
   },

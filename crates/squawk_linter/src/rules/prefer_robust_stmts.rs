@@ -3,6 +3,7 @@ use rustc_hash::{FxHashMap, FxHashSet};
 use squawk_diagnostics::{Edit, Fix};
 use squawk_syntax::ast::{self, AstNode, NameLike};
 
+use crate::rules::ban_concurrent_index_creation_if_not_exists::DroppedIndexes;
 use crate::transactions::{TransactionControl, TransactionState};
 use crate::{Linter, Rule, Violation};
 
@@ -64,6 +65,7 @@ fn alembic_version_commit_tx_indices(
 pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, file: &ast::SourceFile) {
     let mut transaction = TransactionState::new(ctx.settings.assume_in_transaction);
     let mut constraint_names: FxHashMap<String, Constraint> = FxHashMap::default();
+    let mut dropped_indexes = DroppedIndexes::default();
 
     let version_tx_indices = alembic_version_commit_tx_indices(file.stmts());
 
@@ -79,6 +81,7 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, file: &ast::SourceFile) {
             None => transaction.inside_transaction(),
         };
         transaction.update(&stmt);
+        dropped_indexes.update(&stmt);
 
         match &stmt {
             ast::Stmt::AlterTable(alter_table) => {
@@ -189,6 +192,9 @@ pub(crate) fn prefer_robust_stmts(ctx: &mut Linter, file: &ast::SourceFile) {
                     && create_index.index().is_some()
                     && (create_index.concurrently_token().is_some() || !in_robust_tx) =>
             {
+                if dropped_indexes.take(create_index) {
+                    continue;
+                }
                 let fix = create_index.index().map(|index| {
                     let at = index.syntax().text_range().start();
                     let edit = Edit::insert("if not exists ", at);
@@ -594,6 +600,37 @@ select 1; -- so we don't skip checking
 DROP INDEX CONCURRENTLY IF EXISTS "email_idx";
         "#;
         lint_ok(sql);
+    }
+
+    #[test]
+    fn drop_index_before_create_index_ok() {
+        let sql = r#"
+select 1; -- so we don't skip checking
+DROP INDEX CONCURRENTLY IF EXISTS "email_idx";
+CREATE INDEX CONCURRENTLY "email_idx" ON "app_email" ("email");
+DROP INDEX IF EXISTS app.name_idx;
+CREATE INDEX name_idx ON app.app_email (name);
+        "#;
+        lint_ok(sql);
+    }
+
+    #[test]
+    fn drop_other_index_before_create_index_err() {
+        assert_snapshot!(lint_errors(
+            r#"
+select 1; -- so we don't skip checking
+DROP INDEX CONCURRENTLY IF EXISTS "name_idx";
+CREATE INDEX CONCURRENTLY "email_idx" ON "app_email" ("email");
+        "#
+        ), @r#"
+        warning[prefer-robust-stmts]: missing `if not exists`, the migration can't be rerun if it fails part way through
+          ╭▸ 
+        4 │ CREATE INDEX CONCURRENTLY "email_idx" ON "app_email" ("email");
+          │ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+          ╭╴
+        4 │ CREATE INDEX CONCURRENTLY if not exists "email_idx" ON "app_email" ("email");
+          ╰╴                          +++++++++++++
+        "#);
     }
 
     #[test]

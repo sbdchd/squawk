@@ -449,6 +449,12 @@ const rules = [
     tags: ["backwards compatibility"],
     description: "Review extension updates and member removals (opt-in).",
   },
+  {
+    name: "ban-concurrent-index-creation-if-not-exists",
+    tags: ["schema"],
+    description:
+      "Prevent reruns of a failed concurrent index build from keeping an invalid index (opt-in).",
+  },
   // xtask:new-rule:rule-doc-meta
 ]
 

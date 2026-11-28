@@ -101,6 +101,16 @@ create index concurrently on app_user (email);
 create index concurrently if not exists email_idx on app_user (email);
 ```
 
+If your migration tool runs statements one at a time, you can drop the index
+before creating it instead. This rule accepts a `CREATE INDEX` without
+`IF NOT EXISTS` when an earlier statement drops the same index, see
+[ban-concurrent-index-creation-if-not-exists](ban-concurrent-index-creation-if-not-exists.md):
+
+```sql
+drop index concurrently if exists email_idx;
+create index concurrently email_idx on app_user (email);
+```
+
 ### remove table
 
 ```sql

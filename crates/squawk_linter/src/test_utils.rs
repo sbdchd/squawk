@@ -94,7 +94,7 @@ pub(crate) fn fix_sql(sql: &str, rule: Rule) -> String {
     fix_sql_with(sql, LinterSettings::default(), rule)
 }
 
-fn format_violations(sql: &str, violations: &[Violation]) -> String {
+pub(crate) fn format_violations(sql: &str, violations: &[Violation]) -> String {
     let mut buf = String::new();
     let renderer = Renderer::plain().decor_style(DecorStyle::Unicode);
 
